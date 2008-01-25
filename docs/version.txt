@@ -6,6 +6,17 @@
 
 ****************************************************
 
+---------------------------------------
+---        Version 5.3 build ??     ---
+---------------------------------------
+* Corrected bug in FileEffectiveRightsProbe. The probe was improperly reading the access rights for a file.
+* Improved debug logging in the AuditEventPolicyProbe.
+* Added #include <cstring> to REGEX.h and Common.h to file compiler errors when building with GCC 4.3. Thanks to Lubomir Kundrak (lkundrak@redhat.com) for the fix.
+* Corrected bug in EntityComparator::CompareEvrString. Thanks to Mark Cox (mjc@redhat.com) for the fix.
+* Source code comments were cleaned up.
+* Updated Windows FileProbe to use GetFileTime API for a, m, and c times. Code was previously using stat. The schema documentation said to use GetFileTime.
+* Corrected bug in Windows RegistryProbe that was incorrectly appending a trailing space to binary registry values.
+* Corrected bug in windows/FileEffectiveRightsProbe::GetEffectiveRights. Access right were being read incorrectly. 
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
@@ -14,11 +25,11 @@
 * Added REGEX::GetMatchingSubstrings function to allow matched substrings to be pulled from an input string.
 * Corrected Test::EvaluateCheckExistence method's combining of items based on the check_extistence attribute. The schema documetationt was changed causing a code change to the interpreter source.  
 * Corrected bug in processing of AccessToken behaviors. 
-* Corrected bug in EntityCompartator that was causing the parse version string method to fail on 64 bit linux systems.  Thanks to Ken Sorensen (sorensk@losrios.edu) and Mark Cox (mjc@redhat.com) for tracking this down and fixing it. Applied similar fixes to problematic areas of the code.
+* Corrected bug in EntityCompartator that was causing the parse version string method to fail on 64 bit linux systems. Thanks to Ken Sorensen (sorensk@losrios.edu) and Mark Cox (mjc@redhat.com) for tracking this down and fixing it. Applied similar fixes to problematic areas of the code.
 * Corrected bug in processing of variable components. Needed to make a copy of the messages associated with a ComponentValue when computing a value for a Component.
 * Corrected bug in AbsObjectCollector::ProcessObject function. The code was not correctly computing the flag value on collected objects. The flag value should be based on the combination of the status value of each referenced item.
 * Updated Linux makfile to support rpm and dpkg package managers on Linux systems.
-* Corrected bug in processing of unix file_object behaviors. This required an update to AbsFileFinder and both the Linux and Windows FileFinder implementations.  The bug allowed unsupported unix file_object behaviors to go reported on unix systems. 2 of 4 unix file_object behaviors are supported at this time. Now if an unsupported unix file_object behavior is found an error message is reported.
+* Corrected bug in processing of unix file_object behaviors. This required an update to AbsFileFinder and both the Linux and Windows FileFinder implementations. The bug allowed unsupported unix file_object behaviors to go reported on unix systems. 2 of 4 unix file_object behaviors are supported at this time. Now if an unsupported unix file_object behavior is found an error message is reported.
 * Corrected bug in processing of command line arguments which caused the -p flag to not be considered until after some code had already been executed.
 * Source code comments were cleaned up.
 
