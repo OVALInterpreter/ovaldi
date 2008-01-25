@@ -1,5 +1,5 @@
 //
-// $Id: WindowsCommon.cpp 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: WindowsCommon.cpp 4668 2008-01-23 14:08:51Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -304,7 +304,7 @@ bool WindowsCommon::GetTextualSid(PSID pSid, LPTSTR* TextualSid) {
     return true;
 }
 
- bool WindowsCommon::ExpandGroup(string groupName, StringVector* members) {
+bool WindowsCommon::ExpandGroup(string groupName, StringVector* members) {
 
 	// Need to determine if a local or global group.
 	bool groupExists = false;
@@ -1047,4 +1047,9 @@ string WindowsCommon::LookUpLocalSystemName() {
 	}
 
 	return systemName;
+}
+
+string WindowsCommon::ToString(FILETIME fTime) {
+
+	return Common::ToString(fTime.dwLowDateTime) + Common::ToString(fTime.dwHighDateTime);
 }

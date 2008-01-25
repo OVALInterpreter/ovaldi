@@ -1,5 +1,5 @@
 //
-// $Id: WindowsCommon.h 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: WindowsCommon.h 4668 2008-01-23 14:08:51Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -103,6 +103,9 @@ public:
 
 	/** Get the set of all local users. */
 	static void GetAllLocalUsers(UniqueStringVector*);
+
+	/** Convert the FILETIME strucutre to an integer. */
+	static string ToString(FILETIME fTime);
 
 private:
 
