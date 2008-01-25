@@ -1,5 +1,5 @@
 //
-// $Id: EntityComparator.h 4623 2008-01-09 15:07:03Z bakerj $
+// $Id: EntityComparator.h 4663 2008-01-23 13:58:23Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -44,14 +44,33 @@ using namespace std;
 class EntityComparator {
 public:
 
-	/** compare two binary values based on the specified operation */
+	/** Compare two binary values based on the specified operation */
 	static OvalEnum::ResultEnumeration CompareBinary(OvalEnum::Operation op, string defValue, string scValue);
 
+	/** Compare two boolean values based on the specified operation.
+	    May have the following input values: {true, false, 1, 0)
+	*/
 	static OvalEnum::ResultEnumeration CompareBoolean(OvalEnum::Operation op, string defValue, string scValue);
+	
+	/** Compare two evr strings based on the specified operation. 
+		This code motivated (strongly) by librpm's rpmdsCompare().
+	*/
 	static OvalEnum::ResultEnumeration CompareEvrString(OvalEnum::Operation, string defValue, string scValue);
+
+	/** Compare to floats based on the specified operation. */
 	static OvalEnum::ResultEnumeration CompareFloat(OvalEnum::Operation op, string defValue, string scValue);
+
+	/** Compare to integers based on the specified operation. 
+		Since these integers come from an xsd:integer the code needs to allow for very large integers.
+		This code allows for strings with up to 20 characters. The range of allowed integers is:
+		-9,999,999,999,999,999,999 to 99,999,999,999,999,999,999
+	*/
 	static OvalEnum::ResultEnumeration CompareInteger(OvalEnum::Operation op, string defValue, string scValue);
+
+	/** Compare two float values based on the specified operation. */
 	static OvalEnum::ResultEnumeration CompareIosVersion(OvalEnum::Operation op, string defValue, string scValue);
+
+	/** Compare two string values based on the specified operation. */
 	static OvalEnum::ResultEnumeration CompareString(OvalEnum::Operation op, string defValue, string scValue);
 
 	/** Compare two version strings based on the input operation. 
