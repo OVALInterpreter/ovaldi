@@ -1,5 +1,5 @@
 //
-// $Id: CollectedObject.cpp 4584 2008-01-03 16:25:43Z bakerj $
+// $Id: CollectedObject.cpp 4659 2008-01-17 22:26:26Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -565,7 +565,7 @@ bool CollectedObject::IsWritten(StringPairVector* varIdValuePairs, string varId,
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	return true if the specifed variable value has not alredy been written
+	//	return true if the specified variable value has not already been written
 	//  must check the pair of var id and value.
 	// -----------------------------------------------------------------------
 
@@ -589,7 +589,7 @@ bool CollectedObject::IsWritten(IntVector* itemIds, int itemId) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	return true if the specifed item id has already been 
+	//	return true if the specified item id has already been 
 	//	added as a reference
 	// -----------------------------------------------------------------------
 
