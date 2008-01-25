@@ -1,5 +1,5 @@
 //
-// $Id: EntityComparator.cpp 4623 2008-01-09 15:07:03Z bakerj $
+// $Id: EntityComparator.cpp 4664 2008-01-23 14:00:20Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -71,10 +71,18 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 
 	if(defValue.compare("true") == 0 || defValue.compare("1") == 0) {
 		defBoolValue = true;
+	} else if(defValue.compare("false") == 0 || defValue.compare("0") == 0) {
+		defBoolValue = true;
+	} else {
+		throw Exception("Error: Invalid boolean value on definition entity. " + defValue);
 	}
 
 	if(scValue.compare("true") == 0 || scValue.compare("1") == 0) {
 		scBoolValue = true;
+	} else if(scValue.compare("false") == 0 || scValue.compare("0") == 0) {
+		scBoolValue = true;
+	} else {
+		throw Exception("Error: Invalid boolean value on system characteristics item entity. " + scValue);
 	}
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
@@ -114,19 +122,19 @@ OvalEnum::ResultEnumeration EntityComparator::CompareEvrString(OvalEnum::Operati
 
 	int sense = 1; // default to later
 
-	if(installedEpochStr.compare(defEpochStr) == 0) {
+	int defEpochInt = atoi(defEpochStr.c_str());
+	int installedEpochInt = atoi(installedEpochStr.c_str());
+
+	if(defEpochInt == installedEpochInt) {
+
 		sense = rpmvercmp(installedVersionStr.c_str(),defVersionStr.c_str());
 		if (sense == 0) {
 			sense = rpmvercmp(installedReleaseStr.c_str(),defReleaseStr.c_str());
 		}
 	} else {
-		int installedEpochInt = atoi(defEpochStr.c_str());
-		int defEpochInt = atoi(installedEpochStr.c_str());
-		if(installedEpochInt > 0) {
-			sense = 1;
-		} else if(defEpochInt > 0) {
-			sense = -1;
-		}
+		
+		sense = (installedEpochInt > defEpochInt)? 1 : -1;
+
 	}
 
 	// convert sense value to a result based on operator
