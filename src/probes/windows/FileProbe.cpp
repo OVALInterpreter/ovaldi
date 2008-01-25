@@ -1,5 +1,5 @@
 //
-// $Id: FileProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: FileProbe.cpp 4665 2008-01-23 14:01:18Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -175,8 +175,6 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		//
 		// SMC-AUDIT: ISSUE: should probably verify that this is a regular file before opening,
 		// instead of a virtual memory file!
-		//
-		// ARB:
 		
 		hFile = CreateFile(filePath.c_str(),			// file name
 							GENERIC_READ,				// access mode
@@ -361,33 +359,48 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			_snprintf(buf, sizeof(buf)-1, "%ld", statusBuffer.st_size);
 			buf[sizeof(buf)-1] = '\0';
 			item->AppendElement(new ItemEntity("size", buf, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+		}
+
+
+		//////////////////////////////////////////////////////
+		/////////////////////  File Times  ///////////////////
+		//////////////////////////////////////////////////////
+		FILETIME creationTime;
+		FILETIME lastAccessTime;
+		FILETIME writeTime;
+
+		BOOL timeRes = GetFileTime(	hFile,
+									&creationTime,
+									&lastAccessTime,
+									&writeTime);
+
+		if(!timeRes) {
+
+			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			string lastError = WindowsCommon::GetErrorMessage(GetLastError());
+			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
+
+		} else {
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Accessed  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* aTime = new ItemEntity("a_time",  Common::ToString((long)statusBuffer.st_atime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(aTime);
-			// Strip trailing \n if found
-			if(aTime->GetValue().find_last_of("\n") == aTime->GetValue().length()-1)
-				aTime->SetValue(aTime->GetValue().substr(0, aTime->GetValue().length()-1));
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Created  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* cTime = new ItemEntity("c_time",  Common::ToString((long)statusBuffer.st_ctime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(cTime);
-			// Strip trailing \n if found
-			if(cTime->GetValue().find_last_of("\n") == cTime->GetValue().length()-1)
-				cTime->SetValue(cTime->GetValue().substr(0, cTime->GetValue().length()-1));
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Modified  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* mTime = new ItemEntity("m_time",  Common::ToString((long)statusBuffer.st_mtime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(mTime);
-			// Strip trailing \n if found
-			if(mTime->GetValue().find_last_of("\n") == mTime->GetValue().length()-1)
-				mTime->SetValue(cTime->GetValue().substr(0, mTime->GetValue().length()-1));
 
 		}
 
