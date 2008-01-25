@@ -1,5 +1,5 @@
 //
-// $Id: AuditEventPolicyProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: AuditEventPolicyProbe.cpp 4654 2008-01-17 22:19:08Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -209,7 +209,6 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
 	return collectedItems;
 }
 
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -245,10 +244,12 @@ void AuditEventPolicyProbe::ReadAuditOptions(ItemEntity* itemEntity, ULONG audit
 		// As documented at the link below i would not expect to get this value 
 		// after doing a query. The value should only be used when doing a set.
 		// Reference url:
-		// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secmgmt/security/policy_audit_events_info.asp
-		itemEntity->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
+		// http://msdn2.microsoft.com/en-us/library/ms721901.aspx
+		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.");
+		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
 	} else {
 		// should never get here
+		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found.");
 		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
 	} 
 }
