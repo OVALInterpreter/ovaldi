@@ -1,5 +1,5 @@
 //
-// $Id: Common.h 4646 2008-01-15 14:25:59Z bworrell $
+// $Id: Common.h 4660 2008-01-17 22:27:18Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -47,6 +47,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <set>
 #include <time.h>
