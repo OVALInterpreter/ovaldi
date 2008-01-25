@@ -1,5 +1,5 @@
 //
-// $Id: AbsObjectCollector.h 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: AbsObjectCollector.h 4657 2008-01-17 22:25:33Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -29,8 +29,8 @@
 //
 //****************************************************************************************//
 
-#ifndef OVALOBJECTCOLLECTOR_H
-#define OVALOBJECTCOLLECTOR_H
+#ifndef ABSOBJECTCOLLECTOR_H
+#define ABSOBJECTCOLLECTOR_H
 
 //	required xerces includes
 #include <xercesc/dom/DOM.hpp>
@@ -46,6 +46,7 @@
 #include <vector>
 #include <iostream>
 #include <stdlib.h>
+#include <typeinfo>
 
 #include "OvalEnum.h"
 #include "Filter.h"
