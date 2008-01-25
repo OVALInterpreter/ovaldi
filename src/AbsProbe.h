@@ -1,5 +1,5 @@
 //
-// $Id: AbsProbe.h 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: AbsProbe.h 4658 2008-01-17 22:25:59Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -118,11 +118,11 @@ protected:
 	void DeleteItemEntities();
 
 	/**
-		Return true if the specifeid value matches the specifeid pattern.
+		Return true if the specified value matches the specified pattern.
 		This function uses the isRegex parameter to determine how to apply the pattern.
 		@param pattern a string that specifies the pattern to compare against.
 		@param value a string that specifed that value to compare against.
-		@param isRegex a bool that dictates how to apply the pattern. If true apply the pattern as a regular expression other wise use a string compare for not equals. 
+		@param isRegex a bool that dictates how to apply the pattern. If true apply the pattern as a regular expression otherwise use a string compare for not equals. 
 		@return The result of the comparison betweent eh two string values.
 	*/
 	bool IsMatch(string pattern, string value, bool isRegex = true);
