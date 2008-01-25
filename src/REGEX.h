@@ -1,5 +1,5 @@
 //
-// $Id: REGEX.h 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: REGEX.h 4661 2008-01-17 22:28:03Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -40,6 +40,7 @@
 
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <vector>
 
 using namespace std;
