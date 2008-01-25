@@ -1,5 +1,5 @@
 //
-// $Id: FileEffectiveRightsProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: FileEffectiveRightsProbe.cpp 4667 2008-01-23 14:07:42Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -30,14 +30,6 @@
 //****************************************************************************************//
 
 #include "FileEffectiveRightsProbe.h"
-
-/**
-	NOTE: At this time we are not certain how to obtain all effective rights for a file.
-	The code in the FileEffectiveRightsProbe::GetEffectiveRights attempts to do this.
-	If you have any idea how to fix this issue send email to oval@mitre.org.
-
-	Thanks in advance for your comments.
-*/
 
 
 //****************************************************************************************//
@@ -157,8 +149,10 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 								if(item != NULL) {
 									collectedItems->push_back(item);
 								}
+							} catch (ProbeException ex) {
+								Log::Debug(ex.GetErrorMessage());
 							} catch (Exception ex) {
-								Log::Debug("Error while getting effective rights for file. Path: " + fp->first + " Name: " + fp->second + " " + ex.GetErrorMessage());
+								Log::Debug("Unknown error while getting effective rights for file. Path: " + fp->first + " Name: " + fp->second + " " + ex.GetErrorMessage());
 							}
 						}
 						delete trusteeNames;
@@ -296,12 +290,6 @@ void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern
 }
 
 bool FileEffectiveRightsProbe::TrusteeNameExists(string trusteeName, StringVector* trusteeNames) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//	Return a true if the specified trustee name exists in the set of all names.  
-	// -----------------------------------------------------------------------
 
 	bool exists = false;
 
@@ -320,14 +308,14 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	//
 	//  ABSTRACT
 	//
-	//	Return a populated item for the specified trustess on the specified file.
+	//	Return a populated item for the specified trustees on the specified file.
 	//
+	//	- Call GetNamedSecurityInfo to get a DACL Security Descriptor for the file
+	//	  http://msdn2.microsoft.com/en-us/library/aa446645.aspx
 	//	- Use provided trustee name and call LsaLookupNames to get the sid
-	//	  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secmgmt/security/lsalookupnames.asp
-	//	- Then call GetNamedSecurityInfo to get a DACL Security Descriptor for the file
-	//	  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/getnamedsecurityinfo.asp
+	//	  http://msdn2.microsoft.com/en-us/library/ms721797.aspx
 	//	- Then call GetEffectiveRightsFromAcl with the dacl and the sid found in the earlier calls
-	//	  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/geteffectiverightsfromacl.asp
+	//	  http://msdn2.microsoft.com/en-us/library/aa446637.aspx
 	// -----------------------------------------------------------------------
 	
 	Item* item = NULL;
@@ -342,25 +330,6 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 
 		filePath.append(fileName);
 	}
-
-	// elevate privs - this should not be needed and has no effect on the 
-	//	rights obtained by the api calls below
-	//TOKEN_PRIVILEGES tokPrivileges;
-	//HANDLE hProcess = GetCurrentProcess();
-	//HANDLE hToken = NULL;
-	//LUID secNameLUID;
-	//OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
-	//LookupPrivilegeValue(NULL, SE_SECURITY_NAME, &secNameLUID);
-	//tokPrivileges.PrivilegeCount = 1;
-	//tokPrivileges.Privileges[0].Luid = secNameLUID;
-	//tokPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-	//BOOL  result = AdjustTokenPrivileges(hToken, FALSE, &tokPrivileges, NULL, NULL, NULL);
-	//if(!result) {
-	//	cout << "Unable to elevate privilages" << endl;
-	//} else {
-	//	cout << "elevated" << endl;
-	//}
-	//
 
 	DWORD res;
 	PACL pdacl;
@@ -379,9 +348,9 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 
 	if (res != ERROR_SUCCESS) {
 		if (res == ERROR_FILE_NOT_FOUND) {
-			// should never get here. before calling this function the file should already have 
-			// been checked for existence.
-			throw ProbeException("Error unable locate " + filePath + " while getting trustte names."); 
+			// should never get here. 
+			// before calling this function the file should already have been checked for existence.
+			throw ProbeException("Error unable locate " + filePath + " while getting trustee names."); 
 		} else {
 			throw ProbeException("Error unable to retrieve a copy of the security descriptor for " + filePath + " while getting trustee names."); 
 		}
@@ -399,7 +368,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	// check the sid
 	if(!IsValidSid(pSid)) {
 		LocalFree(pSD);
-		throw ProbeException("Invalid sid for trustee: " +  trusteeName);
+		throw ProbeException("Error unable to get effective rights for trustee: " + trusteeName + ". Invalid sid found.");
 	}
 
 	// build the trustee structure
@@ -410,7 +379,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	PACCESS_MASK accessRights = NULL;
 	accessRights = reinterpret_cast<PACCESS_MASK>(::LocalAlloc(LPTR, sizeof(PACCESS_MASK) + sizeof(ACCESS_MASK)));
 	if(accessRights == NULL) {
-		ProbeException("Out of memory");
+		ProbeException("Error unable to get effective rights for trustee: " + trusteeName + ". Out of memory! Unable to allocate memory for access rights.");
 	}
 
 	res = GetEffectiveRightsFromAcl(pdacl,
@@ -418,21 +387,33 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 									accessRights);
 	if (res != ERROR_SUCCESS) {
 		LocalFree(pSD);
+		LocalFree(accessRights);
 		throw ProbeException("Error unable to get effective rights for trustee: " + trusteeName + " from dacl for file: " + filePath); 
 	} 
 		
 	// Convert access mask to binary.
-	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/access_mask_format.asp
-	int j;
+	// http://msdn2.microsoft.com/en-us/library/aa374896.aspx
 	char mask[33];
+	ZeroMemory(&mask, 33);
 
-	for (j = 0; j < 32; j++) {
+	for (int j = 0; j < 32; j++) {
 		if ((*accessRights) & (1 << j))
-			mask[31 - j] = '1';
+			mask[j] = '1';
 		else
-			mask[31 - j] = '0';
+			mask[j] = '0';
 	}
-	mask[32] = 0;
+
+	// need to seperatly determine if the generic bit should be set.
+	// the access mask that is returned never has the generic bits set. 
+	// Those bits can be determined by rolling up the object specific access bits
+	if((*accessRights) & FILE_GENERIC_READ)
+		mask[31] = '1';
+	if((*accessRights) & FILE_GENERIC_WRITE)
+		mask[30] = '1';
+	if((*accessRights) & FILE_GENERIC_EXECUTE)
+		mask[29] = '1';
+	if((*accessRights) & FILE_ALL_ACCESS)
+		mask[28] = '1';
 
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
@@ -440,15 +421,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("trustee_name", trusteeName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-	// removed for version 5.2 of the oval schema
-	//string domainStr = "";
-	//string sidStr = "";
-	//bool isGroup = WindowsCommon::LookUpTrusteeName(&trusteeName, &sidStr, &domainStr);
-	//item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	//item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
 	// read values in the access_mask
-	// http://windowssdk.msdn.microsoft.com/en-us/library/ms717896.aspx
 	item->AppendElement(new ItemEntity("standard_delete", Common::ToString(mask[16]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("standard_read_control", Common::ToString(mask[17]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("standard_write_dac", Common::ToString(mask[18]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
@@ -470,6 +443,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	item->AppendElement(new ItemEntity("file_write_attributes", Common::ToString(mask[8]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 
 	LocalFree(pSD);
+	LocalFree(accessRights);
 
 	return item;
 }
