@@ -1,5 +1,5 @@
 //
-// $Id: RegistryProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: RegistryProbe.cpp 4666 2008-01-23 14:03:59Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -574,8 +574,7 @@ void RegistryProbe::KeyPatternMatch(ItemEntity* hive, string pattern, ItemEntity
 			if(ex.GetSeverity() == ERROR_WARN) {
 				string pcreMsg = "";
 				pcreMsg.append("Registry Keys Probe Warning - while searching for matching keys:\n");
-				pcreMsg.append("-----------------------------------------------------------------------\n");
-				pcreMsg.append(ex.GetErrorMessage());
+				pcreMsg.append("\t" + ex.GetErrorMessage());
 				Log::Debug(pcreMsg);
 			} else {
 				throw;
@@ -620,7 +619,11 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 					if (strlen(binaryBuf) == 1) 
 						value.append("0");
 					value.append(binaryBuf);
-					value.append(" ");
+
+					// add a space only if not at the end of the string
+					if(x < (valuelenIn - 1)) {
+						value.append(" ");
+					}
 				}
 				item->AppendElement(new ItemEntity("value",  value, OvalEnum::DATATYPE_BINARY, false, OvalEnum::STATUS_EXISTS));
 
