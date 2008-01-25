@@ -1,5 +1,5 @@
 //
-// $Id: Version.cpp 4670 2008-01-25 18:01:18Z bakerj $
+// $Id: $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -38,7 +38,7 @@
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VERSION "5.3"
-#define BUILD 43
+#define BUILD 49
 
 string Version::GetMinumumCompatibleVersion() {
 
