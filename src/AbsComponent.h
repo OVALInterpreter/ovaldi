@@ -1,5 +1,5 @@
 //
-// $Id: AbsComponent.h 4579 2008-01-02 17:39:07Z bakerj $
+// $Id: AbsComponent.h 4656 2008-01-17 22:25:00Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -51,7 +51,7 @@ XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
 /**
-	This class represents a component in a local_variable in the oval definitions schema.
+	This calss is the base class for all types of variable components.
 	The oval definition schema defines several types of components that ay be grouped 
 	together to form complex local_varaibles. The commonalities among all components
 	are encapsulated in this class.
