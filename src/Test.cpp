@@ -1,0 +1,784 @@
+//
+// $Id: Test.cpp 4608 2008-01-04 18:03:02Z bakerj $
+//
+//****************************************************************************************//
+// Copyright (c) 2002-2008, The MITRE Corporation
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are
+// permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright notice, this list
+//       of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this 
+//       list of conditions and the following disclaimer in the documentation and/or other
+//       materials provided with the distribution.
+//     * Neither the name of The MITRE Corporation nor the names of its contributors may be
+//       used to endorse or promote products derived from this software without specific 
+//       prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+// SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+// OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+// TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//****************************************************************************************//
+
+#include "Test.h"
+
+TestMap Test::processedTestsMap;
+//****************************************************************************************//
+//								Test Class												  //	
+//****************************************************************************************//
+Test::Test() {
+
+	this->SetId("");
+	this->SetResult(OvalEnum::RESULT_ERROR);
+	this->SetVariableInstance(1);
+	this->SetVersion(1);
+	this->SetWritten(false);
+	this->SetAnalyzed(false);
+	this->SetCheckExistence(OvalEnum::EXISTENCE_ALL_EXIST);
+	this->SetCheck(OvalEnum::CHECK_ALL);
+	this->SetObjectId("");
+	this->SetStateId("");
+}
+
+Test::~Test() {
+	
+	TestedItem* item = NULL;
+	while(this->testedItems.size() != 0) {
+		item = this->testedItems[this->testedItems.size()-1];
+	  	this->testedItems.pop_back();
+	  	delete item;
+	  	item = NULL;
+	}
+}
+
+// ***************************************************************************************	//
+//								 Public members												//
+// ***************************************************************************************	//
+
+OvalEnum::Check Test::GetCheck() {
+	return this->check;
+}
+
+void Test::SetCheck(OvalEnum::Check check) {
+	this->check = check;
+}
+
+OvalEnum::Existence Test::GetCheckExistence() {
+	return this->checkExistence;
+}
+
+void Test::SetCheckExistence(OvalEnum::Existence checkExistence) {
+	this->checkExistence = checkExistence;
+}
+
+
+TestedItemVector* Test::GetTestedItems() {
+	return &this->testedItems;
+}
+
+void Test::SetTestedItems(TestedItemVector* testedItems) {
+	this->testedItems = (*testedItems);
+}
+
+void Test::AppendTestedItem(TestedItem* testedItem) {
+	this->GetTestedItems()->push_back(testedItem);
+}
+
+VariableValueVector* Test::GetTestedVariables() {
+
+	return &this->testedVariables;
+}
+
+void Test::SetTestedVariables(VariableValueVector* testedVariables) {
+
+	this->testedVariables = (*testedVariables);
+}
+
+void Test::AppendTestedVariable(VariableValue* testedVariable) {
+	
+	this->GetTestedVariables()->push_back(testedVariable);
+}
+
+string Test::GetId() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the id field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->id;
+}
+
+void Test::SetId(string id) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the id field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->id = id;
+}
+
+string Test::GetObjectId() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the objectId field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->objectId;
+}
+
+void Test::SetObjectId(string objectId) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the objectId field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->objectId = objectId;
+}
+
+
+string Test::GetStateId() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the stateId field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->stateId;
+}
+
+void Test::SetStateId(string stateId) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the stateId field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->stateId = stateId;
+}
+
+OvalEnum::ResultEnumeration Test::GetResult() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the result field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->result;
+}
+
+void Test::SetResult(OvalEnum::ResultEnumeration result) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the result field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->result = result;
+}
+
+int Test::GetVariableInstance() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the variableInstance field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->variableInstance;
+}
+
+void Test::SetVariableInstance(int variableInstance) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the variableInstance field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->variableInstance = variableInstance;
+}
+
+int Test::GetVersion() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the version field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->version;
+}
+
+void Test::SetVersion(int version) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the version field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->version = version;
+}
+
+bool Test::GetWritten() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the written field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->written;
+}
+
+void Test::SetWritten(bool written) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the written field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->written = written;
+}
+
+bool Test::GetAnalyzed() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the analyzed field's value
+	//
+	// -----------------------------------------------------------------------
+
+	return this->analyzed;
+}
+
+void Test::SetAnalyzed(bool analyzed) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Return the analyzed field's value
+	//
+	// -----------------------------------------------------------------------
+
+	this->analyzed = analyzed;
+}
+
+Test* Test::SearchCache(string id) {
+
+	Test* cachedTest = NULL;
+
+	TestMap::iterator iterator;
+	iterator = Test::processedTestsMap.find(id);
+	if(iterator != Test::processedTestsMap.end()) {
+		cachedTest = iterator->second;
+	} 
+
+	return cachedTest;
+}
+
+void Test::ClearCache() {
+
+	TestMap::iterator iterator;
+	for(iterator = Test::processedTestsMap.begin(); iterator != Test::processedTestsMap.end(); iterator++) {
+		
+		Test* test = iterator->second;
+		delete test;
+	}
+	
+	Test::processedTestsMap.clear();
+}
+
+void Test::Write(DOMElement* parentElm) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	writes a Test element
+	//	calls testedObject->Write() 
+	//	calls testedVariable->Write() for each tested var
+	//
+	// -----------------------------------------------------------------------
+
+	if(!this->GetWritten()) {
+		this->SetWritten(true);
+
+		// get the parent document
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+
+		// create a new Test element
+		DOMElement* testElm = XmlCommon::AddChildElement(resultDoc, parentElm, "test");
+
+		// add the attributes
+		XmlCommon::AddAttribute(testElm, "test_id", this->GetId());
+		XmlCommon::AddAttribute(testElm, "version", Common::ToString(this->GetVersion()));
+		XmlCommon::AddAttribute(testElm, "check_existence", OvalEnum::ExistenceToString(this->GetCheckExistence()));
+		XmlCommon::AddAttribute(testElm, "check", OvalEnum::CheckToString(this->GetCheck()));
+		XmlCommon::AddAttribute(testElm, "result", OvalEnum::ResultToString(this->GetResult()));
+
+		if(this->GetVariableInstance() != 1) {
+			XmlCommon::AddAttribute(testElm, "variable_instance", Common::ToString(this->GetVariableInstance()));
+		}	
+
+		TestedItem* currentElement = NULL;
+		while(this->GetTestedItems()->size() != 0) {
+			currentElement = this->GetTestedItems()->at(this->GetTestedItems()->size()-1);
+			this->GetTestedItems()->pop_back();
+			currentElement->Write(testElm);	  		
+	  		delete currentElement;
+	  		currentElement = NULL;
+		}
+
+		// loop through all variable values and call write method
+		VariableValueVector::iterator iterator1;
+		for(iterator1 = this->GetTestedVariables()->begin(); iterator1 != this->GetTestedVariables()->end(); iterator1++) {
+			(*iterator1)->WriteTestedVariable(testElm);
+		}
+
+		// loop through all vars in the state
+		if(this->GetStateId().compare("") != 0) {
+			State* tmpState = State::SearchCache(this->GetStateId());
+			if(tmpState != NULL) { 
+				VariableValueVector::iterator iterator2;
+				VariableValueVector* stateVars = tmpState->GetVariableValues();
+				for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
+					(*iterator2)->WriteTestedVariable(testElm);
+				}
+			}
+		}
+	}
+}
+
+void Test::Parse(DOMElement* testElm) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	parses Test elm to a Test obj
+	//
+	// -----------------------------------------------------------------------
+
+	// get id
+	string id = XmlCommon::GetAttributeByName(testElm, "id");
+
+	// get the attributes
+	this->SetId(XmlCommon::GetAttributeByName(testElm, "id"));
+	this->SetVersion(atoi(XmlCommon::GetAttributeByName(testElm, "version").c_str()));
+	this->SetCheckExistence(OvalEnum::ToExistence(XmlCommon::GetAttributeByName(testElm, "check_existence")));
+	this->SetCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(testElm, "check")));
+
+	// to support version 5.3 it is best to just look for the deprected check = none exist 
+	// and replace it with the correct pair of check = any and check_existence = none_exist
+	if(this->GetCheck() == OvalEnum::CHECK_EXISTENCE_NONE_EXIST) {
+		Log::Info("Converting deprected check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'.");
+		this->SetCheckExistence(OvalEnum::EXISTENCE_NONE_EXIST);
+		this->SetCheck(OvalEnum::CHECK_NONE_SATISFY);
+	}
+
+	// get the object element and the object id if it exists
+	DOMElement* objectElm = XmlCommon::FindElementNS(testElm, "object");
+	if(objectElm != NULL) {
+		this->SetObjectId(XmlCommon::GetAttributeByName(objectElm, "object_ref"));
+	}
+    
+	// get the state element and the state id if it exists
+	DOMElement* stateElm = XmlCommon::FindElementNS(testElm, "state");
+	if(stateElm != NULL) {
+		string stateId = XmlCommon::GetAttributeByName(stateElm, "state_ref");
+		this->SetStateId(stateId);
+	}
+
+	Test::processedTestsMap.insert(TestPair(this->GetId(), this));
+}
+
+OvalEnum::ResultEnumeration Test::Analyze() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	make sure not previously analyzed.
+	//	get the collected object from the sc file by its id
+	//		- check flag on collected object against check attribute on test
+	//		- copy variable values from collected object to test as tested_variables
+	//			this is just a matter of passing the variable_value element in the colelcted obj
+	//			to the testedVaraible->Parse() method.
+	//	if collected obj not ok stop
+	//	parse all referencesin the colelcted object into Items
+	//	get the state by its id and parse
+	//	analyze each item against the state
+	//	combine the result of each item with the check attribute
+	//	saves and returns the result
+	//
+	// -----------------------------------------------------------------------
+
+	if(!this->GetAnalyzed()) {
+
+		// Does the test have a object ref?
+		if(this->GetObjectId().compare("") == 0) {
+			// Assumes it is only unknown tests that do not have an object specifier and sets result to unknown
+			this->SetResult(OvalEnum::RESULT_UNKNOWN);
+		} else {
+			// get the collected object from the sc file
+			DOMElement* collectedObjElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "object", "id", this->GetObjectId());
+			
+			if(collectedObjElm == NULL) {
+				// this is an unknown result. the interpreter requires that all objects in a definition
+				// file have a corresponding collected object in the sc file to successfully evaluate.
+				Log::Info("Test::Analyze() - Test id: " + this->GetId() + " Unable to locate corresponding collected object in system characteristics file for object id: " + this->GetObjectId());
+				this->SetResult(OvalEnum::RESULT_UNKNOWN);
+
+			} else {
+
+				// Copy all variables in the collected object into VariableValues for the results file
+				// Copy all item references into TestedItems for the results file
+				// loop over all child elements and call tested object
+				DOMNodeList *collectedObjChildren = collectedObjElm->getChildNodes();
+				unsigned int index = 0;
+				while(index < collectedObjChildren->getLength()) {
+					DOMNode *tmpNode = collectedObjChildren->item(index);
+
+					//	only concerned with ELEMENT_NODEs
+					if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+						DOMElement *collectedObjChildElm = (DOMElement*)tmpNode;
+						
+						//	get the name of the child and construct the appropriate criteria type
+						string childName = XmlCommon::GetElementName(collectedObjChildElm);
+						if(childName.compare("reference") == 0) {
+							// get the reference's id
+							string itemId = XmlCommon::GetAttributeByName(collectedObjChildElm, "item_ref");
+							
+							// create a new tested item
+						    TestedItem* testedItem = new TestedItem();
+							Item* item = Item::SearchCache(atoi(itemId.c_str()));
+							if(item != NULL) {                          
+								testedItem->SetItem(item);
+							} else {
+								// get the item elm in the sc file
+								DOMElement* itemElm = XmlCommon::FindElementByAttribute(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), "id", itemId);
+                                testedItem->Parse(itemElm);
+							}
+							this->AppendTestedItem(testedItem);
+						
+						} else if(childName.compare("variable_value") == 0) {
+							// create a new tested variable
+							VariableValue* testedVar = new VariableValue();
+							testedVar->Parse(collectedObjChildElm);
+							this->AppendTestedVariable(testedVar);
+						} 
+					}
+					index ++;
+				}
+
+				// check the flag on the collected object
+				string flagStr = XmlCommon::GetAttributeByName(collectedObjElm, "flag");
+				OvalEnum::Flag collectedObjFlag = OvalEnum::ToFlag(flagStr);
+
+				// determine how to proceed based on flag value
+				if(collectedObjFlag == OvalEnum::FLAG_ERROR) {
+					this->SetResult(OvalEnum::RESULT_ERROR);
+
+					// since we did no look at the state set the tested item result to not evaluated
+					TestedItemVector::iterator iterator;
+					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+						(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+					}
+				} else if(collectedObjFlag == OvalEnum::FLAG_NOT_APPLICABLE) {
+					this->SetResult(OvalEnum::RESULT_NOT_APPLICABLE);
+					
+					// since we did no look at the state set the tested item result to not evaluated
+					TestedItemVector::iterator iterator;
+					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+						(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+					}
+				} else if(collectedObjFlag == OvalEnum::FLAG_NOT_COLLECTED) {
+					this->SetResult(OvalEnum::RESULT_UNKNOWN);
+					
+					// since we did no look at the state set the tested item result to not evaluated
+					TestedItemVector::iterator iterator;
+					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+						(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+					}
+				} else if(collectedObjFlag == OvalEnum::FLAG_INCOMPLETE) {
+
+					OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_UNKNOWN;
+
+					// get the count of items with a status of exists
+					int existsCount = 0;
+					TestedItemVector::iterator iterator;
+					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+						OvalEnum::SCStatus itemStatus = (*iterator)->GetItem()->GetStatus();
+						if(itemStatus == OvalEnum::STATUS_EXISTS) {
+							existsCount++;
+						} 
+					}
+
+					OvalEnum::ResultEnumeration existenceResult = OvalEnum::RESULT_UNKNOWN;
+
+					if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST && existsCount > 0) {
+
+						// if more than 0 then false	
+						existenceResult = OvalEnum::RESULT_FALSE;
+
+					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ONLY_ONE_EXISTS && existsCount > 1) {
+						
+						// if more than 1 then false					
+						existenceResult = OvalEnum::RESULT_FALSE;
+
+					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_AT_LEAST_ONE_EXISTS && existsCount > 0) {
+
+						// if more than 1 then false					
+						existenceResult = OvalEnum::RESULT_TRUE;
+
+					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
+
+						// always true				
+						existenceResult = OvalEnum::RESULT_TRUE;
+
+					} 
+
+					if(existenceResult == OvalEnum::RESULT_TRUE) {
+
+						// consider the check_state if true so far...
+						OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
+
+						if(stateResult == OvalEnum::RESULT_FALSE) {
+							overallResult = OvalEnum::RESULT_FALSE;
+						} if(stateResult == OvalEnum::RESULT_TRUE && this->GetCheck() == OvalEnum::CHECK_AT_LEAST_ONE) {
+
+							overallResult = OvalEnum::RESULT_TRUE;
+						}
+
+					} else {
+						overallResult =	existenceResult;
+
+						// since we did no look at the state set the tested item result to not evaluated
+						TestedItemVector::iterator iterator;
+						for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+							(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+						}
+					}
+
+					this->SetResult(overallResult);
+
+				} else if(collectedObjFlag == OvalEnum::FLAG_DOES_NOT_EXIST) {
+
+					// if the check_existence is set to none_exist or 
+					// any_exist the result is true
+					// otherwise the result is false
+					if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST) {
+						this->SetResult(OvalEnum::RESULT_TRUE);
+						// no need to look at state when check_existence is set to none_exist
+
+						// since we did no look at the state set the tested item result to not evaluated
+						TestedItemVector::iterator iterator;
+						for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+							(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+						}
+
+					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
+						// need to look at state result if there is a state
+						if(this->GetStateId().compare("") != 0) {
+							OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
+							this->SetResult(stateResult);
+						} else {
+							this->SetResult(OvalEnum::RESULT_TRUE);
+						}
+					} else {
+						this->SetResult(OvalEnum::RESULT_FALSE);
+					}
+
+				} else if(collectedObjFlag == OvalEnum::FLAG_COMPLETE) {
+					
+					OvalEnum::ResultEnumeration ovarallResult = OvalEnum::RESULT_ERROR;
+
+					// Evaluate the check existence attribute.
+					OvalEnum::ResultEnumeration existenceResult = this->EvaluateCheckExistence();
+
+					// if the existence result is true evaluate the check_state attribute if there is a state
+					if(existenceResult == OvalEnum::RESULT_TRUE) {
+						if(this->GetStateId().compare("") != 0) {
+							ovarallResult = this->EvaluateCheckState();
+						} else {
+							ovarallResult = existenceResult;
+
+							// since we did no look at the state set the tested item result to not evaluated
+							TestedItemVector::iterator iterator;
+							for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+								(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+							}
+						}
+
+					} else {
+						ovarallResult = existenceResult;
+
+						// since we did no look at the state set the tested item result to not evaluated
+						TestedItemVector::iterator iterator;
+						for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+							(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+						}
+					}
+
+					this->SetResult(ovarallResult);
+				}
+			}
+		}
+		this->SetAnalyzed(true);
+	}
+
+	return this->GetResult();
+}
+
+OvalEnum::ResultEnumeration Test::NotEvaluated() {
+
+	if(!this->GetAnalyzed()) {
+		this->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+		this->SetAnalyzed(true);
+	}
+
+	return this->GetResult();
+}
+
+OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
+
+	OvalEnum::ResultEnumeration existenceResult = OvalEnum::RESULT_ERROR;
+
+	// get the count of each status value
+	int errorCount = 0;
+	int existsCount = 0;
+	int doesNotExistCount = 0;
+	int notCollectedCount = 0;
+
+	TestedItemVector::iterator iterator;
+	for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+		OvalEnum::SCStatus itemStatus = (*iterator)->GetItem()->GetStatus();
+		if(itemStatus == OvalEnum::STATUS_ERROR) {
+			errorCount++;
+		} else if(itemStatus == OvalEnum::STATUS_EXISTS) {
+			existsCount++;
+		} else if(itemStatus == OvalEnum::STATUS_DOES_NOT_EXIST) {
+			doesNotExistCount++;
+		} else if(itemStatus == OvalEnum::STATUS_NOT_COLLECTED) {
+			notCollectedCount++;
+		} 
+	}
+
+	if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ALL_EXIST) {
+
+		if(existsCount >= 1 && doesNotExistCount == 0 && errorCount == 0 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;			
+		} else if(existsCount >= 0 && doesNotExistCount >= 1 && errorCount >= 0 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_FALSE;
+		} else if(existsCount >= 0 && doesNotExistCount == 0 && errorCount >= 1 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_ERROR;
+		} else if(existsCount >= 0 && doesNotExistCount == 0 && errorCount == 0 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		}
+		
+	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
+		
+		if(existsCount >= 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;			
+		} else if(existsCount == 0 && doesNotExistCount == 0 && errorCount >= 1 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_ERROR;
+		}
+
+	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_AT_LEAST_ONE_EXISTS) {
+		
+		if(existsCount >= 1 && doesNotExistCount >= 0 && errorCount >= 0 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;			
+		} else if(existsCount == 0 && doesNotExistCount >= 1 && errorCount == 0 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_FALSE;
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_ERROR;
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
+			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		}
+
+	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST) {
+		
+		if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;			
+		} else if(existsCount >= 1 && doesNotExistCount >= 0 && errorCount >= 0 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_FALSE;
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_ERROR;
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
+			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		}
+
+	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ONLY_ONE_EXISTS) {
+		
+		if(existsCount == 1 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;			
+		} else if(existsCount >= 2 && doesNotExistCount >= 0 && errorCount >= 0 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_FALSE;
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_FALSE;
+		} else if(existsCount >= 0 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_ERROR;
+		} else if(existsCount >= 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
+			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		}
+
+	}
+
+	return existenceResult;
+}
+
+OvalEnum::ResultEnumeration Test::EvaluateCheckState() {
+
+	OvalEnum::ResultEnumeration stateResult = OvalEnum::RESULT_ERROR;
+
+	// is there a state associated with this test?
+	if(this->GetStateId().compare("") == 0) {
+		// no state specified
+		// just report true...
+		stateResult = OvalEnum::RESULT_TRUE;
+
+	} else {
+		try {
+			State* tmpState =  State::SearchCache(this->GetStateId());
+			if(tmpState == NULL) {
+				// state not already cached so parse it
+				tmpState = new State(this->GetStateId());
+			}
+
+			// analyze each tested item
+			IntVector results;
+			TestedItemVector::iterator iterator;
+			for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+				OvalEnum::ResultEnumeration tmpResult;
+				tmpResult = tmpState->Analyze((*iterator)->GetItem());
+				(*iterator)->SetResult(tmpResult);
+				results.push_back(tmpResult);
+			}
+
+			// combine results based on the check attribute
+			stateResult = OvalEnum::CombineResultsByCheck(&results, this->GetCheck());
+
+		} catch(Exception ex) {
+			this->SetResult(OvalEnum::RESULT_ERROR);
+			Log::Fatal("Unable to evaluate test " + this->GetId() + ". An error occured while processing the associated state " + this->GetStateId() + ". " + ex.GetErrorMessage());
+		}
+	}
+
+	return stateResult;
+}

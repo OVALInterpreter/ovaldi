@@ -1,0 +1,163 @@
+//
+// $Id: Definition.h 4604 2008-01-04 13:47:42Z bakerj $
+//
+//****************************************************************************************//
+// Copyright (c) 2002-2008, The MITRE Corporation
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are
+// permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright notice, this list
+//       of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this 
+//       list of conditions and the following disclaimer in the documentation and/or other
+//       materials provided with the distribution.
+//     * Neither the name of The MITRE Corporation nor the names of its contributors may be
+//       used to endorse or promote products derived from this software without specific 
+//       prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+// SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+// OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+// TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//****************************************************************************************//
+
+#ifndef DEFINITION_H
+#define DEFINITION_H
+#include <map>
+#include <utility>
+#include "AbsCriteria.h"
+#include "Criteria.h"
+
+XERCES_CPP_NAMESPACE_USE
+using namespace std;
+
+class Criteria;
+
+class Definition;
+
+/**
+	A vector for storing Definition objects. 
+	Stores only pointers to the objects. 
+*/
+typedef vector < Definition*, allocator<Definition*> > DefinitionVector;
+
+/**	
+	A pair for storing definition ids and Definition objects together. 
+	Stores only pointers to the objects. 
+*/
+typedef pair <string, Definition* > DefinitionPair;
+
+/**	
+	A map for storing DefinitionPairs. 
+	Stores only pointers to the objects. 
+*/
+typedef map <string, Definition* > DefinitionMap;
+
+/**
+	This class represents an oval definition.
+	The Definition class provides methods for parsing a definition in an
+	oval definitions files, analyzing that definitions, and then writing that defition
+	with its analysis result to an oval results file.
+*/
+class Definition {
+
+public:
+
+	/** Create a complete Definition object */
+	Definition();
+	/** 
+		Destroy the object. 
+		Call delete on the criteria element.
+	*/
+	~Definition();
+
+	/** 
+		Writes a Definition element to the results document.
+		Calls criteria->Write()
+	*/
+	void Write(DOMElement* parent);
+	/**
+		Parses a definition from a oval-definitions document.
+		Make sure a definition is only parsed once.
+		parses Definition elm to a Definition obj
+		calls Criteria->Parse() on the Criteria elm
+	*/
+	void Parse(DOMElement* DefinitionElm);
+
+	/** 
+		Analyze the definition and return the result.
+		Make sure not previously analyzed.
+		calls Criteria->Analyze()
+		saves and returns the result.
+	*/
+	OvalEnum::ResultEnumeration Analyze();
+
+	/** Set the result to NOT_EVALUATED. */
+	OvalEnum::ResultEnumeration NotEvaluated();
+
+	/** Return the version field's value. */
+	int GetVersion();
+	/** Set the version field's value. */
+	void SetVersion(int version);
+	
+	/** Return the variableInstance field's value. */
+	int GetVariableInstance();
+	/** Set the variableInstance field's value. */
+	void SetVariableInstance(int variableInstance);
+    
+	/** Return the result field's value. */
+	OvalEnum::ResultEnumeration GetResult();
+	/** Set the result field's value .*/
+	void SetResult(OvalEnum::ResultEnumeration result);
+
+	/** Return the criteria field's value. */
+	Criteria* GetCriteria();
+	/** Set the criteria field's value. */
+	void SetCriteria(Criteria* criteria);
+    
+	/** Return the id field's value. */
+	string GetId();
+	/** Set the id field's value. */
+	void SetId(string id);
+
+	/** Return the written field's value. */
+	bool GetWritten();
+	/** Set the written field's value. */
+	void SetWritten(bool written);
+
+	/** Return the analyzed field's value. */
+	bool GetAnalyzed();
+	/** Set the analyzed field's value. */
+	void SetAnalyzed(bool analyzed);
+
+	/** 
+		Search the cache of definitions for the specifed definition. 
+		@return Returns the cached Definition or NULL if not found.
+	*/
+	static Definition* SearchCache(string id);
+
+	/** Clear the cache of processed definitions. */
+	static void ClearCache();
+
+private:
+	int version;
+	int variableInstance;
+	OvalEnum::ResultEnumeration result;
+	Criteria* criteria;
+	string id;
+	bool written;
+	bool analyzed;
+
+	static DefinitionMap processedDefinitionsMap;
+};
+
+
+#endif

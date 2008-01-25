@@ -1,0 +1,182 @@
+****************************************************
+
+                OVAL Interpreter
+
+  Copyright (c) 2002-2008 - The MITRE Corporation
+
+****************************************************
+
+
+---------------------------------------
+---        Version 5.3 build 40     ---
+---------------------------------------
+* Implemented TextFileContentProbe and documented weaknesses in the oval-definitions-schema. The code for this probe is based on contributions from Pavel Vinogradov (Pavel.Vinogradov@NIXDEV.NET)
+* Added REGEX::GetMatchingSubstrings function to allow matched substrings to be pulled from an input string.
+* Corrected Test::EvaluateCheckExistence method's combining of items based on the check_extistence attribute. The schema documetationt was changed causing a code change to the interpreter source.  
+* Corrected bug in processing of AccessToken behaviors. 
+* Corrected bug in EntityCompartator that was causing the parse version string method to fail on 64 bit linux systems.  Thanks to Ken Sorensen (sorensk@losrios.edu) and Mark Cox (mjc@redhat.com) for tracking this down and fixing it. Applied similar fixes to problematic areas of the code.
+* Corrected bug in processing of variable components. Needed to make a copy of the messages associated with a ComponentValue when computing a value for a Component.
+* Corrected bug in AbsObjectCollector::ProcessObject function. The code was not correctly computing the flag value on collected objects. The flag value should be based on the combination of the status value of each referenced item.
+* Updated Linux makfile to support rpm and dpkg package managers on Linux systems.
+* Corrected bug in processing of unix file_object behaviors. This required an update to AbsFileFinder and both the Linux and Windows FileFinder implementations.  The bug allowed unsupported unix file_object behaviors to go reported on unix systems. 2 of 4 unix file_object behaviors are supported at this time. Now if an unsupported unix file_object behavior is found an error message is reported.
+* Corrected bug in processing of command line arguments which caused the -p flag to not be considered until after some code had already been executed.
+* Source code comments were cleaned up.
+
+---------------------------------------
+---        Version 5.3 build 20     ---
+---------------------------------------
+* Corrected bug in EntityComparator::ParseVersionStr(). Added error checking to the function to ensure that the input version strings are in a valid format.
+* Added command line option to limit definition evaluation to a set of definition ids provided on the command line. 
+* Added function to list error messages associated with a variable. This gives better error reporting on variables.
+* Added support for previous minor versions of the OVAL Language. The code now allows for any version greater than or equal to version 5.0 and less than or equal to the version of the Oval Interpreter itself.
+* Added support for new account privileges defined in Vista to the AccessTokenProbe.
+* Corrected bug in code that determines the namespace of an element. Reported by Thomas Jones.
+* Added support for behaviors on the win:accesstoken_object.
+* Added support for the ONE operator on crieria.
+* Added support for the new check_existence attribute and modified check attribute on tests.
+* Added doxygen generated source documentation to source distributions.
+* Added support for optional Schematron validation of oval-defintitions documents.
+
+---------------------------------------
+---        Version 5.2 build 9      ---
+---------------------------------------
+* Corrected bug in windows implementation of SystemInfoCollector::GetOSInfo. On some systems the interpreter would not collected system data because of an error thrown when getting the primary host name of the system.
+
+---------------------------------------
+---        Version 5.2 build 8      ---
+---------------------------------------
+* Updated to support OVAL version 5.2
+* Converted windows source distributions to include a VC8 project
+* Windows binaries are now built with Visual Studio 2005(VC8).
+* Added support for recurse_direction and max_depth behaviors on files. 
+* Added support for collection of additional fields in win-sc:file_items.
+* Removed unneeded oval-def xmlns from generated system-characteristcs files.
+* Added support for filehash_tests.
+* Corrected bug in results_to_html.xsl that was not creating valid urls to definitions in the results section of the output.
+* Corrected bug in RegistryProbe. Added an additiona result value to the list of values that equate to a registry key does not exist on the system. Previously was reporting an error when teh key was not found. Fix applied to registry names too.
+* Corrected bug in RegistryProbe. When collected data for a REG_MULTI_SZ if the value was an empty string it was not reported properly which lead to incorrect unknown results.
+* Corrected bug in AbsEntity::Analyze method. This bug caused the interpreter to not be able to properly use variable values in some complex objects. The interpreter then would incorrectly report items as not found on a host.
+
+---------------------------------------
+---        Version 5.1 build 14     ---
+---------------------------------------
+* Added newlines to end of RestrictionType.cpp and ExternalVariable.cpp to prevent compile warnings
+* Added build info to System Characteristics and OVAL Results file generator infomation.
+* Added /xml/results_to_html.xsl to convert oval results xml files to html for viewing.
+* Added new command line options and supporting code to run a specified xsl on the results xml and output to a specified file.
+* Added comments to collected objects in the System Characteristics output if the object in the OVAL Definition file has a comment.
+* Removed 127.0.0.1 from the list of interfaces in the <system_info/> element.
+* Corrected bug in EntityComparator.h declaraion of members functions GetEpochFromEVR, GetVersionFromEVR, and GetReleaseFromEVR. Thanks to Thomas R. Jones [thomas.jones@MAITREYASECURITY.COM]
+* Corrected bug in the data collection process seen when an OVAL Definition file is used that does not contain an <objects/> element. Thanks to Max Vozeler [max.vozeler@LSEXPERTS.DE]
+* Corrected bug in the analysis process seen when an OVAL Definition file is used that does not contain a <definitions/> element.
+* Corrected command line output of results to include extended definitions. 
+* Cleaned up Red Hat rpm's. Created a seperate rpm for EL3 and EL4
+* Added man page.
+* Cleaned up Linux src distribution.
+
+---------------------------------------
+---        Version 5.0 build 77     ---
+---------------------------------------
+* Corrected bug determining if a object is applicable when collecting data. 
+
+---------------------------------------
+---        Version 5.0 build 74     ---
+---------------------------------------
+* Corrected bug display of object and definition ids as they are being processed. Bug caused objects that wer actually not applicable to be flagged as not collected.
+
+---------------------------------------
+---        Version 5.0 build 71     ---
+---------------------------------------
+* Added support for data collection of win-def:passwordpolicy_object. Need to figure out how to get password_complexity and reversible_encryption fields. 
+* Added support for data collection of win-def:lockoutpolicy_object. 
+* Added support for data collection of win-def:auditeventpolicy_object.
+* Added support for data collection of win-def:sid_test. 
+* Added support for data collection of win-def:fileeffectiverights_test. 
+* Added support for data collection of win-def:accesstoken_test.
+* Added support for data collection of win-def:group_test.
+* Added support for data collection of win-def:user_test.
+* Corrected bug in Object::Parse method. There was a typo in the name of the behaviors element that would cause behaviors to be ignored.
+* Corrected bug in AbsObjectCollector::ProcessSet method. CollectedSets were no always being initilaized causing a NULLptr error.
+* Corrected bug in error reporting on windows FileProbe. Error messages were being appended one after the other resulting in many repeated messages.
+* Corrected bug in Item::Write() method. Only one message element is allowed on a given item.
+
+---------------------------------------
+---        Version 5.0 build 67     ---
+---------------------------------------
+* Added support for external variables. 
+* Cleaned up command line processing. Added better messages when invalid command line options are provided.
+* Corrected typo in parse function that would have caused the datatype on constant variables to be ignored when parsing and always treated as the a string
+* Corrected bug in reporting of result on a tested_item element. In some cases the result was left as it default error value. This did not effect the overall result computation for a a test.
+* Corrected bug in Variable probe causing it to always fail to collect variable information.
+* Added support to the WMIProbe for addition datatypes. Previously only supported strings.
+* Corrected bug in AbsObjectCollector that lead to error details not being reported in the system-characteristics file.
+
+---------------------------------------
+---        Version 5.0 build 55     ---
+---------------------------------------
+* Corrected a bug in analysis of extended definitions. Definition result values were not properly cached after initial analysis. Caused incorrect result when a extended definition is used more than once.
+* Corrected a bug in analysis of tests. Tests result values were not properly cached after initial analysis. May have caused in accurate results when a test is reused.
+* Corrected a bug in xmlfilecontent probe and file md5 probe. Both probes were using a windows path separator character regardless of the platform they were run on. This prevented proper data collection on UNIX platforms.
+* Corrected a bug related to locating elements in an oval definition document when all elements are prefixed by an xmlns alias. The search method used was not properly matching prefixed elements. 
+* Corrected bug in Test::Analyze function - When a CollectedObject has a flag value of NOT_COLLECTED_FLAG the result value should be UNKNOWN_RESULT not NOT_EVALUATED_RESULT.
+* Corrected bug in OvalEnum::CombineResultsByCheck method when check was ONLY_ONE_CHECK results were not always correct.
+* Corrected bug in Test::Analyze method. When a CollectedObject has a flag of NOT_COLLECTED_FLAG the result should be UNKNOWN_RESULT. When a check of NONE_EXIST_CHECK is specified the results were not always correct.
+* Corrected bug in xpath code. removed extra ItemEntity created when creating a xmlfilecontent_item.
+* Corrected bug in Definition::Analyze method. Added line to set the flag indicating that the definition has been analyzed.
+* Corrected bug in processing of flag attribute on collected objects when the definition object is a set object. Added new CollectedSet class to support changes.
+
+---------------------------------------
+---       Version 5.0 build 2       ---
+---------------------------------------
+* Included final version of oval v5 schemas
+
+---------------------------------------
+---           Version 5.0 beta 3    ---
+---------------------------------------
+* Updated to support version 5 rc 3 of the OVAL Schema
+* Corrected collection of inetlisteningservers_object
+* Corrected EntityComparator class to follow the oval schema based on conversation on the oval-developer's list
+* TODO: implement AbsProbeFactory class and then refactor the Windows, Solaris, and Linux ProbeFactory classes. This change will simplify the creating of new ProbeFactory classes and provide the set of independent schema probes for all other concrete ProbeFactory classes to utilize.
+* TODO: implement activedirectory_object probe 
+* TODO: create a generic Linux Makefile using autoconf. Currently the Makefile has dependencies on various rpm libraries as does the source code. Using autoconf rpm code and dependencies should be excluded if rpm is not installed.
+
+---------------------------------------
+---           Version 5.0 beta 2    ---
+---------------------------------------
+* Updated to support version 5 rc 2 of the OVAL Schema
+* Added support for Linux data collection for the following objects:
+      - rpminfo_object
+      - inetlisteningservers_object
+* Added support for Unix data collection for the following objects:
+      - file_object
+      - process_object
+      - uname_object
+* Added support for Windows data collection for the following objects:
+      - wmi_object
+* Restructured source tree to better mirror OVAL Schema
+* Added in stubs for future Solaris implementation. (Needs to be implemented) 
+* TODO: implement AbsProbeFactory class and then refactor the Windows, Solaris, and Linux ProbeFactory classes. This change will simplify the creating of new ProbeFactory classes and provide the set of independent schema probes for all other concrete ProbeFactory classes to utilize.
+* TODO: implement activedirectory_object probe 
+* TODO: create a generic Linux Makefile using autoconf. Currently the Makefile has dependencies on various rpm libraries as does the source code. Using autoconf rpm code and dependencies should be excluded if rpm is not installed.
+
+---------------------------------------
+---           Version 5.0 beta 1    ---
+---------------------------------------
+* Initial support for version 5 of the OVAL Schema
+* Does not support external variables
+* Supports only windows data collection for the following objects:
+	- registry_object
+	- unknown_object
+	- xml file content_object
+	- file_object
+	- filemd5_object
+	- variable_object
+	- environemntvariable_object
+	- family_object
+* Supports definition analysis for all types of definitions.
+
+----------------------------------------------------------
+OVAL is sponsored by US-CERT at the U.S. Department of Homeland Security.
+OVAL and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2006, The MITRE Corporation (www.mitre.org).
+
+

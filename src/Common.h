@@ -1,0 +1,185 @@
+//
+// $Id: Common.h 4646 2008-01-15 14:25:59Z bworrell $
+//
+//****************************************************************************************//
+// Copyright (c) 2002-2008, The MITRE Corporation
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are
+// permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright notice, this list
+//       of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this 
+//       list of conditions and the following disclaimer in the documentation and/or other
+//       materials provided with the distribution.
+//     * Neither the name of The MITRE Corporation nor the names of its contributors may be
+//       used to endorse or promote products derived from this software without specific 
+//       prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+// SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+// OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+// TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//****************************************************************************************//
+
+#ifndef COMMON_H
+#define COMMON_H
+
+#ifdef WIN32
+	#pragma warning(disable:4786)
+	#include <aclapi.h>
+	#include <windows.h>
+	#include <lmerr.h>
+#endif
+
+#include "Exception.h"
+#include "Log.h"
+#include "REGEX.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <set>
+#include <time.h>
+#include <sstream>
+#include <algorithm>
+#include <utility>
+
+using namespace std;
+
+/**
+	A vector for storing strings.
+*/
+typedef vector < string, allocator<string> > StringVector;
+
+typedef set < string > StringSet;
+
+
+class UniqueStringVector {
+
+public:
+	UniqueStringVector(StringVector*);
+	~UniqueStringVector();
+
+	StringVector* GetUniqueStrings();
+	void Append(string newString);
+	bool Exists(string newString);
+
+private:
+	StringVector* uniqueStrings;
+};
+
+
+/**
+	A vector for storing integers.
+*/
+typedef vector < int, allocator<int> > IntVector;
+
+/**	
+	A pair for storing two related strings.
+*/
+typedef pair < string, string > StringPair;
+
+/**	
+	A vector for storing pairs of strings.
+*/
+typedef vector < StringPair*, allocator<StringPair*> > StringPairVector;
+
+/**
+	This class provides a set of common fuctions used through out the application.
+	All functions are static.
+*/
+class Common {
+	public:
+		static string	GetDatafile();
+		static bool		GetGenerateMD5();
+		static string	GetXMLfile();
+		static string	GetXMLfileMD5();
+		static string	GetOutputFilename();
+		static bool		GetUseProvidedData();
+		static bool		GetUseVariableFile();
+		static string	GetExternalVariableFile();
+		static bool		GetVerifyXMLfile();
+		static string	GetXSLFilename();
+		static string	GetXSLOutputFilename();
+		static bool     GetNoXsl();
+		static string   GetDefinitionIdsString();
+		static bool     GetLimitEvaluationToDefinitionIds();
+		static bool     GetDoDefinitionSchematron();
+		static string   GetDefinitionSchematronPath();
+		static string   GetDefinitionIdsFile();
+
+		static void		SetDataFile(string);
+		static void		SetGenerateMD5(bool);
+		static void		SetXMLfile(string);
+		static void		SetXMLfileMD5(string);
+		static void		SetOutputFilename(string);
+		static void		SetUseProvidedData(bool);
+		static void		SetUseVariableFile(bool);
+		static void		SetExternalVariableFile(string);
+		static void		SetVerifyXMLfile(bool);
+		static void 	SetXSLFilename(string);
+		static void		SetXSLOutputFilename(string);
+		static void     SetNoXsl(bool);
+		static void     SetDefinitionIdsString(string definitionIdsString);
+		static void     SetLimitEvaluationToDefinitionIds(bool set);
+		static void     SetDoDefinitionSchematron(bool set);
+		static void     SetDefinitionSchematronPath(string definitionSchematronPath);
+		static void     SetDefinitionIdsFile(string definitionIdsFile);
+
+		static StringVector* ParseDefinitionIdsFile();
+		static StringVector* ParseDefinitionIdsString();
+		/** Pad the provided string with spaces so that it is the desired length. */
+		static string	PadString(string, unsigned int);
+		/** Pad the provided string with the specified char so that it is the desired length. */
+		static string	PadStringWithChar(string, char, unsigned int);
+		static string	SwitchChar(string stringIn, string oldChr, string newChr);
+		static string	ToString(int);
+		static string	ToString(long);
+		static string	ToString(unsigned long);
+		static string	ToString(bool);
+		static string	ToString(char);
+
+		static string	GetTimeStamp();
+
+		static char fileSeperator;
+
+	private:
+		static string dataFile;
+		static string outputFilename;
+		static string startTime;
+		static string externalVariablesFile;
+		static string xmlfile;
+		static bool noXsl;
+		static string xslFile;
+		static string xslOutputFile;
+		static string xmlfileMD5;
+		static bool	generateMD5;
+		static bool useProvidedData;
+		static bool verifyXMLfile;
+		static bool limitEvaluationToDefinitionIds;
+		static string definitionIds;
+		static bool doDefinitionSchematron;
+		static string definitionSchematronPath;
+		static string definitionIdsFile;
+};
+
+/** 
+	This class represents an Exception that occured while running a function in the Common class.
+*/
+class CommonException : public Exception {
+	public:
+		CommonException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
+		~CommonException();
+};
+
+#endif
