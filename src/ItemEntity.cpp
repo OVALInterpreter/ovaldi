@@ -35,12 +35,6 @@
 //								ItemEntity Class										  //	
 //****************************************************************************************//
 ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete ItemEntity object
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetName(name);
 	this->SetValue(value);
@@ -50,135 +44,64 @@ ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, b
 }
 
 ItemEntity::~ItemEntity() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
+
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 string ItemEntity::GetName() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the name field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->name;
 }
 
 void ItemEntity::SetName(string name) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the name field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->name = name;
 }
 
 string ItemEntity::GetValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the value field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->value;
 }
 
 void ItemEntity::SetValue(string value) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the value field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->value = value;
 }
 
 OvalEnum::Datatype ItemEntity::GetDatatype() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the datatype field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->datatype;
 }
 
 void ItemEntity::SetDatatype(OvalEnum::Datatype datatype) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the datatype field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->datatype = datatype;
 }
 
 bool ItemEntity::GetIsObjectEntity() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the isObjectEntity field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->isObjectEntity;
 }
 
 void ItemEntity::SetIsObjectEntity(bool isObjectEntity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the isObjectEntity field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->isObjectEntity = isObjectEntity;
 }
 
 OvalEnum::SCStatus ItemEntity::GetStatus() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the status field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->scStatus;
 }
 
 void ItemEntity::SetStatus(OvalEnum::SCStatus scStatus) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the scStatus field's value
-	//
-	// -----------------------------------------------------------------------
-
+	
 	this->scStatus = scStatus;
 }
 
 bool ItemEntity::Equals(ItemEntity* entity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return true iff this ItemEntity is equal to the provided ItemEntity
-	//	Note: Status is not compared.
-	// -----------------------------------------------------------------------
-	
+
 	bool isEqual = false;
 	try {
 	
@@ -199,11 +122,6 @@ bool ItemEntity::Equals(ItemEntity* entity) {
 }
 
 void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Write this ItemEntity to the sc file
-	// -----------------------------------------------------------------------
 
 	// Create new item element
 	DOMElement* newItemEntityElem = scFile->createElement(XMLString::transcode(this->GetName().c_str()));
@@ -227,11 +145,6 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 }
 
 void ItemEntity::Parse(DOMElement* itemEntityElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided entity element
-	// -----------------------------------------------------------------------
 	
 	this->SetName(XmlCommon::GetElementName(itemEntityElm));
 	this->SetValue(XmlCommon::GetDataNodeValue(itemEntityElm));

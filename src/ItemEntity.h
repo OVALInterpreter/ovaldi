@@ -57,26 +57,53 @@ using namespace std;
 */
 class ItemEntity {
 public:
+
+	/** Create a complete ItemEntity object. */
 	ItemEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
 	~ItemEntity();
 
+	/** Return true if this ItemEntity is equal to the provided ItemEntity
+		Note: Status is not compared.
+	*/
 	bool Equals(ItemEntity* entity);
+
+	/** Write this ItemEntity to the sc file.
+	    Inserts this ItemEntity as the last child of the specified
+		itemElm.
+	*/
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm);
+
+	/** Parse the provided entity element */
 	void Parse(DOMElement* entityElm);
 
+	/** Return the status field's value. */
 	OvalEnum::SCStatus GetStatus();
+
+	/** Set the scStatus field's value. */
 	void SetStatus(OvalEnum::SCStatus status);
 
+	/** Return the name field's value. */
 	string GetName();
+
+	/** Set the name field's value. */
 	void SetName(string name);
 
+	/** Return the value field's value. */
 	string GetValue();
+
+	/** Set the value field's value. */
 	void SetValue(string value);
 
+	/** Get the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
+
+	/** Set the datatype field's value. */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
+	/** Get the isObjectEntity field's value. */
 	bool GetIsObjectEntity();
+
+	/** Set the isObjectEntity field's value. */
 	void SetIsObjectEntity(bool isObjectEntity);
 
 private:

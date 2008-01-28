@@ -60,35 +60,16 @@ ExtendedDefinition::~ExtendedDefinition() {
 // ***************************************************************************************	//
 
 Definition* ExtendedDefinition::GetDefinitionRef() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the definitionRef field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->definitionRef;
 }
 
 void ExtendedDefinition::SetDefinitionRef(Definition* definitionRef) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the definitionRef field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->definitionRef = definitionRef;
 }
 
 void ExtendedDefinition::Write(DOMElement* parentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	writes a ExtendedDefinition element
-	//	calls Definition->Write() on the test ref
-	//
-	// -----------------------------------------------------------------------
 
 	// get the parent document
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
@@ -117,15 +98,8 @@ void ExtendedDefinition::Write(DOMElement* parentElm) {
 }
 
 void ExtendedDefinition::Parse(DOMElement* extendedDefinitionElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	parses ExtendedDefinition elm to a ExtendedDefinition obj
-	//	calls definition->Parse() on the definition ref
-	//
-	// -----------------------------------------------------------------------
 
-	// get the attributes
+	// get the attributes from the extended definition element
 	string negateStr = XmlCommon::GetAttributeByName(extendedDefinitionElm, "negate");
 	if(negateStr.compare("") == 0 || negateStr.compare("false") == 0) {
         this->SetNegate(false);
@@ -135,25 +109,11 @@ void ExtendedDefinition::Parse(DOMElement* extendedDefinitionElm) {
 
 	// get the definition ref
 	string definitionRefStr = XmlCommon::GetAttributeByName(extendedDefinitionElm, "definition_ref");
-	Definition* defRef = NULL;
-	defRef = Definition::SearchCache(definitionRefStr);
-	if(defRef == NULL) {
-		DOMElement* definitionsElm = XmlCommon::FindElementNS(extendedDefinitionElm->getOwnerDocument(), "definitions");
-		DOMElement* definitionElm = XmlCommon::FindElementByAttribute(definitionsElm, "id", definitionRefStr);	
-		defRef = new Definition();
-		defRef->Parse(definitionElm);
-	}
+	Definition* defRef = Definition::GetDefinitionById(definitionRefStr);
 	this->SetDefinitionRef(defRef);
 }
 
 OvalEnum::ResultEnumeration ExtendedDefinition::Analyze() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	calls definition->Analyze()
-	//	applies negate attribute
-	//	saves and return the result
-	// -----------------------------------------------------------------------
 
 	// analyze the test
 	OvalEnum::ResultEnumeration currentResult = this->GetDefinitionRef()->Analyze();

@@ -35,23 +35,11 @@
 //								Test Class												  //	
 //****************************************************************************************//
 TestedItem::TestedItem() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete Test object
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
 }
 
 TestedItem::~TestedItem() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 	
 }
 
@@ -60,56 +48,26 @@ TestedItem::~TestedItem() {
 // ***************************************************************************************	//
 
 Item* TestedItem::GetItem() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the item field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->item;
 }
 
 void TestedItem::SetItem(Item* item) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the item field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->item = item;
 }
 
 OvalEnum::ResultEnumeration TestedItem::GetResult() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the result field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->result;
 }
 
 void TestedItem::SetResult(OvalEnum::ResultEnumeration result) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the result field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->result = result;
 }
 
 void TestedItem::Write(DOMElement* parentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	writes a TestedItem element
-	//
-	// -----------------------------------------------------------------------	
 
 	// get the parent document
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
@@ -122,15 +80,10 @@ void TestedItem::Write(DOMElement* parentElm) {
 	XmlCommon::AddAttribute(testedItemElm, "result", OvalEnum::ResultToString(this->GetResult()));
 }
 
-void TestedItem::Parse(DOMElement* itemElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	parses itme elm to a Item obj
-	//
-	// -----------------------------------------------------------------------
+void TestedItem::ParseItem(DOMElement* itemElm) {
+
 	Item* item = new Item();
+	item->Parse(itemElm);
 	Item::Cache(item);
 	this->SetItem(item);
-	this->GetItem()->Parse(itemElm);
 }

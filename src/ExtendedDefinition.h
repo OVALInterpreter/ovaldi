@@ -52,12 +52,31 @@ public:
 	ExtendedDefinition(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, Definition* definitionRef = NULL);
 	~ExtendedDefinition();
 
+	/** Writes a ExtendedDefinition element as a child of the parentElm.
+		Calls Definition->Write() on the Definition Ref to ensure that
+		it is also written to the results document.
+	*/
 	void Write(DOMElement* parent);
+	
+	/** Parse ExtendedDefinition element into a ExtendedDefinition object.
+		Search the cach
+		calls definition->Parse() on the definition ref to 
+	*/
 	void Parse(DOMElement* ExtendedDefinitionElm);
+
+	/** Analyze the ExtendedDefinition object.
+		Calls definition->Analyze() to get the result for the definition.
+		Then applies the negate attribute. 
+		Finally saves and returns the result
+	*/
 	OvalEnum::ResultEnumeration Analyze();
+
+	/** Mark this definition as not evaluated. */
 	OvalEnum::ResultEnumeration NotEvaluated();
 
+	/** Return the definitionRef field's value. */
 	Definition* GetDefinitionRef();
+	/** Set the definitionRef field's value. */
 	void SetDefinitionRef(Definition* definitionRef);
 
 private:

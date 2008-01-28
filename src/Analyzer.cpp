@@ -127,8 +127,7 @@ void Analyzer::Run() {
 						cout << backSpaces << definitionId << blankSpaces << endBackSpaces;
 					}
 
-					Definition* def = new Definition();
-					def->Parse(definitionElm);
+					Definition* def = Definition::GetDefinitionById(definitionId);
 					def->Analyze();
 					def->Write(Analyzer::GetResultsDefinitionsElm());					
 					prevIdLength = definitionId.length();
@@ -155,6 +154,7 @@ void Analyzer::Run() {
 		VariableValue::ClearCache();
 
 		this->FinializeResultsDocument();
+
 	} else {
 		string logMessage = "\n    No definitions found! \n";
 		cout << logMessage;
@@ -202,8 +202,7 @@ void Analyzer::Run(StringVector* definitionIds) {
 						cout << backSpaces << definitionId << blankSpaces << endBackSpaces;
 					}
 
-					Definition* def = new Definition();
-					def->Parse(definitionElm);
+					Definition* def = Definition::GetDefinitionById(definitionId);
 					def->Analyze();
 					def->Write(Analyzer::GetResultsDefinitionsElm());					
 					prevIdLength = definitionId.length();
@@ -242,8 +241,7 @@ void Analyzer::Run(StringVector* definitionIds) {
 						cout << backSpaces << definitionId << blankSpaces << endBackSpaces;
 					}
 
-					Definition* def = new Definition();
-					def->Parse(definitionElm);
+					Definition* def = Definition::GetDefinitionById(definitionId);
 					def->NotEvaluated();
 					def->Write(Analyzer::GetResultsDefinitionsElm());
 					prevIdLength = definitionId.length();					
@@ -278,6 +276,7 @@ void Analyzer::Run(StringVector* definitionIds) {
 		throw AnalyzerException("");
 	}
 }
+
 void Analyzer::PrintResults() {
 
 	///////////////////////////////////////////////////////////////////////////

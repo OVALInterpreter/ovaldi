@@ -45,16 +45,29 @@ using namespace std;
 class TestedItem {
 
 public:
+
+	/** Create a Test object and initialize its result to OvalEnum::RESULT_NOT_EVALUATED. */
 	TestedItem();
 	~TestedItem();
 
+	/** Write a TestedItem element as a child of the parent element. */
 	void Write(DOMElement* parent);
-	void Parse(DOMElement* itemElm);
+
+	/** Parses an item element into an Item object and sets it as the 
+		Item associated with this TestedItem.
+	*/
+	void ParseItem(DOMElement* itemElm);
 	
+	/** Return the result field's value. */
 	OvalEnum::ResultEnumeration GetResult();
+
+	/** Set the result field's value. */
 	void SetResult(OvalEnum::ResultEnumeration result);
     
+	/** Return the item field's value. */
 	Item* GetItem();
+
+	/** Set the item field's value. */
 	void SetItem(Item* item);
 
 private:

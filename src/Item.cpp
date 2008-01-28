@@ -508,7 +508,6 @@ void Item::ClearCache() {
 	}
 	
 	Item::processedItemsMap.clear();
-
 }
 
 void Item::Cache(Item* item) {
@@ -517,6 +516,7 @@ void Item::Cache(Item* item) {
 
 	Item::processedItemsMap.insert(ItemPair(item->GetId(), item));
 }
+
 //****************************************************************************************//
 //								ItemException Class										  //	
 //****************************************************************************************//

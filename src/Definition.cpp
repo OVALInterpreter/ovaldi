@@ -52,6 +52,34 @@ Definition::~Definition() {
 	delete this->GetCriteria();
 }
 
+
+// ***************************************************************************************	//
+//								 Static members												//
+// ***************************************************************************************	//
+
+Definition* Definition::GetDefinitionById(string definitionId) {
+	
+	Definition* definition = NULL;
+	
+	// Search the cache
+	definition = Definition::SearchCache(definitionId);
+
+	// if not found try to parse it.
+	if(definition == NULL) {
+
+		DOMElement* definitionsElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(), "definitions");
+		DOMElement* definitionElm = XmlCommon::FindElementByAttribute(definitionsElm, "id", definitionId);
+
+		if(definitionElm == NULL) {
+			throw new Exception("Unable to find specified definition in oval-definition document. Definition id: " + definitionId);
+		}
+		definition = new Definition();
+		definition->Parse(definitionElm);
+	}
+	
+	return definition;
+}
+
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//

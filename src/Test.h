@@ -58,7 +58,7 @@ typedef pair <string, Test* > TestPair;
 typedef map <string, Test* > TestMap;
 
 /**
-	This class represents a test oval.
+	This class represents a test in OVAL.
 	The class provides a method for parsing a test in an oval definition as well as methods
 	for analyzing that test and then writing the test result to an oval results document.
 */
@@ -67,24 +67,33 @@ class Test {
 public:
 	/** Create a complete Test object **/
 	Test();
+
+	/** Distroy the Test object.
+	    Deletes each TestedItem.
+	*/
 	~Test();
 
+	/** Write the Test element to the result document if it has not already been written.
+		calls testedObject->Write() 
+		calls testedVariable->Write() for each tested var.
+	*/
 	void Write(DOMElement* parent);
+	/** Parse the Test elmement into a Test object. */
 	void Parse(DOMElement* testElm);
 
 	/** Evaluate the test and return the result. 
-	 *  Make sure not previously analyzed.
-	 *	Get the collected object from the sc file by its id
-	 *      - Parse all references in the colelcted object into Items
-	 *		- check flag on collected object against check_existence attribute on test
-	 *      - If the test uses a state and the check_existence result is true 
-	 *          - Get the state by its id and parse it.
-	 *          - Analyze all items referenced by the collected object to determine individual results.
-	 *          - Then use the check_state to determine the overall result for the test.
-	 *		- copy variable values from collected object to test as tested_variables
-	 *			this is just a matter of passing the variable_value element in the colelcted obj
-	 * 			to the testedVaraible->Parse() method.
-	 *      - save and return the result
+	    Make sure not previously analyzed.
+	  	Get the collected object from the sc file by its id
+	        - Parse all references in the colelcted object into Items
+	  		- check flag on collected object against check_existence attribute on test
+	        - If the test uses a state and the check_existence result is true 
+	            - Get the state by its id and parse it.
+	            - Analyze all items referenced by the collected object to determine individual results.
+	            - Then use the check_state to determine the overall result for the test.
+	 	 	- copy variable values from collected object to test as tested_variables
+	 	 		this is just a matter of passing the variable_value element in the colelcted obj
+	  	 		to the testedVaraible->Parse() method.
+	        - save and return the result
 	 */
 	OvalEnum::ResultEnumeration Analyze();
 
@@ -97,28 +106,44 @@ public:
 	/** Determine the result of evaluating the check attribute. */
 	OvalEnum::ResultEnumeration EvaluateCheckState();
 
+	/** Return the version field's value. */
 	int GetVersion();
+	/** Set the version field's value. */
 	void SetVersion(int version);
 	
+	/** Return the variableInstance field's value. */
 	int GetVariableInstance();
+	/** Set the variableInstance field's value. */
 	void SetVariableInstance(int variableInstance);
     
+	/** Return the result field's value. */
 	OvalEnum::ResultEnumeration GetResult();
+	/** Set the result field's value. */
 	void SetResult(OvalEnum::ResultEnumeration result);
     
+	/** Return the id field's value. */
 	string GetId();
+	/** Set the id field's value. */
 	void SetId(string id);
 
+	/** Return the objectId field's value. */
 	string GetObjectId();
+	/** Set the objectId field's value. */
 	void SetObjectId(string objectId);
 
+	/** Return the stateId field's value. */
 	string GetStateId();
+	/** Set the stateId field's value. */
 	void SetStateId(string stateId);
 
+	/** Return the written field's value. */
 	bool GetWritten();
+	/** Set the written field's value. */
 	void SetWritten(bool written);
 
+	/** Return the analyzed field's value. */
 	bool GetAnalyzed();
+	/** Set the analyzed field's value. */
 	void SetAnalyzed(bool analyzed);
 
 	/** Return the check field's value. */

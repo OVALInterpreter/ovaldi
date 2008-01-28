@@ -109,178 +109,82 @@ void Test::AppendTestedVariable(VariableValue* testedVariable) {
 }
 
 string Test::GetId() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the id field's value
-	//
-	// -----------------------------------------------------------------------
-
+	
 	return this->id;
 }
 
 void Test::SetId(string id) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the id field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->id = id;
 }
 
 string Test::GetObjectId() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the objectId field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->objectId;
 }
 
 void Test::SetObjectId(string objectId) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the objectId field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->objectId = objectId;
 }
 
 
 string Test::GetStateId() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the stateId field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->stateId;
 }
 
 void Test::SetStateId(string stateId) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the stateId field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->stateId = stateId;
 }
 
 OvalEnum::ResultEnumeration Test::GetResult() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the result field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->result;
 }
 
 void Test::SetResult(OvalEnum::ResultEnumeration result) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the result field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->result = result;
 }
 
 int Test::GetVariableInstance() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the variableInstance field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->variableInstance;
 }
 
 void Test::SetVariableInstance(int variableInstance) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the variableInstance field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->variableInstance = variableInstance;
 }
 
 int Test::GetVersion() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the version field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->version;
 }
 
 void Test::SetVersion(int version) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the version field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->version = version;
 }
 
 bool Test::GetWritten() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the written field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->written;
 }
 
 void Test::SetWritten(bool written) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the written field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->written = written;
 }
 
 bool Test::GetAnalyzed() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the analyzed field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->analyzed;
 }
 
 void Test::SetAnalyzed(bool analyzed) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the analyzed field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->analyzed = analyzed;
 }
@@ -311,14 +215,6 @@ void Test::ClearCache() {
 }
 
 void Test::Write(DOMElement* parentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	writes a Test element
-	//	calls testedObject->Write() 
-	//	calls testedVariable->Write() for each tested var
-	//
-	// -----------------------------------------------------------------------
 
 	if(!this->GetWritten()) {
 		this->SetWritten(true);
@@ -370,12 +266,6 @@ void Test::Write(DOMElement* parentElm) {
 }
 
 void Test::Parse(DOMElement* testElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	parses Test elm to a Test obj
-	//
-	// -----------------------------------------------------------------------
 
 	// get id
 	string id = XmlCommon::GetAttributeByName(testElm, "id");
@@ -411,23 +301,6 @@ void Test::Parse(DOMElement* testElm) {
 }
 
 OvalEnum::ResultEnumeration Test::Analyze() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	make sure not previously analyzed.
-	//	get the collected object from the sc file by its id
-	//		- check flag on collected object against check attribute on test
-	//		- copy variable values from collected object to test as tested_variables
-	//			this is just a matter of passing the variable_value element in the colelcted obj
-	//			to the testedVaraible->Parse() method.
-	//	if collected obj not ok stop
-	//	parse all referencesin the colelcted object into Items
-	//	get the state by its id and parse
-	//	analyze each item against the state
-	//	combine the result of each item with the check attribute
-	//	saves and returns the result
-	//
-	// -----------------------------------------------------------------------
 
 	if(!this->GetAnalyzed()) {
 
@@ -473,7 +346,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 							} else {
 								// get the item elm in the sc file
 								DOMElement* itemElm = XmlCommon::FindElementByAttribute(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), "id", itemId);
-                                testedItem->Parse(itemElm);
+                                testedItem->ParseItem(itemElm);
 							}
 							this->AppendTestedItem(testedItem);
 						

@@ -72,7 +72,7 @@ class Definition {
 public:
 
 	/** Create a complete Definition object */
-	Definition();
+//	Definition();
 	/** 
 		Destroy the object. 
 		Call delete on the criteria element.
@@ -86,9 +86,10 @@ public:
 	void Write(DOMElement* parent);
 	/**
 		Parses a definition from a oval-definitions document.
-		Make sure a definition is only parsed once.
-		parses Definition elm to a Definition obj
-		calls Criteria->Parse() on the Criteria elm
+		Parses Definition elm to a Definition obj
+		Calls Criteria->Parse() on the Criteria elm
+		The final parsed Definition object is stored in the
+		cache of processed definitions.
 	*/
 	void Parse(DOMElement* DefinitionElm);
 
@@ -147,7 +148,21 @@ public:
 	/** Clear the cache of processed definitions. */
 	static void ClearCache();
 
+	/** Return a definition object for the specified definition id.
+		First the cache of Definitions is checked. If the definition is
+		not found in the cache the definition is looked up in the
+		oval-definitions doument and parsed. Once parsed the new Definition
+		object is added to the cache.
+
+		If the definition is not found an exception is thrown. 
+	*/
+	static Definition* GetDefinitionById(string definitionId);
+
 private:
+
+	/** Create a complete Definition object */
+	Definition();
+
 	int version;
 	int variableInstance;
 	OvalEnum::ResultEnumeration result;
