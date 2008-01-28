@@ -97,14 +97,8 @@ void Criterion::Parse(DOMElement* criterionElm) {
 	}
 
 	string testRefStr = XmlCommon::GetAttributeByName(criterionElm, "test_ref");
-	Test* testRef = NULL;
-	testRef = Test::SearchCache(testRefStr);
-	if(testRef == NULL) {
-		DOMElement* testsElm = XmlCommon::FindElementNS(criterionElm->getOwnerDocument(), "tests");
-		DOMElement* testElm = XmlCommon::FindElementByAttribute(testsElm, "id", testRefStr);	
-		testRef = new Test();
-		testRef->Parse(testElm);
-	}
+	Test* testRef = Test::GetTestById(testRefStr);
+	
 	this->SetTestRef(testRef);
 }
 

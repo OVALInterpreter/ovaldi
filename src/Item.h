@@ -78,10 +78,16 @@ typedef pair <int, Item* > ItemPair;
 typedef map <int, Item* > ItemMap;
 
 /**
-	This class represents an Item in a sytem characteristics file.
-    Items must be unique. The Item::Equals() method and the caching methods
-	provided in this class should be utilized to ensure uniqueness. This class also
-	provides static methods for assigning Item ids.
+	This class represents an Item in a system characteristics document.
+
+	Items are created and populated by probes during data collection. During
+	data collection Items must be unique. The Item::Equals() method and the 
+	caching methods provided in this class should be utilized to ensure uniqueness.
+	This class also provides static methods for assigning Item ids.
+
+	Items are also created during analysis by parsing them from a system-characteristics 
+	document.
+      
 */
 class Item {
 public:
@@ -140,22 +146,35 @@ public:
 	void AppendMessage(OvalMessage* msg);
 
 	ItemEntityVector* GetObjectElements();
-    
-	/** Search the cache of Items for the specifed Item. 
-		@return Returns the item with the specified id or NULL if not found.
-	*/
-	static Item* SearchCache(int id);
 
 	/** Delete all items in the cache. */
 	static void ClearCache();
 
-	/** Cache the specified item. */
-	static void Cache(Item* item);
+	/** Return an item object for the specified item id.
+		First the cache of Items is checked. If the item is
+		not found in the cache the item is looked up in the
+		system-characteristics document and parsed. Once parsed 
+		the new Item object is added to the cache.
+
+		If the item is not found an exception is thrown. 
+
+		
+		NOTE: This method is not intended to be used during data collection.
+	*/
+	static Item* GetItemById(string itemId);
 
 private:
 
 	/** Delete all the elements in the item entity vector. */
 	void DeleteElements();
+
+	/** Cache the specified item. */
+	static void Cache(Item* item);
+
+	/** Search the cache of Items for the specifed Item. 
+		@return Returns the item with the specified id or NULL if not found.
+	*/
+	static Item* SearchCache(int id);
 
 	ItemEntityVector elements;
 	int id;

@@ -32,47 +32,17 @@
 #include "State.h"
 
 AbsStateMap State::processedStatesMap;
+
 //****************************************************************************************//
 //									State Class											  //	
 //****************************************************************************************//
-State::State(string id) : AbsState() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete State object
-	//
-	// -----------------------------------------------------------------------
-
-	// get the specified state element
-	DOMElement* statesElm = XmlCommon::FindElement(DocumentManager::GetDefinitionDocument(), "states");
-	DOMElement* stateElm = XmlCommon::FindElementByAttribute(statesElm, "id", id);
-	this->Parse(stateElm);
-}
 
 State::State(OvalEnum::Operator myOperator, int version) : AbsState(myOperator, version) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete State object
-	//
-	// -----------------------------------------------------------------------
-}
 
-State::State(string id, string name, string xmlns, OvalEnum::Operator myOperator, int version) : AbsState(id, name, xmlns, myOperator, version) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete State object
-	//
-	// -----------------------------------------------------------------------
 }
 
 State::~State() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	AbsState class handles deleting all elements
-	// -----------------------------------------------------------------------
+
 }
 
 // ***************************************************************************************	//
@@ -80,16 +50,6 @@ State::~State() {
 // ***************************************************************************************	//
 
 OvalEnum::ResultEnumeration State::Analyze(Item* item) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Analyze the specified Item return the Result value for the Item.
-	//
-	//	1 - create a vector of Item elements that match each element in the state.
-	//	2 - pass the vector to the StateEntity analyze method
-	//	3 - build a vector of results for each element in the state.
-	//	4 - combine the results to a single value based on the states operator
-    // -----------------------------------------------------------------------
 
 	// Check the status of the Item
 	if(item->GetStatus() == OvalEnum::STATUS_ERROR) {
@@ -127,10 +87,8 @@ OvalEnum::ResultEnumeration State::Analyze(Item* item) {
 		}
 
 		// compute the overall state result
-		OvalEnum::ResultEnumeration stateResult = OvalEnum::RESULT_UNKNOWN; // default to unknown;
-		if(stateElmResults.size() > 0) {
-			stateResult = OvalEnum::CombineResultsByCheck(&stateElmResults, stateElm->GetEntityCheck());
-		}
+		OvalEnum::ResultEnumeration stateResult = OvalEnum::CombineResultsByCheck(&stateElmResults, stateElm->GetEntityCheck());
+
 		// store the result for the current state element
 		stateResults.push_back(stateResult);
 	}
@@ -141,12 +99,6 @@ OvalEnum::ResultEnumeration State::Analyze(Item* item) {
 }
 
 void State::Parse(DOMElement* stateElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided state from a definition file into an State object
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetName(XmlCommon::GetElementName(stateElm));
 	this->SetId(XmlCommon::GetAttributeByName(stateElm, "id"));
@@ -181,27 +133,13 @@ void State::Parse(DOMElement* stateElm) {
 			}
 		}
 	}
-	State::processedStatesMap.insert(AbsStatePair(this->GetId(), this));
+
+	State::Cache(this);
 }
 
 State* State::SearchCache(string id) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	search the cache of Tests for the specifed Test. 
-	//	return NULL if not found
-	//
-	// -----------------------------------------------------------------------
 
 	AbsState* cachedState = NULL;
-
-	//AbsStateVector::iterator iterator;
-	//for(iterator = State::processedStates.begin(); iterator != State::processedStates.end(); iterator++) {
-	//	if((*iterator)->GetId().compare(id) == 0) {
-	//		cachedState = (*iterator);
-	//		break;
-	//	}
-	//}
 
 	AbsStateMap::iterator iterator;
 	iterator = State::processedStatesMap.find(id);
@@ -213,12 +151,6 @@ State* State::SearchCache(string id) {
 }
 
 void State::ClearCache() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	delete all items in the cache
-	//
-	// -----------------------------------------------------------------------
 
 	AbsStateMap::iterator iterator;
 	for(iterator = State::processedStatesMap.begin(); iterator != State::processedStatesMap.end(); iterator++) {
@@ -230,12 +162,30 @@ void State::ClearCache() {
 }
 
 void State::Cache(State* state) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	cache the specified state
-	//	TODO - do i need to add protection to this cache? 
-	// -----------------------------------------------------------------------
-	
+
 	State::processedStatesMap.insert(AbsStatePair(state->GetId(), state));
+}
+
+State* State::GetStateById(string stateId) {
+
+	State* state = NULL;
+	
+	// Search the cache
+	state = State::SearchCache(stateId);
+
+	// if not found try to parse it.
+	if(state == NULL) {
+
+		DOMElement* statesElm = XmlCommon::FindElement(DocumentManager::GetDefinitionDocument(), "states");
+		DOMElement* stateElm = XmlCommon::FindElementByAttribute(statesElm, "id", stateId);
+
+		if(stateElm == NULL) {
+			throw new Exception("Unable to find specified state in oval-definition document. State id: " + stateId);
+		}
+
+		state = new State();
+		state->Parse(stateElm);
+	}
+	
+	return state;
 }

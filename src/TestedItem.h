@@ -52,11 +52,6 @@ public:
 
 	/** Write a TestedItem element as a child of the parent element. */
 	void Write(DOMElement* parent);
-
-	/** Parses an item element into an Item object and sets it as the 
-		Item associated with this TestedItem.
-	*/
-	void ParseItem(DOMElement* itemElm);
 	
 	/** Return the result field's value. */
 	OvalEnum::ResultEnumeration GetResult();

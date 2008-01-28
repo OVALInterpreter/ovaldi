@@ -79,11 +79,3 @@ void TestedItem::Write(DOMElement* parentElm) {
 	XmlCommon::AddAttribute(testedItemElm, "item_id", Common::ToString(this->GetItem()->GetId()));
 	XmlCommon::AddAttribute(testedItemElm, "result", OvalEnum::ResultToString(this->GetResult()));
 }
-
-void TestedItem::ParseItem(DOMElement* itemElm) {
-
-	Item* item = new Item();
-	item->Parse(itemElm);
-	Item::Cache(item);
-	this->SetItem(item);
-}

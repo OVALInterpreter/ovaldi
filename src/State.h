@@ -50,23 +50,50 @@ class State;
 class State : public AbsState {
 
 public:
-	State(OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
-	/**
-		Parse the state element with the specified id into a State object.
-		@param id a string that hold the id of a state in an oval definition file to be parsed.
-	*/
-	State(string id);
-	State(string id, string name, string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
+
 	~State();
 
+	/** Analyze the specified Item return the Result value for the Item.
+	
+		1 - create a vector of Item elements that match each element in the state.
+		2 - pass the vector to the StateEntity analyze method
+		3 - build a vector of results for each element in the state.
+		4 - combine the results to a single value based on the states operator
+	*/
 	OvalEnum::ResultEnumeration Analyze(Item* item);
+
+	/** Parse the provided state element from a oval definition file into a State object. */
 	void Parse(DOMElement* stateElm);
 
+	/** Sarch the cache of States for the specifed State. 
+		Return NULL if not found
+	*/
 	static State* SearchCache(string id);
+
+	/** Delete all items in the cache. */
 	static void ClearCache();
+
+	/** Cache the specified state. */
 	static void Cache(State* state);
 
+	/** Return a state object for the specified state id.
+		First the cache of States is checked. If the state is
+		not found in the cache the state is looked up in the
+		oval-definitions document and parsed. Once parsed the new State
+		object is added to the cache.
+
+		If the state is not found an exception is thrown. 
+	*/
+	static State* GetStateById(string stateId);
+
 private:
+
+	/** Create a new State object.
+		Sets the operator and version
+	*/
+	State(OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
+	
+
 	static AbsStateMap processedStatesMap;
 };
 

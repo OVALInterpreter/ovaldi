@@ -65,8 +65,6 @@ typedef map <string, Test* > TestMap;
 class Test {
 
 public:
-	/** Create a complete Test object **/
-	Test();
 
 	/** Distroy the Test object.
 	    Deletes each TestedItem.
@@ -78,8 +76,7 @@ public:
 		calls testedVariable->Write() for each tested var.
 	*/
 	void Write(DOMElement* parent);
-	/** Parse the Test elmement into a Test object. */
-	void Parse(DOMElement* testElm);
+
 
 	/** Evaluate the test and return the result. 
 	    Make sure not previously analyzed.
@@ -171,14 +168,36 @@ public:
 	/** Add the specified TestedVariable to the set of tested variables **/
 	void AppendTestedVariable(VariableValue* testedVariable);
 
+	/** Delete all items in the cache. **/
+	static void ClearCache();
+	/** Cache the specified Test. */
+	static void Cache(Test* test);
+
+	/** Return a test object for the specified test id.
+		First the cache of Tests is checked. If the test is
+		not found in the cache the test is looked up in the
+		oval-definitions document and parsed. Once parsed the new Test
+		object is added to the cache.
+
+		If the test is not found an exception is thrown. 
+	*/
+	static Test* GetTestById(string testId);
+
+private:
+
+	/** Create a complete Test object **/
+	Test();
+
+	/** Parse the Test elmement into a Test object. 
+		The resulting object is cached.
+	*/
+	void Parse(DOMElement* testElm);
+
 	/** Search the cache of Tests for the specifed Test. 
 	    Return NULL if not found 
 	*/
 	static Test* SearchCache(string id);
-	/** Delete all items in the cache. **/
-	static void ClearCache();
 
-private:
 	int version;
 	int variableInstance;
 	OvalEnum::ResultEnumeration result;
@@ -193,7 +212,6 @@ private:
 	string objectId;
 	string stateId;
 
-	//static TestVector processedTests;
 	static TestMap processedTestsMap;
 };
 

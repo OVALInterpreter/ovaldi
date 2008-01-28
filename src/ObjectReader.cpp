@@ -35,12 +35,6 @@
 //								ObjectReader Class										  //	
 //****************************************************************************************//
 OvalEnum::Flag ObjectReader::GetCollectedObjectFlag(string objectId) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the flag associated with the collected object.
-	//
-	// -----------------------------------------------------------------------
 
 	OvalEnum::Flag flag = OvalEnum::FLAG_ERROR;
 
@@ -62,12 +56,6 @@ OvalEnum::Flag ObjectReader::GetCollectedObjectFlag(string objectId) {
 }
 
 ItemVector* ObjectReader::GetItemsForObject(string objectId) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the set of items for the specified id
-	//
-	// -----------------------------------------------------------------------
 
 	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
 	
@@ -93,14 +81,7 @@ ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 						string childName = XmlCommon::GetElementName(objectChild);
 						if(childName.compare("reference") == 0) {
 							string itemRef = XmlCommon::GetAttributeByName(objectChild, "item_ref");
-							Item* item = Item::SearchCache(atoi(itemRef.c_str())); 
-							if(item == NULL) {
-								DOMElement* systemDataElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "system_data");
-								DOMElement* itemElm = XmlCommon::FindElementByAttribute(systemDataElm, "id", itemRef);
-                                item = new Item();
-								item->Parse(itemElm);
-								Item::Cache(item);
-							}
+							Item* item = Item::GetItemById(itemRef);
 							items->push_back(item);
 						}
 					}
@@ -120,12 +101,6 @@ ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 }
 
 VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the set of variable values used to collect this object
-	//
-	// -----------------------------------------------------------------------
 
 	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
 	
@@ -163,10 +138,10 @@ VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
 				throw Exception("Error: The flag attribute value must be \'complete\'. Found: " + OvalEnum::FlagToString(flag));
 			}
 		} else {
-			throw Exception("Error: The specifeid object was not found in the provided System Characteristics file.");
+			throw Exception("Error: The specified object was not found in the provided System Characteristics document.");
 		}
 	} else {
-		throw Exception("Error: Unable to locate collected_object element in provided System Characteristics file.");
+		throw Exception("Error: Unable to locate collected_object element in provided System Characteristics document.");
 	}
 	return values;
 }

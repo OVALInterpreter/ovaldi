@@ -297,7 +297,7 @@ void Test::Parse(DOMElement* testElm) {
 		this->SetStateId(stateId);
 	}
 
-	Test::processedTestsMap.insert(TestPair(this->GetId(), this));
+	Test::Cache(this);
 }
 
 OvalEnum::ResultEnumeration Test::Analyze() {
@@ -340,14 +340,17 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 							
 							// create a new tested item
 						    TestedItem* testedItem = new TestedItem();
-							Item* item = Item::SearchCache(atoi(itemId.c_str()));
-							if(item != NULL) {                          
-								testedItem->SetItem(item);
-							} else {
-								// get the item elm in the sc file
-								DOMElement* itemElm = XmlCommon::FindElementByAttribute(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), "id", itemId);
-                                testedItem->ParseItem(itemElm);
-							}
+							Item* item = Item::GetItemById(itemId);
+							testedItem->SetItem(item);
+
+							//Item* item = Item::SearchCache(atoi(itemId.c_str()));
+							//if(item != NULL) {                          
+							//	testedItem->SetItem(item);
+							//} else {
+							//	// get the item elm in the sc file
+							//	DOMElement* itemElm = XmlCommon::FindElementByAttribute(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), "id", itemId);
+       //                         testedItem->ParseItem(itemElm);
+							//}
 							this->AppendTestedItem(testedItem);
 						
 						} else if(childName.compare("variable_value") == 0) {
@@ -480,7 +483,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 				} else if(collectedObjFlag == OvalEnum::FLAG_COMPLETE) {
 					
-					OvalEnum::ResultEnumeration ovarallResult = OvalEnum::RESULT_ERROR;
+					OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_ERROR;
 
 					// Evaluate the check existence attribute.
 					OvalEnum::ResultEnumeration existenceResult = this->EvaluateCheckExistence();
@@ -488,9 +491,9 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 					// if the existence result is true evaluate the check_state attribute if there is a state
 					if(existenceResult == OvalEnum::RESULT_TRUE) {
 						if(this->GetStateId().compare("") != 0) {
-							ovarallResult = this->EvaluateCheckState();
+							overallResult = this->EvaluateCheckState();
 						} else {
-							ovarallResult = existenceResult;
+							overallResult = existenceResult;
 
 							// since we did no look at the state set the tested item result to not evaluated
 							TestedItemVector::iterator iterator;
@@ -500,7 +503,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 						}
 
 					} else {
-						ovarallResult = existenceResult;
+						overallResult = existenceResult;
 
 						// since we did no look at the state set the tested item result to not evaluated
 						TestedItemVector::iterator iterator;
@@ -509,7 +512,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 						}
 					}
 
-					this->SetResult(ovarallResult);
+					this->SetResult(overallResult);
 				}
 			}
 		}
@@ -627,19 +630,17 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckState() {
 		stateResult = OvalEnum::RESULT_TRUE;
 
 	} else {
+
 		try {
-			State* tmpState =  State::SearchCache(this->GetStateId());
-			if(tmpState == NULL) {
-				// state not already cached so parse it
-				tmpState = new State(this->GetStateId());
-			}
+
+			State* state =  State::GetStateById(this->GetStateId());
 
 			// analyze each tested item
 			IntVector results;
 			TestedItemVector::iterator iterator;
 			for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
 				OvalEnum::ResultEnumeration tmpResult;
-				tmpResult = tmpState->Analyze((*iterator)->GetItem());
+				tmpResult = state->Analyze((*iterator)->GetItem());
 				(*iterator)->SetResult(tmpResult);
 				results.push_back(tmpResult);
 			}
@@ -654,4 +655,33 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckState() {
 	}
 
 	return stateResult;
+}
+
+void Test::Cache(Test* test) {
+
+	Test::processedTestsMap.insert(TestPair(test->GetId(), test));
+}
+
+Test* Test::GetTestById(string testId) {
+
+	Test* test = NULL;
+	
+	// Search the cache
+	test = Test::SearchCache(testId);
+
+	// if not found try to parse it.
+	if(test == NULL) {
+
+		DOMElement* testsElm = XmlCommon::FindElement(DocumentManager::GetDefinitionDocument(), "tests");
+		DOMElement* testElm = XmlCommon::FindElementByAttribute(testsElm, "id", testId);
+
+		if(testElm == NULL) {
+			throw new Exception("Unable to find specified test in oval-definition document. Test id: " + testId);
+		}
+
+		test = new Test();
+		test->Parse(testElm);
+	}
+	
+	return test;
 }

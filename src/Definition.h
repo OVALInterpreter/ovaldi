@@ -151,7 +151,7 @@ public:
 	/** Return a definition object for the specified definition id.
 		First the cache of Definitions is checked. If the definition is
 		not found in the cache the definition is looked up in the
-		oval-definitions doument and parsed. Once parsed the new Definition
+		oval-definitions document and parsed. Once parsed the new Definition
 		object is added to the cache.
 
 		If the definition is not found an exception is thrown. 

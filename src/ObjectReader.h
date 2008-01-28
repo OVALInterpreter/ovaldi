@@ -58,8 +58,16 @@ using namespace std;
 class ObjectReader {
 public:
 	
+	/** Return the flag associated with the collected object. 
+		Locate teh collected object in the System characteristics document and
+		return the flag attribute's value.
+	*/
 	static OvalEnum::Flag GetCollectedObjectFlag(string objectId);
+
+	/** Return the set of items for the specified id. */
 	static ItemVector* GetItemsForObject(string objectId);
+
+	/** Return the set of variable values used to collect the specified object. */
 	static VariableValueVector* GetVariableValuesForObject(string objectId);
 };
 

@@ -32,7 +32,6 @@
 #include "Item.h"
 
 int Item::idCounter = 1;
-//ItemVector Item::processedItems;
 ItemMap Item::processedItemsMap;
 
 //****************************************************************************************//
@@ -385,6 +384,7 @@ ItemEntityVector* Item::GetElementsByName(string elementName) {
 
 	return matchingElements;
 }
+
 void Item::Parse(DOMElement* scItemElm) {
 
 	this->SetName(XmlCommon::GetElementName(scItemElm));
@@ -463,6 +463,31 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 	}
 }
 
+Item* Item::GetItemById(string itemId) {
+
+	Item* item = NULL;
+	
+	// Search the cache
+	item = Item::SearchCache(atoi(itemId.c_str()));
+
+	// if not found try to parse it.
+	if(item == NULL) {
+
+		DOMElement* systemDataElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "system_data");
+		DOMElement* itemElm = XmlCommon::FindElementByAttribute(systemDataElm, "id", itemId);
+
+		if(itemElm == NULL) {
+			throw new Exception("Unable to find specified item in system-characteristics document. Item id: " + itemId);
+		}
+
+		item = new Item();
+		item->Parse(itemElm);
+		Item::Cache(item);
+	}
+	
+	return item;
+}
+
 // ***************************************************************************************	//
 //								 Private members											//
 // ***************************************************************************************	//
@@ -511,8 +536,6 @@ void Item::ClearCache() {
 }
 
 void Item::Cache(Item* item) {
-
-	//	TODO - do i need to add protection to this cache
 
 	Item::processedItemsMap.insert(ItemPair(item->GetId(), item));
 }
