@@ -17,6 +17,9 @@
 * Updated Windows FileProbe to use GetFileTime API for a, m, and c times. Code was previously using stat. The schema documentation said to use GetFileTime.
 * Corrected bug in Windows RegistryProbe that was incorrectly appending a trailing space to binary registry values.
 * Corrected bug in windows/FileEffectiveRightsProbe::GetEffectiveRights. Access right were being read incorrectly. 
+* Corrected bug in caching of Items during evaluation. The cache of items was effectively not being used because the call to cache a new item was made before the item was parsed from the xml. The cache is based on an item's id. The id is not set until the item is parsed.
+* Improved caching code used in Definition, Test, and State evalaute.
+* Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_MULTI_SZ value the last value was not being collected. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
