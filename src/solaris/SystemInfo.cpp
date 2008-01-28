@@ -92,10 +92,6 @@ void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc)
 	//	Find the system_info node
 	DOMElement* sysInfoNode = XmlCommon::FindElement(scDoc, "system_info");
 
-	// Add the required elements
-	//DOMElement* tmpElm = XmlCommon::CreateElement(scDoc, "family", "windows");
-	//sysInfoNode->appendChild(tmpElm);
-
 	DOMElement* tmpElm = XmlCommon::CreateElement(scDoc, "os_name", os_name);
 	sysInfoNode->appendChild(tmpElm);
 
