@@ -688,7 +688,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 				string strValue = "";
 				bool addedValue = false;
-				for (DWORD x=0; x<(valuelenIn-2); x++) {
+				for (DWORD x=0; x<=(valuelenIn-2); x++) {
 
 					ZeroMemory(multiszBuf, sizeof(multiszBuf));
 					_snprintf(multiszBuf, sizeof(multiszBuf)-1, "%C", valueIn[x]);
