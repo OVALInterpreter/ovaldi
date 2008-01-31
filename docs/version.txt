@@ -20,6 +20,7 @@
 * Corrected bug in caching of Items during evaluation. The cache of items was effectively not being used because the call to cache a new item was made before the item was parsed from the xml. The cache is based on an item's id. The id is not set until the item is parsed.
 * Improved caching code used in Definition, Test, and State evalaute.
 * Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_MULTI_SZ value the last value was not being collected. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
+* Corrected bug in EntityComparator::CompareInteger. not equals operation was not properly being evaluated.
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
