@@ -389,9 +389,9 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 		}
 	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
 		if(scInt != defInt) {
-			result = OvalEnum::RESULT_FALSE;
-		} else {
 			result = OvalEnum::RESULT_TRUE;
+		} else {
+			result = OvalEnum::RESULT_FALSE;
 		}
 	} else if(op == OvalEnum::OPERATION_LESS_THAN) {
 		

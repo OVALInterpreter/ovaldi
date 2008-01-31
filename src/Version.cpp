@@ -38,7 +38,7 @@
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VERSION "5.3"
-#define BUILD 49
+#define BUILD 55
 
 string Version::GetMinumumCompatibleVersion() {
 
