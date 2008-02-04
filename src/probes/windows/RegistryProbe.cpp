@@ -1,5 +1,5 @@
 //
-// $Id: RegistryProbe.cpp 4666 2008-01-23 14:03:59Z bakerj $
+// $Id: $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -712,6 +712,18 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 		case REG_SZ:
 			{
 				item->AppendElement(new ItemEntity("type",  "reg_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+
+				/*
+				if the string is empty, sometimes the valuelenIn returned by RegQueryValueEx
+				when used to get the data size returns 3 for an empty string, where valueIn[2]
+				is a ? mark. 
+				*/
+
+				if (valuelenIn > 2) {
+					if ((valueIn[0] == 0x0) && (valueIn[1] == 0x0)) {
+						for (DWORD x=2; x<(valuelenIn); x++) valueIn[x] = 0x0;
+					}
+				}
 
 				char strBuf[3];
 				string strValue = "";
