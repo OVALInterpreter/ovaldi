@@ -21,6 +21,8 @@
 * Improved caching code used in Definition, Test, and State evalaute.
 * Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_MULTI_SZ value the last value was not being collected. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
 * Corrected bug in EntityComparator::CompareInteger. not equals operation was not properly being evaluated.
+* Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_SZ value for a registry value set to an empty string a '?' was occaisionally being recorded as the value. Thanks to Thayne Harmon (thayne.harmon@lumension.com) for the fix.
+ 
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
