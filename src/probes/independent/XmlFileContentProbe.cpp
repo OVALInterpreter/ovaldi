@@ -289,8 +289,18 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
+						} else if(node->getNodeType() == XalanNode::ATTRIBUTE_NODE) {
+
+							const CharVectorType chVec = TranscodeToLocalCodePage(node->getNodeValue());
+							string value;
+							for( int i=0; chVec[i] !='\0'; i++)
+								value += chVec[i];
+
+							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+
 						} else {
-							throw ProbeException("Error: invalid xpath specified. An xpath is only allowed to select text nodes from a document.");
+
+							throw ProbeException("Error: invalid xpath specified. An xpath is only allowed to select text nodes or attribute nodes from a document.");
 						}
 					}
 				}
