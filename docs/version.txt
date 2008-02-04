@@ -23,6 +23,7 @@
 * Corrected bug in EntityComparator::CompareInteger. not equals operation was not properly being evaluated.
 * Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_SZ value for a registry value set to an empty string a '?' was occaisionally being recorded as the value. Thanks to Thayne Harmon (thayne.harmon@lumension.com) for the fix.
 * Corrected bug in XmlFileContentProbe::EvaluateXpath method. The code to transcode a text node's value to a string was not always succeeding.
+* Added support for xpath selection of attribute nodes to existing XmlFileContentProbe::EvaluateXpath method.
  
 
 ---------------------------------------
