@@ -161,13 +161,6 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 }
 
 Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xpath) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//	
-	//	Return an Item for the specifeid xpath if is succeeds
-	//	otherwise return NULL
-	// -----------------------------------------------------------------------
 
 	Item* item = NULL;
 
@@ -200,6 +193,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 	XALAN_USING_XALAN(XalanSourceTreeParserLiaison)
 	XALAN_USING_XALAN(XObjectPtr)
 	XALAN_USING_XALAN(NodeRefList)
+	XALAN_USING_XALAN(CharVectorType)
 
 	// Initialize the XalanSourceTree subsystem...
 	XalanSourceTreeInit	theSourceTreeInit;
@@ -287,16 +281,16 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 						XalanNode* node = nodeList.item(i);
 
 						if(node->getNodeType() == XalanNode::TEXT_NODE) {
-							XalanDOMString nodeValue = node->getNodeValue();
-							// Convert the result value to a string
-							ostringstream r;
-							r << nodeValue;
-							string value = r.str();
+							
+							const CharVectorType chVec = TranscodeToLocalCodePage(node->getNodeValue());
+							string value;
+							for( int i=0; chVec[i] !='\0'; i++)
+								value += chVec[i];
 
 							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
 						} else {
-							throw ProbeException("Error: invalid xpath specifeid. an xpath is only allowed to select text nodes from a document.");
+							throw ProbeException("Error: invalid xpath specified. An xpath is only allowed to select text nodes from a document.");
 						}
 					}
 				}

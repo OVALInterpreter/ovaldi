@@ -101,6 +101,7 @@ protected:
 	/** The static Singleton instance of the XmlFileContentProbe. */
 	static XmlFileContentProbe* instance;
 
+	/** Return an Item for the specified xpath if is succeeds otherwise return NULL. */
 	Item* EvaluateXpath(string path, string fileName, string xpath);
 };
 
