@@ -58,12 +58,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation 
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation op, string defValue, string scValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	compare two boolean values based on the specified operation
-	//  can have the following values: {true, false, 1, 0)
-	// -----------------------------------------------------------------------
+
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
 	bool defBoolValue = false;
@@ -105,12 +100,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareEvrString(OvalEnum::Operation op, string defValue, string scValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Compare two evr string values based on the specified operation
-	//  This code motivated (strongly) by librpm's rpmdsCompare().
-	// -----------------------------------------------------------------------
+	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
 	string installedEpochStr = EntityComparator::GetEpochFromEVR(scValue);
@@ -301,13 +291,7 @@ int EntityComparator::xisupper(int c) {
 	return (c >= 'A' && c <= 'Z');
 }
 
-
 OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation op, string defValue, string scValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	compare two float values based on the specified operation
-	// -----------------------------------------------------------------------
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
@@ -369,11 +353,6 @@ OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operat
 	return result;
 }
 OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation op, string defValue, string scValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	compare two integer values based on the specified operation
-	// -----------------------------------------------------------------------
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
@@ -435,11 +414,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation op, string defValue, string scValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	compare two string values based on the specified operation
-	// -----------------------------------------------------------------------
+
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
@@ -450,30 +425,6 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 		}
 	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
 		if(defValue.compare(scValue) != 0) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;			
-		}
-	} else if(op == OvalEnum::OPERATION_GREATER_THAN) {
-		if(defValue.compare(scValue) < 0) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;			
-		}
-	} else if(op == OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL) {
-		if(defValue.compare(scValue) <= 0) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;			
-		}
-	} else if(op == OvalEnum::OPERATION_LESS_THAN) {
-		if(defValue.compare(scValue) > 0) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;			
-		}
-	} else if(op == OvalEnum::OPERATION_LESS_THAN_OR_EQUAL) {
-		if(defValue.compare(scValue) >= 0) {
 			result = OvalEnum::RESULT_TRUE;
 		} else {
 			result = OvalEnum::RESULT_FALSE;			
