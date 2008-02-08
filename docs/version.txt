@@ -26,7 +26,8 @@
 * Added support for xpath selection of attribute nodes to existing XmlFileContentProbe::EvaluateXpath method.
 * Corrected bug that was creating a tests and definitions element in the result document even if they were not needed. This only occures if a input oval-definitions document has no definitions or no tests.
 * Corrected bug in EntityComparator::CompareFloat. not equals operation was not properly being evaluated.
-* Corrected bug in EntityComparator::CompareBoolean. not equals and equals operations were not properly being evaluated.
+* Corrected bug in EntityComparator::CompareBoolean. not equals and equals operations were not properly being evaluated. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
+* Corrected bug in PasswordPolicyProbe. Code was converting max an min password age to days. Should have been in seconds. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
