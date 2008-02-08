@@ -67,7 +67,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 	if(defValue.compare("true") == 0 || defValue.compare("1") == 0) {
 		defBoolValue = true;
 	} else if(defValue.compare("false") == 0 || defValue.compare("0") == 0) {
-		defBoolValue = true;
+		defBoolValue = false;
 	} else {
 		throw Exception("Error: Invalid boolean value on definition entity. " + defValue);
 	}
@@ -75,7 +75,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 	if(scValue.compare("true") == 0 || scValue.compare("1") == 0) {
 		scBoolValue = true;
 	} else if(scValue.compare("false") == 0 || scValue.compare("0") == 0) {
-		scBoolValue = true;
+		scBoolValue = false;
 	} else {
 		throw Exception("Error: Invalid boolean value on system characteristics item entity. " + scValue);
 	}
@@ -295,9 +295,9 @@ OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation o
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
-	// convert the strings to integers
+	// convert the strings to doubles
 	double defDouble = atof(defValue.c_str());
-	double scDouble = atoi(scValue.c_str());
+	double scDouble = atof(scValue.c_str());
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
 		if(scDouble == defDouble) {
@@ -307,9 +307,9 @@ OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation o
 		}
 	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
 		if(scDouble != defDouble) {
-			result = OvalEnum::RESULT_FALSE;
-		} else {
 			result = OvalEnum::RESULT_TRUE;
+		} else {
+			result = OvalEnum::RESULT_FALSE;
 		}
 	} else if(op == OvalEnum::OPERATION_LESS_THAN) {
 		
