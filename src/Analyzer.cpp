@@ -1,5 +1,4 @@
 //
-// $Id: Analyzer.cpp 4605 2008-01-04 17:59:03Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -33,6 +32,9 @@
 
 DOMElement* Analyzer::definitionsElm = NULL;
 DOMElement* Analyzer::testsElm = NULL;
+DOMElement* Analyzer::resultsSystemElm = NULL;
+DOMElement* Analyzer::resultsElm = NULL;
+
 StringPairVector Analyzer::trueResults;
 StringPairVector Analyzer::falseResults;
 StringPairVector Analyzer::unknownResults;
@@ -45,8 +47,7 @@ StringPairVector Analyzer::notApplicableResults;
 //****************************************************************************************//
 
 Analyzer::Analyzer() {
-	this->resultsSystemElm = NULL;
-	this->resultsElm = NULL;
+
 }
 
 Analyzer::~Analyzer() {
@@ -55,14 +56,38 @@ Analyzer::~Analyzer() {
 // ***************************************************************************************	//
 //								Public members												//
 // ***************************************************************************************	//
+DOMElement* Analyzer::GetResultsElm() {	
+	return Analyzer::resultsElm;
+}
 
-DOMElement* Analyzer::GetResultsTestsElm() {
+DOMElement* Analyzer::GetResultsSystemElm() {	
+
+	if(Analyzer::resultsSystemElm == NULL) {
+		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), Analyzer::GetResultsElm(), "system");
+		Analyzer::resultsSystemElm = elm;
+	}
+	return Analyzer::resultsSystemElm;
+}
+
+DOMElement* Analyzer::GetResultsSystemDefinitionsElm() {	
+
+	if(Analyzer::definitionsElm == NULL) {
+		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), Analyzer::GetResultsSystemElm(), "definitions");
+		Analyzer::definitionsElm = elm;
+	}
+	return Analyzer::definitionsElm;
+}
+
+DOMElement* Analyzer::GetResultsSystemTestsElm() {
+	
+	if(Analyzer::testsElm == NULL) {
+		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), Analyzer::GetResultsSystemElm(), "tests");
+		Analyzer::testsElm = elm;
+	}
 	return Analyzer::testsElm;
 }
 
-DOMElement* Analyzer::GetResultsDefinitionsElm() {
-	return Analyzer::definitionsElm;
-}
+
 
 void Analyzer::AppendTrueResult(StringPair* pair) {
 	return Analyzer::trueResults.push_back(pair);
@@ -129,7 +154,7 @@ void Analyzer::Run() {
 
 					Definition* def = Definition::GetDefinitionById(definitionId);
 					def->Analyze();
-					def->Write(Analyzer::GetResultsDefinitionsElm());					
+					def->Write(Analyzer::GetResultsSystemDefinitionsElm());					
 					prevIdLength = definitionId.length();
 				}
    			}
@@ -156,10 +181,9 @@ void Analyzer::Run() {
 		this->FinializeResultsDocument();
 
 	} else {
-		string logMessage = "\n    No definitions found! \n";
+		string logMessage = "\n    No definitions found in the input oval-definitions document! \n";
 		cout << logMessage;
 		Log::UnalteredMessage(logMessage);
-		throw AnalyzerException("");
 	}
 }
 
@@ -204,7 +228,7 @@ void Analyzer::Run(StringVector* definitionIds) {
 
 					Definition* def = Definition::GetDefinitionById(definitionId);
 					def->Analyze();
-					def->Write(Analyzer::GetResultsDefinitionsElm());					
+					def->Write(Analyzer::GetResultsSystemDefinitionsElm());					
 					prevIdLength = definitionId.length();
 
 				} else {
@@ -243,7 +267,7 @@ void Analyzer::Run(StringVector* definitionIds) {
 
 					Definition* def = Definition::GetDefinitionById(definitionId);
 					def->NotEvaluated();
-					def->Write(Analyzer::GetResultsDefinitionsElm());
+					def->Write(Analyzer::GetResultsSystemDefinitionsElm());
 					prevIdLength = definitionId.length();					
 				}
    			}
@@ -270,10 +294,9 @@ void Analyzer::Run(StringVector* definitionIds) {
 		this->FinializeResultsDocument();
 
 	} else {
-		string logMessage = "\n    No definitions found! \n";
+		string logMessage = "\n    No definitions found in the input oval-definitions document! \n";
 		cout << logMessage;
 		Log::UnalteredMessage(logMessage);
-		throw AnalyzerException("");
 	}
 }
 
@@ -290,7 +313,7 @@ void Analyzer::PrintResults() {
 	///////////////////////////////////////////////////////////////////////////
 	cout << "    OVAL Id                                 Result" << endl;
 	cout << "    -------------------------------------------------------" << endl;
-	Log::UnalteredMessage("    OVAL Id                                Result\n");
+	Log::UnalteredMessage("    OVAL Id                                 Result\n");
 	Log::UnalteredMessage("    -------------------------------------------------------\n");
 
 	// print each result value 
@@ -397,25 +420,9 @@ void Analyzer::InitResultsDocument() {
 	XmlCommon::AddAttribute(defNotAppElm, "reported", "true");
 	XmlCommon::AddAttribute(defNotAppElm, "content", "full");
 
-	// used to add the definition doc here
-
 	// add the results element
 	DOMElement *resultsElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), ovalResultsElm, "results");
-	this->resultsElm = resultsElm;
-
-	// add the system element
-	DOMElement *systemElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), resultsElm, "system");
-	this->resultsSystemElm = systemElm;
-
-	// add the definitions element
-	DOMElement *definitionsElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), systemElm, "definitions");
-	Analyzer::definitionsElm = definitionsElm;
-
-	// add the tests element
-	DOMElement *testsElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), systemElm, "tests");
-	Analyzer::testsElm = testsElm;
-
-	// used to add the sc documnet here
+	Analyzer::resultsElm = resultsElm;
 }
 
 void Analyzer::FinializeResultsDocument() {
@@ -425,9 +432,9 @@ void Analyzer::FinializeResultsDocument() {
 	DOMElement* definitionNode = (DOMElement*)DocumentManager::GetResultDocument()->importNode(DocumentManager::GetDefinitionDocument()->getDocumentElement(), true);
 	ovalResultsElm->insertBefore(definitionNode, this->resultsElm);
 	// need to clean up the attributes on the oval_definitiosn element.
-	// copy all namespaces the documnet root
-	// add all schema locations to the docuement root.
-	// leave only the xmlns attribute on the element to seet the dedfault ns for all child elements.
+	// copy all namespaces the document root
+	// add all schema locations to the document root.
+	// leave only the xmlns attribute on the element to set the default ns for all child elements.
 	XmlCommon::CopyNamespaces(DocumentManager::GetDefinitionDocument(), DocumentManager::GetResultDocument());
 	XmlCommon::CopySchemaLocation(DocumentManager::GetDefinitionDocument(), DocumentManager::GetResultDocument());
 	XmlCommon::RemoveAttributes(definitionNode);
@@ -436,10 +443,10 @@ void Analyzer::FinializeResultsDocument() {
 	// add the oval_system characteristics element
 	DOMElement* scNode = (DOMElement*)DocumentManager::GetResultDocument()->importNode(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), true);
 	this->resultsSystemElm->appendChild(scNode);
-	// need to clean up the attributes on the oval_definitiosn element.
-	// copy all namespaces the documnet root
-	// add all schema locations to the docuement root.
-	// leave only the xmlns attribute on the element to seet the dedfault ns for all child elements.
+	// need to clean up the attributes on the oval_definitions element.
+	// copy all namespaces the document root
+	// add all schema locations to the document root.
+	// leave only the xmlns attribute on the element to seet the default ns for all child elements.
 	XmlCommon::CopyNamespaces(DocumentManager::GetSystemCharacterisitcsDocument(), DocumentManager::GetResultDocument());
 	XmlCommon::CopySchemaLocation(DocumentManager::GetSystemCharacterisitcsDocument(), DocumentManager::GetResultDocument());
 	XmlCommon::RemoveAttributes(scNode);

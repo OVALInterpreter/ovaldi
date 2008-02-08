@@ -1,5 +1,4 @@
 //
-// $Id: Definition.cpp 4604 2008-01-04 13:47:42Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -223,9 +222,6 @@ void Definition::Parse(DOMElement* definitionElm) {
 	if(criteriaElm != NULL) {
 		this->SetCriteria(new Criteria());	
 		this->GetCriteria()->Parse(criteriaElm);
-	} else {
-		this->SetAnalyzed(true);
-		this->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
 	}
 
 	Definition::processedDefinitionsMap.insert(DefinitionPair(this->GetId(), this));
@@ -234,17 +230,23 @@ void Definition::Parse(DOMElement* definitionElm) {
 OvalEnum::ResultEnumeration Definition::Analyze() {
 
 	if(!this->GetAnalyzed()) {
+		
+		if(this->GetCriteria() == NULL) {
 
-		// analyze the definition and save the result
-		OvalEnum::ResultEnumeration currentResult = this->GetCriteria()->Analyze();
-		this->SetResult(currentResult);
+			this->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+	
+		} else {
 
+			// analyze the definition and save the result
+			OvalEnum::ResultEnumeration currentResult = this->GetCriteria()->Analyze();
+			this->SetResult(currentResult);
+		}
 		this->SetAnalyzed(true);
 
 		// make sure the results are stored only once
 		StringPair* pair = new StringPair();
 		pair->first = this->GetId();
-		pair->second = OvalEnum::ResultToString(currentResult);
+		pair->second = OvalEnum::ResultToString(this->GetResult());
 		if(result == OvalEnum::RESULT_TRUE) {
 			Analyzer::AppendTrueResult(pair);
 		} else if(result == OvalEnum::RESULT_FALSE) {

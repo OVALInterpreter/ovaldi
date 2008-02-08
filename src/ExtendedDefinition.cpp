@@ -1,5 +1,4 @@
 //
-// $Id: ExtendedDefinition.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -94,7 +93,7 @@ void ExtendedDefinition::Write(DOMElement* parentElm) {
 	XmlCommon::AddAttribute(extendedDefinitionElm, "result", OvalEnum::ResultToString(this->GetResult()));
 
 	// write the definition ref
-	this->GetDefinitionRef()->Write(Analyzer::GetResultsDefinitionsElm());
+	this->GetDefinitionRef()->Write(Analyzer::GetResultsSystemDefinitionsElm());
 }
 
 void ExtendedDefinition::Parse(DOMElement* extendedDefinitionElm) {

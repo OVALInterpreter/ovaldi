@@ -1,5 +1,4 @@
 //
-// $Id: Criterion.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -83,7 +82,7 @@ void Criterion::Write(DOMElement* parentElm) {
 	XmlCommon::AddAttribute(criterionElm, "result", OvalEnum::ResultToString(this->GetResult()));
 
 	// write the test ref
-	this->GetTestRef()->Write(Analyzer::GetResultsTestsElm());
+	this->GetTestRef()->Write(Analyzer::GetResultsSystemTestsElm());
 }
 
 void Criterion::Parse(DOMElement* criterionElm) {

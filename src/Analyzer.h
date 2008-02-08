@@ -58,6 +58,7 @@ using namespace std;
 class Analyzer {
 public:
 	Analyzer();
+
 	~Analyzer();
 
 	/** Evaluate all OVAL Definitions.
@@ -75,9 +76,13 @@ public:
 	void Run(StringVector* definitionIds);
 
 	/** Return a ptr to the tests element in the results doc. **/
-	static DOMElement* GetResultsTestsElm();
+	static DOMElement* GetResultsSystemTestsElm();
 	/** Return a ptr to the definitions element in the results document. **/
-	static DOMElement* GetResultsDefinitionsElm();
+	static DOMElement* GetResultsSystemDefinitionsElm();
+	/** Return a ptr to the system element in the results document. **/
+	static DOMElement* GetResultsSystemElm();
+	/** Return a ptr to the results element in the results document. **/
+	static DOMElement* GetResultsElm();
 
 	/** Print the results of the analysis. */
 	void PrintResults();
@@ -108,6 +113,8 @@ private:
 
 	static DOMElement* definitionsElm;
 	static DOMElement* testsElm;
+	static DOMElement* resultsSystemElm;
+	static DOMElement* resultsElm;
 
 	static StringPairVector trueResults;
 	static StringPairVector falseResults;
@@ -115,8 +122,7 @@ private:
 	static StringPairVector errorResults;
 	static StringPairVector notEvaluatedResults;
 	static StringPairVector notApplicableResults;
-	DOMElement* resultsSystemElm;
-	DOMElement* resultsElm;
+
 };
 
 /** 
