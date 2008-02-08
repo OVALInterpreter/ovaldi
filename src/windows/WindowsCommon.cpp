@@ -1,5 +1,4 @@
 //
-// $Id: WindowsCommon.cpp 4668 2008-01-23 14:08:51Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -1052,4 +1051,15 @@ string WindowsCommon::LookUpLocalSystemName() {
 string WindowsCommon::ToString(FILETIME fTime) {
 
 	return Common::ToString(fTime.dwLowDateTime) + Common::ToString(fTime.dwHighDateTime);
+}
+
+string WindowsCommon::ToString(DWORD dw) {
+
+	char dwordBuf[12];
+	ZeroMemory(dwordBuf, sizeof(dwordBuf));
+	_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%d", dw);
+	dwordBuf[sizeof(dwordBuf)-1] = '\0';
+
+	string dwStr = dwordBuf;
+	return dwStr;
 }

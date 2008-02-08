@@ -1,5 +1,4 @@
 //
-// $Id: WindowsCommon.h 4668 2008-01-23 14:08:51Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -106,6 +105,9 @@ public:
 
 	/** Convert the FILETIME strucutre to an integer. */
 	static string ToString(FILETIME fTime);
+
+	/** Return a string representation of the DWORD */
+	static string ToString(DWORD dw);
 
 private:
 

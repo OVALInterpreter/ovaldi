@@ -1,5 +1,4 @@
 //
-// $Id: LockoutPolicyProbe.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -57,9 +56,6 @@ public:
 
 private:
 	LockoutPolicyProbe();
-
-	/** Return a string representation of the DWORD */
-	string ConvertDWORD(DWORD dw);
 
 	static LockoutPolicyProbe *instance;
 };

@@ -1,5 +1,4 @@
 //
-// $Id: PasswordPolicyProbe.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -50,6 +49,7 @@ public:
 	/** Run the probe. */
 	ItemVector* CollectItems(Object* object);
 
+	/** Return a new Item created for storing password policy information. */
 	Item* CreateItem();
 		
 	/** Ensure that the PasswordPolicyProbe is a singleton. */
@@ -57,7 +57,6 @@ public:
 
 private:
 	PasswordPolicyProbe();
-	string ConvertDWORD(DWORD dw);
 
 	static PasswordPolicyProbe *instance;
 };

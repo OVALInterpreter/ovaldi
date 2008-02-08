@@ -1,5 +1,4 @@
 //
-// $Id: PasswordPolicyProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -55,13 +54,12 @@ AbsProbe* PasswordPolicyProbe::Instance() {
 }
 
 ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
-	ItemVector *collectedItems = NULL;
 
+	ItemVector *collectedItems = NULL;
 	
 	DWORD dwLevel = 0;
 	USER_MODALS_INFO_0 *pBuf = NULL;
 	NET_API_STATUS nStatus;
-	//LPTSTR pszServerName = NULL;
 	LPCWSTR pszServerName = NULL;
 
 	nStatus = NetUserModalsGet(pszServerName,
@@ -70,10 +68,18 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
 
 	if (nStatus == NERR_Success) {
 		if (pBuf != NULL) {
-			string minPasswordLen = this->ConvertDWORD(pBuf->usrmod0_min_passwd_len);
-			string maxPasswordAge = this->ConvertDWORD(pBuf->usrmod0_max_passwd_age/86400); // div by 86400
-			string minPasswordAge = this->ConvertDWORD(pBuf->usrmod0_min_passwd_age/86400); // div by 86400
-			string passwordHistoryLen = this->ConvertDWORD(pBuf->usrmod0_password_hist_len);
+			string minPasswordLen = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_len);
+
+			string maxPasswordAge = "-1";
+			if(pBuf->usrmod0_max_passwd_age == TIMEQ_FOREVER) {
+				maxPasswordAge = "-1";
+			} else {
+				maxPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_max_passwd_age);
+			}
+
+			string minPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_age);
+
+			string passwordHistoryLen = WindowsCommon::ToString(pBuf->usrmod0_password_hist_len);
 
 			// create a new passwordpolicy item
 			Item* item = this->CreateItem();
@@ -108,18 +114,10 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
 	return collectedItems;
 }
 
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 Item* PasswordPolicyProbe::CreateItem() {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return a new Item created for storing password policy information
-	//
-	// -----------------------------------------------------------------------
 
 	Item* item = new Item(0, 
 						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows", 
@@ -129,22 +127,4 @@ Item* PasswordPolicyProbe::CreateItem() {
 						"passwordpolicy_item");
 
 	return item;
-}
-
-string PasswordPolicyProbe::ConvertDWORD(DWORD dw) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return a string representation of the DWORD
-	//
-	// -----------------------------------------------------------------------
-
-	char dwordBuf[12];
-	ZeroMemory(dwordBuf, sizeof(dwordBuf));
-	_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%d", dw);
-	dwordBuf[sizeof(dwordBuf)-1] = '\0';
-
-	string dwStr = dwordBuf;
-	return dwStr;
 }

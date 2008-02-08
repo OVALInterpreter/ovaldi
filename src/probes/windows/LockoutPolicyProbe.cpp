@@ -1,5 +1,4 @@
 //
-// $Id: LockoutPolicyProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -75,7 +74,7 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object *object) {
 
 	if (nStatus == NERR_Success) {
 		if (pBufM0 != NULL) {
-			string forceLogoff = this->ConvertDWORD(pBufM0->usrmod0_force_logoff);
+			string forceLogoff = WindowsCommon::ToString(pBufM0->usrmod0_force_logoff);
 
 			// create a new passwordpolicy item
 			item = this->CreateItem();
@@ -113,9 +112,10 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object *object) {
 
 	if (nStatus == NERR_Success) {
 		if (pBufM3 != NULL) {
-			string lockoutDuration = this->ConvertDWORD(pBufM3->usrmod3_lockout_duration);
-			string lockoutObservationWindow = this->ConvertDWORD(pBufM3->usrmod3_lockout_observation_window);
-			string lockoutThreshold = this->ConvertDWORD(pBufM3->usrmod3_lockout_threshold);
+
+			string lockoutDuration = WindowsCommon::ToString(pBufM3->usrmod3_lockout_duration);
+			string lockoutObservation = WindowsCommon::ToString(pBufM3->usrmod3_lockout_observation_window);
+			string lockoutThreshold = WindowsCommon::ToString(pBufM3->usrmod3_lockout_threshold);
 
 
 			// create a new passwordpolicy item
@@ -127,7 +127,7 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object *object) {
 			collectedItems->push_back(item);
 
 			item->AppendElement(new ItemEntity("lockout_duration",  lockoutDuration, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("lockout_observation_window",  lockoutObservationWindow, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("lockout_observation_window",  lockoutObservation, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("lockout_threshold",  lockoutThreshold, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
 			// Free the allocated memory.
@@ -163,15 +163,4 @@ Item* LockoutPolicyProbe::CreateItem() {
 						"lockoutpolicy_item");
 
 	return item;
-}
-
-string LockoutPolicyProbe::ConvertDWORD(DWORD dw) {
-
-	char dwordBuf[12];
-	ZeroMemory(dwordBuf, sizeof(dwordBuf));
-	_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%d", dw);
-	dwordBuf[sizeof(dwordBuf)-1] = '\0';
-
-	string dwStr = dwordBuf;
-	return dwStr;
 }
