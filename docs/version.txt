@@ -24,7 +24,9 @@
 * Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_SZ value for a registry value set to an empty string a '?' was occaisionally being recorded as the value. Thanks to Thayne Harmon (thayne.harmon@lumension.com) for the fix.
 * Corrected bug in XmlFileContentProbe::EvaluateXpath method. The code to transcode a text node's value to a string was not always succeeding.
 * Added support for xpath selection of attribute nodes to existing XmlFileContentProbe::EvaluateXpath method.
- 
+* Corrected bug that was creating a tests and definitions element in the result document even if they were not needed. This only occures if a input oval-definitions document has no definitions or no tests.
+* Corrected bug in EntityComparator::CompareFloat. not equals operation was not properly being evaluated.
+* Corrected bug in EntityComparator::CompareBoolean. not equals and equals operations were not properly being evaluated.
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
