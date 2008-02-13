@@ -676,7 +676,7 @@ Test* Test::GetTestById(string testId) {
 		DOMElement* testElm = XmlCommon::FindElementByAttribute(testsElm, "id", testId);
 
 		if(testElm == NULL) {
-			throw new Exception("Unable to find specified test in oval-definition document. Test id: " + testId);
+			throw Exception("Unable to find specified test in oval-definition document. Test id: " + testId);
 		}
 
 		test = new Test();
