@@ -150,31 +150,31 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
 
 				switch (i) {
 					case AuditCategorySystem:
-						this->ReadAuditOptions(systemItem, current); 
+						this->ReadAuditOptions(item, systemItem, current); 
 						break;
 					case AuditCategoryLogon:
-						this->ReadAuditOptions(logonItem, current); 
+						this->ReadAuditOptions(item, logonItem, current); 
 						break;
 					case AuditCategoryObjectAccess:
-						this->ReadAuditOptions(objectAccessItem, current); 
+						this->ReadAuditOptions(item, objectAccessItem, current); 
 						break;
 					case AuditCategoryPrivilegeUse:
-                        this->ReadAuditOptions(privilegeUseItem, current); 
+						this->ReadAuditOptions(item, privilegeUseItem, current); 
 						break;
 					case AuditCategoryDetailedTracking:
-						this->ReadAuditOptions(detailedTrackingItem, current); 
+						this->ReadAuditOptions(item, detailedTrackingItem, current); 
 						break;
 					case AuditCategoryPolicyChange:
-						this->ReadAuditOptions(policyChangeItem, current); 
+						this->ReadAuditOptions(item, policyChangeItem, current); 
 						break;
 					case AuditCategoryAccountManagement:
-						this->ReadAuditOptions(accountManagementItem, current); 
+						this->ReadAuditOptions(item, accountManagementItem, current); 
 						break;
 					case AuditCategoryDirectoryServiceAccess:
-						this->ReadAuditOptions(directoryServiceAccessItem, current); 
+						this->ReadAuditOptions(item, directoryServiceAccessItem, current); 
 						break;
 					case AuditCategoryAccountLogon:
-						this->ReadAuditOptions(accountLogonItem, current); 
+						this->ReadAuditOptions(item, accountLogonItem, current); 
 						break;
 					default:
 						Log::Info("Unknown POLICY_AUDIT_EVENT_TYPE. ");
@@ -229,7 +229,7 @@ Item* AuditEventPolicyProbe::CreateItem() {
 	return item;
 }
 
-void AuditEventPolicyProbe::ReadAuditOptions(ItemEntity* itemEntity, ULONG auditPolicy) {
+void AuditEventPolicyProbe::ReadAuditOptions(Item* item, ItemEntity* itemEntity, ULONG auditPolicy) {
 
 	if(auditPolicy & POLICY_AUDIT_EVENT_NONE) {
         itemEntity->SetValue("AUDIT_NONE");
@@ -251,10 +251,12 @@ void AuditEventPolicyProbe::ReadAuditOptions(ItemEntity* itemEntity, ULONG audit
 		// Reference url:
 		// http://msdn2.microsoft.com/en-us/library/ms721901.aspx
 		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.");
+		item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.", OvalEnum::LEVEL_WARNING));
 		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
 	} else {
 		// should never get here
 		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found.");
+		item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found.", OvalEnum::LEVEL_WARNING));
 		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
 	} 
 }

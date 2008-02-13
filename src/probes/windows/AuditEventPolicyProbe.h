@@ -63,7 +63,7 @@ private:
 		The POLICY_AUDIT_EVENT_MASK mask evaluates to TRUE if it is set 
 		equal to any of the preceding event auditing options.
 	*/
-	void ReadAuditOptions(ItemEntity* itemElm, ULONG auditPolicy);
+	void ReadAuditOptions(Item* item, ItemEntity* itemElm, ULONG auditPolicy);
 
 	static AuditEventPolicyProbe *instance;
 };
