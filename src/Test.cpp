@@ -562,18 +562,36 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_TRUE;			
 		} else if(existsCount >= 0 && doesNotExistCount >= 1 && errorCount >= 0 && notCollectedCount >= 0) {
 			existenceResult = OvalEnum::RESULT_FALSE;
+		} else if(existsCount == 0 && doesNotExistCount == 0 && errorCount == 0 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_FALSE;
 		} else if(existsCount >= 0 && doesNotExistCount == 0 && errorCount >= 1 && notCollectedCount >= 0) {
 			existenceResult = OvalEnum::RESULT_ERROR;
-		} else if(existsCount >= 0 && doesNotExistCount == 0 && errorCount == 0 && notCollectedCount >= 0) {
+		} else if(existsCount >= 0 && doesNotExistCount == 0 && errorCount == 0 && notCollectedCount >= 1) {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		} else {
+			string msg = "Unexpected set of item statues found while evaluating the check existence value for a test. check_existence='all_exist' Found";
+			msg.append(" exists count=" + existsCount);
+			msg.append(" does not exist count=" + doesNotExistCount);
+			msg.append(" error count=" + errorCount);
+			msg.append(" not collected count=" + notCollectedCount);
+			Log::Info(msg);
 		}
 		
 	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
 		
 		if(existsCount >= 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 0) {
-			existenceResult = OvalEnum::RESULT_TRUE;			
-		} else if(existsCount == 0 && doesNotExistCount == 0 && errorCount >= 1 && notCollectedCount == 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;	
+		} else if(existsCount >= 1 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_TRUE;	
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
 			existenceResult = OvalEnum::RESULT_ERROR;
+		} else {
+			string msg = "Unexpected set of item statues found while evaluating the check existence value for a test. check_existence='any_exist' Found";
+			msg.append(" exists count=" + existsCount);
+			msg.append(" does not exist count=" + doesNotExistCount);
+			msg.append(" error count=" + errorCount);
+			msg.append(" not collected count=" + notCollectedCount);
+			Log::Info(msg);
 		}
 
 	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_AT_LEAST_ONE_EXISTS) {
@@ -586,6 +604,13 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_ERROR;
 		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		} else {
+			string msg = "Unexpected set of item statues found while evaluating the check existence value for a test. check_existence='at_least_one_exists' Found";
+			msg.append(" exists count=" + existsCount);
+			msg.append(" does not exist count=" + doesNotExistCount);
+			msg.append(" error count=" + errorCount);
+			msg.append(" not collected count=" + notCollectedCount);
+			Log::Info(msg);
 		}
 
 	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST) {
@@ -598,6 +623,13 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_ERROR;
 		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		} else {
+			string msg = "Unexpected set of item statues found while evaluating the check existence value for a test. check_existence='none_exist' Found";
+			msg.append(" exists count=" + existsCount);
+			msg.append(" does not exist count=" + doesNotExistCount);
+			msg.append(" error count=" + errorCount);
+			msg.append(" not collected count=" + notCollectedCount);
+			Log::Info(msg);
 		}
 
 	} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ONLY_ONE_EXISTS) {
@@ -608,12 +640,22 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_FALSE;
 		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount == 0) {
 			existenceResult = OvalEnum::RESULT_FALSE;
-		} else if(existsCount >= 0 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
 			existenceResult = OvalEnum::RESULT_ERROR;
-		} else if(existsCount >= 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
+		} else if(existsCount == 1 && doesNotExistCount >= 0 && errorCount >= 1 && notCollectedCount >= 0) {
+			existenceResult = OvalEnum::RESULT_ERROR;
+		} else if(existsCount == 0 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		} else if(existsCount == 1 && doesNotExistCount >= 0 && errorCount == 0 && notCollectedCount >= 1) {
+			existenceResult = OvalEnum::RESULT_UNKNOWN;
+		} else {
+			string msg = "Unexpected set of item statues found while evaluating the check existence value for a test. check_existence='only_one_exists' Found";
+			msg.append(" exists count=" + existsCount);
+			msg.append(" does not exist count=" + doesNotExistCount);
+			msg.append(" error count=" + errorCount);
+			msg.append(" not collected count=" + notCollectedCount);
+			Log::Info(msg);
 		}
-
 	}
 
 	return existenceResult;
