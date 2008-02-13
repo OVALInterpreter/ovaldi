@@ -1,5 +1,4 @@
 //
-// $Id: $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -38,7 +37,7 @@
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VERSION "5.3"
-#define BUILD 55
+#define BUILD 58
 
 string Version::GetMinumumCompatibleVersion() {
 
