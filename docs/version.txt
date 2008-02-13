@@ -18,13 +18,13 @@
 * Corrected bug in Windows RegistryProbe that was incorrectly appending a trailing space to binary registry values.
 * Corrected bug in windows/FileEffectiveRightsProbe::GetEffectiveRights. Access right were being read incorrectly. 
 * Corrected bug in caching of Items during evaluation. The cache of items was effectively not being used because the call to cache a new item was made before the item was parsed from the xml. The cache is based on an item's id. The id is not set until the item is parsed.
-* Improved caching code used in Definition, Test, and State evalaute.
+* Improved caching code used in Definition, Test, and State evaluate.
 * Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_MULTI_SZ value the last value was not being collected. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
 * Corrected bug in EntityComparator::CompareInteger. not equals operation was not properly being evaluated.
-* Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_SZ value for a registry value set to an empty string a '?' was occaisionally being recorded as the value. Thanks to Thayne Harmon (thayne.harmon@lumension.com) for the fix.
+* Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_SZ value for a registry value set to an empty string a '?' was occasionally being recorded as the value. Thanks to Thayne Harmon (thayne.harmon@lumension.com) for the fix.
 * Corrected bug in XmlFileContentProbe::EvaluateXpath method. The code to transcode a text node's value to a string was not always succeeding.
 * Added support for xpath selection of attribute nodes to existing XmlFileContentProbe::EvaluateXpath method.
-* Corrected bug that was creating a tests and definitions element in the result document even if they were not needed. This only occures if a input oval-definitions document has no definitions or no tests.
+* Corrected bug that was creating a tests and definitions element in the result document even if they were not needed. This only occurs if an input oval-definitions document has no definitions or no tests.
 * Corrected bug in EntityComparator::CompareFloat. not equals operation was not properly being evaluated.
 * Corrected bug in EntityComparator::CompareBoolean. not equals and equals operations were not properly being evaluated. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
 * Corrected bug in PasswordPolicyProbe. Code was converting max an min password age to days. Should have been in seconds. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
@@ -38,12 +38,12 @@
 ---------------------------------------
 * Implemented TextFileContentProbe and documented weaknesses in the oval-definitions-schema. The code for this probe is based on contributions from Pavel Vinogradov (Pavel.Vinogradov@NIXDEV.NET)
 * Added REGEX::GetMatchingSubstrings function to allow matched substrings to be pulled from an input string.
-* Corrected Test::EvaluateCheckExistence method's combining of items based on the check_extistence attribute. The schema documetationt was changed causing a code change to the interpreter source.  
+* Corrected Test::EvaluateCheckExistence method's combining of items based on the check_extistence attribute. The schema documentation was changed causing a code change to the interpreter source.  
 * Corrected bug in processing of AccessToken behaviors. 
-* Corrected bug in EntityCompartator that was causing the parse version string method to fail on 64 bit linux systems. Thanks to Ken Sorensen (sorensk@losrios.edu) and Mark Cox (mjc@redhat.com) for tracking this down and fixing it. Applied similar fixes to problematic areas of the code.
+* Corrected bug in EntityCompartator that was causing the parse version string method to fail on 64 bit Linux systems. Thanks to Ken Sorensen (sorensk@losrios.edu) and Mark Cox (mjc@redhat.com) for tracking this down and fixing it. Applied similar fixes to problematic areas of the code.
 * Corrected bug in processing of variable components. Needed to make a copy of the messages associated with a ComponentValue when computing a value for a Component.
 * Corrected bug in AbsObjectCollector::ProcessObject function. The code was not correctly computing the flag value on collected objects. The flag value should be based on the combination of the status value of each referenced item.
-* Updated Linux makfile to support rpm and dpkg package managers on Linux systems.
+* Updated Linux makefile to support rpm and dpkg package managers on Linux systems.
 * Corrected bug in processing of unix file_object behaviors. This required an update to AbsFileFinder and both the Linux and Windows FileFinder implementations. The bug allowed unsupported unix file_object behaviors to go reported on unix systems. 2 of 4 unix file_object behaviors are supported at this time. Now if an unsupported unix file_object behavior is found an error message is reported.
 * Corrected bug in processing of command line arguments which caused the -p flag to not be considered until after some code had already been executed.
 * Source code comments were cleaned up.
@@ -58,7 +58,7 @@
 * Added support for new account privileges defined in Vista to the AccessTokenProbe.
 * Corrected bug in code that determines the namespace of an element. Reported by Thomas Jones.
 * Added support for behaviors on the win:accesstoken_object.
-* Added support for the ONE operator on crieria.
+* Added support for the ONE operator on criteria.
 * Added support for the new check_existence attribute and modified check attribute on tests.
 * Added doxygen generated source documentation to source distributions.
 * Added support for optional Schematron validation of oval-defintitions documents.
@@ -76,10 +76,10 @@
 * Windows binaries are now built with Visual Studio 2005(VC8).
 * Added support for recurse_direction and max_depth behaviors on files. 
 * Added support for collection of additional fields in win-sc:file_items.
-* Removed unneeded oval-def xmlns from generated system-characteristcs files.
+* Removed unneeded oval-def xmlns from generated system-characteristics files.
 * Added support for filehash_tests.
 * Corrected bug in results_to_html.xsl that was not creating valid urls to definitions in the results section of the output.
-* Corrected bug in RegistryProbe. Added an additiona result value to the list of values that equate to a registry key does not exist on the system. Previously was reporting an error when teh key was not found. Fix applied to registry names too.
+* Corrected bug in RegistryProbe. Added an additional result value to the list of values that equate to a registry key does not exist on the system. Previously was reporting an error when the key was not found. Fix applied to registry names too.
 * Corrected bug in RegistryProbe. When collected data for a REG_MULTI_SZ if the value was an empty string it was not reported properly which lead to incorrect unknown results.
 * Corrected bug in AbsEntity::Analyze method. This bug caused the interpreter to not be able to properly use variable values in some complex objects. The interpreter then would incorrectly report items as not found on a host.
 
@@ -87,16 +87,16 @@
 ---        Version 5.1 build 14     ---
 ---------------------------------------
 * Added newlines to end of RestrictionType.cpp and ExternalVariable.cpp to prevent compile warnings
-* Added build info to System Characteristics and OVAL Results file generator infomation.
+* Added build info to System Characteristics and OVAL Results file generator information.
 * Added /xml/results_to_html.xsl to convert oval results xml files to html for viewing.
 * Added new command line options and supporting code to run a specified xsl on the results xml and output to a specified file.
 * Added comments to collected objects in the System Characteristics output if the object in the OVAL Definition file has a comment.
 * Removed 127.0.0.1 from the list of interfaces in the <system_info/> element.
-* Corrected bug in EntityComparator.h declaraion of members functions GetEpochFromEVR, GetVersionFromEVR, and GetReleaseFromEVR. Thanks to Thomas R. Jones [thomas.jones@MAITREYASECURITY.COM]
+* Corrected bug in EntityComparator.h declaration of members functions GetEpochFromEVR, GetVersionFromEVR, and GetReleaseFromEVR. Thanks to Thomas R. Jones [thomas.jones@MAITREYASECURITY.COM]
 * Corrected bug in the data collection process seen when an OVAL Definition file is used that does not contain an <objects/> element. Thanks to Max Vozeler [max.vozeler@LSEXPERTS.DE]
 * Corrected bug in the analysis process seen when an OVAL Definition file is used that does not contain a <definitions/> element.
 * Corrected command line output of results to include extended definitions. 
-* Cleaned up Red Hat rpm's. Created a seperate rpm for EL3 and EL4
+* Cleaned up Red Hat rpm's. Created a separate rpm for EL3 and EL4
 * Added man page.
 * Cleaned up Linux src distribution.
 
@@ -108,7 +108,7 @@
 ---------------------------------------
 ---        Version 5.0 build 74     ---
 ---------------------------------------
-* Corrected bug display of object and definition ids as they are being processed. Bug caused objects that wer actually not applicable to be flagged as not collected.
+* Corrected bug display of object and definition ids as they are being processed. Bug caused objects that were actually not applicable to be flagged as not collected.
 
 ---------------------------------------
 ---        Version 5.0 build 71     ---
@@ -122,7 +122,7 @@
 * Added support for data collection of win-def:group_test.
 * Added support for data collection of win-def:user_test.
 * Corrected bug in Object::Parse method. There was a typo in the name of the behaviors element that would cause behaviors to be ignored.
-* Corrected bug in AbsObjectCollector::ProcessSet method. CollectedSets were no always being initilaized causing a NULLptr error.
+* Corrected bug in AbsObjectCollector::ProcessSet method. CollectedSets were no always being initialized causing a NULL ptr error.
 * Corrected bug in error reporting on windows FileProbe. Error messages were being appended one after the other resulting in many repeated messages.
 * Corrected bug in Item::Write() method. Only one message element is allowed on a given item.
 
@@ -132,7 +132,7 @@
 * Added support for external variables. 
 * Cleaned up command line processing. Added better messages when invalid command line options are provided.
 * Corrected typo in parse function that would have caused the datatype on constant variables to be ignored when parsing and always treated as the a string
-* Corrected bug in reporting of result on a tested_item element. In some cases the result was left as it default error value. This did not effect the overall result computation for a a test.
+* Corrected bug in reporting of result on a tested_item element. In some cases the result was left as it default error value. This did not effect the overall result computation for a test.
 * Corrected bug in Variable probe causing it to always fail to collect variable information.
 * Added support to the WMIProbe for addition datatypes. Previously only supported strings.
 * Corrected bug in AbsObjectCollector that lead to error details not being reported in the system-characteristics file.
@@ -203,6 +203,6 @@
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland Security.
-OVAL and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2006, The MITRE Corporation (www.mitre.org).
+OVAL and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2008, The MITRE Corporation (www.mitre.org).
 
 
