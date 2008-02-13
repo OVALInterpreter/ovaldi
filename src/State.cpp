@@ -180,7 +180,7 @@ State* State::GetStateById(string stateId) {
 		DOMElement* stateElm = XmlCommon::FindElementByAttribute(statesElm, "id", stateId);
 
 		if(stateElm == NULL) {
-			throw new Exception("Unable to find specified state in oval-definition document. State id: " + stateId);
+			throw Exception("Unable to find specified state in oval-definition document. State id: " + stateId);
 		}
 
 		state = new State();

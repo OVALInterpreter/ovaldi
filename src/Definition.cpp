@@ -70,7 +70,7 @@ Definition* Definition::GetDefinitionById(string definitionId) {
 		DOMElement* definitionElm = XmlCommon::FindElementByAttribute(definitionsElm, "id", definitionId);
 
 		if(definitionElm == NULL) {
-			throw new Exception("Unable to find specified definition in oval-definition document. Definition id: " + definitionId);
+			throw Exception("Unable to find specified definition in oval-definition document. Definition id: " + definitionId);
 		}
 		definition = new Definition();
 		definition->Parse(definitionElm);

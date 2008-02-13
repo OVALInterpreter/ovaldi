@@ -477,7 +477,7 @@ Item* Item::GetItemById(string itemId) {
 		DOMElement* itemElm = XmlCommon::FindElementByAttribute(systemDataElm, "id", itemId);
 
 		if(itemElm == NULL) {
-			throw new Exception("Unable to find specified item in system-characteristics document. Item id: " + itemId);
+			throw Exception("Unable to find specified item in system-characteristics document. Item id: " + itemId);
 		}
 
 		item = new Item();
