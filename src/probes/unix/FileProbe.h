@@ -1,5 +1,4 @@
 //
-// $Id: FileProbe.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -64,12 +63,16 @@ public:
 	/** Return a new Item created for storing file information */
 	Item* CreateItem();
 
+	/** Ensure that the FileProbe is a singleton. */
 	static AbsProbe* Instance();
+
 private:
+
 	FileProbe();
 
 	static FileProbe* instance;
 
+	/** Get all attributes for the file specified in fileIn. Return them in an Item. */
 	Item* GetFileAttributes(string path, string fileName);
 };
 

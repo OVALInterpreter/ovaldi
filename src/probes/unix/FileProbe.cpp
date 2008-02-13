@@ -1,5 +1,4 @@
 //
-// $Id: FileProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -48,13 +47,6 @@ FileProbe::~FileProbe() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 AbsProbe* FileProbe::Instance() {
-
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//	Ensure that the FileProbe is a singleton.
-	// -----------------------------------------------------------------------
 
 	// Use lazy initialization
 	if(instance == NULL) 
@@ -155,13 +147,6 @@ Item* FileProbe::CreateItem() {
 }
 
 Item* FileProbe::GetFileAttributes(string path, string fileName) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//	Get all attributes for the file specified in fileIn. Return them in a 
-	//	Item
-	// -----------------------------------------------------------------------
 
 	string errorMessage = "";
 
