@@ -7,7 +7,7 @@
 ****************************************************
 
 ---------------------------------------
----        Version 5.3 build ??     ---
+---        Version 5.3 build 59     ---
 ---------------------------------------
 * Corrected bug in FileEffectiveRightsProbe. The probe was improperly reading the access rights for a file.
 * Improved debug logging in the AuditEventPolicyProbe.
