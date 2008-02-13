@@ -1,5 +1,4 @@
 //
-// $Id: AuditEventPolicyProbe.cpp 4654 2008-01-17 22:19:08Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -79,15 +78,16 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
 				NULL,    //Name of the target system. NULL opens localhost
 				&ObjectAttributes, //Object attributes.
 				POLICY_VIEW_AUDIT_INFORMATION , //Desired access permissions. POLICY_ALL_ACCESS
-				&lsahPolicyHandle  //Receives the policy handle.
+				&lsahPolicyHandle  // Receives the policy handle.
 				);
 
 	if (ntsResult != ERROR_SUCCESS) {
-		// An error occurred. Display it as a win32 error code.
-		wprintf(L"OpenPolicy returned %lu\n", LsaNtStatusToWinError(ntsResult));
-
-
-		// TODO - BUG - outputting error mesage here should be logging it and reporting and error to the caller
+		DWORD errorCode = LsaNtStatusToWinError(ntsResult);
+		if(errorCode == ERROR_MR_MID_NOT_FOUND) {
+			throw ProbeException("Error obtaining audit event policy information - (win32) " + LsaNtStatusToWinError(ntsResult));
+		} else {
+			throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
+		}
 	} 
 
 	//
@@ -196,8 +196,13 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
 			item->AppendElement(new ItemEntity("system",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		}
 	} else {
-		// Show the corresponding win32 error code.
-		throw ProbeException("Error obtaining audit event policy information - (win32) " + LsaNtStatusToWinError(ntsResult));
+
+		DWORD errorCode = LsaNtStatusToWinError(ntsResult);
+		if(errorCode == ERROR_MR_MID_NOT_FOUND) {
+			throw ProbeException("Error obtaining audit event policy information - (win32) " + LsaNtStatusToWinError(ntsResult));
+		} else {
+			throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
+		}
 	}
 
 	LsaFreeMemory(pPAEInfo);
