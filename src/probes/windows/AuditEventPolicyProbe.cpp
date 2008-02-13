@@ -244,15 +244,28 @@ void AuditEventPolicyProbe::ReadAuditOptions(Item* item, ItemEntity* itemEntity,
 		itemEntity->SetValue("AUDIT_SUCCESS");
 		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
 	} else if (auditPolicy == POLICY_AUDIT_EVENT_UNCHANGED){
-		// should not get here. For some reason we seem to hit this condition 
+		// Originally I thought that I should not get here. 
+		// These are my original notes on this:
+		// For some reason we seem to hit this condition 
 		// when looking at the permissions for AuditCategoryDetailedTracking
 		// As documented at the link below i would not expect to get this value 
 		// after doing a query. The value should only be used when doing a set.
 		// Reference url:
 		// http://msdn2.microsoft.com/en-us/library/ms721901.aspx
-		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.");
+
+		// I have now looked into this a bit more. This appears to be the value
+		// we get when the the auditing option is not set in the gui. I verified 
+		// this through testing. I have not been able to verify it through the 
+		// Microsoft API documentation. For now i think it is safe to assume that 
+		// this value can be treated as AUDIT_NONE.
+		//
+
+		itemEntity->SetValue("AUDIT_NONE");
+		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+
+		/*Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.");
 		item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.", OvalEnum::LEVEL_WARNING));
-		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
+		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);*/
 	} else {
 		// should never get here
 		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found.");
