@@ -6,7 +6,7 @@ Summary:	The reference interpreter for the Open Vulnerability and Assessment Lan
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Source0:	http://oval.mitre.org/DontDownload/oval/download/ovaldi-%{version}.tar.bz2
+Source0:	http://oval.mitre.org/DontDownload/oval/download/ovaldi-%{version}-src.tar.bz2
 Copyright:	BSD
 Group:		System/Configuration/Other
 BuildRoot:	%{_tmppath}/%{name}-buildroot
@@ -49,7 +49,7 @@ Foundation, but are not yet packaged for Redhat.
 
 %prep
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
-%setup -n Interpreters
+%setup -n ovaldi-%{version}-src
 #%patch -p0
 
 %build
