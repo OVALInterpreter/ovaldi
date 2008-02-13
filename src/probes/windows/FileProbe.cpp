@@ -1,5 +1,4 @@
 //
-// $Id: FileProbe.cpp 4665 2008-01-23 14:01:18Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -187,28 +186,30 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		if (hFile == INVALID_HANDLE_VALUE) {
 
 			DWORD errorNum = GetLastError();
+			string sysErrMsg = WindowsCommon::GetErrorMessage(errorNum);
 
-			if(errorNum == ERROR_FILE_NOT_FOUND) {
+			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
 				
-				/*errorMessage.append("(FileProbe) The file '");
+				string errorMessage = "";
+				errorMessage.append("(FileProbe) Unable to open a handle to the file: '");
 				errorMessage.append(filePath);
-				errorMessage.append("' could not be found.");*/
+				errorMessage.append("'. This error should never occur since the file has already be confirmed to exist on the system. " + sysErrMsg);
+				throw ProbeException(errorMessage);
 				
 			} else if(errorNum == ERROR_PATH_NOT_FOUND) {
-
-				/*errorMessage.append("(FileProbe) The path '");
-				errorMessage.append(path);
-				errorMessage.append("' does not exist.");*/
-
-			} else {
-				char errorCodeBuffer[33];
-				_ltoa(errorNum, errorCodeBuffer, 10);
 
 				string errorMessage = "";
 				errorMessage.append("(FileProbe) Unable to open a handle to the file: '");
 				errorMessage.append(filePath);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
+				errorMessage.append("'. This error should never occur since the file has already be confirmed to exist on the system. " + sysErrMsg);
+				throw ProbeException(errorMessage);
+
+			} else {
+
+				string errorMessage = "";
+				errorMessage.append("(FileProbe) Unable to open a handle to the file: '");
+				errorMessage.append(filePath);
+				errorMessage.append("'.  " + sysErrMsg);
 				throw ProbeException(errorMessage);
 			}
 		}
@@ -347,9 +348,6 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			errorMessage.append("'.");
 			
 			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
-			item->AppendElement(new ItemEntity("a_time", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
-			item->AppendElement(new ItemEntity("c_time", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
-			item->AppendElement(new ItemEntity("m_time", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(errorMessage));
 			
 		} else {
