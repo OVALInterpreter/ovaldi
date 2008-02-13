@@ -28,6 +28,10 @@
 * Corrected bug in EntityComparator::CompareFloat. not equals operation was not properly being evaluated.
 * Corrected bug in EntityComparator::CompareBoolean. not equals and equals operations were not properly being evaluated. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
 * Corrected bug in PasswordPolicyProbe. Code was converting max an min password age to days. Should have been in seconds. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
+* Improved error messages in AuditEventPolicyProbe::CollectItems().
+* Improved error messages in FileProbe.
+* Corrected bug in Item::Equals function that returned false when items do not have any object entities. If there are no object entities the two item should be considered equal.
+* Modified AuditEventPolicyProbe::ReadAuditOptions() to treat POLICY_AUDIT_EVENT_UNCHANGED as AUDIT_NONE.
 
 ---------------------------------------
 ---        Version 5.3 build 40     ---
