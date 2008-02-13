@@ -311,24 +311,28 @@ bool Item::Equals(Item* item) {
 
 					// compare all object elements
 					unsigned int myElementCount = myObjElms->size();
-					unsigned int i = 0;
-					bool finished = false;
-					while(i < myElementCount && !finished) {
-						ItemEntity* myElement = (ItemEntity*)myObjElms->at(i++);
-						
-						string elmName = myElement->GetName();
-						// loop over itemObjElms to find the element with the same name
-						ItemEntityVector::iterator it;
-						for(it = itemObjElms->begin(); it != itemObjElms->end(); it++) {
-							if((*it)->GetName().compare(elmName) == 0) {
-								if(myElement->Equals((*it))) {
-									isEqual = true;
-									finished = false;
-									break;
-								} else {
-									isEqual = false;
-									finished = true;
-									break;
+					if(myElementCount == 0) {
+						isEqual = true;
+					} else {
+						unsigned int i = 0;
+						bool finished = false;
+						while(i < myElementCount && !finished) {
+							ItemEntity* myElement = (ItemEntity*)myObjElms->at(i++);
+							
+							string elmName = myElement->GetName();
+							// loop over itemObjElms to find the element with the same name
+							ItemEntityVector::iterator it;
+							for(it = itemObjElms->begin(); it != itemObjElms->end(); it++) {
+								if((*it)->GetName().compare(elmName) == 0) {
+									if(myElement->Equals((*it))) {
+										isEqual = true;
+										finished = false;
+										break;
+									} else {
+										isEqual = false;
+										finished = true;
+										break;
+									}
 								}
 							}
 						}
