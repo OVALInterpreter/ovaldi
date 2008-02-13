@@ -1,5 +1,4 @@
 //
-// $Id: FileEffectiveRightsProbe.cpp 4667 2008-01-23 14:07:42Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -318,6 +317,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	//	  http://msdn2.microsoft.com/en-us/library/aa446637.aspx
 	// -----------------------------------------------------------------------
 	
+
 	Item* item = NULL;
 
 	// build the path
@@ -330,6 +330,8 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 
 		filePath.append(fileName);
 	}
+
+	string baseErrMsg = "Error unable to get effective rights for trustee: " + trusteeName + " from dacl for file: " + filePath;
 
 	DWORD res;
 	PACL pdacl;
@@ -350,17 +352,30 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 		if (res == ERROR_FILE_NOT_FOUND) {
 			// should never get here. 
 			// before calling this function the file should already have been checked for existence.
-			throw ProbeException("Error unable locate " + filePath + " while getting trustee names."); 
+			throw ProbeException( baseErrMsg + " Unable locate the specified file."); 
 		} else {
-			throw ProbeException("Error unable to retrieve a copy of the security descriptor for " + filePath + " while getting trustee names."); 
+			throw ProbeException(baseErrMsg + " Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
 		}
 	} 
 
-	// Check to see if a valid security descriptor were returned.  
+	// Check to see if a valid security descriptor was returned.  
     if ((IsValidSecurityDescriptor(pSD) == 0) || (IsValidAcl(pdacl) == 0)) {
 		LocalFree(pSD);
-		throw ProbeException("Error invalid data returned from call to GetNamedSecurityInfo(). Cannot get effective rights for file: " + filePath);
+		throw ProbeException(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().");
+
+		//item->SetStatus(OvalEnum::STATUS_ERROR);
+		//item->AppendMessage(new OvalMessage(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().", OvalEnum::LEVEL_ERROR));
+		//Log::Debug(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().");
+		//return item;
 	}
+
+	// the file exists so we can create the new item now.
+	item = this->CreateItem();
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("trustee_name", trusteeName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+
 
 	// Get the sid for the trustee name
 	PSID pSid = WindowsCommon::GetSIDForTrusteeName(trusteeName);
@@ -368,7 +383,12 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	// check the sid
 	if(!IsValidSid(pSid)) {
 		LocalFree(pSD);
-		throw ProbeException("Error unable to get effective rights for trustee: " + trusteeName + ". Invalid sid found.");
+		throw ProbeException(baseErrMsg + " Invalid sid found.");
+
+		//item->SetStatus(OvalEnum::STATUS_ERROR);
+		//item->AppendMessage(new OvalMessage(baseErrMsg + " Invalid sid found.", OvalEnum::LEVEL_ERROR));
+		//Log::Debug(baseErrMsg + " Invalid sid found.");
+		//return item;
 	}
 
 	// build the trustee structure
@@ -379,16 +399,30 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	PACCESS_MASK accessRights = NULL;
 	accessRights = reinterpret_cast<PACCESS_MASK>(::LocalAlloc(LPTR, sizeof(PACCESS_MASK) + sizeof(ACCESS_MASK)));
 	if(accessRights == NULL) {
-		ProbeException("Error unable to get effective rights for trustee: " + trusteeName + ". Out of memory! Unable to allocate memory for access rights.");
+		throw ProbeException(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.");
+
+		//item->SetStatus(OvalEnum::STATUS_ERROR);
+		//item->AppendMessage(new OvalMessage(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.", OvalEnum::LEVEL_ERROR));
+		//Log::Debug(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.");
+		//return item;
 	}
 
 	res = GetEffectiveRightsFromAcl(pdacl,
 									&trustee,
 									accessRights);
 	if (res != ERROR_SUCCESS) {
+		
+		string errMsg = WindowsCommon::GetErrorMessage(res);		
+
 		LocalFree(pSD);
 		LocalFree(accessRights);
-		throw ProbeException("Error unable to get effective rights for trustee: " + trusteeName + " from dacl for file: " + filePath); 
+		
+		//item->SetStatus(OvalEnum::STATUS_ERROR);
+		//item->AppendMessage(new OvalMessage(baseErrMsg + " System error message: " + errMsg, OvalEnum::LEVEL_ERROR));
+		//Log::Debug(baseErrMsg + " System error message: " + errMsg);
+		//return item;
+
+		throw ProbeException(baseErrMsg + " System error message: " + errMsg); 		
 	} 
 		
 	// Convert access mask to binary.
@@ -414,12 +448,6 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 		mask[29] = '1';
 	if((*accessRights) & FILE_ALL_ACCESS)
 		mask[28] = '1';
-
-	item = this->CreateItem();
-	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("trustee_name", trusteeName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
 	// read values in the access_mask
 	item->AppendElement(new ItemEntity("standard_delete", Common::ToString(mask[16]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
