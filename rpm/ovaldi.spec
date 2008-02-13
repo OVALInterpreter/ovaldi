@@ -1,12 +1,12 @@
 %define name	ovaldi
-%define version	5.3.0
+%define version	5.3.59
 %define release	1
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Source0:	http://oval.mitre.org/DontDownload/oval/download/Interpreters.tbz2
+Source0:	http://oval.mitre.org/DontDownload/oval/download/ovaldi-%{version}.tar.bz2
 Copyright:	BSD
 Group:		System/Configuration/Other
 BuildRoot:	%{_tmppath}/%{name}-buildroot
