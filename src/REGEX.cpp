@@ -1,5 +1,4 @@
 //
-// $Id: REGEX.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -91,7 +90,7 @@ int REGEX::FindFirstRegexChar(const string stringIn) {
 		curChar = stringIn.at(pos);
 		nextChar = stringIn.at(pos+1);
 		
-		//	If a '\' check that the next next char is a '\'
+		//	If a '\' check that the next char is a '\'
 		if (strncmp(curChar.c_str(), "\\", 1) == 0)
 		{
 			if(strncmp(nextChar.c_str(), "\\", 1) == 0)
@@ -313,8 +312,8 @@ bool REGEX::IsMatch(const char *patternIn, const char *searchStringIn) {
 
 	//	Match a pattern
 	int rc;
-	int ovector[30];
-	for(int i = 0; i < 30; i++){
+	int ovector[60];
+	for(int i = 0; i < 60; i++){
 		ovector[i] = -1;
 	}
 	rc = pcre_exec(	compiledPattern,		// result of pcre_compile()			
@@ -324,7 +323,7 @@ bool REGEX::IsMatch(const char *patternIn, const char *searchStringIn) {
 					0,						// start at offset 0 in the subject	
 					0,						// default options					
 					ovector,				// vector of integers for substring information	
-					30);					// number of elements in the vector	
+					60);					// number of elements in the vector	
 
 	//	Test the return value of the pattern match 
 	//	and increment the match count if a match was found
@@ -337,8 +336,6 @@ bool REGEX::IsMatch(const char *patternIn, const char *searchStringIn) {
 		result = true;
 		this->matchCount++;
 	}
-
-	//free(compiledPattern);
 
 	return(result);
 }
@@ -448,21 +445,8 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 		}
 	}
 
-	//free(compiledPattern);
-
 	return(result);
 }
-
-//string REGEX::StrToNegativePattern(string strIn) {
-//	// -----------------------------------------------------------------------
-//	//  ABSTRACT
-//	//
-//	//  Convert the specified string to a negative pattern match
-//	//
-//	// -----------------------------------------------------------------------
-//
-//	return ("!^" + strIn + "$");
-//}
 
 string REGEX::RemoveExtraSlashes(string strIn) {
 
