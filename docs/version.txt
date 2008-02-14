@@ -7,6 +7,11 @@
 ****************************************************
 
 ---------------------------------------
+---        Version 5.3 build ??     ---
+---------------------------------------
+* Corrected bug in REGEX.cpp. Expanded the vector of integers for substrings to allow for more matching. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
+
+---------------------------------------
 ---        Version 5.3 build 59     ---
 ---------------------------------------
 * Corrected bug in FileEffectiveRightsProbe. The probe was improperly reading the access rights for a file.
