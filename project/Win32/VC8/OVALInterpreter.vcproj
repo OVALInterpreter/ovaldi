@@ -704,6 +704,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\EscapeRegexFunction.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\ExternalVariable.cpp"
 					>
 				</File>
@@ -1086,6 +1090,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\ConstantVariable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\EscapeRegexFunction.h"
 					>
 				</File>
 				<File
