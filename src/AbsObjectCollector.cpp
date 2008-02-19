@@ -1,5 +1,4 @@
 //
-// $Id: AbsObjectCollector.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -212,15 +211,17 @@ CollectedSet* AbsObjectCollector::Intersection(CollectedSet* collectedSet1, Coll
 	ItemVector* itemSet1 = collectedSet1->GetItems();
 	ItemVector* itemSet2 = collectedSet2->GetItems();
 
+	// Add the items from set 1 that exist in set 2
 	ItemVector::iterator iterator;
 	for(iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
-		if(!this->ExistsInSet(itemSet2, (*iterator))) {
+		if(this->ExistsInSet(itemSet2, (*iterator))) {
 			resultItems->push_back((*iterator));
 		}
 	}
 
+	// Add the items from set 2 that exist in set 1
 	for(iterator = itemSet2->begin(); iterator != itemSet2->end(); iterator++) {
-		if(!this->ExistsInSet(itemSet1, (*iterator))) {
+		if(this->ExistsInSet(itemSet1, (*iterator))) {
 			resultItems->push_back((*iterator));
 		}
 	}
@@ -293,11 +294,9 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 
 	} else {
 
-		collectedSet1 = new CollectedSet();
-		collectedSet2 = new CollectedSet();
-
 		// Collect each referenced object using any supplied filters
 		if(set->GetReferenceOne() != NULL) {
+			collectedSet1 = new CollectedSet();
 			CollectedObject* refOneCollectedObj = this->Run(set->GetReferenceOne()->GetId());
 			ItemVector* itemSet1 = refOneCollectedObj->GetReferences();
 			itemSet1 = this->ApplyFilters(itemSet1, set->GetFilters());
@@ -308,6 +307,7 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 		}
 
 		if(set->GetReferenceTwo() != NULL) {
+			collectedSet2 = new CollectedSet();
 			CollectedObject* refTwoCollectedObj = this->Run(set->GetReferenceTwo()->GetId());
 			ItemVector* itemSet2 = refTwoCollectedObj->GetReferences();
 			itemSet2 = this->ApplyFilters(itemSet2, set->GetFilters());
@@ -320,7 +320,7 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 
 	// combine all sets by operator
 	CollectedSet* combinedCollectedSet = NULL;
-	if(set->GetReferenceTwo() != NULL) {
+	if(collectedSet2 != NULL) {
 		if(set->GetSetOperator() == OvalEnum::SET_OPERATOR_UNION) {
 			combinedCollectedSet = this->Union(collectedSet1, collectedSet2);
 		} else if(set->GetSetOperator() == OvalEnum::SET_OPERATOR_COMPLEMENT) {

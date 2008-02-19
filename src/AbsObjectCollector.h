@@ -1,5 +1,4 @@
 //
-// $Id: AbsObjectCollector.h 4657 2008-01-17 22:25:33Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -159,7 +158,14 @@ protected:
 	/** Return a single set that contains all unique items in both sets. */
 	CollectedSet* Union(CollectedSet* collectedSet1, CollectedSet* collectedSet2);
 
-	/** Create a set of items that exist only in one of the specified sets. */
+	/** 
+		Create a set of items that exist only in one of the specified sets. 
+		From the schema documentation....
+		The intersection of two sets in OVAL results in a set that contains 
+		everything that belongs to both sets in the collection, but nothing else. 
+		If A and B are sets, then the intersection of A and B contains all 
+		the elements of A that also belong to B, but no other elements.
+	*/
 	CollectedSet* Intersection(CollectedSet* collectedSet1, CollectedSet* collectedSet2);
 
 	/** Create a set of unique items in set 1 but not in set 2, a relative complement. */
