@@ -1,5 +1,4 @@
 //
-// $Id: Set.h 4591 2008-01-03 16:29:59Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -74,29 +73,45 @@ public:
 	/** Parse the provided Set object element. */
 	void Parse(DOMElement* setElm);
 
+	/** Return a vector of all variable values used for this set. */
 	VariableValueVector* GetVariableValues();
 	
+	/** Return the filters field's value. */
 	AbsStateVector* GetFilters();
+	/** Set the filters field's value. */
 	void SetFilters(AbsStateVector* filters);
 
+	/** Get the isSimpleSet field's value. */
 	bool GetIsSimpleSet();
+	/** Set the isSimpleSet field's value. */
 	void SetIsSimpleSet(bool isSimpleSet);
 
+	/** Return the referenceOne field's value. */
 	AbsObject* GetReferenceOne();
+	/** Set the referenceOne field's value. */
 	void SetReferenceOne(AbsObject* object);
 
+	/** Return the referenceTwo field's value. */
 	AbsObject* GetReferenceTwo();
+	/** Set the referenceTwo field's value. */
 	void SetReferenceTwo(AbsObject* object);
 
+	/** Return the setOne field's value. */
 	Set* GetSetOne();
+	/** Set the setOne field's value. */
 	void SetSetOne(Set* set);
 
+	/** Return the setTwo field's value. */
 	Set* GetSetTwo();
+	/** Set the setTwo field's value. */
 	void SetSetTwo(Set* set);
 	
+	/** Return the setOperator field's value. */
 	OvalEnum::SetOperator GetSetOperator();
+	/** Set the setOperator field's value. */
 	void SetSetOperator(OvalEnum::SetOperator setOperator);
 
+	/** Add a filter to the end of the filters vector. */
 	void AppendFilter(Filter* filter);
     
 private:

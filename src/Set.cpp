@@ -1,5 +1,4 @@
 //
-// $Id: Set.cpp 4599 2008-01-03 16:47:09Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -59,11 +58,6 @@ Set::~Set() {
 	while(filters.size() != 0) {
 	  	filter = (Filter*)filters[filters.size()-1];
 	  	filters.pop_back();
-
-		// JB - Removed because filters are now cached. 
-		// The cache is managed by the Filter class.
-	  	//delete filter;
-	  	//filter = NULL;
 	}
 
 	if(this->referenceOne != NULL) {
@@ -85,178 +79,67 @@ Set::~Set() {
 //								 Public members												//
 // ***************************************************************************************	//
 AbsStateVector* Set::GetFilters() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the filters field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return &this->filters;
 }
 
 void Set::SetFilters(AbsStateVector* filters) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the filters field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->filters = (*filters);
 }
 
 bool Set::GetIsSimpleSet() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Get the isSimpleSet field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->isSimpleSet;
 }
 
 
 void Set::SetIsSimpleSet(bool isSimpleSet) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the isSimpleSet field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->isSimpleSet = isSimpleSet;	
 }
 
 AbsObject* Set::GetReferenceOne() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the referenceOne field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->referenceOne;
 }
 
 void Set::SetReferenceOne(AbsObject* object) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the referenceOne field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->referenceOne = object;
 }
 
 AbsObject* Set::GetReferenceTwo() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the referenceTwo field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->referenceTwo;
 }
 
 void Set::SetReferenceTwo(AbsObject* object) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the referenceTwo field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->referenceTwo = object;
 }
 
 Set* Set::GetSetOne() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the setOne field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->setOne;
 }
 
 void Set::SetSetOne(Set* set) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the setOne field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->setOne = set;
 }
 
 Set* Set::GetSetTwo() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the setTwo field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->setTwo;
 }
 
 void Set::SetSetTwo(Set* set) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the setTwo field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->setTwo = set;
 }
 
 OvalEnum::SetOperator Set::GetSetOperator() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the setOperator field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->setOperator;
 }
 
 void Set::SetSetOperator(OvalEnum::SetOperator setOperator) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the setOperator field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->setOperator = setOperator;
 }
 
 void Set::AppendFilter(Filter* filter) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Add a filter to the end of the filters vector
-	//
-	// -----------------------------------------------------------------------
-
 	this->filters.push_back(filter);
 }
 
 VariableValueVector* Set::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a vector of all variable values used for this set
-	//
-	// -----------------------------------------------------------------------
 
 	VariableValueVector* varValues = new VariableValueVector();
 	VariableValue* varValue = NULL;
@@ -410,4 +293,3 @@ SetException::SetException(string errMsgIn, int severity, Exception* ex) : Excep
 SetException::~SetException() {
 
 }
-
