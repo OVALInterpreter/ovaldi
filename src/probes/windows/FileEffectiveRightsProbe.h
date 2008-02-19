@@ -69,10 +69,10 @@ private:
 	Item* GetEffectiveRights(string path, string fileName, string trusteeName);
 
 	/** Identify all trustee names for the specified trusteeName ObjectEntity. */ 
-	StringVector* GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName);
+	StringSet* GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior);
 
 	/** Search all trustee names on the the specifed file and return the set of names the match the specifeid criteria. */
-	void GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringVector* trusteeNames, bool isRegex = true);
+	void GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringSet* trusteeNames, bool isRegex = true);
 
 	/** Return ture if the specfied trustee name exists in the set of trustee names */
 	bool TrusteeNameExists(string trusteeName, StringVector* trusteeNames);

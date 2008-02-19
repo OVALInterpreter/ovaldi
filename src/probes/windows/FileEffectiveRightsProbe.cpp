@@ -99,6 +99,24 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 		throw ProbeException("Error: invalid operation specified on trustee_name. Found: " + OvalEnum::OperationToString(trusteeName->GetOperation()));
 	}
 
+	// support behaviors - init with defaults.
+	bool includeGroupBehavior = true;
+	bool resolveGroupBehavior = false;
+	if(object->GetBehaviors()->size() != 0) {
+		BehaviorVector* behaviors = object->GetBehaviors();
+		BehaviorVector::iterator iterator;
+		for(iterator = behaviors->begin(); iterator != behaviors->end(); iterator++) {
+			Behavior* behavior = (*iterator);
+			if(behavior->GetName().compare("include_group") == 0 && behavior->GetValue().compare("false") == 0) {
+				includeGroupBehavior = false;
+			} else if(behavior->GetName().compare("resolve_group") == 0 && behavior->GetValue().compare("true") == 0) {
+				resolveGroupBehavior = true;
+			} else {
+				Log::Info("Unsupported behavior found when collecting " + object->GetId());
+			}
+		}		
+	}
+
 	FileFinder fileFinder;
 	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
 
@@ -139,9 +157,12 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 
 				try {
 
-					StringVector* trusteeNames = this->GetTrusteeNames(fp->first, fp->second, trusteeName);
-					if(trusteeNames->size() > 0) {
-						StringVector::iterator iterator;
+					//
+					// The file exists so lets get the trustees to then examine effective rights
+					//
+					StringSet* trusteeNames = this->GetTrusteeNames(fp->first, fp->second, trusteeName, resolveGroupBehavior, includeGroupBehavior);
+					if(!trusteeNames->empty()) {
+						StringSet::iterator iterator;
 						for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 							try {
 								Item* item = this->GetEffectiveRights(fp->first, fp->second, (*iterator));
@@ -220,15 +241,9 @@ Item* FileEffectiveRightsProbe::CreateItem() {
 	return item;
 }
 
-StringVector* FileEffectiveRightsProbe::GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName) {
-	// -----------------------------------------------------------------------
-	//  ABSTRACT
-	//
-	//	Return the set of trustee names that are specified by the 
-	//  ObjectEntity* trusteeName parameter.
-	// -----------------------------------------------------------------------
+StringSet* FileEffectiveRightsProbe::GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior) {
 
-	StringVector* trusteeNames = new StringVector();
+	StringSet* trusteeNames = new StringSet();
 	
 	// load the set of all Trustee names
 	StringVector* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
@@ -239,9 +254,9 @@ StringVector* FileEffectiveRightsProbe::GetTrusteeNames(string path, string file
 		// proceed based on operation
 		if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
 			
-			// check that the trusee name exists
+			// check that the trustee name exists
 			if(this->TrusteeNameExists(trusteeName->GetValue(), allTrusteeNames)) {
-				trusteeNames->push_back(trusteeName->GetValue());
+				trusteeNames->insert(trusteeName->GetValue());
 			}
 
 		} else if(trusteeName->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
@@ -259,7 +274,7 @@ StringVector* FileEffectiveRightsProbe::GetTrusteeNames(string path, string file
 		for(it = allTrusteeNames->begin(); it != allTrusteeNames->end(); it++) {
 			tmp->SetValue((*it));
 			if(trusteeName->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				trusteeNames->push_back((*it));
+				trusteeNames->insert((*it));
 			}
 		}
 	}
@@ -267,10 +282,44 @@ StringVector* FileEffectiveRightsProbe::GetTrusteeNames(string path, string file
 	// using common code to get these do not delete they are cached.
 	//delete allTrusteeNames;
 
-	return trusteeNames;
+	// apply the behaviors
+	StringSet* trusteeNamesSet = new StringSet();
+	if(!trusteeNames->empty()) {
+		
+		StringVector::iterator iterator;
+		StringSet::iterator it;
+		string domainStr = "";
+		string sidStr = "";
+		bool isGroup;
+
+		for(it = trusteeNames->begin(); it != trusteeNames->end(); it++) {
+			// is this a group
+			isGroup = WindowsCommon::LookUpTrusteeName(&(*it), &sidStr, &domainStr);
+
+			if(isGroup && resolveGroupBehavior) {
+
+				if(includeGroupBehavior) {
+					trusteeNamesSet->insert((*it));
+				}
+
+				// get the group members and add them to the set
+				StringVector* groupMembers = new StringVector();
+				WindowsCommon::ExpandGroup((*it), groupMembers);
+				for(iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
+					trusteeNamesSet->insert((*iterator));
+				}
+				delete groupMembers;
+
+			} else {
+				trusteeNamesSet->insert((*it));
+			}
+		}
+	}
+
+	return trusteeNamesSet;
 }
 
-void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringVector* trusteeNames, bool isRegex) {
+void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringSet* trusteeNames, bool isRegex) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -283,7 +332,7 @@ void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern
 	StringVector::iterator iterator;
 	for(iterator = allTrusteeNames->begin(); iterator != allTrusteeNames->end(); iterator++) {
 		if(this->IsMatch(trusteeNamePattern, (*iterator), isRegex)) {
-			trusteeNames->push_back((*iterator));
+			trusteeNames->insert((*iterator));
 		}
 	}
 }
