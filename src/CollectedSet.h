@@ -1,5 +1,4 @@
 //
-// $Id: CollectedSet.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -52,20 +51,28 @@ using namespace std;
 class CollectedSet {
 
 public:
+	/** Initialize the collected set. */
 	CollectedSet();
-	CollectedSet(ItemVector* items, OvalEnum::Flag flag, VariableValueVector* variableValues);
 	~CollectedSet();
 
+	/** Return the items field's value. */
 	ItemVector* GetItems();
+	/** Set the items field's value. */
 	void SetItems(ItemVector* items);
 	
+	/** Return the variableValues field's value. */
 	VariableValueVector* GetVariableValues();
+	/** Set the variableValues field's value. */
 	void SetVariableValues(VariableValueVector* variableValues);
-
+	
+	/** Add a variable value to the end of the variable values vector. */
 	void AppendVariableValue(VariableValue* variableValue);
+	/** Add a vector of variable values to the end of the variable values vector. */
 	void AppendVariableValues(VariableValueVector* variableValues);
     
+	/** Return the flag field's value. */
 	OvalEnum::Flag GetFlag();
+	/** Set the flag field's value. */
 	void SetFlag(OvalEnum::Flag flag);
 
 private:
