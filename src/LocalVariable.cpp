@@ -47,22 +47,10 @@ LocalVariable::~LocalVariable() {
 //								 Public members												//
 // ***************************************************************************************	//
 AbsComponent* LocalVariable::GetComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the AbsComponent
-	//
-	// -----------------------------------------------------------------------
 	return this->component;
 }
 
 void LocalVariable::SetComponent(AbsComponent* component) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the components member
-	//
-	// -----------------------------------------------------------------------
 	this->component = component;
 }
 
@@ -96,12 +84,6 @@ void LocalVariable::ComputeValue() {
 }
 
 void LocalVariable::Parse(DOMElement* localVariableElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided LocalVariable element into a LocalVariable
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetId(XmlCommon::GetAttributeByName(localVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(localVariableElm, "daatatype")));

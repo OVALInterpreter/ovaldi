@@ -48,11 +48,14 @@ public:
 	LocalVariable(string id = "", string name = "local_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 	~LocalVariable();
 
+	/** Parse the provided local_variable element into a LocalVariable. */
 	void Parse(DOMElement* localVariableElm);
 	void ComputeValue();
 	VariableValueVector* GetVariableValues();
 	
+	/** Get the AbsComponent. */
 	AbsComponent* GetComponent();
+	/** Set the AbsComponent. */
 	void SetComponent(AbsComponent* component);
 
 private:
