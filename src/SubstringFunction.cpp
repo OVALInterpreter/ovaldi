@@ -35,82 +35,37 @@
 //								Component Class											  //	
 //****************************************************************************************//
 SubstringFunction::SubstringFunction(int start, int length) : AbsFunctionComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete Component object
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetStart(start);
 	this->SetLength(length);
 }
 
 SubstringFunction::~SubstringFunction() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 int SubstringFunction::GetStart() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the start field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->start;
 }
 
 void SubstringFunction::SetStart(int start) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the start field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->start = start;
 }
 
 int SubstringFunction::GetLength() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the length field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->length;
 }
 
 void SubstringFunction::SetLength(int length) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the length field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->length = length;
 }
 
 ComponentValue* SubstringFunction::ComputeValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	get the values of the associated component
-	//	loop through them all and get the substring.
-	//	return all stored substrings
-	//  Allows only one component.
-	// -----------------------------------------------------------------------
 
 	StringVector* values = NULL;
 	
@@ -137,17 +92,10 @@ ComponentValue* SubstringFunction::ComputeValue() {
 
 	delete componentValue;
 
-	result->SetFlag(componentValue->GetFlag());
-
 	return result;	
 }
 
 void SubstringFunction::Parse(DOMElement* componentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	parse the component element
-	// -----------------------------------------------------------------------
 
 	// get the start and length attrs
 	string start = XmlCommon::GetAttributeByName(componentElm, "substring_start");
@@ -174,11 +122,6 @@ void SubstringFunction::Parse(DOMElement* componentElm) {
 }
 
 VariableValueVector* SubstringFunction::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this function's value
-	// -----------------------------------------------------------------------
 	
 	VariableValueVector* values = new VariableValueVector();
 	AbsComponentVector* components = this->GetComponents();

@@ -43,18 +43,28 @@ using namespace std;
 */
 class SubstringFunction : public AbsFunctionComponent {
 public:
+
+	/** Create a complete SubstringFunction object. */
 	SubstringFunction(int start = 0, int length = 0);
 	~SubstringFunction();
 
+	/** Parse the substring element and its child component element. */
 	void Parse(DOMElement* componentElm); 
+
+	/** Compute the desired substring and return the value. */
 	ComponentValue* ComputeValue();
 
+	/** Return the variable values used to compute this function's value. */
 	VariableValueVector* GetVariableValues();
 
+	/** Get the start field's value. */
 	int GetStart();
+	/** Set the start field's value. */
 	void SetStart(int start);
 
+	/** Get the length field's value. */
 	int GetLength();
+	/** Set the length field's value. */
 	void SetLength(int length);
 
 private:
