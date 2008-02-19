@@ -28,29 +28,43 @@
 //
 //****************************************************************************************//
 
-#ifndef COMPONENTFACTORY_H
-#define COMPONENTFACTORY_H
+#ifndef ESCAPEREGEXFUNCTION_H
+#define ESCAPEREGEXFUNCTION_H
 
-#include "VariableComponent.h"
-#include "LiteralComponent.h"
-#include "ObjectComponent.h"
-#include "SubstringFunction.h"
-#include "ConcatFunction.h"
-#include "EscapeRegexFunction.h"
+#include "AbsFunctionComponent.h"
+#include "ComponentFactory.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
 /**
-	This class is a Factory class for getting parsed components of a local varaible.
-	This class allows for a single interface to all types of components defined 
-	in the oval definitions schema.
-*/
-class ComponentFactory {
+	This class represents a EscapeRegexFunction component in a local_variable in the oval definition schema.
+	The schema describes this functions as follows:
 
+	The escape regex function takes a single string component and escapes all the 
+	regular expression characters. The purpose for this is that many times, a component
+	used in pattern match needs to be treated a literal string and not regular expression.
+	For example assume a basic component element that pulls a file path out of the Windows
+	registry. This path is a string that might contain regular expression characters but 
+	these characters are not intended to be such, so they need to be escaped. This function
+	allows a definition	writer to mark which components are in regular expression format and
+	which aren't.
+*/
+class EscapeRegexFunction : public AbsFunctionComponent {
 public:
-	/** Return the appropriate component based on the specifed component element.*/
-	static AbsComponent* GetComponent(DOMElement* componentElm);
+
+	/** Create a complete Component object. */
+	EscapeRegexFunction();
+	~EscapeRegexFunction();
+
+	/** parse the component element. */
+	void Parse(DOMElement* componentElm); 
+
+	/** Compute the value by escaping all the values of the associated component. */
+	ComponentValue* ComputeValue();
+
+	/** Return the variable values used to compute this function's value. */
+	VariableValueVector* GetVariableValues();
 };
 
 #endif

@@ -1,5 +1,4 @@
 //
-// $Id: ComponentFactory.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -35,11 +34,6 @@
 //								 Public members												//
 // ***************************************************************************************	//
 AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the appropriate component based on the specifed component element
-	// -----------------------------------------------------------------------
 
 	AbsComponent* absComponent = NULL;
 
@@ -54,11 +48,17 @@ AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
 	} else if(elmName.compare("object_component")  == 0) {
 		absComponent = new ObjectComponent();
 		absComponent->Parse(componentElm);
+	//
+	// functions 
+	//
 	} else if(elmName.compare("substring")  == 0) {
 		absComponent = new SubstringFunction();
 		absComponent->Parse(componentElm);
 	} else if(elmName.compare("concat")  == 0) {
 		absComponent = new ConcatFunction();
+		absComponent->Parse(componentElm);
+	} else if(elmName.compare("escape_regex")  == 0) {
+		absComponent = new EscapeRegexFunction();
 		absComponent->Parse(componentElm);
 	} else {
 		throw Exception("Error: unsupported function: " + elmName);
@@ -66,4 +66,3 @@ AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
 
 	return absComponent;
 }
-
