@@ -1,5 +1,4 @@
 //
-// $Id: VariableFactory.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -101,25 +100,11 @@ AbsVariable* VariableFactory::GetVariable(string varId) {
 //							VariableFactoryException Class								  //	
 //****************************************************************************************//
 VariableFactoryException::VariableFactoryException(AbsVariable* var, string errMsgIn, int severity, Exception* ex) : Exception(errMsgIn, severity, ex) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the error message and then set the severity to ERROR_FATAL. This is 
-	//	done with the explicit call to the Exception class constructor that 
-	//	takes a single string param.
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetVariable(var);
 }
 
 VariableFactoryException::~VariableFactoryException() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 
 }
 
@@ -130,4 +115,3 @@ void VariableFactoryException::SetVariable(AbsVariable* var) {
 AbsVariable* VariableFactoryException::GetVariable() {
 	return this->var;
 }
-
