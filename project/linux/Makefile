@@ -101,6 +101,7 @@ OBJS = \
 	Definition.obj \
 	DocumentManager.obj \
 	EntityComparator.obj \
+	EscapeRegexFunction.obj \
 	Exception.obj \
 	ExtendedDefinition.obj \
 	ExternalVariable.obj \
@@ -188,6 +189,7 @@ REL_OBJS = \
 	$(BUILDDIR)/Definition.obj \
 	$(BUILDDIR)/DocumentManager.obj \
 	$(BUILDDIR)/EntityComparator.obj \
+	$(BUILDDIR)/EscapeRegexFunction.obj \
 	$(BUILDDIR)/Exception.obj \
 	$(BUILDDIR)/ExtendedDefinition.obj \
 	$(BUILDDIR)/ExternalVariable.obj \
