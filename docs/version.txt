@@ -12,7 +12,10 @@
 * Corrected bug in REGEX.cpp. Expanded the vector of integers for substrings to allow for more matching. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
 * Corrected bug in AbsObjectCollector::ProcessSet and AbsObjectCollector::Intersection wich caused set intersections to be improperly evaluated. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
 * Improved source documentation.
-* Implemented resolve_group and include_group behaviors for win-def:fileeffectiverights_object. 
+* Implemented resolve_group and include_group behaviors for win-def:fileeffectiverights_object.
+* Implemented escape_regex function defined in the oval-definitions-schema.
+* Corrected bug in REGEX::EscapeRegexChars() function. When the first char in the input string needed to be escaped the function failed.
+* Corrected bug in SubstringFunction::ComputeValue() function that caused the flag to be set incorrectly.
 
 ---------------------------------------
 ---        Version 5.3 build 59     ---
