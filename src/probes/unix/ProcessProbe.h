@@ -1,5 +1,4 @@
 //
-// $Id: ProcessProbe.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -59,6 +58,8 @@ public:
 	~ProcessProbe();
     
 	ItemVector* CollectItems(Object* object);
+
+	/** Return a new Item created for storing process information. */
 	Item* CreateItem();
 
 	/** Ensure that the ProcessProbe is a singleton. */

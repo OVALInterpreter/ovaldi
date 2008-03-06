@@ -1,5 +1,4 @@
 //
-// $Id: ProcessProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -111,13 +110,6 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 Item* ProcessProbe::CreateItem() {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return a new Item created for storing file information
-	//
-	// -----------------------------------------------------------------------
 
 	Item* item = new Item(0, 
 						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix", 
@@ -130,6 +122,7 @@ Item* ProcessProbe::CreateItem() {
 }
 
 StringVector* ProcessProbe::GetCommands(ObjectEntity* command) {
+
 	StringVector* commands = NULL;
 
 	// does this name use variables?
@@ -191,12 +184,7 @@ StringVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 }
 
 void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//  
-	//  Main method for gathering process information.
-	//------------------------------------------------------------------------------------//
+
 	string errMsg = "";
 
 	// Time parameters
@@ -361,6 +349,7 @@ bool ProcessProbe::CommandExists(string command) {
 				// Retrieve the command line with arguments
 				status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
 				if(status < 0) { 
+					closedir(proc);
 					throw ProbeException(errMsg);
 
 				// If the command line matches the input command line return true
@@ -430,6 +419,7 @@ StringVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
 				// Retrieve the command line with arguments
 				status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
 				if(status < 0) { 
+					closedir(proc);
 					throw ProbeException(errMsg);
 
 				// If the command line matches the input command line store it
@@ -473,6 +463,9 @@ int ProcessProbe::RetrieveCommandLine(char *process, char *cmdline, string *errM
 			}
 		}
 	}
+
+	fclose(cmdlineFile); 
+
   return(0);
 }
 
