@@ -16,6 +16,7 @@
 * Implemented escape_regex function defined in the oval-definitions-schema.
 * Corrected bug in REGEX::EscapeRegexChars() function. When the first char in the input string needed to be escaped the function failed.
 * Corrected bug in SubstringFunction::ComputeValue() function that caused the flag to be set incorrectly.
+* Corrected bug in ProcessProbe. File handles were not properly being closed when reading the /proc dir. Thanks to Sudhakar Govindavajhala (sudhakarg79@gmail.com) for the tracking down and fixing this issue.
 
 ---------------------------------------
 ---        Version 5.3 build 59     ---
