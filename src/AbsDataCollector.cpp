@@ -206,6 +206,7 @@ void AbsDataCollector::WriteGenerator() {
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacterisitcsDocument(), generatorElm, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacterisitcsDocument(), generatorElm, "oval:schema_version", "5.3");
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacterisitcsDocument(), generatorElm, "oval:timestamp", Common::GetTimeStamp());
+	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacterisitcsDocument(), generatorElm, "vendor", Version::GetVendor());
 }
 
 //****************************************************************************************//

@@ -392,6 +392,7 @@ void Analyzer::InitResultsDocument() {
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:schema_version", "5.3");
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:timestamp", Common::GetTimeStamp());
+	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "vendor", Version::GetVendor());
 
 	// add the directives
 	DOMElement *directivesElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), ovalResultsElm, "directives");

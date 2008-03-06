@@ -49,6 +49,9 @@ class Version {
 		/** Return the build date of this interpreter as a string. */
 		static string GetBuildDate();
 
+		/** Return the vendor of this interpreter as a string. */
+		static string GetVendor();
+
 		/** Return the version of this interpreter as a string. */
 		static string GetVersion();
 

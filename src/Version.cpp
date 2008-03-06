@@ -36,6 +36,7 @@
 //
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
+#define VENDOR "The MITRE Corporation"
 #define VERSION "5.3"
 #define BUILD 59
 
@@ -44,6 +45,13 @@ string Version::GetMinumumCompatibleVersion() {
 	string version;
 	version.append(MIN_COMPATIBLE_VERSION);
     return(version);
+}
+
+string Version::GetVendor() {
+
+	string vendor;
+	vendor.append(VENDOR);
+    return(vendor);
 }
 
 string Version::GetVersion() {
