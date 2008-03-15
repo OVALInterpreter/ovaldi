@@ -1,5 +1,4 @@
 //
-// $Id: XmlCommon.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -534,7 +533,7 @@ void XmlCommon::AddSchemaLocation(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *do
 	string currentSchemaLocation = XmlCommon::GetAttributeByName(rootElm, "xsi:schemaLocation");
 
 	if(currentSchemaLocation.compare("") != 0) {
-		unsigned int pos = currentSchemaLocation.find(newSchemaLocation, 0);
+		size_t pos = currentSchemaLocation.find(newSchemaLocation, 0);
 		if(pos == string::npos) {
 			currentSchemaLocation.append(" " + newSchemaLocation);
 			XmlCommon::AddAttribute(rootElm, "xsi:schemaLocation", currentSchemaLocation);

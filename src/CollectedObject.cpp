@@ -125,7 +125,7 @@ CollectedObject* CollectedObject::CreateNotSupported(AbsObject* absObject) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	Create a new ColelctedObject based on the specified AbsObject
+	//	Create a new CollectedObject based on the specified AbsObject
 	//	Set it up as not supported.
 	//
 	// -----------------------------------------------------------------------
@@ -356,12 +356,6 @@ void CollectedObject::SetVersion(int version) {
 }
 
 void CollectedObject::AppendOvalMessage(OvalMessage* message) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Add an message to the end of the messages vector
-	//
-	// -----------------------------------------------------------------------
 
 	this->messages.push_back(message);
 }
@@ -373,10 +367,10 @@ void CollectedObject::AppendReferencesAndComputeFlag(ItemVector* references) {
 	// compute the flag value for the collected obj beased on the set of items
 
 	// get counts of each status value set on the items in the list
-	int errorCnt = 0;
-	int existsCnt = 0;
-	int doesNotExistCnt = 0;
-	int notCollectedCnt = 0;
+	unsigned int errorCnt = 0;
+	unsigned int existsCnt = 0;
+	unsigned int doesNotExistCnt = 0;
+	unsigned int notCollectedCnt = 0;
 
 	// now loop through the items and examine their status values.
 	ItemVector::iterator iterator;

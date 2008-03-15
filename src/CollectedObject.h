@@ -129,6 +129,7 @@ public:
 	int GetVersion();
 	void SetVersion(int version);
 
+	/** Add a message to the end of the messages vector. */
 	void AppendOvalMessage(OvalMessage* message);
 
 	/** Creates references to the set of input items and computes the flag value of this object based on the set. */

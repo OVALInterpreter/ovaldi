@@ -1,5 +1,4 @@
 //
-// $Id: EntityComparator.cpp 4664 2008-01-23 14:00:20Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -567,7 +566,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 	
 	IntVector* tokens = new IntVector();
 
-	int index = versionStr.find_first_not_of("0123456789");
+	size_t index = versionStr.find_first_not_of("0123456789");
 	if(index == string::npos) {
 		// no delmiter found and not an empty string.
 		// simply try to convert the versionStr to an int and return it as the only token.
@@ -594,7 +593,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 				string tokenStr = token;
 				
 				// check that the token is an integer
-				int nonInt = tokenStr.find_first_not_of("0123456789");
+				size_t nonInt = tokenStr.find_first_not_of("0123456789");
 				if(nonInt != string::npos) {
 					if(theString != NULL) {
 						free(theString);

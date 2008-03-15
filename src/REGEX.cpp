@@ -44,7 +44,7 @@ string REGEX::EscapeRegexChars(string stringIn) {
 	string fixedString = stringIn;
 	string prevChar = "";
 
-	unsigned int pos = fixedString.find_first_of(regexChars, 0);
+	size_t pos = fixedString.find_first_of(regexChars, 0);
 	while (pos != string::npos) {
 
 		//	ensure that the char is not already escaped
@@ -135,7 +135,7 @@ int REGEX::FindLastRegexChar(const string stringIn) {
 
 	string regexChars	= "^$\\.[](){}*+?";
 	string prevChar		= "";
-	unsigned int pos	= string::npos;
+	size_t pos	= string::npos;
 	int slashCount		= 0;
 	int prevIndex		= 0;
 
@@ -184,7 +184,7 @@ int REGEX::FindLastRegexChar(const string stringIn) {
 
 void REGEX::GetConstantPortion(string patternIn, string delimIn, string *patternOut, string *constOut) {
 	
-	unsigned int nextDelim = string::npos;
+	size_t nextDelim = string::npos;
 	int delimLen = delimIn.length();
 	(*patternOut) = patternIn;
 	(*constOut) = "";
@@ -241,7 +241,7 @@ void REGEX::GetConstantPortion(string patternIn, string delimIn, string *pattern
 		(*patternOut) = (*patternOut) + "$";
 	}
 
-	//	Add the carrot tot he beginning of the pattern (if removed 
+	//	Add the carrot to the beginning of the pattern (if removed 
 	//	or a constant portion was found) and there is still a pattern left
 	if((rmCarrot || (*constOut).length() != 0) && (*patternOut).length() > 0)
 	{
@@ -251,7 +251,7 @@ void REGEX::GetConstantPortion(string patternIn, string delimIn, string *pattern
 
 bool REGEX::IsConstant(string pattern) {
 
-	int regexChar = string::npos;
+	size_t regexChar = string::npos;
 	bool constant = true;
 	
 	regexChar = FindFirstRegexChar(pattern);
@@ -430,9 +430,9 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 			const char **stringlist;
 			int res = pcre_get_substring_list(searchStringIn, ovector, rc, &stringlist);
 
-			if (rc < 0) {
-				string error = "get substring list failed " + rc;
-				error.append(" unalbe to get memory for the result set.");
+			if (res == PCRE_ERROR_NOMEMORY) {
+				string error = "get substring list failed " + res;
+				error.append(" unable to get memory for the result set.");
 				throw REGEXException(error);
 			} else {
 				int i = 0;
@@ -461,7 +461,7 @@ string REGEX::RemoveExtraSlashes(string strIn) {
 
 	string doubleSlash ="\\\\";
 
-	unsigned int pos = strIn.find(doubleSlash, 0);
+	size_t pos = strIn.find(doubleSlash, 0);
 	while (pos != string::npos)
 	{
 		strIn.erase(pos++, 1);

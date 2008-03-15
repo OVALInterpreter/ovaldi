@@ -1,5 +1,4 @@
 //
-// $Id: InetListeningServersProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -817,8 +816,8 @@ void InetListeningServersProbe::ParseNetstatResult() {
 	int preDelim;
 	int curColon;
 	int preColon;
-	unsigned int curPos;
-	unsigned int tmpPos;
+	size_t curPos;
+	size_t tmpPos;
 
 	string Protocol;
 	string LocalFullAddress;

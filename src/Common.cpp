@@ -1,5 +1,4 @@
 //
-// $Id: Common.cpp 4606 2008-01-04 18:01:23Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -382,7 +381,7 @@ string Common::SwitchChar(string fixedString, string oldChr, string newChr)
 	if(oldChr.length() != 1 || newChr.length() != 1)
 		throw CommonException("Error: (SwitchChar) can only switch strings of length = 1.");
 
-	unsigned int pos = fixedString.find(oldChr, 0);
+	size_t pos = fixedString.find(oldChr, 0);
 	while (pos != string::npos)
 	{
 		fixedString.erase(pos, 1);
