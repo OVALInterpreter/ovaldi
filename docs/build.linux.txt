@@ -79,11 +79,10 @@ Download the appropriate installation files from the OVAL Web site.
 
 The following instructions describe how to build the OVAL Interpreter on a
 Linux system.  The OVAL Interpreter has been built and tested on Red Hat 
-Enterprise Linux 3 and Red Hat 9. The source distribution includes a 
-Makefile that has can be used to build the Interpreter on Linux systems
-with rpm installed.  Before the Interpreter can be built the supporting
-libraries must be installed. Follow the instruction below to setup and install
-the supporting libraries.
+32 bit versions of Enterprise Linux 3 and 4. The source distribution includes
+a Makefile that has can be used to build the Interpreter on Linux systems.
+Before the Interpreter can be built the supporting libraries must be installed.
+Follow the instruction below to setup and install the supporting libraries.
 
   A. PCRE (Perl-compatible regular-expression) Library
  
@@ -130,7 +129,7 @@ the supporting libraries.
              /usr/lib/ovaldi to reduce the dependencies that an unsophisticated
              user would need to resolve.
 
-  D. Building the XML Definition Interpreter
+  D. Building the OVAL Interpreter
 
       After installing the PCRE, Xerces, and Xalan libraries, change into the 
       directory:
