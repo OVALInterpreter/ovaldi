@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-$Id: results_to_html.xsl 4294 2007-08-23 17:02:36Z bakerj $
 
 ****************************************************************************************
- Copyright (c) 2002-2007, The MITRE Corporation
+ Copyright (c) 2002-2008, The MITRE Corporation
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are
@@ -489,13 +488,13 @@ TD.text {font: 10pt/12pt "Arial"}
 		<xsl:param name="definitionsElm"/>
 		<table border="1" cellspacing="0" cellpaddign="2" width="100%">
 			<tr>
-				<td class="title" colspan="7">Oval Definition Results</td>
+				<td class="title" colspan="7">OVAL Definition Results</td>
 			</tr>
 			<!-- display the result color coding table -->
 			<tr><td colspan="7"><xsl:call-template name="ResultColorTable"/></td></tr>
 			
 			<tr>
-				<td class="label" align="center">OVAL ID</td>
+				<td class="label" align="center">ID</td>
 				<td class="label" align="center">Result</td>
 				<td class="label" align="center">Class</td>
 				<td class="label" align="center">Reference ID</td>
