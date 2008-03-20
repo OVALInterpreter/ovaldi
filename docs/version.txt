@@ -7,7 +7,7 @@
 ****************************************************
 
 ---------------------------------------
----        Version 5.3 build ??     ---
+---        Version 5.3 build 68     ---
 ---------------------------------------
 * Corrected bug in REGEX.cpp. Expanded the vector of integers for substrings to allow for more matching. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
 * Corrected bug in AbsObjectCollector::ProcessSet and AbsObjectCollector::Intersection wich caused set intersections to be improperly evaluated. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
