@@ -1,5 +1,4 @@
 //
-// $Id: VariableProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -179,7 +178,7 @@ StringVector* VariableProbe::GetVariableIds() {
 		}
 
 	} else {
-		throw ProbeException("Error: Variable probe is unable to locate any varaibles in the current oval-definitions-docuemnt.");
+		throw ProbeException("Error: Variable probe is unable to locate any variables in the current oval-definitions-docuemnt.");
 	}
 
 	return varIds;
@@ -188,7 +187,7 @@ StringVector* VariableProbe::GetVariableIds() {
 
 Item* VariableProbe::GetItemForVarId(string varId) {
 
-	// not that if the oval-definitions document is valid the variable id will always exist. 
+	// note that if the oval-definitions document is valid the variable id will always exist. 
 	// So an item should always be returned
 
 	Item* item = NULL;
