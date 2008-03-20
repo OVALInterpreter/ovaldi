@@ -1,5 +1,4 @@
 //
-// $Id: FileFinder.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -229,12 +228,25 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
 		if (hFind == INVALID_HANDLE_VALUE) {
 
-			string errorMessage = "";
-			errorMessage.append("Error: Unable to get a valid handle in GetPathsForPattern().\n\tDirectory: ");
-			errorMessage.append(dirIn);
-			errorMessage.append("\n\tPattern: ");
-			errorMessage.append(pattern);
-			throw FileFinderException(errorMessage);
+			DWORD errorNum = GetLastError();
+
+			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
+
+				// if the file is not found just return no need to report an error
+				return;
+
+			} else {
+				
+				// report other errors that might occure
+				string msg = WindowsCommon::GetErrorMessage(errorNum);
+				string errorMessage = "";
+				errorMessage.append("Error while seaching for matching file paths. " + msg);
+				errorMessage.append(" Directory: ");
+				errorMessage.append(dirIn);
+				errorMessage.append(" Pattern: ");
+				errorMessage.append(pattern);
+				throw FileFinderException(errorMessage);
+			}
 		}
 
 		//	Loop through each file in the directory.  
@@ -265,13 +277,15 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 		//	Close the handle to the file search object.
 		if(!FindClose(hFind)) {
-			string errorMessage = "";
-			errorMessage.append("Error: ");
-			errorMessage.append("Unable to close search handle while trying to search for matching paths. \n\tDirectory: ");
-			errorMessage.append(dirIn);
-			errorMessage.append("\n\tPattern: ");
-			errorMessage.append(pattern);
 
+			DWORD errorNum = GetLastError();
+			string msg = WindowsCommon::GetErrorMessage(errorNum);
+			string errorMessage = "";
+			errorMessage.append("Error: Unable to close search handle while trying to search for matching paths. " + msg);
+			errorMessage.append(" Directory: ");
+			errorMessage.append(dirIn);
+			errorMessage.append(" Pattern: ");
+			errorMessage.append(pattern);
 			throw FileFinderException(errorMessage);	
 		}
 
@@ -285,9 +299,9 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 		string errorMessage = "";
 		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
+		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. Directory: ");
 		errorMessage.append(dirIn);
-		errorMessage.append("\n\tPattern: ");
+		errorMessage.append(" Pattern: ");
 		errorMessage.append(pattern);
 		throw FileFinderException(errorMessage);
 	}
@@ -315,12 +329,25 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
 		if (hFind == INVALID_HANDLE_VALUE) {
 
-			string errorMessage = "";
-			errorMessage.append("Error: Unable to get a valid handle in GetFilesForPattern().\n\tDirectory: ");
-			errorMessage.append(path);
-			errorMessage.append("\n\tPattern: ");
-			errorMessage.append(pattern);
-			throw FileFinderException(errorMessage);
+			DWORD errorNum = GetLastError();
+
+			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
+
+				// if the file is not found just return no need to report an error
+				return;
+
+			} else {
+				
+				// report other errors that might occure
+				string msg = WindowsCommon::GetErrorMessage(errorNum);
+				string errorMessage = "";
+				errorMessage.append("Error while seaching for matching files. " + msg);
+				errorMessage.append(" Directory: ");
+				errorMessage.append(path);
+				errorMessage.append(" Pattern: ");
+				errorMessage.append(pattern);
+				throw FileFinderException(errorMessage);
+			}
 		}
 
 		//	Loop through each file in the directory.  
@@ -350,13 +377,16 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 
 		//	Close the handle to the file search object.
 		if(!FindClose(hFind)) {
+
+			DWORD errorNum = GetLastError();
+			string msg = WindowsCommon::GetErrorMessage(errorNum);
 			string errorMessage = "";
-			errorMessage.append("Error: ");
-			errorMessage.append("Unable to close search handle while trying to search for matching file paths. \n\tDirectory: ");
+			errorMessage.append("Error: Unable to close search handle while trying to search for matching files. " + msg);
+			errorMessage.append(" Directory: ");
 			errorMessage.append(path);
-			errorMessage.append("\n\tPattern: ");
+			errorMessage.append(" Pattern: ");
 			errorMessage.append(pattern);
-			throw FileFinderException(errorMessage);	
+			throw FileFinderException(errorMessage);
 		}
 
 	//	Just need to ensure that all exceptions have a nice message. 
