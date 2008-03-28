@@ -188,7 +188,7 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 	string errMsg = "";
 
 	// Time parameters
-	time_t currentTime = 0;
+	time_t currentTime;
 	unsigned long adjustedStartTime, execTime = 0;
 
 	// TTY String
@@ -205,7 +205,7 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 	int status = 0;
 
 	// Grab the current time and uptime(Linux only) to calculate start and exec times later
-	time(&currentTime);
+	currentTime = time(NULL);
 
 	unsigned long uptime = 0;
 	status = RetrieveUptime(&uptime, &errMsg);
@@ -268,6 +268,8 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 							adjustedStartTime = currentTime - (uptime - (starttime/100));
 							execTime = currentTime - adjustedStartTime;
 						}
+						string execTimeStr = this->FormatExecTime(execTime);
+						string adjustedStartTimeStr = this->FormatStartTime(adjustedStartTime);
 
 						// Add the data to a new data object and add th resultVector
 						item->SetStatus(OvalEnum::STATUS_EXISTS);
@@ -275,13 +277,12 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 							item->AppendMessage(new OvalMessage(errMsg));
 						}
 
-						item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("exec_time",  Common::ToString(execTime), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("scheduling_class",  "-", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("start_time", Common::ToString(adjustedStartTime), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("user_id", Common::ToString(uid), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 					}
@@ -298,31 +299,8 @@ bool ProcessProbe::CommandExists(string command) {
 	bool exists = false;
 	string errMsg = "";
 
-	// Time parameters
-	time_t currentTime = 0;
-	unsigned long adjustedStartTime, execTime = 0;
-
-	// TTY String
-	char ttyName[TTY_LEN + 1];
-
 	// Process Parameters
 	char cmdline[CMDLINE_LEN + 1];
-	char schedulingClass[SCHED_CLASS_LEN + 1];
-
-	int uid, pid, ppid;
-	long priority = 0;
-	unsigned long starttime = 0;
-
-	int status = 0;
-
-	// Grab the current time and uptime(Linux only) to calculate start and exec times later
-	time(&currentTime);
-
-	unsigned long uptime = 0;
-	status = RetrieveUptime(&uptime, &errMsg);
-	if(status < 0) {
-		throw ProbeException(errMsg);
-    }
 
 	DIR *proc;
 	struct dirent *readProc;
@@ -340,14 +318,10 @@ bool ProcessProbe::CommandExists(string command) {
 			if(isdigit(readProc->d_name[0])) {
 				// Clear the ps values
 				memset(cmdline, 0, CMDLINE_LEN + 1);
-				memset(schedulingClass, 0, SCHED_CLASS_LEN + 1);
-				memset(ttyName, 0, TTY_LEN + 1);
-				uid = pid = ppid = priority = starttime = 0;
-				adjustedStartTime = execTime = 0;
 				errMsg = "";
 
 				// Retrieve the command line with arguments
-				status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
 				if(status < 0) { 
 					closedir(proc);
 					throw ProbeException(errMsg);
@@ -361,38 +335,15 @@ bool ProcessProbe::CommandExists(string command) {
 		} // else
     closedir(proc);
   }
-	return exists;
+  return exists;
 }
 
 StringVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
 	StringVector* commands = new StringVector();
 	string errMsg = "";
 
-	// Time parameters
-	time_t currentTime = 0;
-	unsigned long adjustedStartTime, execTime = 0;
-
-	// TTY String
-	char ttyName[TTY_LEN + 1];
-
 	// Process Parameters
 	char cmdline[CMDLINE_LEN + 1];
-	char schedulingClass[SCHED_CLASS_LEN + 1];
-
-	int uid, pid, ppid;
-	long priority = 0;
-	unsigned long starttime = 0;
-
-	int status = 0;
-
-	// Grab the current time and uptime(Linux only) to calculate start and exec times later
-	time(&currentTime);
-
-	unsigned long uptime = 0;
-	status = RetrieveUptime(&uptime, &errMsg);
-	if(status < 0) {
-		throw ProbeException(errMsg);
-    }
 
 	DIR *proc;
 	struct dirent *readProc;
@@ -410,14 +361,10 @@ StringVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
 			if(isdigit(readProc->d_name[0])) {
 				// Clear the ps values
 				memset(cmdline, 0, CMDLINE_LEN + 1);
-				memset(schedulingClass, 0, SCHED_CLASS_LEN + 1);
-				memset(ttyName, 0, TTY_LEN + 1);
-				uid = pid = ppid = priority = starttime = 0;
-				adjustedStartTime = execTime = 0;
 				errMsg = "";
 
 				// Retrieve the command line with arguments
-				status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
 				if(status < 0) { 
 					closedir(proc);
 					throw ProbeException(errMsg);
@@ -430,7 +377,7 @@ StringVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
 		} // else
     closedir(proc);
   }
-	return commands;
+  return commands;
 }
 
 int ProcessProbe::RetrieveCommandLine(char *process, char *cmdline, string *errMsg) {
@@ -466,7 +413,7 @@ int ProcessProbe::RetrieveCommandLine(char *process, char *cmdline, string *errM
 
 	fclose(cmdlineFile); 
 
-  return(0);
+	return(0);
 }
 
 int ProcessProbe::RetrieveStatFile(char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
@@ -553,4 +500,84 @@ int  ProcessProbe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
   fclose(uptimeHandle);
 
   return(0);
+}
+
+string ProcessProbe::FormatExecTime(unsigned long execTime) {
+
+	/**
+		This is the cumulative CPU time, formatted in [DD-]HH:MM:SS where DD is the number of days when execution time is 24 hours or more.
+
+		Input is seconds 
+
+		Divide by 86400 to get days
+		Divide remainder of above division by 3600 to get hours
+		Divide remainder by 60 to get minutes, remainder is seconds
+	*/
+
+	string execTimeStr = "";
+	unsigned long days = execTime/86400;
+	if(days > 0) {
+		if(days > 9) execTimeStr = Common::ToString(days);
+		else execTimeStr = "0" + Common::ToString(days);
+
+		execTimeStr.append("-");
+	}	
+
+	unsigned long hours = (execTime%86400)/3600;
+	if(hours > 9) execTimeStr.append("" + Common::ToString(hours));
+	else execTimeStr.append("0" + Common::ToString(hours));
+
+	execTimeStr.append(":");
+
+	unsigned long minutes = ((execTime%86400)%3600)/60;
+	if(minutes > 9) execTimeStr.append("" + Common::ToString(minutes));
+	else execTimeStr.append("0" + Common::ToString(minutes));
+
+	execTimeStr.append(":");
+
+	unsigned long seconds = ((execTime%86400)%3600)%60;
+	if(seconds > 9) execTimeStr.append("" + Common::ToString(seconds));
+	else execTimeStr.append("0" + Common::ToString(seconds));
+
+	return execTimeStr;
+}
+
+string ProcessProbe::FormatStartTime(unsigned long startTime) {
+
+	/** 
+		This is the time of day the process started formatted in HH:MM:SS if the 
+		same day the process started or formatted as MMM_DD (Ex.: Feb_5) if 
+		process started the previous day or further in the past.
+
+		Input resolution is seconds.
+	*/
+
+	char formattedTime[16];
+
+	// current time info
+	time_t rawtime;
+	tm* timeinfo;
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	int currentDays = timeinfo->tm_yday;
+
+	string startTimeStr;
+	time_t sTime = startTime;
+	timeinfo = localtime(&sTime);
+
+	size_t size = 0;
+	if(timeinfo->tm_yday == currentDays) {
+		// no days so just format the hours, minutes, and seconds
+		size = strftime(formattedTime, 15, "%H:%M:%S", timeinfo);
+	} else {
+		size = strftime(formattedTime, 15, "%b_%d", timeinfo);		
+	}
+
+	if(size == 0) {
+		throw ProbeException("Insufficient memory allocated for process start time data. Unable to collect process information.");
+	} else {
+		startTimeStr.append(formattedTime);
+	}
+
+	return startTimeStr;
 }

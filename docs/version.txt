@@ -7,6 +7,12 @@
 ****************************************************
 
 ---------------------------------------
+---        Version 5.4 build ??     ---
+---------------------------------------
+* Updated unix ProcessProbe to match time format changes made for version 5.4
+* Converted to support version 5.4 of OVAL
+
+---------------------------------------
 ---        Version 5.3 build 68     ---
 ---------------------------------------
 * Corrected bug in REGEX.cpp. Expanded the vector of integers for substrings to allow for more matching. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 

@@ -58,7 +58,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("sid_object") == 0) {
 		probe = SidProbe::Instance();
 	} else if(objectName.compare("fileeffectiverights_object") == 0) {
-		Log::Info("Version 5.3 of OVAL has deprecated the fileeffectiverights_object");
+		Log::Info("Version 5.3 of OVAL deprecated the fileeffectiverights_object");
 		probe = FileEffectiveRightsProbe::Instance();
 	} else if(objectName.compare("accesstoken_object") == 0) {
 		probe = AccessTokenProbe::Instance();

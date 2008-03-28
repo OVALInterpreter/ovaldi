@@ -52,6 +52,9 @@ using namespace std;
 
 /**
 	Data collector for process test.
+
+	The following command produces process information sutable fro this probe.
+    ps -eo class,etime,pid,uid,start_time,tty,priority,cmd
 */
 class ProcessProbe : public AbsProbe {
 public:
@@ -122,6 +125,16 @@ private:
 		the start time and exec time of the running processes.
 	*/
 	int RetrieveUptime(unsigned long *uptime, string *errMsg);
+
+	/**
+		Convert the input seconds and conveert to a string format for exec time.
+    */
+	string FormatExecTime(unsigned long execTime);
+
+	/**
+		Convert the input seconds and convert to a string format for start time.
+    */
+	string FormatStartTime(unsigned long startTime);
 
 	static ProcessProbe *instance;
 };
