@@ -37,8 +37,8 @@
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
-#define VERSION "5.3"
-#define BUILD 68
+#define VERSION "5.4"
+#define BUILD 0
 
 string Version::GetMinumumCompatibleVersion() {
 
