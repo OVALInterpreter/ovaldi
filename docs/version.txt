@@ -7,7 +7,7 @@
 ****************************************************
 
 ---------------------------------------
----        Version 5.4 build ??     ---
+---        Version 5.4 build 2     ---
 ---------------------------------------
 * Updated unix ProcessProbe to match time format changes made for version 5.4
 * Converted to support version 5.4 of OVAL
