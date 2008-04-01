@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.3">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.4">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Windows specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.3</version>
-               <date>6/22/2007 11:20:45 AM</date>
-               <sch:title>schematron validation of the Windows portion of an OVAL System Characteristics file</sch:title>
+               <version>5.4</version>
+               <date>3/31/2008 3:43:59 PM</date>
+                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                <sch:title>schematron validation of the Windows portion of an OVAL System Characteristics file</sch:title>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
           </xsd:appinfo>
@@ -641,7 +642,7 @@
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="value" type="oval-sc:EntityItemAnyType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="value" type="oval-sc:EntityItemAnyType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The actual value of the specified active directory attribute.</xsd:documentation>
                                         <xsd:appinfo>
@@ -1456,7 +1457,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="fileitemsize">
                                                   <sch:rule context="win-sc:file_item/win-sc:size">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the size entity of a file_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the size entity of a file_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -1516,7 +1517,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="fileitemversion">
                                                   <sch:rule context="win-sc:file_item/win-sc:version">
-                                                       <sch:assert test="not(@datatype) or @datatype='version'">item <sch:value-of select="../@id"/> - datatype attribute for the version entity of a file_item should be 'version'</sch:assert>
+                                                       <sch:assert test="@datatype='version'">item <sch:value-of select="../@id"/> - datatype attribute for the version entity of a file_item should be 'version'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2214,7 +2215,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="group_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>The windows group item allows the different users that belong to specific groups be collected. Note that the user element can appear an unlimited number of times. If no user is found in the specified group, then a single user element should exist with a status of 'does not exist'. If there is an error determining the users of a group, then a single user element should exist with a status of 'error'.</xsd:documentation>
+               <xsd:documentation>The windows group item allows the different users that belong to specific groups (identified by name) be collected. Note that the user element can appear an unlimited number of times. If no user is found in the specified group, then a single user element should exist with a status of 'does not exist'. If there is an error determining the users of a group, then a single user element should exist with a status of 'error'.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -2250,7 +2251,47 @@
                </xsd:complexContent>
           </xsd:complexType>
      </xsd:element>
-     <!-- =============================================================================== -->
+      <!-- =============================================================================== -->
+      <!-- ============================  GROUP SID ITEM   ================================ -->
+      <!-- =============================================================================== -->
+      <xsd:element name="group_sid_item" substitutionGroup="oval-sc:item">
+            <xsd:annotation>
+                  <xsd:documentation>The windows group_sid_item allows the different users that belong to specific groups (identified by SID) be collected. Note that the user element can appear an unlimited number of times. If no user is found in the specified group, then a single user element should exist with a status of 'does not exist'. If there is an error determining the users of a group, then a single user element should exist with a status of 'error'.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-sc:ItemType">
+                              <xsd:sequence>
+                                    <xsd:element name="group_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>A string the represents the SID of a particular group.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="groupsiditemgroup">
+                                                            <sch:rule context="win-sc:group_sid_item/win-sc:group_sid">
+                                                                  <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the group_sid entity of a group_sid_item should be 'string'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="user_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                                          <xsd:annotation>
+                                                <xsd:documentation>A string that represents the SID of a particular user.  If the specified group has more than one user as a member, then multiple user_sid entities should exist. If the specified group does not contain a single user, then a single user_sid entity should exist with a status of 'does not exist'. If there is an error determining the userss that are members of the group, then a single user_sid entity should be included with a status of 'error'.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="groupsiditemuser">
+                                                            <sch:rule context="win-sc:group_sid_item/win-sc:user_sid">
+                                                                  <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the user_sid entity of a group_sid_item should be 'string'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
      <!-- ============================  INTERFACE ITEM  ================================= -->
      <!-- =============================================================================== -->
      <xsd:element name="interface_item" substitutionGroup="oval-sc:item">
@@ -2279,7 +2320,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="wininterfaceitemindex">
                                                   <sch:rule context="win-sc:interface_item/win-sc:index">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the index entity of an interface_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the index entity of an interface_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2379,7 +2420,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="lpitemforce_logoff">
                                                   <sch:rule context="win-sc:lockoutpolicy_item/win-sc:force_logoff">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the force_logoff entity of a lockoutpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the force_logoff entity of a lockoutpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2391,7 +2432,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="lpitemlockout_duration">
                                                   <sch:rule context="win-sc:lockoutpolicy_item/win-sc:lockout_duration">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the lockout_duration entity of a lockoutpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the lockout_duration entity of a lockoutpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2403,7 +2444,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="lpitemlockout_observation_window">
                                                   <sch:rule context="win-sc:lockoutpolicy_item/win-sc:lockout_observation_window">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the lockout_observation_window entity of a lockoutpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the lockout_observation_window entity of a lockoutpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2415,7 +2456,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="lpitemlockout_threshold">
                                                   <sch:rule context="win-sc:lockoutpolicy_item/win-sc:lockout_threshold">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the lockout_threshold entity of a lockoutpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the lockout_threshold entity of a lockoutpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2455,7 +2496,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="metabaseitemid">
                                                   <sch:rule context="win-sc:metabase_item/win-sc:id">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the id entity of a metabase_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the id entity of a metabase_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2531,7 +2572,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="ppitemmax_passwd_age">
                                                   <sch:rule context="win-sc:passwordpolicy_item/win-sc:max_passwd_age">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the max_passwd_age entity of a passwordpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the max_passwd_age entity of a passwordpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2543,7 +2584,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="ppitemmin_passwd_age">
                                                   <sch:rule context="win-sc:passwordpolicy_item/win-sc:min_passwd_age">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the min_passwd_age entity of a passwordpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the min_passwd_age entity of a passwordpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2555,7 +2596,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="ppitemmin_passwd_len">
                                                   <sch:rule context="win-sc:passwordpolicy_item/win-sc:min_passwd_len">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the min_passwd_len entity of a passwordpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the min_passwd_len entity of a passwordpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2567,7 +2608,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="ppitempassword_hist_len">
                                                   <sch:rule context="win-sc:passwordpolicy_item/win-sc:password_hist_len">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the password_hist_len entity of a passwordpolicy_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the password_hist_len entity of a passwordpolicy_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2631,7 +2672,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="winportitemlocal_port">
                                                   <sch:rule context="win-sc:port_item/win-sc:local_port">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the local_port entity of a port_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the local_port entity of a port_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2655,7 +2696,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="winportitempid">
                                                   <sch:rule context="win-sc:port_item/win-sc:pid">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the pid entity of a port_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the pid entity of a port_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2887,7 +2928,7 @@
                          <xsd:sequence>
                               <xsd:element name="command_line" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The command line used to start the process.</xsd:documentation>
+                                         <xsd:documentation>The command_line entity is the string used to start the process.  This includes any parameters that are part of the command line.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="processitemcommand_line">
                                                   <sch:rule context="win-sc:process_item/win-sc:command_line">
@@ -2903,7 +2944,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="processitempid">
                                                   <sch:rule context="win-sc:process_item/win-sc:pid">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the pid entity of a process_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the pid entity of a process_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2915,7 +2956,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="processitemppid">
                                                   <sch:rule context="win-sc:process_item/win-sc:ppid">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the ppid entity of a process_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the ppid entity of a process_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2935,7 +2976,7 @@
                               </xsd:element>
                               <xsd:element name="image_path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This field contains the DOS Path of the image file.</xsd:documentation>
+                                         <xsd:documentation>The image_path entity contains the name of the executable file in question.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="processitemimage_path">
                                                   <sch:rule context="win-sc:process_item/win-sc:image_path">
@@ -2947,7 +2988,7 @@
                               </xsd:element>
                               <xsd:element name="current_dir" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This field has the current path in DOS format ("C:\WINDOWS")</xsd:documentation>
+                                         <xsd:documentation>The current_directory entity represents the current path to the executable.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="processitemcurrent_dir">
                                                   <sch:rule context="win-sc:process_item/win-sc:current_dir">
@@ -3666,7 +3707,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemmax_uses">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:max_uses">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the max_uses entity of a sharedresource_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the max_uses entity of a sharedresource_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3678,7 +3719,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemcurrent_uses">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:current_uses">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the current_uses entity of a sharedresource_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the current_uses entity of a sharedresource_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3832,7 +3873,7 @@
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="trustee_domain" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                              <xsd:element name="trustee_domain" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The domain of the specified trustee name.</xsd:documentation>
                                         <xsd:appinfo>
@@ -3978,7 +4019,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="user_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>The windows user item allows the different groups that a user belongs to be collected.</xsd:documentation>
+               <xsd:documentation>The windows user_item allows the different groups (identified by name) that a user belongs to be collected.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -4026,7 +4067,59 @@
                </xsd:complexContent>
           </xsd:complexType>
      </xsd:element>
-     <!-- =============================================================================== -->
+      <!-- =============================================================================== -->
+      <!-- ============================  USER SID ITEM  ================================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="user_sid_item" substitutionGroup="oval-sc:item">
+            <xsd:annotation>
+                  <xsd:documentation>The windows user_sid_item allows the different groups (identified by SID) that a user belongs to be collected.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-sc:ItemType">
+                              <xsd:sequence>
+                                    <xsd:element name="user_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>A string the represents the SID of a particular user.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="usersiditemuser">
+                                                            <sch:rule context="win-sc:user_sid_item/win-sc:user_sid">
+                                                                  <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the user_sid entity of a user_sid_item should be 'string'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="enabled" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>A boolean that represents whether the particular user is enabled or not.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="usersiditemenabled">
+                                                            <sch:rule context="win-sc:user_sid_item/win-sc:enabled">
+                                                                  <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the enabled entity of a user_sid_item should be 'boolean'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="group_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                                          <xsd:annotation>
+                                                <xsd:documentation>A string that represents the SID of a particular group.  If the specified user belongs to more than one group, then multiple group_sid elements should exist. If the specified user is not a member of a single group, then a single group_sid element should exist with a status of 'does not exist'. If there is an error determining the groups that the user belongs to, then a single group_sid element should be included with a status of 'error'.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="usersiditemgroup">
+                                                            <sch:rule context="win-sc:user_sid_item/win-sc:group_sid">
+                                                                  <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for a group_sid entity of a user_sid_item should be 'string'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
      <!-- =============================  VOLUME ITEM  =================================== -->
      <!-- =============================================================================== -->
      <xsd:element name="volume_item" substitutionGroup="oval-sc:item">
@@ -4079,7 +4172,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="volitemvolume_max_component_length">
                                                   <sch:rule context="win-sc:volume_item/win-sc:volume_max_component_length">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the volume_max_component_length entity of a volume_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the volume_max_component_length entity of a volume_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -4091,7 +4184,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="volitemserial_number">
                                                   <sch:rule context="win-sc:volume_item/win-sc:serial_number">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the serial_number entity of a volume_item should be 'int'</sch:assert>
+                                                       <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the serial_number entity of a volume_item should be 'int'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>

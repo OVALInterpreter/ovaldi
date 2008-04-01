@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.3">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.4">
      <xsd:annotation>
           <xsd:documentation>The following is a description of the common types that are shared across the different schemas within Open Vulnerability and Assessment Language (OVAL). Each type is described in detail and should provide the information necessary to understand what each represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between these type is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Common</schema>
-               <version>5.3</version>
-               <date>6/22/2007 11:18:05 AM</date>
+               <version>5.4</version>
+               <date>3/31/2008 3:43:56 PM</date>
+                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
           </xsd:appinfo>
      </xsd:annotation>
      <!-- =============================================================================== -->
@@ -14,7 +15,7 @@
      <!-- =============================================================================== -->
      <xsd:complexType name="GeneratorType">
           <xsd:annotation>
-               <xsd:documentation>The GeneratorType complex type defines an element that is used to hold information about when a particular OVAL document was compiled, what version of the schema was used, waht tool compiled the document, and what version of that tools was used.. </xsd:documentation>
+               <xsd:documentation>The GeneratorType complex type defines an element that is used to hold information about when a particular OVAL document was compiled, what version of the schema was used, what tool compiled the document, and what version of that tools was used. </xsd:documentation>
                <xsd:documentation>Additional generator information is also allowed although it is not part of the official OVAL Schema. Individual organizations can place generator information that they feel are important and these will be skipped during the validation. All OVAL really cares about is that the stated generator information is there.</xsd:documentation>
           </xsd:annotation>
           <xsd:sequence>
@@ -65,7 +66,7 @@
                || T  | F  | E  | U  | NE | NA ||
 ---------------||-----------------------------||------------------
                || 1+ | 0  | 0  | 0  | 0  | 0+ ||  True
-               || 0+ | 0+ | 0+ | 0+ | 0+ | 0+ ||  False
+               || 0+ | 1+ | 0+ | 0+ | 0+ | 0+ ||  False
      ALL       || 0+ | 0  | 1+ | 0+ | 0+ | 0+ ||  Error
                || 0+ | 0  | 0  | 1+ | 0+ | 0+ ||  Unknown
                || 0+ | 0  | 0  | 0  | 1+ | 0+ ||  Not Evaluated
@@ -78,7 +79,7 @@
                || T  | F  | E  | U  | NE | NA ||
 ---------------||-----------------------------||------------------
                || 1+ | 0+ | 0+ | 0+ | 0+ | 0+ ||  True
-               || 0  | 0+ | 0  | 0  | 0  | 0+ ||  False
+               || 0  | 1+ | 0  | 0  | 0  | 0+ ||  False
   AT LEAST ONE || 0  | 0+ | 1+ | 0+ | 0+ | 0+ ||  Error
                || 0  | 0+ | 0  | 1+ | 0+ | 0+ ||  Unknown
                || 0  | 0+ | 0  | 0  | 1+ | 0+ ||  Not Evaluated
@@ -92,7 +93,7 @@
 ---------------||-----------------------------||------------------
                || 1  | 0+ | 0  | 0  | 0  | 0+ ||  True
                || 2+ | 0+ | 0+ | 0+ | 0+ | 0+ ||  ** False **
-               || 0  | 0+ | 0  | 0  | 0  | 0+ ||  ** False **
+               || 0  | 1+ | 0  | 0  | 0  | 0+ ||  ** False **
    ONLY ONE    ||0,1 | 0+ | 1+ | 0+ | 0+ | 0+ ||  Error
                ||0,1 | 0+ | 0  | 1+ | 0+ | 0+ ||  Unknown
                ||0,1 | 0+ | 0  | 0  | 1+ | 0+ ||  Not Evaluated
@@ -104,7 +105,7 @@
  check attr is ||                             ||  final result is
                || T  | F  | E  | U  | NE | NA ||
 ---------------||-----------------------------||------------------
-               || 0  | 0+ | 0  | 0  | 0  | 0+ ||  True
+               || 0  | 1+ | 0  | 0  | 0  | 0+ ||  True
                || 1+ | 0+ | 0+ | 0+ | 0+ | 0+ ||  False
   NONE SATISFY || 0  | 0+ | 1+ | 0+ | 0+ | 0+ ||  Error
                || 0  | 0+ | 0  | 1+ | 0+ | 0+ ||  Unknown
@@ -150,42 +151,47 @@
           <xsd:restriction base="xsd:string">
                <xsd:enumeration value="binary">
                     <xsd:annotation>
-                         <xsd:documentation>The binary datatype is used to represent data that is in raw (non-printable) form. Values should be hex strings. Expected operations within OVAL for binary values are 'equals' and 'not equals'.</xsd:documentation>
+                         <xsd:documentation>The binary datatype is used to represent data that is in raw (non-printable) form. Values should be hex strings. Expected operations within OVAL for binary values are 'equals' and 'not equal'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="boolean">
                     <xsd:annotation>
-                         <xsd:documentation>The boolean datatype represent standard boolean data, either true or false. Expected operations within OVAL for boolean values are 'equals' and 'not equals'.</xsd:documentation>
+                         <xsd:documentation>The boolean datatype represents standard boolean data, either true or false. Expected operations within OVAL for boolean values are 'equals' and 'not equal'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="evr_string">
                     <xsd:annotation>
-                         <xsd:documentation>The evr_string datatype represents the epoch, version, and release fields as a single version string. It has the form "EPOCH:VERSION-RELEASE". Comparisons involving this datatype should follow the algorithm of librpm's rpmvercmp() function. Expected operations within OVAL for evr_string values are 'equals', 'not equals', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
+                         <xsd:documentation>The evr_string datatype represents the epoch, version, and release fields as a single version string. It has the form "EPOCH:VERSION-RELEASE". Comparisons involving this datatype should follow the algorithm of librpm's rpmvercmp() function. Expected operations within OVAL for evr_string values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
-               <xsd:enumeration value="float">
+                <xsd:enumeration value="fileset_revision">
+                      <xsd:annotation>
+                            <xsd:documentation>The fileset_revision datatype represents the version string related to filesets in HP-UX. An example would be 'A.03.61.00'. As far as implementing operations, right now there is a IP licensing issue being discussed on our ability to publicize the method to do this; however, the HP-UX team is willing to discuss how to implement this with anyone who would like to do it while we are waiting for the IP licensing issue to be resolved. Expected operations within OVAL for fileset_version values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
+                      </xsd:annotation>
+                </xsd:enumeration>
+                <xsd:enumeration value="float">
                     <xsd:annotation>
-                         <xsd:documentation>The float datatype describes standard float data. Expected operations within OVAL for float values are 'equals', 'not equals', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
+                         <xsd:documentation>The float datatype describes standard float data. Expected operations within OVAL for float values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="ios_version">
                     <xsd:annotation>
-                         <xsd:documentation>The ios_version datatype describes Cisco IOS Train strings. These are in essence version strings for IOS. Please refer to Cisco's IOS Reference Guide for information on how to compare different Trains as they follow a very specific pattern. Expected operations within OVAL for ios_version values are 'equals', 'not equals', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
+                         <xsd:documentation>The ios_version datatype describes Cisco IOS Train strings. These are in essence version strings for IOS. Please refer to Cisco's IOS Reference Guide for information on how to compare different Trains as they follow a very specific pattern. Expected operations within OVAL for ios_version values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="int">
                     <xsd:annotation>
-                         <xsd:documentation>The int datatype describes standard integer data. Expected operations within OVAL for int values are 'equals', 'not equals', 'greater than', 'greater than or equal', 'less than', 'less than or equal', 'bitwise and', and 'bitwise or'.</xsd:documentation>
+                         <xsd:documentation>The int datatype describes standard integer data.  Note that this is based off the built-in xsd integer datatype with an infinite range.  Expected operations within OVAL for int values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', 'less than or equal', 'bitwise and', and 'bitwise or'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="string">
                     <xsd:annotation>
-                         <xsd:documentation>The string datatype describes standard string data. Expected operations within OVAL for string values are 'equals', 'not equals', 'pattern match'.</xsd:documentation>
+                          <xsd:documentation>The string datatype describes standard string data. Expected operations within OVAL for string values are 'equals', 'not equal', 'case insensitive equals', 'case insensitive not equal', 'pattern match'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="version">
                     <xsd:annotation>
-                         <xsd:documentation>The version datatype represents a value that is a hierarchical list of non-negative integers separated by a single character delimiter. Expected operations within OVAL for version values are 'equals', 'not equals', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
+                         <xsd:documentation>The version datatype represents a value that is a hierarchical list of non-negative integers separated by a single character delimiter. Expected operations within OVAL for version values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
                          <xsd:documentation>For example '#.#.#' or '#-#-#-#' where the numbers to the left are more significant than the numbers to the right. When performing an 'equals' operation on a version datatype, you should first check the left most number for equality. If that fails, then the values are not equal. If it succeeds, then check the second left most number for equality. Continue checking the numbers from left to right until the last number has been checked. If, after testing all the previous numbers, the last number is equal then the two versions are equal. When performing other operations, such as 'less than', 'less than or equal', 'greater than, or 'greater than or equal', similar logic as above is used. Start with the left most number and move from left to right. For each number, check if it is less than the number you are testing against. If it is, then the version in question is less than the version you are testing against. If the number is equal, then move to check the next number to the right. For example, to test if 5.7.23 is less than or equal to 5.8.0 you first compare 5 to 5. They are equal so you move on to compare 7 to 8. 7 is less than 8 so the entire test succeeds and 5.7.23 is 'less than or equal' to 5.8.0. The difference between the 'less than' and 'less than or equal' operations is how the last number is handled. If the last number is reached, the check should use the given operation (either 'less than' and 'less than or equal') to test the number. For example, to test if 4.23.6 is greater than 4.23.6 you first compare 4 to 4. They are equal so you move on to compare 23 to 23. They are equal so you move on to compare 6 to 6. This is the last number in the version and since 6 is not greater than 6, the entire test fails and 4.23.6 is not greater than 4.23.6.</xsd:documentation>
                          <xsd:documentation>Version strings with a different number of components shall be padded with zeros to make them the same size. For example, if the version strings '1.2.3' and '6.7.8.9' are being compared, then the short one should be padded to become '1.2.3.0'.</xsd:documentation>
                     </xsd:annotation>
@@ -203,7 +209,8 @@
                ||  EX  |  DE  |  ER  |  NC  ||
 ---------------||---------------------------||------------------
                ||  1+  |  0   |  0   |  0   ||  True
-               ||  0+  |  1+  |  0+  |  0+  ||  False
+               ||  0   |  0   |  0   |  0   ||  False
+               ||  0+  |  1+  |  0+  |  0+  ||  False  
  all_exist     ||  0+  |  0   |  1+  |  0+  ||  Error
                ||  0+  |  0   |  0   |  1+  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
@@ -216,8 +223,9 @@
                ||  EX  |  DE  |  ER  |  NC  ||
 ---------------||---------------------------||------------------
                ||  0+  |  0+  |  0   |  0+  ||  True 
+               ||  1+  |  0+  |  1+  |  0+  ||  True
                ||  --  |  --  |  --  |  --  ||  False
- any           ||  0   |  0   |  1+  |  0   ||  Error
+ any           ||  0   |  0+  |  1+  |  0+  ||  Error
                ||  --  |  --  |  --  |  --  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
                ||  --  |  --  |  --  |  --  ||  Not Applicable
@@ -257,8 +265,8 @@
                ||  1   |  0+  |  0   |  0   ||  True 
                ||  2+  |  0+  |  0+  |  0+  ||  False
                ||  0   |  0+  |  0   |  0   ||  False
- only_one      || 0,2+ |  0+  |  1+  |  0+  ||  Error
-               || 0,2+ |  0+  |  0   |  1+  ||  Unknown
+ only_one      ||  0,1 |  0+  |  1+  |  0+  ||  Error
+               ||  0,1 |  0+  |  0   |  1+  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
                ||  --  |  --  |  --  |  --  ||  Not Applicable
 ---------------||---------------------------||------------------
@@ -343,15 +351,25 @@
           <xsd:restriction base="xsd:string">
                <xsd:enumeration value="equals">
                     <xsd:annotation>
-                         <xsd:documentation>The 'equals' operation returns true if the actual value on the system is equal to the stated entity.</xsd:documentation>
+                         <xsd:documentation>The 'equals' operation returns true if the actual value on the system is equal to the stated entity.  When the specified datatype is a string, this results in a case-sensitive comparison.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
-               <xsd:enumeration value="not equal">
+                <xsd:enumeration value="not equal">
                     <xsd:annotation>
-                         <xsd:documentation>The 'not equal' operation returns true if the actual value on the system is not equal to the stated entity.</xsd:documentation>
+                          <xsd:documentation>The 'not equal' operation returns true if the actual value on the system is not equal to the stated entity.  When the specified datatype is a string, this results in a case-sensitive comparison.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
-               <xsd:enumeration value="greater than">
+                <xsd:enumeration value="case insensitive equals">
+                      <xsd:annotation>
+                            <xsd:documentation>The 'case insensitive equals' operation is meant for string data and returns true if the actual value on the system is equal (using a case insensitive comparison) to the stated entity.</xsd:documentation>
+                      </xsd:annotation>
+                </xsd:enumeration>
+                <xsd:enumeration value="case insensitive not equal">
+                      <xsd:annotation>
+                            <xsd:documentation>The 'case insensitive not equal' operation is meant for string data and returns true if the actual value on the system is not equal (using a case insensitive comparison) to the stated entity.</xsd:documentation>
+                      </xsd:annotation>
+                </xsd:enumeration>
+                <xsd:enumeration value="greater than">
                     <xsd:annotation>
                          <xsd:documentation>The 'greater than' operation returns true if the actual value on the system is greater than the stated entity.</xsd:documentation>
                     </xsd:annotation>
@@ -413,7 +431,7 @@
 ---------------||-----------------------------||------------------
                || 1  | 0+ | 0  | 0  | 0  | 0+ ||  True
                || 2+ | 0+ | 0+ | 0+ | 0+ | 0+ ||  ** False **
-               || 0  | 0+ | 0  | 0  | 0  | 0+ ||  ** False **
+               || 0  | 1+ | 0  | 0  | 0  | 0+ ||  ** False **
       ONE      ||0,1 | 0+ | 1+ | 0+ | 0+ | 0+ ||  Error
                ||0,1 | 0+ | 0  | 1+ | 0+ | 0+ ||  Unknown
                ||0,1 | 0+ | 0  | 0  | 1+ | 0+ ||  Not Evaluated

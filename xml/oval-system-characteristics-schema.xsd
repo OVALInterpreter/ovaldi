@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" elementFormDefault="qualified" version="5.3">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" elementFormDefault="qualified" version="5.4">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
      <xsd:annotation>
@@ -7,9 +7,10 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core System Characteristics</schema>
-               <version>5.3</version>
-               <date>6/22/2007 11:18:56 AM</date>
-               <sch:title>schematron validation of the Core portion of an OVAL System Characteristics file</sch:title>
+               <version>5.4</version>
+               <date>3/31/2008 3:43:57 PM</date>
+                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                <sch:title>schematron validation of the Core portion of an OVAL System Characteristics file</sch:title>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
           </xsd:appinfo>
      </xsd:annotation>
@@ -267,7 +268,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="does not exist">
                     <xsd:annotation>
-                         <xsd:documentation>A flag of 'does not exist' means that no matching item was found on the system.</xsd:documentation>
+                         <xsd:documentation>A flag of 'does not exist' means that the underlying structure is installed on the system but no matching item was found.  For example, the Windows metabase is installed but the specified metabase_object could not be found.  In this example, if the metabase itself was not installed, then the flag would have been 'not applicable'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="not collected">
@@ -277,7 +278,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="not applicable">
                     <xsd:annotation>
-                         <xsd:documentation>The specified object is not applicable to the system being characterized. An example would be trying to collect objects related to a Red Hat system off a Windows system.</xsd:documentation>
+                         <xsd:documentation>The specified object is not applicable to the system being characterized.  This could be because the data repository is not installed or that the object structure is for a different flavor of systems. An example would be trying to collect objects related to a Red Hat system off a Windows system.  Another example would be trying to collect an rpminfo object on a Linux system if the rpm packaging system is not installed.  If the rpm packaging system is installed and the specified rpminfo object could not be found, then the flag would be 'does not exist'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>
@@ -314,7 +315,7 @@
      <!-- =============================================================================== -->
      <xsd:complexType name="EntityItemBaseType" abstract="true">
           <xsd:annotation>
-               <xsd:documentation>The EntityItemBaseType complex type is an abstract type that defines the default attributes associated with every entity.  The optional datatype determines the type of data expected. (the default datatype is 'string')  The optional mask attribute is used to identify values that have been hidden for sensitivity concerns.  This is used by the result file which uses the system characateristic schema to format the information found on a specific system.  If the original definition set the mask attribute of an entity to 'true', then value obtained from the system should not be presented in the results file.  A system characteristics file that is not held within a results file should not use the mask attribute.  The optional status attribute holds information regarding the success of the data collection.  For example, if there was an error collecting a particular piece of data, then the status would be 'error'.</xsd:documentation>
+               <xsd:documentation>The EntityItemBaseType complex type is an abstract type that defines the default attributes associated with every entity.  The optional datatype determines the type of data expected. (the default datatype is 'string')  Note that the datatype attribute simply defines the type of data as found on the system, it is not used during evaluation.  An OVAL Definition defines how the data should be interpreted during analysis.  If the definition states a datatype that is different than what the system characteristics presents, then a type cast must be made.  The optional mask attribute is used to identify values that have been hidden for sensitivity concerns.  This is used by the result file which uses the system characateristic schema to format the information found on a specific system.  If the original definition set the mask attribute of an entity to 'true', then value obtained from the system should not be presented in the results file.  A system characteristics file that is not held within a results file should not use the mask attribute.  The optional status attribute holds information regarding the success of the data collection.  For example, if there was an error collecting a particular piece of data, then the status would be 'error'.</xsd:documentation>
                <xsd:appinfo>
                     <sch:pattern id="entitystatus">
                          <sch:rule context="oval-sc:system_data/*/*">

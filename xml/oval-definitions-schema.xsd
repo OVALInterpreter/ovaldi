@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" elementFormDefault="qualified" version="5.3">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" elementFormDefault="qualified" version="5.4">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
      <xsd:annotation>
@@ -7,9 +7,10 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Definition</schema>
-               <version>5.3</version>
-               <date>6/22/2007 11:18:16 AM</date>
-               <sch:title>schematron validation of the Core portion of an OVAL Definitions file</sch:title>
+               <version>5.4</version>
+               <date>3/31/2008 3:43:56 PM</date>
+                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                <sch:title>Schematron validation of the Core portion of an OVAL Definitions file</sch:title>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
           </xsd:appinfo>
      </xsd:annotation>
@@ -155,7 +156,7 @@
      <!-- =================================  GENERATOR  ================================= -->
      <!-- =============================================================================== -->
      <!--
-		The GeneratorType is defined by the oval shared schema.  Please refer to
+		The GeneratorType is defined by the oval common schema.  Please refer to
 		that documentation for a description of the complex type.
 	 -->
      <!-- =============================================================================== -->
@@ -172,7 +173,14 @@
      <xsd:complexType name="DefinitionType">
           <xsd:annotation>
                <xsd:documentation>The DefinitionType defines a single OVAL Definition. A definition is the key structure in OVAL. It is analogous to the logical sentence or proposition: if a computer's state matches the configuration parameters laid out in the criteria, then that computer exhibits the state described. The DefinitionType contains a section for various metadata related elements that describe the definition. This includes a description, version, affected system types, and reference information. The notes section of a definition should be used to hold information that might be helpful to someone examining the technical aspects of the definition. For example, why certain tests have been included in the criteria, or maybe a link to where further information can be found. The DefinitionType also (unless the definition is deprecated) contains a criteria child element that joins individual tests together with a logical operator to specify the specific computer state being described.</xsd:documentation>
-               <xsd:documentation>The required id attribute is the OVAL-ID of the Definition. The form of an OVAL-ID must follow the specific format described by the definitionidPattern. The required version attribute holds the current version of the definition. Versions are integers, starting at 1 and incrementing every time a definition is modified. The required class attribute indicates the specific class to which the definition belongs. See the definition of classEnumeration for more information about the different valid classes. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
+                <xsd:documentation>The required id attribute is the OVAL-ID of the Definition. The form of an OVAL-ID must follow the specific format described by the definitionidPattern. The required version attribute holds the current version of the definition. Versions are integers, starting at 1 and incrementing every time a definition is modified. The required class attribute indicates the specific class to which the definition belongs.  The class gives a hint to a user so they can know what the definition writer is trying to say. See the definition of classEnumeration for more information about the different valid classes. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
+                <xsd:appinfo>
+                      <sch:pattern id="required_criteria">
+                            <sch:rule context="/oval-def:oval_definitions/oval-def:definitions/oval-def:definition[@deprecated='false' or not(@deprecated)]">
+                                  <sch:assert test="oval-def:criteria">A valid OVAL Definition document must contain a criteria unless the definition is a deprecated definition.</sch:assert>
+                            </sch:rule>
+                      </sch:pattern>
+                </xsd:appinfo>
           </xsd:annotation>
           <xsd:sequence>
                <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
@@ -207,7 +215,7 @@
      </xsd:complexType>
      <xsd:complexType name="AffectedType">
           <xsd:annotation>
-               <xsd:documentation>Each OVAL Definition is written to evaluate a certain type of system(s). The family, platform(s), and product(s) of this target are described by the AffectedType whose main purpose is to provide hints for tools using OVAL Definitions. For instance, to help a reporting tool only use Windows definitions, or to pre-select only Red Hat definitions to be evaluated. Note, the inclusion of a particular platform or product does not mean the definition is physically checking for the existence of the platform or product. For the actual test to be performed, the correct test must still be included in the definition's criteria section.</xsd:documentation>
+               <xsd:documentation>Each OVAL Definition is written to evaluate a certain type of system(s). The family, platform(s), and product(s) of this target are described by the AffectedType whose main purpose is to provide hints for tools using OVAL Definitions. For instance, to help a reporting tool only use Windows definitions, or to preselect only Red Hat definitions to be evaluated. Note, the inclusion of a particular platform or product does not mean the definition is physically checking for the existence of the platform or product. For the actual test to be performed, the correct test must still be included in the definition's criteria section.</xsd:documentation>
                <xsd:documentation>The AffectedType complex type details the specific system, application, subsystem, library, etc. for which a definition has been written. If a definition is not tied to a specific product, then this element should not be included. The absence of the platform or product element can be thought of as definition applying to all platforms or products. The inclusion of a particular platform or product does not mean the definition is physically checking for the existence of the platform or product. For the actual test to be performed, the correct test must still be included in the definition's criteria section. To increase the utility of this element, care should be taken when assigning and using strings for product names. The schema places no restrictions on the values that can be assigned, potentially leading to many different representations of the same value. For example 'Internet Explorer' and 'IE'. The current convention is to fully spell out all terms, and avoid the use of abbreviations at all costs.</xsd:documentation>
                <xsd:documentation>Please note that the AffectedType will change in future versions of OVAL in order to support the Common Platform Enumeration (CPE).</xsd:documentation>
           </xsd:annotation>
@@ -285,7 +293,7 @@
      <xsd:complexType name="TestType">
           <xsd:annotation>
                <xsd:documentation>The base type of every test includes an optional notes element and five attributes. The notes section of a test should be used to hold information that might be helpful to someone examining the technical aspects of the test. For example, why certain values have been used by the test, or maybe a link to where further information can be found. Please refer to the description of the NotesType complex type for more information about the notes element.</xsd:documentation>
-               <xsd:documentation>The required id attribute uniquely identifies each test, and must conform to the format specified by the testidPattern simple type. The required version attribute holds the current version of the test. Versions are integers, starting at 1 and incrementing every time a test is modified.  The optional check_existence attribute determines how many objects in the specified set must exists for the test to be true.  For example, if a value of 'all_exist' is given, every object defined by the OVAL Object must exist on the system for the test to return true.  If the OVAL Object uses a variable reference, then every value of that variable must exist.  Note that a pattern match defines a set of matching objects found on a system.  So when check_existence = 'all_exist' and a regex matches anything on a system the test will evaluate to true.  (since all matching objects on the system were found on the system)  When check_existence = 'all_exist' and a regex does not match anything on a system the test will evaluate to false.  The required check attribute determines how many of the existing objects must satisfy the state requirements. (For example: Should the test check that all files match a specified version or that at least one file matches the specified version?) The valid check values are explained in the description of the CheckEnumeration simple type.  Note that if the test does not contain any references to OVAL States, then the check attribute has no meaning and can be ignored during evaluation. The required comment attribute provides a short description of the test. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
+               <xsd:documentation>The required id attribute uniquely identifies each test, and must conform to the format specified by the testidPattern simple type. The required version attribute holds the current version of the test. Versions are integers, starting at 1 and incrementing every time a test is modified.  The optional check_existence attribute determines how many items in the specified set must exists for the test to evaluate to true.  For example, if a value of 'all_exist' is given, every item defined by the OVAL Object must exist on the system for the test to evaluate to true.  If the OVAL Object uses a variable reference, then every value of that variable must exist.  Note that a pattern match defines a set of matching objects found on a system.  So when check_existence = 'all_exist' and a regex matches anything on a system the test will evaluate to true.  (since all matching objects on the system were found on the system)  When check_existence = 'all_exist' and a regex does not match anything on a system the test will evaluate to false.  The required check attribute determines how many of the existing objects must satisfy the state requirements. (For example: Should the test check that all files match a specified version or that at least one file matches the specified version?) The valid check values are explained in the description of the CheckEnumeration simple type.  Note that if the test does not contain any references to OVAL States, then the check attribute has no meaning and can be ignored during evaluation.  Also note that both the 'check' and 'check_existence' attributes must be satisfied during evaluation for the test to return true.  For example, if the check_existence fails then there is no need to evaluate the check since the test will have a result of false no matter what.  The required comment attribute provides a short description of the test. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
                <xsd:appinfo>
                     <sch:pattern id="test_type">
                          <sch:rule context="/oval-def:oval_definitions/oval-def:tests/*[@check_existence='none_exist']">
@@ -350,52 +358,9 @@
      </xsd:complexType>
      <xsd:element name="set">
           <xsd:annotation>
-               <xsd:documentation>The set element enables complex objects to be described. It is a recursive element in that each set element can contain additional set elements as children. Each set element defines characteristics that produce a matching set of objects. The possible characteristics are an object reference and a collection of filters. The object_reference refers to an existing OVAL Object. The filter element provides a reference to an existing OVAL State. A filter is used to eliminate certain object from the set. Each filter is applied to each OVAL Object before the set_operator is applied. For example, if an object_reference points to an OVAL Object that is every file in a certain directory, a filter might be set up to limit the object set to only those files with a size less than 10 KB. If multiple filters are provided, then each filter is used separately against the defined object set. In other words, if an object matches any of the supplied filters, then it is thrown out of the set.</xsd:documentation>
+               <xsd:documentation>The set element enables complex objects to be described. It is a recursive element in that each set element can contain additional set elements as children. Each set element defines characteristics that produce a matching set of objects. The possible characteristics are an object reference and a collection of filters. The object_reference refers to an existing OVAL Object. The filter element provides a reference to an existing OVAL State. A filter is used to eliminate certain objects from the set. Each filter is applied to each OVAL Object before the set_operator is applied. For example, if an object_reference points to an OVAL Object that is every file in a certain directory, a filter might be set up to limit the object set to only those files with a size less than 10 KB. If multiple filters are provided, then each filter is used separately against the defined object set. In other words, if an object matches any of the supplied filters, then it is thrown out of the set.</xsd:documentation>
                <xsd:documentation>The required set_operator attribute defines how different child sets are combined to form the overall set of objects. For example, does one take the union of different sets or the intersection? For a description of the valid values please refer to the SetOperatorEnumeration simple type.</xsd:documentation>
                <xsd:appinfo>
-                    <evaluation_documentation>Below are some tables that outline how different flags are combined with a given set_operator to return a new flag. These tables are needed when computing the flag for collected objects that represent object sets in an OVAL Definition. The top row identifies the flag associated with the first set or object reference. The left column identifies the flag associated with the second set or object reference. The matrix inside the table represent the resulting flag when the given set_operator is applied. (E=error, C=complete, I=incomplete, DNE=does not exist, NC=not collected, NA=not applicable)</evaluation_documentation>
-                    <evaluation_chart xml:space="preserve">
-                 ||                                   ||
- set_operator is ||            obj 1 flag             || 
-      union      ||                                   ||
-                 ||  E  |  C  |  I  | DNE | NC  | NA  ||
------------------||-----------------------------------||
-               E ||  E  |  E  |  E  |  E  |  E  |  E  || 
-  obj          C ||  E  |  C  |  I  |  C  |  I  |  C  ||
-   2           I ||  E  |  I  |  I  |  I  |  I  |  I  || 
-  flag       DNE ||  E  |  C  |  I  | DNE |  I  | DNE ||
-              NC ||  E  |  I  |  I  |  I  |  NC |  NC || 
-              NA ||  E  |  C  |  I  | DNE |  NC |  NA ||
------------------||-----------------------------------||
-                    </evaluation_chart>
-                    <evaluation_chart xml:space="preserve">
-                 ||                                   ||
- set_operator is ||             obj 1 flag            ||
-  intersection   ||                                   ||
-                 ||  E  |  C  |  I  | DNE | NC  | NA  ||
------------------||-----------------------------------||
-               E ||  E  |  E  |  E  | DNE |  E  |  E  ||
-   obj         C ||  E  |  C  |  I  | DNE |  NC |  C  ||
-    2          I ||  E  |  I  |  I  | DNE |  NC |  I  ||
-   flag      DNE || DNE | DNE | DNE | DNE | DNE | DNE ||
-              NC ||  E  |  NC |  NC | DNE |  NC |  NC ||
-              NA ||  E  |  C  |  I  | DNE |  NC |  NA ||
------------------||-----------------------------------||
-                    </evaluation_chart>
-                    <evaluation_chart xml:space="preserve">
-                 ||                                   ||
- set_operator is ||             obj 1 flag            ||
-    complement   ||                                   ||
-                 ||  E  |  C  |  I  | DNE | NC  | NA  ||
------------------||-----------------------------------||
-               E ||  E  |  E  |  E  | DNE |  E  |  E  ||
-   obj         C ||  E  |  C  |  I  | DNE |  NC |  E  ||
-    2          I ||  E  |  E  |  E  | DNE |  NC |  E  ||
-   flag      DNE ||  E  |  C  |  I  | DNE |  NC |  E  ||
-              NC ||  E  |  NC |  NC | DNE |  NC |  E  ||
-              NA ||  E  |  E  |  E  |  E  |  E  |  E  ||
------------------||-----------------------------------||
-                    </evaluation_chart>
                     <sch:pattern id="setobjref">
                          <sch:rule context="/oval-def:oval_definitions/oval-def:objects/*/oval-def:set/oval-def:object_reference">
                               <sch:assert test="name(./../..) = name(/oval-def:oval_definitions/oval-def:objects/*[@id=current()])"><sch:value-of select="../../@id"/> - Each object referenced by the set must be of the same type as parent object</sch:assert>
@@ -474,7 +439,7 @@
      </xsd:element>
      <xsd:complexType name="VariableType">
           <xsd:annotation>
-               <xsd:documentation>The VariableType complex type defines attributes associated with each OVAL Variable. The required id attribute uniquely identifies each variable, and must conform to the format specified by the varidPattern simple type. The required version attribute holds the current version of the variable. Versions are integers, starting at 1 and incrementing every time a variable is modified. The required datatype attribute specifies the type of value being defined. The required comment attribute provides a short description of the variable. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
+               <xsd:documentation>The VariableType complex type defines attributes associated with each OVAL Variable. The required id attribute uniquely identifies each variable, and must conform to the format specified by the varidPattern simple type. The required version attribute holds the current version of the variable. Versions are integers, starting at 1 and incrementing every time a variable is modified. The required datatype attribute specifies the type of value being defined. The set of values identified by a variable must comply with the specified datatype. The required comment attribute provides a short description of the variable. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
           </xsd:annotation>
           <xsd:sequence>
                <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
@@ -696,17 +661,17 @@
      <!-- =============================================================================== -->
      <xsd:simpleType name="ClassEnumeration">
           <xsd:annotation>
-               <xsd:documentation>The ClassEnumeration simple type defines the different classes of definitions. These classes are used to group definitions by the type of system state they are describing. For example, this allows users to find all the vulnerability definitions.</xsd:documentation>
+                <xsd:documentation>The ClassEnumeration simple type defines the different classes of definitions.  Each class defines a certain intent regarding how an OVAL Definition is written and what that definition is describing.  The specified class gives a hint about the definition so a user can know what the definition writer is trying to say.  Note that the class does not make a statement about whether a true result is good or bad as this depends on the use of an OVAL Definition.  These classes are also used to group definitions by the type of system state they are describing.  For example, this allows users to find all the vulnerability (or patch, or inventory, etc) definitions.</xsd:documentation>
           </xsd:annotation>
           <xsd:restriction base="xsd:string">
                <xsd:enumeration value="compliance">
                     <xsd:annotation>
-                         <xsd:documentation>A compliance definition describes the state of a machine as it complies with a specific policy.</xsd:documentation>
+                          <xsd:documentation>A compliance definition describes the state of a machine as it complies with a specific policy.  The intention is that a definition of this class will return true when the system is found to be compliant with the stated policy.  Another way of thinking about this is that a compliance definition is stating "the system is compliant if ...".</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="inventory">
                     <xsd:annotation>
-                         <xsd:documentation>An inventory definition describes whether a specific piece of software is installed on the system.</xsd:documentation>
+                          <xsd:documentation>An inventory definition describes whether a specific piece of software is installed on the system.  The intention is that a definition of this class will return true when the specified software is found on the system.  Another way of thinking about this is that an inventory definition is stating "the software is installed if ...".</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="miscellaneous">
@@ -716,12 +681,12 @@
                </xsd:enumeration>
                <xsd:enumeration value="patch">
                     <xsd:annotation>
-                         <xsd:documentation>A patch definition details the machine state of whether a patch executable should be installed.</xsd:documentation>
+                          <xsd:documentation>A patch definition details the machine state of whether a patch executable should be installed.  The intention is that a definition of this class will return true when the specified patch is missing from the system.  Another way of thinking about this is that a patch definition is stating "the patch should be installed if ...".  Note that word SHOULD is intended to mean more than just CAN the patch executable be installed.  In other words, if a more recent patch is already installed then the specified patch might not need to be installed.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="vulnerability">
                     <xsd:annotation>
-                         <xsd:documentation>A vulnerability definition describes the conditions under which a machine is vulnerable.</xsd:documentation>
+                          <xsd:documentation>A vulnerability definition describes the conditions under which a machine is vulnerable.  The intention is that a definition of this class will return true when the system is found to be vulnerable with the stated issue.  Another way of thinking about this is that a vulnerability definition is stating "the system is vulnerable if ...".</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>
@@ -729,6 +694,51 @@
      <xsd:simpleType name="SetOperatorEnumeration">
           <xsd:annotation>
                <xsd:documentation>The SetOperatorEnumeration simple type defines acceptable set operations. Set operations are used to take multiple different sets of objects within OVAL and merge them into a single set. The different operators that guide this merge are defined below. For each operator, if only a single object has been supplied, then the resulting set is simply that complete object.</xsd:documentation>
+                <xsd:appinfo>
+                      <evaluation_documentation>Below are some tables that outline how different flags are combined with a given set_operator to return a new flag. These tables are needed when computing the flag for collected objects that represent object sets in an OVAL Definition. The top row identifies the flag associated with the first set or object reference. The left column identifies the flag associated with the second set or object reference. The matrix inside the table represent the resulting flag when the given set_operator is applied. (E=error, C=complete, I=incomplete, DNE=does not exist, NC=not collected, NA=not applicable)</evaluation_documentation>
+                      <evaluation_chart xml:space="preserve">
+                 ||                                   ||
+ set_operator is ||            obj 1 flag             || 
+      union      ||                                   ||
+                 ||  E  |  C  |  I  | DNE | NC  | NA  ||
+-----------------||-----------------------------------||
+               E ||  E  |  E  |  E  |  E  |  E  |  E  || 
+  obj          C ||  E  |  C  |  I  |  C  |  I  |  C  ||
+   2           I ||  E  |  I  |  I  |  I  |  I  |  I  || 
+  flag       DNE ||  E  |  C  |  I  | DNE |  I  | DNE ||
+              NC ||  E  |  I  |  I  |  I  |  NC |  NC || 
+              NA ||  E  |  C  |  I  | DNE |  NC |  NA ||
+-----------------||-----------------------------------||
+                      </evaluation_chart>
+                      <evaluation_chart xml:space="preserve">
+                 ||                                   ||
+ set_operator is ||             obj 1 flag            ||
+  intersection   ||                                   ||
+                 ||  E  |  C  |  I  | DNE | NC  | NA  ||
+-----------------||-----------------------------------||
+               E ||  E  |  E  |  E  | DNE |  E  |  E  ||
+   obj         C ||  E  |  C  |  I  | DNE |  NC |  C  ||
+    2          I ||  E  |  I  |  I  | DNE |  NC |  I  ||
+   flag      DNE || DNE | DNE | DNE | DNE | DNE | DNE ||
+              NC ||  E  |  NC |  NC | DNE |  NC |  NC ||
+              NA ||  E  |  C  |  I  | DNE |  NC |  NA ||
+-----------------||-----------------------------------||
+                      </evaluation_chart>
+                      <evaluation_chart xml:space="preserve">
+                 ||                                   ||
+ set_operator is ||             obj 1 flag            ||
+    complement   ||                                   ||
+                 ||  E  |  C  |  I  | DNE | NC  | NA  ||
+-----------------||-----------------------------------||
+               E ||  E  |  E  |  E  | DNE |  E  |  E  ||
+   obj         C ||  E  |  C  |  I  | DNE |  NC |  E  ||
+    2          I ||  E  |  E  |  E  | DNE |  NC |  E  ||
+   flag      DNE ||  E  |  C  |  I  | DNE |  NC |  E  ||
+              NC ||  E  |  NC |  NC | DNE |  NC |  E  ||
+              NA ||  E  |  E  |  E  |  E  |  E  |  E  ||
+-----------------||-----------------------------------||
+                      </evaluation_chart>
+                </xsd:appinfo>
           </xsd:annotation>
           <xsd:restriction base="xsd:string">
                <xsd:enumeration value="COMPLEMENT">
@@ -759,9 +769,12 @@
                <xsd:documentation>The optional mask attribute can be used in situations where information is need for evaluation, but this information should not be disclosed in the results file.  (maybe due to sensitivity concerns)  If the mask attribute is set to 'true', then the value of this field, along with the operation used, should not appear in the results file.  Note that this value would appear in the copy of the system characteristics contained in the results file.  In this case the results file should make use of the corresponding mask attribute in the system characteristics schema should be set to true and the value should be ommitted.  In addition to the value being omitted from the copy of the system characteristics file, the copy of the definition file should also omit the value and operation used for testing.</xsd:documentation>
                <xsd:documentation>The optional var_ref attribute refers the value of the entity to a variable element. When supplied, the value(s) associated with the OVAL Variable should be used as the value(s) of the entity. If there is an error computing the value of the variable, then that error should be passed up to the entity referencing it. If the variable being referenced does not have a value (for example, if the variable pertains to the size of a file, but the file does not exist) then one of two results are possible. If the entity is part of an object declaration, then the object is considered to not exist. If the entity is part of a state declaration, then the state comparison should result in an error.</xsd:documentation>
                <xsd:appinfo>
-                    <sch:pattern id="entityvarref">
+                    <sch:pattern id="entityrules">
                          <sch:rule context="oval-def:objects/*/*|oval-def:states/*/*">
+                               <sch:let name="var_ref" value="@var_ref"/>
+                               <sch:assert test="((not(@datatype) and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='case insensitive equals' or @operation='case insensitive not equal' or @operation='pattern match')) or (@datatype='binary' and (not(@operation) or @operation='equals' or @operation='not equal')) or (@datatype='boolean' and (not(@operation) or @operation='equals' or @operation='not equal')) or (@datatype='evr_string' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal')) or (@datatype='fileset_revision' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal')) or (@datatype='float' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal')) or (@datatype='ios_version' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal')) or (@datatype='int' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal' or @operation='bitwise and' or @operation='bitwise or')) or (@datatype='string' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='pattern match')) or (@datatype='version' and (not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal')))"><sch:value-of select="../@id"/> - the supplied operation attribute for the <sch:value-of select="name()"/> entity is not valid given a datatype of '<sch:value-of select="@datatype"/>'</sch:assert>
                               <sch:assert test="not(@var_ref) or .=''"><sch:value-of select="../@id"/> - a var-ref has been supplied for the <sch:value-of select="name()"/> entity so no value should be provided</sch:assert>
+                              <sch:assert test="if (@var_ref) then (if (@datatype) then (@datatype=/oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype) else ('string' = /oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype)) else (1=1)"><sch:value-of select="$var_ref"/> - inconsistent datatype between the variable and an associated var_ref</sch:assert>
                          </sch:rule>
                     </sch:pattern>
                </xsd:appinfo>

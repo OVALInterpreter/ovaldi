@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ind-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" elementFormDefault="qualified" version="5.3">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ind-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" elementFormDefault="qualified" version="5.4">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>This document outlines the items of the OVAL System Characteristics XML schema that are independent of any specific family or platform. Each iten is an extention of a basic System Characteristics item defined in the core System Characteristics XML schema.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Independent System Characteristics</schema>
-               <version>5.3</version>
-               <date>6/22/2007 11:17:47 AM</date>
-               <sch:title>schematron validation of the Independent portion of an OVAL System Characteristics file</sch:title>
+               <version>5.4</version>
+               <date>3/31/2008 3:43:55 PM</date>
+                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                <sch:title>schematron validation of the Independent portion of an OVAL System Characteristics file</sch:title>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="ind-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent"/>
           </xsd:appinfo>
@@ -279,7 +280,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="textfilecontent_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>The textfilecontent item looks at the contents of a text file (aka a configuration file) by looking at individual lines.</xsd:documentation>
+               <xsd:documentation>The textfilecontent_item looks at the contents of a text file (aka a configuration file) by looking at individual lines.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -287,7 +288,7 @@
                          <xsd:sequence>
                               <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>Specifies the absolute path to a file on the machine.</xsd:documentation>
+                                        <xsd:documentation>The path entity specifies the absolute path (without the filename) to the file that is being represented.  Note that the trailing slash should be included.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="txtitempath">
                                                   <sch:rule context="ind-sc:textfilecontent_item/ind-sc:path">
@@ -299,7 +300,7 @@
                               </xsd:element>
                               <xsd:element name="filename" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The filename element specifies the name of the file.</xsd:documentation>
+                                         <xsd:documentation>The filename entity specifies the name of the file (without the path) that is being represented.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="txtitemfilename">
                                                   <sch:rule context="ind-sc:textfilecontent_item/ind-sc:filename">
@@ -309,9 +310,34 @@
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="line" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                               <xsd:element name="pattern" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                     <xsd:annotation>
+                                           <xsd:documentation>The pattern entity represents a regular expression that is used to define a block of text.  Subexpression notation (parenthesis) is used to call out a value(s) to test against.  For example, the pattern abc(.*)xyz would look for a block of text in the file that starts with abc and ends with xyz, with the subexpression being all the characters that exist inbetween.  Note that if the pattern can match more than one block of text starting at the same point, then it matches the longest. Subexpressions also match the longest possible substrings, subject to the constraint that the whole match be as long as possible, with subexpressions starting earlier in the pattern taking priority over ones starting later.</xsd:documentation>
+                                           <xsd:appinfo>
+                                                 <sch:pattern id="txtitempattern">
+                                                       <sch:rule context="ind-sc:textfilecontent_item/ind-sc:pattern">
+                                                             <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the pattern entity of a textfilecontent_item should be 'string'</sch:assert>
+                                                       </sch:rule>
+                                                 </sch:pattern>
+                                           </xsd:appinfo>
+                                     </xsd:annotation>
+                               </xsd:element>
+                               <xsd:element name="instance" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                     <xsd:annotation>
+                                           <xsd:documentation>The instance entity calls out which match of the pattern is being represented by this item.  The main purpose of this entity is too provide uniqueness for different textfilecontent_items that results from multiple matches of a given pattern against the same file.</xsd:documentation>
+                                           <xsd:appinfo>
+                                                 <sch:pattern id="txtiteminstance">
+                                                       <sch:rule context="ind-sc:textfilecontent_item/ind-sc:instance">
+                                                             <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the instance entity of a textfilecontent_item should be 'int'</sch:assert>
+                                                       </sch:rule>
+                                                 </sch:pattern>
+                                           </xsd:appinfo>
+                                     </xsd:annotation>
+                               </xsd:element>
+                               <xsd:element name="line" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The line element represents a line in the file and is represented using a regular expression.</xsd:documentation>
+                                         <xsd:documentation>The line entity has been deprecated and will be removed in version 6.0 of the language.</xsd:documentation>
+                                         <xsd:documentation>The line element represents a line in the file and is represented using a regular expression.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="txtitemline">
                                                   <sch:rule context="ind-sc:textfilecontent_item/ind-sc:line">
@@ -321,13 +347,26 @@
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="subexpression" type="oval-sc:EntityItemAnyType" minOccurs="0" maxOccurs="unbounded">
+                               <xsd:element name="text" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                     <xsd:annotation>
+                                           <xsd:documentation>The text entity represents the block of text that matched the specified pattern.</xsd:documentation>
+                                           <xsd:appinfo>
+                                                 <sch:pattern id="txtitemtext">
+                                                       <sch:rule context="ind-sc:textfilecontent_item/ind-sc:text">
+                                                             <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the text entity of a textfilecontent_item should be 'string'</sch:assert>
+                                                       </sch:rule>
+                                                 </sch:pattern>
+                                           </xsd:appinfo>
+                                     </xsd:annotation>
+                               </xsd:element>
+                               <xsd:element name="subexpression" type="oval-sc:EntityItemAnyType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>Each subexpression in the regular expression of the line element is then tested against the value specified in the subexpression element.</xsd:documentation>
+                                         <xsd:documentation>The subexpression entity represents the value of a subexpression in the specified pattern.  If multiple subexpressions are specified in the pattern, then multiple entities are presented.  Note that the textfilecontent_state in the definition schema only allows a single subexpression entity.  This means that the test will check that all (or at least one, none, etc.) the subexpressions pass the same check.  This means that the order of multiple subexpression entities in the item does not matter.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="txtitemsubexpression">
                                                   <sch:rule context="ind-sc:textfilecontent_item/ind-sc:subexpression">
-                                                       <sch:assert test="(@datatype='int' and (floor(.) = number(.))) or not(@datatype='int') or not(node())"><sch:value-of select="../@id"/> - The datatype has been set to 'int' but the value is not an integer.</sch:assert>
+                                                        <sch:assert test="(@datatype='int' and (floor(.) = number(.))) or not(@datatype='int') or not(node())"><sch:value-of select="../@id"/> - The datatype has been set to 'int' but the value is not an integer.</sch:assert>
+                                                        <!-- we can use the xpath 2.0 function matches() to define assertions for other datatypes -->
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>

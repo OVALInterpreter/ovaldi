@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-results-5" elementFormDefault="qualified" version="5.3">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-results-5" elementFormDefault="qualified" version="5.4">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
@@ -9,9 +9,10 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Results</schema>
-               <version>5.3</version>
-               <date>6/22/2007 11:18:49 AM</date>
-               <sch:title>schematron validation of the Core portion of an OVAL Results file</sch:title>
+               <version>5.4</version>
+               <date>3/31/2008 3:43:57 PM</date>
+                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                <sch:title>schematron validation of the Core portion of an OVAL Results file</sch:title>
                <sch:ns prefix="oval-res" uri="http://oval.mitre.org/XMLSchema/oval-results-5"/>
           </xsd:appinfo>
      </xsd:annotation>
@@ -77,7 +78,7 @@
      </xsd:complexType>
      <xsd:complexType name="DirectiveType">
           <xsd:annotation>
-               <xsd:documentation>Each directive determines whether or not certain results are included in the results file. The required reported attribute controls this by providing a true or false for the specific directive. The optional content attribute controls how much information about the specific result is provided. For example, thin conten would only be the id of the definition and the result, while a full content set would be the definition id with the result along with all the test ids and their results. Please refer to the contentEnumeration for details about the different content options.</xsd:documentation>
+               <xsd:documentation>Each directive determines whether or not certain results are included in the results file. The required reported attribute controls this by providing a true or false for the specific directive. The optional content attribute controls how much information about the specific result is provided. For example, thin conten would only be the id of the definition and the result, while a full content set would be the definition id with the result along with results for all the individual tests and extended definitions.  Please refer to the contentEnumeration for details about the different content options.</xsd:documentation>
           </xsd:annotation>
           <xsd:attribute name="reported" type="xsd:boolean" use="required"/>
           <xsd:attribute name="content" type="oval-res:ContentEnumeration" use="optional" default="full"/>
@@ -116,7 +117,16 @@
                          <xsd:field xpath="@version"/>
                          <xsd:field xpath="@variable_instance"/>
                     </xsd:key>
-                    <xsd:keyref name="testVersionKeyRef" refer="oval-res:testVersionKey">
+                     <xsd:keyref name="definitionInstanceKeyRef" refer="oval-res:definitionInstanceKey">
+                           <xsd:annotation>
+                                 <xsd:documentation>Requires each definition reference (used by extend_definitions) to refer to a valid definition id.</xsd:documentation>
+                           </xsd:annotation>
+                           <xsd:selector xpath=".//*"/>
+                           <xsd:field xpath="@definition_ref"/>
+                           <xsd:field xpath="@version"/>
+                           <xsd:field xpath="@variable_instance"/>
+                     </xsd:keyref>
+                     <xsd:keyref name="testVersionKeyRef" refer="oval-res:testVersionKey">
                          <xsd:annotation>
                               <xsd:documentation>Requires each test reference to refer to a valid test id.</xsd:documentation>
                          </xsd:annotation>
@@ -180,35 +190,35 @@
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='unknown' and oval-res:criteria]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of UNKNOWN should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain THIN content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of UNKNOWN should contain THIN content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='unknown' and not(oval-res:criteria)]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of UNKNOWN should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain FULL content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of UNKNOWN should contain FULL content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='error' and oval-res:criteria]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of ERROR should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain THIN content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of ERROR should contain THIN content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='error' and not(oval-res:criteria)]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of ERROR should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain FULL content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of ERROR should contain FULL content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='not evaluated' and oval-res:criteria]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT EVALUATED should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain THIN content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT EVALUATED should contain THIN content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='not evaluated' and not(oval-res:criteria)]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT EVALUATED should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain FULL content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT EVALUATED should contain FULL content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='not applicable' and oval-res:criteria]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT APPLICABLE should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain THIN content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@content='full'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT APPLICABLE should contain THIN content (see directives)</sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:definition[@result='not applicable' and not(oval-res:criteria)]">
                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported='true'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT APPLICABLE should not be included (see directives)</sch:assert>
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of TRUE should contain FULL content (see directives)</sch:assert>
+                               <sch:assert test="/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@content='thin'"><sch:value-of select="@definition_id"/> - definitions with a result of NOT APPLICABLE should contain FULL content (see directives)</sch:assert>
                          </sch:rule>
                     </sch:pattern>
                </xsd:appinfo>
@@ -335,7 +345,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="full">
                     <xsd:annotation>
-                         <xsd:documentation>A value of 'full' means that very detailed information will be provided allowing in-depth reports to be generated from the results. In addition to the results of the evaluated definition, the results of all extended definitions and tests included in the criteria as well as the actual information collected off the system will be presented.</xsd:documentation>
+                         <xsd:documentation>A value of 'full' means that very detailed information will be provided allowing in-depth reports to be generated from the results. In addition to the results of the evaluated definition, the results of all extended definitions and tests included in the criteria as well as the actual information collected off the system must be presented.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>
@@ -372,7 +382,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="not applicable">
                     <xsd:annotation>
-                         <xsd:documentation>When evaluating a definition or test, a result value of 'not applicable' means that the definition or test being evaluated is not valid on the given platform. For example, trying to collect Linux RPM information on a Windows system.</xsd:documentation>
+                         <xsd:documentation>When evaluating a definition or test, a result value of 'not applicable' means that the definition or test being evaluated is not valid on the given platform. For example, trying to collect Linux RPM information on a Windows system.  Another example would be in trying to collect RPM information on a linux system that does not have the RPM packaging system installed.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>
