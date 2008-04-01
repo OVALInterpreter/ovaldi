@@ -7,7 +7,7 @@
             <xsd:appinfo>
                   <schema>Solaris Definition</schema>
                   <version>5.4</version>
-                  <date>3/31/2008 3:43:57 PM</date>
+                  <date>4/1/2008 10:41:45 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:title>schematron validation of the Solaris portion of an OVAL Definitions file</sch:title>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>

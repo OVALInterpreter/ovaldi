@@ -7,7 +7,7 @@
           <xsd:appinfo>
                <schema>Independent System Characteristics</schema>
                <version>5.4</version>
-               <date>3/31/2008 3:43:55 PM</date>
+               <date>4/1/2008 10:41:41 AM</date>
                 <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                 <sch:title>schematron validation of the Independent portion of an OVAL System Characteristics file</sch:title>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
