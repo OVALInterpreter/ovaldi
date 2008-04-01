@@ -20,23 +20,7 @@
                 xmlns:sol-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"
                 xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
                 xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-                version="2.0"
-                xsi:dummy-for-xmlns=""
-                oval:dummy-for-xmlns=""
-                oval-def:dummy-for-xmlns=""
-                ind-def:dummy-for-xmlns=""
-                aix-def:dummy-for-xmlns=""
-                apache-def:dummy-for-xmlns=""
-                catos-def:dummy-for-xmlns=""
-                esx-def:dummy-for-xmlns=""
-                freebsd-def:dummy-for-xmlns=""
-                hpux-def:dummy-for-xmlns=""
-                ios-def:dummy-for-xmlns=""
-                linux-def:dummy-for-xmlns=""
-                macos-def:dummy-for-xmlns=""
-                sol-def:dummy-for-xmlns=""
-                unix-def:dummy-for-xmlns=""
-                win-def:dummy-for-xmlns="">
+                version="2.0">
 
 <!--PHASES-->
 
@@ -10562,7 +10546,7 @@
 
 		<!--ASSERT -->
 <xsl:choose>
-         <xsl:when test="not(oval-def:platform) or oval-def:platform='Microsoft Windows 95' or oval-def:platform='Microsoft Windows 98' or oval-def:platform='Microsoft Windows ME' or oval-def:platform='Microsoft Windows NT' or oval-def:platform='Microsoft Windows 2000' or oval-def:platform='Microsoft Windows XP' or oval-def:platform='Microsoft Windows Server 2003' or oval-def:platform='Microsoft Windows Vista'"/>
+         <xsl:when test="not(oval-def:platform) or oval-def:platform='Microsoft Windows 95' or oval-def:platform='Microsoft Windows 98' or oval-def:platform='Microsoft Windows ME' or oval-def:platform='Microsoft Windows NT' or oval-def:platform='Microsoft Windows 2000' or oval-def:platform='Microsoft Windows XP' or oval-def:platform='Microsoft Windows Server 2003' or oval-def:platform='Microsoft Windows Vista' or oval-def:platform='Microsoft Windows Server 2008'"/>
          <xsl:otherwise>
                         <xsl:text/>
             <xsl:value-of select="../../@id"/>
