@@ -43,7 +43,9 @@
 #include <lm.h>
 #include <Ntsecapi.h>
 #include <windows.h>
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
+#endif
 #include <Sddl.h>
 
 using namespace std;
