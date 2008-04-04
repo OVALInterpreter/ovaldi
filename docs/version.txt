@@ -7,7 +7,13 @@
 ****************************************************
 
 ---------------------------------------
----        Version 5.4 build 2     ---
+---        Version 5.4 build ??     ---
+---------------------------------------
+* Converted windows project to Visual Studio 2008 format. This conversion required one minor change WindowsCommon.h for make it compile without warnings with the new SDK.
+
+
+---------------------------------------
+---        Version 5.4 build 2      ---
 ---------------------------------------
 * Updated unix ProcessProbe to match time format changes made for version 5.4
 * Converted to support version 5.4 of OVAL
