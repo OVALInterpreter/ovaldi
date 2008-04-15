@@ -7,7 +7,7 @@
             <xsd:appinfo>
                   <schema>AIX Definition</schema>
                   <version>5.4</version>
-                  <date>4/1/2008 10:41:33 AM</date>
+                  <date>4/11/2008 10:41:33 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:title>schematron validation of the AIX portion of an OVAL Definitions file</sch:title>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
@@ -84,7 +84,7 @@
                                                 </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="level" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="level" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>Maintenance level (also known as version in Solaris or Linux) of a fileset. For example, "5.3.0.10" is the level for 'bos.txt.tfs' fileset in one AIX machine.</xsd:documentation>
                                                 <xsd:appinfo>
@@ -271,7 +271,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="maintenance_level" type="oval-def:EntityStateVersionType" minOccurs="1" maxOccurs="1">
+                                    <xsd:element name="maintenance_level" type="oval-def:EntityStateStringType" minOccurs="1" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the maintenance level (system version) of current AIX operating system.</xsd:documentation>
                                                 <xsd:appinfo>
