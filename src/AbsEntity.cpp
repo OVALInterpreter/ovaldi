@@ -55,174 +55,82 @@ AbsEntity::~AbsEntity() {
 // ***************************************************************************************	//
 
 string AbsEntity::GetName() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the name field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->name;
 }
 
 void AbsEntity::SetName(string name) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the name field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->name = name;
 }
 
 string AbsEntity::GetValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the value field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->value;
 }
 
 void AbsEntity::SetValue(string value) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the value field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->value = value;
 }
 
 OvalEnum::Datatype AbsEntity::GetDatatype() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the datatype field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->datatype;
 }
 
 void AbsEntity::SetDatatype(OvalEnum::Datatype datatype) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the datatype field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->datatype = datatype;
 }
 
 bool AbsEntity::GetIsObjectEntity() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the isObjectEntity field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->isObjectEntity;
 }
 
 void AbsEntity::SetIsObjectEntity(bool isObjectEntity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the isObjectEntity field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->isObjectEntity = isObjectEntity;
 }
 
 
 OvalEnum::Check AbsEntity::GetVarCheck() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the varCheck field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->varCheck;
 }
 
 void AbsEntity::SetVarCheck(OvalEnum::Check varCheck) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the varCheck field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->varCheck = varCheck;
 }
 
 bool AbsEntity::GetNil() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the nil field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->nil;
 }
 
 void AbsEntity::SetNil(bool nil) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the nil field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->nil = nil;
 }
 
 OvalEnum::Operation AbsEntity::GetOperation() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the operation field's value
-	// -----------------------------------------------------------------------
 
 	return this->operation;
 }
 
 void AbsEntity::SetOperation(OvalEnum::Operation operation) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the operation field's value
-	// -----------------------------------------------------------------------
 
 	this->operation = operation;
 }
 
 AbsVariable* AbsEntity::GetVarRef() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the varRef field's value
-	// -----------------------------------------------------------------------
 
 	return this->varRef;
 }
 
 void AbsEntity::SetVarRef(AbsVariable* varRef) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the varRef field's value
-	// -----------------------------------------------------------------------
 
 	this->varRef = varRef;
 }

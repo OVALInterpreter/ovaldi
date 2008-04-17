@@ -67,9 +67,11 @@ string XslCommon::ApplyXSL(string xmlIn, string xslIn) {
 	theResult = XalanTransformToData(xmlIn.c_str(),xslIn.c_str(), &theData, xalan);
 
 	string result = "";
-	result.append(theData);
+	if(theData != NULL) {
+		result.append(theData);
 
-	XalanFreeData(theData);
+		XalanFreeData(theData);
+	}
 
 	// 5. Shut down Xalan
 	XalanTerminate(false);

@@ -114,29 +114,44 @@ public:
 	*/
 	VariableValueVector* GetVariableValues(); 
 
+	/** Return the name field's value. */
 	string GetName();
+	/** Set the name field's value. */
 	void SetName(string name);
 
+	/** Return the value field's value. */
 	string GetValue();
+	/** Set the value field's value. */
 	void SetValue(string value);
 
+	/** Return the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
+	/** Set the datatype field's value. */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
+	/** Get the isObjectEntity field's value. */
 	bool GetIsObjectEntity();
+	/** Set the isObjectEntity field's value. */
 	void SetIsObjectEntity(bool isObjectAbsEntity);
 
 	/** Return true if the xsi:nil is set to true. */
 	bool GetNil();
+	/** Set the nil field's value. */
 	void SetNil(bool nil);
 
+	/** Return the operation field's value. */
 	OvalEnum::Operation GetOperation();
+	/** Set the operation field's value. */
 	void SetOperation(OvalEnum::Operation operation);
 
+	/** Return the varCheck field's value */
 	OvalEnum::Check GetVarCheck();
+	/** Set the varCheck field's value. */
 	void SetVarCheck(OvalEnum::Check check);
 
+	/** Return the varRef field's value */
 	AbsVariable* GetVarRef();
+	/** Set the varRef field's value. */
 	void SetVarRef(AbsVariable* varRef);
 
 private:
