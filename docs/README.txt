@@ -67,15 +67,15 @@ for more information.
 
        Install the RPM simply by running the following command:
 
-       # rpm -ivh <Definition Interpreter RPM>
+       # rpm -ivh <OVAL Interpreter RPM>
 
        The RPM places the following files on the system.  To learn their
        exact location after install, run:  rpm -ql ovaldi.
 
        Executables:
        ovaldi.sh - Shell Script to simplify execution of the Definition
-	           Interpreter
-       ovaldi - Definition Interpreter binary
+	               Interpreter
+       ovaldi - OVAL Interpreter binary
 
        Libraries:
        libxerces-c.so.27.0 - Xerces XML library
@@ -99,11 +99,11 @@ for more information.
        results_to_html.xsl - A simple xsl that formats an oval-results document as html
  
        The .so file for the Xerces library must be made accessible to
-       the Definition Interpreter binary.  The ovaldi RPM places a 
+       the OVAL Interpreter binary.  The ovaldi RPM places a 
        pre-compiled version in /usr/lib/ovaldi/ and appends this directory
        to your /etc/ld.so.conf file.
 
-       To run the Definition Interpreter, run:
+       To run the OVAL Interpreter, run:
 
        # /usr/sbin/ovaldi.sh
 
@@ -118,10 +118,10 @@ for more information.
   C. Microsoft Windows Installation
      
        The OVAL Interpreter can be installed and run on
-       Microsoft Windows NT 2000/XP/Server 2003.
+       Microsoft Windows NT/2000/XP/Server 2003/Vista/Server 2008.
 
        Install the Interpreter by running the installer
-       executable - ovaldisetupX.X.exe
+       executable -  	ovaldi-X.X.X-setup.exe
 
        The installer is a self-extracting zip archive that prompts
        the user for an installation directory 
@@ -194,14 +194,11 @@ for more information.
      http://oval.mitre.org/repository/download/index.html
 
      Additionally it is recommended that you join the 
-     "OVAL-DATA-UPDATE" email list.  This list provides subscribers with
-     reports of new OVAL definitions, updates, and other detailed
-     technical information regarding OVAL.  This list is intended for
-     heavy technical users of OVAL, such as tool and service developers,
-     vulnerability database maintainers, or those who require timely
-     notification of new definitions.  Messages are sent when new OVAL
-     data is available, which is approximately once per week.  To
-     subscribe to the list, go to the Free Newsletters page on the
+     "oval-discussion-list" email list.  A lightly moderated public
+	 forum for discussion realted to new and previously posted OVAL
+	 Repository content, as well as the vulnerabilities and configuration
+	 issues themselves that affect definition writing. To
+     subscribe to the list, go to the Forum Sign-Up page on the
      OVAL Web Site.
 
      http://oval.mitre.org/community/registration.html
@@ -546,23 +543,33 @@ of the OVAL Interpreter, and the platform upon which the problem was
 detected.  The version of the OVAL Interpreter can be found in a banner
 at the top of any output.
 
+To report a problem with an OVAL Definition from the OVAL Repository,
+please send an email to the 'oval-discussion-list' with the id of the 
+definition in question and a detailed description of the issue. To
+subscribe to the list, go to the Forum Sign-Up page on the
+OVAL Web Site and join the "OVAL Repository Forum".
+
+http://oval.mitre.org/community/registration.html
+
+
 -- IX ­ USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org
 
-OVAL Interpreters -- http://oval.mitre.org/language/download/interpreter/index.html
+OVAL Interpreter SourceForge Site -- http://sourceforge.net/projects/ovaldi/
 
-Data Files -- http://oval.mitre.org/repository/download/index.html
+OVAL Repository -- http://oval.mitre.org/repository/index.html
 
 Terms of Use -- http://oval.mitre.org/about/bsd_license.html
 
-CVE List -- http://cve.mitre.org
+CVE -- http://cve.mitre.org
 
-OVAL-Data-Updates e-Newsletter -- http://oval.mitre.org/news/newsletters.html
+CPE -- http://cce.mitre.org
 
+CCE -- http://cpe.mitre.org
 
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland
 Security. OVAL and the OVAL logo are trademarks of The MITRE
-Corporation. Copyright 2006, The MITRE Corporation (www.mitre.org).
+Corporation. Copyright 2008, The MITRE Corporation (www.mitre.org).
