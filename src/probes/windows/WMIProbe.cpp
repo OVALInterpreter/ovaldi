@@ -234,45 +234,31 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 			throw ProbeException("(WMIProbe) Wmi query failed. ('" + wmi_wql->GetValue() + "')", ERROR_FATAL);
 		}
 
-		HRESULT enumhRes = WBEM_S_NO_ERROR;
 		IWbemClassObject *pclsObj[1];
 		ULONG uReturn = 0;
+		HRESULT enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn);
 
 		// iterate through each instance returned
-		while (enumhRes == WBEM_S_NO_ERROR) {
-
-			enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn);
-
+		do {
 			// We have finished looping through the enumeration.  If no results
 			// were returned, ie pEnumerator is empty, then we will break out of the
 			// while loop. Must create an item .  This will cause the wmi
 			// probe to return an empty item vector which will mean the collected
 			// object in the sc file will have a does not exist flag.
 
-			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
-
+			if(item == NULL){
 				item = this->CreateItem();
 				item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
+			}
+
+			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
 				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
-
 				break;
-
 			} else {
 				// We have a result.  Create an ItemEntity for it and add it to the
 				// item.
-
-				// If the item hasn't been created, create it.  This peice of code
-				// allows the while loop to break out without having created an
-				// item for the case where the enumeration was empty.
-
-				if (item == NULL) {
-					item = this->CreateItem();
-					item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->SetStatus(OvalEnum::STATUS_EXISTS);
-				}
 
 				if ((enumhRes == WBEM_E_INVALID_PARAMETER) ||
 					(enumhRes == WBEM_E_OUT_OF_MEMORY) ||
@@ -393,6 +379,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 				for (ULONG n=0; n<uReturn; n++) pclsObj[n]->Release();
 			}
 		}
+		while ( ( enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn) ) == WBEM_S_NO_ERROR  );
 	} catch (ProbeException ex) {
 		// Make sure we clean up if there is an error, otherwise we will get an COM
 		// security error when we try to run the wmi probe again.
