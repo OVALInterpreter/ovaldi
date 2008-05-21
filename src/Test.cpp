@@ -1,5 +1,4 @@
 //
-// $Id: Test.cpp 4608 2008-01-04 18:03:02Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -343,14 +342,6 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 							Item* item = Item::GetItemById(itemId);
 							testedItem->SetItem(item);
 
-							//Item* item = Item::SearchCache(atoi(itemId.c_str()));
-							//if(item != NULL) {                          
-							//	testedItem->SetItem(item);
-							//} else {
-							//	// get the item elm in the sc file
-							//	DOMElement* itemElm = XmlCommon::FindElementByAttribute(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), "id", itemId);
-       //                         testedItem->ParseItem(itemElm);
-							//}
 							this->AppendTestedItem(testedItem);
 						
 						} else if(childName.compare("variable_value") == 0) {
