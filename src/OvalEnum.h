@@ -52,7 +52,7 @@ public:
 	/** An enum to define the acceptable check values. */
 	enum Check	{CHECK_ALL,
 				CHECK_AT_LEAST_ONE,
-				CHECK_EXISTENCE_NONE_EXIST, // DEPRECATED in version 5.3
+				CHECK_NONE_EXIST, // DEPRECATED in version 5.3
 				CHECK_NONE_SATISFY,
 				CHECK_ONLY_ONE};
 	static string CheckToString(OvalEnum::Check check);

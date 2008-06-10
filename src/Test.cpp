@@ -277,8 +277,8 @@ void Test::Parse(DOMElement* testElm) {
 
 	// to support version 5.3 it is best to just look for the deprected check = none exist 
 	// and replace it with the correct pair of check = any and check_existence = none_exist
-	if(this->GetCheck() == OvalEnum::CHECK_EXISTENCE_NONE_EXIST) {
-		Log::Info("Converting deprected check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'.");
+	if(this->GetCheck() == OvalEnum::CHECK_NONE_EXIST) {
+		Log::Info("Converting deprected check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'. The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
 		this->SetCheckExistence(OvalEnum::EXISTENCE_NONE_EXIST);
 		this->SetCheck(OvalEnum::CHECK_NONE_SATISFY);
 	}

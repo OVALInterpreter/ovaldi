@@ -104,6 +104,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
 	} else if(objectName.compare("patch_object") == 0) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
+	} else {
+		Log::Info(objectName + " is not currently supported.");
 	}
 
 	return probe;

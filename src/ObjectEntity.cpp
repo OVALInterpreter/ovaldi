@@ -112,6 +112,12 @@ void ObjectEntity::Parse(DOMElement* ObjectEntityElm) {
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(ObjectEntityElm, "datatype")));
 	this->SetVarCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(ObjectEntityElm, "var_check")));
 
+	// to support version 5.3 it is best to just look for the deprected check = none exist 
+	// and report it in the log
+	if(this->GetVarCheck() == OvalEnum::CHECK_NONE_EXIST) {
+		Log::Info("DEPRECATED: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
+	}
+
 	// get the nill attribute
 	string nilAttr = XmlCommon::GetAttributeByName(ObjectEntityElm, "xsi:nil");
 	if(nilAttr.compare("") == 0 || nilAttr.compare("false") == 0) {

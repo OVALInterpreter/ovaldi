@@ -47,8 +47,7 @@ string OvalEnum::CheckToString(OvalEnum::Check check) {
 		case (CHECK_AT_LEAST_ONE):
 			checkStr = "at least one";
 			break;
-		case (CHECK_EXISTENCE_NONE_EXIST):
-			Log::Info("DEPRECATED: the \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language.  One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
+		case (CHECK_NONE_EXIST):
 			checkStr = "none exist";
 			break;
 		case (CHECK_NONE_SATISFY):
@@ -73,8 +72,8 @@ OvalEnum::Check OvalEnum::ToCheck(string checkStr) {
 		check = CHECK_ALL;
 	} else if(checkStr.compare(OvalEnum::CheckToString(CHECK_AT_LEAST_ONE)) == 0) {
 		check = CHECK_AT_LEAST_ONE;
-	} else if(checkStr.compare(OvalEnum::CheckToString(CHECK_EXISTENCE_NONE_EXIST)) == 0) {
-		check = CHECK_EXISTENCE_NONE_EXIST;
+	} else if(checkStr.compare(OvalEnum::CheckToString(CHECK_NONE_EXIST)) == 0) {
+		check = CHECK_NONE_EXIST;
 	} else if(checkStr.compare(OvalEnum::CheckToString(CHECK_NONE_SATISFY)) == 0) {
 		check = CHECK_NONE_SATISFY;
 	} else if(checkStr.compare(OvalEnum::CheckToString(CHECK_ONLY_ONE)) == 0) {

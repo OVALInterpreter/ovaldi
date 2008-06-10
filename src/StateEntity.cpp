@@ -134,6 +134,19 @@ void StateEntity::Parse(DOMElement* stateEntityElm) {
 	this->SetEntityCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(stateEntityElm, "entity_check")));
 	this->SetVarCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(stateEntityElm, "var_check")));
 
+	// to support version 5.3 it is best to just look for the deprected check = none exist 
+	// and report it in the log
+	if(this->GetVarCheck() == OvalEnum::CHECK_NONE_EXIST) {
+		Log::Info("DEPRECATED: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
+	}
+
+
+	// to support version 5.3 it is best to just look for the deprected check = none exist 
+	// and report it in the log
+	if(this->GetEntityCheck() == OvalEnum::CHECK_NONE_EXIST) {
+		Log::Info("DEPRECATED: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
+	}
+
 	// get the nill attribute
 	string nilAttr = XmlCommon::GetAttributeByName(stateEntityElm, "nil");
 	if(nilAttr.compare("") == 0 || nilAttr.compare("false") == 0) {
