@@ -31,6 +31,7 @@
 #include "WindowsCommon.h"
 
 StringVector* WindowsCommon::allTrusteeNames = NULL;
+StringVector* WindowsCommon::allTrusteeSIDs = NULL;
 StringVector* WindowsCommon::wellKnownTrusteeNames = NULL;
 
 bool WindowsCommon::DisableAllPrivileges() {
@@ -314,6 +315,17 @@ bool WindowsCommon::ExpandGroup(string groupName, StringVector* members) {
 	return groupExists;
 }
 
+bool WindowsCommon::ExpandGroupBySID(string groupSID, StringVector* memberSIDs) {
+	// to do 
+	return false;
+}
+
+bool WindowsCommon::IsGroupSID(string SID) {
+
+	// to do 
+	return false;
+}
+
 StringVector* WindowsCommon::GetAllGroups() {
 
 	StringVector* groups = WindowsCommon::GetAllLocalGroups();
@@ -527,6 +539,26 @@ StringVector* WindowsCommon::GetAllTrusteeNames() {
 	}
 
 	return WindowsCommon::allTrusteeNames;
+}
+
+StringVector* WindowsCommon::GetAllTrusteeSIDs() {
+
+	if(WindowsCommon::allTrusteeNames == NULL) {
+
+		StringVector* trusteeNames = WindowsCommon::GetAllTrusteeNames();
+		WindowsCommon::allTrusteeSIDs = new StringVector();
+		StringVector::iterator iterator;
+		for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
+		
+			PSID pSid = WindowsCommon::GetSIDForTrusteeName((*iterator));
+			LPTSTR sidString;
+			WindowsCommon::GetTextualSid(pSid, &sidString);
+			string sidStr = sidString;
+			WindowsCommon::allTrusteeSIDs->push_back(sidStr);
+		}
+	}
+
+	return WindowsCommon::allTrusteeSIDs;
 }
 
 void WindowsCommon::GetWellKnownTrusteeNames() {
@@ -942,6 +974,41 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 	} catch(...) {
 		
 		Log::Debug("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
+	}
+
+	return psid;
+}
+
+PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
+
+	DWORD sidSize = 128;
+	BOOL retVal = FALSE;
+	PSID psid;
+
+	try {
+		// Call LookupAccountName to get the SID.
+		retVal = ConvertStringSidToSid(const_cast<char*>(trusteeSID.c_str()),	// sid string
+										&psid);									// security identifier
+		
+		if(retVal == FALSE) {
+
+			LocalFree(psid);
+
+			DWORD errCode = GetLastError();
+			string errMsg = WindowsCommon::GetErrorMessage(errCode);
+
+			if(errCode == ERROR_INVALID_PARAMETER) {
+				throw Exception("Invalid parameter specified for call to ConvertStringSidToSid()");
+			} else if(errCode == ERROR_INVALID_SID) {
+				throw Exception("Invalid sid specified for call to ConvertStringSidToSid()");
+			} else {
+				throw Exception("Error looking up SID for sid string. " + errMsg);
+			}
+		}
+
+	} catch(...) {
+		
+		Log::Debug("Error looking up sid for account: " + trusteeSID + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
 	}
 
 	return psid;

@@ -57,10 +57,12 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = AuditEventPolicyProbe::Instance();
 	} else if(objectName.compare("sid_object") == 0) {
 		probe = SidProbe::Instance();
+	} else if(objectName.compare("fileeffectiverights53_object") == 0) {
+		probe = FileEffectiveRights53Probe::Instance();
 	} else if(objectName.compare("fileeffectiverights_object") == 0) {
 		Log::Info("Version 5.3 of OVAL deprecated the fileeffectiverights_object");
 		probe = FileEffectiveRightsProbe::Instance();
-	} else if(objectName.compare("accesstoken_object") == 0) {
+	}  else if(objectName.compare("accesstoken_object") == 0) {
 		probe = AccessTokenProbe::Instance();
 	} else if(objectName.compare("group_object") == 0) {
 		probe = GroupProbe::Instance();
@@ -139,6 +141,9 @@ void ProbeFactory::Shutdown() {
 	delete probe;
 
 	probe = UserProbe::Instance();
+	delete probe;
+
+	probe = FileEffectiveRights53Probe::Instance();
 	delete probe;
 
 	probe = FileEffectiveRightsProbe::Instance();

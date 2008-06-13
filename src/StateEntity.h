@@ -1,5 +1,4 @@
 //
-// $Id: StateEntity.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -54,6 +53,8 @@ public:
 	~StateEntity();
 
 	bool Equals(AbsEntity* entity);
+
+	/** Parse the XML representation of a StateEntity. */
 	void Parse(DOMElement* entitiyElm);
 
 	OvalEnum::Check GetEntityCheck();

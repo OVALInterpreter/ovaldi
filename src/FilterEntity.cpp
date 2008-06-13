@@ -1,5 +1,4 @@
 //
-// $Id: FilterEntity.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -126,11 +125,6 @@ bool FilterEntity::Equals(AbsEntity* entity) {
 }
 
 void FilterEntity::Parse(DOMElement* FilterEntityElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided FilterEntity element
-	// -----------------------------------------------------------------------
 
 	this->SetName(XmlCommon::GetElementName(FilterEntityElm));
 	this->SetValue(XmlCommon::GetDataNodeValue(FilterEntityElm));
@@ -138,6 +132,20 @@ void FilterEntity::Parse(DOMElement* FilterEntityElm) {
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(FilterEntityElm, "datatype")));
 	this->SetEntityCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(FilterEntityElm, "entity_check")));
 	this->SetVarCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(FilterEntityElm, "var_check")));
+
+	// to support version 5.3 it is best to just look for the deprected check = none exist 
+	// and report it in the log
+	if(this->GetVarCheck() == OvalEnum::CHECK_NONE_EXIST) {
+		this->SetVarCheck(OvalEnum::CHECK_NONE_SATISFY);
+		Log::Info("DEPRECATED var_check value: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. The OVAL Interpreter has mapped this value to \'none satisfy\'");
+	}
+
+	// to support version 5.3 it is best to just look for the deprected check = none exist 
+	// and report it in the log
+	if(this->GetEntityCheck() == OvalEnum::CHECK_NONE_EXIST) {
+		this->SetEntityCheck(OvalEnum::CHECK_NONE_SATISFY);
+		Log::Info("DEPRECATED entity_check value: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. The OVAL Interpreter has mapped this value to \'none satisfy\'");
+	}
 
 	// get the nill attribute
 	string nilAttr = XmlCommon::GetAttributeByName(FilterEntityElm, "nil");

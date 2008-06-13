@@ -1,6 +1,5 @@
 //
-// $Id: StateEntity.cpp 4662 2008-01-23 12:51:18Z bakerj $
-//
+// 
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
 // All rights reserved.
@@ -121,11 +120,6 @@ bool StateEntity::Equals(AbsEntity* entity) {
 }
 
 void StateEntity::Parse(DOMElement* stateEntityElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided StateEntity element
-	// -----------------------------------------------------------------------
 
 	this->SetName(XmlCommon::GetElementName(stateEntityElm));
 	this->SetValue(XmlCommon::GetDataNodeValue(stateEntityElm));
@@ -137,14 +131,15 @@ void StateEntity::Parse(DOMElement* stateEntityElm) {
 	// to support version 5.3 it is best to just look for the deprected check = none exist 
 	// and report it in the log
 	if(this->GetVarCheck() == OvalEnum::CHECK_NONE_EXIST) {
-		Log::Info("DEPRECATED: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
+		this->SetVarCheck(OvalEnum::CHECK_NONE_SATISFY);
+		Log::Info("DEPRECATED var_check value: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. The OVAL Interpreter has mapped this value to \'none satisfy\'");
 	}
-
 
 	// to support version 5.3 it is best to just look for the deprected check = none exist 
 	// and report it in the log
 	if(this->GetEntityCheck() == OvalEnum::CHECK_NONE_EXIST) {
-		Log::Info("DEPRECATED: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
+		this->SetEntityCheck(OvalEnum::CHECK_NONE_SATISFY);
+		Log::Info("DEPRECATED entity_check value: The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. The OVAL Interpreter has mapped this value to \'none satisfy\'");
 	}
 
 	// get the nill attribute

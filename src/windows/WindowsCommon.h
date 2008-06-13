@@ -86,18 +86,38 @@ public:
 	*/
 	static StringVector* GetAllTrusteeNames();
 
+	/** Get all the Trustee SIDs on the system.
+		This method simply calls the WindowsCommon::GetAllTrusteeNames() method
+		and converts each returned name to a sid string. THe resulting set of sids is 
+		returned as a StringVector.		
+	*/
+	static StringVector* GetAllTrusteeSIDs();
+
 	/** Get the trustee name for the specified sid formatted for oval useage. */
 	static string GetFormattedTrusteeName(PSID pSid);
 
 	/** Get the SID for the specified trustee name. 
 		TrusteeName should be a fully qualified account name. 
 		For more info see:
-		http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/lookupaccountname.asp
+		http://msdn.microsoft.com/en-us/library/aa379159.aspx
 	*/
 	static PSID GetSIDForTrusteeName(string trusteeName);
 
+	/** Get the SID for the specified trustee sid string. 
+		TrusteeSID is a complete sid string formated as the 
+		For more info see:
+		http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/lookupaccountname.asp
+	*/
+	static PSID GetSIDForTrusteeSID(string trusteeSID);
+
 	/** Get the domain and sid string for the specifeid trustee name. Return true if the trustee is a group. */
 	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
+
+	/** Return true if the SID corresponds to a group. */
+	static bool IsGroupSID(string sid);
+
+	/** Return true if the gour exists add all group member's SID to the memberSIDs parameter. */
+	static bool WindowsCommon::ExpandGroupBySID(string groupSID, StringVector* memberSIDs);
 
 	/** Return the set of all local and global groups on the local system. */
 	static StringVector* GetAllGroups();
@@ -137,6 +157,7 @@ private:
 	static string WindowsCommon::LookUpLocalSystemName();
 
 	static StringVector* allTrusteeNames;
+	static StringVector* allTrusteeSIDs;
 	static StringVector* wellKnownTrusteeNames;
 };
 

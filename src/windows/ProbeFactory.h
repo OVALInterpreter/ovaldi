@@ -1,5 +1,4 @@
 //
-// $Id: ProbeFactory.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -59,6 +58,7 @@
 #include "AuditEventPolicyProbe.h"
 #include "SidProbe.h"
 #include "FileEffectiveRightsProbe.h"
+#include "FileEffectiveRights53Probe.h"
 #include "AccessTokenProbe.h"
 #include "GroupProbe.h"
 #include "UserProbe.h"

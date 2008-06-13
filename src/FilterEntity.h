@@ -1,5 +1,4 @@
 //
-// $Id: FilterEntity.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -55,6 +54,8 @@ public:
 	~FilterEntity();
 
 	bool Equals(AbsEntity* entity);
+
+	/** Parses a FilterEntity element. */
 	void Parse(DOMElement* entitiyElm);
 
 	OvalEnum::Check GetEntityCheck();
