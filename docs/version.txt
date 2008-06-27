@@ -13,6 +13,7 @@
 * COrrected bug in WMIProbe.cpp. wmi_items were not properly being collected resulting incorrect wmi_test evaluations.
 * Added log message when an object is not supported for datacollection.
 * Corrected bug that caused a deprecated message for the check='none exist' on a test to be incorrectly reported in the log file.
+* Added mapping of deprected var_check and entity_check 'none exist' value to 'none satisfy' value.
 
 
 ---------------------------------------
