@@ -116,8 +116,8 @@ public:
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
 
-	/** Return true if the gour exists add all group member's SID to the memberSIDs parameter. */
-	static bool WindowsCommon::ExpandGroupBySID(string groupSID, StringVector* memberSIDs);
+	/** Return true if the group exists add all the group member's SIDs to the memberSIDs parameter. */
+	static bool ExpandGroupBySID(string groupSID, StringVector* memberSIDs);
 
 	/** Return the set of all local and global groups on the local system. */
 	static StringVector* GetAllGroups();
