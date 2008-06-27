@@ -543,7 +543,7 @@ StringVector* WindowsCommon::GetAllTrusteeNames() {
 
 StringVector* WindowsCommon::GetAllTrusteeSIDs() {
 
-	if(WindowsCommon::allTrusteeNames == NULL) {
+	if(WindowsCommon::allTrusteeSIDs == NULL) {
 
 		StringVector* trusteeNames = WindowsCommon::GetAllTrusteeNames();
 		WindowsCommon::allTrusteeSIDs = new StringVector();
