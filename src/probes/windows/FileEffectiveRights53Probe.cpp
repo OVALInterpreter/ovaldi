@@ -179,7 +179,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 
 					} else {
 
-						StringVector* trusteeSIDs = NULL;
+						StringVector* trusteeSIDs = new StringVector();
 						if(this->ReportTrusteeSIDDoesNotExist(trusteeSID, trusteeSIDs)) {
 
 							StringVector::iterator iterator;
@@ -236,7 +236,7 @@ Item* FileEffectiveRights53Probe::CreateItem() {
 						"win-sc", 
 						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows windows-system-characteristics-schema.xsd", 
 						OvalEnum::STATUS_ERROR, 
-						"fileeffectiverights53_item");
+						"fileeffectiverights_item");
 
 	return item;
 }
@@ -524,14 +524,12 @@ bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trus
 	if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeSID->GetNil()) {		
 		
 		if(trusteeSID->GetVarRef() == NULL) {
-			if(this->TrusteeSIDExists(trusteeSID->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {
-				trusteeSIDs = new StringVector();
+			if(!this->TrusteeSIDExists(trusteeSID->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {		
 				trusteeSIDs->push_back(trusteeSID->GetValue());
 				result = true;
 			}
 		} else {
 
-			trusteeSIDs = new StringVector();
 			VariableValueVector::iterator iterator;
 			for(iterator = trusteeSID->GetVarRef()->GetValues()->begin(); iterator != trusteeSID->GetVarRef()->GetValues()->end(); iterator++) {
 				if(this->TrusteeSIDExists((*iterator)->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {
