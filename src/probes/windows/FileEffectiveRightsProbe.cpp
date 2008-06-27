@@ -179,7 +179,7 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 
 					} else {
 
-						StringVector* trusteeNames = NULL;
+						StringVector* trusteeNames = new StringVector();
 						if(this->ReportTrusteeNameDoesNotExist(trusteeName, trusteeNames)) {
 
 							StringVector::iterator iterator;
@@ -532,14 +532,12 @@ bool FileEffectiveRightsProbe::ReportTrusteeNameDoesNotExist(ObjectEntity *trust
 	if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeName->GetNil()) {		
 		
 		if(trusteeName->GetVarRef() == NULL) {
-			if(this->TrusteeNameExists(trusteeName->GetValue(), WindowsCommon::GetAllTrusteeNames())) {
-				trusteeNames = new StringVector();
+			if(!this->TrusteeNameExists(trusteeName->GetValue(), WindowsCommon::GetAllTrusteeNames())) {
 				trusteeNames->push_back(trusteeName->GetValue());
 				result = true;
 			}
 		} else {
 
-			trusteeNames = new StringVector();
 			VariableValueVector::iterator iterator;
 			for(iterator = trusteeName->GetVarRef()->GetValues()->begin(); iterator != trusteeName->GetVarRef()->GetValues()->end(); iterator++) {
 				if(this->TrusteeNameExists((*iterator)->GetValue(), WindowsCommon::GetAllTrusteeNames())) {
