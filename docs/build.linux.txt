@@ -34,20 +34,22 @@ WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
 
 -- CONTENTS --
 
-  I    OVERVIEW
-        A. Source Distribution
-        B. Source Distribution Contents
-        C. Supporting Libraries
-  II  BUILD INSTRUCTIONS
-        A. PCRE Library
-        B. Xerces Library
-        C. Xalan Library
-        D. Building the OVAL Interpreter
-  III  PCRE
-  IV   XERCES
-  V    XALAN
-  VI   REPORTING PROBLEMS
-  VII  USEFUL LINKS
+  I     OVERVIEW
+          A. Source Distribution
+          B. Source Distribution Contents
+          C. Supporting Libraries
+  II    BUILD INSTRUCTIONS
+          A. PCRE Library
+          B. Xerces Library
+          C. Xalan Library
+          D. RPM Libraries
+          E. APT Libraries 
+          F. Building the OVAL Interpreter
+  III   PCRE
+  IV    XERCES
+  V     XALAN
+  VI    REPORTING PROBLEMS
+  VII   USEFUL LINKS
 
 -- I -- OVERVIEW --
 
@@ -129,7 +131,28 @@ Follow the instruction below to setup and install the supporting libraries.
              /usr/lib/ovaldi to reduce the dependencies that an unsophisticated
              user would need to resolve.
 
-  D. Building the OVAL Interpreter
+  D. RPM
+
+      The Definition Interpreter can be compiled to utilize libraries provided by 
+      the RPM Package Manager (RPM) in order to complete certain RPM-specific tasks.
+      Utilizing RPM libraries will allow the Definition Interpreter to execute RPM
+      Probes.
+
+      For more information about RPM please visit:
+        http://www.rpm.org
+
+  E. APT
+
+      The Definition Interpreter can be compiled to utilize libraries provided by 
+      the Advanced Packaging Tool (APT) in order to complete certain APT-specific tasks.
+      Utilizing APT libraries will allow the Definition Interpreter to execute DPKG
+      Probes.
+      
+      For more information about APT please visit:
+        http://en.wikipedia.org/wiki/Advanced_Packaging_Tool
+
+ 
+  F. Building the OVAL Interpreter
 
       After installing the PCRE, Xerces, and Xalan libraries, change into the 
       directory:
@@ -192,6 +215,7 @@ For more information about Xalan visit:
     http://xml.apache.org
 
 The source code is also available at the above Web site.
+
 
 -- VI -- REPORTING PROBLEMS --
 
