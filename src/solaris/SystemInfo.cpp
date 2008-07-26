@@ -184,7 +184,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 
 	// First make a call to gethostname()
 	string strHostName = "";
-	char *chHostName = (char*)malloc(sizeof(char*)*MAXHOSTNAMELENGTH);
+	char *chHostName = (char*)malloc(sizeof(char)*MAXHOSTNAMELENGTH);
 	int res = 0;
 	res = gethostname(chHostName, MAXHOSTNAMELENGTH);
 
@@ -321,7 +321,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 
 		  
 			u = (unsigned char *) &ifr->ifr_addr.sa_data;
-			char *macStr = (char*)malloc(sizeof(char*)*128);
+			char *macStr = (char*)malloc(sizeof(char)*128);
 			memset(macStr, 0, 128);
 			if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
 			  //printf("HW Address: %2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x\n", u[0], u[1], u[2], u[3], u[4], u[5]);

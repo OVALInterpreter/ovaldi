@@ -577,7 +577,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 	} else {
 		char delm = versionStr.at(index);
 
-		char* theString = (char*)malloc(sizeof(char*)*(versionStr.length()));
+		char* theString = (char*)malloc(sizeof(char)*(versionStr.length()));
 		theString = strcpy(theString, versionStr.c_str());
 		char* token = strtok(theString, &delm);		
 

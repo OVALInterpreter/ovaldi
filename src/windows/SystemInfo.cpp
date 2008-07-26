@@ -208,7 +208,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	}
 	
 	// Allocate memory for that version number string
-	char *verNum = (char*)malloc(sizeof(char*)*16);
+	char *verNum = (char*)malloc(sizeof(char)*16);
 	if(verNum == NULL) {
 		throw SystemInfoException("Error: Unable to allocate memeory while gathering Operating System information.");
 	}
@@ -458,7 +458,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	// First get the host name
 	char *host_name;
 	int size = 256;
-	host_name = (char*)malloc(sizeof(char*)*size);
+	host_name = (char*)malloc(sizeof(char)*size);
 	if(host_name == NULL) {
 		sysInfo->primary_host_name = "unknown";	
 		throw SystemInfoException("Error: Unable to allocate memeory while gathering Operating System information.");
@@ -610,7 +610,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 
 
 				// Format MAC Address
-				char *macStr = (char*)malloc(sizeof(char*)*30);
+				char *macStr = (char*)malloc(sizeof(char)*30);
 				ZeroMemory(macStr, sizeof(macStr));
 				if(macStr == NULL) {
 					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");

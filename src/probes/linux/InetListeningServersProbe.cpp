@@ -733,7 +733,7 @@ NetstatResult* InetListeningServersProbe::ParentGetChildResult(int readErrh, int
   bool stdComplete = false;
 
   // Allocate memory for  buf
-  buf = (char*)malloc(sizeof(char*)*1024);
+  buf = (char*)malloc(sizeof(char)*1024);
   if(buf == NULL) {
 
     // Wait for the child process to complete

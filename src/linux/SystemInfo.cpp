@@ -178,7 +178,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 
 	// First make a call to gethostname()
 	string strHostName = "";
-	char *chHostName = (char*)malloc(sizeof(char*)*MAXHOSTNAMELENGTH);
+	char *chHostName = (char*)malloc(sizeof(char)*MAXHOSTNAMELENGTH);
 	int res = 0;
 	res = gethostname(chHostName, MAXHOSTNAMELENGTH);
 
@@ -208,47 +208,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	//------------------------------------------------------------------------------------//
 
 	IfDataVector interfaces;
-	/*
-	struct ifconf conf;
-	struct sockaddr_in *s_in;
-	struct  sockaddr_in *hwAddr;
-	int sock, count;
-
-	// Open dummy socket
-	if((sock = socket(PF_INET, SOCK_DGRAM, 0)) == -1) {
-	  throw SystemInfoException("Error: Unable to open socket.");
-	}
-
-	// Get the list of devices - only gets 20
-	memset(&conf, 0, sizeof(conf));
-	conf.ifc_len = sizeof(struct ifreq) * 20;
-	conf.ifc_buf = (char*)malloc(conf.ifc_len);
-
-	if(ioctl(sock, SIOCGIFCONF, &conf) == -1) {
-	  throw SystemInfoException("Error: Unable to get a device list.");
-	}
-
-	count = conf.ifc_len/sizeof(struct ifreq);
-	for(int i = 0; i < count; i++) {
-	  IfData *tmpIfData = new IfData();
-	  s_in = (struct sockaddr_in*)&conf.ifc_req[i].ifr_addr;
-	  tmpIfData->ifName = conf.ifc_req[i].ifr_name;
-	  tmpIfData->ipAddress = inet_ntoa(s_in->sin_addr);
-
-	  hwAddr = (struct sockaddr_in*)&conf.ifc_req[i].ifr_hwaddr;
-	  tmpIfData->macAddress = inet_ntoa(hwAddr->sin_addr);
-
-	  tmpIfData->macAddress = " UNKNOWN ";
-	  
-	  interfaces.push_back(tmpIfData);
-	}
-
-	free(conf.ifc_buf);	  
-*/
-
-	/* here is the test sample code i found on the net
-	*/
-
+	
 	unsigned char      *u;
 	int                sockfd, size  = 1;
 	struct ifreq       *ifr;
@@ -315,7 +275,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 
 		  
 			u = (unsigned char *) &ifr->ifr_addr.sa_data;
-			char *macStr = (char*)malloc(sizeof(char*)*128);
+			char *macStr = (char*)malloc(sizeof(char)*128);
 			memset(macStr, 0, 128);
 			if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
 			  //printf("HW Address: %2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x\n", u[0], u[1], u[2], u[3], u[4], u[5]);
@@ -359,9 +319,6 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	}
 
 	close(sockfd);
-
-	/* end sample code from the net
-	*/
 
 	return interfaces;
 }

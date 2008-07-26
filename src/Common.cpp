@@ -312,7 +312,7 @@ StringVector* Common::ParseDefinitionIdsString() {
 	StringVector* definitionIds = new StringVector();
 	char delm = ',';
 
-	char* theString = (char*)malloc(sizeof(char*)*(definitionIdsString.length()));
+	char* theString = (char*)malloc(sizeof(char)*(definitionIdsString.length()));
 	theString = strcpy(theString, definitionIdsString.c_str());
 	char* token = strtok(theString, &delm);		
 
