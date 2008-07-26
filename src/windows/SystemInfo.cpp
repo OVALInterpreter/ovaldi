@@ -597,10 +597,10 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 
 				// Here I am using the description value as the name
 				char *descStr = (char*)malloc(pMibIfRow->dwDescrLen+1);
-				ZeroMemory(descStr, sizeof(descStr));
 				if(descStr == NULL) {
 					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
 				}
+				ZeroMemory(descStr, sizeof(descStr));
 				for (unsigned int j=0;j<pMibIfRow->dwDescrLen;j++) {
 					descStr[j] = (char)pMibIfRow->bDescr[j];
 					//sprintf(&descStr[j],"%s",pMibIfRow->bDescr[j]);
@@ -610,11 +610,11 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 
 
 				// Format MAC Address
-				char *macStr = (char*)malloc(sizeof(char)*30);
-				ZeroMemory(macStr, sizeof(macStr));
+				char *macStr = (char*)malloc(sizeof(char)*30);				
 				if(macStr == NULL) {
 					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
 				}
+				ZeroMemory(macStr, sizeof(macStr));
 				for (unsigned int i=0;i<pMibIfRow->dwPhysAddrLen;i++) {
 					sprintf(&macStr[i*3],"%02X-",pMibIfRow->bPhysAddr[i]);
 				}
