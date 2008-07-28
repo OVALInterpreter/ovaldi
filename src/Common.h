@@ -149,6 +149,8 @@ class Common {
 	     *  at a time. No multiple char strings allowed
 	     */
 		static string	SwitchChar(string stringIn, string oldChr, string newChr);
+		/** Return true if the specified file exists. */
+		static bool     FileExists(const char* filename);
 		static string	ToString(int);
 		static string	ToString(long);
 		static string	ToString(unsigned long);

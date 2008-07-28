@@ -179,23 +179,23 @@ string Common::GetDefinitionSchematronPath() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Mutators  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-void Common::SetDataFile(string fileIn)
-{
+void Common::SetDataFile(string fileIn) {
 	dataFile = fileIn;	
 }
 
-void Common::SetGenerateMD5(bool genMD5In)
-{
+void Common::SetGenerateMD5(bool genMD5In) {
 	generateMD5 = genMD5In;
 }
 
-void Common::SetXMLfile(string xmlfileIn)
-{
-	xmlfile = xmlfileIn;
+void Common::SetXMLfile(string xmlfileIn) {
+	if(Common::FileExists(xmlfileIn.c_str())) {
+		xmlfile = xmlfileIn;
+	} else {
+		throw CommonException("The specified definition file does not exist! " + xmlfileIn);
+	}
 }
 
-void Common::SetXMLfileMD5(string xmlfileMD5In)
-{
+void Common::SetXMLfileMD5(string xmlfileMD5In) {
 	xmlfileMD5 = xmlfileMD5In;
 }
 
@@ -204,14 +204,17 @@ void Common::SetOutputFilename(string outputFilenameIn)
 	outputFilename = outputFilenameIn;
 }
 
-void Common::SetUseProvidedData(bool useDataIn)
-{
+void Common::SetUseProvidedData(bool useDataIn) {
 	useProvidedData = useDataIn;
 }
 
-void Common::SetExternalVariableFile(string varFilenameIn)
-{
-	externalVariablesFile = varFilenameIn;
+void Common::SetExternalVariableFile(string varFilenameIn) {
+
+	if(Common::FileExists(varFilenameIn.c_str())) {
+		externalVariablesFile = varFilenameIn;
+	} else {
+		throw CommonException("The specified external variables file does not exist! " + varFilenameIn);
+	}
 }
 
 void Common::SetVerifyXMLfile(bool verifyXMLfileIn)
@@ -219,13 +222,16 @@ void Common::SetVerifyXMLfile(bool verifyXMLfileIn)
 	verifyXMLfile = verifyXMLfileIn;
 }
 
-void Common::SetXSLFilename(string in)
-{
-	Common::xslFile = in;
+void Common::SetXSLFilename(string in) {
+	
+	if(Common::FileExists(in.c_str())) {
+		Common::xslFile = in;
+	} else {
+		throw CommonException("The specified results xsl file does not exist! " + in);
+	}
 }
 
-void Common::SetXSLOutputFilename(string in)
-{
+void Common::SetXSLOutputFilename(string in) {
 	Common::xslOutputFile = in;
 }
 void Common::SetNoXsl(bool noXsl) {
@@ -237,7 +243,12 @@ void Common::SetDefinitionIdsString(string definitionIdsString) {
 }
 
 void Common::SetDefinitionIdsFile(string definitionIdsFile) {
-	Common::definitionIdsFile = definitionIdsFile;
+
+	if(Common::FileExists(definitionIdsFile.c_str())) {
+		Common::definitionIdsFile = definitionIdsFile;
+	} else {
+		throw CommonException("The specified definition ids file does not exist! " + definitionIdsFile);
+	}
 }
 
 void Common::SetLimitEvaluationToDefinitionIds(bool set) {
@@ -249,7 +260,12 @@ void Common::SetDoDefinitionSchematron(bool set) {
 }
 
 void Common::SetDefinitionSchematronPath(string definitionSchematronPath) {
-	Common::definitionSchematronPath = definitionSchematronPath;
+	
+	if(Common::FileExists(definitionSchematronPath.c_str())) {
+		Common::definitionSchematronPath = definitionSchematronPath;
+	} else {
+		throw CommonException("The specified definition schematron validation file does not exist! " + definitionSchematronPath);
+	}
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -429,6 +445,16 @@ string Common::GetTimeStamp()
 	tmpbuf[sizeof(tmpbuf)-1] = '\0';
 	
 	return (tmpbuf);
+}
+
+bool Common::FileExists(const char * filename) {
+
+    if (FILE * file = fopen(filename, "r")) {
+        fclose(file);
+        return true;
+    }
+
+    return false;
 }
 
 string Common::ToString(int num)

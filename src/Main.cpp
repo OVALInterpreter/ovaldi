@@ -43,7 +43,6 @@ int main(int argc, char* argv[]) {
 	//
 	//------------------------------------------------------------------------------------//
 
-
 ///////////////////////		DEBUG	///////////////////////////////////////
 #ifdef _DEBUG
 	int startTime = 0;
@@ -110,7 +109,7 @@ int main(int argc, char* argv[]) {
 
 		FILE* fpVerify = fopen(Common::GetXMLfile().c_str(), "rb");
 		if (fpVerify == NULL) {
-			cerr << endl << "** ERROR: Could not open file.";
+			cerr << endl << "** ERROR: Could not open file. The specified definition file does not exist.";
 			exit(0);
 		}
 
@@ -472,221 +471,236 @@ void ProcessCommandLine(int argc, char* argv[]) {
 	// which is why we stop when argc is less than or equal to 1)  This signifies that we
 	// have run out of arguments to check.
 
-	while (argc > 1) {
-		// Make sure that the switch control starts with a dash.
+	try {
 
-		if (argv[1][0] != '-') {
-			if ((argc == 2) && (Common::GetVerifyXMLfile() == true)) {
-				Common::SetXMLfileMD5(argv[1]);
-				++argv;
-				--argc;
-				continue;
-			} else {
-				Usage();
-				exit(0);
+		while (argc > 1) {
+			// Make sure that the switch control starts with a dash.
+
+			if (argv[1][0] != '-') {
+				if ((argc == 2) && (Common::GetVerifyXMLfile() == true)) {
+					Common::SetXMLfileMD5(argv[1]);
+					++argv;
+					--argc;
+					continue;
+				} else {
+					Usage();
+					exit(0);
+				}
 			}
-		}
 
-		// Determine which option has been signalled.  Perform necessary steps.
+			// Determine which option has been signalled.  Perform necessary steps.
 
-		switch (argv[1][1]) {
-			// **********  save the data  ********** //
-			case 'd':
+			switch (argv[1][1]) {
+				// **********  save the data  ********** //
+				case 'd':
 
-				if ((argc < 3) || (argv[2][0] == '-')) {
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetDataFile(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;	
+					
+				// **********  available options  ********** //
+				case 'h':
+
 					Usage();
 					exit(0);
-				} else {
-					Common::SetDataFile(argv[2]);
-					++argv;
-					--argc;
-				}
 
-				break;	
-				
-			// **********  available options  ********** //
-			case 'h':
+					break;
 
-				Usage();
-				exit(0);
+				// **********  use input data file  ********** //
+				case 'i':
 
-				break;
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetDataFile(argv[2]);
+						Common::SetUseProvidedData(true);
+						if(!Common::FileExists(argv[2])) {
+							string str = argv[2];
+							throw CommonException("The specified data file does not exist! " + str);
+						}
+						++argv;
+						--argc;
+					}
 
-			// **********  use input data file  ********** //
-			case 'i':
+					break;
 
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetDataFile(argv[2]);
-					Common::SetUseProvidedData(true);
-					++argv;
-					--argc;
-				}
+				// **********  definition ids to evaluate  ********** //
+				case 'e':
 
-				break;
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetDefinitionIdsString(argv[2]);
+						Common::SetLimitEvaluationToDefinitionIds(true);
+						++argv;
+						--argc;
+					}
 
-			// **********  definition ids to evaluate  ********** //
-			case 'e':
+					break;
 
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetDefinitionIdsString(argv[2]);
-					Common::SetLimitEvaluationToDefinitionIds(true);
-					++argv;
-					--argc;
-				}
+				// **********  file containing definition ids to evaluate  ********** //
+				case 'f':
 
-				break;
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetDefinitionIdsFile(argv[2]);
+						Common::SetLimitEvaluationToDefinitionIds(true);
+						++argv;
+						--argc;
+					}
 
-			// **********  file containing definition ids to evaluate  ********** //
-			case 'f':
+					break;
 
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetDefinitionIdsFile(argv[2]);
-					Common::SetLimitEvaluationToDefinitionIds(true);
-					++argv;
-					--argc;
-				}
+				// ********  do oval definition schematron validation  ******** //
+				case 'n':
 
-				break;
-
-			// ********  do oval definition schematron validation  ******** //
-			case 'n':
-
-				Common::SetDoDefinitionSchematron(true);
-
-				break;
-
-			// **********  path to the oval definitions schematron xsl  ********** //
-			case 'c':
-
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetDefinitionSchematronPath(argv[2]);
 					Common::SetDoDefinitionSchematron(true);
-					++argv;
-					--argc;
-				}
 
-				break;
+					break;
 
-			// ********  don't compare xmlfile to MD5 hash  ******** //
-			case 'm':
+				// **********  path to the oval definitions schematron xsl  ********** //
+				case 'c':
 
-				Common::SetVerifyXMLfile(false);
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetDefinitionSchematronPath(argv[2]);
+						Common::SetDoDefinitionSchematron(true);
+						++argv;
+						--argc;
+					}
 
-				break;
+					break;
 
-			// **********  path to definitions.xml file  ********** //
-			case 'o':
+				// ********  don't compare xmlfile to MD5 hash  ******** //
+				case 'm':
 
-				if ((argc < 3) || (argv[2][0] == '-')) {
+					Common::SetVerifyXMLfile(false);
+
+					break;
+
+				// **********  path to definitions.xml file  ********** //
+				case 'o':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetXMLfile(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+
+				// **********  save results in XML file  ********** //
+				case 'r':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetOutputFilename(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+
+				// **********  no xsl  ********** //
+				case 's':
+
+					Common::SetNoXsl(true);
+
+					break;
+
+				// **********  apply the specified xsl to the results XML file  ********** //
+				case 't':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetXSLFilename(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+
+				// **********  write specified xsl output to the specified file  ********** //
+				case 'x':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetXSLOutputFilename(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+				
+				// **********  verbose mode  ********** //
+				case 'p':
+
+					Log::SetLevel(Log::DEBUG);
+					Log::SetToScreen(true);
+
+					break;
+
+				// **********  location of external variable file  ********** //
+				case 'v':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetExternalVariableFile(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+
+				// **********  MD5 Utility  ********** //
+				case 'z':
+
+					Common::SetGenerateMD5(true);
+
+					break;
+
+				// **********  Default  ********** //
+				default:
+
 					Usage();
 					exit(0);
-				} else {
-					Common::SetXMLfile(argv[2]);
-					++argv;
-					--argc;
-				}
+			}
 
-				break;
-
-			// **********  save results in XML file  ********** //
-			case 'r':
-
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetOutputFilename(argv[2]);
-					++argv;
-					--argc;
-				}
-
-				break;
-
-			// **********  no xsl  ********** //
-			case 's':
-
-				Common::SetNoXsl(true);
-
-				break;
-
-			// **********  apply the specified xsl to the results XML file  ********** //
-			case 't':
-
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetXSLFilename(argv[2]);
-					++argv;
-					--argc;
-				}
-
-				break;
-
-			// **********  write specified xsl output to the specified file  ********** //
-			case 'x':
-
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetXSLOutputFilename(argv[2]);
-					++argv;
-					--argc;
-				}
-
-				break;
-			
-			// **********  verbose mode  ********** //
-			case 'p':
-
-				Log::SetLevel(Log::DEBUG);
-				Log::SetToScreen(true);
-
-				break;
-
-			// **********  location of external variable file  ********** //
-			case 'v':
-
-				if ((argc < 3) || (argv[2][0] == '-')) {
-					Usage();
-					exit(0);
-				} else {
-					Common::SetExternalVariableFile(argv[2]);
-					++argv;
-					--argc;
-				}
-
-				break;
-
-			// **********  MD5 Utility  ********** //
-			case 'z':
-
-				Common::SetGenerateMD5(true);
-
-				break;
-
-			// **********  Default  ********** //
-			default:
-
-				Usage();
-				exit(0);
+			++argv;
+			--argc;
 		}
 
-		++argv;
-		--argc;
+	} catch(Exception ex) {
+
+		cout << "*** Input error: " << ex.GetErrorMessage() << "\n\n\n----------------------------------------------------" << endl;
+		Log::Fatal("*** Input error: "  + ex.GetErrorMessage() + "\n\n\n----------------------------------------------------\n");
+
+		Usage();
+		exit(0);
 	}
 
 	////////////////////////////////////////////////////////////

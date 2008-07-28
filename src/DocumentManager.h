@@ -1,5 +1,4 @@
 //
-// $Id: DocumentManager.h 4602 2008-01-03 17:29:35Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -31,15 +30,6 @@
 #ifndef DOCUMENTMANAGER_H
 #define DOCUMENTMANAGER_H
 
-//	required xerces includes
-//#include <xercesc/dom/DOM.hpp>
-//#include <xercesc/dom/DOMAttr.hpp>
-//#include <xercesc/dom/DOMDocument.hpp>
-//#include <xercesc/dom/DOMNodeList.hpp>
-//#include <xercesc/util/XMLString.hpp>
-//#include <xercesc/util/PlatformUtils.hpp>
-//#include <xercesc/parsers/AbstractDOMParser.hpp>
-
 #include "XmlProcessor.h"
 #include "Common.h"
 
@@ -53,9 +43,15 @@ using namespace std;
 */
 class DocumentManager {
 public:
+	/** Return the definition document. */
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetDefinitionDocument();
+	/** Return the systemCharacterisitcsDoc document. */
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetSystemCharacterisitcsDocument();
+	/** Return the resultDoc document. */
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetResultDocument();
+	/** Return the externalVariableDoc document.
+	 *  If the document has not yet been parsed parse it.
+	 */
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetExternalVariableDocument();
 
 	/** Get the evaluation id docuement.
@@ -64,9 +60,13 @@ public:
 	*/
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetEvaluationIdDocument();
 
+	/** Set the definitionDoc document. */
 	static void SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	/** Set the systemCharacterisitcsDoc document. */
 	static void SetSystemCharacterisitcsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	/** Set the resultDoc document. */
 	static void SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	/** Set the externalVariableDoc document. */
 	static void SetExternalVariableDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 
 private:

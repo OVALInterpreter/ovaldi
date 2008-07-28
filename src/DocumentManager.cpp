@@ -1,5 +1,4 @@
 //
-// $Id: DocumentManager.cpp 4600 2008-01-03 16:49:12Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -45,57 +44,35 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::evaluationIdDoc = N
 //								Public members												//
 // ***************************************************************************************	//
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDefinitionDocument() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the definition document
-	//
-	// -----------------------------------------------------------------------
-
 	return DocumentManager::definitionDoc;
 }
 
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetResultDocument() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the resultDoc document
-	//
-	// -----------------------------------------------------------------------
-
 	return DocumentManager::resultDoc;
 }
 
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetSystemCharacterisitcsDocument() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the systemCharacterisitcsDoc document
-	//
-	// -----------------------------------------------------------------------
-
 	return DocumentManager::systemCharacterisitcsDoc;
 }
 
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariableDocument() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the externalVariableDoc document
-	//	If the document has not yet been parsed parse it
-	//
-	// -----------------------------------------------------------------------
 
 	if(DocumentManager::externalVariableDoc == NULL) {
-		try {
-			XmlProcessor *processor = XmlProcessor::Instance();
-			DocumentManager::externalVariableDoc = processor->ParseFile(Common::GetExternalVariableFile());
-		} catch (Exception ex) {
-			Log::Debug("Error while parsing external variable file: " + Common::GetExternalVariableFile() + " " + ex.GetErrorMessage());
-			throw ex;
-		} catch (...) {
-			Log::Debug("An unknown error occured while parsing external variable file: " + Common::GetExternalVariableFile());
-			throw Exception("An unknown error occured while parsing external variable file: " + Common::GetExternalVariableFile());
+		string varFile = Common::GetExternalVariableFile();
+		if(Common::FileExists(varFile.c_str())) {
+			try {
+				XmlProcessor *processor = XmlProcessor::Instance();
+				DocumentManager::externalVariableDoc = processor->ParseFile(Common::GetExternalVariableFile());
+			} catch (Exception ex) {
+				Log::Debug("Error while parsing external variable file: " + Common::GetExternalVariableFile() + " " + ex.GetErrorMessage());
+				throw ex;
+			} catch (...) {
+				Log::Debug("An unknown error occured while parsing external variable file: " + Common::GetExternalVariableFile());
+				throw Exception("An unknown error occured while parsing external variable file: " + Common::GetExternalVariableFile());
+			}
+		} else {
+			Log::Debug("The external variable file does not exist! The definitions being evaluated rely on external variables for proper evaluation. Values for external variables must be specifed in an external variables file. " + varFile);
+			throw Exception("The external variable file does not exist! The definitions being evaluated rely on external variables for proper evaluation. Values for external variables must be specifed in an external variables file. " + varFile);
 		}
 	}
 
@@ -105,15 +82,21 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariable
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetEvaluationIdDocument() {
 
 	if(DocumentManager::evaluationIdDoc == NULL) {
-		try {
-			XmlProcessor *processor = XmlProcessor::Instance();
-			DocumentManager::evaluationIdDoc = processor->ParseFile(Common::GetDefinitionIdsFile());
-		} catch (Exception ex) {
-			Log::Debug("Error while parsing evaluation id file: " + Common::GetDefinitionIdsFile() + " " + ex.GetErrorMessage());
-			throw ex;
-		} catch (...) {
-			Log::Debug("An unknown error occured while parsing evaluation id file: " + Common::GetDefinitionIdsFile());
-			throw Exception("An unknown error occured while parsing evaluation id file: " + Common::GetDefinitionIdsFile());
+		string idFile = Common::GetDefinitionIdsFile();
+		if(Common::FileExists(idFile.c_str())) {
+			try {
+				XmlProcessor *processor = XmlProcessor::Instance();
+				DocumentManager::evaluationIdDoc = processor->ParseFile(Common::GetDefinitionIdsFile());
+			} catch (Exception ex) {
+				Log::Debug("Error while parsing evaluation id file: " + Common::GetDefinitionIdsFile() + " " + ex.GetErrorMessage());
+				throw ex;
+			} catch (...) {
+				Log::Debug("An unknown error occured while parsing evaluation id file: " + Common::GetDefinitionIdsFile());
+				throw Exception("An unknown error occured while parsing evaluation id file: " + Common::GetDefinitionIdsFile());
+			}
+		} else {
+			Log::Debug("The evaluation id file does not exist! " + idFile);
+			throw Exception("The evaluation id file does not exist! " + idFile);
 		}
 	}
 
@@ -121,45 +104,17 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetEvaluationIdDocu
 }
 
 void DocumentManager::SetSystemCharacterisitcsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* sc) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	set the systemCharacterisitcsDoc document
-	//
-	// -----------------------------------------------------------------------
-
 	DocumentManager::systemCharacterisitcsDoc = sc;
 }
 
 void DocumentManager::SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* r) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	set the resultDoc document
-	//
-	// -----------------------------------------------------------------------
-
 	DocumentManager::resultDoc = r;
 }
 
 void DocumentManager::SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	set the definitionDoc document
-	//
-	// -----------------------------------------------------------------------
-
 	DocumentManager::definitionDoc = d;
 }
 
 void DocumentManager::SetExternalVariableDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	set the externalVariableDoc document
-	//
-	// -----------------------------------------------------------------------
-
 	DocumentManager::externalVariableDoc = d;
 }
