@@ -14,6 +14,8 @@
 * Added log message when an object is not supported for datacollection.
 * Corrected bug that caused a deprecated message for the check='none exist' on a test to be incorrectly reported in the log file.
 * Added mapping of deprected var_check and entity_check 'none exist' value to 'none satisfy' value.
+* Corrected numerous coding issues related to misuse of sizeof. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
+* Corrected numerous coding issues related to throwing exceptions without freeing or deleteing allocated memory. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
 
 
 ---------------------------------------
