@@ -55,8 +55,6 @@ AbsProbe* XmlFileContentProbe::Instance() {
 
 ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 
-	ItemVector *collectedItems = new ItemVector();
-
 	// get the hive, key, and name from the provided object
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
@@ -87,6 +85,9 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 	if(xpath->GetOperation() != OvalEnum::OPERATION_EQUALS) {
 		throw ProbeException("Error: invalid operation specified on xpath. Found: " + OvalEnum::OperationToString(xpath->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
+
 
 	FileFinder fileFinder;
 	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());

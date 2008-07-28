@@ -114,12 +114,6 @@ string OvalEnum::ExistenceToString(OvalEnum::Existence existence) {
 }
 
 OvalEnum::Existence OvalEnum::ToExistence(string existenceStr) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Convert the string to a Existence
-	//
-	// -----------------------------------------------------------------------
 
 	OvalEnum::Existence existence;
 	

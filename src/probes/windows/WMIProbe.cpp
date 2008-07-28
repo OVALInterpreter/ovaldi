@@ -58,8 +58,6 @@ AbsProbe* WMIProbe::Instance() {
 
 ItemVector* WMIProbe::CollectItems(Object* object) {
 
-	ItemVector* collectedItems = new ItemVector();
-
 	// get the namespace and wql query
 	ObjectEntity* wmi_namespace = object->GetElementByName("namespace");
 	ObjectEntity* wmi_wql = object->GetElementByName("wql");
@@ -79,6 +77,8 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 	if(wmi_wql->GetOperation() != OvalEnum::OPERATION_EQUALS) {
 		throw ProbeException("Error: invalid operation specified on wql. Found: " + OvalEnum::OperationToString(wmi_wql->GetOperation()));
 	}
+
+	ItemVector* collectedItems = new ItemVector();
 
 	// get all the namespaces
 	ItemEntityVector* namespaces = this->GetNamespaces(wmi_namespace);

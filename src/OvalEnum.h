@@ -65,6 +65,7 @@ public:
 				EXISTENCE_NONE_EXIST,
 				EXISTENCE_ONLY_ONE_EXISTS};
 	static string ExistenceToString(OvalEnum::Existence existence);
+	/** Convert the string to an Existence. */
 	static OvalEnum::Existence ToExistence(string existenceStr);
 
 	/** An enum to define the acceptable data types. */

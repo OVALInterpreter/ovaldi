@@ -184,20 +184,26 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 
 	// First make a call to gethostname()
 	string strHostName = "";
-	char *chHostName = (char*)malloc(sizeof(char)*MAXHOSTNAMELENGTH);
+	char *chHostName = (char*)malloc(sizeof(char)*(MAXHOSTNAMELENGTH + 1));
 	int res = 0;
 	res = gethostname(chHostName, MAXHOSTNAMELENGTH);
 
-	if(res != 0)
+	if(res != 0) {
+		free(chHostName);
 		throw SystemInfoException("Error: Unable to determine the host name.");
+	}
 
 	strHostName = chHostName;
 	// Next get the fqdn with a call to gethostbyname
 	struct hostent *hostData = NULL;
 	hostData = gethostbyname((const char*)chHostName); 
-	if(hostData == NULL)
+	if(hostData == NULL) {
+	  free(chHostName);
 	  throw SystemInfoException("Error: Unable to get the fully qualified domain name.");
+	}
 	
+	free(chHostName);
+
 	// Process the hostData structure
 	sysInfo->primary_host_name = hostData->h_name;
 }
@@ -231,6 +237,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	conf.ifc_buf = (char*)malloc(conf.ifc_len);
 
 	if(ioctl(sock, SIOCGIFCONF, &conf) == -1) {
+	  free(conf.ifc_buf);
 	  throw SystemInfoException("Error: Unable to get a device list.");
 	}
 
@@ -277,6 +284,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 		}
 		ifc.ifc_len = IFRSIZE;
 		if (ioctl(sockfd, SIOCGIFCONF, &ifc)) {
+		  free(ifc.ifc_req);
 		  throw SystemInfoException("Error: ioctl SIOCFIFCONF.");
 		}
 	} while  (IFRSIZE <= ifc.ifc_len);

@@ -64,6 +64,10 @@ bool UniqueStringVector::Exists(string newString) {
 	return exists;
 }
 
+// constants
+const string Common::DEFINITION_ID = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*";
+const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*(,oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*)*";
+
 // Initialize static variables.
 string	Common::dataFile			= "system-characteristics.xml";
 string	Common::xmlfile				= "definitions.xml";
@@ -303,16 +307,16 @@ StringVector* Common::ParseDefinitionIdsString() {
 
 	// validate the format of the string
 	REGEX* regex = new REGEX();
-	string pattern = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*(,oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*)*";
-	if(!regex->IsMatch(pattern.c_str(), definitionIdsString.c_str())) {
+	if(!regex->IsMatch(Common::DEFINITION_ID_LIST.c_str(), definitionIdsString.c_str())) {
+		delete regex;
 		throw Exception("Error: Invalid parameter format. Expected a comma seperated list of definition ids. No spaces are allowed.");
 	}
 
 	// break the comma seperated string into definition ids.
 	StringVector* definitionIds = new StringVector();
-	char delm = ',';
+	const char delm = ',';
 
-	char* theString = (char*)malloc(sizeof(char)*(definitionIdsString.length()));
+	char* theString = (char*)malloc(sizeof(char)*(definitionIdsString.length()+1));
 	theString = strcpy(theString, definitionIdsString.c_str());
 	char* token = strtok(theString, &delm);		
 
@@ -320,6 +324,8 @@ StringVector* Common::ParseDefinitionIdsString() {
 		if(theString != NULL) {
 			free(theString);
 		}
+		delete regex;
+		delete definitionIds;
 		throw Exception("Error parsing definition id list. A delimiter was found, but no definition ids were found. Input version string: \'" + definitionIdsString + "\'");
 	} else {
 
@@ -328,10 +334,12 @@ StringVector* Common::ParseDefinitionIdsString() {
 			string tokenStr = token;
 			
 			// make sure it is a valid dafinition id
-
-			REGEX* regex = new REGEX();
-			string pattern = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*(,oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*)*";
-			if(!regex->IsMatch(pattern.c_str(), definitionIdsString.c_str())) {
+			if(!regex->IsMatch(Common::DEFINITION_ID.c_str(), definitionIdsString.c_str())) {
+				if(theString != NULL) {
+					free(theString);
+				}	
+				delete definitionIds;
+				delete regex;
 				throw Exception("Error: Invalid parameter format. Expected a comma seperated list of definition ids. No spaces are allowed. Found invalid definition id");
 			}
 
@@ -346,6 +354,7 @@ StringVector* Common::ParseDefinitionIdsString() {
 	if(theString != NULL) {
 		free(theString);
 	}
+	delete regex;
 
 	return definitionIds;
 }

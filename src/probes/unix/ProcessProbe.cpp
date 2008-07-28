@@ -55,8 +55,6 @@ AbsProbe* ProcessProbe::Instance() {
 
 ItemVector* ProcessProbe::CollectItems(Object* object) {
 
-	ItemVector *collectedItems = new ItemVector();
-
 	ObjectEntity* command = object->GetElementByName("command");
 
 	// check datatypes - only allow string
@@ -68,6 +66,8 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 	if(command->GetOperation() != OvalEnum::OPERATION_EQUALS && command->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && command->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on name. Found: " + OvalEnum::OperationToString(command->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	StringVector* commands = this->GetCommands(command);
 	if(commands->size() > 0) {
@@ -238,6 +238,7 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 				// Retrieve the command line with arguments
 				status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
 				if(status < 0) { 
+				    closedir(proc);
 					throw ProbeException(errMsg);
 
 				// If the command line matches the input command line get the remaining 

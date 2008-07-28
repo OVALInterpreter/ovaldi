@@ -54,7 +54,6 @@ AbsProbe* VariableProbe::Instance() {
 }
 
 ItemVector* VariableProbe::CollectItems(Object *object) {
-	ItemVector *collectedItems = new ItemVector();
 
 	// get the varRef from the provided object
 	ObjectEntity* varRef = object->GetElementByName("var_ref");
@@ -70,6 +69,8 @@ ItemVector* VariableProbe::CollectItems(Object *object) {
 		&& varRef->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on var_ref. Found: " + OvalEnum::OperationToString(varRef->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	if(varRef->GetVarRef() == NULL) {
 		if(varRef->GetOperation() == OvalEnum::OPERATION_EQUALS) {
@@ -178,6 +179,7 @@ StringVector* VariableProbe::GetVariableIds() {
 		}
 
 	} else {
+		delete varIds;
 		throw ProbeException("Error: Variable probe is unable to locate any variables in the current oval-definitions-docuemnt.");
 	}
 

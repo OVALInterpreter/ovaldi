@@ -118,6 +118,7 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 					pcreMsg.append(ex.GetErrorMessage());
 					Log::Debug(pcreMsg);
 				} else {
+					delete drives;
 					throw;
 				}		
 			}
@@ -157,6 +158,9 @@ StringVector* FileFinder::GetDrives() {
 											lpBuffer);		// drive strings buffer
 	
 	} else if(dwResult == 0) {
+		delete drives;
+		delete [] (lpBuffer);
+
 		//	Error check GetLastError 
 		char strErrorCode[33];
 		_itoa(GetLastError(), strErrorCode, 10);
@@ -166,6 +170,9 @@ StringVector* FileFinder::GetDrives() {
 		throw FileFinderException(errMsg);
 
 	} else {
+		delete drives;
+		delete [] (lpBuffer);
+
 		//	Unknown Error
 		errMsg.append("Error: Unable to enumerate the drives on the system. (Unknown error)\n");
 		throw FileFinderException(errMsg);
@@ -173,6 +180,8 @@ StringVector* FileFinder::GetDrives() {
 
 	
 	if(dwResult == 0) {
+		delete drives;
+		delete [] (lpBuffer);
 
 		//	Error check GetLastError 
 		char strErrorCode[33];
@@ -198,6 +207,8 @@ StringVector* FileFinder::GetDrives() {
 			drive = "";			
 		}	
 	}
+
+	delete [] (lpBuffer);
 
 	return drives;
 }
@@ -560,6 +571,8 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
 		if (hFind == INVALID_HANDLE_VALUE) {
 
+			delete childDirs;
+
 			string errorMessage = "";
 			errorMessage.append("Error: Unable to get a valid handle in GetChildDirectories(). Directory: ");
 			errorMessage.append(path);
@@ -587,6 +600,8 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 
 		//	Close the handle to the file search object.
 		if(!FindClose(hFind)) {
+			delete childDirs;
+
 			string errorMessage = "";
 			errorMessage.append("Error: Unable to close search handle while trying to get child directories. Parent directory: ");
 			errorMessage.append(path);
@@ -600,6 +615,8 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		throw;
 
 	} catch(...) {
+
+		delete childDirs;
 
 		string errorMessage = "";
 		errorMessage.append("Error: An unspecified error was encountered while trying to get child directories. Parent Directory: ");

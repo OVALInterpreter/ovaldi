@@ -80,8 +80,6 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 	//
 	// -----------------------------------------------------------------------
 
-	ItemVector *collectedItems = new ItemVector();
-
 	// get the path and file name
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
@@ -98,6 +96,8 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 		&& trusteeSID->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on trustee_sid. Found: " + OvalEnum::OperationToString(trusteeSID->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	// support behaviors - init with defaults.
 	bool includeGroupBehavior = true;

@@ -116,8 +116,6 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 	//	http://msdn.microsoft.com/library/default.asp?url=/library/en-us/netmgmt/netmgmt/netlocalgroupgetmembers.asp
 	//
 	// -----------------------------------------------------------------------
-	
-	ItemVector *collectedItems = new ItemVector();
 
 	// get the trustee_name from the provided object
 	ObjectEntity* trusteeName = object->GetElementByName("trustee_name");
@@ -131,6 +129,8 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 	if(trusteeName->GetOperation() != OvalEnum::OPERATION_EQUALS && trusteeName->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && trusteeName->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on trustee_name. Found: " + OvalEnum::OperationToString(trusteeName->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	// support behaviors - init with defaults.
 	bool includeGroupBehavior = true;

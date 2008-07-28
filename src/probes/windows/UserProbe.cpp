@@ -57,8 +57,6 @@ AbsProbe* UserProbe::Instance() {
 }
 
 ItemVector* UserProbe::CollectItems(Object *object) {
-	
-	ItemVector *collectedItems = new ItemVector();
 
 	// get the trustee_name from the provided object
 	ObjectEntity* user = object->GetElementByName("user");
@@ -78,6 +76,8 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 	if(object->GetBehaviors()->size() != 0) {
 		throw ProbeException("Error user_objects do not support behaviors.");		
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	// get the user data
 	if(user->GetVarRef() == NULL) {

@@ -577,7 +577,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 	} else {
 		char delm = versionStr.at(index);
 
-		char* theString = (char*)malloc(sizeof(char)*(versionStr.length()));
+		char* theString = (char*)malloc(sizeof(char)*(versionStr.length()+1));
 		theString = strcpy(theString, versionStr.c_str());
 		char* token = strtok(theString, &delm);		
 
@@ -585,6 +585,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 			if(theString != NULL) {
 				free(theString);
 			}
+			delete tokens;
 			throw Exception("Error parsing version string. A delimiter was found, but no other components to the version were found. Input version string: \'" + versionStr + "\' delimiter detected: \'" + delm + "\'");
 		} else {
 
@@ -598,6 +599,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 					if(theString != NULL) {
 						free(theString);
 					}
+					delete tokens;
 					throw Exception("Error parsing version string. A component of the version string is not an integer. Input version string: \'" + versionStr + "\' delimiter detected: \'" + delm + "\' erroneous component: \'" + tokenStr + "\'");
 				}
 

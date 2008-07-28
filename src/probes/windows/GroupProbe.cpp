@@ -56,8 +56,6 @@ AbsProbe* GroupProbe::Instance() {
 }
 
 ItemVector* GroupProbe::CollectItems(Object *object) {
-	
-	ItemVector *collectedItems = new ItemVector();
 
 	// get the trustee_name from the provided object
 	ObjectEntity* group = object->GetElementByName("group");
@@ -76,6 +74,8 @@ ItemVector* GroupProbe::CollectItems(Object *object) {
 	if(object->GetBehaviors()->size() != 0) {
 		throw ProbeException("Error group_objects do not support behaviors.");		
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	// get the group data
 	if(group->GetVarRef() == NULL) {

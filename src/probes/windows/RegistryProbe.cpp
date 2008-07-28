@@ -68,9 +68,6 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 	//	not found. If not in verbose mode only keys that have a matching name 
 	//	are printed.
 
-
-	ItemVector *collectedItems = new ItemVector();
-
 	// get the hive, key, and name from the provided object
 	ObjectEntity* hive = object->GetElementByName("hive");
 	ObjectEntity* key = object->GetElementByName("key");
@@ -102,6 +99,8 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 	if(object->GetBehaviors()->size() != 0) {
 		throw ProbeException("Error: (RegistryProbe) Behaviors are not supported."); 
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	// get all the hives
 	ItemEntityVector* hives = this->GetHives(hive);
@@ -233,6 +232,7 @@ void RegistryProbe::GetMatchingKeys(string hiveIn, string keyIn, string pattern,
 	/////////////////////////////////////////////////////////////////
 	HKEY rootKey = GetRootKey(hiveIn);
 	if(rootKey == NULL) {
+		free(lpName);
 		errorMessage.append("(RegistryProbe) The registry hive '");
 		errorMessage.append(hiveIn);
 		errorMessage.append("' does not exist.");
@@ -293,6 +293,8 @@ void RegistryProbe::GetMatchingKeys(string hiveIn, string keyIn, string pattern,
 			}
 		}
 	}
+
+	free(lpName);
 	
 	RegCloseKey(hkey);	
 }
@@ -313,7 +315,7 @@ void RegistryProbe::GetMatchingNames(string hiveIn, string keyIn, string pattern
 	/////////////////////////////////////////////////////////////////
 	HKEY rootKey = GetRootKey(hiveIn);
 	if(rootKey == NULL) {
-
+		free(lpName);
 		errorMessage.append("(RegistryProbe) The registry hive '");
 		errorMessage.append(hiveIn);
 		errorMessage.append("' does not exist.");
@@ -374,10 +376,13 @@ void RegistryProbe::GetMatchingNames(string hiveIn, string keyIn, string pattern
 				pcreMsg.append(ex.GetErrorMessage());
 				Log::Debug(pcreMsg);
 			} else {
+				free(lpName);
 				throw;
 			}
 		}
 	}
+
+	free(lpName);
 	
 	RegCloseKey(hkey);	
 }
@@ -1035,6 +1040,8 @@ bool RegistryProbe::NameExists(string hive, string key, string name) {
 				exists = false;
 
 			} else if (res != ERROR_SUCCESS) {
+				
+				free(value);
 
 				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
 				char errorCodeBuffer[20];

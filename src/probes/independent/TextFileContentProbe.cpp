@@ -58,7 +58,6 @@ AbsProbe* TextFileContentProbe::Instance() {
 
 ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 
-	ItemVector *collectedItems = new ItemVector();
 
 	// get the path and file name
 	ObjectEntity* path = object->GetElementByName("path");
@@ -71,6 +70,8 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 	if (line->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH) {
 		throw ProbeException("Error: invalid operation specified on line. Found: " + OvalEnum::OperationToString(line->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	FileFinder fileFinder;
 	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());

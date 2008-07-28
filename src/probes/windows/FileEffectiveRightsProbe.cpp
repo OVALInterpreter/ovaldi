@@ -80,8 +80,6 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 	//
 	// -----------------------------------------------------------------------
 
-	ItemVector *collectedItems = new ItemVector();
-
 	// get the path and file name
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
@@ -98,6 +96,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 		&& trusteeName->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on trustee_name. Found: " + OvalEnum::OperationToString(trusteeName->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	// support behaviors - init with defaults.
 	bool includeGroupBehavior = true;
@@ -448,6 +448,9 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	PACCESS_MASK accessRights = NULL;
 	accessRights = reinterpret_cast<PACCESS_MASK>(::LocalAlloc(LPTR, sizeof(PACCESS_MASK) + sizeof(ACCESS_MASK)));
 	if(accessRights == NULL) {
+		
+		LocalFree(pSD);
+		
 		throw ProbeException(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.");
 
 		//item->SetStatus(OvalEnum::STATUS_ERROR);

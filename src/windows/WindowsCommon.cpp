@@ -439,7 +439,7 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringVector* member
 
 			// Loop through each user.
 			for (unsigned int i=0; i<entriesread; i++) {
-				ZeroMemory(tmpUserName, 21);
+				ZeroMemory(tmpUserName, sizeof(tmpUserName));
 				_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].grui0_name);
 				tmpUserName[sizeof(tmpUserName)-1] = '\0';
 
@@ -662,7 +662,7 @@ StringVector* WindowsCommon::GetAllLocalGroups() {
 
 			// Loop through each group.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpGroupName, 257);
+				ZeroMemory(tmpGroupName, sizeof(tmpGroupName));
 				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", localGroupInfo[i].lgrpi0_name);
 				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
 
@@ -677,10 +677,13 @@ StringVector* WindowsCommon::GetAllLocalGroups() {
 			nts = LsaClose(polHandle);
 
 			if(nas == ERROR_ACCESS_DENIED) { 
+				delete allGroups;
 				throw Exception("Error unable to enumerate local groups. The user does not have access to the requested information.");
 			} else if(nas == NERR_InvalidComputer) {
+				delete allGroups;
 				throw Exception("Error unable to enumerate local groups. The computer name is invalid.");
 			} else {
+				delete allGroups;
 				throw Exception("Error unable to enumerate local groups. " + WindowsCommon::GetErrorMessage(GetLastError()));
 			}
 
@@ -741,7 +744,7 @@ StringVector* WindowsCommon::GetAllGlobalGroups() {
 
 			// Loop through each group.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpGroupName, 257);
+				ZeroMemory(tmpGroupName, sizeof(tmpGroupName));
 				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", globalGroupInfo[i].grpi0_name);
 				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
 
@@ -756,10 +759,13 @@ StringVector* WindowsCommon::GetAllGlobalGroups() {
 			nts = LsaClose(polHandle);
 
 			if(nas == ERROR_ACCESS_DENIED) { 
+				delete allGroups;
 				throw Exception("Error unable to enumerate global groups. The user does not have access to the requested information.");
 			} else if(nas == NERR_InvalidComputer) {
+				delete allGroups;
 				throw Exception("Error unable to enumerate global groups. The computer name is invalid.");
 			} else {
+				delete allGroups;
 				throw Exception("Error unable to enumerate global groups. " + WindowsCommon::GetErrorMessage(GetLastError()));
 			}
 		}
@@ -825,7 +831,7 @@ void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
 
 			// Loop through each user.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpUserName, 21);
+				ZeroMemory(tmpUserName, sizeof(tmpUserName));
 				_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].usri0_name);
 				tmpUserName[sizeof(tmpUserName)-1] = '\0';
 
@@ -899,6 +905,7 @@ string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
 	domain_name_size++;
 	domain_name = (LPTSTR)realloc(domain_name, domain_name_size * sizeof(TCHAR));
 	if (domain_name == NULL) {
+		free(trustee_name);
 		throw Exception("Could not allocate space. Cannot get domain_name for.");
 	}
 	
@@ -917,6 +924,8 @@ string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
 		WindowsCommon::GetTextualSid(pSid, &sidString);
 		string sidStr = sidString;
 		free(sidString);
+		free(trustee_name);
+		free(domain_name);
 		// all occurances of this that i have seen are for the domain admins sid and the domain user's sid
 		// I should be able to ignore these.
 		throw Exception("Unable to look up account name for sid: " + sidStr + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
@@ -1033,6 +1042,7 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 
 		domain = (LPTSTR)realloc(domain, domainSize);
 		if (domain == NULL) {
+			free(psid);
 			retVal = FALSE;
 			break;
 		}
@@ -1105,6 +1115,7 @@ string WindowsCommon::LookUpLocalSystemName() {
  
 	// Get and display the name of the computer. 
 	if(!GetComputerName( buff, &buffSize )) {
+		free(buff);
 		DWORD error = GetLastError();
 		throw Exception("Error failed to get local computer name. " + WindowsCommon::GetErrorMessage(error));
 	} else {

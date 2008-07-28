@@ -59,7 +59,6 @@ AbsProbe* DPKGInfoProbe::Instance() {
 //bad
 ItemVector* DPKGInfoProbe::CollectItems(Object* object) {
 
-	ItemVector *collectedItems = new ItemVector();
 
 	ObjectEntity* name = object->GetElementByName("name");
 
@@ -72,6 +71,8 @@ ItemVector* DPKGInfoProbe::CollectItems(Object* object) {
 	if(name->GetOperation() != OvalEnum::OPERATION_EQUALS && name->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && name->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on name. Found: " + OvalEnum::OperationToString(name->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	StringVector* names = this->GetDPKGNames(name);
 	if(names->size() > 0) {
@@ -212,14 +213,15 @@ StringVector* DPKGInfoProbe::GetMatchingDPKGNames(string pattern, bool isRegex) 
 	string installed_dpkg_name;
 	string installed_dpkg_status;
 
-	StringVector* names = new StringVector ();
 
 	FileFd Fd(this->StatusFile, FileFd::ReadOnly);
 	pkgTagFile Tags(&Fd);
 
 	if (_error->PendingError() == true)
 		throw ProbeException("Error: (DPKGInfoProbe) Could not read DPKG status file, which is necessary to read the packages status.");
-   
+
+	StringVector* names = new StringVector();
+
 	pkgTagSection Section;
 		
 	while (Tags.Step(Section) == true)
@@ -234,8 +236,10 @@ StringVector* DPKGInfoProbe::GetMatchingDPKGNames(string pattern, bool isRegex) 
 		}
    	}
 	
-   	if (_error->PendingError() == true)
+	if (_error->PendingError() == true) {
+		delete names;
    		throw ProbeException("Error: (DPKGInfoProbe) Error while walking DPKG database.");
+	}
 
 	return names;
 }

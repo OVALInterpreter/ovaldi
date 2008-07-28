@@ -89,12 +89,15 @@ ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 				}
 
 			} else {
+				delete items;
 				throw Exception("Error: The flag attribute value must be \'complete\'. Found: " + OvalEnum::FlagToString(flag));
 			}
 		} else {
+			delete items;
 			throw Exception("Error: The specifeid object was not found in the provided System Characteristics file.");
 		}
 	} else {
+		delete items;
 		throw Exception("Error: Unable to locate collected_object element in provided System Characteristics file.");
 	}
 	return items;
@@ -135,12 +138,15 @@ VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
 				}
 
 			} else {
+				delete values;
 				throw Exception("Error: The flag attribute value must be \'complete\'. Found: " + OvalEnum::FlagToString(flag));
 			}
 		} else {
+			delete values;
 			throw Exception("Error: The specified object was not found in the provided System Characteristics document.");
 		}
 	} else {
+		delete values;
 		throw Exception("Error: Unable to locate collected_object element in provided System Characteristics document.");
 	}
 	return values;

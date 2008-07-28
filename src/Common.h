@@ -143,6 +143,11 @@ class Common {
 		static string	PadString(string, unsigned int);
 		/** Pad the provided string with the specified char so that it is the desired length. */
 		static string	PadStringWithChar(string, char, unsigned int);
+		/**
+		 *  This function takes a string and searches for all oldChrs.  If one is found,
+	     *  it is replaced with a newChr.  It is only intended to work with a single char 
+	     *  at a time. No multiple char strings allowed
+	     */
 		static string	SwitchChar(string stringIn, string oldChr, string newChr);
 		static string	ToString(int);
 		static string	ToString(long);
@@ -172,6 +177,12 @@ class Common {
 		static bool doDefinitionSchematron;
 		static string definitionSchematronPath;
 		static string definitionIdsFile;
+
+		/** format of a definition id. */
+		static const string DEFINITION_ID;
+
+		/** format required for a list of definitions ids */
+		static const string DEFINITION_ID_LIST;
 };
 
 /** 

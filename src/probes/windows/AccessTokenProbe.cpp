@@ -57,8 +57,6 @@ AbsProbe* AccessTokenProbe::Instance() {
 
 ItemVector* AccessTokenProbe::CollectItems(Object *object) {
 
-	ItemVector *collectedItems = new ItemVector();
-
 	// get the security_principle from the provided object
 	ObjectEntity* securityPrinciple = object->GetElementByName("security_principle");
 
@@ -71,6 +69,8 @@ ItemVector* AccessTokenProbe::CollectItems(Object *object) {
 	if(securityPrinciple->GetOperation() != OvalEnum::OPERATION_EQUALS && securityPrinciple->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && securityPrinciple->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on security_principle. Found: securityPrinciple " + OvalEnum::OperationToString(securityPrinciple->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 	
 	// support behaviors - init with defaults.
 	bool includeGroupBehavior = true;

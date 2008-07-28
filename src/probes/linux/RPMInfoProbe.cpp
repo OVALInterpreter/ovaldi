@@ -58,8 +58,6 @@ AbsProbe* RPMInfoProbe::Instance() {
 
 ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 
-	ItemVector *collectedItems = new ItemVector();
-
 	ObjectEntity* name = object->GetElementByName("name");
 
 	// check datatypes - only allow string
@@ -71,6 +69,8 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 	if(name->GetOperation() != OvalEnum::OPERATION_EQUALS && name->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && name->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
 		throw ProbeException("Error: invalid operation specified on name. Found: " + OvalEnum::OperationToString(name->GetOperation()));
 	}
+
+	ItemVector *collectedItems = new ItemVector();
 
 	StringVector* names = this->GetRPMNames(name);
 	if(names->size() > 0) {
@@ -207,8 +207,6 @@ StringVector* RPMInfoProbe::GetMatchingRPMNames(string pattern, bool isRegex) {
 	//
 	// -----------------------------------------------------------------------
 
-	StringVector* names = new StringVector();
-
 	/* Transaction sets are the modern way to read the RPM database. */
 	rpmts ts;
 	/* We use an iterator to walk the RPM database. */
@@ -231,6 +229,7 @@ StringVector* RPMInfoProbe::GetMatchingRPMNames(string pattern, bool isRegex) {
 		throw ProbeException("Error: (RPMInfoProbe) Could not create an iterator to walk the RPM database.");
 	
 	/* Look at each installed package matching this name.  Generally, there is only one.*/
+	StringVector* names = new StringVector();
 	while ( (header = rpmdbNextIterator(iterator)) != NULL) {
 		/* Get the rpm_name value for comparision. */
 		installed_rpm_name = readHeaderString(header, RPMTAG_NAME);
@@ -588,6 +587,8 @@ string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
     }
   }
   
+  free(buff);
+
   // Wait for the child process to complete
   if(waitpid (pid, NULL, 0) == -1) {
     errText.append("Execution of rpm query in child process failed.");

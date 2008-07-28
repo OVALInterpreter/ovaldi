@@ -65,13 +65,6 @@ AbsProbe* InetListeningServersProbe::Instance() {
 
 
 ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//------------------------------------------------------------------------------------//
-
-	ItemVector *collectedItems = new ItemVector();
 
 	ObjectEntity* protocol = object->GetElementByName("protocol");
 	ObjectEntity* localAddress = object->GetElementByName("local_address");
@@ -107,6 +100,9 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 	if(localPort->GetDatatype() != OvalEnum::DATATYPE_STRING) {
 		throw ProbeException("Error: invalid data type specified on program_name. Found: " + OvalEnum::DatatypeToString(localPort->GetDatatype()));
 	}
+
+	
+	ItemVector *collectedItems = new ItemVector();
 
 	// passed initial checks make call to netstat
 	if(this->netstatResult == NULL) {
@@ -652,8 +648,6 @@ void InetListeningServersProbe::ExecNetstat() {
 	int fd1[2];
 	int fd2[2];
 	int pid = 0;
-	//char *buf = NULL;
-	//char *errbuf = NULL;
 
 	// Open communication pipes between processes
 	if (pipe(fd1) < 0 || pipe(fd2) < 0)
