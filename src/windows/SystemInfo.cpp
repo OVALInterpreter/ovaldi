@@ -1,5 +1,4 @@
 //
-// $Id: SystemInfo.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -36,12 +35,6 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 SystemInfo::SystemInfo() {
-	// -----------------------------------------------------------------------
-	//	ABSTRACT
-	//
-	//	Initialize data memebres
-	//
-	// -----------------------------------------------------------------------
 
 	os_name = "";
 	os_version = "";
@@ -51,12 +44,6 @@ SystemInfo::SystemInfo() {
 }
 
 SystemInfo::~SystemInfo() {
-	// -----------------------------------------------------------------------
-	//	ABSTRACT
-	//
-	//	Delete all objects in the interfaces vector.
-	//
-	// -----------------------------------------------------------------------
 
 	IfData *tmp	= NULL;
 	while(interfaces.size() !=0) {
@@ -72,14 +59,7 @@ SystemInfo::~SystemInfo() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc)
-{
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//	Write the system_info node to the sc file.
-	//------------------------------------------------------------------------------------//
+void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc) {
 
 	//	Find the system_info node
 	DOMElement* sysInfoNode = XmlCommon::FindElement(scDoc, "system_info");
@@ -131,15 +111,7 @@ void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-SystemInfo* SystemInfoCollector::CollectSystemInfo()
-{
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Run the system info collector. Return a SystemInfo object. 
-	//
-	//------------------------------------------------------------------------------------//
+SystemInfo* SystemInfoCollector::CollectSystemInfo() {
 
 	SystemInfo *sysInfo = new SystemInfo();
 	SystemInfoCollector::GetOSInfo(sysInfo);
@@ -153,14 +125,6 @@ SystemInfo* SystemInfoCollector::CollectSystemInfo()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Get the OS name and version, the architecture, and the primary host name
-	//	for the system.
-	//
-	//------------------------------------------------------------------------------------/
 
 	//////////////////////////////////////////////////////////
 	////////////////	Get Archtecture	//////////////////////
@@ -207,8 +171,9 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 		}
 	}
 	
-	// Allocate memory for that version number string
-	char *verNum = (char*)malloc(sizeof(char)*16);
+	// Allocate memory for the version number string
+	const int verNumSize = 16;
+	char *verNum = (char*)malloc(sizeof(char)*verNumSize);
 	if(verNum == NULL) {
 		throw SystemInfoException("Error: Unable to allocate memeory while gathering Operating System information.");
 	}
@@ -283,11 +248,11 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 				// Get Version number
 				_itoa(osvi.dwMajorVersion, verNum, 10);
 				sysInfo->os_version = verNum;
-				ZeroMemory(verNum, sizeof(verNum));
+				ZeroMemory(verNum, verNumSize);
 				_itoa(osvi.dwMinorVersion, verNum, 10);
 				sysInfo->os_version.append(".");
 				sysInfo->os_version.append(verNum);
-				ZeroMemory(verNum, sizeof(verNum));
+				ZeroMemory(verNum, verNumSize);
 				_itoa(osvi.dwBuildNumber, verNum, 10);
 				sysInfo->os_version.append(".");
 				sysInfo->os_version.append(verNum);				
@@ -330,7 +295,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 				// Get Version number
 				_itoa(osvi.dwMajorVersion, verNum, 10);
 				sysInfo->os_version = verNum;
-				ZeroMemory(verNum, sizeof(verNum));
+				ZeroMemory(verNum, verNumSize);
 				_itoa(osvi.dwMinorVersion, verNum, 10);
 				sysInfo->os_version.append(".");
 				sysInfo->os_version.append(verNum);
@@ -393,11 +358,11 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 			// Get Version number
 			_itoa(osvi.dwMajorVersion, verNum, 10);
 			sysInfo->os_version = verNum;
-			ZeroMemory(verNum, sizeof(verNum));
+			ZeroMemory(verNum, verNumSize);
 			_itoa(osvi.dwMinorVersion, verNum, 10);
 			sysInfo->os_version.append(".");
 			sysInfo->os_version.append(verNum);
-			ZeroMemory(verNum, sizeof(verNum));
+			ZeroMemory(verNum, verNumSize);
 			_itoa((osvi.dwBuildNumber & 0xFFFF), verNum, 10);
 			sysInfo->os_version.append(".");
 			sysInfo->os_version.append(verNum);
@@ -411,11 +376,11 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 			// Get Version number
 			_itoa(osvi.dwMajorVersion, verNum, 10);
 			sysInfo->os_version = verNum;
-			ZeroMemory(verNum, sizeof(verNum));
+			ZeroMemory(verNum, verNumSize);
 			_itoa(osvi.dwMinorVersion, verNum, 10);
 			sysInfo->os_version.append(".");
 			sysInfo->os_version.append(verNum);
-			ZeroMemory(verNum, sizeof(verNum));
+			ZeroMemory(verNum, verNumSize);
 			_itoa((osvi.dwBuildNumber & 0xFFFF), verNum, 10);
 			sysInfo->os_version.append(".");
 			sysInfo->os_version.append(verNum);		
@@ -457,7 +422,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 
 	// First get the host name
 	char *host_name;
-	int size = 256;
+	const int size = 256;
 	host_name = (char*)malloc(sizeof(char)*size);
 	if(host_name == NULL) {
 		sysInfo->primary_host_name = "unknown";	
@@ -487,15 +452,6 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 }
 
 IfDataVector SystemInfoCollector::GetInterfaces() {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Create a vector of IfData object that will represent all the available
-	//	interfaces on the system.
-	//
-	//	Must get interface_name, ip_address, and mac_address for each interface
-	//------------------------------------------------------------------------------------//
 
 	IfDataVector interfaces;
 
@@ -598,9 +554,10 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 				// Here I am using the description value as the name
 				char *descStr = (char*)malloc(pMibIfRow->dwDescrLen+1);
 				if(descStr == NULL) {
+					free(pIPAddrTable);
 					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
 				}
-				ZeroMemory(descStr, sizeof(descStr));
+				ZeroMemory(descStr, sizeof(pMibIfRow->dwDescrLen+1));
 				for (unsigned int j=0;j<pMibIfRow->dwDescrLen;j++) {
 					descStr[j] = (char)pMibIfRow->bDescr[j];
 					//sprintf(&descStr[j],"%s",pMibIfRow->bDescr[j]);
@@ -612,9 +569,10 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 				// Format MAC Address
 				char *macStr = (char*)malloc(sizeof(char)*30);				
 				if(macStr == NULL) {
+					free(pIPAddrTable);
 					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
 				}
-				ZeroMemory(macStr, sizeof(macStr));
+				ZeroMemory(macStr, 30);
 				for (unsigned int i=0;i<pMibIfRow->dwPhysAddrLen;i++) {
 					sprintf(&macStr[i*3],"%02X-",pMibIfRow->bPhysAddr[i]);
 				}
@@ -645,7 +603,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~  Class SystemInfoException  ~~~~~~~~~~~~~~~~~~~~~~~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~  Class SystemInfoException  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 SystemInfoException::SystemInfoException(string errMsgIn, int severity, Exception* ex) : Exception(errMsgIn, severity, ex) {
 	// Set the error message and then set the severity to ERROR_FATAL. This is done with

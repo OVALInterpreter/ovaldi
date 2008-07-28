@@ -95,8 +95,12 @@ typedef vector < IfData*, allocator<IfData*> > IfDataVector;
 class SystemInfo {
 
 public:
+	/** Initialize data memebers. */
 	SystemInfo();
+	/** Delete all objects in the interfaces vector. */
 	~SystemInfo();
+
+	/** Write the system_info node to the sc file. */
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc);
 		
 	string os_name;
@@ -111,10 +115,17 @@ public:
 */
 class SystemInfoCollector {
 	public:
+		/** Run the system info collector. Return a SystemInfo object. */
 		static SystemInfo* CollectSystemInfo();
 		
 	private:
+		/** Get the OS name and version, the architecture, and the primary host name for the system. */
 		static void GetOSInfo(SystemInfo*);
+
+		/** Create a vector of IfData object that will represent all the available
+		 *	interfaces on the system. 		
+	     *	Must get interface_name, ip_address, and mac_address for each interface
+         */
 		static IfDataVector GetInterfaces();
 };
 
