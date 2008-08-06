@@ -101,6 +101,10 @@ private:
 	*/
 	void GetRPMInfo(string name, ItemVector* items);
 
+	/**
+	   Read readErrh and readh until there is no more data to be read. Wait for the 
+       child process to complete. Return a the result string with the data.
+    */
 	string ParentGetSigKeyId(int readErrh, int readh, int pid);
 	void ChildGetSigKeyId(int writeErrh, int writeh, string rpmName);
 	string GetSigKeyId(string rpmName);

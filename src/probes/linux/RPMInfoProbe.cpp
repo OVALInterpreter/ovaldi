@@ -1,5 +1,4 @@
 //
-// $Id: RPMInfoProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -513,13 +512,7 @@ void RPMInfoProbe::ChildGetSigKeyId(int writeErrh, int writeh, string rpmName) {
 } 
 
 string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) { 
-  //------------------------------------------------------------------------------------//
-  //  ABSTRACT
-  //  
-  //  Read readErrh and readh until there is no more data to be read. Wait for the 
-  //  child process to complere. Return a the result string with the data.
-  //
-  //------------------------------------------------------------------------------------//
+
   int bytes = 0;
   int maxFDS = 0;
   char *buf = NULL;
@@ -547,7 +540,7 @@ string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
   // Init the maxFDS value
   if(readh >= readErrh) {
     maxFDS = readh + 1;
-  }else {
+  } else {
     maxFDS = readErrh + 1;
   }
 
@@ -568,26 +561,25 @@ string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
 		memset(buf, '\0', 1024);
 		bytes = read(readErrh, buf, 1023);
 		errText.append(buf);
-			if(bytes == 0) 
-				errComplete = true;
-	}
+		  if(bytes == 0) 
+		    errComplete = true;
+	  }
 
       if(FD_ISSET(readh, &readfds)) { 
-	// Read allsome std output from command. 
-	memset(buf, '\0', 1024);
-	bytes = read(readh, buf, 1023);
-	text.append(buf);
+	    // Read allsome std output from command. 
+	    memset(buf, '\0', 1024);
+	    bytes = read(readh, buf, 1023);
+	    text.append(buf);
 
-	if(bytes == 0)
-	  stdComplete = true;
-      }
-	  
-    }else {	    
-      break;
+	    if(bytes == 0)
+	      stdComplete = true;
+      }	  
+    } else {	    
+       break;
     }
   }
   
-  free(buff);
+  free(buf);
 
   // Wait for the child process to complete
   if(waitpid (pid, NULL, 0) == -1) {
