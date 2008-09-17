@@ -71,7 +71,11 @@ private:
 	/** Identify all trustee names for the specified trusteeName ObjectEntity. */ 
 	StringSet* GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior);
 
-	/** Search all trustee names on the the specifed file and return the set of names the match the specifeid criteria. */
+	/** 
+		Select all Trustees that match the specified trusteeNamePattern. 
+	    Matching is done via regex or != depending on the isRegex boolean
+		flag. All matches are added to the trusteeNames vector.
+	*/
 	void GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringSet* trusteeNames, bool isRegex = true);
 
 	/** Return ture if the specfied trustee name exists in the set of trustee names */
