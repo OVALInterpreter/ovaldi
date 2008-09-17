@@ -320,15 +320,6 @@ StringSet* FileEffectiveRightsProbe::GetTrusteeNames(string path, string fileNam
 }
 
 void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringSet* trusteeNames, bool isRegex) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//	Select all Trustees for the specified file that match the specified
-	//	trusteeNamePattern. matching is done via regex or != depending on the
-	//	isRegex boolean flag. All matches are added to the trusteeNames vector.
-	// -----------------------------------------------------------------------
-
 	StringVector::iterator iterator;
 	for(iterator = allTrusteeNames->begin(); iterator != allTrusteeNames->end(); iterator++) {
 		if(this->IsMatch(trusteeNamePattern, (*iterator), isRegex)) {
