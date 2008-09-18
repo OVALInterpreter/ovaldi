@@ -7,16 +7,21 @@
 ****************************************************
 
 ---------------------------------------
----        Version 5.4 build ??     ---
+---        Version 5.5 build ??     ---
 ---------------------------------------
 * Converted windows project to Visual Studio 2008 format. This conversion required one minor change WindowsCommon.h for make it compile without warnings with the new SDK.
-* COrrected bug in WMIProbe.cpp. wmi_items were not properly being collected resulting incorrect wmi_test evaluations.
-* Added log message when an object is not supported for datacollection.
+* Corrected bug in WMIProbe.cpp. wmi_items were not properly being collected resulting incorrect wmi_test evaluations.
+* Added log message when an object is not supported for data collection.
 * Corrected bug that caused a deprecated message for the check='none exist' on a test to be incorrectly reported in the log file.
 * Added mapping of deprected var_check and entity_check 'none exist' value to 'none satisfy' value.
 * Corrected numerous coding issues related to misuse of sizeof. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
 * Corrected numerous coding issues related to throwing exceptions without freeing or deleteing allocated memory. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
-
+* Added file existence check to all files that are specified on the command line. 
+* Added a check to DocumentManager::GetExternalVariableDocument() before the external variable file is read to make sure it exists. If the check fails the error is logged with a message indicating that an external variable file is needed for proper evaluation of the current definitions.
+* Moved version to 5.5 and add the Version::GetSchemaVersion() method to simplify changing the schema version.
+* Added support for case insensitive equals and not equals. Thanks to Lumension Security (http://www.lumension.com)
+* Corrected issue in EntityComparator::CompareBinary(). Needed to ensure that collected binary values are formatted properly. Thanks to Lumension Security (http://www.lumension.com)
+* Changed ExternalVariable::ComputeValue() to warn and not error out when the input datatype on a variable does not match the desired datatype in the definition document. Based on a suggestion by Lumension Security (http://www.lumension.com).
 
 ---------------------------------------
 ---        Version 5.4 build 2      ---
