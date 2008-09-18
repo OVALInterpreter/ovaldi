@@ -35,23 +35,41 @@
 //****************************************************************************************//
 OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation op, string defValue, string scValue) {
 
+	string tmpdefValue="";
+	string tmpscValue="";
+
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
+	/*make sure hex-encoded binary data has two bytes for each hex digit: 0 is in the form 00, and 1 is 01, etc. */
+	if((defValue.length() % 2) == 0) {
+		tmpdefValue = defValue;
+	}
+	else {
+		tmpdefValue = "0" + defValue;
+	}
+
+	if((scValue.length() % 2) == 0){
+		tmpscValue = scValue;
+	}
+	else {
+		tmpscValue = "0" + scValue;
+	}
+
 	if(op == OvalEnum::OPERATION_EQUALS) {
-		if(defValue.compare(scValue) == 0) {
+		if(tmpdefValue.compare(tmpscValue) == 0) {
 			result = OvalEnum::RESULT_TRUE;
 		} else {
 			result = OvalEnum::RESULT_FALSE;
 		}
 	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
-		if(defValue.compare(scValue) != 0) {
+		if(tmpdefValue.compare(tmpscValue) != 0) {
 			result = OvalEnum::RESULT_TRUE;
 		} else {
 			result = OvalEnum::RESULT_FALSE;			
 		}
 	} else {
 		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
-	} 
+	}
 
 	return result;
 }
@@ -347,8 +365,11 @@ OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation o
 
 OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operation op, string defValue, string scValue) {
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-// TODO need to implement
-		throw Exception("Error: not implemented:" + OvalEnum::OperationToString(op));
+
+	// TODO need to implement
+	
+	throw Exception("Error: not implemented:" + OvalEnum::OperationToString(op));
+	
 	return result;
 }
 OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation op, string defValue, string scValue) {
@@ -422,12 +443,34 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 		} else {
 			result = OvalEnum::RESULT_FALSE;
 		}
+	} else if(op == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {
+
+		string upperDefValue = ToUpper(defValue);
+		string upperSCValue = ToUpper(defValue);
+
+		if(upperDefValue.compare(upperSCValue) == 0) {
+			result = OvalEnum::RESULT_TRUE;
+		} else {
+			result = OvalEnum::RESULT_FALSE;
+		}
+
 	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
 		if(defValue.compare(scValue) != 0) {
 			result = OvalEnum::RESULT_TRUE;
 		} else {
 			result = OvalEnum::RESULT_FALSE;			
 		}
+	} else if(op == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL) {
+
+		string upperDefValue = ToUpper(defValue);
+		string upperSCValue = ToUpper(defValue);
+
+		if(upperDefValue.compare(upperSCValue) != 0) {
+			result = OvalEnum::RESULT_TRUE;
+		} else {
+			result = OvalEnum::RESULT_FALSE;
+		}
+
 	} else if(op == OvalEnum::OPERATION_PATTERN_MATCH) {
 		REGEX myRegex;
 		if(myRegex.IsMatch(defValue.c_str(), scValue.c_str())) {
@@ -437,9 +480,22 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 		}
 	} else {
 		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
-	} 
+	}
 
 	return result;
+}
+
+string EntityComparator::ToUpper(string s) {
+
+	string upperString;
+	string::const_iterator iter;
+
+	for(iter = s.begin(); iter != s.end(); iter++)
+	{ 
+		upperString += ::toupper(*iter);
+	}
+
+	return upperString;
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation op, string defValue, string scValue) {

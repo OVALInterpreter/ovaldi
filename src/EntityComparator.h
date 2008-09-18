@@ -102,6 +102,8 @@ private:
 	static string GetEpochFromEVR(string evrStr);
 	static string GetVersionFromEVR(string evrStr);
 	static string GetReleaseFromEVR(string evrStr);
+
+	static string ToUpper(string s);
 };
 
 #endif
