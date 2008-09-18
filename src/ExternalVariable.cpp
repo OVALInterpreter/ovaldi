@@ -36,12 +36,6 @@
 //****************************************************************************************//
 
 ExternalVariable::ExternalVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) : AbsVariable (id, name, version, datatype, msgs) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete ExternalVariable
-	//
-	// -----------------------------------------------------------------------
 
 }
 
@@ -53,12 +47,6 @@ ExternalVariable::~ExternalVariable() {
 //								 Public members												//
 // ***************************************************************************************	//
 void ExternalVariable::Parse(DOMElement* externalVariableElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided ExternalVariable element into a ExternalVariable
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetId(XmlCommon::GetAttributeByName(externalVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(externalVariableElm, "datatype")));
@@ -94,13 +82,7 @@ void ExternalVariable::Parse(DOMElement* externalVariableElm) {
 }
 
 VariableValueVector* ExternalVariable::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this variable's value
-	//	in this case just an empty vector.
-	// -----------------------------------------------------------------------
-	
+
 	VariableValueVector* values = new VariableValueVector();
 
 	return values;
@@ -145,58 +127,50 @@ void ExternalVariable::ComputeValue() {
 		this->AppendMessage("Error unable to find external variable " + this->GetId() + " in external variable document.");
 	} else {
 
-		// validate the datatype
+		// validate the datatype and warn if not matching
 		OvalEnum::Datatype externalDatatype = OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(variableElm, "datatype"));
 		if(this->GetDatatype() != externalDatatype) {
+			string warningMessage = "Warning, the specified external variable (" + this->GetId() + ") in the supplied external variable document has the wrong datatype. The variable in the oval-definition document expected datatype=" + OvalEnum::DatatypeToString(this->GetDatatype()) + ". The external variable in the supplied variable document has datatype=" + OvalEnum::DatatypeToString(externalDatatype) + ".";
+			this->AppendMessage(warningMessage);
+			Log::Info(warningMessage);
+		}
+
+
+		// get each value from the variable element in the external variables document.
+		DOMNodeList *variableElmChildren = variableElm->getChildNodes();
+		unsigned int index = 0;
+		while(index < variableElmChildren->getLength()) {
+			DOMNode *tmpNode = variableElmChildren->item(index);
+			if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+				DOMElement *childElm = (DOMElement*)tmpNode;
+				string elmName = XmlCommon::GetElementName(childElm);				
 			
-			this->SetFlag(OvalEnum::FLAG_ERROR);
-			this->AppendMessage("Error, the specified external variable (" + this->GetId() + ") in the supplied external variable document has the wrong datatype. The variable in the oval-definition document expected datatype=" + OvalEnum::DatatypeToString(this->GetDatatype()) + ". The external variable in the supplied variable document has datatype=" + OvalEnum::DatatypeToString(externalDatatype) + ".");
-			return;
+				// parse each value element
+				if(elmName.compare("value") == 0) {
+					string externalValue = XmlCommon::GetDataNodeValue(childElm);
 
-		} else {
-			// get each value from the variable element in the external variables document.
-			DOMNodeList *variableElmChildren = variableElm->getChildNodes();
-			unsigned int index = 0;
-			while(index < variableElmChildren->getLength()) {
-				DOMNode *tmpNode = variableElmChildren->item(index);
-				if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
-					DOMElement *childElm = (DOMElement*)tmpNode;
-					string elmName = XmlCommon::GetElementName(childElm);				
-				
-					// parse each value element
-					if(elmName.compare("value") == 0) {
-						string externalValue = XmlCommon::GetDataNodeValue(childElm);
+					// validate the value
+					if(this->ValidateValue(this->GetDatatype(), externalValue)) {
 
-						// validate the value
-						if(this->ValidateValue(this->GetDatatype(), externalValue)) {
+						// add the value to the set of values for this exteranl variable.
+						VariableValue* varValue = new VariableValue(this->GetId(), externalValue);
+						this->AppendVariableValue(varValue);
 
-							// add the value to the set of values for this exteranl variable.
-							VariableValue* varValue = new VariableValue(this->GetId(), externalValue);
-							this->AppendVariableValue(varValue);
-
-						} else {
-							this->SetFlag(OvalEnum::FLAG_ERROR);
-							this->AppendMessage("Error a value ('" + externalValue + "') of external variable " + this->GetId() + " does not match the possible values for the variable.");
-							return;
-						}
+					} else {
+						this->SetFlag(OvalEnum::FLAG_ERROR);
+						this->AppendMessage("Error a value ('" + externalValue + "') of external variable " + this->GetId() + " does not match the possible values for the variable.");
+						return;
 					}
 				}
-				index ++;
 			}
-			this->SetFlag(OvalEnum::FLAG_COMPLETE);
+			index ++;
 		}
+		this->SetFlag(OvalEnum::FLAG_COMPLETE);
+		
 	}
 }
 
 bool ExternalVariable::ValidateValue(OvalEnum::Datatype datatype, string externalValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Ensure that the specified value matches the criteria 
-	//	specified by the possible_value and possible_restriction elements
-	//  of this variable
-	//	
-	// ----------------------------------------------------------------------
 
 	bool isValid = false;
 	

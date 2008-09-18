@@ -48,6 +48,7 @@ public:
 	ExternalVariable(string id = "", string name = "external_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 	~ExternalVariable();
 
+	/** Parse the provided ExternalVariable element into a ExternalVariable. */
 	void Parse(DOMElement* externalVariableElm);
 
 	/** Fetch the variable from the external-variables.xml file.
@@ -71,6 +72,7 @@ public:
 	/** Append a PossibleRestrictionType to the set of PossibleRestrictionType objects for this ExternalVariable. */
 	void AppendPossibleRestrictionType(PossibleRestrictionType* pr);
 
+	/** Return the variable values used to compute this variable's value. In this case just an empty vector. */
 	VariableValueVector* GetVariableValues();
 
 	PossibleValueTypeVector possibleValueTypes;
