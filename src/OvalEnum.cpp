@@ -460,6 +460,14 @@ string OvalEnum::OperationToString(OvalEnum::Operation operation){
 		case (OPERATION_PATTERN_MATCH):
 			operationStr = "pattern match";
 			break;
+        /* LS Start */
+		case (OPERATION_CASE_INSENSITIVE_EQUALS):
+			operationStr = "case insensitive equals";
+			break;
+		case (OPERATION_CASE_INSENSITIVE_NOT_EQUAL):
+			operationStr = "case insensitive not equal";
+			break;
+        /* LS End */
 		default:
 			throw Exception("OvalEnum::OperationToString - Error unsupported operation value.");
 			break;
@@ -494,6 +502,10 @@ OvalEnum::Operation OvalEnum::ToOperation(string operationStr){
 		operation = OPERATION_BITWISE_OR;
 	} else if(operationStr.compare(OvalEnum::OperationToString(OPERATION_PATTERN_MATCH)) == 0) {
 		operation = OPERATION_PATTERN_MATCH;
+	} else if(operationStr.compare(OvalEnum::OperationToString(OPERATION_CASE_INSENSITIVE_EQUALS)) == 0) {
+		operation = OPERATION_CASE_INSENSITIVE_EQUALS;
+	} else if(operationStr.compare(OvalEnum::OperationToString(OPERATION_CASE_INSENSITIVE_NOT_EQUAL)) == 0) {
+		operation = OPERATION_CASE_INSENSITIVE_NOT_EQUAL;
 	} else {
 		throw Exception("OvalEnum::ToOperation - Error unsupported operation value: " + operationStr);
 	}

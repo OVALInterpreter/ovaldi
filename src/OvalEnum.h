@@ -109,7 +109,9 @@ public:
 					OPERATION_LESS_THAN_OR_EQUAL, 
 					OPERATION_BITWISE_AND, 
 					OPERATION_BITWISE_OR, 
-					OPERATION_PATTERN_MATCH};
+					OPERATION_PATTERN_MATCH,
+					OPERATION_CASE_INSENSITIVE_EQUALS,
+					OPERATION_CASE_INSENSITIVE_NOT_EQUAL };
 	static string OperationToString(OvalEnum::Operation operation);
 	static OvalEnum::Operation ToOperation(string operationStr);
 
