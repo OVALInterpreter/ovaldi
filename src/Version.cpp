@@ -37,8 +37,10 @@
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
-#define VERSION "5.4"
-#define BUILD 2
+#define VERSION "5.5"
+#define BUILD 0
+
+#define SCHEMA_VERSION "5.5"
 
 string Version::GetMinumumCompatibleVersion() {
 
@@ -76,5 +78,12 @@ string Version::GetBuildDate() {
 	version.append(__DATE__);
 	version.append(" ");
 	version.append(__TIME__);
+    return(version);
+}
+
+string Version::GetSchemaVersion() {
+
+	string version;
+	version.append(VERSION);
     return(version);
 }

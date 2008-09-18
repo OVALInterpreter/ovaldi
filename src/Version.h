@@ -57,6 +57,9 @@ class Version {
 
 		/** Return the minimum compatible version of this interpreter as a string. */
 		static string GetMinumumCompatibleVersion();
+
+		/** Return the schema version this interpreter writes documents against. */
+		static string GetVersion();
 };
 
 #endif
