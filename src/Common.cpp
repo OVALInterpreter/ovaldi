@@ -69,28 +69,29 @@ const string Common::DEFINITION_ID = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*";
 const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*(,oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*)*";
 
 // Initialize static variables.
-string	Common::dataFile			= "system-characteristics.xml";
-string	Common::xmlfile				= "definitions.xml";
-string	Common::outputFilename		= "results.xml";
-string	Common::externalVariablesFile	= "external-variables.xml";
-string	Common::xmlfileMD5			= "";
-string	Common::startTime			= "";
+string	Common::dataFile			  = "system-characteristics.xml";
+string	Common::xmlfile				  = "definitions.xml";
+string	Common::schemapath			  = "";
+string	Common::outputFilename	      = "results.xml";
+string	Common::externalVariablesFile = "external-variables.xml";
+string	Common::xmlfileMD5			  = "";
+string	Common::startTime			  = "";
 
-bool Common::noXsl                  = false;
-string Common::xslFile				= "results_to_html.xsl";
-string Common::xslOutputFile		= "results.html";
+bool    Common::noXsl                 = false;
+string  Common::xslFile			      = "results_to_html.xsl";
+string  Common::xslOutputFile		  = "results.html";
 
 
-bool Common::doDefinitionSchematron  = false;
-string Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
+bool    Common::doDefinitionSchematron   = false;
+string  Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
 
-bool   Common::generateMD5			= false;
-bool   Common::useProvidedData		= false;
-bool   Common::verifyXMLfile		= true;
+bool    Common::generateMD5			  = false;
+bool    Common::useProvidedData		  = false;
+bool    Common::verifyXMLfile		  = true;
 
-bool          Common::limitEvaluationToDefinitionIds = false;
-string        Common::definitionIds                  = "";
-string        Common::definitionIdsFile              = "";
+bool    Common::limitEvaluationToDefinitionIds = false;
+string  Common::definitionIds                  = "";
+string  Common::definitionIdsFile              = "";
 
 
 #ifdef WIN32
@@ -116,6 +117,11 @@ bool Common::GetGenerateMD5()
 string Common::GetXMLfile()
 {
 	return xmlfile;	
+}
+
+string Common::GetSchemaPath()
+{
+	return schemapath;	
 }
 
 string Common::GetXMLfileMD5()
@@ -193,6 +199,11 @@ void Common::SetXMLfile(string xmlfileIn) {
 	} else {
 		throw CommonException("The specified definition file does not exist! " + xmlfileIn);
 	}
+}
+
+void Common::SetSchemaPath(string schemapathIn)
+{
+	schemapath = schemapathIn;
 }
 
 void Common::SetXMLfileMD5(string xmlfileMD5In) {
@@ -392,16 +403,7 @@ string Common::PadStringWithChar(string strIn, char pad, unsigned int desiredLen
 	return strIn;
 }
 
-string Common::SwitchChar(string fixedString, string oldChr, string newChr)
-{
-	//------------------------------------------------------------------------------------//
-	//  ABSTRACT
-	//
-	//  This function takes a string and searches for all oldChrs.  If one is found,
-	//  it is replaced with a newChr.  It is only intended to work with a single char 
-	//	at a time. No multiple char strings allowed
-	//
-	//------------------------------------------------------------------------------------//
+string Common::SwitchChar(string fixedString, string oldChr, string newChr) {
 
 	if(oldChr.length() != 1 || newChr.length() != 1)
 		throw CommonException("Error: (SwitchChar) can only switch strings of length = 1.");
@@ -417,17 +419,7 @@ string Common::SwitchChar(string fixedString, string oldChr, string newChr)
 	return fixedString;
 }
 
-string Common::GetTimeStamp()
-{
-	//------------------------------------------------------------------------------------//
-	//  ABSTRACT
-	//
-	//  Retrieve the date/time.  The final output will be in the format:
-	//
-	//	  yyyy-mm-ddThh:mm:ss	2006-08-16T14:21:38
-	//
-	//------------------------------------------------------------------------------------//
-
+string Common::GetTimeStamp() {
 	char tmpbuf[128];
 	
 	time_t tmpTime;
@@ -457,40 +449,21 @@ bool Common::FileExists(const char * filename) {
     return false;
 }
 
-string Common::ToString(int num)
-{
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a the int as a string
-	//
-	// -----------------------------------------------------------------------
+string Common::ToString(int num) {
 	ostringstream result;
 	result << num;
 
 	return result.str();
 }
-string Common::ToString(long num)
-{
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a the long as a string
-	//
-	// -----------------------------------------------------------------------
+
+string Common::ToString(long num) {
 	ostringstream result;
 	result << num;
 
 	return result.str();
 }
-string Common::ToString(bool b)
-{
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a the bool as a string
-	//
-	// -----------------------------------------------------------------------
+
+string Common::ToString(bool b) {
 	
 	if(b) 
 		return "true";
@@ -498,34 +471,20 @@ string Common::ToString(bool b)
 		return "false";
 }
 
-string Common::ToString(char c)
-{
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a the char as a string
-	//
-	// -----------------------------------------------------------------------
-	
+string Common::ToString(char c) {
+
 	string str;
 	str = c;
 	return str;
 }
 
-string Common::ToString(unsigned long num)
-{
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a the unsigned long as a string
-	//
-	// -----------------------------------------------------------------------
+string Common::ToString(unsigned long num) {
+
 	ostringstream result;
 	result << num;
 
 	return result.str();
 }
-
 
 //****************************************************************************************//
 //							CommonException Class										  //	

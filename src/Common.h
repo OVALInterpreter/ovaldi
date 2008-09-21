@@ -1,5 +1,4 @@
 //
-// $Id: Common.h 4660 2008-01-17 22:27:18Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -104,6 +103,7 @@ class Common {
 		static string	GetDatafile();
 		static bool		GetGenerateMD5();
 		static string	GetXMLfile();
+		static string	GetSchemaPath();
 		static string	GetXMLfileMD5();
 		static string	GetOutputFilename();
 		static bool		GetUseProvidedData();
@@ -122,6 +122,7 @@ class Common {
 		static void		SetDataFile(string);
 		static void		SetGenerateMD5(bool);
 		static void		SetXMLfile(string);
+		static void		SetSchemaPath(string);
 		static void		SetXMLfileMD5(string);
 		static void		SetOutputFilename(string);
 		static void		SetUseProvidedData(bool);
@@ -151,12 +152,21 @@ class Common {
 		static string	SwitchChar(string stringIn, string oldChr, string newChr);
 		/** Return true if the specified file exists. */
 		static bool     FileExists(const char* filename);
+		/** Return the int as a string. */
 		static string	ToString(int);
+		/** Return the long as a string. */
 		static string	ToString(long);
+		/** Return the unsigned long as a string. */
 		static string	ToString(unsigned long);
+		/** Return a the bool as a string. */
 		static string	ToString(bool);
+		/** Return a the char as a string. */
 		static string	ToString(char);
 
+		/** 
+		 *	Retrieve the date/time.  The final output will be in the format:
+		 *	yyyy-mm-ddThh:mm:ss	2006-08-16T14:21:38
+		 */
 		static string	GetTimeStamp();
 
 		static char fileSeperator;
@@ -167,6 +177,7 @@ class Common {
 		static string startTime;
 		static string externalVariablesFile;
 		static string xmlfile;
+		static string schemapath;
 		static bool noXsl;
 		static string xslFile;
 		static string xslOutputFile;
