@@ -1,5 +1,4 @@
 //
-// $Id: Main.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -73,8 +72,17 @@ using namespace std;
 
 #define BUFFER_SIZE 4096
 
-// Local Function Definitions.
+/** The starting point for the application. */
+int main(int argc, char* argv[]);
+
+/** 
+ *  Processes the commandline arguments and enforces required arguments. 
+ *  There must be at least two arguments.  The program name and the xmlfile hash. (or
+ *  the -m flag signifing no hash is required)
+ */
 void ProcessCommandLine(int argc, char* argv[]);
+
+/** Prints out a list of option flags that can be used with this exe. */
 void Usage();
 
 #endif
