@@ -35,13 +35,6 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 int main(int argc, char* argv[]) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  This is the starting point for this app.
-	//
-	//------------------------------------------------------------------------------------//
 
 ///////////////////////		DEBUG	///////////////////////////////////////
 #ifdef _DEBUG
@@ -166,7 +159,7 @@ int main(int argc, char* argv[]) {
 
 			string errorMessage = "";
 			errorMessage.append("\nERROR: Unable to open the '");
-			errorMessage.append(Common::GetXMLfile());
+ 			errorMessage.append(Common::GetXMLfile());
 			errorMessage.append("' file to verify it.  The program will terminate.\n");
 			cerr << errorMessage;
 			Log::Fatal(errorMessage);
@@ -453,13 +446,6 @@ int main(int argc, char* argv[]) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Functions  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 void ProcessCommandLine(int argc, char* argv[]) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Parse list of options passed from command line.
-	//
-	//------------------------------------------------------------------------------------//
 
 	// There must be at least two arguments.  The program name and the xmlfile hash. (or
 	// the -m flag signifing no hash is required)
@@ -676,6 +662,20 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 
+                // **********  path to directory containing OVAL schema  ********** //
+			    case 'a':
+
+				if ((argc < 3) || (argv[2][0] == '-')) {
+					Usage();
+					exit(0);
+				} else {
+					Common::SetSchemaPath(argv[2]);
+					++argv;
+					--argc;
+				}
+
+				break;
+
 				// **********  MD5 Utility  ********** //
 				case 'z':
 
@@ -716,13 +716,6 @@ void ProcessCommandLine(int argc, char* argv[]) {
 }
 
 void Usage() {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Prints out a list of option flags that can be used with this exe.
-	//
-	//------------------------------------------------------------------------------------//
 
 	cout << endl;
 	cout << "Command Line: ovaldi [options] MD5Hash" << endl;
@@ -741,10 +734,11 @@ void Usage() {
 	cout << "Input Validation Options:" << endl;
 	cout << "   -m           = do not verify the oval-definitions file with an MD5 hash." << endl;
 	cout << "   -n           = perform Schematron validation of the oval-definitions file." << endl;
-	cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"oval-definitions-schematron.xsl\"" << endl;
+	cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"xml\\oval-definitions-schematron.xsl\"" << endl;
 	cout << "\n";
 
 	cout << "Data Collection Options:" << endl;
+	cout << "   -a <string>  = path to the directory that contains the OVAL schema. DEFAULT=\"xml\"" << endl;
 	cout << "   -i <string>  = path to input System Characteristics file. Evaluation will be based on the contents of the file." << endl;
 	cout << "\n";
 
@@ -752,7 +746,7 @@ void Usage() {
 	cout << "   -d <string>  = save data to the specified XML file. DEFAULT=\"system-characteristics.xml\"" << endl;	
 	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"oval-results.xml\"" << endl;
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
-	cout << "   -t <string>  = apply the sepcified xsl to the results xml. DEFAULT=\"results_to_html.xsl\"" << endl;
+	cout << "   -t <string>  = apply the sepcified xsl to the results xml. DEFAULT=\"xml\\results_to_html.xsl\"" << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
 	cout << "\n";
 	
