@@ -248,7 +248,8 @@ for more information.
                      evaluated. The file must comply with the evaluation-id schema.
 
      Input Validation Options:
-      -m           = do not verify the oval-definitions file with an MD5 hash
+      -a dir name  = path to the directory that contains the OVAL schema and other xml resources. DEFAULT="xml"
+	  -m           = do not verify the oval-definitions file with an MD5 hash
       -n           = perform Schematron validation of the oval-definitions file.
       -c filename  = path to xsl for oval-definitions Schematron validation. 
                      DEFAULT="oval-definitions-schematron.xsl"    
