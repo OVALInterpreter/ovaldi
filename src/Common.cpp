@@ -68,22 +68,30 @@ bool UniqueStringVector::Exists(string newString) {
 const string Common::DEFINITION_ID = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*";
 const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*(,oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*)*";
 
+#ifdef WIN32
+	char Common::fileSeperator = '\\';
+	string Common::fileSeperatorStr = "\\";
+#else
+	char Common::fileSeperator = '/';
+	string Common::fileSeperatorStr = "\\";
+#endif
+
 // Initialize static variables.
 string	Common::dataFile			  = "system-characteristics.xml";
 string	Common::xmlfile				  = "definitions.xml";
-string	Common::schemapath			  = "";
+string	Common::schemapath			  = "xml";
 string	Common::outputFilename	      = "results.xml";
 string	Common::externalVariablesFile = "external-variables.xml";
 string	Common::xmlfileMD5			  = "";
 string	Common::startTime			  = "";
 
 bool    Common::noXsl                 = false;
-string  Common::xslFile			      = "results_to_html.xsl";
+string  Common::xslFile			      = "xml" + Common::fileSeperatorStr + "results_to_html.xsl";
 string  Common::xslOutputFile		  = "results.html";
 
 
 bool    Common::doDefinitionSchematron   = false;
-string  Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
+string  Common::definitionSchematronPath = "xml" + Common::fileSeperatorStr + "oval-definitions-schematron.xsl";
 
 bool    Common::generateMD5			  = false;
 bool    Common::useProvidedData		  = false;
@@ -93,12 +101,6 @@ bool    Common::limitEvaluationToDefinitionIds = false;
 string  Common::definitionIds                  = "";
 string  Common::definitionIdsFile              = "";
 
-
-#ifdef WIN32
-	char Common::fileSeperator = '\\';
-#else
-	char Common::fileSeperator = '/';
-#endif
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Accessors  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

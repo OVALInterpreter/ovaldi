@@ -170,6 +170,7 @@ class Common {
 		static string	GetTimeStamp();
 
 		static char fileSeperator;
+		static string fileSeperatorStr;
 
 	private:
 		static string dataFile;
