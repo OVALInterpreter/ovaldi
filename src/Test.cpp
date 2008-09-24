@@ -127,6 +127,10 @@ void Test::SetObjectId(string objectId) {
 	this->objectId = objectId;
 }
 
+Object* Test::GetReferencedObject() {
+
+    return Object::GetObjectById(this->GetObjectId());
+}
 
 string Test::GetStateId() {
 
@@ -136,6 +140,16 @@ string Test::GetStateId() {
 void Test::SetStateId(string stateId) {
 
 	this->stateId = stateId;
+}
+
+string Test::GetName() {
+
+	return this->name;
+}
+
+void Test::SetName(string name) {
+
+	this->name = name;
 }
 
 OvalEnum::ResultEnumeration Test::GetResult() {
@@ -271,6 +285,7 @@ void Test::Parse(DOMElement* testElm) {
 
 	// get the attributes
 	this->SetId(XmlCommon::GetAttributeByName(testElm, "id"));
+	this->SetName(XmlCommon::GetElementName(testElm));
 	this->SetVersion(atoi(XmlCommon::GetAttributeByName(testElm, "version").c_str()));
 	this->SetCheckExistence(OvalEnum::ToExistence(XmlCommon::GetAttributeByName(testElm, "check_existence")));
 	this->SetCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(testElm, "check")));
@@ -310,12 +325,69 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 		} else {
 			// get the collected object from the sc file
 			DOMElement* collectedObjElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "object", "id", this->GetObjectId());
-			
+			OvalEnum::Flag collectedObjFlag = OvalEnum::FLAG_NOT_COLLECTED;
+
 			if(collectedObjElm == NULL) {
-				// this is an unknown result. the interpreter requires that all objects in a definition
-				// file have a corresponding collected object in the sc file to successfully evaluate.
-				Log::Info("Test::Analyze() - Test id: " + this->GetId() + " Unable to locate corresponding collected object in system characteristics file for object id: " + this->GetObjectId());
-				this->SetResult(OvalEnum::RESULT_UNKNOWN);
+				
+                // If there are no collected objects available, the interpreter will try to find corresponding
+				// items in the system_data section.
+                Log::Info(" Note: No collected objects found for test " + this->GetId() + ". Assuming that the input system characteristics file is complete. Searching system_data with in the input system characteristics.");
+
+
+                // Get the component name from the first part of the test name
+				// NOTE: Due to the inconsistent OVAL definition, this won't work for inetlisteningserver(s)
+				string componentName;
+                string::size_type loc = this->name.find("_", 0);
+				if( loc != string::npos ) {
+					componentName = this->name.substr(0, loc);
+				}
+
+				// Find potential matching items in the system_data section
+				ElementVector* dataElems = XmlCommon::FindAllElements(DocumentManager::GetSystemCharacterisitcsDocument(), componentName + "_item");
+                if(dataElems->size() == 0) {
+					
+                    // No potential matching items found
+					collectedObjFlag = OvalEnum::FLAG_NOT_COLLECTED;
+					this->SetResult(OvalEnum::RESULT_UNKNOWN);
+
+				} else {
+
+                    /**
+                     *  Loop through all potentially matching items.
+                     *  Turn each potential match into an Item
+                     *  Than call the Analyze() method on the current Object. 
+                     *  If the return is a TRUE result then the Item should be considered to be a match for the Object
+                     *  The loop here needs to identify ALL matches so it will loop through all possible matches all the time.
+                     *  If any matches are found it will be assumed that the collected Object flag shoudl be complete.
+                     *  If no matches are found it is assumed that no items on the system were found that matched the Object.
+                     *  
+                     *  
+                     */
+
+                    // get the object referenced by the test.
+                    Object* referencedObject = this->GetReferencedObject();
+                    
+				    ElementVector::iterator iterator;
+                    for(iterator = dataElems->begin(); iterator != dataElems->end(); iterator++) {
+                        DOMElement *itemElm = (*iterator);
+                        string itemId = XmlCommon::GetAttributeByName(itemElm, "id");
+
+                        // get the element as an item
+                        Item* currentItem = Item::GetItemById(itemId);
+
+                        if(referencedObject->Analyze(currentItem) == OvalEnum::RESULT_TRUE) {
+                            TestedItem* testedItem = new TestedItem();
+                            testedItem->SetItem(currentItem);
+                            this->AppendTestedItem(testedItem);
+                        }
+                    }
+                }
+
+                if(this->GetTestedItems()->size() > 0) {
+                    collectedObjFlag = OvalEnum::FLAG_COMPLETE;
+                } else {
+                    collectedObjFlag = OvalEnum::FLAG_DOES_NOT_EXIST;
+                }		
 
 			} else {
 
@@ -356,156 +428,139 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 				// check the flag on the collected object
 				string flagStr = XmlCommon::GetAttributeByName(collectedObjElm, "flag");
-				OvalEnum::Flag collectedObjFlag = OvalEnum::ToFlag(flagStr);
+				collectedObjFlag = OvalEnum::ToFlag(flagStr);
+            }
 
-				// determine how to proceed based on flag value
-				if(collectedObjFlag == OvalEnum::FLAG_ERROR) {
-					this->SetResult(OvalEnum::RESULT_ERROR);
+			// determine how to proceed based on flag value
+			if(collectedObjFlag == OvalEnum::FLAG_ERROR) {
+				this->SetResult(OvalEnum::RESULT_ERROR);
 
-					// since we did no look at the state set the tested item result to not evaluated
-					TestedItemVector::iterator iterator;
-					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-						(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-					}
-				} else if(collectedObjFlag == OvalEnum::FLAG_NOT_APPLICABLE) {
-					this->SetResult(OvalEnum::RESULT_NOT_APPLICABLE);
-					
-					// since we did no look at the state set the tested item result to not evaluated
-					TestedItemVector::iterator iterator;
-					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-						(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-					}
-				} else if(collectedObjFlag == OvalEnum::FLAG_NOT_COLLECTED) {
-					this->SetResult(OvalEnum::RESULT_UNKNOWN);
-					
-					// since we did no look at the state set the tested item result to not evaluated
-					TestedItemVector::iterator iterator;
-					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-						(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-					}
-				} else if(collectedObjFlag == OvalEnum::FLAG_INCOMPLETE) {
+				// since we did no look at the state set the tested item result to not evaluated
+				this->MarkTestedItemsNotEvaluated();
 
-					OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_UNKNOWN;
+			} else if(collectedObjFlag == OvalEnum::FLAG_NOT_APPLICABLE) {
+				this->SetResult(OvalEnum::RESULT_NOT_APPLICABLE);
+				
+				// since we did no look at the state set the tested item result to not evaluated
+				this->MarkTestedItemsNotEvaluated();
 
-					// get the count of items with a status of exists
-					int existsCount = 0;
-					TestedItemVector::iterator iterator;
-					for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-						OvalEnum::SCStatus itemStatus = (*iterator)->GetItem()->GetStatus();
-						if(itemStatus == OvalEnum::STATUS_EXISTS) {
-							existsCount++;
-						} 
-					}
+			} else if(collectedObjFlag == OvalEnum::FLAG_NOT_COLLECTED) {
+				this->SetResult(OvalEnum::RESULT_UNKNOWN);
+				
+				// since we did no look at the state set the tested item result to not evaluated
+				this->MarkTestedItemsNotEvaluated();
 
-					OvalEnum::ResultEnumeration existenceResult = OvalEnum::RESULT_UNKNOWN;
+			} else if(collectedObjFlag == OvalEnum::FLAG_INCOMPLETE) {
 
-					if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST && existsCount > 0) {
+				OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_UNKNOWN;
 
-						// if more than 0 then false	
-						existenceResult = OvalEnum::RESULT_FALSE;
-
-					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ONLY_ONE_EXISTS && existsCount > 1) {
-						
-						// if more than 1 then false					
-						existenceResult = OvalEnum::RESULT_FALSE;
-
-					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_AT_LEAST_ONE_EXISTS && existsCount > 0) {
-
-						// if more than 1 then false					
-						existenceResult = OvalEnum::RESULT_TRUE;
-
-					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
-
-						// always true				
-						existenceResult = OvalEnum::RESULT_TRUE;
-
+				// get the count of items with a status of exists
+				int existsCount = 0;
+				TestedItemVector::iterator iterator;
+				for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+					OvalEnum::SCStatus itemStatus = (*iterator)->GetItem()->GetStatus();
+					if(itemStatus == OvalEnum::STATUS_EXISTS) {
+						existsCount++;
 					} 
+				}
 
-					if(existenceResult == OvalEnum::RESULT_TRUE) {
+				OvalEnum::ResultEnumeration existenceResult = OvalEnum::RESULT_UNKNOWN;
 
-						// consider the check_state if true so far...
-						OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST && existsCount > 0) {
 
-						if(stateResult == OvalEnum::RESULT_FALSE) {
-							overallResult = OvalEnum::RESULT_FALSE;
-						} if(stateResult == OvalEnum::RESULT_TRUE && this->GetCheck() == OvalEnum::CHECK_AT_LEAST_ONE) {
+					// if more than 0 then false	
+					existenceResult = OvalEnum::RESULT_FALSE;
 
-							overallResult = OvalEnum::RESULT_TRUE;
-						}
-
-					} else {
-						overallResult =	existenceResult;
-
-						// since we did no look at the state set the tested item result to not evaluated
-						TestedItemVector::iterator iterator;
-						for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-							(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-						}
-					}
-
-					this->SetResult(overallResult);
-
-				} else if(collectedObjFlag == OvalEnum::FLAG_DOES_NOT_EXIST) {
-
-					// if the check_existence is set to none_exist or 
-					// any_exist the result is true
-					// otherwise the result is false
-					if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST) {
-						this->SetResult(OvalEnum::RESULT_TRUE);
-						// no need to look at state when check_existence is set to none_exist
-
-						// since we did no look at the state set the tested item result to not evaluated
-						TestedItemVector::iterator iterator;
-						for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-							(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-						}
-
-					} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
-						// need to look at state result if there is a state
-						if(this->GetStateId().compare("") != 0) {
-							OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
-							this->SetResult(stateResult);
-						} else {
-							this->SetResult(OvalEnum::RESULT_TRUE);
-						}
-					} else {
-						this->SetResult(OvalEnum::RESULT_FALSE);
-					}
-
-				} else if(collectedObjFlag == OvalEnum::FLAG_COMPLETE) {
+				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ONLY_ONE_EXISTS && existsCount > 1) {
 					
-					OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_ERROR;
+					// if more than 1 then false					
+					existenceResult = OvalEnum::RESULT_FALSE;
 
-					// Evaluate the check existence attribute.
-					OvalEnum::ResultEnumeration existenceResult = this->EvaluateCheckExistence();
+				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_AT_LEAST_ONE_EXISTS && existsCount > 0) {
 
-					// if the existence result is true evaluate the check_state attribute if there is a state
-					if(existenceResult == OvalEnum::RESULT_TRUE) {
-						if(this->GetStateId().compare("") != 0) {
-							overallResult = this->EvaluateCheckState();
-						} else {
-							overallResult = existenceResult;
+					// if more than 1 then false					
+					existenceResult = OvalEnum::RESULT_TRUE;
 
-							// since we did no look at the state set the tested item result to not evaluated
-							TestedItemVector::iterator iterator;
-							for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-								(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-							}
-						}
+				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
 
+					// always true				
+					existenceResult = OvalEnum::RESULT_TRUE;
+
+				} 
+
+				if(existenceResult == OvalEnum::RESULT_TRUE) {
+
+					// consider the check_state if true so far...
+					OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
+
+					if(stateResult == OvalEnum::RESULT_FALSE) {
+						overallResult = OvalEnum::RESULT_FALSE;
+					} else if(stateResult == OvalEnum::RESULT_TRUE && this->GetCheck() == OvalEnum::CHECK_AT_LEAST_ONE) {
+
+						overallResult = OvalEnum::RESULT_TRUE;
+					}
+
+				} else {
+					overallResult =	existenceResult;
+
+					// since we did no look at the state set the tested item result to not evaluated
+					this->MarkTestedItemsNotEvaluated();
+				}
+
+				this->SetResult(overallResult);
+
+			} else if(collectedObjFlag == OvalEnum::FLAG_DOES_NOT_EXIST) {
+
+				// if the check_existence is set to none_exist or 
+				// any_exist the result is true
+				// otherwise the result is false
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST) {
+					this->SetResult(OvalEnum::RESULT_TRUE);
+					// no need to look at state when check_existence is set to none_exist
+
+					// since we did no look at the state set the tested item result to not evaluated
+					this->MarkTestedItemsNotEvaluated();
+
+				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
+					// need to look at state result if there is a state
+					if(this->GetStateId().compare("") != 0) {
+						OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
+						this->SetResult(stateResult);
+					} else {
+						this->SetResult(OvalEnum::RESULT_TRUE);
+					}
+				} else {
+					this->SetResult(OvalEnum::RESULT_FALSE);
+				}
+
+			} else if(collectedObjFlag == OvalEnum::FLAG_COMPLETE) {
+				
+				OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_ERROR;
+
+				// Evaluate the check existence attribute.
+				OvalEnum::ResultEnumeration existenceResult = this->EvaluateCheckExistence();
+
+				// if the existence result is true evaluate the check_state attribute if there is a state
+				if(existenceResult == OvalEnum::RESULT_TRUE) {
+					if(this->GetStateId().compare("") != 0) {
+						overallResult = this->EvaluateCheckState();
 					} else {
 						overallResult = existenceResult;
 
-						// since we did no look at the state set the tested item result to not evaluated
-						TestedItemVector::iterator iterator;
-						for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-							(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
-						}
+						// since we did not look at the state set the tested item result to not evaluated
+						this->MarkTestedItemsNotEvaluated();
 					}
 
-					this->SetResult(overallResult);
+				} else {
+					overallResult = existenceResult;
+
+					// since we did no look at the state set the tested item result to not evaluated
+                    this->MarkTestedItemsNotEvaluated();
 				}
-			}
+
+                this->SetResult(overallResult);
+
+            }				
 		}
 		this->SetAnalyzed(true);
 	}
@@ -717,4 +772,12 @@ Test* Test::GetTestById(string testId) {
 	}
 	
 	return test;
+}
+
+void Test::MarkTestedItemsNotEvaluated() {
+    
+    TestedItemVector::iterator iterator;
+	for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
+		(*iterator)->SetResult(OvalEnum::RESULT_NOT_EVALUATED);
+	}
 }

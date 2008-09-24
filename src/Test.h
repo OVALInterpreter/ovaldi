@@ -1,5 +1,4 @@
 //
-// $Id: Test.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -128,10 +127,18 @@ public:
 	/** Set the objectId field's value. */
 	void SetObjectId(string objectId);
 
+    /** Return the object that is referenced by this test. */
+    Object* GetReferencedObject();
+
 	/** Return the stateId field's value. */
 	string GetStateId();
 	/** Set the stateId field's value. */
 	void SetStateId(string stateId);
+
+	/** Return the name field's value. */
+	string GetName();
+	/** Set the name field's value. */
+	void SetName(string name);
 
 	/** Return the written field's value. */
 	bool GetWritten();
@@ -167,6 +174,9 @@ public:
 	void SetTestedVariables(VariableValueVector* testedVariables);
 	/** Add the specified TestedVariable to the set of tested variables **/
 	void AppendTestedVariable(VariableValue* testedVariable);
+
+    /** mark all the tested items as not evaluated. **/
+    void MarkTestedItemsNotEvaluated();
 
 	/** Delete all items in the cache. **/
 	static void ClearCache();
@@ -211,6 +221,7 @@ private:
 	VariableValueVector testedVariables;
 	string objectId;
 	string stateId;
+	string name;
 
 	static TestMap processedTestsMap;
 };
