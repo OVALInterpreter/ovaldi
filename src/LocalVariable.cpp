@@ -1,5 +1,4 @@
 //
-// $Id: LocalVariable.cpp 4593 2008-01-03 16:39:57Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -86,7 +85,7 @@ void LocalVariable::ComputeValue() {
 void LocalVariable::Parse(DOMElement* localVariableElm) {
 
 	this->SetId(XmlCommon::GetAttributeByName(localVariableElm, "id"));
-	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(localVariableElm, "daatatype")));
+	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(localVariableElm, "datatype")));
 	string versionStr = XmlCommon::GetAttributeByName(localVariableElm, "version");
 	int version;
 	if(versionStr.compare("") != 0) {
