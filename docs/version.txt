@@ -1,10 +1,35 @@
-****************************************************
+*********************************************************************
 
-                OVAL Interpreter
+OVAL Interpreter (ovaldi)
 
-  Copyright (c) 2002-2008 - The MITRE Corporation
+Copyright (c) 2002-2008, The MITRE Corporation
+All rights reserved.
 
-****************************************************
+Redistribution and use in source and binary forms, with or without modification, are
+permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list
+      of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this 
+      list of conditions and the following disclaimer in the documentation and/or other
+      materials provided with the distribution.
+    * Neither the name of The MITRE Corporation nor the names of its contributors may be
+      used to endorse or promote products derived from this software without specific 
+      prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*********************************************************************
+
+This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
 ---        Version 5.5 build ??     ---
@@ -22,6 +47,10 @@
 * Added support for case insensitive equals and not equals. Thanks to Lumension Security (http://www.lumension.com)
 * Corrected issue in EntityComparator::CompareBinary(). Needed to ensure that collected binary values are formatted properly. Thanks to Lumension Security (http://www.lumension.com)
 * Changed ExternalVariable::ComputeValue() to warn and not error out when the input datatype on a variable does not match the desired datatype in the definition document. Based on a suggestion by Lumension Security (http://www.lumension.com).
+* Added a command line flag '-a' to allow the user to specify the location of the OVAL schema files that will be utilized for schema validation. The default value is 'xml'. This 'xml' directory is also considered the home of the Schematron validation xsl and the resutls to html conversion xsl. This directory will now be a component of binary distributions. Thanks to Lumension Security (http://www.lumension.com)
+* Added support for driving evaluations off of an input system characteristics file that does not include the <collected_object/> section. This capability will allow other systems to generate system characteristics files without prior knowledge of a set of definitions. Thanks to Michael Wiegand of Intevation GmbH, Osnabrück (http://www.intevation.de/)
+* Corrected bug in LocalVariable::Parse(). I found a typo in the 'datatype' attribute name. This woudl have prevented the code from properly reading the datatype attribute's name.
+*
 
 ---------------------------------------
 ---        Version 5.4 build 2      ---
@@ -238,9 +267,5 @@
 	- environemntvariable_object
 	- family_object
 * Supports definition analysis for all types of definitions.
-
-----------------------------------------------------------
-OVAL is sponsored by US-CERT at the U.S. Department of Homeland Security.
-OVAL and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2008, The MITRE Corporation (www.mitre.org).
 
 
