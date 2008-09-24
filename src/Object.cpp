@@ -30,17 +30,14 @@
 
 #include "Object.h"
 
+
+ObjectMap Object::objectCache;
+
 //****************************************************************************************//
 //									Object Class										  //	
 //****************************************************************************************//
 
 Object::Object(string id, string comment, string xmlns, string name, int version) : AbsObject (id, comment, xmlns, name, version) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete object
-	//
-	// -----------------------------------------------------------------------
 
 	this->type = "Object";
 }
@@ -66,67 +63,31 @@ Object::~Object() {
 //								 Public members												//
 // ***************************************************************************************	//
 BehaviorVector* Object::GetBehaviors() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the behaviors field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return &this->behaviors;
 }
 
 void Object::SetBehaviors(BehaviorVector* behaviors) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the behaviors field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->behaviors = (*behaviors);
 }
 
 AbsEntityVector* Object::GetElements() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the elements field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return &this->elements;
 }
 
 void Object::SetElements(AbsEntityVector* elements) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the elements field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->elements = (*elements);
 }
 
 void Object::AppendElement(ObjectEntity* objectEntity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Add an element to the end of the elements vector
-	//
-	// -----------------------------------------------------------------------
 
 	this->elements.push_back(objectEntity);
 }
 
 ObjectEntity* Object::GetElementByName(string elementName) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the set of elements with the specified name
-	//
-	// -----------------------------------------------------------------------
 
 	ObjectEntity* matchingElm = NULL;
 
@@ -142,12 +103,6 @@ ObjectEntity* Object::GetElementByName(string elementName) {
 }
 
 VariableValueVector* Object::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return a vector of variable values that were used for this object.
-	//
-	// -----------------------------------------------------------------------
 
 	VariableValueVector* varValues = new VariableValueVector();
 
@@ -170,12 +125,6 @@ VariableValueVector* Object::GetVariableValues() {
 }
 
 void Object::Parse(DOMElement* objectElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided object element int an object
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetName(XmlCommon::GetElementName(objectElm));
 	this->SetId(XmlCommon::GetAttributeByName(objectElm, "id"));
@@ -218,3 +167,145 @@ void Object::Parse(DOMElement* objectElm) {
 		}
 	}
 }
+
+bool Object::Analyze(Item* item) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Analyze the specified Item return the Result value for the Item.
+	//
+	//	1 - create a vector of Item elements that match each element in the object.
+	//	2 - pass the vector to the AbsEntity analyze method
+	//	3 - build a vector of results for each element in the object.
+	//	4 - combine the results to a single value by doing a logical and of the result values
+    // -----------------------------------------------------------------------
+
+	OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_ERROR;
+
+	// Check the status of the Item
+	if(item->GetStatus() == OvalEnum::STATUS_ERROR) {
+		overallResult = OvalEnum::RESULT_ERROR;
+	} else if(item->GetStatus() == OvalEnum::STATUS_NOT_COLLECTED) {
+		overallResult = OvalEnum::RESULT_ERROR;
+	} else if(item->GetStatus() == OvalEnum::STATUS_DOES_NOT_EXIST) {
+		overallResult = OvalEnum::RESULT_FALSE;
+	} else {
+
+		// check data before analysis
+		if(this->GetElements()->size() == 0) {
+			overallResult = OvalEnum::RESULT_TRUE;
+		} else {
+
+			// vector of result values before they are combined
+			IntVector iResults;
+
+			// Loop through all elements in the object
+			AbsEntityVector::iterator iterator;
+            for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end() && overallResult == OvalEnum::RESULT_TRUE; iterator++) {
+				ObjectEntity* objectEntity = (ObjectEntity*)(*iterator);
+
+				// locate matching elements in the item
+				string objectElmName = objectEntity->GetName(); 
+				ItemEntityVector* scElements = item->GetElementsByName(objectElmName);
+
+                if(scElements->size() == 0)  {
+
+                    // no matching elements foudn so not a matching item.
+                    iResults.push_back(OvalEnum::RESULT_FALSE);
+
+                } else if (scElements->size() == 1) {
+
+                    // found one match now we need to analyze the element to see if it is a match based on datatype and operation.
+                    ItemEntity* itemEntity = (ItemEntity*)scElements->at(0);    
+                    OvalEnum::ResultEnumeration elmResult = objectEntity->Analyze(itemEntity);
+                    iResults.push_back(elmResult);
+
+                } else {
+
+                    // an error if more than 1 match is found
+                    iResults.push_back(OvalEnum::RESULT_ERROR);
+                    string errMessage = "More than one match element was found for an object entity. Object Id: " + this->GetId();
+                    errMessage.append(" Item Id: " + item->GetId());
+                    Log::Fatal(errMessage);
+                }
+
+                scElements->clear();
+				delete scElements;
+			}
+
+			// compute the overall result
+            overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
+		}
+	}
+
+	// want to convert the result to a boolean
+	bool isMatch = false;
+	if(overallResult == OvalEnum::RESULT_TRUE) {
+		isMatch = true;
+	} else if(overallResult == OvalEnum::RESULT_FALSE) {
+		isMatch = false;	
+	} else {
+		throw AbsObjectException("Object::Analyze method unable to convert result value to a boolean. Found result: " + OvalEnum::ResultToString(overallResult));
+	}
+	return isMatch;
+}
+
+Object* Object::GetObjectById(string objectId) {
+
+	Object* object = NULL;
+	
+	// Search the cache
+	object = Object::SearchCache(objectId);
+
+	// if not found try to parse it.
+	if(object == NULL) {
+
+        DOMElement* objectsElm = XmlCommon::FindElement(DocumentManager::GetDefinitionDocument(), "objects");
+		DOMElement* objectElm = XmlCommon::FindElementByAttribute(objectsElm, "id", objectId);
+
+		if(objectElm == NULL) {
+			throw Exception("Unable to find specified object in oval-definitions document. Object id: " + objectId);
+		}
+
+		object = new Object();
+		object->Parse(objectElm);
+		Object::Cache(object);
+	}
+	
+	return object;
+}
+
+// ***************************************************************************************	//
+//								 Private members											//
+// ***************************************************************************************	//
+
+Object* Object::SearchCache(string id) {
+
+	Object* cachedObject = NULL;
+
+	ObjectMap::iterator iterator;
+	iterator = Object::objectCache.find(id);
+	if(iterator != Object::objectCache.end()) {
+		cachedObject = iterator->second;
+	} 
+
+	return cachedObject;
+}
+
+void Object::ClearCache() {
+
+	ObjectMap::iterator iterator;
+	for(iterator = Object::objectCache.begin(); iterator != Object::objectCache.end(); iterator++) {
+		
+		Object* object = iterator->second;
+		delete object;
+	}
+	
+	Object::objectCache.clear();
+}
+
+void Object::Cache(Object* object) {
+
+    Object::objectCache.insert(ObjectPair(object->GetId(), object));
+}
+

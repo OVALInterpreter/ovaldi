@@ -1,5 +1,4 @@
 //
-// $Id: Object.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -32,6 +31,8 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <map>
+
 #include "AbsObject.h"
 #include "ObjectEntity.h"
 #include "Behavior.h"
@@ -40,31 +41,85 @@ XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
 class ObjectEntity;
+class Object;
+
+/**	
+	A pair for storing object ids and Object pointers together. 
+	Stores only pointers to the objects. 
+*/
+typedef pair <string, Object* > ObjectPair;
+
+/**	
+	A map for storing ObjectPairs. 
+	Stores only pointers to the objects. 
+*/
+typedef map <string, Object* > ObjectMap;
 
 /**
 	This class represents an Object in an oval definition file.	
 */
 class Object : public AbsObject {
 public:
+    /** Create a complete object */
 	Object(string id = "", string comment = "", string xmlns = "", string name = "", int version = 1);
 	~Object();
 
+    /** Parse the provided object element into an object. */
 	void Parse(DOMElement* objectElm);
+
+    /** Return a vector of variable values that were used for this object. */
 	VariableValueVector* GetVariableValues();
 	
+    /** Set the behaviors field's value. */
 	BehaviorVector* GetBehaviors();
+
+    /** Return the behaviors field's value. */
 	void SetBehaviors(BehaviorVector* behaviors);
 
+    /** Return the elements field's value. */
 	AbsEntityVector* GetElements();
+
+    /** Set the elements field's value. */
 	void SetElements(AbsEntityVector* elements);
 
+    /** Return the set of elements with the specified name. */
 	ObjectEntity* GetElementByName(string elementName);
 
+    /** Add an element to the end of the elements vector. */
 	void AppendElement(ObjectEntity* objectEntity);
+
+    /** Return TRUE if the input itme matches the criteria specified by this object. */
+    bool Analyze(Item* item);
+
+    /** Return an object for the specified object id.
+		First the cache of Objects is checked. If the object is
+		not found in the cache the object is looked up in the
+		oval-definitions document and parsed. Once parsed 
+		the new Object is added to the cache.
+
+		If the Object is not found an exception is thrown. 
+		
+		NOTE: This method is not intended to be used during data collection.
+	*/
+	static Object* GetObjectById(string objectId);
     
+    /** Delete all Objects in the cache. */
+	static void ClearCache();
+
 private:
+
+    /** Cache the specified Object. */
+	static void Cache(Object* object);
+
+	/** Search the cache of Objects for the specifed Object. 
+		@return Returns the object with the specified id or NULL if not found.
+	*/
+	static Object* SearchCache(string id);
+
 	AbsEntityVector elements;
 	BehaviorVector behaviors;
+
+    static ObjectMap objectCache;
 };
 
 #endif
