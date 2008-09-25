@@ -1,5 +1,4 @@
 //
-// $Id: AbsFunctionComponent.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -35,56 +34,27 @@
 //								AbsFunctionComponent Class								  //	
 //****************************************************************************************//
 AbsFunctionComponent::AbsFunctionComponent() : AbsComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete AbsFunctionComponent object
-	//
-	// -----------------------------------------------------------------------
 
 }
 
 AbsFunctionComponent::~AbsFunctionComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
+
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 AbsComponentVector* AbsFunctionComponent::GetComponents() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the components field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return &this->components;
 }
 
 void AbsFunctionComponent::SetComponents(AbsComponentVector* components) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the components field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->components = (*components);
 }
 
 void AbsFunctionComponent::AppendComponent(AbsComponent* component) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the components field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->GetComponents()->push_back(component);
 }
