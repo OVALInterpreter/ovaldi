@@ -35,25 +35,20 @@
 //****************************************************************************************//
 OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation op, string defValue, string scValue) {
 
-	string tmpdefValue="";
-	string tmpscValue="";
+    // Validate the inputs align with the notion of binary regex = "[0-9a-fA-F]"
+    REGEX myRegex;
+    if(!myRegex.IsMatch("[0-9a-fA-F]", defValue.c_str())) {
+		throw Exception("Error: Invalid binary value on definition entity. " + defValue);
+	}
+
+    if(!myRegex.IsMatch("[0-9a-fA-F]", scValue.c_str())) {
+		throw Exception("Error: Invalid binary value on system characteristics item entity. " + defValue);
+	}
+
+    string tmpdefValue = EntityComparator::ToUpper(defValue);
+	string tmpscValue = EntityComparator::ToUpper(scValue);
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-
-	/*make sure hex-encoded binary data has two bytes for each hex digit: 0 is in the form 00, and 1 is 01, etc. */
-	if((defValue.length() % 2) == 0) {
-		tmpdefValue = defValue;
-	}
-	else {
-		tmpdefValue = "0" + defValue;
-	}
-
-	if((scValue.length() % 2) == 0){
-		tmpscValue = scValue;
-	}
-	else {
-		tmpscValue = "0" + scValue;
-	}
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
 		if(tmpdefValue.compare(tmpscValue) == 0) {
@@ -181,13 +176,6 @@ OvalEnum::ResultEnumeration EntityComparator::CompareEvrString(OvalEnum::Operati
 		} else {
 			result = OvalEnum::RESULT_FALSE;
 		}
-	//} else if(op == OvalEnum::OPERATION_PATTERN_MATCH) {
-	//	REGEX myRegex;
-	//	if(myRegex.IsMatch(defValue.c_str(), scValue.c_str())) {
-	//		result = OvalEnum::RESULT_TRUE;
-	//	} else {			
-	//		result = OvalEnum::RESULT_FALSE;
-	//	}
 	} else {
 		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
 	} 

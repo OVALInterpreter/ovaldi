@@ -44,7 +44,9 @@ using namespace std;
 class EntityComparator {
 public:
 
-	/** Compare two binary values based on the specified operation */
+	/** Compare two binary values based on the specified operation 
+        Binary values must match the following regex "[0-9a-fA-F]"
+    */
 	static OvalEnum::ResultEnumeration CompareBinary(OvalEnum::Operation op, string defValue, string scValue);
 
 	/** Compare two boolean values based on the specified operation.
@@ -57,7 +59,15 @@ public:
 	*/
 	static OvalEnum::ResultEnumeration CompareEvrString(OvalEnum::Operation, string defValue, string scValue);
 
-	/** Compare to floats based on the specified operation. */
+	/** 
+     * Compare to floats based on the specified operation. 
+     * 
+     * TODO - need to align with W3C notion of a float.
+     * This datatype conforms to the W3C Recommendation for float data meaning it is patterned after the IEEE 
+     * single-precision 32-bit floating point type.  The format consists of a decimal followed, optionally, 
+     * by the character 'E' or 'e', followed by an integer exponent.  The special values positive and negative
+     * infinity and not-a-number have are represented by INF, -INF and NaN, respectively.
+     */
 	static OvalEnum::ResultEnumeration CompareFloat(OvalEnum::Operation op, string defValue, string scValue);
 
 	/** Compare to integers based on the specified operation. 
