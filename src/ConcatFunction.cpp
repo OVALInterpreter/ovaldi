@@ -143,8 +143,8 @@ VariableValueVector* ConcatFunction::GetVariableValues() {
 		for(varIterator = tmp->begin(); varIterator != tmp->end(); varIterator++) {
 			values->push_back((*varIterator));
 		}
-		// BUG - These can ot currenrtly be deleted. 
-		// The code is no consistant here. In places a new vector is returned
+		// BUG - These can not currenrtly be deleted. 
+		// The code is not consistant here. In places a new vector is returned
 		// in others a reference to a vector that is managed by other code is returned.
 		//delete tmp;
 		//tmp = NULL;
