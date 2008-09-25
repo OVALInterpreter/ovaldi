@@ -1,5 +1,4 @@
 //
-// $Id: ObjectReader.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -94,7 +93,7 @@ ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 			}
 		} else {
 			delete items;
-			throw Exception("Error: The specifeid object was not found in the provided System Characteristics file.");
+			throw Exception("Error: The specified object was not found in the provided System Characteristics file.");
 		}
 	} else {
 		delete items;
