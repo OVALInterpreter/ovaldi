@@ -28,49 +28,46 @@
 //
 //****************************************************************************************//
 
+#ifndef REGEXCAPTUREFUNCTION_H
+#define REGEXCAPTUREFUNCTION_H
+
+#include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
 
-// ***************************************************************************************	//
-//								 Public members												//
-// ***************************************************************************************	//
-AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
+XERCES_CPP_NAMESPACE_USE
+using namespace std;
 
-	AbsComponent* absComponent = NULL;
+/**
+	This class represents a RegexCaptureFunction component in a local_variable in the oval definition schema.
 
-	// determine if this is a set object or a simple object
-	string elmName = XmlCommon::GetElementName(componentElm);
-	if(elmName.compare("variable_component")  == 0) {
-		absComponent = new VariableComponent();
-	} else if(elmName.compare("literal_component")  == 0) {
-		absComponent = new LiteralComponent();
-	} else if(elmName.compare("object_component")  == 0) {
-		absComponent = new ObjectComponent();
-	//
-	// functions 
-	//
-	} else if(elmName.compare("substring")  == 0) {
-		absComponent = new SubstringFunction();
-	} else if(elmName.compare("concat")  == 0) {
-		absComponent = new ConcatFunction();
-	} else if(elmName.compare("escape_regex")  == 0) {
-		absComponent = new EscapeRegexFunction();
-	} else if(elmName.compare("begin")  == 0) {
-        absComponent = new BeginFunction();
-	} else if(elmName.compare("end")  == 0) {
-        absComponent = new EndFunction();
-	} else if(elmName.compare("split")  == 0) {
-        absComponent = new SplitFunction();
-	} else if(elmName.compare("time_difference")  == 0) {
-        absComponent = new TimeDifferenceFunction();
-    } else if(elmName.compare("regex_capture")  == 0) {
-        absComponent = new RegexCaptureFunction();
-    } else if(elmName.compare("arithmetic")  == 0) {
-        absComponent = new ArithmeticFunction();
-    } else {
-		throw Exception("Error: unsupported function: " + elmName);
-	}
+    The regex_capture function accepts one string component input and returns the first 
+    match in each component value, as matched against the regex pattern specified in the
+    'pattern' attribute.
 
-    absComponent->Parse(componentElm);
+*/
+class RegexCaptureFunction : public AbsFunctionComponent {
+public:
 
-	return absComponent;
-}
+	/** Create a complete RegexCaptureFunction object. */
+	RegexCaptureFunction(string pattern = "");
+	~RegexCaptureFunction();
+
+	/** Parse the substring element and its child component element. */
+	void Parse(DOMElement* componentElm); 
+
+	/** Compute the desired substring and return the value. */
+	ComponentValue* ComputeValue();
+
+	/** Return the variable values used to compute this function's value. */
+	VariableValueVector* GetVariableValues();
+
+	/** Get the pattern field's value. */
+	string GetPattern();
+	/** Set the pattern field's value. */
+	void SetPattern(string pattern);
+
+private:
+	string pattern;
+};
+
+#endif

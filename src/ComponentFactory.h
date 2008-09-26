@@ -37,6 +37,12 @@
 #include "SubstringFunction.h"
 #include "ConcatFunction.h"
 #include "EscapeRegexFunction.h"
+#include "BeginFunction.h"
+#include "EndFunction.h"
+#include "SplitFunction.h"
+#include "RegexCaptureFunction.h"
+#include "ArithmeticFunction.h"
+#include "TimeDifferenceFunction.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;

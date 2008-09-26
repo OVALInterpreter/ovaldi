@@ -28,49 +28,47 @@
 //
 //****************************************************************************************//
 
+#ifndef ARITHMETICFUNCTION_H
+#define ARITHMETICFUNCTION_H
+
+#include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
 
-// ***************************************************************************************	//
-//								 Public members												//
-// ***************************************************************************************	//
-AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
+XERCES_CPP_NAMESPACE_USE
+using namespace std;
 
-	AbsComponent* absComponent = NULL;
+/**
+	This class represents a ArithmeticFunction component in a local_variable in the 
+    oval definition schema.
 
-	// determine if this is a set object or a simple object
-	string elmName = XmlCommon::GetElementName(componentElm);
-	if(elmName.compare("variable_component")  == 0) {
-		absComponent = new VariableComponent();
-	} else if(elmName.compare("literal_component")  == 0) {
-		absComponent = new LiteralComponent();
-	} else if(elmName.compare("object_component")  == 0) {
-		absComponent = new ObjectComponent();
-	//
-	// functions 
-	//
-	} else if(elmName.compare("substring")  == 0) {
-		absComponent = new SubstringFunction();
-	} else if(elmName.compare("concat")  == 0) {
-		absComponent = new ConcatFunction();
-	} else if(elmName.compare("escape_regex")  == 0) {
-		absComponent = new EscapeRegexFunction();
-	} else if(elmName.compare("begin")  == 0) {
-        absComponent = new BeginFunction();
-	} else if(elmName.compare("end")  == 0) {
-        absComponent = new EndFunction();
-	} else if(elmName.compare("split")  == 0) {
-        absComponent = new SplitFunction();
-	} else if(elmName.compare("time_difference")  == 0) {
-        absComponent = new TimeDifferenceFunction();
-    } else if(elmName.compare("regex_capture")  == 0) {
-        absComponent = new RegexCaptureFunction();
-    } else if(elmName.compare("arithmetic")  == 0) {
-        absComponent = new ArithmeticFunction();
-    } else {
-		throw Exception("Error: unsupported function: " + elmName);
-	}
+    The arithmetic function takes two or more integer or float components and performs a 
+    basic mathmetical function on them.  The result of this function in a single integer
+    or float.  Note that if both an integer and float components are used then the result
+    is a float.
+*/
+class ArithmeticFunction : public AbsFunctionComponent {
+public:
 
-    absComponent->Parse(componentElm);
+	/** Create a complete ArithmeticFunction object. */
+    ArithmeticFunction(OvalEnum::ArithmeticOperation op = OvalEnum::ARITHMETIC_ADD);
+	~ArithmeticFunction();
 
-	return absComponent;
-}
+	/** Parse the begin element and its child component element. */
+	void Parse(DOMElement* componentElm); 
+
+	/** Compute and return the value. */
+	ComponentValue* ComputeValue();
+
+	/** Return the variable values used to compute this function's value. */
+	VariableValueVector* GetVariableValues();
+
+	/** Get the arithmetic_operation field's value. */
+	OvalEnum::ArithmeticOperation GetArithmeticOperation();
+	/** Set the arithmetic_operation field's value. */
+	void SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn);
+
+private:
+    OvalEnum::ArithmeticOperation arithmeticOperation;
+};
+
+#endif
