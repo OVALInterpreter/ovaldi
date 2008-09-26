@@ -1,5 +1,4 @@
 #
-# $Id: Makefile 4579 2008-01-02 17:39:07Z bakerj $
 #
 #****************************************************************************************//
 # Copyright (c) 2002-2008, The MITRE Corporation
@@ -88,7 +87,9 @@ OBJS = \
 	AbsState.obj \
 	AbsVariable.obj \
 	Analyzer.obj \
+	ArithmeticFunction.obj \
 	Behavior.obj \
+	BeginFunction.obj \
 	CollectedObject.obj \
 	CollectedSet.obj \
 	Common.obj \
@@ -100,6 +101,7 @@ OBJS = \
 	Criterion.obj \
 	Definition.obj \
 	DocumentManager.obj \
+	EndFunction.obj \
 	EntityComparator.obj \
 	EscapeRegexFunction.obj \
 	Exception.obj \
@@ -124,14 +126,17 @@ OBJS = \
 	PossibleRestrictionType.obj \
 	PossibleValueType.obj \
 	REGEX.obj \
+	RegexCaptureFunction.obj \
 	RestrictionType.obj \
 	Set.obj \
 	SetObject.obj \
+	SplitFunction.obj \
 	State.obj \
 	StateEntity.obj \
 	SubstringFunction.obj \
 	Test.obj \
 	TestedItem.obj \
+	TimeDifferenceFunction.obj \
 	VariableComponent.obj \
 	VariableFactory.obj \
 	VariableValue.obj \
@@ -176,6 +181,8 @@ REL_OBJS = \
 	$(BUILDDIR)/AbsState.obj \
 	$(BUILDDIR)/AbsVariable.obj \
 	$(BUILDDIR)/Analyzer.obj \
+	$(BUILDDIR)/ArithmeticFunction.obj \
+	$(BUILDDIR)/BeginFunction.obj \
 	$(BUILDDIR)/Behavior.obj \
 	$(BUILDDIR)/CollectedObject.obj \
 	$(BUILDDIR)/CollectedSet.obj \
@@ -188,6 +195,7 @@ REL_OBJS = \
 	$(BUILDDIR)/Criterion.obj \
 	$(BUILDDIR)/Definition.obj \
 	$(BUILDDIR)/DocumentManager.obj \
+	$(BUILDDIR)/EndFunction.obj \
 	$(BUILDDIR)/EntityComparator.obj \
 	$(BUILDDIR)/EscapeRegexFunction.obj \
 	$(BUILDDIR)/Exception.obj \
@@ -212,6 +220,7 @@ REL_OBJS = \
 	$(BUILDDIR)/PossibleRestrictionType.obj \
 	$(BUILDDIR)/PossibleValueType.obj \
 	$(BUILDDIR)/REGEX.obj \
+	$(BUILDDIR)/RegexCaptureFunction.obj \
 	$(BUILDDIR)/RestrictionType.obj \
 	$(BUILDDIR)/Set.obj \
 	$(BUILDDIR)/SetObject.obj \
@@ -230,12 +239,14 @@ REL_OBJS = \
 	$(BUILDDIR)/DataCollector.obj \
 	$(BUILDDIR)/ObjectCollector.obj \
 	$(BUILDDIR)/ProbeFactory.obj \
+	$(BUILDDIR)/SplitFunction.obj \
 	$(BUILDDIR)/SystemInfo.obj \
 	$(BUILDDIR)/FileProbe.obj \
 	$(BUILDDIR)/InetListeningServersProbe.obj \
 	$(BUILDDIR)/ProcessProbe.obj \
 	$(BUILDDIR)/UnameProbe.obj \
 	$(BUILDDIR)/TextFileContentProbe.obj \
+	$(BUILDDIR)/TimeDifferenceFunction.obj \
 	$(BUILDDIR)/XmlFileContentProbe.obj \
 	$(BUILDDIR)/EnvironmentVariableProbe.obj \
 	$(BUILDDIR)/FamilyProbe.obj \
