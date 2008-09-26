@@ -183,7 +183,7 @@ std::string WMIUtil::GetStringFromVariant(VARIANT value) {
 			wcstombs(szChar, value.bstrVal, size);
 			stringValue = szChar;		
 						
-			delete(szChar);	// Lumension New
+			delete(szChar);
 		} else {
 			// TODO ERROR
 		}
