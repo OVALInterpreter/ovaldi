@@ -49,7 +49,13 @@ using namespace std;
 class OvalEnum {
 
 public:
-	/** An enum to define the acceptable check values. */
+	/** An enum to define the acceptable arithmetic operations. */
+	enum ArithmeticOperation	{ARITHMETIC_ADD,
+				                ARITHMETIC_MULTIPLY};
+	static string ArithmeticOperationToString(OvalEnum::ArithmeticOperation arithOp);
+	static OvalEnum::ArithmeticOperation ToArithmeticOperation(string arithStr);
+
+    /** An enum to define the acceptable check values. */
 	enum Check	{CHECK_ALL,
 				CHECK_AT_LEAST_ONE,
 				CHECK_NONE_EXIST, // DEPRECATED in version 5.3

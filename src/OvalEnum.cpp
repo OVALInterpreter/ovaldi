@@ -1,5 +1,4 @@
 //
-// $Id: OvalEnum.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -35,6 +34,40 @@
 //****************************************************************************************//
 //									OvalEnum Class										  //	
 //****************************************************************************************//
+
+string OvalEnum::ArithmeticOperationToString(OvalEnum::ArithmeticOperation arithOp) {
+
+	string arithStr = "";
+
+	switch(arithOp) {
+		case (ARITHMETIC_ADD):
+			arithStr = "add";
+			break;
+		case (ARITHMETIC_MULTIPLY):
+			arithStr = "multiply";
+			break;
+		default:	
+			throw Exception("OvalEnum::ArithmeticOperationToString - Error unsupported arithmetic operation value.");
+			break;
+	}
+
+	return arithStr;
+}
+
+OvalEnum::ArithmeticOperation OvalEnum::ToArithmeticOperation(string arithStr) {
+
+	OvalEnum::ArithmeticOperation arithOp;
+	
+	if(arithStr.compare(OvalEnum::ArithmeticOperationToString(ARITHMETIC_ADD)) == 0) {
+		arithOp = ARITHMETIC_ADD;
+	} else if(arithStr.compare(OvalEnum::ArithmeticOperationToString(ARITHMETIC_MULTIPLY)) == 0) {
+		arithOp = ARITHMETIC_MULTIPLY;
+	} else {
+		throw Exception("OvalEnum::ToArithmeticOperation - Error unsupported arithmetic operation value: " + arithStr);
+	}
+
+	return arithOp;
+}
 
 string OvalEnum::CheckToString(OvalEnum::Check check) {
 
