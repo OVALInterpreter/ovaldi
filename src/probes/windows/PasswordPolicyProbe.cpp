@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 #include "PasswordPolicyProbe.h"
+#include "WMIItem.h"
+#include "WMIUtil.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  PasswordPolicyProbe Class  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -91,9 +93,17 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
 			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("password_complexity",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-			item->AppendElement(new ItemEntity("reversible_encryption",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-			item->AppendMessage(new OvalMessage("At this time it is not clear how to obtain password_complexity or reversible_encryption."));
+
+			std::string passwordComplexity;
+			std::string reversibleEncryption;
+			
+            /**
+                This is a workaround until we know the proper API to call to retrieve this information.
+             */
+			ArePasswordComplexityReverseEncryptionSet(passwordComplexity, reversibleEncryption);
+
+			item->AppendElement(new ItemEntity("password_complexity",  passwordComplexity, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("reversible_encryption",  reversibleEncryption, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 
 			// Free the allocated memory.
 			NetApiBufferFree(pBuf);
@@ -112,6 +122,23 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
 	}	
 
 	return collectedItems;
+}
+
+void PasswordPolicyProbe::ArePasswordComplexityReverseEncryptionSet(std::string &passwordComplexity, std::string &reversibleEncryption) {
+
+	vector<WMIItem> wmiItems = WMIUtil::GetPropertyValues("root\\rsop\\computer", "Select * from RSOP_SecuritySettingBoolean", "Setting");
+
+	// When passwordComplexity and reversibleEncryption haven't been explicitly set they default to (true, false)
+	passwordComplexity = "1";
+	reversibleEncryption = "0";
+
+	for(unsigned int i = 0; i < wmiItems.size(); i++) {
+		if(wmiItems[i].KeyName == "PasswordComplexity") {
+			passwordComplexity = wmiItems[i].PropertyValue;
+		} else if (wmiItems[i].KeyName == "ClearTextPassword") {
+			reversibleEncryption = wmiItems[i].PropertyValue;
+		}
+	}
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

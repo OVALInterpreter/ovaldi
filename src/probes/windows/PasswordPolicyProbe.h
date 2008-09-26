@@ -57,8 +57,17 @@ public:
 
 private:
 	PasswordPolicyProbe();
+	
+    /**
+        Checks to see if password_complaexity and reversible_encryption are set.
 
-	static PasswordPolicyProbe *instance;
+        NOTE: This is a workaround until we find the correct API call to retrieve this data.
+        This sould not be considered the correct way to retrieve this data.
+
+     */
+    void ArePasswordComplexityReverseEncryptionSet(std::string &passwordComplexity, std::string &reversibleEncryption);
+	
+    static PasswordPolicyProbe *instance;
 };
 
 #endif
