@@ -312,6 +312,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									wcstombs(szChar, vtProp.bstrVal, size);
 									strFieldValue = szChar;
 									item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+                                    delete szChar;
 								} else {
 									item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 								}
