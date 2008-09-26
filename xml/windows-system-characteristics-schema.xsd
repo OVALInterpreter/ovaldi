@@ -1,15 +1,14 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.4">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.5">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Windows specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.4</version>
-               <date>4/1/2008 10:41:47 AM</date>
+               <version>5.5 Release Candidate 1</version>
+               <date>9/10/2008 8:19:08 AM</date>
                 <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
-                <sch:title>schematron validation of the Windows portion of an OVAL System Characteristics file</sch:title>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
           </xsd:appinfo>
@@ -1678,7 +1677,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="fileaudititemtrustee_name">
                                                   <sch:rule context="win-sc:fileauditedpermissions_item/win-sc:trustee_name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileauditedpermissions_item should be 'string'</sch:assert>
+                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileauditedpermissions_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -1971,7 +1970,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="feritemtrustee_name">
                                                   <sch:rule context="win-sc:fileeffectiverights_item/win-sc:trustee_name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileeffectiverights_item should be 'string'</sch:assert>
+                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileeffectiverights_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3134,7 +3133,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="rapitemtrustee_name">
                                                   <sch:rule context="win-sc:regkeyauditedpermissions_item/win-sc:trustee_name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyauditedpermissions_item should be 'string'</sch:assert>
+                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyauditedpermissions_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3427,7 +3426,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="reritemtrustee_name">
                                                   <sch:rule context="win-sc:regkeyeffectiverights_item/win-sc:trustee_name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyeffectiverights_item should be 'string'</sch:assert>
+                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyeffectiverights_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3919,7 +3918,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="uacitemelevationpromptadmin">
                                                   <sch:rule context="win-sc:uac_item/win-sc:elevation_prompt_admin">
-                                                       <sch:assert test="@not(@datatype) or datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the elevation_prompt_admin entity of a uac_item should be 'string'</sch:assert>
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the elevation_prompt_admin entity of a uac_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -4415,7 +4414,47 @@
                </xsd:complexContent>
           </xsd:complexType>
      </xsd:element>
-     <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <!-- =========================  WUA UPDATE SEARCHER ITEM   ========================= -->
+    <!-- =============================================================================== -->
+    <xsd:element name="wuaupdatesearcher_item" substitutionGroup="oval-sc:item">
+        <xsd:annotation>
+            <xsd:documentation>The wuaupdatesearcher_item outlines information defined through the Search method of the IUpdateSearcher interface as part of Microsoft's WUA (Windows Update Agent) API.  This information is related to the current patch level in a Windows environment.  The test extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-sc:ItemType">
+                    <xsd:sequence>
+                        <xsd:element name="search_criteria" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation></xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="wuaupdatesearcheritemsearchcriteria">
+                                        <sch:rule context="win-sc:wuaupdatesearcher_item/win-sc:search_criteria">
+                                            <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the search_criteria entity of a wuaupdatesearcher_item should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="update_id" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:annotation>
+                                <xsd:documentation>The update_id entity specifies a string that represents a revision-independent identifier of an update.  This information is part of the IUpdateIdentity interface that is part of the result of the IUpdateSearcher interface's Search method.  Note that multiple update identifiers can be associated with a give search criteria and thus multiple entities can exist for this item.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="wuaupdatesearcheritemresult">
+                                        <sch:rule context="win-sc:wuaupdatesearcher_item/win-sc:update_id">
+                                            <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the update_id entity of a wuaupdatesearcher_item should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <!-- =============================================================================== -->
      <!-- =============================================================================== -->
      <!-- =============================================================================== -->
      <xsd:complexType name="EntityItemAddrTypeType">

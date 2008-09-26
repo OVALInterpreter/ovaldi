@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" elementFormDefault="qualified" version="5.4">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" elementFormDefault="qualified" version="5.5">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,10 +7,9 @@
             <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Independent Definition</schema>
-                  <version>5.4</version>
-                  <date>4/1/2008 10:41:40 AM</date>
+                  <version>5.5 Release Candidate 1</version>
+                  <date>9/10/2008 8:19:04 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
-                  <sch:title>schematron validation of the Independent portion of an OVAL Definitions file</sch:title>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ind-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -529,6 +528,7 @@
                                                                   <sch:pattern id="sqlobjdengine">
                                                                         <sch:rule context="ind-def:sql_object/ind-def:engine">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the engine entity of an sql_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the engine entity of an sql_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -541,6 +541,7 @@
                                                                   <sch:pattern id="sqlobjversion">
                                                                         <sch:rule context="ind-def:sql_object/ind-def:version">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of an sql_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the version entity of an sql_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -553,6 +554,7 @@
                                                                   <sch:pattern id="sqlobjconnection_string">
                                                                         <sch:rule context="ind-def:sql_object/ind-def:connection_string">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the connection_string entity of an sql_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the connection_string entity of an sql_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -565,6 +567,7 @@
                                                                   <sch:pattern id="sqlobjsql">
                                                                         <sch:rule context="ind-def:sql_object/ind-def:sql">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sql entity of a sql_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the sql entity of an sql_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -728,7 +731,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="instance" type="oval-def:EntityObjectIntType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The instance entity calls out a specific match of the pattern. Note that the main purpose of this entity is too provide uniqueness for different textfilecontent_items that results from multiple matches of a given pattern against the same file. Most likely this entity will be defined as greater than 1 which would result in the object representing the set of all matches of the pattern.</xsd:documentation>
+                                                          <xsd:documentation>The instance entity calls out a specific match of the pattern.  The first match is given an instance value of 1, the second match is given and instance value of 2, and so on.  Note that the main purpose of this entity is to provide uniqueness for different textfilecontent_items that results from multiple matches of a given pattern against the same file. Most likely this entity will be defined as greater than or equal to 1 which would result in the object representing the set of all matches of the pattern.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="txt54objinstance">
                                                                         <sch:rule context="ind-def:textfilecontent54_object/ind-def:instance">
@@ -1169,6 +1172,7 @@
                                                                   <sch:pattern id="xmlobjxpath">
                                                                         <sch:rule context="ind-def:xmlfilecontent_object/ind-def:xpath">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the xpath entity of a xmlfilecontent_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the xpath entity of a xmlfilecontent_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>

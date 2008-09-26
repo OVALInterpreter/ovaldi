@@ -1,15 +1,14 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:aix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" elementFormDefault="qualified" version="5.4">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:aix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" elementFormDefault="qualified" version="5.5">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the AIX specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>AIX Definition</schema>
-                  <version>5.4</version>
-                  <date>4/11/2008 10:41:33 AM</date>
+                  <version>5.5 Release Candidate 1</version>
+                  <date>9/10/2008 8:19:00 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
-                  <sch:title>schematron validation of the AIX portion of an OVAL Definitions file</sch:title>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="aix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -21,6 +20,16 @@
       <xsd:element name="fileset_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The fileset test is used to check information associated with different filesets installed on the system. The information used by this test is modeled after the /usr/bin/lslpp -l command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                <xsd:appinfo>
+                    <sch:pattern id="filesettst">
+                        <sch:rule context="aix-def:fileset_test/aix-def:object">
+                            <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:fileset_object/@id"><sch:value-of select="../@id"/> - the object child element of a fileset_test must reference a fileset_object</sch:assert>
+                        </sch:rule>
+                        <sch:rule context="aix-def:fileset_test/aix-def:state">
+                            <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:fileset_state/@id"><sch:value-of select="../@id"/> - the state child element of a fileset_test must reference a fileset_state</sch:assert>
+                        </sch:rule>
+                    </sch:pattern>
+                </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -131,6 +140,16 @@
       <xsd:element name="fix_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The fix test is used to check information associated with different fixes installed on the system. The information being tested is based off the /usr/sbin/instfix -iavk command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an fix_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                <xsd:appinfo>
+                    <sch:pattern id="fixtst">
+                        <sch:rule context="aix-def:fix_test/aix-def:object">
+                            <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:fix_object/@id"><sch:value-of select="../@id"/> - the object child element of a fix_test must reference a fix_object</sch:assert>
+                        </sch:rule>
+                        <sch:rule context="aix-def:fix_test/aix-def:state">
+                            <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:fix_state/@id"><sch:value-of select="../@id"/> - the state child element of a fix_test must reference a fix_state</sch:assert>
+                        </sch:rule>
+                    </sch:pattern>
+                </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -241,6 +260,16 @@
       <xsd:element name="oslevel_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The oslevel test reveals information about the release and maintenance level of AIX operating system. This information can be retrieved by the /usr/bin/oslevel -r command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an oslevel_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                <xsd:appinfo>
+                    <sch:pattern id="osleveltst">
+                        <sch:rule context="aix-def:oslevel_test/aix-def:object">
+                            <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:oslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of a oslevel_test must reference a oslevel_object</sch:assert>
+                        </sch:rule>
+                        <sch:rule context="aix-def:oslevel_test/aix-def:state">
+                            <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:oslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of a oslevel_test must reference a oslevel_state</sch:assert>
+                        </sch:rule>
+                    </sch:pattern>
+                </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ios-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" elementFormDefault="qualified" version="5.4">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ios-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" elementFormDefault="qualified" version="5.5">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,11 +7,10 @@
             <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>IOS Definition</schema>
-                  <version>5.4</version>
-                  <date>4/1/2008 10:41:41 AM</date>
+                  <version>5.5 Release Candidate 1</version>
+                  <date>9/10/2008 8:19:05 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
-                  <sch:title>schematron validation of the Cisco IOS portion of an OVAL Definitions file</sch:title>
-                  <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
+                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ios-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
             </xsd:appinfo>
@@ -237,7 +236,7 @@
             <xsd:annotation>
                   <xsd:documentation>The line test is used to check the properties of specific output lines from a SHOW command, such as show running-config. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a line_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="linetst">
+                        <sch:pattern id="ioslinetst">
                               <sch:rule context="ios-def:line_test/ios-def:object">
                                     <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/ios-def:line_object/@id"><sch:value-of select="../@id"/> - the object child element of a line_test must reference a line_object</sch:assert>
                               </sch:rule>
@@ -274,7 +273,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The name of a SHOW sub-command.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="lineobjshow_subcommand">
+                                                                  <sch:pattern id="ioslineobjshow_subcommand">
                                                                         <sch:rule context="ios-def:line_object/ios-def:show_subcommand">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the show_subcommand entity of a line_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -301,7 +300,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the SHOW sub-command.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="linesteshow_subcommand">
+                                                      <sch:pattern id="ioslinesteshow_subcommand">
                                                             <sch:rule context="ios-def:line_state/ios-def:show_subcommand">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the show_subcommand entity of a line_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -313,7 +312,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The value returned from by the specified SHOW sub-command.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="linesteconfig_line">
+                                                      <sch:pattern id="ioslinesteconfig_line">
                                                             <sch:rule context="ios-def:line_state/ios-def:config_line">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the config_line entity of a line_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -465,18 +464,18 @@
             </xsd:complexType>
       </xsd:element>
       <!-- =============================================================================== -->
-      <!-- ================================  VERSION TEST  =============================== -->
+      <!-- =============================  VERSION TEST (55)  ============================= -->
       <!-- =============================================================================== -->
-      <xsd:element name="version_test" substitutionGroup="oval-def:test">
+      <xsd:element name="version55_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The version test is used to check the version of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The version55_test is used to check the version of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="iosvertst">
-                              <sch:rule context="ios-def:version_test/ios-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/ios-def:version_object/@id"><sch:value-of select="../@id"/> - the object child element of a version_test must reference a version_object</sch:assert>
+                        <sch:pattern id="iosver55tst">
+                              <sch:rule context="ios-def:version55_test/ios-def:object">
+                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/ios-def:version55_object/@id"><sch:value-of select="../@id"/> - the object child element of a version55_test must reference a version_object</sch:assert>
                               </sch:rule>
-                              <sch:rule context="ios-def:version_test/ios-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/ios-def:version_state/@id"><sch:value-of select="../@id"/> - the state child element of a version_test must reference a version_state</sch:assert>
+                              <sch:rule context="ios-def:version55_test/ios-def:state">
+                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/ios-def:version55_state/@id"><sch:value-of select="../@id"/> - the state child element of a version55_test must reference a version_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -492,9 +491,9 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-      <xsd:element name="version_object" substitutionGroup="oval-def:object">
+      <xsd:element name="version55_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The version_object element is used by a version test to define the different version information associated with an IOS system. There is actually only one object relating to version and this is the system as a whole. Therefore, there are no child entities defined. Any OVAL Test written to check version will reference the same version_object which is basically an empty object element.</xsd:documentation>
+                  <xsd:documentation>The version55_object element is used by a version55_test to define the different version information associated with an IOS system. There is actually only one object relating to version and this is the system as a whole. Therefore, there are no child entities defined.  Any OVAL Test written to check version will reference the same version55_object which is basically an empty object element.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -502,73 +501,224 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-      <xsd:element name="version_state" substitutionGroup="oval-def:state">
+      <xsd:element name="version55_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The version_state element defines the version information held within a Cisco IOS Train. A Cisco IOS train is a vehicle for delivering releases that evolve from a common code base.</xsd:documentation>
+                  <xsd:documentation>The version55_state element defines the version information held within a Cisco IOS Train. A Cisco IOS train is a vehicle for delivering releases that evolve from a common code base.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="major_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
-                                          <xsd:annotation>
-                                                <xsd:documentation>The major_release is a combination of train and rebuild information and is used by Cisco advisories to identify major releases.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="iosverstemajor_release">
-                                                            <sch:rule context="ios-def:version_state/ios-def:major_release">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the major_release entity of a version_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
-                                          </xsd:annotation>
-                                    </xsd:element>
-                                    <xsd:element name="train_number" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
-                                          <xsd:annotation>
-                                                <xsd:documentation>The train number is the dotted version that starts a version string. For example the version string 12.2(3)T has a train number of 12.2.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="iosverstetrain_number">
-                                                            <sch:rule context="ios-def:version_state/ios-def:train_number">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the train_number entity of a version_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
-                                          </xsd:annotation>
-                                    </xsd:element>
-                                    <xsd:element name="train_identifier" type="ios-def:EntityStateTrainIdentifierType" minOccurs="0" maxOccurs="1">
-                                          <xsd:annotation>
-                                                <xsd:documentation>The train identifier is the type of Train. For example the version string 12.2(3)T has a train identifier of T. Please see the EntityStateVersionTrainIdentifierType for more information about the different train identifiers.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="iosverstetrain_identifier">
-                                                            <sch:rule context="ios-def:version_state/ios-def:train_identifier">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the train_identifier entity of a version_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
-                                          </xsd:annotation>
-                                    </xsd:element>
-                                    <xsd:element name="version_string" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
-                                          <xsd:annotation>
-                                                <xsd:documentation>The version is the raw string output of a 'show version' command.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="iosversteversion_string">
-                                                            <sch:rule context="ios-def:version_state/ios-def:version_string">
-                                                                  <sch:assert test="not(@datatype) or @datatype='ios_version'"><sch:value-of select="../@id"/> - datatype attribute for the version_string entity of a version_state should be 'ios_version'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
-                                          </xsd:annotation>
-                                    </xsd:element>
+                                  <xsd:element name="major_version" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The major_version entity is used to check the major version piece of the version string.  The value is an integer and in the example 12.4(9)T0a the major version is '12'.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55stemajorversion">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:major_version">
+                                                      <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the major_version entity of a version55_state should be 'int'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="minor_version" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The minor_version entity is used to check the minor version piece of the version string.  The value is an integer and in the example 12.4(9)T0a the minor version is '4'.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55steminorversion">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:minor_version">
+                                                      <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the minor_version entity of a version55_state should be 'int'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="release" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The release entity is used to check the release piece of the version string.  The value is an integer and in the example 12.4(9)T0a the release is '9'.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55sterelease">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:release">
+                                                      <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the release entity of a version55_state should be 'int'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="train_identifier" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The train_identifier entity is used to check the type of train represented in the version string.  The value is a string and in the example 12.4(9)T0a the train identifier is 'T'.  The following explaination from Wikipedia should help explain the different train identifiers. Cisco IOS releases are split into several "trains", each containing a different set of features. Trains more or less map onto distinct markets or groups of customers that Cisco is targeting.  The 'mainline' train is designed to be the most stable release the company can offer, and its feature set never expands during its lifetime. Updates are released only to address bugs in the product. The previous technology train becomes the source for the current mainline train--for example, the 12.1T train becomes the basis for the 12.2 mainline. Therefore, to determine the features available in a particular mainline release, look at the previous T train release.  The 'T' (Technology) train, gets new features and bug fixes throughout its life, and is therefore less stable than the mainline. (In releases prior to Cisco IOS Release 12.0, the P train served as the Technology train.)  The 'S' (Service Provider) train, runs only on the company's core router products and is heavily customized for Service Provider customers.  The 'E' (Enterprise) train, is customized for implementation in enterprise environments.  The 'B' (broadband) train, support internet based broadband features.  The 'XA', 'Xb' ... (special functionality) train, needs to be documented.  There are other trains from time to time, designed for specific needs -- for example, the 12.0AA train contained new code required for Cisco's AS5800 product.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55stetrain_identifier">
+                                                  <sch:rule context="ios-def:version_state/ios-def:train_identifier">
+                                                      <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the train_identifier entity of a version_state should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="rebuild" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The rebuild entity is used to check the rebuild piece of the version string.  The value is an integer and in the example 12.4(9)T0a the rebuild is '0'.  Often a rebuild is compiled to fix a single specific problem or vulnerability for a given IOS version. For example, 12.1(8)E14 is a Rebuild, the 14 denoting the 14th rebuild of 12.1(8)E. Rebuilds are produced to either quickly repair a defect, or to satisfy customers who do not want to upgrade to a later major revision because they may be running critical infrastructure on their devices, and hence prefer to minimise change and risk.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55sterebuild">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:rebuild">
+                                                      <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the rebuild entity of a version55_state should be 'int'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="subrebuild" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The subrebuild entity is used to check the subrebuild piece of the version string.  The value is a string and in the example 12.4(9)T0a the subrebuild is 'a'.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55stesubrebuild">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:subrebuild">
+                                                      <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the subrebuild entity of a version55_state should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="mainline_rebuild" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The mainline_rebuild entity is used to check the mainline rebuild piece of the version string.  The mainline rebuild is just a regular rebuild release against the mainline operating system release (e.g. the branch of development that would typically be called "the trunk" that isn't associated with a train). Since there is no train identifier to stick the rebuild release after, they stick a alphabetic character inside the parens holding the maintenance release number. For example, 12.4(5b) is the second rebuild of the 12.4(5) maintenance release.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55stemainlinerebuild">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:mainline_rebuild">
+                                                      <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the mainline_rebuild entity of a version55_state should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
+                                  <xsd:element name="version_string" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                      <xsd:annotation>
+                                          <xsd:documentation>The version_string entity is used to check the raw string output of a 'show version' command.</xsd:documentation>
+                                          <xsd:appinfo>
+                                              <sch:pattern id="iosver55steversionstring">
+                                                  <sch:rule context="ios-def:version55_state/ios-def:version_string">
+                                                      <sch:assert test="not(@datatype) or @datatype='ios_version'"><sch:value-of select="../@id"/> - datatype attribute for the version_string entity of a version55_state should be 'ios_version'</sch:assert>
+                                                  </sch:rule>
+                                              </sch:pattern>
+                                          </xsd:appinfo>
+                                      </xsd:annotation>
+                                  </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-      <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <!-- ================================  VERSION TEST  =============================== -->
+    <!-- =============================================================================== -->
+    <xsd:element name="version_test" substitutionGroup="oval-def:test">
+        <xsd:annotation>
+            <xsd:documentation>This test has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer version55_test.</xsd:documentation>
+            <xsd:documentation>The version test is used to check the version of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+            <xsd:appinfo>
+                <sch:pattern id="iosvertst">
+                    <sch:rule context="ios-def:version_test/ios-def:object">
+                        <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/ios-def:version_object/@id"><sch:value-of select="../@id"/> - the object child element of a version_test must reference a version_object</sch:assert>
+                    </sch:rule>
+                    <sch:rule context="ios-def:version_test/ios-def:state">
+                        <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/ios-def:version_state/@id"><sch:value-of select="../@id"/> - the state child element of a version_test must reference a version_state</sch:assert>
+                    </sch:rule>
+                </sch:pattern>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:TestType">
+                    <xsd:sequence>
+                        <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="version_object" substitutionGroup="oval-def:object">
+        <xsd:annotation>
+            <xsd:documentation>This object has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer version55_object.</xsd:documentation>
+            <xsd:documentation>The version_object element is used by a version test to define the different version information associated with an IOS system. There is actually only one object relating to version and this is the system as a whole. Therefore, there are no child entities defined. Any OVAL Test written to check version will reference the same version_object which is basically an empty object element.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:ObjectType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="version_state" substitutionGroup="oval-def:state">
+        <xsd:annotation>
+            <xsd:documentation>This state has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer version55_state.</xsd:documentation>
+            <xsd:documentation>The version_state element defines the version information held within a Cisco IOS Train. A Cisco IOS train is a vehicle for delivering releases that evolve from a common code base.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:StateType">
+                    <xsd:sequence>
+                        <xsd:element name="major_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>The major_release is a combination of train and rebuild information and is used by Cisco advisories to identify major releases.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="iosverstemajor_release">
+                                        <sch:rule context="ios-def:version_state/ios-def:major_release">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the major_release entity of a version_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="train_number" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>The train number is the dotted version that starts a version string. For example the version string 12.2(3)T has a train number of 12.2.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="iosverstetrain_number">
+                                        <sch:rule context="ios-def:version_state/ios-def:train_number">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the train_number entity of a version_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="train_identifier" type="ios-def:EntityStateTrainIdentifierType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>The train identifier is the type of Train. For example the version string 12.2(3)T has a train identifier of T. Please see the EntityStateVersionTrainIdentifierType for more information about the different train identifiers.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="iosverstetrain_identifier">
+                                        <sch:rule context="ios-def:version_state/ios-def:train_identifier">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the train_identifier entity of a version_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="version_string" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>The version is the raw string output of a 'show version' command.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="iosversteversion_string">
+                                        <sch:rule context="ios-def:version_state/ios-def:version_string">
+                                            <sch:assert test="not(@datatype) or @datatype='ios_version'"><sch:value-of select="../@id"/> - datatype attribute for the version_string entity of a version_state should be 'ios_version'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <!-- =============================================================================== -->
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
       <xsd:complexType name="EntityStateTrainIdentifierType">
             <xsd:annotation>
-                  <xsd:documentation>The EntityStateTrainIdentifierType complex type restricts a string value to a specific set of values. These values describe the possible types of trains in a Cisco IOS release. The empty string is also allowed to support empty emlement associated with variable references.</xsd:documentation>
+                <xsd:documentation>Note that this enumeration is used by the deprecated version_test and will be removed in version 6.0 of the language.</xsd:documentation>
+                <xsd:documentation>The EntityStateTrainIdentifierType complex type restricts a string value to a specific set of values. These values describe the possible types of trains in a Cisco IOS release. The empty string is also allowed to support empty emlement associated with variable references.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleContent>
                   <xsd:restriction base="oval-def:EntityStateStringType">

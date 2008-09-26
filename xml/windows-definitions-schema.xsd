@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" elementFormDefault="qualified" version="5.4">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" elementFormDefault="qualified" version="5.5">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,10 +7,9 @@
             <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.4</version>
-                  <date>4/1/2008 10:41:46 AM</date>
+                  <version>5.5 Release Candidate 1</version>
+                  <date>9/10/2008 8:19:08 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
-                  <sch:title>schematron validation of the Windows portion of an OVAL Definitions file</sch:title>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -1696,7 +1695,7 @@
                                                                   <sch:pattern id="fileobjfilename">
                                                                         <sch:rule context="win-def:file_object/win-def:filename">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a file_object should be 'string'</sch:assert>
-                                                                              <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1736,7 +1735,7 @@
                                                       <sch:pattern id="filestefilename">
                                                             <sch:rule context="win-def:file_state/win-def:filename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a file_state should be 'string'</sch:assert>
-                                                                  <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -2016,7 +2015,7 @@
                                                                   <sch:pattern id="fap53objfilename">
                                                                         <sch:rule context="win-def:fileauditedpermissions53_object/win-def:filename">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileauditedpermissions53_object should be 'string'</sch:assert>
-                                                                              <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -2024,7 +2023,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                                          <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).  If a pattern match operation is used attempts to identify all the trustees (for exampl a .* pattern) then the search should be limited to just the trustees on the DACL/SACL of the object in question.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="fap53objtrustee_sid">
                                                                         <sch:rule context="win-def:fileauditedpermissions53_object/win-def:trustee_sid">
@@ -2068,7 +2067,7 @@
                                                       <sch:pattern id="fap53stefilename">
                                                             <sch:rule context="win-def:fileauditedpermissions53_state/win-def:filename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileauditedpermissions53_state should be 'string'</sch:assert>
-                                                                  <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -2410,7 +2409,7 @@
                                                                   <sch:pattern id="fapobjfilename">
                                                                         <sch:rule context="win-def:fileauditedpermissions_object/win-def:filename">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileauditedpermissions_object should be 'string'</sch:assert>
-                                                                              <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -2463,7 +2462,7 @@
                                                       <sch:pattern id="fapstefilename">
                                                             <sch:rule context="win-def:fileauditedpermissions_state/win-def:filename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileauditedpermissions_state should be 'string'</sch:assert>
-                                                                  <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -2803,7 +2802,7 @@
                                                                   <sch:pattern id="fer53objfilename">
                                                                         <sch:rule context="win-def:fileeffectiverights53_object/win-def:filename">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileeffectiverights53_object should be 'string'</sch:assert>
-                                                                              <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -2811,7 +2810,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                                          <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).  If a pattern match operation is used attempts to identify all the trustees (for exampl a .* pattern) then the search should be limited to just the trustees on the DACL/SACL of the object in question.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="fer53objtrustee_sid">
                                                                         <sch:rule context="win-def:fileeffectiverights53_object/win-def:trustee_sid">
@@ -2855,7 +2854,7 @@
                                                       <sch:pattern id="fer53stefilename">
                                                             <sch:rule context="win-def:fileeffectiverights53_state/win-def:filename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileeffectiverights53_state should be 'string'</sch:assert>
-                                                                  <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -3197,7 +3196,7 @@
                                                                   <sch:pattern id="fefobjfilename">
                                                                         <sch:rule context="win-def:fileeffectiverights_object/win-def:filename">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileeffectiverights_object should be 'string'</sch:assert>
-                                                                              <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -3250,7 +3249,7 @@
                                                       <sch:pattern id="ferstefilename">
                                                             <sch:rule context="win-def:fileeffectiverights_state/win-def:filename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the filename entity of a fileeffectiverights_state should be 'string'</sch:assert>
-                                                                  <sch:assert test="if (not(@operation) or @operation='equals' or @operation='not equal') then (not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) else (1=1)"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
+                                                                <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity can not contain the characters / \ : * ? > | </sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -4042,7 +4041,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="id" type="oval-def:EntityObjectIntType" nillable="true">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The id element specifies a particular object under the metabase key. If the nillable attribute is set to true, then the object being specified is the higher level key. In this case, the id element should not be collected or used in analysis. Setting nil equal to true is different than using a .* pattern match, says to collect every id under a given key. The most likely use for xsi:nil within a metabase object is when checking for the existance of a particular key, without regards to the different ids associated with it.</xsd:documentation>
+                                                            <xsd:documentation>The id element specifies a particular object under the metabase key. If the nillable attribute is set to true, then the object being specified is the higher level key. In this case, the id element should not be collected or used in analysis. Setting nil equal to true is different than using a .* pattern match, says to collect every id under a given key. The most likely use for xsi:nil within a metabase object is when checking for the existence of a particular key, without regards to the different ids associated with it.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <valid_datatypes>integer</valid_datatypes>
                                                                   <valid_operators>equals, not equal, greater than, less than, greater than or equal, less than or equal</valid_operators>
@@ -4909,7 +4908,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="name" type="oval-def:EntityObjectStringType" nillable="true">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The name element describes the name assigned to a value associated with a specific registry key. If the nillable attribute is set to true, then the object being specified is the higher level hive/key. In this case, the name element should not be collected or used in analysis. Setting nil equal to true on an element is different than using a .* pattern match. A .* pattern match says to collect every name under a given hive/key. The most likely use for xsi:nil within a registry object is when checking for the existance of a particular key, without regards to the different names associated with it.</xsd:documentation>
+                                                            <xsd:documentation>The name element describes the name assigned to a value associated with a specific registry key. If the nillable attribute is set to true, then the object being specified is the higher level hive/key. In this case, the name element should not be collected or used in analysis. Setting nil equal to true on an element is different than using a .* pattern match. A .* pattern match says to collect every name under a given hive/key. The most likely use for xsi:nil within a registry object is when checking for the existence of a particular key, without regards to the different names associated with it.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="regobjname">
                                                                         <sch:rule context="win-def:registry_object/win-def:name">
@@ -5097,7 +5096,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                                          <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).  If a pattern match operation is used attempts to identify all the trustees (for exampl a .* pattern) then the search should be limited to just the trustees on the DACL/SACL of the object in question.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="rap53objtrustee_sid">
                                                                         <sch:rule context="win-def:regkeyauditedpermissions53_object/win-def:trustee_sid">
@@ -5880,7 +5879,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                                          <xsd:documentation>The trustee_sid element is the unique sid that associated a user, group, system, or program (such as a Windows service).  If a pattern match operation is used attempts to identify all the trustees (for exampl a .* pattern) then the search should be limited to just the trustees on the DACL/SACL of the object in question.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="rer53objtrustee_sid">
                                                                         <sch:rule context="win-def:regkeyeffectiverights53_object/win-def:trustee_sid">
@@ -7344,12 +7343,120 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-      <!-- =============================================================================== -->
-      <!-- ===============================  USER SID TEST  =============================== -->
+    <!-- =============================================================================== -->
+    <!-- ============================  USER SID TEST (55)  ============================= -->
+    <!-- =============================================================================== -->
+    <xsd:element name="user_sid55_test" substitutionGroup="oval-def:test">
+        <xsd:annotation>
+            <xsd:documentation>The user_sid55_test is used to check information about Windows users. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a user_sid55_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+            <xsd:appinfo>
+                <sch:pattern id="usersid55tst">
+                    <sch:rule context="win-def:user_sid55_test/win-def:object">
+                        <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/win-def:user_sid55_object/@id"><sch:value-of select="../@id"/> - the object child element of a user_sid55_test must reference a user_sid55_object</sch:assert>
+                    </sch:rule>
+                    <sch:rule context="win-def:user_sid55_test/win-def:state">
+                        <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/win-def:user_sid55_state/@id"><sch:value-of select="../@id"/> - the state child element of a user_sid55_test must reference a user_sid55_state</sch:assert>
+                    </sch:rule>
+                </sch:pattern>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:TestType">
+                    <xsd:sequence>
+                        <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                        <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="user_sid55_object" substitutionGroup="oval-def:object">
+        <xsd:annotation>
+            <xsd:documentation>The user_sid55_object represents a set of users on a Windows system.  This set (which might contain only one user) is identified by a SID.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:ObjectType">
+                    <xsd:sequence>
+                        <xsd:choice>
+                            <xsd:element ref="oval-def:set" minOccurs="0"/>
+                            <xsd:sequence minOccurs="0">
+                                <xsd:element name="user_sid" type="oval-def:EntityObjectStringType">
+                                    <xsd:annotation>
+                                        <xsd:documentation>The user_sid entity holds a string that represents the SID of a particular user.</xsd:documentation>
+                                        <xsd:appinfo>
+                                            <sch:pattern id="usersid55objuser">
+                                                <sch:rule context="win-def:user_sid55_object/win-def:user_sid">
+                                                    <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the user_sid entity of a user_sid55_object should be 'string'</sch:assert>
+                                                </sch:rule>
+                                            </sch:pattern>
+                                        </xsd:appinfo>
+                                    </xsd:annotation>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:choice>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="user_sid55_state" substitutionGroup="oval-def:state">
+        <xsd:annotation>
+            <xsd:documentation>The user_sid55_state element enumerates the different groups (identified by SID) that a Windows user might belong to. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:StateType">
+                    <xsd:sequence>
+                        <xsd:element name="user_sid" type="oval-def:EntityStateStringType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>The user_sid entity holds a string that represents the SID of a particular user.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="usersid55steuser">
+                                        <sch:rule context="win-def:user_sid55_state/win-def:user_sid">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the user_sid entity of a user_sid55_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="enabled" type="oval-def:EntityStateBoolType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>This element holds a boolean value that specifies whether the particular user account is enabled or not.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="usersid55steenabled">
+                                        <sch:rule context="win-def:user_sid55_state/win-def:enabled">
+                                            <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the enabled entity of a user_sid55_state should be 'boolean'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="group_sid" type="oval-def:EntityStateStringType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>A string the represents the SID of a particular group.  The group_sid element can be included multiple times in a system characteristic item in order to record that a user can be a member of a number of different groups. Note that the entity_check attribute associated with EntityStateStringType guides the evaluation of entities like group that refer to items that can occur an unbounded number of times.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="usersid55stegroup">
+                                        <sch:rule context="win-def:user_sid_55state/win-def:group_sid">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the group_sid entity of a user_sid55_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <!-- =============================================================================== -->
+    <!-- ========================  USER SID TEST (deprecated)  ========================= -->
       <!-- =============================================================================== -->
       <xsd:element name="user_sid_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The user_sid_test is used to check information about Windows users. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a user_sid_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                <xsd:documentation>This test has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer user_sid55_test.</xsd:documentation>
+                <xsd:documentation>The user_sid_test is used to check information about Windows users. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a user_sid_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
                         <sch:pattern id="usersidtst">
                               <sch:rule context="win-def:user_sid_test/win-def:object">
@@ -7374,7 +7481,8 @@
       </xsd:element>
       <xsd:element name="user_sid_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The user_sid_object represents a set of users on a Windows system.  This set (which might contain only one user) is identified by a SID.</xsd:documentation>
+                <xsd:documentation>This object has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer user_sid55_object.</xsd:documentation>
+                <xsd:documentation>The user_sid_object represents a set of users on a Windows system.  This set (which might contain only one user) is identified by a SID.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -7404,7 +7512,8 @@
       </xsd:element>
       <xsd:element name="user_sid_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The user_sid_state element enumerates the different groups (identified by SID) that a Windows user might belong to. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                <xsd:documentation>This state has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer user_sid55_state.</xsd:documentation>
+                <xsd:documentation>The user_sid_state element enumerates the different groups (identified by SID) that a Windows user might belong to. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -7512,7 +7621,7 @@
       </xsd:element>
       <xsd:element name="volume_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The volume_state element defines the different metadata associate with a storage volume in Windows. This includes the rootpat, the file system type, name, and serial number, as well as any associated flags. Please refer to the individual elements in the schema for more details about what each represents. The GetVolumeInformation function as defined by Microsoft is also a good place to look for information.</xsd:documentation>
+                  <xsd:documentation>The volume_state element defines the different metadata associate with a storage volume in Windows. This includes the rootpath, the file system type, name, and serial number, as well as any associated flags. Please refer to the individual elements in the schema for more details about what each represents. The GetVolumeInformation function as defined by Microsoft is also a good place to look for information.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -7797,6 +7906,7 @@
                                                                   <sch:pattern id="wmiobjnamespace">
                                                                         <sch:rule context="win-def:wmi_object/win-def:namespace">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the namespace entity of a wmi_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the namespace entity of a wmi_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -7809,6 +7919,7 @@
                                                                   <sch:pattern id="wmiobjwql">
                                                                         <sch:rule context="win-def:wmi_object/win-def:wql">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the wql entity of a wmi_object should be 'string'</sch:assert>
+                                                                            <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the wql entity of a wmi_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -7870,6 +7981,111 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
+      <!-- =============================================================================== -->
+      <!-- =========================  WUA UPDATE SEARCHER TEST  ========================== -->
+      <!-- =============================================================================== -->
+    <xsd:element name="wuaupdatesearcher_test" substitutionGroup="oval-def:test">
+        <xsd:annotation>
+            <xsd:documentation>The wuaupdatesearcher_test is used to evaluate patch level in a Windows environment utilizing the WUA (Windows Update Agent) interface.  It is based on the Search method of the IUpdateSearcher interface found in the WUA API.  It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a wmi_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+            <xsd:documentation>Note that WUA can work off of many different sources including WSUS, update.microsoft.com, and a local cab file.  The content source is specific to a given system evaluating a wuaupdatesearcher_test and thus is not defined by this test.  The tool being used for evaluation should determine what content source is best for the system being assessed and then evaluate this test based on that selection.</xsd:documentation>
+            <xsd:appinfo>
+                <sch:pattern id="wuaupdatesearchertst">
+                    <sch:rule context="win-def:wuaupdatesearcher_test/win-def:object">
+                        <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/win-def:wuasearch_object/@id">
+                            <sch:value-of select="../@id"/> - the object child element of a wuaupdatesearcher_test must reference a wuaupdatesearcher_object
+                        </sch:assert>
+                    </sch:rule>
+                    <sch:rule context="win-def:wuaupdatesearcher_test/win-def:state">
+                        <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/win-def:wuasearch_state/@id">
+                            <sch:value-of select="../@id"/> - the state child element of a wuaupdatesearcher_test must reference a wuaupdatesearcher_state
+                        </sch:assert>
+                    </sch:rule>
+                </sch:pattern>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:TestType">
+                    <xsd:sequence>
+                        <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                        <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="wuaupdatesearcher_object" substitutionGroup="oval-def:object">
+        <xsd:annotation>
+            <xsd:documentation>The wuaupdatesearcher_object element is used by a wuaupdatesearcher_test to define the specific search criteria to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="oval-def:ObjectType">
+                    <xsd:sequence>
+                        <xsd:choice>
+                            <xsd:element ref="oval-def:set" minOccurs="0"/>
+                            <xsd:sequence minOccurs="0">
+                                <xsd:element name="search_criteria" type="oval-def:EntityObjectStringType">
+                                    <xsd:annotation>
+                                        <xsd:documentation>The search_criteria entity specifies a search criteria to use when generating a search result.  The string used for the search criteria entity must match the custom search language for Search method of the IUpdateSearcher interface.  The string consists of criteria that are evaluated to determine which updates to return.  The Search method performs a synchronous search for updates by using the current configured search options.   For more information about possible search criteria, please see the Search method of the IUpdateSearcher interface.</xsd:documentation>
+                                        <xsd:appinfo>
+                                            <sch:pattern id="wuaupdatesearcherobjsearchcriteria">
+                                                <sch:rule context="win-def:wuaupdatesearcher_object/win-def:search_criteria">
+                                                    <sch:assert test="not(@datatype) or @datatype='string'">
+                                                        <sch:value-of select="../@id"/> - datatype attribute for the search_criteria entity of a wuaupdatesearcher_object should be 'string'
+                                                    </sch:assert>
+                                                    <sch:assert test="not(@operation) or @operation='equals'">
+                                                        <sch:value-of select="../@id"/> - operation attribute for the search_criteria entity of a wuaupdatesearcher_object should be 'equals'
+                                                    </sch:assert>
+                                                </sch:rule>
+                                            </sch:pattern>
+                                        </xsd:appinfo>
+                                    </xsd:annotation>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:choice>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="wuaupdatesearcher_state" substitutionGroup="oval-def:state">
+        <xsd:annotation>
+            <xsd:documentation>The wuaupdatesearcher_state element defines entities that can be tested related to a uaupdatesearcher_object.  This includes the search criteria and updated id.  Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+        </xsd:annotation>		
+        <xsd:complexType>			
+            <xsd:complexContent>				
+                <xsd:extension base="oval-def:StateType">
+                    <xsd:sequence>
+                        <xsd:element name="search_criteria" type="oval-def:EntityStateStringType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>The search_criteria entity specifies a string to examine the search criteria that was used to generate the object set.  Note that since this entity is part of the state, it is not used to determine the object set, but rather is used to test the search criteria that was actually used.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="wuaupdatesearcherstesearchcriteria">
+                                        <sch:rule context="win-def:wuaupdatesearcher_state/win-def:search_criteria">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the search_criteria entity of a wuaupdatesearcher_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="update_id" type="oval-def:EntityStateStringType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>The update_id enity specifies a string that represents a revision-independent identifier of an update.  This information is part of the IUpdateIdentity interface that is part of the result of the IUpdateSearcher interface's Search method.</xsd:documentation>
+                                <xsd:appinfo>
+                                    <sch:pattern id="wuaupdatesearchersteupdateid">
+                                        <sch:rule context="win-def:wuaupdatesearcher_state/win-def:update_id">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the update_id entity of a wuaupdatesearcher_state should be 'string'</sch:assert>
+                                        </sch:rule>
+                                    </sch:pattern>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>					
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
