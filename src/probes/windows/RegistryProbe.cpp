@@ -1,5 +1,4 @@
 //
-// $Id: $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -626,9 +625,9 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 					value.append(binaryBuf);
 
 					// add a space only if not at the end of the string
-					if(x < (valuelenIn - 1)) {
+					/*if(x < (valuelenIn - 1)) {
 						value.append(" ");
-					}
+					}*/
 				}
 				item->AppendElement(new ItemEntity("value",  value, OvalEnum::DATATYPE_BINARY, false, OvalEnum::STATUS_EXISTS));
 
