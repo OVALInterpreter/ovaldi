@@ -1,5 +1,5 @@
 %define name	ovaldi
-%define version	5.4.2
+%define version	5.5.3
 %define release	1
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
@@ -29,7 +29,7 @@ interface, but running the Interpreter will provide you with
 a list of true/false results and their references (e.g., CVE names)
 for all input OVAL definitions.
 
-MITRE offers the Interpreters, source code, schemas, and data files
+MITRE offers the Interpreter, source code, schemas, and data files
 at no cost to further the OVAL effort and in hopes that individuals
 and organizations will build and expand upon them. If you are 
 interested in contributing to the OVAL Interpreter please send an
