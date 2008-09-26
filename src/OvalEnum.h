@@ -86,6 +86,15 @@ public:
 	static string DatatypeToString(OvalEnum::Datatype datatype);
 	static OvalEnum::Datatype ToDatatype(string datatypeStr);
 
+    /** An enum to define the acceptable date time formats. */
+	enum DateTimeFormat	{DATETIME_YEAR_MONTH_DAY,
+					DATETIME_MONTH_DAY_YEAR,
+					DATETIME_DAY_MONTH_YEAR,
+					DATETIME_WIN_FILETIME,
+					DATETIME_SECONDS_SINCE_EPOCH};
+	static string DateTimeFormatToString(OvalEnum::DateTimeFormat dateTimeFormat);
+	static OvalEnum::DateTimeFormat ToDateTimeFormat(string dateTimeFormatStr);
+
 	/** enumeration of possible CollectedObject Flag values. */
 	enum Flag	{FLAG_ERROR,
 				FLAG_COMPLETE,

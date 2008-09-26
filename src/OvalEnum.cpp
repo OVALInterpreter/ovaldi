@@ -118,6 +118,55 @@ OvalEnum::Check OvalEnum::ToCheck(string checkStr) {
 	return check;
 }
 
+string OvalEnum::DateTimeFormatToString(OvalEnum::DateTimeFormat dateTimeFormat) {
+
+	string dateTimeFormatStr = "";
+
+	switch(dateTimeFormat) {
+		case (DATETIME_YEAR_MONTH_DAY):
+			dateTimeFormatStr = "year_month_day";
+			break;
+		case (DATETIME_MONTH_DAY_YEAR):
+			dateTimeFormatStr = "month_day_year";
+			break;
+		case (DATETIME_DAY_MONTH_YEAR):
+			dateTimeFormatStr = "day_month_year";
+			break;
+		case (DATETIME_WIN_FILETIME):
+			dateTimeFormatStr = "win_filetime";
+			break;
+		case (DATETIME_SECONDS_SINCE_EPOCH):
+			dateTimeFormatStr = "seconds_since_epoch";
+			break;
+		default:	
+			throw Exception("OvalEnum::DateTimeFormatToString - Error unsupported data time format value.");
+			break;
+	}
+
+	return dateTimeFormatStr;
+}
+
+OvalEnum::DateTimeFormat OvalEnum::ToDateTimeFormat(string dateTimeFormatStr) {
+
+	OvalEnum::DateTimeFormat dateTimeFormat;
+	
+	if(dateTimeFormatStr.compare(OvalEnum::DateTimeFormatToString(DATETIME_YEAR_MONTH_DAY)) == 0 || dateTimeFormatStr.compare("") == 0) {
+		dateTimeFormat = DATETIME_YEAR_MONTH_DAY;
+	} else if(dateTimeFormatStr.compare(OvalEnum::DateTimeFormatToString(DATETIME_MONTH_DAY_YEAR)) == 0) {
+		dateTimeFormat = DATETIME_MONTH_DAY_YEAR;
+	} else if(dateTimeFormatStr.compare(OvalEnum::DateTimeFormatToString(DATETIME_DAY_MONTH_YEAR)) == 0) {
+		dateTimeFormat = DATETIME_DAY_MONTH_YEAR;
+	} else if(dateTimeFormatStr.compare(OvalEnum::DateTimeFormatToString(DATETIME_WIN_FILETIME)) == 0) {
+		dateTimeFormat = DATETIME_WIN_FILETIME;
+	} else if(dateTimeFormatStr.compare(OvalEnum::DateTimeFormatToString(DATETIME_SECONDS_SINCE_EPOCH)) == 0) {
+		dateTimeFormat = DATETIME_SECONDS_SINCE_EPOCH;
+	} else {
+		throw Exception("OvalEnum::ToDateTimeFormat - Error unsupported date time format value: " + dateTimeFormatStr);
+	}
+
+	return dateTimeFormat;
+}
+
 string OvalEnum::ExistenceToString(OvalEnum::Existence existence) {
 
 	string existenceStr = "";
