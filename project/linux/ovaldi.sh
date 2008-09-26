@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# $Id: ovaldi.sh 4579 2008-01-02 17:39:07Z bakerj $
 #
 #****************************************************************************************#
 # Copyright (c) 2002-2008, The MITRE Corporation
@@ -40,13 +39,6 @@
 #
 if [ $# == 1 ]; then
   DEFS="$1"
-  # Check to make sure schema files are in the same directory
-  SCHEMADIR=`dirname "$DEFS"`
-  if [ ! -f ${SCHEMADIR}/oval-common-schema.xsd ]; then
-    echo "Error: Schema files must be located in the same directory as the"
-    echo "definition file."
-    exit 1
-  fi
 elif [ -f /usr/share/ovaldi/linux.definitions.xml ]; then
   DEFS=/usr/share/ovaldi/linux.definitions.xml
 else
