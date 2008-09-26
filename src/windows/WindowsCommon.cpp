@@ -33,6 +33,7 @@
 StringVector* WindowsCommon::allTrusteeNames = NULL;
 StringVector* WindowsCommon::allTrusteeSIDs = NULL;
 StringVector* WindowsCommon::wellKnownTrusteeNames = NULL;
+const int NAME_BUFFER_SIZE = 255;
 
 bool WindowsCommon::DisableAllPrivileges() {
 
@@ -315,15 +316,122 @@ bool WindowsCommon::ExpandGroup(string groupName, StringVector* members) {
 	return groupExists;
 }
 
-bool WindowsCommon::ExpandGroupBySID(string groupSID, StringVector* memberSIDs) {
-	// to do 
-	return false;
+
+bool WindowsCommon::ExpandGroupBySID(string groupSidStr, StringVector* memberSids) {	
+	
+	char groupNameBuffer[NAME_BUFFER_SIZE];
+	char domainNameBuffer[NAME_BUFFER_SIZE];
+	SID_NAME_USE sidType;
+	PSID pGroupSid;
+	bool retVal = false;
+	BYTE *pLocalMemberBuffer = NULL;
+
+	try	{
+		if(ConvertStringSidToSid(groupSidStr.c_str(), &pGroupSid) == 0) {
+			throw Exception("Error encountered converting group string SID in WindowsCommon::ExpandGroupBySID");
+		} else {	
+			DWORD dwGroupNameBufferSize = NAME_BUFFER_SIZE;	
+			DWORD dwDomainNameBufferSize = NAME_BUFFER_SIZE;
+
+			if(LookupAccountSid(NULL, pGroupSid, groupNameBuffer, &dwGroupNameBufferSize, domainNameBuffer, &dwDomainNameBufferSize, &sidType) != 0) {				
+				DWORD dwEntriesRead = 0;
+				DWORD dwTotalEntries = 0;
+
+				wchar_t wideGroupNameBuffer[NAME_BUFFER_SIZE];
+
+				memset(wideGroupNameBuffer, 0, NAME_BUFFER_SIZE * 2);
+				mbstowcs(wideGroupNameBuffer, groupNameBuffer, dwGroupNameBufferSize);
+
+				NET_API_STATUS apiStatus = NetLocalGroupGetMembers(NULL, wideGroupNameBuffer, 0, &pLocalMemberBuffer, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
+
+				if(apiStatus == NERR_Success) {	
+					LOCALGROUP_MEMBERS_INFO_0 *pLocalGroupMembers = (LOCALGROUP_MEMBERS_INFO_0 *)pLocalMemberBuffer;
+
+					for(DWORD i = 0; i < dwTotalEntries; i++) {
+						char *recvString = NULL;
+
+						if(ConvertSidToStringSid(pLocalGroupMembers[i].lgrmi0_sid, &recvString) != 0) {
+							std::string s = recvString;
+							memberSids->push_back(s);	
+							LocalFree(recvString);
+						} else {
+							throw Exception("Error encountered converting group string SID in WindowsCommon::ExpandGroupBySID");
+							break;
+						}
+					}
+
+					retVal = true;
+				} else {
+					// If we try to get members for a non group let it go.
+				}
+			} else {
+				throw Exception("Error in call to LookupAccountSid for " + groupSidStr + " in WindowsCommon::ExpandGroupBySID");
+			}
+		}
+
+	} catch(...) {
+		if(pGroupSid != NULL) {
+			LocalFree(pGroupSid);
+		}
+
+		if(pLocalMemberBuffer != NULL) {
+			NetApiBufferFree(pLocalMemberBuffer);
+		}
+
+		throw;
+	}
+
+	if(pGroupSid != NULL) {
+		LocalFree(pGroupSid);
+	}
+
+	if(pLocalMemberBuffer != NULL) {
+		NetApiBufferFree(pLocalMemberBuffer);
+	}
+
+	return true;
 }
 
 bool WindowsCommon::IsGroupSID(string SID) {
 
-	// to do 
-	return false;
+	PSID pSID;	
+	DWORD nameBufferSize = NAME_BUFFER_SIZE;	
+	DWORD domainNameBufferSize = NAME_BUFFER_SIZE;
+	DWORD sidSize = NAME_BUFFER_SIZE;
+	char nameBuffer[NAME_BUFFER_SIZE];
+	char domainNameBuffer[NAME_BUFFER_SIZE];
+	SID_NAME_USE sidType;
+	bool isAccountGroup = false;
+
+	try {
+		
+        if(ConvertStringSidToSid(SID.c_str(), &pSID) == 0) {
+			throw Exception("Error encountered converting group string SID");
+		}
+
+		if(!IsValidSid(pSID)) {
+			throw Exception("Invalid SID found in WindowsCommon::IsGroupSID()");
+		}
+
+		if(LookupAccountSid(NULL, pSID, nameBuffer, &nameBufferSize, domainNameBuffer, &domainNameBufferSize, &sidType) != 0)  {
+			isAccountGroup = IsAccountGroup(sidType, string(nameBuffer));
+		} else {
+			throw Exception("Error looking up SID.  Error: " + GetLastError());
+		}
+
+	} catch(...) {
+		if(pSID != NULL) {
+			LocalFree(pSID);
+		}
+
+		throw;
+	}
+
+	if(pSID != NULL) {
+		LocalFree(pSID);
+	}
+
+	return isAccountGroup;
 }
 
 StringVector* WindowsCommon::GetAllGroups() {
@@ -377,7 +485,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringVector* members
 					string userName = WindowsCommon::GetFormattedTrusteeName(pSid);
 					members->push_back(userName);
 				} catch (Exception ex) {
-					Log::Info("Unable to get all group memebrs." + ex.GetErrorMessage());
+					Log::Info("Unable to get all group members." + ex.GetErrorMessage());
 				}
 			}
 
@@ -1103,6 +1211,100 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 	}
 
 	return isGroup;
+}
+
+bool WindowsCommon::IsAccountGroup(SID_NAME_USE sidType, string accountName) {
+	
+	if ((sidType == SidTypeGroup) || (sidType == SidTypeWellKnownGroup) || (sidType == SidTypeAlias)) {	
+		return (accountName.compare("SYSTEM") != 0); // special case...
+	}
+	
+	return false;
+}
+
+bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr) {
+
+	PSID pSid = NULL;
+	LPTSTR pDomain = NULL;
+	LPTSTR pAccountName = NULL;
+	DWORD accountNameSize = 128;
+	DWORD domainSize = 128;
+	SID_NAME_USE sid_type;
+	BOOL retVal = FALSE;
+
+	do {
+		// Initial memory allocations for the ACCOUNT and DOMAIN.
+		pAccountName = (LPTSTR)realloc(pAccountName, accountNameSize);
+		if (pAccountName == NULL) {
+			retVal = FALSE;
+			break;
+		}
+
+		pDomain = (LPTSTR)realloc(pDomain, domainSize);
+		if (pDomain == NULL) {
+			retVal = FALSE;
+			break;
+		}
+
+		if(pSid == NULL) {
+			if(ConvertStringSidToSid(sidStr.c_str(), &pSid) == 0) {
+				throw Exception("Error encountered converting group string SID in WindowsCommon::ExpandGroupBySID");
+			}
+		}
+
+		// Call LookupAccountSid to get the account name and domain.
+		retVal = LookupAccountSid(NULL,							// system name
+								  pSid,							// security identifier
+								  pAccountName,					// account name
+								  &accountNameSize,				// security identifier
+								  pDomain,						// domain name
+								  &domainSize,					// size of domain name
+								  &sid_type);					// SID-type indicator
+
+	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+	LocalFree(pSid);
+	if(retVal == TRUE) {
+		(*pAccountNameStr) = pAccountName;
+		(*pDomainStr) = pDomain;
+		free(pAccountName);
+		free(pDomain);	
+	} else {
+		if(pAccountName != NULL){
+			free(pAccountName);
+		}
+
+		if(pDomain != NULL){
+			free(pDomain);
+		}
+	
+		DWORD error = GetLastError();
+		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
+			throw Exception("Unable to locate account: " + sidStr + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
+		} else {
+			throw Exception("Error failed to look up account: " + sidStr + ". " + WindowsCommon::GetErrorMessage(error));
+		}
+	}
+
+	// make sure account names are consistantly formated
+	if(sid_type == SidTypeUser) {
+		// make sure all user accounts are prefixed by their domain or the local system name.
+		if((*pAccountNameStr).find("\\") == string::npos && (*pDomainStr).compare("") != 0)
+			(*pAccountNameStr) = (*pDomainStr) + "\\" + (*pAccountNameStr);
+
+	} else if(sid_type == SidTypeDomain) {
+		// do not prepend the domain if it is a domain...
+
+	} else {
+		// make sure all local group accounts are prefixed by their domain
+		// do not prefix if domain is "BUILTIN" "NT AUTHORITY"
+		if((*pDomainStr).compare("BUILTIN") != 0 && (*pDomainStr).compare("NT AUTHORITY") != 0) {
+			if((*pAccountNameStr).find("\\") == string::npos && (*pDomainStr).compare("") != 0)
+				(*pAccountNameStr) = (*pDomainStr) + "\\" + (*pAccountNameStr);
+		}
+	}
+
+	return IsAccountGroup(sid_type, *pAccountNameStr);
 }
 
 string WindowsCommon::LookUpLocalSystemName() {

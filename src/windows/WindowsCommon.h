@@ -113,6 +113,9 @@ public:
 	/** Get the domain and sid string for the specifeid trustee name. Return true if the trustee is a group. */
 	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
 
+	/** Get the account and domain string for the specified trustee sid. Return true if the trustee is a group. */
+	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr);
+
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
 
@@ -154,11 +157,13 @@ private:
 	static void GetWellKnownTrusteeNames();
 
 	/** Look up the local system name. */
-	static string WindowsCommon::LookUpLocalSystemName();
+	static string LookUpLocalSystemName();
 
 	static StringVector* allTrusteeNames;
 	static StringVector* allTrusteeSIDs;
 	static StringVector* wellKnownTrusteeNames;
+
+	static inline bool IsAccountGroup(SID_NAME_USE sidType, string accountName);	
 };
 
 #endif
