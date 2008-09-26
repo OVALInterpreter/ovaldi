@@ -50,6 +50,8 @@ using namespace std;
 
 /**
 	This class is responsible for collecting information from WMI.
+
+    This class is intended to be used when no other API based solution is available.
 */
 class WMIUtil {
 
