@@ -82,11 +82,13 @@
 				Version="2.0"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\build\Win32\Debug"
+				DelayLoadDLLs="Advapi32.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/ovaldiD.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				SupportUnloadOfDelayLoadedDLL="true"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -178,10 +180,12 @@
 				Version="5.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				DelayLoadDLLs="Advapi32.dll"
 				ProgramDatabaseFile=".\Release/ovaldi.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				SupportUnloadOfDelayLoadedDLL="true"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -416,6 +420,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\independent\EnvironmentVariableProbe.cpp"
 					>
 				</File>
@@ -465,6 +473,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\SidProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\SidSidProbe.cpp"
 					>
 				</File>
 				<File
@@ -691,6 +703,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\ArithmeticFunction.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\BeginFunction.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\ComponentFactory.cpp"
 					>
 				</File>
@@ -704,6 +724,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\ConstantVariable.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\EndFunction.cpp"
 					>
 				</File>
 				<File
@@ -735,11 +759,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\RegexCaptureFunction.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\RestrictionType.cpp"
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\SplitFunction.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\SubstringFunction.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\TimeDifferenceFunction.cpp"
 					>
 				</File>
 				<File
@@ -776,6 +812,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\windows\WindowsCommon.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\windows\WMIUtil.cpp"
 					>
 				</File>
 			</Filter>
@@ -956,6 +996,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\independent\EnvironmentVariableProbe.h"
 					>
 				</File>
@@ -1005,6 +1049,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\SidProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\SidSidProbe.h"
 					>
 				</File>
 				<File
@@ -1084,6 +1132,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\ArithmeticFunction.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\BeginFunction.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\ComponentFactory.h"
 					>
 				</File>
@@ -1097,6 +1153,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\ConstantVariable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\EndFunction.h"
 					>
 				</File>
 				<File
@@ -1128,11 +1188,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\RegexCaptureFunction.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\RestrictionType.h"
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\SplitFunction.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\SubstringFunction.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\TimeDifferenceFunction.h"
 					>
 				</File>
 				<File
@@ -1169,6 +1241,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\windows\WindowsCommon.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\windows\WMIItem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\windows\WMIUtil.h"
 					>
 				</File>
 			</Filter>
