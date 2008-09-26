@@ -1,5 +1,4 @@
 //
-// $Id: XmlProcessor.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -29,6 +28,41 @@
 //
 //****************************************************************************************//
 #include "XmlProcessor.h"
+
+//****************************************************************************************//
+//			DataDirResolver Class                                   					  //	
+//****************************************************************************************//
+
+DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const publicId, const XMLCh *const systemId, const XMLCh *const baseURI) {
+	
+	string path = "";
+	size_t last;
+	string schemapath = Common::GetSchemaPath();
+
+	if(schemapath.empty()) {
+        schemapath = Common::fileSeperatorStr;
+	}
+
+    //remove double quotes
+	while((last = schemapath.find_last_of("\"")) != string::npos) {
+		schemapath.erase(last, 1);  
+	}
+
+
+    if(schemapath[schemapath.length()-1] != Common::fileSeperator) {
+		schemapath = schemapath+"\\";
+	}
+
+	string systemIDFilename = XmlCommon::ToString(systemId);
+	last = systemIDFilename.find_last_of("/\\");
+	path = schemapath + systemIDFilename.substr(last+1);
+
+	return new Wrapper4InputSource (new LocalFileInputSource (XMLString::transcode (path.c_str())));	
+}
+
+//****************************************************************************************//
+//																						  //	
+//****************************************************************************************//
 
 //****************************************************************************************//
 //								XmlProcessor Class										  //	
@@ -88,6 +122,17 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string fileP
 	parser->setFeature(XMLUni::fgXercesSchemaFullChecking, true); //  Enable full schema constraint checking, including checking which may be time-consuming or memory intensive. Currently, particle unique attribution constraint checking and particle derivation restriction checking are controlled by this option.  
 	parser->setFeature(XMLUni::fgXercesValidationErrorAsFatal, true); //  The parser will treat validation error as fatal and will exit  
 	parser->setFeature(XMLUni::fgXercesDOMHasPSVIInfo, true); // Enable storing of PSVI information in element and attribute nodes.
+
+	///////////////////////////////////////////////////////
+//****************************************************************************************//
+//			The following code was added to handle air-gap operation					  //	
+//****************************************************************************************//
+	/* Look for XML schemas in local directory instead of Internet */
+		DataDirResolver resolver;
+		parser->setEntityResolver (&resolver);
+//****************************************************************************************//
+//			End of air-gap code															  //	
+//****************************************************************************************//
 
 	///////////////////////////////////////////////////////
     //	Add an Error Handler
@@ -232,12 +277,6 @@ XmlProcessorException::XmlProcessorException(string errMsgIn, int severity) : Ex
 }
 
 XmlProcessorException::~XmlProcessorException() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 
 }
 

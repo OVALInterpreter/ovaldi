@@ -1,5 +1,4 @@
 //
-// $Id: XmlProcessor.h 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -61,12 +60,33 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/util/XMLUni.hpp>
 
+// for entity resolver
+#include <xercesc/dom/DOMEntityResolver.hpp>
+#include <xercesc/dom/DOMInputSource.hpp>
+#include <xercesc/framework/LocalFileInputSource.hpp>
+#include <xercesc/framework/Wrapper4InputSource.hpp>
+
+#include <string>
+
 #include "Common.h"
 #include "XmlCommon.h"
 #include "Exception.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace	std;
+
+
+/** 
+	This class extends the default DOMEntityResolver and implments the resolve entity method 
+	to support 
+*/
+class DataDirResolver : public DOMEntityResolver {
+public:
+	/**
+     *     
+	*/
+	DOMInputSource *resolveEntity (const XMLCh *const publicId, const XMLCh *const systemId, const XMLCh *const baseURI);
+};
 
 /**
 	This class uses xerces to parse, create and write XML documents.
