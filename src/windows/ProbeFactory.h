@@ -57,11 +57,13 @@
 #include "LockoutPolicyProbe.h"
 #include "AuditEventPolicyProbe.h"
 #include "SidProbe.h"
+#include "SidSidProbe.h"
 #include "FileEffectiveRightsProbe.h"
 #include "FileEffectiveRights53Probe.h"
 #include "AccessTokenProbe.h"
 #include "GroupProbe.h"
 #include "UserProbe.h"
+#include "AuditEventPolicySubcategoriesProbe.h"
 
 using namespace std;
 

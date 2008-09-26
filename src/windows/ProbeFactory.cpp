@@ -1,5 +1,4 @@
 //
-// $Id: ProbeFactory.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -57,6 +56,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = AuditEventPolicyProbe::Instance();
 	} else if(objectName.compare("sid_object") == 0) {
 		probe = SidProbe::Instance();
+	} else if(objectName.compare("sid_sid_object") == 0) {
+		probe = SidSidProbe::Instance();
 	} else if(objectName.compare("fileeffectiverights53_object") == 0) {
 		probe = FileEffectiveRights53Probe::Instance();
 	} else if(objectName.compare("fileeffectiverights_object") == 0) {
@@ -68,6 +69,9 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = GroupProbe::Instance();
 	} else if(objectName.compare("user_object") == 0) {
 		probe = UserProbe::Instance();
+	} else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
+		probe = AuditEventPolicySubcategoriesProbe::Instance();
+
 
 // independent schema objects
 	} else if(objectName.compare("family_object") == 0) {
@@ -151,5 +155,9 @@ void ProbeFactory::Shutdown() {
 
 	probe = TextFileContentProbe::Instance();
 	delete probe;
-}
 
+	probe = SidSidProbe::Instance();
+	delete probe;
+
+	AuditEventPolicySubcategoriesProbe::DeleteInstance();
+}
