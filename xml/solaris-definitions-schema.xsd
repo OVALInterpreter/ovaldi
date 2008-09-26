@@ -6,8 +6,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Solaris Definition</schema>
-                  <version>5.5 Release Candidate 1</version>
-                  <date>9/10/2008 8:19:07 AM</date>
+                  <version>5.5</version>
+                  <date>9/26/2008 7:31:00 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sol-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"/>
@@ -24,11 +24,11 @@
                   <xsd:appinfo>
                         <sch:pattern id="isainfotst">
                               <sch:rule context="sol-def:isainfo_test/sol-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sol-def:smf_object/@id">
+                                  <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sol-def:isainfo_object/@id">
                                           <sch:value-of select="../@id"/> - the object child element of an isainfo_test must reference an isainfo_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sol-def:isainfo_test/sol-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sol-def:smf_state/@id">
+                                  <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sol-def:isainfo_state/@id">
                                           <sch:value-of select="../@id"/> - the state child element of an isainfo_test must reference an isainfo_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>

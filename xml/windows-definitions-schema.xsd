@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.5 Release Candidate 1</version>
-                  <date>9/10/2008 8:19:08 AM</date>
+                  <version>5.5</version>
+                  <date>9/26/2008 7:31:01 AM</date>
                   <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -5823,7 +5823,7 @@
                               <sch:rule context="win-def:regkeyeffectiverights53_test/win-def:object">
                                     <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/win-def:regkeyeffectiverights53_object/@id"><sch:value-of select="../@id"/> - the object child element of a regkeyeffectiverights53_test must reference a regkeyeffectiverights53_object</sch:assert>
                               </sch:rule>
-                              <sch:rule context="win-def:regkeyeffectiverights_test/win-def:state">
+                              <sch:rule context="win-def:regkeyeffectiverights53_test/win-def:state">
                                     <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/win-def:regkeyeffectiverights53_state/@id"><sch:value-of select="../@id"/> - the state child element of a regkeyeffectiverights53_test must reference a regkeyeffectiverights53_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
@@ -6726,8 +6726,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_read_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_read_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_read_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_read_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6739,8 +6739,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_write_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_write_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_write_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_write_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6752,8 +6752,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_create_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_create_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_create_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_create_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6765,8 +6765,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_exec_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_exec_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_exec_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_exec_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6778,8 +6778,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_delete_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_delete_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_delete_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_delete_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6791,8 +6791,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_atrib_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_atrib_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_atrib_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_atrib_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6804,8 +6804,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_perm_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_perm_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_perm_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_perm_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -6817,8 +6817,8 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="srsteaccess_all_permission">
                                                             <sch:rule context="win-def:sharedresource_state/win-def:access_all_permission">
-                                                                  <sch:assert test="not(@datatype) or @datatype='bool'">
-                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_all_permission entity of a sharedresource_state should be 'bool'</sch:assert>
+                                                                  <sch:assert test="@datatype='boolean'">
+                                                                        <sch:value-of select="../@id"/> - datatype attribute for the access_all_permission entity of a sharedresource_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>

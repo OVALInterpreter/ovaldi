@@ -6,11 +6,12 @@
           <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.5 Release Candidate 1</version>
-               <date>9/10/2008 8:19:08 AM</date>
+               <version>5.5</version>
+               <date>9/26/2008 7:31:01 AM</date>
                 <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
+              <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
           </xsd:appinfo>
      </xsd:annotation>
      <!-- =============================================================================== -->
@@ -3742,7 +3743,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_read_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_read_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_read_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_read_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3754,7 +3755,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_write_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_write_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_write_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_write_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3766,7 +3767,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_create_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_create_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_create_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_create_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3778,7 +3779,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_exec_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_exec_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_exec_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_exec_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3790,7 +3791,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_delete_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_delete_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_delete_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_delete_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3802,7 +3803,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_atrib_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_atrib_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_atrib_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_atrib_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3814,7 +3815,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_perm_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_perm_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_perm_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_perm_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3826,7 +3827,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="sritemaccess_all_permission">
                                                   <sch:rule context="win-sc:sharedresource_item/win-sc:access_all_permission">
-                                                       <sch:assert test="not(@datatype) or @datatype='bool'">item <sch:value-of select="../@id"/> - datatype attribute for the access_all_permission entity of a sharedresource_item should be 'bool'</sch:assert>
+                                                       <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the access_all_permission entity of a sharedresource_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
