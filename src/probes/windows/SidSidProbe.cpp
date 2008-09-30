@@ -140,12 +140,16 @@ ItemVector* SidSidProbe::CollectItems(Object *object) {
 		BehaviorVector::iterator iterator;
 		for(iterator = behaviors->begin(); iterator != behaviors->end(); iterator++) {
 			Behavior* behavior = (*iterator);
-			if(behavior->GetName().compare("include_group") == 0 && behavior->GetValue().compare("false") == 0) {
-				includeGroupBehavior = false;
-			} else if(behavior->GetName().compare("resolve_group") == 0 && behavior->GetValue().compare("true") == 0) {
-				resolveGroupBehavior = true;
+			iif(behavior->GetName().compare("include_group") == 0)  {
+                if(behavior->GetValue().compare("false") == 0) {
+				    includeGroupBehavior = false;
+                }
+            } else if(behavior->GetName().compare("resolve_group") == 0) {
+                if(behavior->GetValue().compare("true") == 0) {
+				    resolveGroupBehavior = true;
+                }
 			} else {
-				Log::Info("Unsupported behavior found when collecting " + object->GetId());
+                Log::Info("Unsupported behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
 			}
 		}		
 	}

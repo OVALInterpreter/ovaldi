@@ -1,5 +1,4 @@
 //
-// $Id: AccessTokenProbe.cpp 4579 2008-01-02 17:39:07Z bakerj $
 //
 //****************************************************************************************//
 // Copyright (c) 2002-2008, The MITRE Corporation
@@ -89,7 +88,7 @@ ItemVector* AccessTokenProbe::CollectItems(Object *object) {
 					resolveGroupBehavior = true;
 				}
 			} else {
-				Log::Info("Unsupported behavior found when collecting " + object->GetId() + " behavior: " + behavior->GetName());
+				Log::Info("Unsupported behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
 			}
 		}		
 	}
