@@ -138,17 +138,20 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 	if(object->GetBehaviors()->size() != 0) {
 		BehaviorVector* behaviors = object->GetBehaviors();
 		BehaviorVector::iterator iterator;
-		if(behavior->GetName().compare("include_group") == 0)  {
+        for(iterator = behaviors->begin(); iterator != behaviors->end(); iterator++) {
+			Behavior* behavior = (*iterator);
+		    if(behavior->GetName().compare("include_group") == 0)  {
                 if(behavior->GetValue().compare("false") == 0) {
-				    includeGroupBehavior = false;
+			        includeGroupBehavior = false;
                 }
             } else if(behavior->GetName().compare("resolve_group") == 0) {
                 if(behavior->GetValue().compare("true") == 0) {
-				    resolveGroupBehavior = true;
+			        resolveGroupBehavior = true;
                 }
-			} else {
+		    } else {
                 Log::Info("Unsupported behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
-			}		
+		    }
+        }
 	}
 
 	// get the SID data

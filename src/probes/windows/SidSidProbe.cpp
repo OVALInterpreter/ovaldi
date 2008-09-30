@@ -140,7 +140,7 @@ ItemVector* SidSidProbe::CollectItems(Object *object) {
 		BehaviorVector::iterator iterator;
 		for(iterator = behaviors->begin(); iterator != behaviors->end(); iterator++) {
 			Behavior* behavior = (*iterator);
-			iif(behavior->GetName().compare("include_group") == 0)  {
+			if(behavior->GetName().compare("include_group") == 0)  {
                 if(behavior->GetValue().compare("false") == 0) {
 				    includeGroupBehavior = false;
                 }
