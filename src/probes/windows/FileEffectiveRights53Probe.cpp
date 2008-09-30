@@ -112,7 +112,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 			} else if(behavior->GetName().compare("resolve_group") == 0 && behavior->GetValue().compare("true") == 0) {
 				resolveGroupBehavior = true;
 			} else {
-				Log::Info("Unsupported behavior found when collecting " + object->GetId());
+                Log::Info("Unsupported behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
 			}
 		}		
 	}
