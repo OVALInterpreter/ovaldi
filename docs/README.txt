@@ -303,7 +303,10 @@ for more information.
            Definitions in the input document that are not in the list will be 
            assigned a 'Not Evaluated' evaluated.  
 
-     -m -- Run without requiring an MD5 checksum.  Running the
+     -a -- Specifies the pathname of the directory that contains the OVAL
+           schema and other xml resources. DEFAULT="xml"
+	 
+	 -m -- Run without requiring an MD5 checksum.  Running the
            Interpreter with this option DISABLES an important security
            feature.  In normal usage, a trusted checksum provided on the
            command line is used to verify the integrity of the OVAL
