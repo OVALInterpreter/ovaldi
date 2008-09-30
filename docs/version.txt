@@ -32,7 +32,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
----        Version 5.5 build ??     ---
+---        Version 5.5 build 3      ---
 ---------------------------------------
 * Converted windows project to Visual Studio 2008 format. This conversion required one minor change WindowsCommon.h for make it compile without warnings with the new SDK.
 * Corrected bug in WMIProbe.cpp. wmi_items were not properly being collected resulting incorrect wmi_test evaluations.
