@@ -40,17 +40,20 @@ LINUXPROBEDIR = ${SRCDIR}/probes/linux
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
 CURRENTDIR = ../project/linux
 
-INCDIRS = -I/usr/include -I$(LINUXDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${LINUXPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/usr/include/pcre
+INCDIRS = -I/usr/local/include -I/usr/include -I$(LINUXDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${LINUXPROBEDIR} -I${INDEPENDENTPROBEDIR}
 
 EXECUTABLE = $(OUTDIR)/ovaldi
 
 # The location of the c++ compiler.
-CXX = /usr/bin/g++
+ifeq (${CXX}, )
+ CXX=/usr/bin/g++
+endif
+
 
 # General options that should be used by g++.
 CPPFLAGS = -Wall -O
 
-LIBDIR = -L/usr/lib
+LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lpopt
