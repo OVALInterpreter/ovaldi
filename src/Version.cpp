@@ -87,3 +87,4 @@ string Version::GetSchemaVersion() {
 	version.append(VERSION);
     return(version);
 }
+

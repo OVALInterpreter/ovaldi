@@ -260,7 +260,7 @@ bool REGEX::IsConstant(string pattern) {
 	if(pattern.length() == 0)
 		return true;
 
-	if(regexChar != -1)
+	if( regexChar != string::npos )
 	{
 		//	Try removing a leading ^ if it is not followed by a regex char
 		if (regexChar == 0 && pattern.at(regexChar) == '^')
