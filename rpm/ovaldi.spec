@@ -82,6 +82,10 @@ elif grep "release 4" /etc/redhat-release &> /dev/null ; then
   /bin/cp project/linux/EL4/libxerces-c.so.27.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
   /bin/cp project/linux/EL4/libxalan-c.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
   /bin/cp project/linux/EL4/libxalanMsg.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
+elif grep "release 5" /etc/redhat-release &> /dev/null ; then
+  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
+  /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
+  /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
 else
   echo "Unsupported Redhat version. Exiting."
   exit 1
@@ -156,6 +160,10 @@ fi
 /usr/lib/ovaldi/libxalanMsg.so.110.0
 
 %changelog
+
+* Thu Oct 02 2008 Jonathen Baker <bakerj@mitre.org> 5.5.0-1.0
+* Updated to 5.5 source.
+
 * Thu Jun 28 2007 Jonathen Baker <bakerj@mitre.org> 5.3.0-1.0
 * Updated to 5.3 source.
 
