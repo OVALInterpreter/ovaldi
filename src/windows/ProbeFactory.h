@@ -64,6 +64,7 @@
 #include "GroupProbe.h"
 #include "UserProbe.h"
 #include "AuditEventPolicySubcategoriesProbe.h"
+#include "WUAUpdateSearcherProbe.h"
 
 using namespace std;
 

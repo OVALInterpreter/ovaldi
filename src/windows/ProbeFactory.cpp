@@ -71,7 +71,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = UserProbe::Instance();
 	} else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		probe = AuditEventPolicySubcategoriesProbe::Instance();
-
+	} else if(objectName.compare("wuaupdatesearcher_object") == 0) {
+		probe = WUAUpdateSearcherProbe::Instance();
 
 // independent schema objects
 	} else if(objectName.compare("family_object") == 0) {
@@ -158,6 +159,8 @@ void ProbeFactory::Shutdown() {
 
 	probe = SidSidProbe::Instance();
 	delete probe;
+
+    WUAUpdateSearcherProbe::DeleteInstance();
 
 	AuditEventPolicySubcategoriesProbe::DeleteInstance();
 }
