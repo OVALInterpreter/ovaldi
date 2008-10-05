@@ -27,7 +27,6 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
-
 #ifndef AUDITEVENTPOLICYSUBCATEGORIESPROBE_H
 #define AUDITEVENTPOLICYSUBCATEGORIESPROBE_H
 
@@ -40,6 +39,9 @@
 
 using namespace std;
 
+/** 
+    This class is responsible for collecting information for windows auditeventpolicysubcategories_object.
+*/
 class AuditEventPolicySubcategoriesProbe : public AbsProbe {
 public:
 	~AuditEventPolicySubcategoriesProbe();
@@ -53,7 +55,7 @@ public:
 	/** Ensure that the AuditEventPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
 
-	static void AuditEventPolicySubcategoriesProbe::DeleteInstance();
+	static void DeleteInstance();
 
 private:
 
