@@ -32,6 +32,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.5 build ?      ---
+---------------------------------------
+* Added support for the new win-def:wuaupdatesearcher_test with the WUAUpdateSearcherProbe. Thanks for sample code contributions from Kevin Sitto of G2, Inc. (http://g2-inc.com/)
+* Added support for Redhat EL5.
+
+---------------------------------------
 ---        Version 5.5 build 3      ---
 ---------------------------------------
 * Converted windows project to Visual Studio 2008 format. This conversion required one minor change WindowsCommon.h for make it compile without warnings with the new SDK.
