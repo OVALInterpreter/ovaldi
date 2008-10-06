@@ -122,7 +122,6 @@ Item* WUAUpdateSearcherProbe::CreateItem() {
 	return item;
 }
 
-
 ItemEntityVector* WUAUpdateSearcherProbe::GetSearchCriteria(ObjectEntity* search_criteria) {
 
     ItemEntityVector* searchCriteriaItems = new ItemEntityVector();
@@ -138,8 +137,6 @@ ItemEntityVector* WUAUpdateSearcherProbe::GetSearchCriteria(ObjectEntity* search
 
 		// retrieve all the variable values that match the supplied var_ref.
 		VariableValueVector* vars = search_criteria->GetVariableValues();
-
-		// we may need to add a check to see if the search_criteria exists here?
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
@@ -267,12 +264,10 @@ Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
 			    throw ProbeException("(WUAUpdateSearcherProbe) Failed to cast the enumerator of the search results. " + errorMessage, ERROR_FATAL);
 		    }
 
-		    // examine all the searh results
-		    VARIANT variant;
+		    // examine all the searh results		    
 		    ULONG celtFetched = 0;
 		    HRESULT nextHRES = S_OK;
-		    IDispatch *pDisp = NULL;
-		    IUpdate* pUpdate;		
+            VARIANT variant;
 		    while(S_OK == nextHRES) {
 
 			    nextHRES = pIEnumVARIANT->Next(1, &variant, &celtFetched);
@@ -284,7 +279,9 @@ Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
 
 			    } else {
 
-				    // We have a result. Create an ItemEntity for it and add it to the item.
+				    // We have a result. Create an ItemEntity for it and add it to the item.                    
+                    IDispatch *pDisp = NULL;
+                    IUpdate* pUpdate;		
 
 				    pDisp = V_DISPATCH(&variant);
 				    pDisp->QueryInterface(IID_IUpdate, (void**)&pUpdate); 
@@ -320,7 +317,7 @@ Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
 		this->ShutdownWUASearcher();
 
 		// re-throw the error so it can be caught higher up.
-		throw ProbeException("An unknown error occured while executing a wql.");
+		throw ProbeException("(WUAUpdateSearcherProbe) An unknown error occured while searching for updates.");
 	}
 
 	this->ShutdownWUASearcher();
@@ -380,7 +377,7 @@ void WUAUpdateSearcherProbe::InitWUASearcher() {
 		hres = pIUSearcher->put_ServerSelection(ssDefault);
 		if (FAILED(hres)) {
 			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WUAUpdateSearcherProbe) Failed to set the searver to search for updates. " + errorMessage, ERROR_FATAL);
+			throw ProbeException("(WUAUpdateSearcherProbe) Failed to set the server to search for updates. " + errorMessage, ERROR_FATAL);
 		}	
 
 	} catch (ProbeException ex) {
@@ -398,4 +395,3 @@ void WUAUpdateSearcherProbe::InitWUASearcher() {
 		throw ProbeException("An unknown error occured while executing a windows update search.");
 	}
 }
-
