@@ -50,7 +50,7 @@ DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const publicId, con
 
 
     if(schemapath[schemapath.length()-1] != Common::fileSeperator) {
-		schemapath = schemapath+"\\";
+		schemapath = schemapath + Common::fileSeperatorStr;
 	}
 
 	string systemIDFilename = XmlCommon::ToString(systemId);
