@@ -35,35 +35,35 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---        Version 5.5 build 4      ---
 ---------------------------------------
 * Added support for the new win-def:wuaupdatesearcher_test with the WUAUpdateSearcherProbe. Thanks for sample code contributions from Kevin Sitto of G2, Inc. (http://g2-inc.com/)
-* Added support for Redhat EL5.
-* 
+* Added support for RedHat EL5.
+* Updated spec file to comply with RPM. Thanks to Steve Milner for the corrections.
 
 ---------------------------------------
 ---        Version 5.5 build 3      ---
 ---------------------------------------
-* Converted windows project to Visual Studio 2008 format. This conversion required one minor change WindowsCommon.h for make it compile without warnings with the new SDK.
+* Converted windows project to Visual Studio 2008 format. This conversion required one minor change to WindowsCommon.h to make it compile without warnings with the new SDK.
 * Corrected bug in WMIProbe.cpp. wmi_items were not properly being collected resulting incorrect wmi_test evaluations.
 * Added log message when an object is not supported for data collection.
 * Corrected bug that caused a deprecated message for the check='none exist' on a test to be incorrectly reported in the log file.
 * Added mapping of deprected var_check and entity_check 'none exist' value to 'none satisfy' value.
 * Corrected numerous coding issues related to misuse of sizeof. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
-* Corrected numerous coding issues related to throwing exceptions without freeing or deleteing allocated memory. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
+* Corrected numerous coding issues related to throwing exceptions without freeing or deleting allocated memory. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
 * Added file existence check to all files that are specified on the command line. 
 * Added a check to DocumentManager::GetExternalVariableDocument() before the external variable file is read to make sure it exists. If the check fails the error is logged with a message indicating that an external variable file is needed for proper evaluation of the current definitions.
 * Moved version to 5.5 and add the Version::GetSchemaVersion() method to simplify changing the schema version.
 * Added support for case insensitive equals and not equals. Thanks to Lumension Security (http://www.lumension.com)
 * Changed ExternalVariable::ComputeValue() to warn and not error out when the input datatype on a variable does not match the desired datatype in the definition document. Based on a suggestion by Lumension Security (http://www.lumension.com).
-* Added a command line flag '-a' to allow the user to specify the location of the OVAL schema files that will be utilized for schema validation. The default value is 'xml'. This 'xml' directory is also considered the home of the Schematron validation xsl and the resutls to html conversion xsl. This directory will now be a component of binary distributions. Thanks to Lumension Security (http://www.lumension.com)
+* Added a command line flag '-a' to allow the user to specify the location of the OVAL schema files that will be utilized for schema validation. The default value is 'xml'. This 'xml' directory is also considered the home of the Schematron validation xsl and the results to html conversion xsl. This directory will now be a component of binary distributions. Thanks to Lumension Security (http://www.lumension.com)
 * Added support for driving evaluations off of an input system characteristics file that does not include the <collected_object/> section. This capability will allow other systems to generate system characteristics files without prior knowledge of a set of definitions. Thanks to Michael Wiegand of Intevation GmbH, Osnabrück (http://www.intevation.de/)
-* Corrected bug in LocalVariable::Parse(). I found a typo in the 'datatype' attribute name. This woudl have prevented the code from properly reading the datatype attribute's name.
+* Corrected bug in LocalVariable::Parse(). I found a typo in the 'datatype' attribute name. This would have prevented the code from properly reading the datatype attribute's name.
 * Added support for the end function as it is defined in the oval-definitions-schema.
 * Added support for the begin function as it is defined in the oval-definitions-schema.
-* Added base code for supporting alll other functions. This should make it easier to implement thes functions at a alter date.
+* Added base code for supporting all other functions. This should make it easier to implement these functions at a later date.
 * Corrected formatting of reg_binary data. The code was inserting a space after each octet. 
 * Added a workaround to support collecting password_complexity and reversible_encryption in the PasswordPolicyProbe. Thanks to Lumension Security (http://www.lumension.com)
 * Completed support for the FileEffectiveRights53Probe. The code was not properly expanding groups based on sids. Thanks to Lumension Security (http://www.lumension.com)
 * Added the SidSidProbe. Thanks to Lumension Security (http://www.lumension.com)
-* Added code for mmaking requests to WMI for system charateristics when the proper API is not known. Thanks to Lumension Security (http://www.lumension.com)
+* Added code for making requests to WMI for system characteristics when the proper API is not known. Thanks to Lumension Security (http://www.lumension.com)
 * Added the AuditEventPolicySubcategoriesProbe. Thanks to Lumension Security (http://www.lumension.com)
 
 ---------------------------------------
@@ -97,7 +97,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Source code comments were cleaned up.
 * Updated Windows FileProbe to use GetFileTime API for a, m, and c times. Code was previously using stat. The schema documentation said to use GetFileTime.
 * Corrected bug in Windows RegistryProbe that was incorrectly appending a trailing space to binary registry values.
-* Corrected bug in windows/FileEffectiveRightsProbe::GetEffectiveRights. Access right were being read incorrectly. 
+* Corrected bug in windows/FileEffectiveRightsProbe::GetEffectiveRights. Access rights were being read incorrectly. 
 * Corrected bug in caching of Items during evaluation. The cache of items was effectively not being used because the call to cache a new item was made before the item was parsed from the xml. The cache is based on an item's id. The id is not set until the item is parsed.
 * Improved caching code used in Definition, Test, and State evaluate.
 * Corrected bug in RegistryProbe::RetrieveInfo method. When processing a REG_MULTI_SZ value the last value was not being collected. Thanks to Ken Lassesen (ken.lassesen@lumension.com) for reporting the issue.
