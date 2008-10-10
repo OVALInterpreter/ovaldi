@@ -73,7 +73,7 @@ const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-
 	string Common::fileSeperatorStr = "\\";
 #else
 	char Common::fileSeperator = '/';
-	string Common::fileSeperatorStr = "\\";
+	string Common::fileSeperatorStr = "/";
 #endif
 
 // Initialize static variables.
