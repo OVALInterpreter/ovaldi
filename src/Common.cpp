@@ -86,12 +86,12 @@ string	Common::xmlfileMD5			  = "";
 string	Common::startTime			  = "";
 
 bool    Common::noXsl                 = false;
-string  Common::xslFile			      = "xml" + Common::fileSeperatorStr + "results_to_html.xsl";
+string  Common::xslFile			      = "results_to_html.xsl";
 string  Common::xslOutputFile		  = "results.html";
 
 
 bool    Common::doDefinitionSchematron   = false;
-string  Common::definitionSchematronPath = "xml" + Common::fileSeperatorStr + "oval-definitions-schematron.xsl";
+string  Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
 
 bool    Common::generateMD5			  = false;
 bool    Common::useProvidedData		  = false;
@@ -153,7 +153,7 @@ bool Common::GetVerifyXMLfile()
 
 string Common::GetXSLFilename()
 {
-	return Common::xslFile;	
+    return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::xslFile;	
 }
 string Common::GetXSLOutputFilename()
 {
@@ -180,7 +180,7 @@ bool Common::GetDoDefinitionSchematron() {
 }
 
 string Common::GetDefinitionSchematronPath() {
-	return Common::definitionSchematronPath;
+	return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::definitionSchematronPath;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
