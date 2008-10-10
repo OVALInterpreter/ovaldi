@@ -1,5 +1,5 @@
 %define name	ovaldi
-%define version	5.5.3
+%define version	5.5.4
 %define release	1
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
@@ -11,7 +11,7 @@ License:	BSD
 Group:		System/Configuration/Other
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 Prefix:		%{_prefix}
-BuildArchitectures: i386
+BuildArch: 	i386
 
 %description
 The OVAL Interpreter is a freely available reference 
@@ -41,7 +41,7 @@ To run:
 
 %package libs
 Summary: Libraries required to run the OVAL Interpreter.
-Group: System/Configuration/Other
+Group: Applications/System
 %description libs
 This package contains the Xerces and Xalan XML libraries needed to run
 the OVAL Interpreter. These libraries are available from the Apache
@@ -49,8 +49,7 @@ Foundation, but are not yet packaged for Redhat.
 
 %prep
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
-%setup -n ovaldi-%{version}-src
-#%patch -p0
+%setup -q -n ovaldi-%{version}-src
 
 %build
 cd project/linux
@@ -59,7 +58,7 @@ make
 
 %install
 /bin/mkdir -p $RPM_BUILD_ROOT/usr/sbin
-/bin/mkdir -m 700 -p $RPM_BUILD_ROOT/usr/lib/ovaldi
+/bin/mkdir -m 700 -p $RPM_BUILD_ROOT%{_libdir}/ovaldi
 /bin/mkdir -m 700 -p $RPM_BUILD_ROOT/usr/share/ovaldi
 /bin/mkdir -m 700 -p $RPM_BUILD_ROOT/var/log/ovaldi
 /bin/mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
@@ -75,17 +74,17 @@ make
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
 if grep "release 3" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL3/libxerces-c.so.27.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
-  /bin/cp project/linux/EL3/libxalan-c.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
-  /bin/cp project/linux/EL3/libxalanMsg.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
+  /bin/cp project/linux/EL3/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL3/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL3/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
 elif grep "release 4" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL4/libxerces-c.so.27.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
-  /bin/cp project/linux/EL4/libxalan-c.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
-  /bin/cp project/linux/EL4/libxalanMsg.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
+  /bin/cp project/linux/EL4/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL4/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL4/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
 elif grep "release 5" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
-  /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
-  /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT/usr/lib/ovaldi
+  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
 else
   echo "Unsupported Redhat version. Exiting."
   exit 1
@@ -96,9 +95,9 @@ fi
 /bin/rm -fr $RPM_BUILD_ROOT/%{name}
 
 %post libs
-# Add /usr/lib/ovaldi to the end of /etc/ld.so.conf if it's not yet present.
-if [ `/bin/egrep -c '^/usr/lib/ovaldi' /etc/ld.so.conf ` -lt 1 ] ; then
-        /bin/echo "/usr/lib/ovaldi" >>/etc/ld.so.conf
+# Add %{_libdir}/ovaldi to the end of /etc/ld.so.conf if it's not yet present.
+if [ `/bin/egrep -c '^%{_libdir}/ovaldi' /etc/ld.so.conf ` -lt 1 ] ; then
+        /bin/echo "%{_libdir}/ovaldi" >>/etc/ld.so.conf
 #	/sbin/ldconfig
 fi
 /sbin/ldconfig
@@ -106,34 +105,34 @@ fi
 %preun libs
 if [ $1 = 0 ]; then
     #// Do stuff specific to uninstalls
-    if [ -e /usr/lib/ovaldi/libxerces-c.so.27 ] ; then
-        /bin/rm /usr/lib/ovaldi/libxerces-c.so.27
+    if [ -e %{_libdir}/ovaldi/libxerces-c.so.27 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.27
     fi
-    if [ -e /usr/lib/ovaldi/libxerces-c.so ] ; then
-        /bin/rm /usr/lib/ovaldi/libxerces-c.so
+    if [ -e %{_libdir}/ovaldi/libxerces-c.so ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxerces-c.so
     fi
-    if [ -e /usr/lib/ovaldi/libxalan-c.so.110 ] ; then
-        /bin/rm /usr/lib/ovaldi/libxalan-c.so.110
+    if [ -e %{_libdir}/ovaldi/libxalan-c.so.110 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalan-c.so.110
     fi
-    if [ -e /usr/lib/ovaldi/libxalan-c.so ] ; then
-        /bin/rm /usr/lib/ovaldi/libxalan-c.so
+    if [ -e %{_libdir}/ovaldi/libxalan-c.so ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalan-c.so
     fi
-    if [ -e /usr/lib/ovaldi/libxalanRMsg.so.110 ] ; then
-        /bin/rm /usr/lib/ovaldi/libxalanMsg.so.110
+    if [ -e %{_libdir}/ovaldi/libxalanRMsg.so.110 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalanMsg.so.110
     fi
-    if [ -e /usr/lib/ovaldi/libxalanMsg.so ] ; then
-        /bin/rm /usr/lib/ovaldi/libxalanMsg.so
+    if [ -e %{_libdir}/ovaldi/libxalanMsg.so ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalanMsg.so
     fi
 fi
 
 %postun libs
 if [ $1 = 0 ]; then
    # // Do stuff specific to uninstalls
-if  [ `/bin/egrep -c '^/usr/lib/ovaldi' /etc/ld.so.conf ` -gt 0 ] ; then
-        /bin/egrep -v '^/usr/lib/ovaldi$' /etc/ld.so.conf >/usr/lib/etc.ld.so.conf.uninstalling-oval
-        /bin/chown root:root /usr/lib/etc.ld.so.conf.uninstalling-oval
-        /bin/chmod 644 /usr/lib/etc.ld.so.conf.uninstalling-oval
-        /bin/mv /usr/lib/etc.ld.so.conf.uninstalling-oval /etc/ld.so.conf
+if  [ `/bin/egrep -c '^%{_libdir}/ovaldi' /etc/ld.so.conf ` -gt 0 ] ; then
+        /bin/egrep -v '^%{_libdir}/ovaldi$' /etc/ld.so.conf >%{_libdir}/etc.ld.so.conf.uninstalling-oval
+        /bin/chown root:root %{_libdir}/etc.ld.so.conf.uninstalling-oval
+        /bin/chmod 644 %{_libdir}/etc.ld.so.conf.uninstalling-oval
+        /bin/mv %{_libdir}/etc.ld.so.conf.uninstalling-oval /etc/ld.so.conf
 fi
 /sbin/ldconfig
 fi
@@ -155,11 +154,13 @@ fi
 /usr/share/ovaldi/*.xsd
 
 %files libs
-/usr/lib/ovaldi/libxerces-c.so.27.0
-/usr/lib/ovaldi/libxalan-c.so.110.0
-/usr/lib/ovaldi/libxalanMsg.so.110.0
+%{_libdir}/ovaldi/libxerces-c.so.27.0
+%{_libdir}/ovaldi/libxalan-c.so.110.0
+%{_libdir}/ovaldi/libxalanMsg.so.110.0
 
 %changelog
+* Fri Oct 10 2008 Bryan Worrell <bworrell@mitre.org> 5.5.4-1.0
+* Updated spec file as per instructions from Steve 'Ashcrow' Milner <me@stevemilner.org>
 
 * Thu Oct 02 2008 Jonathen Baker <bakerj@mitre.org> 5.5.0-1.0
 * Updated to 5.5 source.
