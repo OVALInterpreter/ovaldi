@@ -32,10 +32,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
----        Version 5.5 build ?      ---
+---        Version 5.5 build 4      ---
 ---------------------------------------
 * Added support for the new win-def:wuaupdatesearcher_test with the WUAUpdateSearcherProbe. Thanks for sample code contributions from Kevin Sitto of G2, Inc. (http://g2-inc.com/)
 * Added support for Redhat EL5.
+* 
 
 ---------------------------------------
 ---        Version 5.5 build 3      ---
