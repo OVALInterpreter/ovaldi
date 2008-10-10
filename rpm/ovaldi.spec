@@ -7,7 +7,7 @@ Name:		%{name}
 Version:	%{version}
 Release:	%{release}
 Source0:	http://oval.mitre.org/DontDownload/oval/download/ovaldi-%{version}-src.tar.bz2
-Copyright:	BSD
+License:	BSD
 Group:		System/Configuration/Other
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 Prefix:		%{_prefix}
