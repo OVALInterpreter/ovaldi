@@ -734,7 +734,7 @@ void Usage() {
 	cout << "Input Validation Options:" << endl;
 	cout << "   -m           = do not verify the oval-definitions file with an MD5 hash." << endl;
 	cout << "   -n           = perform Schematron validation of the oval-definitions file." << endl;
-	cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"xml\\oval-definitions-schematron.xsl\"" << endl;
+    cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"xml" << Common::fileSeperatorStr << "oval-definitions-schematron.xsl\"" << endl;
 	cout << "\n";
 
 	cout << "Data Collection Options:" << endl;
@@ -746,7 +746,7 @@ void Usage() {
 	cout << "   -d <string>  = save data to the specified XML file. DEFAULT=\"system-characteristics.xml\"" << endl;	
 	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"oval-results.xml\"" << endl;
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
-	cout << "   -t <string>  = apply the sepcified xsl to the results xml. DEFAULT=\"xml\\results_to_html.xsl\"" << endl;
+	cout << "   -t <string>  = apply the sepcified xsl to the results xml. DEFAULT=\"xml" << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
 	cout << "\n";
 	
