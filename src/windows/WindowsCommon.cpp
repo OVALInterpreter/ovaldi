@@ -677,7 +677,7 @@ void WindowsCommon::GetWellKnownTrusteeNames() {
 		// create a vector of the well known sids
 		StringVector wellKnownSids;
 		//wellKnownSids.push_back("S-1-0");			// Null Authority
-		wellKnownSids.push_back("S-1-0-0");			// Nobody
+		//wellKnownSids.push_back("S-1-0-0");		// Nobody
 		//wellKnownSids.push_back("S-1-1");			// World Authority
 		wellKnownSids.push_back("S-1-1-0");			// Everyone
 		//wellKnownSids.push_back("S-1-2");			// Local Authority
