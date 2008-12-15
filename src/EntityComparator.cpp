@@ -434,7 +434,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 	} else if(op == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {
 
 		string upperDefValue = ToUpper(defValue);
-		string upperSCValue = ToUpper(defValue);
+		string upperSCValue = ToUpper(scValue);
 
 		if(upperDefValue.compare(upperSCValue) == 0) {
 			result = OvalEnum::RESULT_TRUE;
@@ -451,7 +451,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 	} else if(op == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL) {
 
 		string upperDefValue = ToUpper(defValue);
-		string upperSCValue = ToUpper(defValue);
+		string upperSCValue = ToUpper(scValue);
 
 		if(upperDefValue.compare(upperSCValue) != 0) {
 			result = OvalEnum::RESULT_TRUE;
