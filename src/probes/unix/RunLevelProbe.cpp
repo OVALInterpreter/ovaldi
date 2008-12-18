@@ -119,7 +119,7 @@ RunLevelProbe::CreateItem( ){
 
 
 void
-RunLevelProbe::_verifyRunlevelObjectAttr( ObjectEntity * service_name, ObjectEntity * runlevel ) throw( ProbeException ){
+RunLevelProbe::_verifyRunlevelObjectAttr( ObjectEntity * service_name, ObjectEntity * runlevel ) const throw( ProbeException ) {
   
   // check datatypes - only allow string
   if( service_name->GetDatatype() != OvalEnum::DATATYPE_STRING ){
@@ -146,26 +146,6 @@ RunLevelProbe::_verifyRunlevelObjectAttr( ObjectEntity * service_name, ObjectEnt
   }
 
 }
-
-
-/*
-StringVector *
-RunLevelProbe::_getEntityValues( ObjectEntity * entity ){
-  StringVector * values = new StringVector();
- 
-  if( entity->GetVarRef == NULL ){
-    values.push_back( entity->GetValue() );
-  }
-  else{
-    VariableValueVector * varVals = entity->GetVarRef()->GetValues();
-    VariableValueVector::iterator iter;
-    for( iter = varVals->begin(); iter != varVals->end(); iter++ ){
-      values->push_back( (*iter)->GetValue() );
-  } 
-
-  return values;
-}
-*/
 
 
 
@@ -232,7 +212,7 @@ RunLevelProbe::_getItemEntities( CharSet * runlevelSet, CharPtrSet * services ) 
 CharSet * 
 RunLevelProbe::_analyzeContainer( CharSet * workingSet, ObjectEntity * entity ) {
   CharSet     * rtnSet = new CharSet();
-  ItemEntity  * item   = this->CreateItemEntity( entity );
+  ItemEntity  * item   = this->CreateItemEntity( entity );   // memory cleaned up automatically by the ProbeFactory.
 
   for( CharSet::iterator iter = workingSet->begin(); iter != workingSet->end(); iter++ ){
     char * str = _chrToStr( (*iter) );
@@ -254,7 +234,7 @@ RunLevelProbe::_analyzeContainer( CharSet * workingSet, ObjectEntity * entity ) 
 CharPtrSet * 
 RunLevelProbe::_analyzeContainer( CharPtrSet * workingSet, ObjectEntity * entity ) {
   CharPtrSet * rtnSet = new CharPtrSet();
-  ItemEntity * item   = this->CreateItemEntity( entity );
+  ItemEntity * item   = this->CreateItemEntity( entity );  // memory cleaned up automatically by the ProbeFactory
   
   for ( CharPtrSet::iterator iter = workingSet->begin(); iter != workingSet->end(); iter++ ){
     item->SetValue( (*iter) );
@@ -263,7 +243,6 @@ RunLevelProbe::_analyzeContainer( CharPtrSet * workingSet, ObjectEntity * entity
     }
   }
 
-  //delete  item; 
   return  rtnSet;
 }
 
@@ -319,6 +298,14 @@ RunLevelProbe::_getMatchingRunlevels( string pattern, bool isRegex, bool insertU
 
 
 
+/**
+  _getMatchingServiceNames():
+  Ideally this would return a SetMap * with each runlevel containing a set of associated services that match
+  the criteria set by OVAL constructs.  This would easily preserving the mapping of runlevels to associated
+  services without requiring a lookup on the _runlevels map.  However, the lookup isn't very difficult or procesor
+  intensive so it's not a big deal.  Also, we are more than likely going to only be working with one runlevel for
+  a given runlevel_test so the map loses it's appeal in that scenario.
+ **/
 
 CharPtrSet *
 RunLevelProbe::_getMatchingServiceNames ( string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex ) {
@@ -380,13 +367,12 @@ RunLevelProbe::_getServiceData( ObjectEntity * service_name, CharSet * runlevels
   else
     workingSet =  _getMatchingServiceNames( ".*", runlevels, true, false );  // gimme all the runlevels on the box
 
+  
   rtnSet = _analyzeContainer( workingSet, service_name );
 
   delete  workingSet;
   return  rtnSet;
 }
-
-
 
 
 
@@ -458,7 +444,7 @@ RunLevelProbe::_handleReg( const char * filename, const char runlevel ){
 
 
 void
-RunLevelProbe::_handleLink( const char * fullPath, const char * filename, const char runlevel ){
+RunLevelProbe::_handleLink( const char * fullPath,  const char runlevel ){
   char    buffer[BUFLEN + 1];
   char *  serviceName   = new char[BUFLEN + 1],
        *  lastSlash     = NULL;
@@ -485,13 +471,14 @@ RunLevelProbe::_handleLink( const char * fullPath, const char * filename, const 
 void
 RunLevelProbe::_addRunlevelItem( const char * dir, const char * filename, const char runlevel ){
   struct stat st_file;
-  char * fullPath  = _constructFullPath( dir, filename );
+  char * fullPath  = NULL;
 
   if( _isBadDir( filename ) == false ){
+    fullPath = _constructFullPath( dir, filename );
     stat( fullPath, &st_file );
 
     if( st_file.st_mode & S_IFLNK ){
-      _handleLink( fullPath, filename, runlevel );
+      _handleLink( fullPath, runlevel );
     }
     else if( st_file.st_mode & S_IFREG ){
       _handleReg( filename, runlevel );
@@ -499,7 +486,7 @@ RunLevelProbe::_addRunlevelItem( const char * dir, const char * filename, const 
     else ;  // Directories, Pipes, Sockets, etc. cannot be used -- only Symbolic Links and Regular Files (scripts and binary executables)
   }
 
-  delete fullPath;
+  if( fullPath ) delete fullPath;
 }
 
 

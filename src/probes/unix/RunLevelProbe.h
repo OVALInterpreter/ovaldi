@@ -92,7 +92,7 @@ class RunLevelProbe : public AbsProbe {
     
     ItemVector* CollectItems( Object* object );
 
-	  /** Return a new Item created for storing process information. */
+	  /** Return a new Item created for storing runlevel information. */
 	  Item* CreateItem();
 
 	  /** Ensure that the RunLevelProbe is a singleton. */
@@ -101,30 +101,171 @@ class RunLevelProbe : public AbsProbe {
   private: // Private Methods
 	  RunLevelProbe();
 
-    void          _verifyRunlevelObjectAttr( ObjectEntity * service_name, ObjectEntity * runlevel ) throw( ProbeException );
+    /**
+      Checks runlevel object entity operations and datatypes
+      @param service_name the service_name runlevel_object entity
+      @param runlevel the runlevel runlevel_object entity
+      @throws ProbeException if invalid operations or datatypes are encountered
+    */
+    void          _verifyRunlevelObjectAttr( ObjectEntity * service_name, ObjectEntity * runlevel ) const throw( ProbeException );
+
+    /**
+      Checks to see if the given filename is either "." or ".."
+      @param filename the file we are working with
+      @return true if the filename is either "." or ".."
+    */
     bool          _isBadDir( const char * filename ) const;
+
+    /**
+      Constructs a complete path to a given file. Usually this is because the method is expecting the path
+      to point to a runlevel directory like /etc/rc.d/rc0.d and we are trying to construct a full path
+      to one of the directories contents as returned by readdir( path );
+      @param path system path like /etc/rc.d/rc0.d
+      @param filename file contained by path like K01foobar
+      @return a pointer to a constructed full path string like /etc/rc.d/rc0.d/K01foobar.  This must be deleted after using.
+    */
     char *        _constructFullPath( const char * path, const char * filename ) const;
+
+    /**
+      Adds the given @filename to the _runlevels map at key @runlevel
+      @param filename the path to the file we are storing in the _runlevels map
+      @param runlevel the runlevel in which @filename is being executed at
+    */
     void          _handleReg( const char * filename, const char runlevel );
-    void          _handleLink( const char * fullPath, const char * filename, const char runlevel );
+
+    /**
+      Dereferences the symbolic link desegnated by fullPath.  Then sends the derefernced path to _handleReg(...)
+      @param fullPath the path to the symbolic link
+      @param the runlevel in which the service pointed to by @fullPath is to be executed at
+    */
+    void          _handleLink( const char * fullPath,  const char runlevel );
+
+    /**
+      Adds the script to the _runlevels map for given runlevel if the file pointed to by dir and filename is valid
+      @param dir diretory in which the script exists
+      @param filename the filename of the script
+      @param runlevel the runleveel in which the script is being executed at
+    */
     void          _addRunlevelItem( const char * dir, const char * filename, const char runlevel );
+
+    /**
+      Reads the runlevel script directory designated by the given directory
+      @param dir the directory which contains runlevel directories ( /etc/rc.d )
+      @param runlevel the runlevel being analyzed [0,1,2,3,4,5,6,s,S] 
+    */
     void          _analyzeRunlevelDir( const char * dir, const char runlevel ); 
+
+    /**
+      Creates a string representing the appropriate runlevel directory designated by the given runlevel 
+      @param runlevel [0,1,2,3,4,5,6,s,S]
+      @return a pointer to the new directory string.  This must be deleted after using.
+    */
     char *        _generateRunlevelDir( const char runlevel ) const;
+
+    /**
+      Generates a map (_runlevels) of runlevel information for the system.
+    */
     void          _analyzeRunlevels();
+    
+    /**
+      Deallocates the memory contained by the given set
+      @param rlSet the set which contains dynamically allocated memory
+    */
     void          _deallocateSet( CharPtrSet * rlSet );
+    
+    /**
+      Erases the contents of the _runlevels  map which contains sets of dynamically allocated memory.
+    */
     void          _deallocateMap( );
+
+    /**
+      Converts a character to a single character string.
+      @param chr the character being converted into a string
+      @return a pointer to the new string.  This must be deleted after use. 
+    */
     char *        _chrToStr( char chr ) const;
+
+    /**
+      Creates an runelevel_item for the given paramters
+      @param runlevel the runlevel_item runlevel entity
+      @param service_name the runlevel_item service_name entity
+      @param kill the runlevel_item kill entity ( should always be false )
+      @param start the runlevel_item start entity ( should always be true )
+      @return a new runlevel_item object.  This is cleaned up by the ProbeFactory.
+    */ 
     Item *        _makeRunlevelItem( const char runlevel, const char * service_name, bool kill = false, bool start = true );
+
+    /**
+      Generates all the runlevel_item objects for the given runlevel_object we are processing
+      @param runlevelSet the set of runlevels dictated by the runlevel runlevel_object entity
+      @param services the set of services dictated by the service_name runlevel_object entity
+      @return a vectory of runlevel_item objects.  This should be cleared up by the ProbeFactory.
+    */
     ItemVector  * _getItemEntities( CharSet * runlevelSet, CharPtrSet * services ); 
+
+    /**
+      Generates a set of runlevels dictated by the runlevel runlevel_object entity
+      @param pattern the value supplied by the runlevel runlevel_object entity
+      @param isRegex true if the pattern parameter is a regular expression
+      @param insertUnequalNonRegex true if the runlevel runlevel_object entity has a "not equal" operation
+      @return a set of runlevels being used in the runlevel_test
+    */ 
     CharSet     * _getMatchingRunlevels( string pattern, bool isRegex, bool insertUnequalNonRegex = false );
+
+    /**
+      Generates a set of service names dictated by the service_name runlevel_object enitty 
+      @param pattern the value supplied by the service_name runlevel_object entity
+      @param working_runlevels the runlevels we need to look at for services
+      @param isRegex is the given pattern parameter a regular expression
+      @insertUnequalNonRegex true if the service_name runlevel_object entity has a "not equal" operation
+      @return a set of services being used in the given runlevels 
+    */
     CharPtrSet  * _getMatchingServiceNames ( string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex = false );
+
+    /**
+      Calls  ItemEntity::Analyze() method to validate the data collected for the given entity (service_name)
+      @param workingSet the set of services collected for the given entity
+      @param entity the service_name entity for the working runlevel_object
+      @return a set of validated services.  This must be deleted after use.
+    */
     CharPtrSet  * _analyzeContainer( CharPtrSet * workingSet, ObjectEntity * entity );
+
+    /**
+      Calls  ItemEntity::Analyze() method to validate the data collected for the given entity (runlevel)
+      @param workingSet the set of runlevels collected for the given entity
+      @param entity the runlevel entity for the working runlevel_object
+      @return a set of validated runlevels.  This must be deleted after use.
+    */
     CharSet     * _analyzeContainer( CharSet * workingSet, ObjectEntity * entity ) ;
+
+    /**
+      Generates a set of runevels as dictated by the runlevel entity 
+      @param runelvel the runlevel runlevel_object entity being worked with
+      @return a set of validated runlevels as dictated by the object entity.  This must be deleted after use.
+    */
     CharSet     * _getRunLevelData( ObjectEntity * runlevel );
+      
+    /** 
+      Generates a set of services as dictated by the services entity for the given set of runlevels
+      @param service_name the service_name runlevel_object entity being worked with
+      @return a set of validated services as dictated by the object entity.  This must be deleted after use.
+    */
     CharPtrSet  * _getServiceData( ObjectEntity * service_name, CharSet * runlevels );
+
+    /**
+      Determines whether or not the supplied value should be inserted into a container.
+      @pattern the pattern (regex or otherwise) to be used in comparison
+      @value the value we are considering for insertion
+      @isRegex true if the pattern is a regular expression
+      @insertUnequalNonRegex true if the value should be inserted though pattern and value do not match and isRegex is false
+      @return true if the value warrants an insertion
+    */
     bool          _isInsertable( string pattern, string value, bool isRegex, bool insertUnequalNonRegex );
     
   private:  // Private Member Variables 
 	  static RunLevelProbe *  _instance;
+
+    /** Storage container of system runlevel information **/
     SetMap  _runlevels;   
 };
 
