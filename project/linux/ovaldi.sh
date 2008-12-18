@@ -47,7 +47,7 @@ else
   echo "usage: $0 [definitions.xml]"
   exit 1
 fi
-	
+  
 
 #
 # Get a date of the start of the run, so we can date-stamp the results
@@ -63,12 +63,13 @@ DATE=`/bin/date +%F--%T`
 
 cd /var/log/ovaldi
 /usr/sbin/ovaldi -d /var/log/ovaldi/data-$DATE.xml \
-		 -r /var/log/ovaldi/results-$DATE.xml \
-		 -t /usr/share/ovaldi/results_to_html.xsl \
-		 -x /var/log/ovaldi/results-$DATE.html \
-		 -o $DEFS \
-		 -m \
+     -r /var/log/ovaldi/results-$DATE.xml \
+     -a /usr/share/ovaldi \
+     -x /var/log/ovaldi/results-$DATE.html \
+     -o $DEFS \
+     -m \
 
 echo ...
 echo Results-related files are stored in /var/log/ovaldi.
 echo ...
+
