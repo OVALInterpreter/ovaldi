@@ -41,7 +41,7 @@ DPKGInfoProbe::DPKGInfoProbe() {
 }
 
 DPKGInfoProbe::~DPKGInfoProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

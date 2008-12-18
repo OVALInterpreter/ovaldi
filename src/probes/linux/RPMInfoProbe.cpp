@@ -40,7 +40,7 @@ RPMInfoProbe::RPMInfoProbe() {
 }
 
 RPMInfoProbe::~RPMInfoProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

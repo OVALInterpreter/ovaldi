@@ -49,7 +49,7 @@ FamilyProbe::FamilyProbe() {
 }
 
 FamilyProbe::~FamilyProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

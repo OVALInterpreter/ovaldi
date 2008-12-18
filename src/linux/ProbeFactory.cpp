@@ -31,8 +31,12 @@
 
 #include "ProbeFactory.h"
 
+
+AbsProbeSet ProbeFactory::_probes;
+
+
 // ***************************************************************************************	//
-//								 Public members												//
+//								 Public members												                                    //
 // ***************************************************************************************	//
 AbsProbe* ProbeFactory::GetProbe(string objectName) {
 
@@ -66,7 +70,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("process_object") == 0) {
 		probe = ProcessProbe::Instance();
 	} else if(objectName.compare("runlevel_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = RunLevelProbe::Instance();
 	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
@@ -89,50 +93,14 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		Log::Info(objectName + " is not currently supported.");
 	}
 
+  _probes.insert( probe );
+
 	return probe;
 }
 
 void ProbeFactory::Shutdown() {
-
-	AbsProbe* probe = NULL;
-
-	probe = FileProbe::Instance();
-	delete probe;
-
-	probe = UnameProbe::Instance();
-	delete probe;
-
-#ifdef PACKAGE_RPM
- 	probe = RPMInfoProbe::Instance();
- 	delete probe;
-#endif
- 	
-#ifdef PACKAGE_DPKG
- 	probe = DPKGInfoProbe::Instance();
- 	delete probe;
-#endif
-
-	probe = ProcessProbe::Instance();
-	delete probe;
-
-	probe = InetListeningServersProbe::Instance();
-	delete probe;
-
-	probe = FamilyProbe::Instance();
-	delete probe;
-
-	probe = EnvironmentVariableProbe::Instance();
-	delete probe;
-
-	probe = VariableProbe::Instance();
-	delete probe;
-
-	probe = XmlFileContentProbe::Instance();
-	delete probe;
-
-	probe = TextFileContentProbe::Instance();
-	delete probe;
-
-	probe = FileHashProbe::Instance();
-	delete probe;
-}
+  for( AbsProbeSet::iterator iter = _probes.begin(); iter != _probes.end(); iter++ ){
+    delete (*iter);  // the probe better set it's instance pointer to NULL inside of its destructor
+    _probes.erase( iter );
+  } 
+} 

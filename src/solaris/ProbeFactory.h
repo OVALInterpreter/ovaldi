@@ -87,4 +87,8 @@ public:
 	static void Shutdown();
 };
 
+
+private:
+  static AbsProbeSet _probes;
+
 #endif

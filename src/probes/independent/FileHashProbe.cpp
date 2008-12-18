@@ -40,7 +40,7 @@ FileHashProbe::FileHashProbe() {
 }
 
 FileHashProbe::~FileHashProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

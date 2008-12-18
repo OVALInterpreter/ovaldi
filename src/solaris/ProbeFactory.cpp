@@ -37,6 +37,8 @@
 
 #include "ProbeFactory.h"
 
+AbsProbeSet ProbeFactory::_probes;
+
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
@@ -108,6 +110,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		Log::Info(objectName + " is not currently supported.");
 	}
 
+  _probes.insert( probe );
+
 	return probe;
 }
 
@@ -118,36 +122,8 @@ void ProbeFactory::Shutdown() {
 	//	Shutdown all probes
 	// -----------------------------------------------------------------------
 
-	// SOLARIS PORT NOTICE: Make sure any new probes are deleted here after using them.
-	AbsProbe* probe = NULL;
-
-	probe = FileProbe::Instance();
-	delete probe;
-
-	probe = UnameProbe::Instance();
-	delete probe;
-
-	probe = ProcessProbe::Instance();
-	delete probe;
-
-	probe = FamilyProbe::Instance();
-	delete probe;
-
-	probe = EnvironmentVariableProbe::Instance();
-	delete probe;
-
-	probe = VariableProbe::Instance();
-	delete probe;
-
-	probe = XmlFileContentProbe::Instance();
-	delete probe;
-
-	probe = TextFileContentProbe::Instance();
-	delete probe;
-
-	probe = FileHashProbe::Instance();
-	delete probe;
-
-	probe = FileMd5Probe::Instance();
-	delete probe;
+  for( AbsProbeSet::iterator iter = _probes.begin(); iter != _probes.end(); iter++ ){
+    delete (*iter);  // the probe better set it's instance pointer to NULL inside of its destructor
+    _probes.erase( iter );
+  }
 }

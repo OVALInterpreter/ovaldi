@@ -43,19 +43,21 @@ AuditEventPolicySubcategoriesProbe::AuditEventPolicySubcategoriesProbe() {
 }
 
 AuditEventPolicySubcategoriesProbe::~AuditEventPolicySubcategoriesProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+/*
 void AuditEventPolicySubcategoriesProbe::DeleteInstance() {
 	if(instance != NULL) {
 		delete instance;
 		instance = NULL;
 	}
 }
-
+*/
 AbsProbe* AuditEventPolicySubcategoriesProbe::Instance() {
 
 	// Use lazy initialization

@@ -39,7 +39,7 @@ AuditEventPolicyProbe::AuditEventPolicyProbe() {
 }
 
 AuditEventPolicyProbe::~AuditEventPolicyProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

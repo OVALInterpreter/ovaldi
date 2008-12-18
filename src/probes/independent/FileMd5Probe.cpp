@@ -40,7 +40,7 @@ FileMd5Probe::FileMd5Probe() {
 }
 
 FileMd5Probe::~FileMd5Probe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

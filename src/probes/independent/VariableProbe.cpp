@@ -39,6 +39,7 @@ VariableProbe::VariableProbe() {
 }
 
 VariableProbe::~VariableProbe() {
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

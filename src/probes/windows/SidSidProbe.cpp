@@ -40,7 +40,7 @@ SidSidProbe::SidSidProbe() : AbsProbe() {
 }
 
 SidSidProbe::~SidSidProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

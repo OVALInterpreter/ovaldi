@@ -71,6 +71,16 @@ class AbsState;
 typedef vector < AbsState*, allocator<AbsState*> > AbsStateVector;
 
 
+struct probe_comparator {
+  bool operator() ( AbsProbe * p1, AbsProbe * p2 ) {
+    return p1 < p2;
+  }
+};
+
+
+typedef set<AbsProbe *, probe_comparator> AbsProbeSet;
+
+
 /**
 	This class acts a base class for all platform specific object collectors.
 */

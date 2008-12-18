@@ -39,6 +39,7 @@ EnvironmentVariableProbe::EnvironmentVariableProbe() {
 }
 
 EnvironmentVariableProbe::~EnvironmentVariableProbe() {
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

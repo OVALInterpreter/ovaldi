@@ -40,7 +40,7 @@ PasswordPolicyProbe::PasswordPolicyProbe() {
 }
 
 PasswordPolicyProbe::~PasswordPolicyProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

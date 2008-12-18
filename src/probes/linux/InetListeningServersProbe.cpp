@@ -41,8 +41,8 @@ InetListeningServersProbe::InetListeningServersProbe() {
 }
 
 InetListeningServersProbe::~InetListeningServersProbe() {
-
 	delete this->netstatResult;
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

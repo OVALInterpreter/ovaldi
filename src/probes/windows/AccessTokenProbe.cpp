@@ -40,7 +40,7 @@ AccessTokenProbe::AccessTokenProbe() : AbsProbe() {
 }
 
 AccessTokenProbe::~AccessTokenProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

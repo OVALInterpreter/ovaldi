@@ -94,6 +94,10 @@ public:
 		Shutdown the ProbeFactory.
 	*/
 	static void Shutdown();
+
+
+private:
+  static AbsProbeSet _probes;
 };
 
 #endif

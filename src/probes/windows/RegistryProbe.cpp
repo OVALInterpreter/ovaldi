@@ -40,7 +40,7 @@ RegistryProbe::RegistryProbe() : AbsProbe() {
 }
 
 RegistryProbe::~RegistryProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

@@ -31,19 +31,28 @@
 #include "ProcessProbe.h"
 
 //****************************************************************************************//
-//								ProcessProbe Class										  //	
+//								                  ProcessProbe Class										                ?/
 //****************************************************************************************//
+
 ProcessProbe *ProcessProbe::instance = NULL;
 
-ProcessProbe::ProcessProbe() {
-}
+
+
+
+ProcessProbe::ProcessProbe() {}
+
+
+
 
 ProcessProbe::~ProcessProbe() {
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+
 AbsProbe* ProcessProbe::Instance() {
 
 	// Use lazy initialization
@@ -52,6 +61,9 @@ AbsProbe* ProcessProbe::Instance() {
 
 	return instance;	
 }
+
+
+
 
 ItemVector* ProcessProbe::CollectItems(Object* object) {
 
@@ -106,9 +118,10 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 	return collectedItems;
 }  
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+
+
+
 Item* ProcessProbe::CreateItem() {
 
 	Item* item = new Item(0, 
@@ -120,6 +133,13 @@ Item* ProcessProbe::CreateItem() {
 
 	return item;
 }
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
 
 StringVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 

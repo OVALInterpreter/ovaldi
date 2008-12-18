@@ -37,7 +37,7 @@ XmlFileContentProbe::XmlFileContentProbe() {
 }
 
 XmlFileContentProbe::~XmlFileContentProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

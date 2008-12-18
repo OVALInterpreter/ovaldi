@@ -61,8 +61,10 @@
 #include "XmlFileContentProbe.h"
 #include "TextFileContentProbe.h"
 #include "VariableProbe.h"
+#include "RunLevelProbe.h"
 
 using namespace std;
+
 
 class AbsProbe;
 
@@ -90,6 +92,10 @@ public:
 		Shutdown the ProbeFactory.
 	*/
 	static void Shutdown();
+
+private:
+  static AbsProbeSet _probes;
+
 };
 
 #endif

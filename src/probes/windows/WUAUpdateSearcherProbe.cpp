@@ -41,7 +41,7 @@ WUAUpdateSearcherProbe::WUAUpdateSearcherProbe() {
 }
 
 WUAUpdateSearcherProbe::~WUAUpdateSearcherProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -56,12 +56,14 @@ AbsProbe* WUAUpdateSearcherProbe::Instance() {
 	return instance;	
 }
 
+/*
 void WUAUpdateSearcherProbe::DeleteInstance() {
 	if(instance != NULL) {
 		delete instance;
 		instance = NULL;
 	}
 }
+*/
 
 ItemVector* WUAUpdateSearcherProbe::CollectItems(Object* object) {
 

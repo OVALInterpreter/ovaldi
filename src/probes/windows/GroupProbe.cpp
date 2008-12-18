@@ -39,7 +39,7 @@ GroupProbe::GroupProbe() : AbsProbe() {
 }
 
 GroupProbe::~GroupProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

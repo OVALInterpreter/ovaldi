@@ -39,7 +39,7 @@ LockoutPolicyProbe::LockoutPolicyProbe() {
 }
 
 LockoutPolicyProbe::~LockoutPolicyProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

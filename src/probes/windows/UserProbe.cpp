@@ -40,7 +40,7 @@ UserProbe::UserProbe() : AbsProbe() {
 }
 
 UserProbe::~UserProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

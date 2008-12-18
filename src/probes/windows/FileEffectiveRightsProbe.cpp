@@ -41,7 +41,7 @@ FileEffectiveRightsProbe::FileEffectiveRightsProbe() {
 }
 
 FileEffectiveRightsProbe::~FileEffectiveRightsProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

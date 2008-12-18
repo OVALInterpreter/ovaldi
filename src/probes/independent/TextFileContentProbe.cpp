@@ -40,7 +40,7 @@ TextFileContentProbe::TextFileContentProbe() {
 }
 
 TextFileContentProbe::~TextFileContentProbe() {
-
+  instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

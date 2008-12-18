@@ -30,6 +30,10 @@
 
 #include "ProbeFactory.h"
 
+
+AbsProbeSet ProbeFactory::_probes;
+
+
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
@@ -93,74 +97,14 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		Log::Info(objectName + " is not currently supported.");
 	}
 
+  _probes.insert( probe );
+
 	return probe;
 }
 
 void ProbeFactory::Shutdown() {
-
-	AbsProbe* probe = NULL;
-
-	probe = FileProbe::Instance();
-	delete probe;
-
-	probe = RegistryProbe::Instance();
-	delete probe;
-
-//	probe = ActiveDirectoryProbe::Instance();
-//	delete probe;
-
-//	probe = MetabaseProbe::Instance();
-//	delete probe;
-
-	probe = AccessTokenProbe::Instance();
-	delete probe;
-
-	probe = WMIProbe::Instance();
-	delete probe;
-
-	probe = FamilyProbe::Instance();
-	delete probe;
-
-	probe = EnvironmentVariableProbe::Instance();
-	delete probe;
-
-	probe = VariableProbe::Instance();
-	delete probe;
-
-	probe = XmlFileContentProbe::Instance();
-	delete probe;
-
-	probe = FileMd5Probe::Instance();
-	delete probe;
-
-	probe = LockoutPolicyProbe::Instance();
-	delete probe;
-
-	probe = AuditEventPolicyProbe::Instance();
-	delete probe;
-
-	probe = SidProbe::Instance();
-	delete probe;
-
-	probe = GroupProbe::Instance();
-	delete probe;
-
-	probe = UserProbe::Instance();
-	delete probe;
-
-	probe = FileEffectiveRights53Probe::Instance();
-	delete probe;
-
-	probe = FileEffectiveRightsProbe::Instance();
-	delete probe;
-
-	probe = TextFileContentProbe::Instance();
-	delete probe;
-
-	probe = SidSidProbe::Instance();
-	delete probe;
-
-    WUAUpdateSearcherProbe::DeleteInstance();
-
-	AuditEventPolicySubcategoriesProbe::DeleteInstance();
+  for( AbsProbeSet::iterator iter = _probes.begin(); iter != _probes.end(); iter++ ){
+    delete (*iter);  // the probe better set it's instance pointer to NULL inside of its destructor
+    _probes.erase( iter );
+  }
 }
