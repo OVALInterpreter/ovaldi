@@ -34,23 +34,19 @@
 
 #pragma warning(disable:4786)
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
 
-#include "XmlCommon.h"
-#include "Common.h"
-#include "Exception.h"
-#include "Log.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
+
+#undef DOMDocument
+
+#include "Common.h"
+#include "Exception.h"
+#include "Log.h"
+
+
 
 //#undef _MAC	// This is a bit messy. windows.h includes winsock.h if _MAC is defined. this causes a conflict with winsock2.h
 

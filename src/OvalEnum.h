@@ -36,7 +36,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "Exception.h"
 #include "Common.h"
 
 using namespace std;

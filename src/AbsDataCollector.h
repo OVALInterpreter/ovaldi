@@ -32,15 +32,6 @@
 #ifndef OVALDATACOLLECTOR_H
 #define OVALDATACOLLECTOR_H
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
-
 //	other includes
 #include <string>
 #include <vector>
@@ -50,10 +41,7 @@
 //	include common classes
 #include "DocumentManager.h"
 #include "Common.h"
-#include "Exception.h"
-#include "Log.h"
 #include "Version.h"
-#include "XmlCommon.h"
 #include "AbsObjectCollector.h"
 #include "CollectedObject.h"
 #include "AbsVariable.h"

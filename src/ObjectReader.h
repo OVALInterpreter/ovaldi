@@ -32,16 +32,7 @@
 #ifndef OBJECTREADER_H
 #define OBJECTREADER_H
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
-
-#include "XmlCommon.h"
+#include "Common.h"
 #include "DocumentManager.h"
 #include "Item.h"
 #include "VariableValue.h"

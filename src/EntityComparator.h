@@ -32,9 +32,9 @@
 #ifndef ENTITYCOMPARATOR_H
 #define ENTITYCOMPARATOR_H
 
+#include "Common.h"
 #include "OvalEnum.h"
 #include "REGEX.h"
-#include "Common.h"
 
 using namespace std;
 

@@ -36,8 +36,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "Exception.h"
-#include "XmlCommon.h"
+#include "Common.h"
 #include "Filter.h"
 #include "Object.h"
 #include "OvalEnum.h"

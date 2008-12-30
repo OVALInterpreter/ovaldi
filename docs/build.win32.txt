@@ -160,16 +160,6 @@ supporting libraries.
 
       From the build menu simply select "build" to build the OVAL Interpreter.
       Note that a "Debug" and a "Release" build configuration is provided.
-
-      NOTE: There is currently an unresolved bug in the OVAL Interpreter that 
-      results in an error when compiling on Windows. There is a conflict between 
-      the Xerces declaration of a DOMDocument and the msxml.h declaration of the
-      same type. At this time our suggested work around is to comment out the 
-      declaration of DOMDocument in msxml.h on line 9594. This workaround may
-      cause unknown issues with other applications that use msxml.h. So once
-      work on the OVAL Interpreter is completed it is recommended that the 
-      change is undone.
-
  
 -- III -- PCRE --
 

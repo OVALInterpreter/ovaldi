@@ -32,7 +32,6 @@
 #ifndef POSSIBLERESTRICTIONTYPE_H
 #define POSSIBLERESTRICTIONTYPE_H
 
-#include "XmlCommon.h"
 #include "RestrictionType.h"
 
 using namespace std;

@@ -32,7 +32,7 @@
 #ifndef RESTRICTIONTYPE_H
 #define RESTRICTIONTYPE_H
 
-#include "XmlCommon.h"
+#include "Common.h"
 #include "OvalEnum.h"
 #include "EntityComparator.h"
 

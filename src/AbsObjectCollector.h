@@ -31,14 +31,6 @@
 #ifndef ABSOBJECTCOLLECTOR_H
 #define ABSOBJECTCOLLECTOR_H
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
 
 //	other includes
 #include <string>
@@ -47,6 +39,7 @@
 #include <stdlib.h>
 #include <typeinfo>
 
+#include "Common.h"
 #include "OvalEnum.h"
 #include "Filter.h"
 #include "Object.h"

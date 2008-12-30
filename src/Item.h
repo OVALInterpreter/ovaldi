@@ -38,18 +38,9 @@
 #include <iostream>
 #include <stdlib.h>
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
-
+#include "Common.h"
 #include "ItemEntity.h"
 #include "OvalMessage.h"
-#include "Exception.h"
 #include "DocumentManager.h"
 
 

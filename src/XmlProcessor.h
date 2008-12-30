@@ -35,14 +35,10 @@
 #pragma	warning(disable:4786)
 #endif
 
+#include <string>
+#include "Common.h" 
+
 //	required xerces	includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMBuilder.hpp>
 #include <xercesc/dom/DOMException.hpp>
@@ -66,11 +62,6 @@
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 
-#include <string>
-
-#include "Common.h"
-#include "XmlCommon.h"
-#include "Exception.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace	std;

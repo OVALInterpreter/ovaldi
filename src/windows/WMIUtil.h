@@ -32,8 +32,11 @@
 #ifndef WMIUTIL_H
 #define WMIUTIL_H
 
-#undef __DOMDocument_FWD_DEFINED__
+// No need to include <comdefsp.h> which causes conflicts with the XERCES headers
+#define _INC_COMDEFSP
 #include <comdef.h>
+#undef _INC_COMDEFSP
+
 #include <Dsgetdc.h>
 #include <Lm.h>
 #include <Wbemidl.h>

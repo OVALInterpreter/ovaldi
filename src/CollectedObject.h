@@ -32,15 +32,6 @@
 #ifndef COLLECTEDOBJECT_H
 #define COLLECTEDOBJECT_H
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
-
 #include <string>
 #include <vector>
 #include <iostream>
@@ -48,11 +39,11 @@
 #include <map>
 #include <utility>
 
+#include "Common.h"
 #include "AbsObject.h"
 #include "OvalMessage.h"
 #include "Item.h"
 #include "VariableValue.h"
-#include "Exception.h"
 #include "AbsDataCollector.h"
 #include "OvalEnum.h"
 

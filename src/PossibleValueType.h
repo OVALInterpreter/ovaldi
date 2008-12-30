@@ -32,7 +32,7 @@
 #ifndef POSSIBLEVALUETYPE_H
 #define POSSIBLEVALUETYPE_H
 
-#include "XmlCommon.h"
+#include "Common.h"
 #include "OvalEnum.h"
 #include "EntityComparator.h"
 

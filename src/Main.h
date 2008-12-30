@@ -33,22 +33,6 @@
 
 #ifdef WIN32
 	#pragma warning(disable:4786)
-#endif
-
-#include "Common.h"
-#include "Log.h"
-#include "MD5.h"
-#include "AbsDataCollector.h"
-#include "XmlProcessor.h"
-#include "Version.h"
-#include "Analyzer.h"
-#include "DocumentManager.h"
-#include "DataCollector.h"
-#include "XslCommon.h"
-#include "EntityComparator.h"
-#include "OvalEnum.h"
-
-#ifdef WIN32
 	#include "WindowsCommon.h"
 	#include <windows.h>
 #endif
@@ -57,9 +41,6 @@
 	#define STRNICMP strnicmp
 #endif
 
-//	xerces include
-#include <xercesc/dom/DOM.hpp>
-
 //	other includes
 #include <time.h>
 #include <fstream>
@@ -67,6 +48,19 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+
+#include "XmlProcessor.h"
+#include "MD5.h"
+#include "AbsDataCollector.h"
+#include "Version.h"
+#include "Analyzer.h"
+#include "DocumentManager.h"
+#include "DataCollector.h"
+#include "XslCommon.h"
+#include "EntityComparator.h"
+#include "OvalEnum.h"
+
 
 using namespace std;
 

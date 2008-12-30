@@ -35,7 +35,6 @@
 
 #pragma warning(disable:4786)
 
-#include "WindowsCommon.h"
 #include "Exception.h"
 #include "Log.h"
 

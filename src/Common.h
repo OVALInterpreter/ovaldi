@@ -28,6 +28,12 @@
 //
 //****************************************************************************************//
 
+/**
+  If XmlCommon.h is needed in a Windows environment, Common.h should be included
+  instead in order to avoid conflicts with msxml.h
+**/
+
+
 #ifndef COMMON_H
 #define COMMON_H
 
@@ -41,8 +47,7 @@
 #include "Exception.h"
 #include "Log.h"
 #include "REGEX.h"
-#include "XmlCommon.h"
-#include "DocumentManager.h"
+
 
 #include <iostream>
 #include <string>
@@ -53,6 +58,10 @@
 #include <sstream>
 #include <algorithm>
 #include <utility>
+
+
+#include "XmlCommon.h"
+#include "DocumentManager.h"
 
 using namespace std;
 

@@ -32,22 +32,12 @@
 #ifndef ITEMENTITY_H
 #define ITEMENTITY_H
 
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
-
 #include <string>
 #include <iostream>
 #include <stdlib.h>
 
-#include "Log.h"
+#include "Common.h"
 #include "OvalEnum.h"
-#include "XmlCommon.h"
-#include "Exception.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;

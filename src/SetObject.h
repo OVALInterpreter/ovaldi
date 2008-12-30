@@ -32,9 +32,9 @@
 #ifndef SETOBJECT_H
 #define SETOBJECT_H
 
+#include "Common.h"
 #include "ObjectFactory.h"
 #include "AbsObject.h"
-#include "XmlCommon.h"
 #include "State.h"
 #include "Object.h"
 #include "Set.h"
