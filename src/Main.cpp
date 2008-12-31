@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2008, The MITRE Corporation
+// Copyright (c) 2002-2009, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 	headerMessage.append("OVAL Definition Interpreter\n");
     headerMessage.append("Version: " + Version::GetVersion() + " Build: " + Version::GetBuild() +"\n");
     headerMessage.append("Build date: " + Version::GetBuildDate() + "\n");
-	headerMessage.append("Copyright (c) 2002-2008 - The MITRE Corporation\n");
+	headerMessage.append("Copyright (c) 2002-2009 - The MITRE Corporation\n");
 	headerMessage.append("----------------------------------------------------\n");
 	headerMessage.append("\n");
 	headerMessage.append(timeBuffer);

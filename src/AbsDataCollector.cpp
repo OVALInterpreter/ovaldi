@@ -1,8 +1,7 @@
 //
-// $Id: AbsDataCollector.cpp 4647 2008-01-15 14:35:33Z bworrell $
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2008, The MITRE Corporation
+// Copyright (c) 2002-2009, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are

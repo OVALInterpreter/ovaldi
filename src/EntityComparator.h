@@ -1,8 +1,7 @@
 //
-// $Id: EntityComparator.h 4663 2008-01-23 13:58:23Z bakerj $
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2008, The MITRE Corporation
+// Copyright (c) 2002-2009, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are

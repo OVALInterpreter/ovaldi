@@ -1,8 +1,7 @@
 //
-// $Id: AbsState.cpp 4583 2008-01-03 16:25:18Z bakerj $
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2008, The MITRE Corporation
+// Copyright (c) 2002-2009, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are

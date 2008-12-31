@@ -1,8 +1,7 @@
 //
-// $Id: ExternalVariable.cpp 4607 2008-01-04 18:02:14Z bakerj $
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2008, The MITRE Corporation
+// Copyright (c) 2002-2009, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are

@@ -1,8 +1,7 @@
 #!/usr/bin/perl
-# $Id: updateversion.pl 3659 2007-01-09 17:43:02Z bakerj $
 #
 #****************************************************************************************//
-# Copyright (c) 2002-2007, The MITRE Corporation
+# Copyright (c) 2002-2009, The MITRE Corporation
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are
