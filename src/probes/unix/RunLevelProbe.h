@@ -43,8 +43,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifndef INIT_DIR
 #define INIT_DIR  "/etc/rc.d/init.d"
+#endif  /* INIT_DIR */
+
+#ifndef RC_DIR
 #define RC_DIR    "/etc/rc.d"
+#endif  /* RC_DIR */
+
 #define BUFLEN    1024
 
 using namespace std;
