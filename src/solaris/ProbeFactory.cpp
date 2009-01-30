@@ -121,8 +121,8 @@ void ProbeFactory::Shutdown() {
 	//	Shutdown all probes
 	// -----------------------------------------------------------------------
 
-  for( AbsProbeSet::iterator iter = _probes.begin(); iter != _probes.end(); iter++ ){
+  for( AbsProbeSet::iterator iter = _probes.begin(); iter != _probes.end(); ){
     delete (*iter);  // the probe better set it's instance pointer to NULL inside of its destructor
-    _probes.erase( iter );
+    _probes.erase( iter++ );
   }
 }
