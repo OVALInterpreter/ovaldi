@@ -727,7 +727,7 @@ void Usage() {
 	cout << "Definition Evaluation Options:" << endl;
 	cout << "   -o <string>  = path to the oval-definitions xml file. DEFAULT=\"definitions.xml\"" << endl;
 	cout << "   -v <string>  = path to external variable values file. DEFAULT=\"external-variables.xml\"" << endl;
-	cout << "   -e <string>  = evaluate the specified list of definitions. Supply definition ids as a comma seperated list like: oval:com.example:def:123" << endl;
+	cout << "   -e <string>  = evaluate the specified list of definitions. Supply definition ids as a comma separated list like: oval:com.example:def:123" << endl;
 	cout << "   -f <string>  = path to a file containing a list of definitions to be evaluated. The file must comply with the evaluation-id schema." << endl;
 	cout << "\n";
 	
@@ -744,9 +744,9 @@ void Usage() {
 
 	cout << "Result Output Options:" << endl;	
 	cout << "   -d <string>  = save data to the specified XML file. DEFAULT=\"system-characteristics.xml\"" << endl;	
-	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"oval-results.xml\"" << endl;
+	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"results.xml\"" << endl;
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
-	cout << "   -t <string>  = apply the sepcified xsl to the results xml. DEFAULT=\"xml" << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;
+	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"xml" << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
 	cout << "\n";
 	
