@@ -630,15 +630,26 @@ TD.text {font: 10pt/12pt "Arial"}
 			</xsl:choose>
 
 			<!-- id -->
-			<xsl:variable name="idUrl" select="concat('http://oval.mitre.org/repository/data/getDef?id=', $definitionElm/@definition_id)"/>
-			<td class="text" align="center">				
-				<a>
-					<xsl:attribute name="target">_blank</xsl:attribute>
-					<xsl:attribute name="href">
-						<xsl:value-of select="$idUrl"/>
-					</xsl:attribute>
-					<xsl:value-of select="$definitionElm/@definition_id"/>
-				</a>
+			
+			<td class="text" align="center">
+				<xsl:choose>
+					<!-- if the id is an oval repository id add a link otherwise don't -->
+					<xsl:when test="starts-with($definitionElm/@definition_id, 'oval:org.mitre.oval:def:')">
+						<xsl:variable name="idUrl" select="concat('http://oval.mitre.org/repository/data/getDef?id=', $definitionElm/@definition_id)"/>
+						<a>
+							<xsl:attribute name="target">_blank</xsl:attribute>
+							<xsl:attribute name="href">
+								<xsl:value-of select="$idUrl"/>
+							</xsl:attribute>
+							<xsl:value-of select="$definitionElm/@definition_id"/>
+						</a>
+					</xsl:when>
+					
+					<xsl:otherwise>
+						<xsl:value-of select="$definitionElm/@definition_id"/>						
+					</xsl:otherwise>
+					
+				</xsl:choose>
 			</td>
 
 			<!-- result -->
