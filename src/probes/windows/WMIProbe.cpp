@@ -449,6 +449,20 @@ bool WMIProbe::GetWqlField(string wqlIn, string* fieldName) {
 
 	*fieldName = wqlIn.substr(endSelect, startFrom-endSelect);
 
+	// Removing any ' ' from the WQL
+	string newFieldname;
+	string::const_iterator iter = fieldName->begin();
+	while(iter != fieldName->end())
+	{
+		if(*iter != ' ') {
+			newFieldname = *iter + newFieldname;
+		}
+
+		iter++;
+	}
+	
+	*fieldName = newFieldname;
+
 	// make sure the field name is not *
 	if((*fieldName).compare("*") == 0) {
 		throw ProbeException("Found field name of '*'. Only a single named field is allowed");
