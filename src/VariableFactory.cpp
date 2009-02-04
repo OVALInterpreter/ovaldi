@@ -59,6 +59,12 @@ AbsVariable* VariableFactory::GetVariable(string varId) {
 
 		// get the specific variable for this varId
 		DOMElement* varElm = XmlCommon::FindElementByAttribute(variablesElm, "id", varId);
+
+		if(varElm == NULL) {
+			Log::Fatal("VariableFactory::GetVariable() - Could not find variable: " + varId + " Schema validation reqires that all referenced variables exist in the oval-definition document.");
+			throw Exception("VariableFactory::GetVariable() - Could not find variable: " + varId);				 
+		}
+
 		// get the element name
 		string elmName = XmlCommon::GetElementName(varElm);
 		if(elmName.compare("local_variable") == 0) {
