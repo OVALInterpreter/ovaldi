@@ -358,9 +358,8 @@ OvalEnum::ResultEnumeration Test::Analyze() {
                      *  Than call the Analyze() method on the current Object. 
                      *  If the return is a TRUE result then the Item should be considered to be a match for the Object
                      *  The loop here needs to identify ALL matches so it will loop through all possible matches all the time.
-                     *  If any matches are found it will be assumed that the collected Object flag shoudl be complete.
+                     *  If any matches are found it will be assumed that the collected Object flag should be complete.
                      *  If no matches are found it is assumed that no items on the system were found that matched the Object.
-                     *  
                      *  
                      */
 
@@ -389,7 +388,12 @@ OvalEnum::ResultEnumeration Test::Analyze() {
                     collectedObjFlag = OvalEnum::FLAG_DOES_NOT_EXIST;
                 }		
 
+			// The collected object was not NULL
 			} else {
+
+				// get the flag on the collected object
+				string flagStr = XmlCommon::GetAttributeByName(collectedObjElm, "flag");
+				collectedObjFlag = OvalEnum::ToFlag(flagStr);
 
 				// Copy all variables in the collected object into VariableValues for the results file
 				// Copy all item references into TestedItems for the results file
@@ -403,9 +407,10 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 					if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
 						DOMElement *collectedObjChildElm = (DOMElement*)tmpNode;
 						
-						//	get the name of the child and construct the appropriate criteria type
+						//	get the name of the child
 						string childName = XmlCommon::GetElementName(collectedObjChildElm);
 						if(childName.compare("reference") == 0) {
+							
 							// get the reference's id
 							string itemId = XmlCommon::GetAttributeByName(collectedObjChildElm, "item_ref");
 							
@@ -425,29 +430,52 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 					}
 					index ++;
 				}
-
-				// check the flag on the collected object
-				string flagStr = XmlCommon::GetAttributeByName(collectedObjElm, "flag");
-				collectedObjFlag = OvalEnum::ToFlag(flagStr);
             }
 
 			// determine how to proceed based on flag value
 			if(collectedObjFlag == OvalEnum::FLAG_ERROR) {
-				this->SetResult(OvalEnum::RESULT_ERROR);
+				
+				// the result should be error unless the check existence is set to any exist
+				// and the test does not have a state reference. In this case the result should be true
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && this->GetStateId().compare("") == 0) {
+					
+					this->SetResult(OvalEnum::RESULT_TRUE);
 
-				// since we did no look at the state set the tested item result to not evaluated
+				} else {
+					this->SetResult(OvalEnum::RESULT_ERROR);
+				}
+
+				// since we did not look at the state set the tested item result to not evaluated
 				this->MarkTestedItemsNotEvaluated();
 
 			} else if(collectedObjFlag == OvalEnum::FLAG_NOT_APPLICABLE) {
-				this->SetResult(OvalEnum::RESULT_NOT_APPLICABLE);
-				
-				// since we did no look at the state set the tested item result to not evaluated
+
+				// the result should be not applicable unless the check existence is set to any exist
+				// and the test does not have a state reference. In this case the result should be true
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && this->GetStateId().compare("") == 0) {
+					
+					this->SetResult(OvalEnum::RESULT_TRUE);
+
+				} else {
+					this->SetResult(OvalEnum::RESULT_NOT_APPLICABLE);
+				}
+
+				// since we did not look at the state set the tested item result to not evaluated
 				this->MarkTestedItemsNotEvaluated();
 
 			} else if(collectedObjFlag == OvalEnum::FLAG_NOT_COLLECTED) {
-				this->SetResult(OvalEnum::RESULT_UNKNOWN);
+
+				// the result should be unknown unless the check existence is set to any exist
+				// and the test does not have a state reference. In this case the result should be true
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && this->GetStateId().compare("") == 0) {
+					
+					this->SetResult(OvalEnum::RESULT_TRUE);
+
+				} else {
+					this->SetResult(OvalEnum::RESULT_UNKNOWN);
+				}
 				
-				// since we did no look at the state set the tested item result to not evaluated
+				// since we did not look at the state set the tested item result to not evaluated
 				this->MarkTestedItemsNotEvaluated();
 
 			} else if(collectedObjFlag == OvalEnum::FLAG_INCOMPLETE) {
@@ -478,7 +506,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_AT_LEAST_ONE_EXISTS && existsCount > 0) {
 
-					// if more than 1 then false					
+					// if more than 0 then true					
 					existenceResult = OvalEnum::RESULT_TRUE;
 
 				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
@@ -503,7 +531,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 				} else {
 					overallResult =	existenceResult;
 
-					// since we did no look at the state set the tested item result to not evaluated
+					// since we did not look at the state set the tested item result to not evaluated
 					this->MarkTestedItemsNotEvaluated();
 				}
 
@@ -514,21 +542,12 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 				// if the check_existence is set to none_exist or 
 				// any_exist the result is true
 				// otherwise the result is false
-				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST) {
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_NONE_EXIST || this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
 					this->SetResult(OvalEnum::RESULT_TRUE);
-					// no need to look at state when check_existence is set to none_exist
 
-					// since we did no look at the state set the tested item result to not evaluated
+					// since we did not look at the state set the tested item result to not evaluated
 					this->MarkTestedItemsNotEvaluated();
 
-				} else if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST) {
-					// need to look at state result if there is a state
-					if(this->GetStateId().compare("") != 0) {
-						OvalEnum::ResultEnumeration stateResult = this->EvaluateCheckState();
-						this->SetResult(stateResult);
-					} else {
-						this->SetResult(OvalEnum::RESULT_TRUE);
-					}
 				} else {
 					this->SetResult(OvalEnum::RESULT_FALSE);
 				}
