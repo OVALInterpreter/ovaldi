@@ -451,10 +451,8 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 			OvalMessageVector::iterator messageIterator;
 			for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
 				OvalMessage* message = (*messageIterator);
-				//message->Write(scFile, newItemElem, "oval-sc");
-				msgStr.append(message->ToString() + "\n");
+				message->Write(scFile, newItemElem, "oval-sc");
 			}
-				XmlCommon::AddChildElement(scFile, newItemElem, "oval-sc:message", msgStr);
 		}
 
 		// Call the write method for each element
