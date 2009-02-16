@@ -34,80 +34,38 @@
 //								OvalMessage Class										  //	
 //****************************************************************************************//
 OvalMessage::OvalMessage(string value, OvalEnum::Level level) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete OvalMessage object
-	//
-	// -----------------------------------------------------------------------
 
 	this->SetValue(value);
 	this->SetLevel(level);
 }
 
 OvalMessage::~OvalMessage() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 string OvalMessage::GetValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the value field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->value;
 }
 
 void OvalMessage::SetValue(string value) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the value field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->value = value;
 }
 
 OvalEnum::Level OvalMessage::GetLevel() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the Level field's value
-	//
-	// -----------------------------------------------------------------------
 
 	return this->level;
 }
 
 void OvalMessage::SetLevel(OvalEnum::Level level) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the Level field's value
-	//
-	// -----------------------------------------------------------------------
 
 	this->level = level;
 }
 
 string OvalMessage::ToString() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Make string representation of object
-	//
-	// -----------------------------------------------------------------------
 
 	string msgStr = "";
 
@@ -118,11 +76,6 @@ string OvalMessage::ToString() {
 }
 
 void OvalMessage::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, DOMElement* parentElm, string prefix) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Write this ItemEntity to the sc file
-	// -----------------------------------------------------------------------
 
 	// Create new item element
 	string elementName = prefix + ":message";
@@ -137,11 +90,6 @@ void OvalMessage::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, DOMElem
 }
 
 void OvalMessage::Parse(DOMElement* msgElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Parse the provided entity element
-	// -----------------------------------------------------------------------
 
 	this->SetValue(XmlCommon::GetDataNodeValue(msgElm));
 	this->SetLevel(OvalEnum::ToLevel(XmlCommon::GetAttributeByName(msgElm, "level")));

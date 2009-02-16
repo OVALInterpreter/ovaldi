@@ -46,18 +46,26 @@ using namespace std;
 */
 class OvalMessage  {
 public:
+	/** Create a complete OvalMessage object. */
 	OvalMessage(string value = "", OvalEnum::Level level = OvalEnum::LEVEL_INFO);
 	~OvalMessage();
 
+	/** Write this message to the specified document. */
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm, string prefix);
+	/** Parse the supplied message element into a message object. */
 	void Parse(DOMElement* msgElm);
 
+	/** Return the value field's value. */
 	string GetValue();
+	/** Set the value field's value. */
 	void SetValue(string value);
 
+	/** Return the Level field's value. */
 	OvalEnum::Level GetLevel();
+	/** Set the Level field's value. */
 	void SetLevel(OvalEnum::Level level);
 
+	/** Make string representation of object. */
 	string ToString();
 
 private:
