@@ -32,7 +32,6 @@
 #define EXCEPTION_H
 
 #include <string>
-//class Log;
 
 using namespace std;
 
@@ -62,6 +61,5 @@ class Exception {
 		Exception* cause;
 };
 
-//#include "Log.h"
 
 #endif
