@@ -412,7 +412,7 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 	} else if (rc < -1) {
 		
 		// An error occured
-		string errMsg = "Error: PCRE returned error code (" + rc;
+		string errMsg = "Error: PCRE returned error code (" + Common::ToString(rc);
 		errMsg.append(") While evaluating the following regex: ");
 		errMsg.append(patternIn);
 		errMsg.append(" against this string: ");
@@ -431,8 +431,7 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 			int res = pcre_get_substring_list(searchStringIn, ovector, rc, &stringlist);
 
 			if (res == PCRE_ERROR_NOMEMORY) {
-				string error = "get substring list failed " + res;
-				error.append(" unable to get memory for the result set.");
+				string error = "get substring list failed: unable to get memory for the result set.";
 				throw REGEXException(error);
 			} else {
 				int i = 0;
