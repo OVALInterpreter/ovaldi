@@ -50,14 +50,6 @@ AuditEventPolicySubcategoriesProbe::~AuditEventPolicySubcategoriesProbe() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-/*
-void AuditEventPolicySubcategoriesProbe::DeleteInstance() {
-	if(instance != NULL) {
-		delete instance;
-		instance = NULL;
-	}
-}
-*/
 AbsProbe* AuditEventPolicySubcategoriesProbe::Instance() {
 
 	// Use lazy initialization
@@ -83,9 +75,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object *object) {
 
 		// Object attributes are reserved, so initialize to zeroes.
 		ZeroMemory(&ObjectAttributes, sizeof(ObjectAttributes));
-
-		Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - About to call LsaOpenPolicy()");
-		
+	
 		// Get a handle to the Policy object.
 		ntsResult = LsaOpenPolicy(
 					NULL,							// Name of the target system. NULL opens localhost

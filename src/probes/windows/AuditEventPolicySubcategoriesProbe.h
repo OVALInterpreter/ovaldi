@@ -55,8 +55,6 @@ public:
 	/** Ensure that the AuditEventPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
 
-	static void DeleteInstance();
-
 private:
 
 	AuditEventPolicySubcategoriesProbe();
