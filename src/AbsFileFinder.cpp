@@ -168,7 +168,7 @@ void AbsFileFinder::DownwardPathRecursion(StringVector* paths, string path, int 
 		return;
 	} 
 	if(maxDepth < -1) {
-		throw FileFinderException("Error invalid max_depth. max_depth must be -1 or more. Found: " + maxDepth);
+		throw FileFinderException("Error invalid max_depth. max_depth must be -1 or more. Found: " + Common::ToString(maxDepth));
 	}
 
 	// get child directories
@@ -199,7 +199,7 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 		return;
 	} 
 	if(maxDepth < -1) {
-		throw FileFinderException("Error invalid max_depth. max_depth must be -1 or more. Found: " + maxDepth);
+		throw FileFinderException("Error invalid max_depth. max_depth must be -1 or more. Found: " + Common::ToString(maxDepth));
 	}
 
 	// get parent directory by parsing the string to find the last file seperator

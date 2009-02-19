@@ -241,7 +241,7 @@ Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
 		hres = pIUpdateCollection->get_Count(&resultCount);
 		if (FAILED(hres)) {
 			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WUAUpdateSearcherProbe) Failed to get a coutn of search results. " + errorMessage, ERROR_FATAL);
+			throw ProbeException("(WUAUpdateSearcherProbe) Failed to get a count of search results. " + errorMessage, ERROR_FATAL);
 		} 
 
         if(resultCount == 0) {

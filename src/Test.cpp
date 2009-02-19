@@ -635,10 +635,10 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
 		} else {
 			string msg = "Unexpected set of item statuses found while evaluating the check existence value for a test. check_existence='all_exist' Found";
-			msg.append(" exists count=" + existsCount);
-			msg.append(" does not exist count=" + doesNotExistCount);
-			msg.append(" error count=" + errorCount);
-			msg.append(" not collected count=" + notCollectedCount);
+			msg.append(" exists count=" + Common::ToString(existsCount));
+			msg.append(" does not exist count=" + Common::ToString(doesNotExistCount));
+			msg.append(" error count=" + Common::ToString(errorCount));
+			msg.append(" not collected count=" + Common::ToString(notCollectedCount));
 			Log::Info(msg);
 		}
 		
@@ -652,10 +652,10 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_ERROR;
 		} else {
 			string msg = "Unexpected set of item statuses found while evaluating the check existence value for a test. check_existence='any_exist' Found";
-			msg.append(" exists count=" + existsCount);
-			msg.append(" does not exist count=" + doesNotExistCount);
-			msg.append(" error count=" + errorCount);
-			msg.append(" not collected count=" + notCollectedCount);
+			msg.append(" exists count=" + Common::ToString(existsCount));
+			msg.append(" does not exist count=" + Common::ToString(doesNotExistCount));
+			msg.append(" error count=" + Common::ToString(errorCount));
+			msg.append(" not collected count=" + Common::ToString(notCollectedCount));
 			Log::Info(msg);
 		}
 
@@ -671,10 +671,10 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
 		} else {
 			string msg = "Unexpected set of item statuses found while evaluating the check existence value for a test. check_existence='at_least_one_exists' Found";
-			msg.append(" exists count=" + existsCount);
-			msg.append(" does not exist count=" + doesNotExistCount);
-			msg.append(" error count=" + errorCount);
-			msg.append(" not collected count=" + notCollectedCount);
+			msg.append(" exists count=" + Common::ToString(existsCount));
+			msg.append(" does not exist count=" + Common::ToString(doesNotExistCount));
+			msg.append(" error count=" + Common::ToString(errorCount));
+			msg.append(" not collected count=" + Common::ToString(notCollectedCount));
 			Log::Info(msg);
 		}
 
@@ -690,10 +690,10 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
 		} else {
 			string msg = "Unexpected set of item statuses found while evaluating the check existence value for a test. check_existence='none_exist' Found";
-			msg.append(" exists count=" + existsCount);
-			msg.append(" does not exist count=" + doesNotExistCount);
-			msg.append(" error count=" + errorCount);
-			msg.append(" not collected count=" + notCollectedCount);
+			msg.append(" exists count=" + Common::ToString(existsCount));
+			msg.append(" does not exist count=" + Common::ToString(doesNotExistCount));
+			msg.append(" error count=" + Common::ToString(errorCount));
+			msg.append(" not collected count=" + Common::ToString(notCollectedCount));
 			Log::Info(msg);
 		}
 
@@ -715,10 +715,10 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckExistence() {
 			existenceResult = OvalEnum::RESULT_UNKNOWN;
 		} else {
 			string msg = "Unexpected set of item statuses found while evaluating the check existence value for a test. check_existence='only_one_exists' Found";
-			msg.append(" exists count=" + existsCount);
-			msg.append(" does not exist count=" + doesNotExistCount);
-			msg.append(" error count=" + errorCount);
-			msg.append(" not collected count=" + notCollectedCount);
+			msg.append(" exists count=" + Common::ToString(existsCount));
+			msg.append(" does not exist count=" + Common::ToString(doesNotExistCount));
+			msg.append(" error count=" + Common::ToString(errorCount));
+			msg.append(" not collected count=" + Common::ToString(notCollectedCount));
 			Log::Info(msg);
 		}
 	}
