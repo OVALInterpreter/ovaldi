@@ -356,7 +356,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operat
 
 	// TODO need to implement
 	
-	throw Exception("Error: not implemented:" + OvalEnum::OperationToString(op));
+	throw Exception("Error: Comparing IOS versions has not been implemented.");
 	
 	return result;
 }
@@ -620,16 +620,27 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 
 	} else {
 		char delm = versionStr.at(index);
+		char* delimiter = (char*)malloc(sizeof(char)*2);
+		delimiter[0] = delm;
+		delimiter[1] = '\0';
 
 		char* theString = (char*)malloc(sizeof(char)*(versionStr.length()+1));
 		theString = strcpy(theString, versionStr.c_str());
-		char* token = strtok(theString, &delm);		
+		char* token = strtok(theString, delimiter);
 
 		if(token == NULL) {
 			if(theString != NULL) {
 				free(theString);
+				theString = NULL;
 			}
-			delete tokens;
+			if(tokens != NULL) {
+				delete tokens;
+				tokens = NULL;
+			}
+			if(delimiter != NULL) {
+				free(delimiter);
+				delimiter = NULL;
+			}
 			throw Exception("Error parsing version string. A delimiter was found, but no other components to the version were found. Input version string: \'" + versionStr + "\' delimiter detected: \'" + delm + "\'");
 		} else {
 
@@ -642,8 +653,16 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 				if(nonInt != string::npos) {
 					if(theString != NULL) {
 						free(theString);
+						theString = NULL;
 					}
-					delete tokens;
+					if(tokens != NULL) {
+						delete tokens;
+						tokens = NULL;
+					}
+					if(delimiter != NULL) {
+						free(delimiter);
+						delimiter = NULL;
+					}
 					throw Exception("Error parsing version string. A component of the version string is not an integer. Input version string: \'" + versionStr + "\' delimiter detected: \'" + delm + "\' erroneous component: \'" + tokenStr + "\'");
 				}
 
@@ -653,13 +672,19 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 				// add it to the vector
 				tokens->push_back(tokenInt);
 
-				//	Get the next token
-				token = strtok(NULL, &delm);
+				// get the next token
+				token = strtok(NULL, delimiter);
 			}
+		}
+
+		if(delimiter != NULL) {
+			free(delimiter);
+			delimiter = NULL;
 		}
 
 		if(theString != NULL) {
 			free(theString);
+			theString = NULL;
 		}
 	}
 
