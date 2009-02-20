@@ -88,7 +88,7 @@ public:
     /** Add an element to the end of the elements vector. */
 	void AppendElement(ObjectEntity* objectEntity);
 
-    /** Return TRUE if the input itme matches the criteria specified by this object. */
+    /** Return TRUE if the input item matches the criteria specified by this object. */
     bool Analyze(Item* item);
 
     /** Return an object for the specified object id.

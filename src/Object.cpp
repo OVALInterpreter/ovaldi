@@ -196,6 +196,8 @@ bool Object::Analyze(Item* item) {
 			overallResult = OvalEnum::RESULT_TRUE;
 		} else {
 
+			overallResult = OvalEnum::RESULT_TRUE;
+
 			// vector of result values before they are combined
 			IntVector iResults;
 
@@ -210,7 +212,7 @@ bool Object::Analyze(Item* item) {
 
                 if(scElements->size() == 0)  {
 
-                    // no matching elements foudn so not a matching item.
+                    // no matching elements found so not a matching item.
                     iResults.push_back(OvalEnum::RESULT_FALSE);
 
                 } else if (scElements->size() == 1) {
