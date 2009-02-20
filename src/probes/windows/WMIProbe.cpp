@@ -455,7 +455,7 @@ bool WMIProbe::GetWqlField(string wqlIn, string* fieldName) {
 	while(iter != fieldName->end())
 	{
 		if(*iter != ' ') {
-			newFieldname = *iter + newFieldname;
+			newFieldname = newFieldname + *iter
 		}
 
 		iter++;
