@@ -374,7 +374,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
                         // get the element as an item
                         Item* currentItem = Item::GetItemById(itemId);
 
-                        if(referencedObject->Analyze(currentItem) == OvalEnum::RESULT_TRUE) {
+                        if(referencedObject->Analyze(currentItem) == true) {
                             TestedItem* testedItem = new TestedItem();
                             testedItem->SetItem(currentItem);
                             this->AppendTestedItem(testedItem);
