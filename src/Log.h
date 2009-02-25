@@ -64,26 +64,50 @@ public:
 	/** Shutdown the logger. Simply has to close the log file. */
 	static void Shutdown();
 
-	static void Debug(string, bool fileOnly = false);
+	/** Write the specified message at Log::DEBUG level.
 
-	static void Info(string);
-	static void Message(string);
-	static void Fatal(string);
+		@param msg The message to write
+		@param fileOnly When true log to the file only, not to std out.
+		@throws Exception Thrown when the logger has not been initialized.
+	*/
+	static void Debug(string msg, bool fileOnly = false);
+
+	/** Write the specified message at Log::INFO level.
+
+		@param msg The message to write
+		@throws Exception Thrown when the logger has not been initialized.
+	*/
+	static void Info(string msg);
+	
+	/** Write the specified message at Log::MESSAGE level.
+
+		@param msg The message to write
+		@throws Exception Thrown when the logger has not been initialized.
+	*/
+	static void Message(string msg);
+	
+	/** Write the specified message at Log::FATAL level.
+
+		@param msg The message to write
+		@throws Exception Thrown when the logger has not been initialized.
+	*/
+	static void Fatal(string msg);
+
 	static int  GetLevel();		
 	static void SetLevel(string strLevel);
 	static void SetLevel(int level);
 	static void SetToScreen(bool screen);
 
-	/** Return true if the Logger is configured to write DEBUG or higher level messages. */
+	/** Return true if the Logger the current level is less than or equal to DEBUG. */
 	static bool IsDebug();
 	
-	/** Return true if the Logger is configured to write INFO or higher level messages. */
+	/** Return true if the Logger the current level is less than or equal to INFO. */
 	static bool IsInfo();
 	
-	/** Return true if the Logger is configured to write MESSAGE or higher level messages. */
+	/** Return true if the Logger the current level is less than or equal to MESSAGE. */
 	static bool IsMessage();
 	
-	/** Return true if the Logger is configured to write FATAL or higher level messages. */
+	/** Return true if the Logger the current level is less than or equal to FATAL. */
 	static bool IsFatal();
 	
 	/** Writes an unaltered messaged to the log.
