@@ -41,53 +41,40 @@ FILE* Log::fp = NULL;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 void Log::Shutdown() {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Close the log file
-	//
-	//------------------------------------------------------------------------------------//
 
 	if(fp != NULL) {
 		fclose(fp);
 	}
+	Log::initialized = false;
 }
 
 void Log::Init(int level, string logFile, bool toScreen) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  This function clears the existing log file.  Only return false if an existing
-	//  file can not be deleted.
-	//	Sets the log level to be used by the loggin system
-	//	Sets a flag indicating if log messages should be output to screen or not.
-	//
-	//------------------------------------------------------------------------------------//
 
-	// init the log level
-	Log::SetLevel(level);
+	if(!Log::initialized) {
 
-	// init the log file
-	Log::logFilename = logFile;
+		// init the log level
+		Log::SetLevel(level);
 
-	// init the to screen flag
-	Log::toScreen = toScreen;
+		// init the log file
+		Log::logFilename = logFile;
 
-	// Reset the log file
-	Log::fp = NULL;
-	Log::fp = fopen(logFilename.c_str(), "w+"); 
-	if (Log::fp == NULL) {
-		throw Exception("Error initializing log system. Unable to clear log file.");
+		// init the to screen flag
+		Log::toScreen = toScreen;
+
+		// Reset the log file
+		Log::fp = NULL;
+		Log::fp = fopen(logFilename.c_str(), "w+"); 
+		if (Log::fp == NULL) {
+			throw Exception("Error initializing log system. Unable to clear log file.");
+		}
+
+		Log::initialized = true;
 	}
-
-	Log::initialized = true;
 }
 
 void Log::UnalteredMessage(string msg) {
 	if(!Log::initialized)
-		throw Exception("The loging system must first be initialized.");
+		throw Exception("The logging system must first be initialized.");
 
 	bool tmp = Log::toScreen;
 	Log::toScreen = false;
@@ -97,7 +84,7 @@ void Log::UnalteredMessage(string msg) {
 
 void Log::Debug(string msg, bool fileOnly) {
 	if(!Log::initialized)
-		throw Exception("The loging system must first be initialized.");
+		throw Exception("The logging system must first be initialized.");
 
 	if(Log::IsDebug()) {
 		msg = Common::GetTimeStamp() + " : DEBUG : " + msg;
@@ -107,7 +94,7 @@ void Log::Debug(string msg, bool fileOnly) {
 
 void Log::Info(string msg) {
 	if(!Log::initialized)
-		throw Exception("The loging system must first be initialized.");
+		throw Exception("The logging system must first be initialized.");
 
 	if(Log::IsInfo()) {
 		msg = Common::GetTimeStamp() + " : INFO : " + msg;
@@ -117,7 +104,7 @@ void Log::Info(string msg) {
 
 void Log::Message(string msg) {
 	if(!Log::initialized)
-		throw Exception("The loging system must first be initialized.");
+		throw Exception("The logging system must first be initialized.");
 
 	if(Log::IsMessage()) {
 		msg = Common::GetTimeStamp() + " : MESSAGE : " + msg;
@@ -127,11 +114,22 @@ void Log::Message(string msg) {
 
 void Log::Fatal(string msg) {
 	if(!Log::initialized)
-		throw Exception("The loging system must first be initialized.");
+		throw Exception("The logging system must first be initialized.");
 
 	if(Log::IsFatal()) {
 		msg = Common::GetTimeStamp() + " : FATAL : " + msg;
 		Log::WriteLog(msg);
+	}
+}
+
+void Log::SetLevel(string strLevel) {
+
+	int tmpLevel = atoi(strLevel.c_str());
+	if(tmpLevel > Log::FATAL || tmpLevel < Log::DEBUG) {
+		Log::Message("Error setting Log level. A log level between " + Common::ToString(Log::FATAL) + " and " + Common::ToString(Log::DEBUG) + " must be specified. Setting Log level to " + Common::ToString(Log::DEBUG) + ".");
+		Log::SetLevel(Log::DEBUG);
+	} else {
+		Log::SetLevel(tmpLevel);
 	}
 }
 
@@ -149,28 +147,28 @@ void Log::SetToScreen(bool screen) {
 
 bool Log::IsDebug() {
 	bool enabled = false;
-	if(Log::GetLevel() <= DEBUG)
+	if(Log::GetLevel() <= Log::DEBUG)
 		enabled = true;
 	return enabled;
 }
 
 bool Log::IsInfo() {
 	bool enabled = false;
-	if(Log::GetLevel() <= INFO)
+	if(Log::GetLevel() <= Log::INFO)
 		enabled = true;
 	return enabled;
 }
 
 bool Log::IsMessage() {
 	bool enabled = false;
-	if(Log::GetLevel() <= MESSAGE)
+	if(Log::GetLevel() <= Log::MESSAGE)
 		enabled = true;
 	return enabled;
 }
 
 bool Log::IsFatal() {
 	bool enabled = false;
-	if(Log::GetLevel() <= FATAL)
+	if(Log::GetLevel() <= Log::FATAL)
 		enabled = true;
 	return enabled;
 }
@@ -182,21 +180,6 @@ bool Log::WriteToScreen() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 void Log::WriteLog(string logMessageIn, bool fileOnly) {
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  Writes the given message to the log file
-	//
-	//  The log file is opened using fopen with a mode of "a+".  This opens the file for
-	//  reading and appending.  The appending operation includes the removal of the EOF
-	//  marker before new data is written to the file and the EOF marker is restored after
-	//  writing is complete.  The file is created first if it doesn’t exist.
-	//
-	//  If an error occurs, ignore it.  Just means that the error message will not get
-	//  written to the log file.
-	//
-	//------------------------------------------------------------------------------------//
 
 	string tmp = logMessageIn + "\n";
 	fputs(tmp.c_str(), fp);

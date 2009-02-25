@@ -39,35 +39,84 @@ using namespace std;
 
 /** 
 	This class provides logging for the application.
+
+	In general each log message is associated with a level. The logging
+	system can be configured to write messages at or above a specified level.
+	For example, if the log system is configured such that the current Logg::level
+	is Log::INFO then Log::INFO level messages and above will be displayed. This means
+	that Log::MESSAGE and Log::FATAL will be displayed, but not Log::DEBUG.
 */
 class Log {
 public:
 
+	/** Initializes the Logger for the application.
+
+		The logging system can only be initialized once.
+		This function clears the existing log file.
+
+		@param level Sets the log level to be used by the logging system.
+		@param logFile Specifies the log file to be used.
+		@param toScreen when true the log messages will be written to std out.
+		@throws Exception Thrown when the existing log file can not be cleared.
+	*/
 	static void Init(int level = DEBUG, string logFile = "", bool toScreen = false);
+
+	/** Shutdown the logger. Simply has to close the log file. */
 	static void Shutdown();
+
 	static void Debug(string, bool fileOnly = false);
+
 	static void Info(string);
 	static void Message(string);
 	static void Fatal(string);
-	static int GetLevel();		
+	static int  GetLevel();		
+	static void SetLevel(string strLevel);
 	static void SetLevel(int level);
 	static void SetToScreen(bool screen);
+
+	/** Return true if the Logger is configured to write DEBUG level messages. */
 	static bool IsDebug();
+	
+	/** Return true if the Logger is configured to write INFO level messages. */
 	static bool IsInfo();
+	
+	/** Return true if the Logger is configured to write MESSAGE level messages. */
 	static bool IsMessage();
+	
+	/** Return true if the Logger is configured to write FATAL level messages. */
 	static bool IsFatal();
-	static void UnalteredMessage(string);
+	
+	/** Writes an unaltered messaged to the log.
+		This method can be used for ensuring that the formatting of a message
+		is preserved when it is written to the log.
+
+		@param msg The message to be written.
+	*/
+	static void UnalteredMessage(string msg);
 
 	static const int DEBUG = 1;
 	static const int INFO = 2;
 	static const int MESSAGE = 3;
 	static const int FATAL = 4;
 
+	/** Return true if the Logger is configured to write to the screen. */
 	static bool WriteToScreen();
 
 private:
-	static void WriteLog(string, bool fileOnly = false);
+
+	/** Writes the given message to the log file.
+		Messages may optionally be written to std out if
+		the input fileOnly parameter is false and the Log::toScreen
+		variable is set to true.
+
+		@param logMessageIn The message to be logged.
+		@param fileOnly If true write the log message only to file, not to screen.
+	*/
+	static void WriteLog(string logMessageIn, bool fileOnly = false);
+
+	/** Convert the level to a string. */
 	static string LevelToString(int level);
+
 	static string logFilename;
 	static int level;
 	static bool toScreen;

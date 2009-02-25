@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
 		FILE* fpVerify = fopen(Common::GetXMLfile().c_str(), "rb");
 		if (fpVerify == NULL) {
 			cerr << endl << "** ERROR: Could not open file. The specified definition file does not exist.";
+			Log::UnalteredMessage("\n** ERROR: Could not open file. The specified definition file does not exist.");
 			exit(0);
 		}
 
@@ -115,6 +116,7 @@ int main(int argc, char* argv[]) {
 
 		string hashBuf = context.hex_digest();
 		cout << endl << hashBuf << endl;
+		Log::UnalteredMessage(errorMessage);
 
 		exit(0);
 	}
@@ -640,6 +642,20 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 				
+				// **********  log level  ********** //
+				case 'l':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Log::SetLevel(argv[2]);
+						++argv;
+						--argc;
+					}					
+
+					break;
+
 				// **********  verbose mode  ********** //
 				case 'p':
 
@@ -751,7 +767,7 @@ void Usage() {
 	cout << "\n";
 	
 	cout << "Other Options:" << endl;
-	//cout << "   -l <string>  = save log to the specified file DEFAULT=\"ovaldi.log\"" << endl;
+	cout << "   -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4)" << endl;
 	cout << "   -p           = print all information and error messages." << endl;
 	cout << "   -z           = return md5 of current oval-definitions file." << endl;
 	cout << endl;
