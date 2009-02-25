@@ -146,31 +146,19 @@ void Log::SetToScreen(bool screen) {
 }
 
 bool Log::IsDebug() {
-	bool enabled = false;
-	if(Log::GetLevel() <= Log::DEBUG)
-		enabled = true;
-	return enabled;
+	return (Log::GetLevel() <= Log::DEBUG);
 }
 
 bool Log::IsInfo() {
-	bool enabled = false;
-	if(Log::GetLevel() <= Log::INFO)
-		enabled = true;
-	return enabled;
+	return (Log::GetLevel() <= Log::INFO);
 }
 
 bool Log::IsMessage() {
-	bool enabled = false;
-	if(Log::GetLevel() <= Log::MESSAGE)
-		enabled = true;
-	return enabled;
+	return (Log::GetLevel() <= Log::MESSAGE);
 }
 
 bool Log::IsFatal() {
-	bool enabled = false;
-	if(Log::GetLevel() <= Log::FATAL)
-		enabled = true;
-	return enabled;
+	return (Log::GetLevel() <= Log::FATAL);
 }
 
 bool Log::WriteToScreen() {

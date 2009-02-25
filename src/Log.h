@@ -74,16 +74,16 @@ public:
 	static void SetLevel(int level);
 	static void SetToScreen(bool screen);
 
-	/** Return true if the Logger is configured to write DEBUG level messages. */
+	/** Return true if the Logger is configured to write DEBUG or higher level messages. */
 	static bool IsDebug();
 	
-	/** Return true if the Logger is configured to write INFO level messages. */
+	/** Return true if the Logger is configured to write INFO or higher level messages. */
 	static bool IsInfo();
 	
-	/** Return true if the Logger is configured to write MESSAGE level messages. */
+	/** Return true if the Logger is configured to write MESSAGE or higher level messages. */
 	static bool IsMessage();
 	
-	/** Return true if the Logger is configured to write FATAL level messages. */
+	/** Return true if the Logger is configured to write FATAL or higher level messages. */
 	static bool IsFatal();
 	
 	/** Writes an unaltered messaged to the log.

@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
     headerMessage.append("Build date: " + Version::GetBuildDate() + "\n");
 	headerMessage.append("Copyright (c) 2002-2009 - The MITRE Corporation\n");
 	headerMessage.append("----------------------------------------------------\n");
-	headerMessage.append("\n");
+	headerMessage.append("\nStart Time: ");
 	headerMessage.append(timeBuffer);
 	headerMessage.append("\n");
 
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 
 		string hashBuf = context.hex_digest();
 		cout << endl << hashBuf << endl;
-		Log::UnalteredMessage(errorMessage);
+		Log::UnalteredMessage(hashBuf);
 
 		exit(0);
 	}
