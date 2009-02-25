@@ -508,7 +508,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 				//
 				// For now I have decided to use the value of the description as the 
 				// name for an interface. I will leave a chunk of code commented out
-				// below taht should be capable of retreiving the interface name.
+				// below that should be capable of retreiving the interface name.
 				//
 				//
 				
@@ -539,13 +539,11 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 					case ERROR_INVALID_PARAMETER:
 						cout << "3" << endl;
 						break;
-
 					default:
 						cout << "what?" << endl;
 						break;
 					}	
 				}
-
   
 				// Cleanup
 				free(charIfName);
