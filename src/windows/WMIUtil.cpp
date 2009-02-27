@@ -185,7 +185,8 @@ std::string WMIUtil::GetStringFromVariant(VARIANT value) {
 						
 			delete(szChar);
 		} else {
-			// TODO ERROR
+			// TODO - currently logging the error, but should an exception be thrown?
+			Log::Debug("WMIUtil::GetStringFromVariant() - Error converting value to string.");
 		}
 	} else if ((V_VT(&value) == VT_UINT)) {
 		char valBuf[20];
@@ -199,11 +200,11 @@ std::string WMIUtil::GetStringFromVariant(VARIANT value) {
 			stringValue = "1";
 		}
 	} else if ((V_VT(&value) == VT_DATE)) {
-		//TODO
+		//TODO - need to format VT_DATE
 	} else if ((V_VT(&value) == VT_DECIMAL)) {
-		//TODO
+		//TODO - need to format VT_DECIMAL
 	} else if ((V_VT(&value) == VT_FILETIME)) {
-		//TODO 
+		//TODO - need to format VT_FILETIME
 	} else if ((V_VT(&value) == VT_INT)) {
 		char valBuf[20];
 		int intValue = V_INT(&value);
@@ -220,9 +221,9 @@ std::string WMIUtil::GetStringFromVariant(VARIANT value) {
 		long longValue = V_I4(&value);
 		stringValue = _ltoa(longValue, valBuf, 10);
 	} else if ((V_VT(&value) == VT_I8)) {
-		// TODO
+		// TODO - need to format VT_I8
 	} else if ((V_VT(&value) == VT_NULL)) {
-		// TODO
+		// TODO - Not sure what to do with VT_NULL
 	} else {
 		// TODO Unsupported data type
 	}

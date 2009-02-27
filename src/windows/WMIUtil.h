@@ -47,6 +47,7 @@
 #include <map>
 
 #include "Exception.h"
+#include "Log.h"
 #include "WMIItem.h"
 
 using namespace std;
