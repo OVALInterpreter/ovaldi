@@ -141,7 +141,7 @@ for more information.
        Documentation:
        README.txt - This file
        terms.txt - License and Terms of Use
-       version.txt - Definition Interpreter change log
+       version.txt - OVAL Interpreter change log
 
        XML Schema:
        OVAL schema files
@@ -181,16 +181,16 @@ for more information.
      ADMINISTRATOR ACCESS ONLY.
 
 
-  C. Obtaining the Latest OVAL Definition Data Files:
+  C. Obtaining the Latest OVAL Definitions from the OVAL Repository:
 
      OVAL Definitions are created and modified on a regular basis,
-     therefore it is advised that you check the Data Files page on
-     the OVAL Web Site before running the Interpreter to ensure
+     therefore it is advised that you check the OVAL Repository for 
+     the latest updates before running the Interpreter to ensure
      that you are using the most up-to-date Definitions.  Make sure
      to note the MD5 signature of the data file, as it will be
      needed to execute the Interpreter.
 
-     Data files page:
+     OVAL Repository Downloads page:
      http://oval.mitre.org/repository/download/index.html
 
      Additionally it is recommended that you join the 
@@ -270,6 +270,7 @@ for more information.
                      DEFAULT="results.html"
 
      Other Options:
+      -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
       -p           = print all information and error messages.
       -z           = return md5 of current oval-definitions file.
 
@@ -354,7 +355,10 @@ for more information.
            are to be saved.  If none is specified then the Interpreter 
            will default to "results.html" in the Interpreter directory.
 
-     -p -- Verbose output.  Print all information and error message to the 
+     -l -- Logging level.  Log messages at the specified level. 
+	       (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
+
+	-p -- Verbose output.  Print all information and error message to the 
            console.
 
      -z -- Calculates and prints to the screen the MD5 checksum of the
@@ -541,11 +545,9 @@ is working incorrectly.
 
 -- VIII -- REPORTING PROBLEMS --
 
-To report a problem with the OVAL Interpreter, please send an email
-to oval@mitre.org with a brief description of the problem, the version
-of the OVAL Interpreter, and the platform upon which the problem was
-detected.  The version of the OVAL Interpreter can be found in a banner
-at the top of any output.
+To report a problem with the OVAL Interpreter, please post a bug report
+on the OVAL Interpreter SourceForge site 
+(https://sourceforge.net/projects/ovaldi/).
 
 To report a problem with an OVAL Definition from the OVAL Repository,
 please send an email to the 'oval-discussion-list' with the id of the 
@@ -558,20 +560,23 @@ http://oval.mitre.org/community/registration.html
 
 -- IX ­ USEFUL LINKS --
 
-OVAL Web site -- http://oval.mitre.org
+OVAL Web site -- http://oval.mitre.org/
 
 OVAL Interpreter SourceForge Site -- http://sourceforge.net/projects/ovaldi/
 
-OVAL Repository -- http://oval.mitre.org/repository/index.html
+OVAL Repository -- http://oval.mitre.org/repository/
 
 Terms of Use -- http://oval.mitre.org/about/bsd_license.html
 
-CVE -- http://cve.mitre.org
+CCE -- http://cpe.mitre.org/
 
-CPE -- http://cce.mitre.org
+CPE -- http://cce.mitre.org/
 
-CCE -- http://cpe.mitre.org
+CWE -- http://cwe.mitre.org/
 
+CVE -- http://cve.mitre.org/
+
+Making Security Measurable - http://msm.mitre.org/
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland
