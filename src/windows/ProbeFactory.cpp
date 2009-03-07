@@ -74,9 +74,21 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("user_object") == 0) {
 		probe = UserProbe::Instance();
 	} else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
-		probe = AuditEventPolicySubcategoriesProbe::Instance();
+		
+		// Supported on vista and later
+		if(WindowsCommon::IsVistaOrLater()) {
+			probe = AuditEventPolicySubcategoriesProbe::Instance();
+		} else {
+			Log::Message("Found auditeventpolicysubcategories_object. auditeventpolicysubcategories_objects are only supported on Vista and later.");
+		}
+		
 	} else if(objectName.compare("wuaupdatesearcher_object") == 0) {
 		probe = WUAUpdateSearcherProbe::Instance();
+	} else if(objectName.compare("user_sid_object") == 0) {
+		Log::Info("Version 5.5 of OVAL deprecated the user_sid_object");
+		probe = UserSidProbe::Instance();
+	} else if(objectName.compare("user_sid55_object") == 0) {
+		probe = UserSid55Probe::Instance();
 
 // independent schema objects
 	} else if(objectName.compare("family_object") == 0) {
