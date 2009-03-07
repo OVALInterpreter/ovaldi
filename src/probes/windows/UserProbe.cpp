@@ -71,7 +71,6 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 	}
 
 	// behaviors are not allowed on users
-
 	if(object->GetBehaviors()->size() != 0) {
 		throw ProbeException("Error user_objects do not support behaviors.");		
 	}
@@ -93,10 +92,10 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 				isRegex = true;
 
 			// Get all users on the system...
-			StringVector* allUsers = this->GetAllUsers();
+			StringSet* allUsers = this->GetAllUsers();
 			
 			// Get the set of users that match the ItemEntity.
-			StringVector::iterator iterator;
+			StringSet::iterator iterator;
 			for(iterator = allUsers->begin(); iterator != allUsers->end(); iterator++) {
 				string curr = (*iterator);
 				if(this->IsMatch(user->GetValue(), (*iterator), isRegex)) {
@@ -110,11 +109,11 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 
 	} else {
 		// Get all users on the system...
-		StringVector* allUsers = this->GetAllUsers();
+		StringSet* allUsers = this->GetAllUsers();
 
 		// loop through all users on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(user);
 		for(it = allUsers->begin(); it != allUsers->end(); it++) {
 			tmp->SetValue((*it));
@@ -149,10 +148,9 @@ Item* UserProbe::GetUserInfo(string userName) {
 
 	Item* item = NULL;
 
-
 	// get the groups
-	StringVector* groups = new StringVector();
-	bool userExists = this->GetGroupsForUser(userName, groups);
+	StringSet* groups = new StringSet();
+	bool userExists = WindowsCommon::GetGroupsForUser(userName, groups);
 	if(userExists) {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
@@ -160,14 +158,14 @@ Item* UserProbe::GetUserInfo(string userName) {
 
 		// get the enabled flag
 		try {
-			bool enabled = this->GetEnabledFlag(userName);
+			bool enabled = WindowsCommon::GetEnabledFlagForUser(userName);
 			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 		} catch (Exception ex) {
 			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
 		}
 
-		StringVector::iterator iterator;
+		StringSet::iterator iterator;
 		if(groups->size() > 0) {
 			for(iterator = groups->begin(); iterator != groups->end(); iterator++) {
 				item->AppendElement(new ItemEntity("group", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
@@ -185,240 +183,12 @@ Item* UserProbe::GetUserInfo(string userName) {
 	return item;
 }
 
-bool UserProbe::GetGroupsForUser(string userName, StringVector* groups) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return a the set of groups this user is a member of.
-	//
-	// -----------------------------------------------------------------------
+StringSet* UserProbe::GetAllUsers() {
 
-	bool userExists = false;
-	UniqueStringVector* usv = new UniqueStringVector(groups);
-
-	LPCWSTR userNameApi;
-	// convert groupName for api use
-	wchar_t* wUserName = NULL;
-	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
-	wUserName = new wchar_t[size];
-	mbstowcs(wUserName, userName.c_str(), userName.size() + 1 );
-	userNameApi = wUserName;
-
-	// get the global groups
-	LPGROUP_USERS_INFO_0 pBuf = NULL;
-	DWORD dwLevel = 0;
-	DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
-	DWORD dwEntriesRead = 0;
-	DWORD dwTotalEntries = 0;
-	NET_API_STATUS nStatus;
-	
-	// Call the NetUserGetGroups function, specifying level 0.
-	nStatus = NetUserGetGroups(NULL,
-								userNameApi,
-								dwLevel,
-								(LPBYTE*)&pBuf,
-								dwPrefMaxLen,
-								&dwEntriesRead,
-								&dwTotalEntries);
-	// If the call succeeds,
-	if (nStatus == NERR_Success) {
-		userExists = true;
-
-		LPGROUP_USERS_INFO_0 pTmpBuf;
-		DWORD i;
-		DWORD dwTotalCount = 0;
-		char tmpGroupName[512];
-
-		if ((pTmpBuf = pBuf) != NULL) {
-
-			// Loop through the entries; 
-			//  print the name of the global groups 
-			//  to which the user belongs.
-			for (i = 0; i < dwEntriesRead; i++) {
-				
-				if (pTmpBuf == NULL) {
-					// Free the allocated buffer.
-					if (pBuf != NULL)
-						NetApiBufferFree(pBuf);
-					throw ProbeException("An access violation has occurred while getting groups for user: " + userName);
-				}
-
-				ZeroMemory(tmpGroupName, 21);
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pTmpBuf->grui0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-				usv->Append(tmpGroupName);
-
-				pTmpBuf++;
-				dwTotalCount++;
-			}
-		}
-
-		// report an error if all groups are not listed.
-		if (dwEntriesRead < dwTotalEntries) {
-			// Free the allocated buffer.
-			if (pBuf != NULL)
-				NetApiBufferFree(pBuf);
-			throw ProbeException("Unable to get all global groups for user: " + userName);
-		}
-	
-	} else if(nStatus == NERR_UserNotFound) {
-		userExists = false;
-	} else {
-		throw ProbeException("A system error has occurred unable to get all global groups for user: " + userName);
-	}
-
-	// Free the allocated buffer.
-	if (pBuf != NULL)
-		NetApiBufferFree(pBuf);
-
-
-	// only proceed if the user exists
-	if(userExists) {
-
-		//
-		// get the local groups for the user
-		//
-		LPLOCALGROUP_USERS_INFO_0 pLocalBuf = NULL;
-		dwLevel = 0;
-		DWORD dwFlags = LG_INCLUDE_INDIRECT ;
-		dwPrefMaxLen = MAX_PREFERRED_LENGTH;
-		dwEntriesRead = 0;
-		dwTotalEntries = 0;
-
-		//  Call the NetUserGetLocalGroups function 
-		//  specifying information level 0.
-		//
-		//   The LG_INCLUDE_INDIRECT flag specifies that the 
-		//   function should also return the names of the local 
-		//   groups in which the user is indirectly a member.
-		nStatus = NetUserGetLocalGroups(NULL,
-										userNameApi,
-										dwLevel,
-										dwFlags,
-										(LPBYTE *) &pLocalBuf,
-										dwPrefMaxLen,
-										&dwEntriesRead,
-										&dwTotalEntries);
-		// If the call succeeds
-		if (nStatus == NERR_Success) {
-			LPLOCALGROUP_USERS_INFO_0 pLocalTmpBuf;
-			DWORD i;
-			DWORD dwTotalCount = 0;
-			char tmpGroupName[512];
-
-			if ((pLocalTmpBuf = pLocalBuf) != NULL) {
-
-				//  Loop through the entries and 
-				//  print the names of the local groups 
-				//  to which the user belongs. 
-				for (i = 0; i < dwEntriesRead; i++) {
-
-					if (pLocalTmpBuf == NULL) {
-						// Free the allocated memory.
-						if (pLocalBuf != NULL)
-							NetApiBufferFree(pLocalBuf);
-						throw ProbeException("An access violation has occurred while getting local groups for user: " + userName);
-					}
-
-					ZeroMemory(tmpGroupName, 21);
-					_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pLocalTmpBuf->lgrui0_name);
-					tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-					usv->Append(tmpGroupName);
-
-					pLocalTmpBuf++;
-					dwTotalCount++;
-				}
-			}
-
-			// report an error if all groups are not listed
-			if (dwEntriesRead < dwTotalEntries) {
-				// Free the allocated memory.
-				if (pLocalBuf != NULL)
-					NetApiBufferFree(pLocalBuf);
-				throw ProbeException("Unable to get all local groups for user: " + userName);
-			}
-
-		} else if (nStatus == NERR_UserNotFound){
-			// do nothing
-		} else {
-			throw ProbeException("A system error has occurred unable to get all local groups for user: " + userName);
-		}
-
-		// Free the allocated memory.
-		if (pLocalBuf != NULL)
-			NetApiBufferFree(pLocalBuf);
-	}
-
-	delete usv;
-
-	return userExists;
-}
-
-bool UserProbe::GetEnabledFlag(string userName) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return the enabled flag for this user.
-	//
-	// -----------------------------------------------------------------------
-
-	bool enabled = true;
-
-	LPCWSTR userNameApi;
-	// convert groupName for api use
-	wchar_t* wUserName = NULL;
-	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
-	wUserName = new wchar_t[size];
-	mbstowcs(wUserName, userName.c_str(), userName.size() + 1 );
-	userNameApi = wUserName;
-
-	DWORD dwLevel = 23; // need USER_INFO_23  to get enabled flag
-	LPUSER_INFO_23  pBuf = NULL;
-	NET_API_STATUS nStatus;
-
-	// Call the NetUserGetInfo function
-	nStatus = NetUserGetInfo(NULL,
-							userNameApi,
-							dwLevel,
-							(LPBYTE *)&pBuf);
-
-	// If the call succeeds, print the user information.
-	if (nStatus == NERR_Success) {
-		if (pBuf != NULL) {			
-			// now read the flags
-			if(pBuf->usri23_flags & UF_ACCOUNTDISABLE) {
-				enabled = false;
-			}
-		}
-	} else {
-		throw ProbeException("A system error has occurred while getting user enabmed flag.");
-	}
-	
-	// Free the allocated memory.
-	if (pBuf != NULL)
-		NetApiBufferFree(pBuf);
-
-    return enabled;
-}
-
-StringVector* UserProbe::GetAllUsers() {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return a the set of users on the local host
-	//
-	//	Do we need to get users other than local users?
-	// -----------------------------------------------------------------------
-
-	StringVector* users = new StringVector();
-	UniqueStringVector* allUsers = new UniqueStringVector(users);
+	StringSet* users = new StringSet();
 
 	// just call windows common method to get local users.
-	WindowsCommon::GetAllLocalUsers(allUsers);
+	WindowsCommon::GetAllLocalUsers(users);
 
-
-	return allUsers->GetUniqueStrings();
+	return users;
 }

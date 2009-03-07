@@ -38,7 +38,7 @@
 using namespace std;
 
 /**
-	This class is responsible for collecting information for windows group_objects.
+	This class is responsible for collecting information for windows user_objects.
 */
 class UserProbe : public AbsProbe {
 public:
@@ -62,18 +62,12 @@ private:
 	static UserProbe* instance;
 
 	/** Return an item for the specified user name. 
-	    If the user is not found return and item withthe status set to does not exist
-	 */
+	    If the user is not found return and item with the status set to does not exist
+	*/
 	Item* GetUserInfo(string userName);
 
-	/** Return false if the user does not exist. Get the set of groups that the specified user is a memeber of. */
-	bool GetGroupsForUser(string userName, StringVector* groups);
-
 	/** Return the set of users on the local host. */
-	StringVector* GetAllUsers();
-
-	/** Return the enabled flag for this user name. */
-	bool GetEnabledFlag(string userName);
+	StringSet* GetAllUsers();
 
 };
 
