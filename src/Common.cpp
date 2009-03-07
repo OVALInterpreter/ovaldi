@@ -30,40 +30,6 @@
 
 #include "Common.h"
 
-UniqueStringVector::UniqueStringVector(StringVector* strings) {
-	// caller is responsible for providing a ptr to a StringVector
-	// caller is responsible for cleaning up after the StringVector
-	// is no longer needed.
-	this->uniqueStrings = strings;
-}
-
-UniqueStringVector::~UniqueStringVector() {
-
-}
-
-StringVector* UniqueStringVector::GetUniqueStrings() {
-	return this->uniqueStrings;
-}
-
-void UniqueStringVector::Append(string newString) {
-	if(!this->Exists(newString)) {
-		this->uniqueStrings->push_back(newString);
-	}
-}
-
-bool UniqueStringVector::Exists(string newString) {
-	bool exists = false;
-
-	StringVector::iterator iterator;
-	for(iterator = this->uniqueStrings->begin(); iterator != this->uniqueStrings->end(); iterator++) {
-		if(newString.compare((*iterator)) == 0) {
-			exists = true;
-		}
-	}			
-
-	return exists;
-}
-
 // constants
 const string Common::DEFINITION_ID = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*";
 const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*(,oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-9]*)*";
@@ -452,6 +418,13 @@ bool Common::FileExists(const char * filename) {
 }
 
 string Common::ToString(int num) {
+	ostringstream result;
+	result << num;
+
+	return result.str();
+}
+
+string Common::ToString(unsigned int num) {
 	ostringstream result;
 	result << num;
 

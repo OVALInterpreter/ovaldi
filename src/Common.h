@@ -73,21 +73,6 @@ typedef vector < string, allocator<string> > StringVector;
 typedef set < string > StringSet;
 
 
-class UniqueStringVector {
-
-public:
-	UniqueStringVector(StringVector*);
-	~UniqueStringVector();
-
-	StringVector* GetUniqueStrings();
-	void Append(string newString);
-	bool Exists(string newString);
-
-private:
-	StringVector* uniqueStrings;
-};
-
-
 /**
 	A vector for storing integers.
 */
@@ -163,6 +148,8 @@ class Common {
 		static bool     FileExists(const char* filename);
 		/** Return the int as a string. */
 		static string	ToString(int);
+		/** Return the unsigned int as a string. */
+		static string	ToString(unsigned int);
 		/** Return the long as a string. */
 		static string	ToString(long);
 		/** Return the unsigned long as a string. */
