@@ -99,8 +99,7 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 	//	or a well known account name like:
 	//		Administrators, or SYSTEM, or Administrator, or Users
 	//
-	//	TODO:
-	//	Ensure that a given account is only looked up once
+	//	TODO: Ensure that a given account is only looked up once
 	//		
 	//	Get All Local users with:
 	//	http://msdn.microsoft.com/library/default.asp?url=/library/en-us/netmgmt/netmgmt/netuserenum.asp
@@ -165,10 +164,10 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 				isRegex = true;
 
 			// Get all trustee_names on the system...
-			StringVector* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+			StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
 			
 			// Get the set of trustee names that match the ItemEntity.
-			StringVector::iterator iterator;
+			StringSet::iterator iterator;
 			for(iterator = allTrusteeNames->begin(); iterator != allTrusteeNames->end(); iterator++) {
 				string curr = (*iterator);
 				if(this->IsMatch(trusteeName->GetValue(), (*iterator), isRegex)) {
@@ -179,11 +178,11 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 
 	} else {
 		// Get all trustee_names on the system...
-		StringVector* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+		StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
 
 		// loop through all trustee names on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(trusteeName);
 		for(it = allTrusteeNames->begin(); it != allTrusteeNames->end(); it++) {
 			tmp->SetValue((*it));
@@ -235,9 +234,9 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 			} 
 			
 			// Get all the accounts in the group
-			StringVector* groupMembers = new StringVector();
-			WindowsCommon::ExpandGroup(accountName, groupMembers);
-			StringVector::iterator iterator;
+			StringSet* groupMembers = new StringSet();
+			WindowsCommon::ExpandGroup(accountName, groupMembers, includeGroupBehavior, resolveGroupBehavior);
+			StringSet::iterator iterator;
 			for(iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
 				// make recursive call...
 				try {
