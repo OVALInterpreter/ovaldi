@@ -92,10 +92,10 @@ ItemVector* UserSidProbe::CollectItems(Object *object) {
 				isRegex = true;
 
 			// Get all users SIDs on the system...
-			StringVector* allUserSids = WindowsCommon::GetAllLocalUserSids();
+			StringSet* allUserSids = WindowsCommon::GetAllLocalUserSids();
 			
 			// Get the set of users that match the ItemEntity.
-			StringVector::iterator iterator;
+			StringSet::iterator iterator;
 			for(iterator = allUserSids->begin(); iterator != allUserSids->end(); iterator++) {
 				string curr = (*iterator);
 				if(this->IsMatch(userSid->GetValue(), (*iterator), isRegex)) {
@@ -108,11 +108,11 @@ ItemVector* UserSidProbe::CollectItems(Object *object) {
 		}
 	} else {
 		// Get all users on the system...
-		StringVector* allLocalUserSids = WindowsCommon::GetAllLocalUserSids();
+		StringSet* allLocalUserSids = WindowsCommon::GetAllLocalUserSids();
 
 		// loop through all users on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(userSid);
 		for(it = allLocalUserSids->begin(); it != allLocalUserSids->end(); it++) {
 			tmp->SetValue((*it));
@@ -160,12 +160,12 @@ Item* UserSidProbe::GetUserSidInfo(string userSid) {
 		userName = userName.substr(idx + 1, string::npos);
 	}
 
-	StringVector* groups = new StringVector();
+	StringSet* groups = new StringSet();
 	
 	bool userExists = WindowsCommon::GetGroupsForUser(userName, groups);		
 
 	if(userExists) {
-		StringVector* groupSids = new StringVector();
+		StringSet* groupSids = new StringSet();
 	
 		WindowsCommon::ConvertTrusteeNamesToSidStrings(groups, groupSids);
 
@@ -182,7 +182,7 @@ Item* UserSidProbe::GetUserSidInfo(string userSid) {
 			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
 		}
 
-		StringVector::iterator iterator;
+		StringSet::iterator iterator;
 		if(groupSids->size() > 0) {
 			for(iterator = groupSids->begin(); iterator != groupSids->end(); iterator++) {
 				item->AppendElement(new ItemEntity("group", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
