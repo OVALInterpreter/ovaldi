@@ -65,6 +65,8 @@
 #include "UserProbe.h"
 #include "AuditEventPolicySubcategoriesProbe.h"
 #include "WUAUpdateSearcherProbe.h"
+#include "UserSidProbe.h"
+#include "UserSid55Probe.h"
 
 using namespace std;
 
