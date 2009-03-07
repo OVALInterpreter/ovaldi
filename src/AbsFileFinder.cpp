@@ -145,19 +145,25 @@ StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behavi
 	// apply any behaviors and consolidate the results
 	StringVector* behaviorPaths = this->ProcessPathBehaviors(paths, behaviors);
 
-	// combine all the paths into a unique string vector
-	StringVector* uniquePaths = new StringVector();
-	UniqueStringVector* usv = new UniqueStringVector(uniquePaths);
+	// combine all the paths into a set to ensure uniqueness
+	StringSet pathSet;
 	StringVector::iterator it;
 	for(it = paths->begin(); it != paths->end(); it++) {
-		usv->Append((*it));
+		pathSet.insert((*it));
 	}
 	delete paths;
 	for(it = behaviorPaths->begin(); it != behaviorPaths->end(); it++) {
-		usv->Append((*it));
+		pathSet.insert((*it));
 	}
 	delete behaviorPaths;
-	delete usv;
+
+	
+	// convert back to a vector (I know this is ugly) ...
+	StringVector* uniquePaths = new StringVector();
+	StringSet::iterator setIterator;
+	for(setIterator = pathSet.begin(); setIterator != pathSet.end(); setIterator++) {
+		uniquePaths->push_back((*setIterator));
+	}
 
 	return uniquePaths;
 }
