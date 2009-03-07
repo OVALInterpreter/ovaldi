@@ -104,10 +104,10 @@ ItemVector* AccessTokenProbe::CollectItems(Object *object) {
 				isRegex = true;
 
 			// Get all trustee_names on the system...
-			StringVector* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+			StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
 			
 			// Get the set of trustee names that match the ItemEntity.
-			StringVector::iterator iterator;
+			StringSet::iterator iterator;
 			for(iterator = allTrusteeNames->begin(); iterator != allTrusteeNames->end(); iterator++) {
 				string curr = (*iterator);
 				if(this->IsMatch(securityPrinciple->GetValue(), (*iterator), isRegex)) {
@@ -118,11 +118,11 @@ ItemVector* AccessTokenProbe::CollectItems(Object *object) {
 
 	} else {
 		// Get all trustee_names on the system...
-		StringVector* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+		StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
 
 		// loop through all trustee names on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(securityPrinciple);
 		for(it = allTrusteeNames->begin(); it != allTrusteeNames->end(); it++) {
 			tmp->SetValue((*it));
@@ -169,9 +169,9 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 			accountNames->push_back(accountNameIn);
 		}
 
-		StringVector* groupMembers = new StringVector();
-		WindowsCommon::ExpandGroup(accountNameIn, groupMembers);
-		StringVector::iterator iterator;
+		StringSet* groupMembers = new StringSet();
+		WindowsCommon::ExpandGroup(accountNameIn, groupMembers, includeGroupBehavior, resolveGroupBehavior);
+		StringSet::iterator iterator;
 		for(iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
 			accountNames->push_back((*iterator));
 		}
