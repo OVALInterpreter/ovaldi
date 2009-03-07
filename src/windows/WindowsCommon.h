@@ -46,6 +46,11 @@
 #define _WIN32_WINNT 0x0501
 #endif
 #include <Sddl.h>
+#include <Authz.h>
+#undef __DOMDocument_FWD_DEFINED__
+#include <comdef.h>
+#include <DelayImp.h>
+
 
 using namespace std;
 
@@ -68,10 +73,25 @@ public:
 	static string GetErrorMessage(DWORD dwLastError);
 
 	/** Expand the group returning all members. 
-		If the group does not exist return false 
-		Look at local groups then global groups
+		If the group does not exist return false. 
+		Look at local groups then global groups.
+
+		@param groupName The name of the group to be expanded.
+		@param members A pointer to a set that will be populated with the specified group members.
+		@param includeSubGroups When true include subgroups in the set of groups that are reported.
+		@param resolveSubGroup When true recurse into any subgroups and expand them too.
 	*/
-	static bool ExpandGroup(string groupName, StringVector* members);
+	static bool ExpandGroup(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
+
+	/** Return true if the group exists add all the group member's SIDs to the memberSIDs parameter. 
+		
+		@param groupSID The SID of the group to be expanded.
+		@param memberSIDs A pointer to a set that will be populated with the specified group member SIDs.
+		@param includeSubGroups When true include subgroups in the set of groups that are reported.
+		@param resolveSubGroup When true recurse into any subgroups and expand them too.
+	*/
+	static bool ExpandGroupBySID(string groupSID, StringSet* memberSIDs, bool includeSubGroups, bool resolveSubGroup);
+
 
 	/** Get all trustee names on the system. 
 		This set consists of the following:
@@ -83,14 +103,14 @@ public:
 		Get the trustee name of the system.
 		Resulting trustee names should be unique.
 	*/
-	static StringVector* GetAllTrusteeNames();
+	static StringSet* GetAllTrusteeNames();
 
 	/** Get all the Trustee SIDs on the system.
 		This method simply calls the WindowsCommon::GetAllTrusteeNames() method
 		and converts each returned name to a sid string. THe resulting set of sids is 
-		returned as a StringVector.		
+		returned as a StringSet.		
 	*/
-	static StringVector* GetAllTrusteeSIDs();
+	static StringSet* GetAllTrusteeSIDs();
 
 	/** Get the trustee name for the specified sid formatted for oval useage. */
 	static string GetFormattedTrusteeName(PSID pSid);
@@ -115,17 +135,35 @@ public:
 	/** Get the account and domain string for the specified trustee sid. Return true if the trustee is a group. */
 	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr);
 
+	/** Convert a vector of trustee names to a vector of corresponding SID strings */
+	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);
+
+	/** Retrieves list of sids for all local users */
+	static StringSet* WindowsCommon::GetAllLocalUserSids();
+
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
 
-	/** Return true if the group exists add all the group member's SIDs to the memberSIDs parameter. */
-	static bool ExpandGroupBySID(string groupSID, StringVector* memberSIDs);
+	/** Returns true if the trustee name corresponds to a group. */
+	static bool IsGroup(string trusteeName);
 
 	/** Return the set of all local and global groups on the local system. */
-	static StringVector* GetAllGroups();
+	static StringSet* GetAllGroups();
 
-	/** Get the set of all local users. */
-	static void GetAllLocalUsers(UniqueStringVector*);
+	/** Get the set of all local users. 
+
+		@param allUsers A pointer to variable that will be populated with all the local users.
+	*/
+	static void GetAllLocalUsers(StringSet* all);
+
+	/** Get local and global groups for the user. */
+	static bool GetGroupsForUser(string userName, StringSet* groups);
+
+	/** Get 'enabled flag' for user with specified name 
+		If the user name is provided with a leading doamin name or host name
+		the user name is extracted and provided to the NetUserGetInfo api.
+	*/
+	static bool GetEnabledFlagForUser(string userNameIn);
 
 	/** Convert the FILETIME strucutre to an integer. */
 	static string ToString(FILETIME fTime);
@@ -133,19 +171,65 @@ public:
 	/** Return a string representation of the DWORD */
 	static string ToString(DWORD dw);
 
+	/** Convert the PSID to a string. 
+		Attempts to return a string representation of the input PSID. If
+		the PSID can not be converted to a string an empty string is returned.
+	*/
+	static string ToString(PSID pSid);
+
+	/** Return the access mask for the file for the specifed SID. **/
+	static void GetEffectiveRightsForFile(PSID pSid, string* filePath, PACCESS_MASK pAccessRights);
+
+	/** Return true if the current os is Vista or later. 
+		The return value is calculated once and the result is stored in a static private variable.
+
+		See: http://msdn.microsoft.com/en-us/library/ms725491(VS.85).aspx
+	**/
+	static bool IsVistaOrLater();
+
+	/** Return true if the current os is XP or later. 
+		The return value is calculated once and the result is stored in a static private variable.
+
+		See: http://msdn.microsoft.com/en-us/library/ms725491(VS.85).aspx
+	**/
+	static bool IsXPOrLater();
+
 private:
+	
+	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
 
-	/** Return a StringVector* of all local groups. */
-	static StringVector* GetAllLocalGroups();
+	/** Return the access mask for the file for the specifed SID. **/
+	static void GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PACCESS_MASK pAccessRights);
 
-	/** Return a StringVector* of all global groups. */
-	static StringVector* GetAllGlobalGroups();
+	/** Return the access mask for the file for the specifed SID. **/
+	static void GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, PACCESS_MASK pAccessRights);
 
-	/** Get the members of the specified local group. */
-	static bool GetLocalGroupMembers(string groupName, StringVector* members);
+	/** Split Trustee name between domain and account portion */
+	static void SplitTrusteeName(string trusteeName, string *domainName, string *accountName);
 
-	/** Get the members of the specified global group. 	*/
-	static bool GetGlobalGroupMembers(string groupName, StringVector* members);
+	/** Return a StringSet* of all local groups. */
+	static StringSet* GetAllLocalGroups();
+
+	/** Return a StringSet* of all global groups. */
+	static StringSet* GetAllGlobalGroups();
+
+	/** Get the members of the specified local group. 
+
+		@param groupName The name of the group to retrieve members for.
+		@param members A pointer to a set of members. All members that are found for the specified group will be added to this set.
+		@param includeSubGroups When true include subgroups in the set of groups that are reported.
+		@param resolveSubGroup When true recurse into any subgroups and expand them too.
+	*/
+	static bool GetLocalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
+
+	/** Get the members of the specified global group.
+
+		@param groupName The name of the group to retrieve members for.
+		@param members A pointer to a set of members. All members that are found for the specified group will be added to this set.
+		@param includeSubGroups When true include subgroups in the set of groups that are reported.
+		@param resolveSubGroup When true recurse into any subgroups and expand them too.
+	*/
+	static bool GetGlobalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
 
 	/** Get the set of all trustee names on the system for the well knowns SIDS.
 		These are sids that are not returend by a call to NetUserEnum, 
@@ -158,9 +242,13 @@ private:
 	/** Look up the local system name. */
 	static string LookUpLocalSystemName();
 
-	static StringVector* allTrusteeNames;
-	static StringVector* allTrusteeSIDs;
-	static StringVector* wellKnownTrusteeNames;
+	/** Convert string to wide */
+	static LPWSTR StringToWide(string s);
+
+	static StringSet* allTrusteeNames;
+	static StringSet* allTrusteeSIDs;
+	static StringSet* wellKnownTrusteeNames;
+	static StringSet* allLocalUserSIDs;
 
 	static inline bool IsAccountGroup(SID_NAME_USE sidType, string accountName);	
 };
