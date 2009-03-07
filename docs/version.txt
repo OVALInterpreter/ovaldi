@@ -38,7 +38,21 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected long standing conflict with msxml.h when building on windows systems
 * Added support for unix-def:runlevel_test.
 * Corrected handling of not applicable, error, and not evaluated flags on collected objects when the test has a existence check of EXISTENCE_ANY_EXIST.
-
+* Added NULL check to the VariableFactory to address NULL pointer exception that occured when processing variables that are referenced, but do not exist in the oval-definition document. Thanks to Lumension Security (http://www.lumension.com).
+* Added new logic that removes spaces in WQL filed names that would normally cause the WMI probe to error out. Thanks to Lumension Security (http://www.lumension.com).
+* Improved FileEffectiveRightsProbe to better handle collecting rights on all types of files. Added new logic utilizing the Authz API when it is supported. If not supported the code uses the old logic to use GetEffectiveRightsFromAcl(). This has all been moved to WindowsCommon. Thanks to Lumension Security (http://www.lumension.com).
+* Added common functionality to WindowsCommon for getting groups for a user and getting the enabled flag for a user. Thanks to Lumension Security (http://www.lumension.com).
+* Cleaned up comments for doxygen in several places.
+* Corrected formatting of message elements on Items in the system-characteristics document.
+* Corrected bug in REGEX.cpp that would have produced truncated error messages and possibly other unknown results. Thanks to Marcus Meissner for pointing out the issue.
+* Corrected bug in Object::Analyze method that would have prevented it from ever finding a matching item. Thanks to Michael Wiegand for finding and fixing the issue.
+* Corrected bug in Test::Analyze() method that would have prevented it from returning correct results when the collected_object structure is not used in a System Characteristics file. Thanks to Michael Wiegand for finding and fixing the issue.
+* Corrected EntityComparator::ParseVersionStr() method that was misusing strtok. This lead to unpredictable results. In some cases the method succeeded correctly, in other cases it would fail unpredictably all depending on what was in memory at run time. Thanks to Michael Wiegand for finding and fixing the issue.
+* Added -l command line flag to allow the logging level to be set on the command line.
+* Removed UniqueStringVector and replaced all uses with StringSet.
+* Added support for win-def:user_sid__test. Thanks to Lumension Security (http://www.lumension.com).
+* Added support for win-def:user_sid_55_test. Thanks to Lumension Security (http://www.lumension.com).
+* Added check to make sure the os is Vista or later before trying to collect auditeventpolicysubcategories_objects.
 
 ---------------------------------------
 ---        Version 5.5 build 4      ---
@@ -55,7 +69,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected bug in WMIProbe.cpp. wmi_items were not properly being collected resulting incorrect wmi_test evaluations.
 * Added log message when an object is not supported for data collection.
 * Corrected bug that caused a deprecated message for the check='none exist' on a test to be incorrectly reported in the log file.
-* Added mapping of deprected var_check and entity_check 'none exist' value to 'none satisfy' value.
+* Added mapping of deprecated var_check and entity_check 'none exist' value to 'none satisfy' value.
 * Corrected numerous coding issues related to misuse of sizeof. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
 * Corrected numerous coding issues related to throwing exceptions without freeing or deleting allocated memory. Thanks to Derek Abdine (derek_abdine@RAPID7.COM) for reporting these issues.
 * Added file existence check to all files that are specified on the command line. 
@@ -223,7 +237,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for external variables. 
 * Cleaned up command line processing. Added better messages when invalid command line options are provided.
 * Corrected typo in parse function that would have caused the datatype on constant variables to be ignored when parsing and always treated as the a string
-* Corrected bug in reporting of result on a tested_item element. In some cases the result was left as it default error value. This did not effect the overall result computation for a test.
+* Corrected bug in reporting of result on a tested_item element. In some cases the result was left as it default error value. This did not affect the overall result computation for a test.
 * Corrected bug in Variable probe causing it to always fail to collect variable information.
 * Added support to the WMIProbe for addition datatypes. Previously only supported strings.
 * Corrected bug in AbsObjectCollector that lead to error details not being reported in the system-characteristics file.
@@ -291,5 +305,3 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 	- environemntvariable_object
 	- family_object
 * Supports definition analysis for all types of definitions.
-
-
