@@ -99,8 +99,7 @@ ItemVector* SidSidProbe::CollectItems(Object *object) {
 	//	or a well known account name like:
 	//		Administrators, or SYSTEM, or Administrator, or Users
 	//
-	//	TODO:
-	//	Ensure that a given account is only looked up once
+	//	TODO: Ensure that a given account is only looked up once
 	//		
 	//	Get All Local users with:
 	//	http://msdn.microsoft.com/library/default.asp?url=/library/en-us/netmgmt/netmgmt/netuserenum.asp
@@ -165,10 +164,10 @@ ItemVector* SidSidProbe::CollectItems(Object *object) {
 				isRegex = true;
 			
 			// Get all trustee_sids on the system...
-			StringVector* allTrusteeSids = WindowsCommon::GetAllTrusteeSIDs();	
+			StringSet* allTrusteeSids = WindowsCommon::GetAllTrusteeSIDs();	
 			
 			// Get the set of trustee names that match the ItemEntity.
-			StringVector::iterator iterator;
+			StringSet::iterator iterator;
 			for(iterator = allTrusteeSids->begin(); iterator != allTrusteeSids->end(); iterator++) {
 				string curr = (*iterator);
 				if(this->IsMatch(trusteeSid->GetValue(), (*iterator), isRegex)) {
@@ -179,11 +178,11 @@ ItemVector* SidSidProbe::CollectItems(Object *object) {
 
 	} else {			
 		// Get all trustee_sids on the system...
-		StringVector* allTrusteeSids = WindowsCommon::GetAllTrusteeSIDs();
+		StringSet* allTrusteeSids = WindowsCommon::GetAllTrusteeSIDs();
 
 		// loop through all trustee sids on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(trusteeSid);
 		for(it = allTrusteeSids->begin(); it != allTrusteeSids->end(); it++) {
 			tmp->SetValue((*it));
@@ -235,9 +234,9 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 			} 
 			
 			// Get all the accounts in the group
-			StringVector* groupMemberSids = new StringVector();
-			WindowsCommon::ExpandGroupBySID(sidStr, groupMemberSids);
-			StringVector::iterator iterator;
+			StringSet* groupMemberSids = new StringSet();
+			WindowsCommon::ExpandGroupBySID(sidStr, groupMemberSids, includeGroupBehavior, resolveGroupBehavior);
+			StringSet::iterator iterator;
 			for(iterator = groupMemberSids->begin(); iterator != groupMemberSids->end(); iterator++) {
 				// make recursive call...
 				try {
