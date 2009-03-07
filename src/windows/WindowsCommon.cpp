@@ -30,9 +30,10 @@
 
 #include "WindowsCommon.h"
 
-StringVector* WindowsCommon::allTrusteeNames = NULL;
-StringVector* WindowsCommon::allTrusteeSIDs = NULL;
-StringVector* WindowsCommon::wellKnownTrusteeNames = NULL;
+StringSet* WindowsCommon::allLocalUserSIDs = NULL;
+StringSet* WindowsCommon::allTrusteeNames = NULL;
+StringSet* WindowsCommon::allTrusteeSIDs = NULL;
+StringSet* WindowsCommon::wellKnownTrusteeNames = NULL;
 const int NAME_BUFFER_SIZE = 255;
 
 bool WindowsCommon::DisableAllPrivileges() {
@@ -52,7 +53,6 @@ bool WindowsCommon::DisableAllPrivileges() {
 		errorMessage.append("\nERROR: Unable to get a handle to the current process.  Error # - ");
 		errorMessage.append(buffer);
 		errorMessage.append("\n");
-		cerr << errorMessage;
 		Log::Fatal(errorMessage);
 
 		return false;
@@ -74,7 +74,6 @@ bool WindowsCommon::DisableAllPrivileges() {
 		errorMessage.append("\nERROR: Unable to disable token privileges.  Error # - ");
 		errorMessage.append(buffer);
 		errorMessage.append("\n");
-		cerr << errorMessage;
 		Log::Fatal(errorMessage);
 
 		CloseHandle(hToken);
@@ -305,91 +304,53 @@ bool WindowsCommon::GetTextualSid(PSID pSid, LPTSTR* TextualSid) {
     return true;
 }
 
-bool WindowsCommon::ExpandGroup(string groupName, StringVector* members) {
+bool WindowsCommon::ExpandGroup(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
 
 	// Need to determine if a local or global group.
 	bool groupExists = false;
-	groupExists = WindowsCommon::GetLocalGroupMembers(groupName, members);
-	if(!groupExists)
-		groupExists = WindowsCommon::GetGlobalGroupMembers(groupName, members);	
+	
+	try {
+		groupExists = WindowsCommon::GetLocalGroupMembers(groupName, members, includeSubGroups, resolveSubGroup);
+	} catch(Exception lex) {
+		Log::Info("Problem retrieving local group members for " + groupName + ":" + lex.GetErrorMessage());
+	}
+
+	if(!groupExists) {
 		
+		try {
+			groupExists = WindowsCommon::GetGlobalGroupMembers(groupName, members, includeSubGroups, resolveSubGroup);	
+		} catch(Exception gex) {
+			Log::Info("Problem retrieving global group members for " + groupName + ":" + gex.GetErrorMessage());
+		}			
+	}	
+
 	return groupExists;
 }
 
+bool WindowsCommon::ExpandGroupBySID(string groupSidStr, StringSet* memberSids, bool includeSubGroups, bool resolveSubGroup) {	
 
-bool WindowsCommon::ExpandGroupBySID(string groupSidStr, StringVector* memberSids) {	
-	
-	char groupNameBuffer[NAME_BUFFER_SIZE];
-	char domainNameBuffer[NAME_BUFFER_SIZE];
-	SID_NAME_USE sidType;
-	PSID pGroupSid;
-	bool retVal = false;
-	BYTE *pLocalMemberBuffer = NULL;
+	bool groupExists = false;
+	PSID pSid;
 
-	try	{
-		if(ConvertStringSidToSid(groupSidStr.c_str(), &pGroupSid) == 0) {
-			throw Exception("Error encountered converting group string SID in WindowsCommon::ExpandGroupBySID");
-		} else {	
-			DWORD dwGroupNameBufferSize = NAME_BUFFER_SIZE;	
-			DWORD dwDomainNameBufferSize = NAME_BUFFER_SIZE;
+	BOOL retVal = ConvertStringSidToSid(const_cast<char*>(groupSidStr.c_str()),	&pSid);									
+		
+	if(retVal != FALSE) {		
+		string groupName = WindowsCommon::GetFormattedTrusteeName(pSid);
 
-			if(LookupAccountSid(NULL, pGroupSid, groupNameBuffer, &dwGroupNameBufferSize, domainNameBuffer, &dwDomainNameBufferSize, &sidType) != 0) {				
-				DWORD dwEntriesRead = 0;
-				DWORD dwTotalEntries = 0;
+		StringSet *memberNames = new StringSet();
 
-				wchar_t wideGroupNameBuffer[NAME_BUFFER_SIZE];
+		groupExists = WindowsCommon::ExpandGroup(groupName, memberNames, includeSubGroups, resolveSubGroup);
 
-				memset(wideGroupNameBuffer, 0, NAME_BUFFER_SIZE * 2);
-				mbstowcs(wideGroupNameBuffer, groupNameBuffer, dwGroupNameBufferSize);
+		if(groupExists) {
+			WindowsCommon::ConvertTrusteeNamesToSidStrings(memberNames, memberSids);
+		} 
 
-				NET_API_STATUS apiStatus = NetLocalGroupGetMembers(NULL, wideGroupNameBuffer, 0, &pLocalMemberBuffer, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
-
-				if(apiStatus == NERR_Success) {	
-					LOCALGROUP_MEMBERS_INFO_0 *pLocalGroupMembers = (LOCALGROUP_MEMBERS_INFO_0 *)pLocalMemberBuffer;
-
-					for(DWORD i = 0; i < dwTotalEntries; i++) {
-						char *recvString = NULL;
-
-						if(ConvertSidToStringSid(pLocalGroupMembers[i].lgrmi0_sid, &recvString) != 0) {
-							std::string s = recvString;
-							memberSids->push_back(s);	
-							LocalFree(recvString);
-						} else {
-							throw Exception("Error encountered converting group string SID in WindowsCommon::ExpandGroupBySID");
-							break;
-						}
-					}
-
-					retVal = true;
-				} else {
-					// If we try to get members for a non group let it go.
-				}
-			} else {
-				throw Exception("Error in call to LookupAccountSid for " + groupSidStr + " in WindowsCommon::ExpandGroupBySID");
-			}
-		}
-
-	} catch(...) {
-		if(pGroupSid != NULL) {
-			LocalFree(pGroupSid);
-		}
-
-		if(pLocalMemberBuffer != NULL) {
-			NetApiBufferFree(pLocalMemberBuffer);
-		}
-
-		throw;
+		delete memberNames;
 	}
 
-	if(pGroupSid != NULL) {
-		LocalFree(pGroupSid);
-	}
+	LocalFree(pSid);
 
-	if(pLocalMemberBuffer != NULL) {
-		NetApiBufferFree(pLocalMemberBuffer);
-	}
-
-	return true;
+	return groupExists;
 }
 
 bool WindowsCommon::IsGroupSID(string SID) {
@@ -434,207 +395,367 @@ bool WindowsCommon::IsGroupSID(string SID) {
 	return isAccountGroup;
 }
 
-StringVector* WindowsCommon::GetAllGroups() {
+StringSet* WindowsCommon::GetAllGroups() {
 
-	StringVector* groups = WindowsCommon::GetAllLocalGroups();
-	StringVector* globalGroups = WindowsCommon::GetAllLocalGroups();
-	StringVector::iterator iterator;
+	StringSet* groups = WindowsCommon::GetAllLocalGroups();
+	StringSet* globalGroups = WindowsCommon::GetAllGlobalGroups();
+	StringSet::iterator iterator;
 	for(iterator = globalGroups->begin(); iterator != globalGroups->end(); iterator++) {
-		groups->push_back((*iterator));
+		groups->insert((*iterator));
 	}
 
     return groups;
 }
 
-bool WindowsCommon::GetLocalGroupMembers(string groupName, StringVector* members) {
+bool WindowsCommon::IsGroup(string trusteeName) {
+	DWORD sidSize = 128;
+	DWORD domainSize = 128;
+	SID_NAME_USE sidUse;
+	BOOL retVal = FALSE;
+	PSID psid = NULL;
+	LPTSTR domain = NULL;
+	bool isGroup = false;
+
+	do {
+		// Initial memory allocations for the SID and DOMAIN.
+		psid = (PSID)realloc(psid, sidSize);
+		if (psid == NULL) {
+			retVal = FALSE;
+			break;
+		}
+
+		domain = (LPTSTR)realloc(domain, domainSize);
+		if (domain == NULL) {
+			retVal = FALSE;
+			break;
+		}
+
+		// Call LookupAccountName to get the SID.
+		retVal = LookupAccountName(NULL,								// system name NULL == localhost
+								const_cast<char*>(trusteeName.c_str()),	// account name
+								psid,									// security identifier
+								&sidSize,								// size of security identifier
+								domain,									// domain name
+								&domainSize,							// size of domain name
+								&sidUse);								// SID-type indicator
+		
+		if(retVal != FALSE) {
+			isGroup = WindowsCommon::IsAccountGroup(sidUse, trusteeName);
+		}
+	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+	free(psid);
+	free(domain);
+
+	if(retVal == FALSE) {	
+		DWORD error = GetLastError();
+		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
+			throw Exception("Unable to locate account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
+		} else {
+			throw Exception("Error failed to look up account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(error));
+		}
+	}
+
+	return isGroup;
+}
+
+LPWSTR WindowsCommon::StringToWide(string s) {
+	
+	size_t size = mbstowcs(NULL, s.c_str(), s.length()) + 1;
+	LPWSTR wide = new wchar_t[size];
+	mbstowcs(wide, s.c_str(), s.size() + 1 );
+
+	return wide;
+}
+
+void WindowsCommon::SplitTrusteeName(string trusteeName, string *domainName, string *accountName) {
+	
+	size_t idx = trusteeName.find('\\', 0);
+
+	if((idx != string::npos) && (trusteeName.length() != idx + 1)) {
+		
+		*domainName = trusteeName.substr(0, idx);
+		*accountName = trusteeName.substr(idx + 1, string::npos);
+	} else {
+		*domainName = "";
+		*accountName = trusteeName;
+	}
+}
+
+bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
 	
 	bool groupExists = false;
 
 	NET_API_STATUS  res;
-	LPCWSTR localgroupname;
-	LPBYTE bufptr = NULL;
+	LPCWSTR localGroupName = NULL;
 	DWORD entriesread;
 	DWORD totalentries;
-	LOCALGROUP_MEMBERS_INFO_0* userInfo;
+	LOCALGROUP_MEMBERS_INFO_0* userInfo = NULL;
 
-	// convert groupName for api use
-	wchar_t* wGroupName = NULL;
-	size_t size = mbstowcs(NULL, groupName.c_str(), groupName.length()) + 1;
-	wGroupName = new wchar_t[size];
-	mbstowcs(wGroupName, groupName.c_str(), groupName.size() + 1 );
-	localgroupname = wGroupName;
+	localGroupName = WindowsCommon::StringToWide(groupName);
 
-	res = NetLocalGroupGetMembers(NULL,					// server name NULL == localhost
-								localgroupname,			// group name
-  								0,						// level LOCALGROUP_MEMBERS_INFO_3
-								(unsigned char**) &userInfo,
-								MAX_PREFERRED_LENGTH,
-								&entriesread,
-								&totalentries,
-								NULL);
+	try {
 
-	// was there an error?
-	if(res == NERR_Success) {
+		res = NetLocalGroupGetMembers(NULL,						// server name NULL == localhost
+									  localGroupName,			// group name
+  									  0,						// level LOCALGROUP_MEMBERS_INFO_3
+									  (unsigned char**) &userInfo,
+									  MAX_PREFERRED_LENGTH,
+									  &entriesread,
+									  &totalentries,
+									  NULL);
 
-			// Loop through each user.
-			for (unsigned int i=0; i<entriesread; i++) {
+		// was there an error?
+		if(res == NERR_Success) {
 
-				// get sid
-				PSID pSid = userInfo[i].lgrmi0_sid;
-				try {
-					string userName = WindowsCommon::GetFormattedTrusteeName(pSid);
-					members->push_back(userName);
-				} catch (Exception ex) {
-					Log::Info("Unable to get all group members." + ex.GetErrorMessage());
+				// Loop through each member.
+				for (unsigned int i=0; i<entriesread; i++) {
+
+					// get sid
+					PSID pSid = userInfo[i].lgrmi0_sid;
+					try {
+						string trusteeName = WindowsCommon::GetFormattedTrusteeName(pSid);
+					
+						bool isGroup = WindowsCommon::IsGroup(trusteeName);
+
+						if(isGroup && resolveSubGroup) {
+
+							if(!WindowsCommon::GetLocalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
+								
+								// May be a global group so go that route
+								if(!WindowsCommon::GetGlobalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
+									isGroup = false;
+									Log::Debug("Could not find group " + trusteeName + " when looking up group members.");	
+								}
+							}
+						} 
+
+						if(!isGroup || includeSubGroups) {
+							members->insert(trusteeName);
+						}
+					} catch (Exception ex) {
+						Log::Info("Unable to get all group members." + ex.GetErrorMessage());
+					}
+				}
+
+				groupExists = true;
+
+		} else {
+			if(res == NERR_InvalidComputer) {
+				// throw this error
+				throw Exception("Unable to expand local group: " + groupName + ". The computer name is invalid.");
+			} else if(res == ERROR_MORE_DATA) {
+				// throw this error
+				throw Exception("Unable to expand local group: " + groupName + ". More entries are available. Specify a large enough buffer to receive all entries. This error message should never occure since the api call is made with MAX_PREFERRED_LENGTH for the size of the buffer.");
+			} else if(res == ERROR_NO_SUCH_ALIAS || res == NERR_GroupNotFound) {
+				// ignore this error
+				Log::Debug("GetLocalGroupMembers - The local group name: " + groupName + " could not be found.");
+			} else if(res == ERROR_ACCESS_DENIED) {
+				// throw this error???
+				throw Exception("Unable to expand local group: " + groupName + ". " + " The user does not have access to the requested information.");
+			} else {
+				throw Exception("Unable to expand local group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
+			}
+		}
+
+	} catch(...) {
+		if(localGroupName != NULL) {
+			delete localGroupName;
+		}
+		
+		if(userInfo != NULL) {
+			NetApiBufferFree(userInfo);
+		}
+
+		throw;
+	}
+
+	if(localGroupName != NULL) {
+		delete localGroupName;
+	}
+	
+	if(userInfo != NULL) {
+		NetApiBufferFree(userInfo);
+	}
+
+	return groupExists;
+}
+
+bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
+
+	string domainName;
+	DWORD entriesread;
+	DWORD totalentries;
+	NET_API_STATUS res;
+	string shortGroupName;
+	bool groupExists = false;
+	LPWSTR wDomainName = NULL;
+	LPWSTR globalgroupname = NULL;
+	LPBYTE domainControllerName = NULL;
+	GROUP_USERS_INFO_0* userInfo = NULL; 
+
+	WindowsCommon::SplitTrusteeName(groupName, &domainName, &shortGroupName);
+
+	wDomainName = WindowsCommon::StringToWide(domainName);
+
+	try {
+
+		if(NetGetAnyDCName(NULL, wDomainName, &domainControllerName) == NERR_Success) {
+
+			globalgroupname = WindowsCommon::StringToWide(shortGroupName);
+
+			LPCWSTR p = (LPCWSTR)domainControllerName;
+
+			res = NetGroupGetUsers((LPCWSTR)domainControllerName,		// server name NULL == localhost
+								   globalgroupname,						// group name
+								   0,										// level LOCALGROUP_MEMBERS_INFO_3
+								  (unsigned char**) &userInfo,
+								  MAX_PREFERRED_LENGTH,
+								  &entriesread,
+								  &totalentries,
+								  NULL);
+
+			delete globalgroupname;
+
+			// was there an error?
+			if(res == NERR_Success) {
+
+				char tmpUserName[512];
+
+				// Loop through each user.
+				for (unsigned int i=0; i<entriesread; i++) {
+					ZeroMemory(tmpUserName, sizeof(tmpUserName));
+					_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].grui0_name);
+					tmpUserName[sizeof(tmpUserName)-1] = '\0';
+
+					// Get the account information.
+					string trusteeName = tmpUserName;
+
+					// get sid for trustee name
+					PSID pSid = WindowsCommon::GetSIDForTrusteeName(trusteeName);
+
+					// get formatted trustee name
+					trusteeName = WindowsCommon::GetFormattedTrusteeName(pSid);
+
+					bool isGroup = WindowsCommon::IsGroup(trusteeName);
+
+					if(isGroup && resolveSubGroup) {
+						try {
+							if(!WindowsCommon::GetGlobalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
+									
+								if(!WindowsCommon::GetLocalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
+									isGroup = false;
+									Log::Debug("Could not find group " + trusteeName + " when looking up group members.");
+								}
+							}
+						} catch (Exception gEx) {
+							Log::Info("Error retrieving group members for global group " + trusteeName + ":" + gEx.GetErrorMessage());
+						}
+					}
+					
+					if(!isGroup || includeSubGroups) {
+						members->insert(trusteeName);
+					}
+				}
+
+				groupExists = true;
+			} else {
+				if(res == NERR_InvalidComputer) {
+					// throw this error
+					throw Exception("Unable to expand global group: " + groupName + ". The computer name is invalid.");
+				} else if(res == ERROR_MORE_DATA) {
+					// throw this error
+					throw Exception("Unable to expand global group: " + groupName + ". More entries are available. Specify a large enough buffer to receive all entries. This error message should never occure since the api call is made with MAX_PREFERRED_LENGTH for the size of the buffer.");
+				} else if(res == NERR_GroupNotFound) {
+					groupExists = false;
+					// no action here
+					Log::Debug("GetGlobalGroupMembers - The global group name: " + groupName + " could not be found.");			
+				} else if(res == ERROR_ACCESS_DENIED) {
+					// throw this error???
+					throw Exception("Unable to expand global group: " + groupName + ". The user does not have access to the requested information.");			
+				} else {
+					throw Exception("Unable to expand global group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
 				}
 			}
-
-			groupExists = true;
-
-	} else {
-		if(res == NERR_InvalidComputer) {
-			// throw this error
-			throw Exception("Unable to expand local group: " + groupName + ". The computer name is invalid.");
-		} else if(res == ERROR_MORE_DATA) {
-			// throw this error
-			throw Exception("Unable to expand local group: " + groupName + ". More entries are available. Specify a large enough buffer to receive all entries. This error message should never occure since the api call is made with MAX_PREFERRED_LENGTH for the size of the buffer.");
-		} else if(res == ERROR_NO_SUCH_ALIAS || res == NERR_GroupNotFound) {
-			// ignore this error
-			//cout << "The specified local group " + groupName + " does not exist." << endl;
-		} else if(res == ERROR_ACCESS_DENIED) {
-			// throw this error???
-			throw Exception("Unable to expand local group: " + groupName + ". " + " The user does not have access to the requested information.");
-		} else {
-			throw Exception("Unable to expand local group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
 		}
+
+	} catch(...) {
+		if(domainControllerName != NULL) {
+			NetApiBufferFree(domainControllerName);
+		}
+
+		if(userInfo != NULL) {
+			NetApiBufferFree(userInfo);
+		}
+
+		if(wDomainName != NULL) {
+			delete wDomainName;	
+		}
+
+		throw;
 	}
 
-	NetApiBufferFree(bufptr);
+	if(domainControllerName != NULL) {
+		NetApiBufferFree(domainControllerName);
+	}
+
+	if(userInfo != NULL) {
+		NetApiBufferFree(userInfo);
+	}
+
+	if(wDomainName != NULL) {
+		delete wDomainName;
+	}
 
 	return groupExists;
 }
 
-bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringVector* members) {
-
-	bool groupExists = false;
-	NET_API_STATUS  res;
-	LPCWSTR globalgroupname;
-	LPBYTE bufptr = NULL;
-	DWORD entriesread;
-	DWORD totalentries;
-	GROUP_USERS_INFO_0* userInfo; 
-
-	// convert groupName for api use
-	wchar_t* wGroupName = NULL;
-	size_t size = mbstowcs(NULL, groupName.c_str(), groupName.length()) + 1;
-	wGroupName = new wchar_t[size];
-	mbstowcs(wGroupName, groupName.c_str(), groupName.size() + 1 );
-	globalgroupname = wGroupName;
-
-	res = NetGroupGetUsers(NULL,					// server name NULL == localhost
-						globalgroupname,			// group name
-  						0,							// level LOCALGROUP_MEMBERS_INFO_3
-						(unsigned char**) &userInfo,
-						MAX_PREFERRED_LENGTH,
-						&entriesread,
-						&totalentries,
-						NULL);
-
-	// was there an error?
-	if(res == NERR_Success) {
-
-			char tmpUserName[512];
-
-			// Loop through each user.
-			for (unsigned int i=0; i<entriesread; i++) {
-				ZeroMemory(tmpUserName, sizeof(tmpUserName));
-				_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].grui0_name);
-				tmpUserName[sizeof(tmpUserName)-1] = '\0';
-
-				// Get the account information.
-				string userName = tmpUserName;
-
-				// get sid for trustee name
-				PSID pSid = WindowsCommon::GetSIDForTrusteeName(userName);
-				// get formatted trustee name
-				userName = WindowsCommon::GetFormattedTrusteeName(pSid);
-				members->push_back(userName);
-			}
-			groupExists = true;
-
-	} else {
-		if(res == NERR_InvalidComputer) {
-			// throw this error
-			throw Exception("Unable to expand global group: " + groupName + ". The computer name is invalid.");
-		} else if(res == ERROR_MORE_DATA) {
-			// throw this error
-			throw Exception("Unable to expand global group: " + groupName + ". More entries are available. Specify a large enough buffer to receive all entries. This error message should never occure since the api call is made with MAX_PREFERRED_LENGTH for the size of the buffer.");
-		} else if(res == NERR_GroupNotFound) {
-			groupExists = false;
-			// no action here
-			//cout << "The global group name: " + groupName + " could not be found." << endl;			
-		} else if(res == ERROR_ACCESS_DENIED) {
-			// throw this error???
-			throw Exception("Unable to expand global group: " + groupName + ". The user does not have access to the requested information.");
-		} else {
-			throw Exception("Unable to expand global group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
-		}
-	}
-
-	NetApiBufferFree(bufptr);
-
-	return groupExists;
-}
-
-StringVector* WindowsCommon::GetAllTrusteeNames() {
+StringSet* WindowsCommon::GetAllTrusteeNames() {
 
 	if(WindowsCommon::allTrusteeNames == NULL) {
-		WindowsCommon::allTrusteeNames = new StringVector();
 
-		UniqueStringVector* usv = new UniqueStringVector(allTrusteeNames);
+		Log::Debug("Getting all trustee names for the first time.");
+
+		WindowsCommon::allTrusteeNames = new StringSet();
 
 		// get the well know trustee names
 		WindowsCommon::GetWellKnownTrusteeNames();
-		StringVector::iterator iterator;
+		StringSet::iterator iterator;
 		for(iterator = WindowsCommon::wellKnownTrusteeNames->begin(); iterator != WindowsCommon::wellKnownTrusteeNames->end(); iterator++) {
-			usv->Append((*iterator));
+			allTrusteeNames->insert((*iterator));
 		}
 
-		WindowsCommon::GetAllLocalUsers(usv);
+		WindowsCommon::GetAllLocalUsers(allTrusteeNames);
 
-		// local groups
-		StringVector* localGroups = WindowsCommon::GetAllLocalGroups();
+		// local groups		
+		StringSet* localGroups = WindowsCommon::GetAllLocalGroups();
 		for(iterator = localGroups->begin(); iterator != localGroups->end(); iterator++) {
-			usv->Append((*iterator));
+			allTrusteeNames->insert((*iterator));
+			StringSet *members = new StringSet();
+
 			// expand the group
 			try {
-				StringVector* members = new StringVector();
-				WindowsCommon::GetLocalGroupMembers((*iterator), members);
-				StringVector::iterator member;
+				WindowsCommon::GetLocalGroupMembers((*iterator), members, true, true);
+				StringSet::iterator member;
 				for(member = members->begin(); member != members->end(); member++) {
-					usv->Append((*member));
-				}				
-				delete members;
+					allTrusteeNames->insert((*member));
+				}		
 			} catch(Exception ex) {
 				Log::Debug(ex.GetErrorMessage());
 			}
+
+			delete members;
 		}
 		delete localGroups;
 
 		// global groups
-		StringVector* globalGroups = WindowsCommon::GetAllGlobalGroups();
+		StringSet* globalGroups = WindowsCommon::GetAllGlobalGroups();
 		for(iterator = globalGroups->begin(); iterator != globalGroups->end(); iterator++) {
-			usv->Append((*iterator));
+			allTrusteeNames->insert((*iterator));
+
 			// expand the group
 			try {
-				StringVector* members = new StringVector();
-				WindowsCommon::GetGlobalGroupMembers((*iterator), allTrusteeNames);
-				StringVector::iterator member;
-				for(member = members->begin(); member != members->end(); member++) {
-					usv->Append((*member));
-				}				
-				delete members;
-
+				WindowsCommon::GetGlobalGroupMembers((*iterator), allTrusteeNames, true, true);
 			} catch(Exception ex) {
 				Log::Debug(ex.GetErrorMessage());
 			}
@@ -642,27 +763,32 @@ StringVector* WindowsCommon::GetAllTrusteeNames() {
 		delete globalGroups;
 
 		// get the system's trustee name
-		string systemName = WindowsCommon::LookUpLocalSystemName();
-		usv->Append(systemName);
+
+		// TODO - Lumension Specific? - don't want the system's trustee name -> doesn't process correctly anyway
+		// string systemName = WindowsCommon::LookUpLocalSystemName();
+		// allTrusteeNames->insert(systemName);		
 	}
 
 	return WindowsCommon::allTrusteeNames;
 }
 
-StringVector* WindowsCommon::GetAllTrusteeSIDs() {
+StringSet* WindowsCommon::GetAllTrusteeSIDs() {
 
 	if(WindowsCommon::allTrusteeSIDs == NULL) {
 
-		StringVector* trusteeNames = WindowsCommon::GetAllTrusteeNames();
-		WindowsCommon::allTrusteeSIDs = new StringVector();
-		StringVector::iterator iterator;
+		StringSet* trusteeNames = WindowsCommon::GetAllTrusteeNames();
+		
+		Log::Debug("GetAllTrusteeSIDs() - Found " + Common::ToString(trusteeNames->size()) + " trustee names when searching for all names.");
+
+		WindowsCommon::allTrusteeSIDs = new StringSet();
+		StringSet::iterator iterator;
 		for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 		
 			PSID pSid = WindowsCommon::GetSIDForTrusteeName((*iterator));
 			LPTSTR sidString;
 			WindowsCommon::GetTextualSid(pSid, &sidString);
 			string sidStr = sidString;
-			WindowsCommon::allTrusteeSIDs->push_back(sidStr);
+			WindowsCommon::allTrusteeSIDs->insert(sidStr);
 		}
 	}
 
@@ -672,48 +798,49 @@ StringVector* WindowsCommon::GetAllTrusteeSIDs() {
 void WindowsCommon::GetWellKnownTrusteeNames() {
 
 	if(WindowsCommon::wellKnownTrusteeNames == NULL) {
-		WindowsCommon::wellKnownTrusteeNames = new StringVector();
+		WindowsCommon::wellKnownTrusteeNames = new StringSet();
 
 		// create a vector of the well known sids
-		StringVector wellKnownSids;
-		//wellKnownSids.push_back("S-1-0");			// Null Authority
-		//wellKnownSids.push_back("S-1-0-0");		// Nobody
-		//wellKnownSids.push_back("S-1-1");			// World Authority
-		wellKnownSids.push_back("S-1-1-0");			// Everyone
-		//wellKnownSids.push_back("S-1-2");			// Local Authority
-		//wellKnownSids.push_back("S-1-3");			// Creator Authority
-		wellKnownSids.push_back("S-1-3-0");			// Creator Owner
-		wellKnownSids.push_back("S-1-3-1");			// Creator Group
-		wellKnownSids.push_back("S-1-3-2");			// Creator Owner Server
-		wellKnownSids.push_back("S-1-3-3");			// Creator Group Server
-		//wellKnownSids.push_back("S-1-4");			// Non-unique Authority
-		//wellKnownSids.push_back("S-1-5");			// NT Authority
-		wellKnownSids.push_back("S-1-5-1");			// Dialup
-		wellKnownSids.push_back("S-1-5-2");			// Network
-		wellKnownSids.push_back("S-1-5-3");			// Batch
-		wellKnownSids.push_back("S-1-5-4");			// Interactive
-		wellKnownSids.push_back("S-1-5-6");			// Service
-		wellKnownSids.push_back("S-1-5-7");			// Anonymous
-		wellKnownSids.push_back("S-1-5-8");			// Proxy
-		wellKnownSids.push_back("S-1-5-9");			// Enterprise Domain Controllers
-		wellKnownSids.push_back("S-1-5-11");		// Authenticated Users
-		wellKnownSids.push_back("S-1-5-13");		// Terminal Server Users
-		wellKnownSids.push_back("S-1-5-18");		// Local System
-		wellKnownSids.push_back("S-1-5-19");		// NT Authority - local service
-		wellKnownSids.push_back("S-1-5-20");		// NT Authority - network service
-		wellKnownSids.push_back("S-1-5-32-544");	// Administrators
-		wellKnownSids.push_back("S-1-5-32-545");	// Users
-		wellKnownSids.push_back("S-1-5-32-546");	// Guests
-		wellKnownSids.push_back("S-1-5-32-547");	// Power Users
-		//wellKnownSids.push_back("S-1-5-32-548");	// Account Operators
-		//wellKnownSids.push_back("S-1-5-32-549");	// Server Operators
-		//wellKnownSids.push_back("S-1-5-32-550");	// Print Operators
-		wellKnownSids.push_back("S-1-5-32-551");	// Backup Operators
-		wellKnownSids.push_back("S-1-5-32-552");	// Replicators
+		StringSet wellKnownSids;
+		//wellKnownSids.insert("S-1-0");			// Null Authority
+		//wellKnownSids.insert("S-1-0-0");			// Nobody
+		//wellKnownSids.insert("S-1-1");			// World Authority
+		wellKnownSids.insert("S-1-1-0");			// Everyone
+		//wellKnownSids.insert("S-1-2");			// Local Authority
+		//wellKnownSids.insert("S-1-3");			// Creator Authority
+		wellKnownSids.insert("S-1-3-0");			// Creator Owner
+		wellKnownSids.insert("S-1-3-1");			// Creator Group
+		wellKnownSids.insert("S-1-3-2");			// Creator Owner Server
+		wellKnownSids.insert("S-1-3-3");			// Creator Group Server
+		//wellKnownSids.insert("S-1-4");			// Non-unique Authority
+		//wellKnownSids.insert("S-1-5");			// NT Authority
+		wellKnownSids.insert("S-1-5-1");			// Dialup
+		wellKnownSids.insert("S-1-5-2");			// Network
+		wellKnownSids.insert("S-1-5-3");			// Batch
+		wellKnownSids.insert("S-1-5-4");			// Interactive
+		wellKnownSids.insert("S-1-5-6");			// Service
+		wellKnownSids.insert("S-1-5-7");			// Anonymous
+		wellKnownSids.insert("S-1-5-8");			// Proxy
+		wellKnownSids.insert("S-1-5-9");			// Enterprise Domain Controllers
+		wellKnownSids.insert("S-1-5-11");			// Authenticated Users
+		wellKnownSids.insert("S-1-5-13");			// Terminal Server Users
+		wellKnownSids.insert("S-1-5-18");			// Local System
+		wellKnownSids.insert("S-1-5-19");			// NT Authority - local service
+		wellKnownSids.insert("S-1-5-20");			// NT Authority - network service
+		wellKnownSids.insert("S-1-5-32-544");		// Administrators
+		wellKnownSids.insert("S-1-5-32-545");		// Users
+		wellKnownSids.insert("S-1-5-32-546");		// Guests
+		wellKnownSids.insert("S-1-5-32-547");		// Power Users
+		//wellKnownSids.insert("S-1-5-32-548");		// Account Operators
+		//wellKnownSids.insert("S-1-5-32-549");		// Server Operators
+		//wellKnownSids.insert("S-1-5-32-550");		// Print Operators
+		wellKnownSids.insert("S-1-5-32-551");		// Backup Operators
+		wellKnownSids.insert("S-1-5-32-552");		// Replicators
 
+		Log::Debug("Found " + Common::ToString(wellKnownSids.size()) + " well known SIDs.");
 
 		// look up account names for all the sids
-		StringVector::iterator iterator;
+		StringSet::iterator iterator;
 		for(iterator = wellKnownSids.begin(); iterator != wellKnownSids.end(); iterator++) {
 			string currentSidStr = (*iterator);
 			PSID psid = NULL;
@@ -722,17 +849,19 @@ void WindowsCommon::GetWellKnownTrusteeNames() {
 			} else {
 			
 				string trusteeName = WindowsCommon::GetFormattedTrusteeName(psid);	
-				WindowsCommon::wellKnownTrusteeNames->push_back(trusteeName);
+				WindowsCommon::wellKnownTrusteeNames->insert(trusteeName);
 			}
 
 			LocalFree(psid);
 		}
+
+		Log::Debug("Found " + Common::ToString(WindowsCommon::wellKnownTrusteeNames->size()) + " well known truseee names.");
 	}
 }
 
-StringVector* WindowsCommon::GetAllLocalGroups() {
+StringSet* WindowsCommon::GetAllLocalGroups() {
 
-	StringVector* allGroups = new StringVector();
+	StringSet* allGroups = new StringSet();
 
 	NTSTATUS nts;
 	LOCALGROUP_INFO_0* localGroupInfo = NULL;
@@ -748,9 +877,7 @@ StringVector* WindowsCommon::GetAllLocalGroups() {
 
 	nts = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_LOOKUP_NAMES, &polHandle);
 	if (nts != ERROR_SUCCESS) {
-		string errorMessage = "";
-		errorMessage.append("Error unable to open a handle to the Policy object.");
-		Log::Debug(errorMessage);
+		Log::Debug("Error unable to open a handle to the Policy object when getting all local groups.");
 		return allGroups;
 	}
 
@@ -779,7 +906,7 @@ StringVector* WindowsCommon::GetAllLocalGroups() {
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
 				// get formatted trustee name
 				groupName = WindowsCommon::GetFormattedTrusteeName(pSid);
-				allGroups->push_back(groupName);
+				allGroups->insert(groupName);
 			}
 		} else {
 			nts = LsaClose(polHandle);
@@ -813,9 +940,9 @@ StringVector* WindowsCommon::GetAllLocalGroups() {
 	return allGroups;
 }
 
-StringVector* WindowsCommon::GetAllGlobalGroups() {
+StringSet* WindowsCommon::GetAllGlobalGroups() {
 
-	StringVector* allGroups = new StringVector();
+	StringSet* allGroups = new StringSet();
 
 	// Get a handle to the policy object.
 	NTSTATUS nts;
@@ -825,9 +952,7 @@ StringVector* WindowsCommon::GetAllGlobalGroups() {
 
 	nts = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_LOOKUP_NAMES, &polHandle);
 	if (nts != ERROR_SUCCESS) {
-		string errorMessage = "";
-		errorMessage.append("Error unable to open a handle to the Policy object.");
-		Log::Debug(errorMessage);
+		Log::Debug("Error unable to open a handle to the Policy object when trying to get all global groups.");
 		return allGroups;
 	}
 
@@ -861,7 +986,7 @@ StringVector* WindowsCommon::GetAllGlobalGroups() {
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
 				// get formatted trustee name
 				groupName = WindowsCommon::GetFormattedTrusteeName(pSid);
-				allGroups->push_back(groupName);
+				allGroups->insert(groupName);
 			}
 		} else {
 			nts = LsaClose(polHandle);
@@ -893,7 +1018,39 @@ StringVector* WindowsCommon::GetAllGlobalGroups() {
 
 	return allGroups;
 }
-void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
+
+void WindowsCommon::ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings) {
+
+	StringSet::iterator iterator;
+	for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
+	
+		PSID pSid = WindowsCommon::GetSIDForTrusteeName(*iterator);
+		LPTSTR sidString;
+
+		WindowsCommon::GetTextualSid(pSid, &sidString);
+		string sidStr = sidString;
+		sidStrings->insert(sidStr);
+	}
+}
+
+StringSet* WindowsCommon::GetAllLocalUserSids() {
+
+	if(WindowsCommon::allLocalUserSIDs == NULL) {
+		WindowsCommon::allLocalUserSIDs = new StringSet();
+
+		StringSet *pUsers = new StringSet();
+
+		WindowsCommon::GetAllLocalUsers(pUsers);
+
+		WindowsCommon::ConvertTrusteeNamesToSidStrings(pUsers, WindowsCommon::allLocalUserSIDs);
+
+		delete pUsers;
+	}
+
+	return WindowsCommon::allLocalUserSIDs;
+}
+
+void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 
 	NTSTATUS nts;
 
@@ -904,9 +1061,7 @@ void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
 
 	nts = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_LOOKUP_NAMES, &polHandle);
 	if (nts != ERROR_SUCCESS) {
-		string errorMessage = "";
-		errorMessage.append("Error unable to open a handle to the Policy object.");
-		Log::Debug(errorMessage);
+		Log::Fatal("Error unable to open a handle to the Policy object when trying to get all local users.");
 		return;
 	}
 
@@ -925,7 +1080,7 @@ void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
 
 		nas = NetUserEnum(NULL,
 						  0,			// need to us this to get the name
-						  0,			//FILTER_NORMAL_ACCOUNT
+						  0,			// FILTER_NORMAL_ACCOUNT
 						  (unsigned char**) &userInfo,
 						  MAX_PREFERRED_LENGTH,
 						  &recordsEnumerated,
@@ -933,9 +1088,11 @@ void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
 						  NULL);
 
 		if ((nas == NERR_Success) || (nas == ERROR_MORE_DATA)) {
-			// User account names are limited to 20 characters.
 
+			// User account names are limited to 20 characters.
 			char tmpUserName[21];
+
+			Log::Debug("Found " + WindowsCommon::ToString(recordsEnumerated) + " local users.");
 
 			// Loop through each user.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
@@ -949,9 +1106,9 @@ void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(userName);
 				// get formatted trustee name
 				userName = WindowsCommon::GetFormattedTrusteeName(pSid);
-				allUsers->Append(userName);
-
+				allUsers->insert(userName);
 			}
+
 		} else {
 			nts = LsaClose(polHandle);
 
@@ -977,14 +1134,13 @@ void WindowsCommon::GetAllLocalUsers(UniqueStringVector* allUsers) {
 
 	// Close the handle to the open policy object.
 	nts = LsaClose(polHandle);
-
 }
 
 string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
 
 	// validate the sid
 	if(!IsValidSid(pSid)) {
-		throw Exception("Error invlid sid found in WindowsCommon::GetFormattedTrusteeName()");
+		throw Exception("GetFormattedTrusteeName() - Error invalid sid found.");
 	}
 
 	// get the account info for the sid
@@ -1032,11 +1188,11 @@ string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
 		WindowsCommon::GetTextualSid(pSid, &sidString);
 		string sidStr = sidString;
 		free(sidString);
-		free(trustee_name);
-		free(domain_name);
+		sidString = NULL;
+
 		// all occurances of this that i have seen are for the domain admins sid and the domain user's sid
 		// I should be able to ignore these.
-		throw Exception("Unable to look up account name for sid: " + sidStr + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
+		Log::Info("Unable to look up account name for sid: " + sidStr + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
 
 	} else {
 		trusteeDomain = domain_name;
@@ -1059,14 +1215,14 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 	DWORD domainSize = 128;
 	SID_NAME_USE sidUse;
 	BOOL retVal = FALSE;
-	PSID psid = NULL;
+	PSID pSid = NULL;
 	LPTSTR domain = NULL;
 
 	try {
 		do {
 			// Initial memory allocations for the SID and DOMAIN.
-			psid = (PSID)realloc(psid, sidSize);
-			if (psid == NULL) {
+			pSid = (PSID)realloc(pSid, sidSize);
+			if (pSid == NULL) {
 				retVal = FALSE;
 				break;
 			}
@@ -1080,7 +1236,7 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 			// Call LookupAccountName to get the SID.
 			retVal = LookupAccountName(NULL,								// system name NULL == localhost
 									const_cast<char*>(trusteeName.c_str()),	// account name
-									psid,									// security identifier
+									pSid,									// security identifier
 									&sidSize,								// size of security identifier
 									domain,									// domain name
 									&domainSize,							// size of domain name
@@ -1091,25 +1247,38 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 	} catch(...) {
 		
 		Log::Debug("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
+		throw Exception("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
 	}
 
-	return psid;
+	// check the sid
+	if(!IsValidSid(pSid)) {
+		
+		if(pSid != NULL)
+			LocalFree(pSid);
+
+		throw Exception("Error looking up sid for account: " + trusteeName + ". Invalid sid found.");
+	}
+
+	return pSid;
 }
 
 PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
 
+	Log::Debug("Starting GetSIDForTrusteeSID with: " + trusteeSID);
+
 	DWORD sidSize = 128;
 	BOOL retVal = FALSE;
-	PSID psid;
+	PSID pSid;
 
 	try {
 		// Call LookupAccountName to get the SID.
 		retVal = ConvertStringSidToSid(const_cast<char*>(trusteeSID.c_str()),	// sid string
-										&psid);									// security identifier
+										&pSid);									// security identifier
 		
 		if(retVal == FALSE) {
 
-			LocalFree(psid);
+			LocalFree(pSid);
+			pSid = NULL;
 
 			DWORD errCode = GetLastError();
 			string errMsg = WindowsCommon::GetErrorMessage(errCode);
@@ -1123,12 +1292,37 @@ PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
 			}
 		}
 
-	} catch(...) {
+	} catch(Exception ex) {
+		if(pSid != NULL) 
+			LocalFree(pSid);
+	
+		pSid = NULL;
 		
+		Log::Debug("Error looking up sid for account: " + trusteeSID + ". " + ex.GetErrorMessage());
+		throw Exception("Error looking up sid for account: " + trusteeSID + ". " + ex.GetErrorMessage());
+
+	} catch(...) {
+		if(pSid != NULL) 
+			LocalFree(pSid);
+
+		pSid = NULL;		
+
 		Log::Debug("Error looking up sid for account: " + trusteeSID + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
+		throw Exception("Error looking up sid for account: " + trusteeSID + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
 	}
 
-	return psid;
+	// check the sid
+	if(!IsValidSid(pSid)) {
+		
+		if(pSid != NULL)
+			LocalFree(pSid);
+
+		pSid = NULL;
+
+		throw Exception("Error looking up sid for account: " + trusteeSID + ". Invalid sid found.");
+	}
+
+	return pSid;
 }
 
 bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr) {
@@ -1215,8 +1409,10 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 
 bool WindowsCommon::IsAccountGroup(SID_NAME_USE sidType, string accountName) {
 	
+	// No solid quick way found to determine if a sid is a group - using this along with local/global group member apis which flag an error
+
 	if ((sidType == SidTypeGroup) || (sidType == SidTypeWellKnownGroup) || (sidType == SidTypeAlias)) {	
-		return (accountName.compare("SYSTEM") != 0); // special case...
+		return ((accountName.compare("SYSTEM") != 0) && (accountName.compare("NETWORK SERVICE"))); // special cases...
 	}
 	
 	return false;
@@ -1342,4 +1538,715 @@ string WindowsCommon::ToString(DWORD dw) {
 
 	string dwStr = dwordBuf;
 	return dwStr;
+}
+
+string WindowsCommon::ToString(PSID pSID) {
+
+	LPTSTR sidString;
+	WindowsCommon::GetTextualSid(pSID, &sidString);
+	string sidStr = sidString;
+	free(sidString);
+	sidString = NULL;
+
+	return sidStr;
+}
+
+bool WindowsCommon::GetGroupsForUser(string userName, StringSet* groups) {
+
+	bool userExists = false;
+
+	LPCWSTR userNameApi;
+	// convert groupName for api use
+	wchar_t* wUserName = NULL;
+	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
+	wUserName = new wchar_t[size];
+	mbstowcs(wUserName, userName.c_str(), userName.size() + 1 );
+	userNameApi = wUserName;
+
+	// get the global groups
+	LPGROUP_USERS_INFO_0 pBuf = NULL;
+	DWORD dwLevel = 0;
+	DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
+	DWORD dwEntriesRead = 0;
+	DWORD dwTotalEntries = 0;
+	NET_API_STATUS nStatus;
+	
+	// Call the NetUserGetGroups function, specifying level 0.
+	nStatus = NetUserGetGroups(NULL,
+								userNameApi,
+								dwLevel,
+								(LPBYTE*)&pBuf,
+								dwPrefMaxLen,
+								&dwEntriesRead,
+								&dwTotalEntries);
+	// If the call succeeds,
+	if (nStatus == NERR_Success) {
+		userExists = true;
+
+		LPGROUP_USERS_INFO_0 pTmpBuf;
+		DWORD i;
+		DWORD dwTotalCount = 0;
+		char tmpGroupName[512];
+
+		if ((pTmpBuf = pBuf) != NULL) {
+
+			// Loop through the entries; 
+			//  print the name of the global groups 
+			//  to which the user belongs.
+			for (i = 0; i < dwEntriesRead; i++) {
+				
+				if (pTmpBuf == NULL) {
+					// Free the allocated buffer.
+					if (pBuf != NULL) {
+						NetApiBufferFree(pBuf);
+						pBuf = NULL;
+					}
+
+					if(wUserName != NULL) {
+						delete wUserName;
+						wUserName = NULL;
+					}
+
+					throw Exception("An access violation has occurred while getting groups for user: " + userName);
+				}
+
+				ZeroMemory(tmpGroupName, 21);
+				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pTmpBuf->grui0_name);
+				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
+				groups->insert(tmpGroupName);
+
+				pTmpBuf++;
+				dwTotalCount++;
+			}
+		}
+
+		// report an error if all groups are not listed.
+		if (dwEntriesRead < dwTotalEntries) {
+			// Free the allocated buffer.
+			if (pBuf != NULL) {
+				NetApiBufferFree(pBuf);
+				pBuf = NULL;
+			}
+
+			if(wUserName != NULL) {
+				delete wUserName;
+				wUserName = NULL;
+			}
+
+			throw Exception("Unable to get all global groups for user: " + userName);
+		}
+	
+	} else if(nStatus == NERR_UserNotFound) {
+		// do nothing
+	} else {
+
+		if (pBuf != NULL) {
+			NetApiBufferFree(pBuf);
+			pBuf = NULL;
+		}
+
+		if(wUserName != NULL) {
+			delete wUserName;
+			wUserName = NULL;
+		}
+
+		string errMsg = "Unable to get all global groups for user: " + userName + ". Windows Api NetUserGetGroups failed with error: ";
+
+		if(nStatus == ERROR_ACCESS_DENIED) {
+			errMsg = errMsg + "The user does not have access rights to the requested information.";
+ 
+		} else if(nStatus == ERROR_BAD_NETPATH) {
+			errMsg = errMsg + "The network path was not found. This error is returned if the servername parameter could not be found.";
+ 
+		} else if(nStatus == ERROR_INVALID_LEVEL) {
+			errMsg = errMsg + "The system call level is not correct. This error is returned if the level parameter was specified as a value other than 0 or 1.";
+ 
+		} else if(nStatus == NERR_InvalidComputer) {
+			errMsg = errMsg + "The computer name is invalid."; 
+ 
+		} else if(nStatus == ERROR_INVALID_NAME) {
+			errMsg = errMsg + "The name syntax is incorrect. This error is returned if the servername parameter has leading or trailing blanks or contains an illegal character.";
+
+		} else if(nStatus == ERROR_MORE_DATA) {
+			errMsg = errMsg + "More entries are available. Specify a large enough buffer to receive all entries.";
+
+		} else if(nStatus == ERROR_NOT_ENOUGH_MEMORY) {
+			errMsg = errMsg + "Insufficient memory was available to complete the operation.";
+
+		} else if(nStatus == NERR_InternalError) {
+			errMsg = errMsg + "An internal error occurred.";
+
+		} else {
+			errMsg = errMsg + "Unknown error.";
+		} 
+
+		throw Exception(errMsg);
+	}
+
+	// Free the allocated buffer.
+	if (pBuf != NULL) {
+		NetApiBufferFree(pBuf);
+		pBuf = NULL;
+	}
+
+
+	//
+	// get the local groups for the user
+	//
+	LPLOCALGROUP_USERS_INFO_0 pLocalBuf = NULL;
+	dwLevel = 0;
+	DWORD dwFlags = LG_INCLUDE_INDIRECT ;
+	dwPrefMaxLen = MAX_PREFERRED_LENGTH;
+	dwEntriesRead = 0;
+	dwTotalEntries = 0;
+
+	//  Call the NetUserGetLocalGroups function 
+	//  specifying information level 0.
+	//
+	//   The LG_INCLUDE_INDIRECT flag specifies that the 
+	//   function should also return the names of the local 
+	//   groups in which the user is indirectly a member.
+	nStatus = NetUserGetLocalGroups(NULL,
+									userNameApi,
+									dwLevel,
+									dwFlags,
+									(LPBYTE *) &pLocalBuf,
+									dwPrefMaxLen,
+									&dwEntriesRead,
+									&dwTotalEntries);
+	// If the call succeeds
+	if (nStatus == NERR_Success) {
+		userExists = true;
+
+		LPLOCALGROUP_USERS_INFO_0 pLocalTmpBuf;
+		DWORD i;
+		DWORD dwTotalCount = 0;
+		char tmpGroupName[512];
+
+		if ((pLocalTmpBuf = pLocalBuf) != NULL) {
+
+			//  Loop through the entries and 
+			//  print the names of the local groups 
+			//  to which the user belongs. 
+			for (i = 0; i < dwEntriesRead; i++) {
+
+				if (pLocalTmpBuf == NULL) {
+					// Free the allocated memory.
+					if (pBuf != NULL) {
+						NetApiBufferFree(pBuf);
+						pBuf = NULL;
+					}
+
+					if(wUserName != NULL) {
+						delete wUserName;
+						wUserName = NULL;
+					}
+
+					throw Exception("An access violation has occurred while getting local groups for user: " + userName);
+				}
+
+				ZeroMemory(tmpGroupName, 21);
+				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pLocalTmpBuf->lgrui0_name);
+				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
+				groups->insert(tmpGroupName);
+
+				pLocalTmpBuf++;
+				dwTotalCount++;
+			}
+		}
+
+		// report an error if all groups are not listed
+		if (dwEntriesRead < dwTotalEntries) {
+			// Free the allocated memory.
+			if (pBuf != NULL) {
+				NetApiBufferFree(pBuf);
+				pBuf = NULL;
+			}
+
+			if(wUserName != NULL) {
+				delete wUserName;
+				wUserName = NULL;
+			}
+
+			throw Exception("Unable to get all local groups for user: " + userName);
+		}
+
+	} else if (nStatus == NERR_UserNotFound){
+		// do nothing
+	} else {
+
+		if (pBuf != NULL) {
+			NetApiBufferFree(pBuf);
+			pBuf = NULL;
+		}
+
+		if(wUserName != NULL) {
+			delete wUserName;
+			wUserName = NULL;
+		}
+
+		string errMsg = "Unable to get all local groups for user: " + userName + ". Windows Api NetUserGetLocalGroups failed with error: ";
+
+		if(nStatus == ERROR_ACCESS_DENIED) {
+			errMsg = errMsg + "The user does not have access rights to the requested information. This error is also returned if the servername parameter has a trailing blank.";
+ 
+		} else if(nStatus == ERROR_INVALID_LEVEL) {
+			errMsg = errMsg + "The system call level is not correct. This error is returned if the level parameter was not specified as 0.";
+
+		} else if(nStatus == ERROR_INVALID_PARAMETER) {
+			errMsg = errMsg + "A parameter is incorrect. This error is returned if the flags parameter contains a value other than LG_INCLUDE_INDIRECT.";
+
+		} else if(nStatus == ERROR_MORE_DATA) {
+			errMsg = errMsg + "More entries are available. Specify a large enough buffer to receive all entries.";
+
+		} else if(nStatus == ERROR_NOT_ENOUGH_MEMORY) {
+			errMsg = errMsg + "Insufficient memory was available to complete the operation.";
+
+		} else if(nStatus == NERR_DCNotFound) {
+			errMsg = errMsg + "The domain controller could not be found."; 
+
+		} else if(nStatus == NERR_InvalidComputer) {
+			errMsg = errMsg + "The computer name is not valid. This error is returned on Windows NT 4.0 and earlier if the servername parameter does not begin with \\."; 
+  
+		} else if(nStatus == NERR_InvalidComputer) {
+			errMsg = errMsg + "The computer name is not valid. This error is returned on Windows NT 4.0 and earlier if the servername parameter does not begin with \\."; 
+ 
+		} else if(nStatus == RPC_S_SERVER_UNAVAILABLE) {
+			errMsg = errMsg + "The RPC server is unavailable. This error is returned if the servername parameter could not be found.";
+
+		} else {
+			errMsg = errMsg + "Unknown error.";
+		} 
+
+		throw Exception(errMsg);
+	}
+
+	// Free the allocated memory.
+	if (pBuf != NULL) {
+		NetApiBufferFree(pBuf);
+		pBuf = NULL;
+	}
+
+	if(wUserName != NULL) {
+		delete wUserName;
+		wUserName = NULL;
+	}
+
+	return userExists;
+}
+
+bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
+
+	bool enabled = true;
+
+	// need to split username from server name and domain.
+	unsigned int dash = userNameIn.find("\\");
+	string userName = "";
+	if(dash != string::npos ) {
+		userName = userNameIn.substr(dash+1, userNameIn.length());
+	} else {
+		userName = userNameIn;
+	}
+		
+	// convert userName for api use
+	wchar_t* wUserName = NULL;
+	LPCWSTR userNameApi = NULL;
+	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
+	wUserName = new wchar_t[size];
+	mbstowcs(wUserName, userName.c_str(), userName.size() + 1 );
+	userNameApi = wUserName;
+	
+
+	DWORD dwLevel = 23; // need USER_INFO_23  to get enabled flag
+	LPUSER_INFO_23 pBuf = NULL;
+	NET_API_STATUS nStatus;
+
+	// Call the NetUserGetInfo function
+	//
+	// Pass in NULL for the server portion since we are running on the local
+	// host only. This will prevent the interpreter from trying to get user
+	// information for users that are not defined on the local host.
+	//
+	nStatus = NetUserGetInfo(NULL,
+							userNameApi,
+							dwLevel,
+							(LPBYTE *)&pBuf);
+
+	delete wUserName;
+
+	// If the call succeeds, print the user information.
+	if (nStatus == NERR_Success) {
+		if (pBuf != NULL) {			
+			// now read the flags
+			if(pBuf->usri23_flags & UF_ACCOUNTDISABLE) {
+				enabled = false;
+			}
+		}
+	} else {
+		string errMsg = "Windows Api NetUserGetinfo failed with error: ";
+
+		if(nStatus == ERROR_ACCESS_DENIED) {
+			errMsg = errMsg + "The user does not have access to the requested information.";
+ 
+		} else if(nStatus == ERROR_BAD_NETPATH) {
+			errMsg = errMsg + "The network path specified in the servername parameter was not found.";
+ 
+		} else if(nStatus == ERROR_INVALID_LEVEL) {
+			errMsg = errMsg + "The value specified for the level parameter is invalid.";
+ 
+		} else if(nStatus == NERR_InvalidComputer) {
+			errMsg = errMsg + "he computer name is invalid."; 
+ 
+		} else if(nStatus == NERR_UserNotFound) {
+			errMsg = errMsg + "The user name could not be found.";
+
+		} else {
+			errMsg = errMsg + "Unknown error.";
+		}
+
+		throw Exception("Error while getting user enabled flag. " + errMsg);
+	}
+	
+	// Free the allocated memory.
+	if (pBuf != NULL)
+		NetApiBufferFree(pBuf);
+
+    return enabled;
+}
+
+void WindowsCommon::GetEffectiveRightsForFile(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {	
+
+	if(WindowsCommon::IsXPOrLater()) {
+		WindowsCommon::GetEffectiveRightsForFileAuthz(pSid, filePath, pAccessRights);
+	} else {
+		WindowsCommon::GetEffectiveRightsForFileAcl(pSid, filePath, pAccessRights);
+	}
+
+	//__try {
+
+	//	WindowsCommon::GetEffectiveRightsForFileAuthz(pSid, filePath, pAccessRights);
+
+	//} __except (WindowsCommon::DelayLoadDllExceptionFilter(GetExceptionInformation())) {
+
+	//	WindowsCommon::GetEffectiveRightsForFileAcl(pSid, filePath, pAccessRights);
+ //  }
+}
+//
+//LONG WINAPI WindowsCommon::DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
+//   LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
+//   PDelayLoadInfo pDelayLoadInfo = PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
+//
+//   switch (pExcPointers->ExceptionRecord->ExceptionCode) {
+//	   case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
+//		  printf("Dll %s was not found", pDelayLoadInfo->szDll);
+//		  lDisposition = EXCEPTION_EXECUTE_HANDLER;
+//		  break;
+//
+//	   case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
+//		  if (pDelayLoadInfo->dlp.fImportByName) {
+//			printf("Function %s was not found in %sn",
+//      			  pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
+//		  } else {
+//			printf("Function ordinal %d was not found in %sn",
+//      			  pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
+//		  }
+//		  lDisposition = EXCEPTION_EXECUTE_HANDLER;
+//		  break; 
+//
+//	   default:
+//		  // Exception is not related to delay loading
+//		  lDisposition = EXCEPTION_CONTINUE_SEARCH;
+//		  break;
+//   }
+//
+//   return(lDisposition);
+//}
+
+void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {
+	// -----------------------------------------------------------------------
+	//
+	//  ABSTRACT
+	//
+	//	Return a populated item for the specified trustees on the specified file.
+	//
+	//	- Call GetNamedSecurityInfo to get a DACL Security Descriptor for the file
+	//	  http://msdn2.microsoft.com/en-us/library/aa446645.aspx
+	//	- Use provided trustee name and call LsaLookupNames to get the sid
+	//	  http://msdn2.microsoft.com/en-us/library/ms721797.aspx
+	//	- Then call GetEffectiveRightsFromAcl with the dacl and the sid found in the earlier calls
+	//	  http://msdn2.microsoft.com/en-us/library/aa446637.aspx
+	// -----------------------------------------------------------------------
+
+	Log::Debug("Calling calling the acl api to get effective rights");
+
+
+	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid) + " from dacl for file: " + (*filePath);
+
+	DWORD res;
+	PACL pdacl;
+	PSECURITY_DESCRIPTOR pSD;
+
+	res = GetNamedSecurityInfo(const_cast<char*>((*filePath).c_str()),	// object name
+							   SE_FILE_OBJECT,							// object type
+							   DACL_SECURITY_INFORMATION |				// information type
+							   PROTECTED_DACL_SECURITY_INFORMATION |
+							   UNPROTECTED_DACL_SECURITY_INFORMATION, 			
+							   NULL,									// owner SID
+							   NULL,									// primary group SID
+							   &pdacl,									// DACL
+							   NULL,									// SACL
+							   &pSD);									// Security Descriptor
+
+	if (res != ERROR_SUCCESS) {
+		if (res == ERROR_FILE_NOT_FOUND) {
+			// should never get here. 
+			// before calling this function the file should already have been checked for existence.
+			throw Exception( baseErrMsg + " Unable locate the specified file."); 
+		} else {
+			throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
+		}
+	} 
+
+
+	// Check to see if a valid security descriptor was returned.  
+    if ((IsValidSecurityDescriptor(pSD) == 0) || (IsValidAcl(pdacl) == 0)) {
+		LocalFree(pSD);
+		throw Exception(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().");
+	}
+
+
+	// build the trustee structure
+	TRUSTEE trustee = {0};
+	BuildTrusteeWithSid(&trustee, pSid);
+
+	// get the rights
+	res = GetEffectiveRightsFromAcl(pdacl,
+									&trustee,
+									pAccessRights);
+	if (res != ERROR_SUCCESS) {
+		
+		string errMsg = WindowsCommon::GetErrorMessage(res);		
+
+		LocalFree(pSD);
+		
+		throw Exception(baseErrMsg + " System error message: " + errMsg); 		
+	} 
+		
+	LocalFree(pSD);
+	pSD = NULL;
+
+	Log::Debug("Calling calling the acl api to get effective rights");
+}
+
+void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {	
+	// -----------------------------------------------------------------------
+	//
+	//  ABSTRACT
+	//
+	//	Return a populated item for the specified trustees on the specified file.
+	//
+	//	- Call GetNamedSecurityInfo to get a Security Descriptor for the file
+	//	  http://msdn2.microsoft.com/en-us/library/aa446645.aspx
+	//	- Initialize resource manager through call to AuthzInitializeResourceManager
+	//	  http://msdn.microsoft.com/en-us/library/aa376313(VS.85).aspx
+	//	- Initialize client context using supplied SID through call to AuthzInitializeContextFromSid
+	//	  http://msdn.microsoft.com/en-us/library/aa376309(VS.85).aspx
+	//  - Finally retrieve the rights mask throuogh a call to AuthzAccessCheck
+	//    http://msdn.microsoft.com/en-us/library/aa375788(VS.85).aspx
+	//
+	//  Note: The original logic present in FileEffectiveRights53Probe and 
+	//        FileEffectiveRightsProbe utilized the API GetEffectiveRightsFromAcl.
+	//        This API was very restrictive in terms of what users could call
+	//        it and on what files.  The Authz API set does not suffer from
+	//        this restriction.
+	// -----------------------------------------------------------------------
+
+	Log::Debug("Calling calling the authz api to get effective rights");
+
+	PSECURITY_DESCRIPTOR pSD = NULL;	
+	AUTHZ_CLIENT_CONTEXT_HANDLE hClientContext = NULL;	
+	AUTHZ_RESOURCE_MANAGER_HANDLE hAuthzResourceManager = NULL;	
+
+	DWORD res = GetNamedSecurityInfo(const_cast<char*>((*filePath).c_str()),// object name
+									 SE_FILE_OBJECT,						// object type
+									 DACL_SECURITY_INFORMATION |			// information type
+									 GROUP_SECURITY_INFORMATION |
+									 OWNER_SECURITY_INFORMATION,
+									 NULL,								   // owner SID
+									 NULL,								   // primary group SID
+									 NULL,								   // DACL
+									 NULL,								   // SACL
+									 &pSD);								   // Security Descriptor
+
+	if (res != ERROR_SUCCESS) {
+		if (res == ERROR_FILE_NOT_FOUND) {
+			// should never get here. 
+			// before calling this function the file should already have been checked for existence.
+			throw Exception("Unable locate the specified file."); 
+		} else {
+			throw Exception("Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
+		}
+	} 
+
+	// Check to see if a valid security descriptor was returned.  
+    if ((IsValidSecurityDescriptor(pSD) == 0)) {
+		LocalFree(pSD);
+		throw Exception("Invalid data returned from call to GetNamedSecurityInfo().");
+	}
+
+	try	{
+	
+		if(AuthzInitializeResourceManager(AUTHZ_RM_FLAG_NO_AUDIT, NULL, NULL, NULL, NULL, &hAuthzResourceManager) != 0) {
+
+			LUID id = { 0 };
+
+			// From description AUTHZ_SKIP_TOKEN_GROUPS <seems> correct
+			if(AuthzInitializeContextFromSid(AUTHZ_SKIP_TOKEN_GROUPS, pSid, hAuthzResourceManager, NULL, id, NULL, &hClientContext) != 0) {						
+
+				AUTHZ_ACCESS_REQUEST request = {0};
+				DWORD errorNumber  = ERROR_ACCESS_DENIED; 
+
+				request.DesiredAccess = MAXIMUM_ALLOWED;
+
+				request.PrincipalSelfSid = NULL;
+				request.ObjectTypeList = NULL;
+				request.ObjectTypeListLength = 0;
+				request.OptionalArguments = NULL;
+
+				AUTHZ_ACCESS_REPLY reply = {0};
+				ACCESS_MASK replyMask = 0;
+				reply.GrantedAccessMask = &replyMask;
+				reply.ResultListLength = 1;
+				reply.Error = &errorNumber;				
+
+				if(AuthzAccessCheck(0, hClientContext, &request, NULL, pSD, NULL, 0, &reply, NULL) == TRUE) {
+
+					*pAccessRights = reply.GrantedAccessMask[0];
+				} else {
+					throw Exception("Failure to perform Authz Check: " + string(_com_error(GetLastError()).ErrorMessage()));
+				}
+
+			} else { 
+				throw Exception("Failure to initialize context from SID: " + string(_com_error(GetLastError()).ErrorMessage()));
+			}
+
+		} else {
+			throw Exception("Can't init the resource manager");
+		}
+
+	} catch(...) {
+
+		if(hAuthzResourceManager != NULL) {
+			AuthzFreeResourceManager(hAuthzResourceManager);
+		}
+
+		if(hClientContext != NULL) {
+			AuthzFreeContext(hClientContext);
+		}
+
+		if(pSD != NULL) {
+			LocalFree(pSD);
+		}
+
+		throw;
+	}
+
+	if(hAuthzResourceManager != NULL) {
+		AuthzFreeResourceManager(hAuthzResourceManager);
+	}
+	
+	if(hClientContext != NULL) {
+		AuthzFreeContext(hClientContext);
+	}
+
+	if(pSD != NULL) {
+		LocalFree(pSD);
+	}
+
+	Log::Debug("Finished calling the authz api to get effective rights");
+}
+
+
+bool WindowsCommon::IsVistaOrLater() {
+
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op=VER_GREATER_EQUAL;
+
+	// Initialize the OSVERSIONINFOEX structure.
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = 6;
+	osvi.dwMinorVersion = 0;
+	osvi.wServicePackMajor = 0;
+	osvi.wServicePackMinor = 0;
+
+	// Initialize the condition mask.
+
+	VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, op );
+
+	// Perform the test.
+    BOOL retVal = VerifyVersionInfo( &osvi, 
+									  VER_MAJORVERSION | VER_MINORVERSION | 
+									  VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
+									  dwlConditionMask);
+
+	
+	if(retVal == TRUE) {
+		return true;
+	} else {
+		DWORD error = GetLastError();
+		if(error == ERROR_OLD_WIN_VERSION) {
+			return false;
+		} else {
+			throw Exception("IsVistaOrLater - Error while checking windows version. " + WindowsCommon::GetErrorMessage(error));
+		}
+	}
+}
+
+bool WindowsCommon::IsXPOrLater() {
+	
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op=VER_GREATER_EQUAL;
+
+	// Initialize the OSVERSIONINFOEX structure.
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = 5;
+	osvi.dwMinorVersion = 1;
+	osvi.wServicePackMajor = 0;
+	osvi.wServicePackMinor = 0;
+
+	// Initialize the condition mask.
+
+	VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, op );
+
+	// Perform the test.
+	BOOL retVal = VerifyVersionInfo( &osvi, 
+									  VER_MAJORVERSION | VER_MINORVERSION | 
+									  VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
+									  dwlConditionMask);
+
+	
+	if(retVal == TRUE) {
+		Log::Debug("The version of windows is xp or later.");
+		return true;
+	} else {
+		DWORD error = GetLastError();
+		if(error == ERROR_OLD_WIN_VERSION) {
+			Log::Debug("The version of windows is earlier than xp.");
+			return false;
+		} else {
+			throw Exception("IsXPOrLater - Error while checking windows version. " + WindowsCommon::GetErrorMessage(error));
+		}
+	}
 }
