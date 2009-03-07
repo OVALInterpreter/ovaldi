@@ -75,10 +75,14 @@ private:
 	    Matching is done via regex or != depending on the isRegex boolean
 		flag. All matches are added to the trusteeNames vector.
 	*/
-	void GetMatchingTrusteeNames(string trusteeNamePattern, StringVector* allTrusteeNames, StringSet* trusteeNames, bool isRegex = true);
+	void GetMatchingTrusteeNames(string trusteeNamePattern, StringSet* allTrusteeNames, StringSet* trusteeNames, bool isRegex = true);
 
-	/** Return ture if the specfied trustee name exists in the set of trustee names */
-	bool TrusteeNameExists(string trusteeName, StringVector* trusteeNames);
+	/** Return ture if the specfied trustee name exists in the set of trustee names. 
+		
+		@param trusteeName The name to look for.
+		@param trusteeNames The set for names to search.
+	*/
+	bool TrusteeNameExists(string trusteeName, StringSet* trusteeNames);
 
 	/** Get the account name, domain, and sid string for the specified SID. */
 	//void GetTrusteeInfoForSid(PSID psid, string* trusteeName, string* trusteeDomain, string* trusteeSid);
@@ -98,7 +102,7 @@ private:
 		that any memory allocated for the trusteeNames parameter is cleaned up. The trusteeNames paramter
 		should be input as NULL when the function is called.
 	*/
-	bool ReportTrusteeNameDoesNotExist(ObjectEntity* trusteeName, StringVector* trusteeNames);
+	bool ReportTrusteeNameDoesNotExist(ObjectEntity* trusteeName, StringSet* trusteeNames);
 };
 
 #endif

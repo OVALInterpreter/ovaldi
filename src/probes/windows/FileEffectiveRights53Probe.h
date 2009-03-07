@@ -39,12 +39,11 @@
 
 #include <aclapi.h>
 #include <windows.h>
-
 using namespace std;
 
 
 /**
-	This class is responsible for collecting file information for windows fileeffictiverights_objects.
+	This class is responsible for collecting file information for windows fileeffictiverights53_objects.
 */
 class FileEffectiveRights53Probe : public AbsProbe {
 
@@ -68,19 +67,18 @@ private:
 	Item* GetEffectiveRights(string path, string fileName, string trusteeSID);
 
 	/** Identify all trustee SIDs for the specified trusteeSID ObjectEntity. */ 
-	StringSet* GetTrusteeSIDs(string path, string fileName, ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior);
+	StringSet* GetTrusteeSIDs(ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior);
 
 	/** Search all trustee SIDs on the the specifed file and return the set of SIDs the match the specified criteria. */
-	void GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringVector* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex = true);
+	void GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex = true);
 
-	/** Return true if the specfied trustee SID exists in the set of trustee SIDs */
-	bool TrusteeSIDExists(string trusteeSID, StringVector* trusteeSIDs);
+	/** Return true if the specfied trustee SID exists in the set of trustee SIDs.
+		
+		@param trusteeSID The SID to look for.
+		@param trusteeSIDs The set of SIDs to search.
+	*/
+	bool TrusteeSIDExists(string trusteeSID, StringSet* trusteeSIDs);
 
-	/** Get the account name, domain, and sid string for the specified SID. */
-	//void GetTrusteeInfoForSid(PSID psid, string* trusteeName, string* trusteeDomain, string* trusteeSid);
-
-	// 8/28/2006
-	//PSID GetSIDForTrusteeName(string trusteeName);
 
 	Item* GetEffectiveRightsForSID(string path, string fileName, PSID psid);
 
@@ -94,7 +92,7 @@ private:
 		trusteeSIDs parameter is cleaned up. The trusteeSIDs paramter should be input as NULL when the
 		function is called.
 	*/
-	bool ReportTrusteeSIDDoesNotExist(ObjectEntity* trusteeSID, StringVector* trusteeSIDs);
+	bool ReportTrusteeSIDDoesNotExist(ObjectEntity* trusteeSID, StringSet* trusteeSIDs);
 };
 
 #endif

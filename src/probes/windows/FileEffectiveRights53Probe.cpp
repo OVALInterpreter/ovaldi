@@ -32,7 +32,7 @@
 
 
 //****************************************************************************************//
-//								FileEffectiveRights53Probe Class							  //	
+//								FileEffectiveRights53Probe Class						  //	
 //****************************************************************************************//
 FileEffectiveRights53Probe* FileEffectiveRights53Probe::instance = NULL;
 
@@ -41,7 +41,7 @@ FileEffectiveRights53Probe::FileEffectiveRights53Probe() {
 }
 
 FileEffectiveRights53Probe::~FileEffectiveRights53Probe() {
-  instance = NULL;
+	instance = NULL;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -134,6 +134,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 
 			StringPair* fp = (*iterator);
 
+			// if there is no file name
 			if(fp->second.compare("") == 0) {
 
 				Item* item = NULL;
@@ -167,7 +168,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 					//
 					// The file exists so lets get the sids to then examine effective rights
 					//
-					StringSet* trusteeSIDs = this->GetTrusteeSIDs(fp->first, fp->second, trusteeSID, resolveGroupBehavior, includeGroupBehavior);
+					StringSet* trusteeSIDs = this->GetTrusteeSIDs(trusteeSID, resolveGroupBehavior, includeGroupBehavior);
 					if(!trusteeSIDs->empty()) {
 						StringSet::iterator iterator;
 						for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
@@ -177,19 +178,21 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 									collectedItems->push_back(item);
 								}
 							} catch (ProbeException ex) {
-								Log::Debug(ex.GetErrorMessage());
+								Log::Message("ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage());
 							} catch (Exception ex) {
-								Log::Debug("Unknown error while getting effective rights for file. Path: " + fp->first + " Name: " + fp->second + " " + ex.GetErrorMessage());
+								Log::Message("Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage());
 							}
 						}
 						delete trusteeSIDs;
 
 					} else {
 
-						StringVector* trusteeSIDs = new StringVector();
+						Log::Debug("No matching SIDs found when getting effective rights for object: " + object->GetId());
+
+						StringSet* trusteeSIDs = new StringSet();
 						if(this->ReportTrusteeSIDDoesNotExist(trusteeSID, trusteeSIDs)) {
 
-							StringVector::iterator iterator;
+							StringSet::iterator iterator;
 							for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
 
 								Item* item = this->CreateItem();
@@ -203,9 +206,11 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 					}
 
 				} catch (ProbeException ex) {
-					Log::Debug(ex.GetErrorMessage());
+					Log::Message("ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage());
+				} catch (Exception ex) {
+					Log::Message("Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage());
 				} catch (...) {
-					Log::Debug("Unknown error.");
+					Log::Message("Unknown error when collecting " + object->GetId());
 				}
 			}
 
@@ -248,12 +253,14 @@ Item* FileEffectiveRights53Probe::CreateItem() {
 	return item;
 }
 
-StringSet* FileEffectiveRights53Probe::GetTrusteeSIDs(string path, string fileName, ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior) {
+StringSet* FileEffectiveRights53Probe::GetTrusteeSIDs(ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior) {
 
 	StringSet* trusteeSIDs = new StringSet();
 	
 	// load the set of all Trustee SIDs
-	StringVector* allTrusteeSIDs = WindowsCommon::GetAllTrusteeSIDs();
+	StringSet* allTrusteeSIDs = WindowsCommon::GetAllTrusteeSIDs();
+
+	Log::Debug("Found " + Common::ToString(allTrusteeSIDs->size()) + " trustee SIDs when searching for all SIDs.");
 
 	// does this trusteeSID use variables?
 	if(trusteeSID->GetVarRef() == NULL) {
@@ -276,7 +283,7 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDs(string path, string fileNa
 	
 		// loop through all trustee SIDs on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(trusteeSID);
 		for(it = allTrusteeSIDs->begin(); it != allTrusteeSIDs->end(); it++) {
 			tmp->SetValue((*it));
@@ -293,7 +300,7 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDs(string path, string fileNa
 	StringSet* trusteeSIDSet = new StringSet();
 	if(!trusteeSIDs->empty()) {
 		
-		StringVector::iterator iterator;
+		StringSet::iterator iterator;
 		StringSet::iterator it;
 		string domainStr = "";
 		string sidStr = "";
@@ -310,8 +317,8 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDs(string path, string fileNa
 				}
 
 				// get the group members and add them to the set
-				StringVector* groupMembers = new StringVector();
-				WindowsCommon::ExpandGroupBySID((*it), groupMembers);
+				StringSet* groupMembers = new StringSet();
+				WindowsCommon::ExpandGroupBySID((*it), groupMembers, includeGroupBehavior, resolveGroupBehavior);
 				for(iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
 					trusteeSIDSet->insert((*iterator));
 				}
@@ -323,12 +330,14 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDs(string path, string fileNa
 		}
 	}
 
+	Log::Debug("Found " + Common::ToString(trusteeSIDSet->size()) + " matching SIDs after applying behaviors");
+
 	return trusteeSIDSet;
 }
 
-void FileEffectiveRights53Probe::GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringVector* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex) {
+void FileEffectiveRights53Probe::GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex) {
 
-	StringVector::iterator iterator;
+	StringSet::iterator iterator;
 	for(iterator = allTrusteeSIDs->begin(); iterator != allTrusteeSIDs->end(); iterator++) {
 		if(this->IsMatch(trusteeSIDPattern, (*iterator), isRegex)) {
 			trusteeSIDs->insert((*iterator));
@@ -336,11 +345,11 @@ void FileEffectiveRights53Probe::GetMatchingTrusteeSIDs(string trusteeSIDPattern
 	}
 }
 
-bool FileEffectiveRights53Probe::TrusteeSIDExists(string trusteeSID, StringVector* trusteeSIDs) {
+bool FileEffectiveRights53Probe::TrusteeSIDExists(string trusteeSID, StringSet* trusteeSIDs) {
 
 	bool exists = false;
 
-	StringVector::iterator iterator;
+	StringSet::iterator iterator;
 	for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
 		if(trusteeSID.compare((*iterator)) == 0) {
 			exists = true;
@@ -351,22 +360,17 @@ bool FileEffectiveRights53Probe::TrusteeSIDExists(string trusteeSID, StringVecto
 }
 
 Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileName, string trusteeSID) {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//	Return a populated item for the specified trustees on the specified file.
-	//
-	//	- Call GetNamedSecurityInfo to get a DACL Security Descriptor for the file
-	//	  http://msdn2.microsoft.com/en-us/library/aa446645.aspx
-	//	- Use provided trustee name and call LsaLookupNames to get the sid
-	//	  http://msdn2.microsoft.com/en-us/library/ms721797.aspx
-	//	- Then call GetEffectiveRightsFromAcl with the dacl and the sid found in the earlier calls
-	//	  http://msdn2.microsoft.com/en-us/library/aa446637.aspx
-	// -----------------------------------------------------------------------
 	
+	//  Note: The original logic present in FileEffectiveRights53Probe  
+	//        utilized the API GetEffectiveRightsFromAcl.  This API was very 
+	//        restrictive in terms of what users could call it and on what files.
+	//        The Authz API set does not suffer from this restriction.
+
+	Log::Debug("Collecting effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
 
 	Item* item = NULL;
+	PSID pSid = NULL;
+	PACCESS_MASK pAccessRights = NULL;
 
 	// build the path
 	string filePath = path;
@@ -379,152 +383,123 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 		filePath.append(fileName);
 	}
 
-	string baseErrMsg = "Error unable to get effective rights for trustee: " + trusteeSID + " from dacl for file: " + filePath;
+	string baseErrMsg = "Error unable to get effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID;
 
-	DWORD res;
-	PACL pdacl;
-	PSECURITY_DESCRIPTOR pSD;
 
-	res = GetNamedSecurityInfo(const_cast<char*>(filePath.c_str()),	// object name
-							   SE_FILE_OBJECT,						// object type
-							   DACL_SECURITY_INFORMATION |			// information type
-							   PROTECTED_DACL_SECURITY_INFORMATION |
-							   UNPROTECTED_DACL_SECURITY_INFORMATION, 			
-							   NULL,								// owner SID
-							   NULL,								// primary group SID
-							   &pdacl,								// DACL
-							   NULL,								// SACL
-							   &pSD);								// Security Descriptor
+	try {
 
-	if (res != ERROR_SUCCESS) {
-		if (res == ERROR_FILE_NOT_FOUND) {
-			// should never get here. 
-			// before calling this function the file should already have been checked for existence.
-			throw ProbeException( baseErrMsg + " Unable locate the specified file."); 
-		} else {
-			throw ProbeException(baseErrMsg + " Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
+		// verify that the file exists.
+		if(GetFileAttributes(filePath.c_str()) == INVALID_FILE_ATTRIBUTES) {
+			string systemErrMsg = WindowsCommon::GetErrorMessage(GetLastError());
+			throw ProbeException(baseErrMsg + " File " + filePath + " doesn't exist. " + systemErrMsg);
 		}
+
+
+		// Get the sid for the trustee name
+		pSid = WindowsCommon::GetSIDForTrusteeSID(trusteeSID);
+
+		
+		// the file exists and teh trustee_sid looks valid so we can create the new item now.
+		Log::Debug("Creating item to hold file effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
+		item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("trustee_sid", trusteeSID, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+
+
+		// build structure to hold the rights
+		pAccessRights = reinterpret_cast<PACCESS_MASK>(::LocalAlloc(LPTR, sizeof(PACCESS_MASK) + sizeof(ACCESS_MASK)));
+		if(pAccessRights == NULL) {
+			throw ProbeException(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.");
+		}
+
+		// get the rights
+		Log::Debug("Getting rights mask for file: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
+		WindowsCommon::GetEffectiveRightsForFile(pSid, &filePath, pAccessRights);
+			
+
+		// Convert access mask to binary.
+		// http://msdn2.microsoft.com/en-us/library/aa374896.aspx
+		char mask[33];
+		ZeroMemory(&mask, 33);
+
+		for (int j = 0; j < 32; j++) {
+			if ((*pAccessRights) & (1 << j))
+				mask[j] = '1';
+			else
+				mask[j] = '0';
+		}
+
+		// need to seperatly determine if the generic bit should be set.
+		// the access mask that is returned never has the generic bits set. 
+		// Those bits can be determined by rolling up the object specific access bits
+		if((*pAccessRights) & FILE_GENERIC_READ)
+			mask[31] = '1';
+		if((*pAccessRights) & FILE_GENERIC_WRITE)
+			mask[30] = '1';
+		if((*pAccessRights) & FILE_GENERIC_EXECUTE)
+			mask[29] = '1';
+		if((*pAccessRights) & FILE_ALL_ACCESS)
+			mask[28] = '1';
+		
+		// read values in the access_mask
+		item->AppendElement(new ItemEntity("standard_delete", Common::ToString(mask[16]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("standard_read_control", Common::ToString(mask[17]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("standard_write_dac", Common::ToString(mask[18]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("standard_write_owner", Common::ToString(mask[19]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("standard_synchronize", Common::ToString(mask[20]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("access_system_security", Common::ToString(mask[24]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("generic_read", Common::ToString(mask[31]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("generic_write", Common::ToString(mask[30]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("generic_execute", Common::ToString(mask[29]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("generic_all", Common::ToString(mask[28]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_read_data", Common::ToString(mask[0]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_write_data", Common::ToString(mask[1]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_append_data", Common::ToString(mask[2]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_read_ea", Common::ToString(mask[3]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_write_ea", Common::ToString(mask[4]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_execute", Common::ToString(mask[5]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_delete_child", Common::ToString(mask[6]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_read_attributes", Common::ToString(mask[7]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("file_write_attributes", Common::ToString(mask[8]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+
+	} catch(Exception ex) {
+
+		if(item != NULL) {
+
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
+
+		} else {
+
+			if(pAccessRights != NULL) {
+				LocalFree(pAccessRights);
+				pAccessRights = NULL;
+			}
+			
+			if(pSid != NULL) {
+				LocalFree(pSid);
+				pSid = NULL;
+			}
+			throw ex;
+		} 
 	} 
 
-	// Check to see if a valid security descriptor was returned.  
-    if ((IsValidSecurityDescriptor(pSD) == 0) || (IsValidAcl(pdacl) == 0)) {
-		LocalFree(pSD);
-		throw ProbeException(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().");
-
-		//item->SetStatus(OvalEnum::STATUS_ERROR);
-		//item->AppendMessage(new OvalMessage(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().", OvalEnum::LEVEL_ERROR));
-		//Log::Debug(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().");
-		//return item;
+	if(pAccessRights != NULL) {
+		LocalFree(pAccessRights);
+		pAccessRights = NULL;
 	}
-
-	// the file exists so we can create the new item now.
-	item = this->CreateItem();
-	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("trustee_sid", trusteeSID, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-
-
-	// Get the sid for the trustee name
-	PSID pSid = WindowsCommon::GetSIDForTrusteeSID(trusteeSID);
-
-	// check the sid
-	if(!IsValidSid(pSid)) {
-		LocalFree(pSD);
-		throw ProbeException(baseErrMsg + " Invalid sid found.");
-
-		//item->SetStatus(OvalEnum::STATUS_ERROR);
-		//item->AppendMessage(new OvalMessage(baseErrMsg + " Invalid sid found.", OvalEnum::LEVEL_ERROR));
-		//Log::Debug(baseErrMsg + " Invalid sid found.");
-		//return item;
+	
+	if(pSid != NULL) {
+		LocalFree(pSid);
+		pSid = NULL;
 	}
-
-	// build the trustee structure
-	TRUSTEE trustee = {0};
-	BuildTrusteeWithSid(&trustee, pSid);
-
-	// get the rights
-	PACCESS_MASK accessRights = NULL;
-	accessRights = reinterpret_cast<PACCESS_MASK>(::LocalAlloc(LPTR, sizeof(PACCESS_MASK) + sizeof(ACCESS_MASK)));
-	if(accessRights == NULL) {
-		throw ProbeException(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.");
-
-		//item->SetStatus(OvalEnum::STATUS_ERROR);
-		//item->AppendMessage(new OvalMessage(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.", OvalEnum::LEVEL_ERROR));
-		//Log::Debug(baseErrMsg + " Out of memory! Unable to allocate memory for access rights.");
-		//return item;
-	}
-
-	res = GetEffectiveRightsFromAcl(pdacl,
-									&trustee,
-									accessRights);
-	if (res != ERROR_SUCCESS) {
-		
-		string errMsg = WindowsCommon::GetErrorMessage(res);		
-
-		LocalFree(pSD);
-		LocalFree(accessRights);
-		
-		//item->SetStatus(OvalEnum::STATUS_ERROR);
-		//item->AppendMessage(new OvalMessage(baseErrMsg + " System error message: " + errMsg, OvalEnum::LEVEL_ERROR));
-		//Log::Debug(baseErrMsg + " System error message: " + errMsg);
-		//return item;
-
-		throw ProbeException(baseErrMsg + " System error message: " + errMsg); 		
-	} 
-		
-	// Convert access mask to binary.
-	// http://msdn2.microsoft.com/en-us/library/aa374896.aspx
-	char mask[33];
-	ZeroMemory(&mask, 33);
-
-	for (int j = 0; j < 32; j++) {
-		if ((*accessRights) & (1 << j))
-			mask[j] = '1';
-		else
-			mask[j] = '0';
-	}
-
-	// need to seperatly determine if the generic bit should be set.
-	// the access mask that is returned never has the generic bits set. 
-	// Those bits can be determined by rolling up the object specific access bits
-	if((*accessRights) & FILE_GENERIC_READ)
-		mask[31] = '1';
-	if((*accessRights) & FILE_GENERIC_WRITE)
-		mask[30] = '1';
-	if((*accessRights) & FILE_GENERIC_EXECUTE)
-		mask[29] = '1';
-	if((*accessRights) & FILE_ALL_ACCESS)
-		mask[28] = '1';
-
-	// read values in the access_mask
-	item->AppendElement(new ItemEntity("standard_delete", Common::ToString(mask[16]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("standard_read_control", Common::ToString(mask[17]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("standard_write_dac", Common::ToString(mask[18]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("standard_write_owner", Common::ToString(mask[19]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("standard_synchronize", Common::ToString(mask[20]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("access_system_security", Common::ToString(mask[24]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("generic_read", Common::ToString(mask[31]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("generic_write", Common::ToString(mask[30]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("generic_execute", Common::ToString(mask[29]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("generic_all", Common::ToString(mask[28]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_read_data", Common::ToString(mask[0]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_write_data", Common::ToString(mask[1]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_append_data", Common::ToString(mask[2]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_read_ea", Common::ToString(mask[3]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_write_ea", Common::ToString(mask[4]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_execute", Common::ToString(mask[5]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_delete_child", Common::ToString(mask[6]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_read_attributes", Common::ToString(mask[7]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("file_write_attributes", Common::ToString(mask[8]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-
-	LocalFree(pSD);
-	LocalFree(accessRights);
 
 	return item;
 }
 
-bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trusteeSID, StringVector* trusteeSIDs) {
+bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trusteeSID, StringSet* trusteeSIDs) {
 	
 	bool result = false;
 	
@@ -532,7 +507,7 @@ bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trus
 		
 		if(trusteeSID->GetVarRef() == NULL) {
 			if(!this->TrusteeSIDExists(trusteeSID->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {		
-				trusteeSIDs->push_back(trusteeSID->GetValue());
+				trusteeSIDs->insert(trusteeSID->GetValue());
 				result = true;
 			}
 		} else {
@@ -540,7 +515,7 @@ bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trus
 			VariableValueVector::iterator iterator;
 			for(iterator = trusteeSID->GetVarRef()->GetValues()->begin(); iterator != trusteeSID->GetVarRef()->GetValues()->end(); iterator++) {
 				if(this->TrusteeSIDExists((*iterator)->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {
-					trusteeSIDs->push_back((*iterator)->GetValue());
+					trusteeSIDs->insert((*iterator)->GetValue());
 					result = true;
 				}
 			}
