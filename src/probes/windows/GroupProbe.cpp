@@ -91,10 +91,10 @@ ItemVector* GroupProbe::CollectItems(Object *object) {
 				isRegex = true;
 
 			// Get all groups on the system...
-			StringVector* allGroups = WindowsCommon::GetAllGroups();
+			StringSet* allGroups = WindowsCommon::GetAllGroups();
 			
 			// Get the set of groups that match the ItemEntity.
-			StringVector::iterator iterator;
+			StringSet::iterator iterator;
 			for(iterator = allGroups->begin(); iterator != allGroups->end(); iterator++) {
 				string curr = (*iterator);
 				if(this->IsMatch(group->GetValue(), (*iterator), isRegex)) {
@@ -108,11 +108,11 @@ ItemVector* GroupProbe::CollectItems(Object *object) {
 
 	} else {
 		// Get all groups on the system...
-		StringVector* allGroups = WindowsCommon::GetAllGroups();
+		StringSet* allGroups = WindowsCommon::GetAllGroups();
 
 		// loop through all groups on the system
 		// only keep those that match operation and value and var check
-		StringVector::iterator it;
+		StringSet::iterator it;
 		ItemEntity* tmp = this->CreateItemEntity(group);
 		for(it = allGroups->begin(); it != allGroups->end(); it++) {
 			tmp->SetValue((*it));
@@ -146,15 +146,15 @@ Item* GroupProbe::CreateItem() {
 Item* GroupProbe::GetGroupMembers(string groupName) {
 	Item* item = NULL;
 
-	StringVector* members = new StringVector();
-	bool groupExists = WindowsCommon::ExpandGroup(groupName, members);
+	StringSet* members = new StringSet();
+	bool groupExists = WindowsCommon::ExpandGroup(groupName, members, false, false);
 
 	if(groupExists) {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		item->AppendElement(new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-		StringVector::iterator iterator;
+		StringSet::iterator iterator;
 		if(members->size() > 0) {
 			for(iterator = members->begin(); iterator != members->end(); iterator++) {
 				item->AppendElement(new ItemEntity("user", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
