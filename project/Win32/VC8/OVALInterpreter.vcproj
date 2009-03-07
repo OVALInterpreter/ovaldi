@@ -77,12 +77,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib"
 				OutputFile="Debug/ovaldiD.exe"
 				Version="2.0"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\build\Win32\Debug"
-				DelayLoadDLLs="Advapi32.dll"
+				DelayLoadDLLs="Advapi32.dll;Authz.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/ovaldiD.pdb"
 				SubSystem="1"
@@ -175,12 +175,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib"
 				OutputFile="Release/ovaldi.exe"
 				Version="5.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				DelayLoadDLLs="Advapi32.dll"
+				DelayLoadDLLs="Advapi32.dll;Authz.dll"
 				ProgramDatabaseFile=".\Release/ovaldi.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -485,6 +485,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\UserProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\UserSid55Probe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\UserSidProbe.cpp"
 					>
 				</File>
 				<File
@@ -1065,6 +1073,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\UserProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\UserSid55Probe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\UserSidProbe.h"
 					>
 				</File>
 				<File
