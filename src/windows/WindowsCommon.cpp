@@ -1977,7 +1977,7 @@ void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PA
 	//	  http://msdn2.microsoft.com/en-us/library/aa446637.aspx
 	// -----------------------------------------------------------------------
 
-	Log::Debug("Calling calling the acl api to get effective rights");
+	Log::Debug("Calling the acl api to get effective rights");
 
 
 	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid) + " from dacl for file: " + (*filePath);
@@ -2035,7 +2035,7 @@ void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PA
 	LocalFree(pSD);
 	pSD = NULL;
 
-	Log::Debug("Calling calling the acl api to get effective rights");
+	Log::Debug("Finished calling the acl api to get effective rights");
 }
 
 void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {	
@@ -2061,7 +2061,7 @@ void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, 
 	//        this restriction.
 	// -----------------------------------------------------------------------
 
-	Log::Debug("Calling calling the authz api to get effective rights");
+	Log::Debug("Calling the authz api to get effective rights");
 
 	PSECURITY_DESCRIPTOR pSD = NULL;	
 	AUTHZ_CLIENT_CONTEXT_HANDLE hClientContext = NULL;	
