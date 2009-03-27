@@ -75,7 +75,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 
 	bool defBoolValue = false;
 	bool scBoolValue = false;
-
+	
 	if(defValue.compare("true") == 0 || defValue.compare("1") == 0) {
 		defBoolValue = true;
 	} else if(defValue.compare("false") == 0 || defValue.compare("0") == 0) {
@@ -98,13 +98,17 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 		} else {
 			result = OvalEnum::RESULT_FALSE;
 		}
-	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
-		if(defBoolValue != scBoolValue) {
-			result = OvalEnum::RESULT_FALSE;
-		} else {
+	}
+
+	else if(op == OvalEnum::OPERATION_NOT_EQUAL){
+		if(defBoolValue != scBoolValue){
 			result = OvalEnum::RESULT_TRUE;
+		} else{
+			result = OvalEnum::RESULT_FALSE;
 		}
-	} else {
+	}
+	
+	else {
 		throw Exception("Error: Invalid operation. operation: " + OvalEnum::OperationToString(op));
 	} 	
 
