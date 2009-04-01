@@ -1556,7 +1556,7 @@ bool WindowsCommon::GetGroupsForUser(string userName, StringSet* groups) {
 	bool userExists = false;
 
 	LPCWSTR userNameApi;
-	// convert groupName for api use
+	// convert userName for api use
 	wchar_t* wUserName = NULL;
 	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
 	wUserName = new wchar_t[size];

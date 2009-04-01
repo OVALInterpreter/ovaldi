@@ -156,7 +156,10 @@ public:
 	*/
 	static void GetAllLocalUsers(StringSet* all);
 
-	/** Get local and global groups for the user. */
+	/** Get local and global groups for the user. 
+	    @param userName The name of the user to get groups for.
+		@param groups A pointer to a StringSet that will be populated with the groups that the user is a member of.
+	*/
 	static bool GetGroupsForUser(string userName, StringSet* groups);
 
 	/** Get 'enabled flag' for user with specified name 

@@ -71,7 +71,7 @@ using namespace std;
 	When one or more of the subexpressions in the line regex do not match any substring it is not possible to convey that
 	no substring was matched for a specific subexpression.
 
-	Below is a proposed change tot he textfilecontent object and state:
+	Below is a proposed change to the textfilecontent object and state:
 	<textfilecontent_object ...>
       <path>C:\mydir</path>
       <filename>myfile.txt</filename>
