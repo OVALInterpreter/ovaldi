@@ -43,9 +43,16 @@ using namespace std;
     The time_difference function calculates the difference in seconds between date-time 
     values. If one component is specified, the values of that component are subtracted
     from the current time (UTC). If two components are specified, the value of the second
-    component is subtracted from the value of the first component. If the component(s) 
-    contain multiple values, the operation is performed multiple times and the result is
-    an array of time differences.
+    component is subtracted from the value of the first component. If the component(s) contain
+	multiple values, the operation is performed multiple times on the Cartesian product of the
+	component(s) and the result is an array of time difference values. For example, assume a 
+	local_variable specifies the time_difference function and has two sub-components under this
+	function: the first component returns multiple values "04/02/2009" and "04/03/2009", and
+	the second component returns multiple values "02/02/2005" and "02/03/2005" and "02/04/2005".
+	The local_variable element would be evaluated to have six values:  
+	(ToSeconds("04/02/2009") - ToSeconds("02/02/2005")), (ToSeconds("04/02/2009") - ToSeconds("02/03/2005")),
+	(ToSeconds("04/02/2009") - ToSeconds("02/04/2005")), (ToSeconds("04/03/2009") - ToSeconds("02/02/2005")),
+	(ToSeconds("04/03/2009") - ToSeconds("02/03/2005")), and (ToSeconds("04/03/2009") - ToSeconds("02/04/2005")).
 
     The date-time format of each component is determined by the two format attributes. The
     format1 attribute applies to the first component, and the format2 attribute applies to
@@ -75,6 +82,13 @@ public:
 	/** Return the variable values used to compute this function's value. */
 	VariableValueVector* GetVariableValues();
 
+	
+
+private:
+    
+	OvalEnum::DateTimeFormat format1;
+    OvalEnum::DateTimeFormat format2;
+
 	/** Get the format1 field's value. */
 	OvalEnum::DateTimeFormat GetFormat1();
 	/** Set the format1 field's value. */
@@ -84,13 +98,24 @@ public:
 	OvalEnum::DateTimeFormat GetFormat2();
 	/** Set the format2 field's value. */
 	void SetFormat2(OvalEnum::DateTimeFormat format2);
+	
+	/** Convert a DateTime_YEAR_MONTH_DAY format date-time value to seconds **/
+	time_t TimeDifferenceFunction::YearMonthDayValueToSeconds(string dateTimeValue);
+	/** Convert a DateTime_MONTH_DAY_YEAR format date-time value to seconds **/
+	time_t TimeDifferenceFunction::MonthDayYearValueToSeconds(string dateTimeValue);
+	/** Convert a DateTime_DAY_MONTH_YEAR format date-time value to seconds **/
+	time_t TimeDifferenceFunction::DayMonthYearValueToSeconds(string dateTimeValue);
+	/** Convert a DateTime_WIN_FILETIME format date-time value to seconds **/
+	time_t TimeDifferenceFunction::WinFiletimeValueToSeconds(string dateTimeValue);
+	/** Convert a DateTime_SECONDS_SINCE_EPOCH format date-time value to seconds **/
+	time_t TimeDifferenceFunction::SecondsSinceEpochValueToSeconds(string dateTimeValue);
 
-
-private:
-    
-	OvalEnum::DateTimeFormat format1;
-    OvalEnum::DateTimeFormat format2;
-
+	/** Build a time structure (struct tm) and convert it to the time in seconds since the epoch **/
+	time_t buildTimeStructure(int,int,int,int=0,int=0,int=0);
+	/** Convert a string representation of a month into its corresponding numerical value **/
+	int TimeDifferenceFunction::MonthStrToInt(string monthValueStr);
+	/** Convert a hexadecimal value to its equivalent decimal value **/
+	long long TimeDifferenceFunction::HexToDecimal(string hexTimeDateStr);
 };
 
 #endif
