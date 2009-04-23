@@ -90,7 +90,7 @@ ItemVector* EnvironmentVariableProbe::CollectItems(Object *object) {
 		} else {			
 			StringPairVector* envs = this->GetAllEnvs();
 
-			// loop through all envs if they are a regex match on name create item an return it
+			// loop through all envs if they are a regex match on name create item and return it
 			StringPairVector::iterator iterator;
 			for(iterator = envs->begin(); iterator != envs->end(); iterator++) {
 				string first = (*iterator)->first;
