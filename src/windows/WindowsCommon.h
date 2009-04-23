@@ -66,8 +66,52 @@ public:
 	/** Enable the specified privilege. */
 	static bool EnablePrivilege(string);
 
-	/** Convert the provded PSID to a string in the SID string format. */
-	static bool GetTextualSid(PSID, LPTSTR*);
+	/** Convert the provded PSID to a string in the SID string format. 
+
+	  A SID value includes components that provide information about the SID structure
+	  and components that uniquely identify a trustee. A SID consists of the following
+	  components: 
+	
+	   * The revision level of the SID structure 
+	   * A 48-bit identifier authority value that identifies the authority that issued
+	     the SID 
+	   * A variable number of subauthority or relative identifier (RID) values that
+	     uniquely identify the trustee relative to the authority that issued the SID
+	
+	  The combination of the identifier authority value and the subauthority values
+	  ensures that no two SIDs will be the same, even if two different SID-issuing
+	  authorities issue the same combination of RID values. Each SID-issuing authority
+	  issues a given RID only once. 
+	
+	  SIDs are stored in binary format in a SID structure. To display a SID, you can
+	  call the ConvertSidToStringSid function to convert a binary SID to string format.
+	  To convert a SID string back to a valid, functional SID, call the
+	  ConvertStringSidToSid function. 
+	
+	  These functions use the following standardized string notation for SIDs, which
+	  makes it simpler to visualize their components: 
+	
+	  S-R-I-S-S...
+	
+	  In this notation, the literal character S identifies the series of digits as a
+	  SID, R is the revision level, I is the identifier-authority value, and S... is one
+	  or more subauthority values. 
+	
+	  NOTE:	
+	  Windows 2000 provides the ConvertSidToStringSid and ConvertStringSidToSid functions
+	  for converting a SID to and from string format. For a description of the SID string
+	  format, see SID Components.
+	
+	  On earlier versions of Windows NT, use the following sample code to convert a SID
+	  to string format.
+
+	  SEE: http://msdn.microsoft.com/en-us/library/aa379597(VS.85).aspx
+
+	  @param pSid the sid to convert to a string
+	  @param the string to populate with the string representation of the SID.
+	  @return true if the conversion was successful. otherwise return false.
+	*/
+	static bool GetTextualSid(PSID pSid, LPTSTR* TextualSid);
 
 	/** Return the string error massge for the specified error code. */
 	static string GetErrorMessage(DWORD dwLastError);
@@ -128,6 +172,13 @@ public:
 		http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/lookupaccountname.asp
 	*/
 	static PSID GetSIDForTrusteeSID(string trusteeSID);
+
+	/** Retrieve the set of SIDS as string from an ACL.
+		
+		@param pacl the ACL to  extract SID string from.
+		@param sids is a pointer to a set of strings that will be populated based on the input PACL.
+	*/
+	static void GetSidsFromPACL(PACL pacl, StringSet *sids);
 
 	/** Get the domain and sid string for the specifeid trustee name. Return true if the trustee is a group. */
 	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);

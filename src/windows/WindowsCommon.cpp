@@ -190,49 +190,6 @@ string WindowsCommon::GetErrorMessage(DWORD dwLastError) {
 }
 
 bool WindowsCommon::GetTextualSid(PSID pSid, LPTSTR* TextualSid) { 
-	//------------------------------------------------------------------------------------//
-	//
-	//  ABSTRACT
-	//
-	//  A SID value includes components that provide information about the SID structure
-	//  and components that uniquely identify a trustee. A SID consists of the following
-	//  components: 
-	//
-	//   * The revision level of the SID structure 
-	//   * A 48-bit identifier authority value that identifies the authority that issued
-	//     the SID 
-	//   * A variable number of subauthority or relative identifier (RID) values that
-	//     uniquely identify the trustee relative to the authority that issued the SID
-	//
-	//  The combination of the identifier authority value and the subauthority values
-	//  ensures that no two SIDs will be the same, even if two different SID-issuing
-	//  authorities issue the same combination of RID values. Each SID-issuing authority
-	//  issues a given RID only once. 
-	//
-	//  SIDs are stored in binary format in a SID structure. To display a SID, you can
-	//  call the ConvertSidToStringSid function to convert a binary SID to string format.
-	//  To convert a SID string back to a valid, functional SID, call the
-	//  ConvertStringSidToSid function. 
-	//
-	//  These functions use the following standardized string notation for SIDs, which
-	//  makes it simpler to visualize their components: 
-	//
-	//  S-R-I-S-S...
-	//
-	//  In this notation, the literal character S identifies the series of digits as a
-	//  SID, R is the revision level, I is the identifier-authority value, and S... is one
-	//  or more subauthority values. 
-	//
-	//  NOTE:
-	//
-	//  Windows 2000 provides the ConvertSidToStringSid and ConvertStringSidToSid functions
-	//  for converting a SID to and from string format. For a description of the SID string
-	//  format, see SID Components.
-	//
-	//  On earlier versions of Windows NT, use the following sample code to convert a SID
-	//  to string format.
-	//
-	//------------------------------------------------------------------------------------//
 
     PSID_IDENTIFIER_AUTHORITY psia;
     DWORD dwSubAuthorities;
@@ -484,6 +441,8 @@ void WindowsCommon::SplitTrusteeName(string trusteeName, string *domainName, str
 
 bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
 	
+	Log::Debug("Getting group members for local group: " + groupName + " resolveSubGroup = " + Common::ToString(resolveSubGroup));
+
 	bool groupExists = false;
 
 	NET_API_STATUS  res;
@@ -583,6 +542,8 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 
 bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
 
+	Log::Debug("Getting group members for global group: " + groupName + " resolveSubGroup = " + Common::ToString(resolveSubGroup));
+
 	string domainName;
 	DWORD entriesread;
 	DWORD totalentries;
@@ -608,12 +569,12 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 
 			res = NetGroupGetUsers((LPCWSTR)domainControllerName,		// server name NULL == localhost
 								   globalgroupname,						// group name
-								   0,										// level LOCALGROUP_MEMBERS_INFO_3
-								  (unsigned char**) &userInfo,
-								  MAX_PREFERRED_LENGTH,
-								  &entriesread,
-								  &totalentries,
-								  NULL);
+								   0,									// level LOCALGROUP_MEMBERS_INFO_3
+								   (unsigned char**) &userInfo,
+								   MAX_PREFERRED_LENGTH,
+								   &entriesread,
+								   &totalentries,
+								   NULL);
 
 			delete globalgroupname;
 
@@ -735,7 +696,12 @@ StringSet* WindowsCommon::GetAllTrusteeNames() {
 
 			// expand the group
 			try {
-				WindowsCommon::GetLocalGroupMembers((*iterator), members, true, true);
+				
+				/**
+					Changing the resolvegroup flag to false should fix the recursion issue. 
+					We already have the list of all local groups. We just need to get the members.
+				*/
+				WindowsCommon::GetLocalGroupMembers((*iterator), members, true, false);
 				StringSet::iterator member;
 				for(member = members->begin(); member != members->end(); member++) {
 					allTrusteeNames->insert((*member));
@@ -752,21 +718,36 @@ StringSet* WindowsCommon::GetAllTrusteeNames() {
 		StringSet* globalGroups = WindowsCommon::GetAllGlobalGroups();
 		for(iterator = globalGroups->begin(); iterator != globalGroups->end(); iterator++) {
 			allTrusteeNames->insert((*iterator));
+		
+			/**
+			4/23/2009 - don't try to expand global groups when gettign all users. This 
+			jumps off the systems and will expand all the domain.
 
 			// expand the group
 			try {
+				/**
+				Changing the resolvegroup flag to false should fix the recursion issue 
+				that occures when i try to get all users and still allow the code to do full recursion
+				when needed
+
 				WindowsCommon::GetGlobalGroupMembers((*iterator), allTrusteeNames, true, true);
+				
+				
+				WindowsCommon::GetGlobalGroupMembers((*iterator), allTrusteeNames, true, false);
 			} catch(Exception ex) {
 				Log::Debug(ex.GetErrorMessage());
 			}
+			*/
 		}
 		delete globalGroups;
 
 		// get the system's trustee name
 
-		// TODO - Lumension Specific? - don't want the system's trustee name -> doesn't process correctly anyway
+		// 4/23/2009 - don't want the system's trustee name -> doesn't process correctly anyway
 		// string systemName = WindowsCommon::LookUpLocalSystemName();
-		// allTrusteeNames->insert(systemName);		
+		// allTrusteeNames->insert(systemName);	
+
+		Log::Debug("Completed getting all trustee names and found " + Common::ToString(WindowsCommon::allTrusteeNames->size()) + " names.");
 	}
 
 	return WindowsCommon::allTrusteeNames;
@@ -1323,6 +1304,57 @@ PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
 	}
 
 	return pSid;
+}
+
+void WindowsCommon::GetSidsFromPACL(PACL pacl, StringSet *sids) {
+
+	ACL_SIZE_INFORMATION size_info;
+
+	if (GetAclInformation(pacl, &size_info, sizeof(size_info), AclSizeInformation)) {
+
+		for(unsigned int aceIdx = 0; aceIdx < size_info.AceCount; aceIdx++) {
+			void *ace = NULL;
+
+			if(GetAce(pacl, aceIdx, &ace)) {
+
+				ACE_HEADER *header = (ACE_HEADER *)ace;
+				PSID psid = NULL;
+
+				if(header->AceType == ACCESS_ALLOWED_ACE_TYPE) {
+					psid = (PSID)&((ACCESS_ALLOWED_ACE *)ace)->SidStart;
+				} else if(header->AceType == ACCESS_DENIED_ACE_TYPE) {
+					psid = (PSID)&((ACCESS_DENIED_ACE *)ace)->SidStart;
+				} else {
+					//TODO skip for now
+					Log::Debug("Unsupported AceType found when gettign sids from acl.");
+				}
+
+				if(IsValidSid(psid)) {
+
+					char *buffer = NULL;
+					if(ConvertSidToStringSid(psid, &buffer) == 0) {
+
+						string errMessage = WindowsCommon::GetErrorMessage(GetLastError());
+
+						if(buffer != NULL) {
+							LocalFree(buffer);
+						}
+
+						throw Exception("Can't convert sid to string sid. " + errMessage);
+
+					} else {
+						string strSid = buffer;
+						sids->insert(strSid);
+						LocalFree(buffer);
+					}
+				} else {
+					throw Exception("Invalid Sid found when getting SIDs from an ACL.");
+				}
+			}
+		}
+	} else {
+		throw Exception("Could not retrieve ace information from acl");
+	}
 }
 
 bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr) {
