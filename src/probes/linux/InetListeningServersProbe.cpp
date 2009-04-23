@@ -98,7 +98,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 	// check datatypes - only allow string
 	if(localPort->GetDatatype() != OvalEnum::DATATYPE_STRING) {
-		throw ProbeException("Error: invalid data type specified on program_name. Found: " + OvalEnum::DatatypeToString(localPort->GetDatatype()));
+		throw ProbeException("Error: invalid data type specified on local_port. Found: " + OvalEnum::DatatypeToString(localPort->GetDatatype()));
 	}
 
 	
