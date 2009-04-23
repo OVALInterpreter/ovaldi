@@ -147,7 +147,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 								Item* item = this->CreateItem();
 								item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-								item->AppendElement(new ItemEntity("protocols",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("protocol",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 								item->AppendElement(new ItemEntity("local_address",  localAddressStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 								item->AppendElement(new ItemEntity("local_port", localPort->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 								collectedItems->push_back(item);
@@ -159,7 +159,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 									Item* item = this->CreateItem();
 									item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-									item->AppendElement(new ItemEntity("protocols",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+									item->AppendElement(new ItemEntity("protocol",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 									item->AppendElement(new ItemEntity("local_address",  localAddressStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 									item->AppendElement(new ItemEntity("local_port", (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 									collectedItems->push_back(item);
@@ -180,7 +180,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 						Item* item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("protocols",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("protocol",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("local_address",  localAddress->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 						collectedItems->push_back(item);
 
@@ -191,7 +191,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 							Item* item = this->CreateItem();
 							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-							item->AppendElement(new ItemEntity("protocols",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("protocol",  protocolStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 							item->AppendElement(new ItemEntity("local_address",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 							collectedItems->push_back(item);
 						}
@@ -211,7 +211,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("protocols",  protocol->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("protocol",  protocol->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 				collectedItems->push_back(item);
 
 			} else {
@@ -221,7 +221,7 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("protocols",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("protocol",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
