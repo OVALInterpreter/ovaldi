@@ -1583,9 +1583,18 @@ string WindowsCommon::ToString(PSID pSID) {
 	return sidStr;
 }
 
-bool WindowsCommon::GetGroupsForUser(string userName, StringSet* groups) {
+bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 
 	bool userExists = false;
+
+	// need to split username from server name and domain.
+	size_t dash = userNameIn.find("\\");
+	string userName = "";
+	if(dash != string::npos ) {
+		userName = userNameIn.substr(dash+1, userNameIn.length());
+	} else {
+		userName = userNameIn;
+	}
 
 	LPCWSTR userNameApi;
 	// convert userName for api use
@@ -1596,7 +1605,7 @@ bool WindowsCommon::GetGroupsForUser(string userName, StringSet* groups) {
 	userNameApi = wUserName;
 
 	// get the global groups
-	LPGROUP_USERS_INFO_0 pBuf = NULL;
+	LPGROUP_USERS_INFO_0 pBuf = NULL; 
 	DWORD dwLevel = 0;
 	DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
 	DWORD dwEntriesRead = 0;
@@ -1872,7 +1881,7 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	bool enabled = true;
 
 	// need to split username from server name and domain.
-	unsigned int dash = userNameIn.find("\\");
+	size_t dash = userNameIn.find("\\");
 	string userName = "";
 	if(dash != string::npos ) {
 		userName = userNameIn.substr(dash+1, userNameIn.length());
