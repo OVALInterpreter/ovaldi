@@ -56,6 +56,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected bug in the EntityComparator::ParseVersionStr() method such that it will be up-to-date with the language specification (version 5.5) that allows for mixed delimiter characters in a version value. Also, additional error checking was added. 
 * Corrected bug in the EntityComparator::CompareBoolean() method such that when using the not equal operation, if the two boolean values are not equal, it will return true, and if the two boolean values are equal, it will return false.
 * Added support for the oval-def:time_difference function.  Allows for different time-date formats to be compared with each other and returns the difference between them in seconds.
+* Corrected bug in WindowsCommon::GetGroupsForUser(). Added code to ensure that user names are well formed before making api call. Thanks to Tim Harrison of National Institute of Standards and Technology for pointing out the defect.
+
+
 ---------------------------------------
 ---        Version 5.5 build 4      ---
 ---------------------------------------
