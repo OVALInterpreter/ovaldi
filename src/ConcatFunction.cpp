@@ -44,7 +44,7 @@ ConcatFunction::~ConcatFunction() {
 // ***************************************************************************************	//
 ComponentValue* ConcatFunction::ComputeValue() {
 
-	ComponentValue* values = new ComponentValue();
+	ComponentValue* values;
 
 	values = this->ProcessComponents(0);
 
