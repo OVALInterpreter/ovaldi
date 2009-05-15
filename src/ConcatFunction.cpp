@@ -44,20 +44,15 @@ ConcatFunction::~ConcatFunction() {
 // ***************************************************************************************	//
 ComponentValue* ConcatFunction::ComputeValue() {
 
-	ComponentValue* values;
-
-	values = this->ProcessComponents(0);
-
-	return values;	
+	/** 
+	    Make initial call to start the recursive processing of components.
+	    Call starts with the index of the first item in the set of components
+	*/
+	return this->ProcessComponents(0);
 }
 
 ComponentValue* ConcatFunction::ProcessComponents(unsigned int index) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	recursively process all componets of this function
-	// -----------------------------------------------------------------------
-
+	
 	if(this->GetComponents()->size()-1 == index) {
 		// reached the end of the line just return all this components values in a vector
 		ComponentValue* results = this->GetComponents()->at(index)->ComputeValue();
@@ -103,11 +98,6 @@ ComponentValue* ConcatFunction::ProcessComponents(unsigned int index) {
 }
 
 void ConcatFunction::Parse(DOMElement* componentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	parse the component element
-	// -----------------------------------------------------------------------
     
 	// Loop through all child elements
 	DOMNodeList *componentElms = componentElm->getChildNodes();
@@ -127,11 +117,6 @@ void ConcatFunction::Parse(DOMElement* componentElm) {
 }
 
 VariableValueVector* ConcatFunction::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this function's value
-	// -----------------------------------------------------------------------
 	
 	VariableValueVector* values = new VariableValueVector();
 	AbsComponentVector* components = this->GetComponents();

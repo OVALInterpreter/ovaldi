@@ -45,11 +45,20 @@ public:
 	ConcatFunction();
 	~ConcatFunction();
 
+	/** Parse the concat element and its child component elements. */
 	void Parse(DOMElement* componentElm); 
+
+	/** Compute the desired concatenated strings and return the values. */
 	ComponentValue* ComputeValue();
 
+	/** Return the variable values used to compute this function's value. */
 	VariableValueVector* GetVariableValues();
 
+	/**
+		Recursively process all components of this function starting
+		with the component at the designated index.
+		@param index the index of the component to process.
+	*/
 	ComponentValue* ProcessComponents(unsigned int index);
 };
 

@@ -47,10 +47,10 @@ public:
 	SubstringFunction(int start = 0, int length = 0);
 	~SubstringFunction();
 
-	/** Parse the substring element and its child component element. */
+	/** Parse the substring element and its child component elements. */
 	void Parse(DOMElement* componentElm); 
 
-	/** Compute the desired substring and return the value. */
+	/** Compute the desired substring and return the values. */
 	ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
