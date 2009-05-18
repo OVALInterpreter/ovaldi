@@ -540,14 +540,3 @@ void Item::Cache(Item* item) {
 
 	Item::processedItemsMap.insert(ItemPair(item->GetId(), item));
 }
-
-//****************************************************************************************//
-//								ItemException Class										  //	
-//****************************************************************************************//
-ItemException::ItemException(string errMsgIn, int severity, Exception* ex) : Exception(errMsgIn, severity, ex) {
-
-}
-
-ItemException::~ItemException() {
-
-}

@@ -181,13 +181,4 @@ private:
 	static ItemMap processedItemsMap;
 };
 
-/** 
-	This class represents an Exception that occured while processing an item.
-*/
-class ItemException : public Exception {
-	public:
-		ItemException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
-		~ItemException();
-};
-
 #endif

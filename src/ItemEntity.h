@@ -109,13 +109,4 @@ private:
 */
 typedef vector < ItemEntity*, allocator<ItemEntity*> > ItemEntityVector;
 
-/** 
-	This class represents an Exception that occured while processing an ItemEntity.
-*/
-class ItemEntityException : public Exception {
-	public:
-		ItemEntityException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
-		~ItemEntityException();
-};
-
 #endif

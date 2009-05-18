@@ -133,7 +133,7 @@ protected:
 private:
 	/** 
 		Cache all items in the vector of items.
-		Called by the AbsProbe::Run(Object* object) to ensure taht all Items return be a probe
+		Called by the AbsProbe::Run(Object* object) to ensure that all Items return by a probe
 		are cached and unique. Duplicate Items are deleted and the existing item is returned.
 		@param items the set of Items to cache.
 		@return A set of unique items that have all been cached.

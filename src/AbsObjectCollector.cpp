@@ -365,7 +365,7 @@ CollectedObject* AbsObjectCollector::ProcessObject(Object* object) {
 			if(probe != NULL) {
 				items = probe->Run(object);
 
-				// only create collected object if the pribe succeeds
+				// only create collected object if the probe succeeds
 				collectedObject = CollectedObject::Create(object);
 				collectedObject->AppendVariableValues(object->GetVariableValues());
 				collectedObject->AppendReferencesAndComputeFlag(items);
