@@ -33,6 +33,8 @@
 
 #include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
+#include <math.h>
+
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
