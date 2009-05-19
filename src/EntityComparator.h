@@ -70,9 +70,8 @@ public:
 	static OvalEnum::ResultEnumeration CompareFloat(OvalEnum::Operation op, string defValue, string scValue);
 
 	/** Compare to integers based on the specified operation. 
-		Since these integers come from an xsd:integer the code needs to allow for very large integers.
-		This code allows for strings with up to 20 characters. The range of allowed integers is:
-		-9,999,999,999,999,999,999 to 99,999,999,999,999,999,999
+	 *	Since these integers come from an xsd:integer the code needs to allow for very large integers.
+     *	The range of allowed integers is: -9223372036854775808 to 9223372036854775807.
 	*/
 	static OvalEnum::ResultEnumeration CompareInteger(OvalEnum::Operation op, string defValue, string scValue);
 
@@ -97,7 +96,7 @@ private:
 		If a given component of the version string can not be converted to an integer an error is thrown.
 		If a delimiter is found but no integer components are found an error is thrown.		
 	*/
-	static IntVector* ParseVersionStr(string versionStr);
+	static LongLongVector* ParseVersionStr(string versionStr);
 
 	// copied from lib/rpmvercmp.c
 	static int rpmvercmp(const char * a, const char * b);
@@ -112,7 +111,6 @@ private:
 	static string GetVersionFromEVR(string evrStr);
 	static string GetReleaseFromEVR(string evrStr);
 
-	static string ToUpper(string s);
 };
 
 #endif
