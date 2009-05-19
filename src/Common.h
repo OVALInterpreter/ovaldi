@@ -47,7 +47,8 @@
 #include "Exception.h"
 #include "Log.h"
 #include "REGEX.h"
-
+#include "math.h"
+#include "errno.h"
 
 #include <iostream>
 #include <string>
@@ -77,6 +78,11 @@ typedef set < string > StringSet;
 	A vector for storing integers.
 */
 typedef vector < int, allocator<int> > IntVector;
+
+/**
+	A vector for storing long long integers.
+*/
+typedef vector < long long, allocator<long long> > LongLongVector;
 
 /**	
 	A pair for storing two related strings.
@@ -152,13 +158,26 @@ class Common {
 		static string	ToString(unsigned int);
 		/** Return the long as a string. */
 		static string	ToString(long);
+		/** Return the long long as a string. */
+		static string   ToString(long long);
 		/** Return the unsigned long as a string. */
 		static string	ToString(unsigned long);
 		/** Return a the bool as a string. */
 		static string	ToString(bool);
 		/** Return a the char as a string. */
 		static string	ToString(char);
-
+		/** Converts a string into a string of all uppercase characters.
+		 *	@param s The string that you would like to convert into all uppercase characters.
+		 *	@return A string of uppercase characters.
+		 */
+		static string ToUpper(string s);
+		/** Converts a string into a long long integer. 
+		 *	@param numstr Pointer to the character string that you would like to convert into a long long integer.
+		 *	@param endptr Points to the first character in the character string that cannot be converted.
+	     *	@param base The base to use during the conversion process.
+		 *	@return The long long integer value of the character string. If the value is outside the limit of LLONG_MAX or LLONG_MIN, the function will return LLONG_MAX if the value is positive, and LLONG_MIN if the value is negative. If the conversion was unsuccessful, the return value will be 0, and the errno variable will be set to the corresponding error code. If errno is equal to EINVAL, it indicates that the specified base value was invalid. If errno is equal to ERANGE, it indicates that the converted value exceeded the limit of LLONG_MIN or LLONGMAX. 
+		 */
+		static long long StringToLongLong(char* numstr , char** endptr , int base);
 		/** 
 		 *	Retrieve the date/time.  The final output will be in the format:
 		 *	yyyy-mm-ddThh:mm:ss	2006-08-16T14:21:38
@@ -167,6 +186,8 @@ class Common {
 
 		static char fileSeperator;
 		static string fileSeperatorStr;
+
+		
 
 	private:
 		static string dataFile;
