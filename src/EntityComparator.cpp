@@ -29,7 +29,6 @@
 //****************************************************************************************//
 
 #include "EntityComparator.h"
-
 //****************************************************************************************//
 //								EntityComparator Class									  //	
 //****************************************************************************************//
@@ -45,8 +44,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation 
 		throw Exception("Error: Invalid binary value on system characteristics item entity. " + defValue);
 	}
 
-    string tmpdefValue = EntityComparator::ToUpper(defValue);
-	string tmpscValue = EntityComparator::ToUpper(scValue);
+    string tmpdefValue = Common::ToUpper(defValue);
+	string tmpscValue = Common::ToUpper(scValue);
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
@@ -63,14 +62,14 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation 
 			result = OvalEnum::RESULT_FALSE;			
 		}
 	} else {
-		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
 	}
 
 	return result;
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation op, string defValue, string scValue) {
-
+	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
 	bool defBoolValue = false;
@@ -109,8 +108,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 	}
 	
 	else {
-		throw Exception("Error: Invalid operation. operation: " + OvalEnum::OperationToString(op));
-	} 	
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
+	} 
 
 	return result;
 }
@@ -181,7 +180,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareEvrString(OvalEnum::Operati
 			result = OvalEnum::RESULT_FALSE;
 		}
 	} else {
-		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
 	} 
 
 	return result;
@@ -349,7 +348,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation o
 			result = OvalEnum::RESULT_FALSE;
 		}
 	} else {
-		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
 	} 
 
 	return result;
@@ -364,13 +363,40 @@ OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operat
 	
 	return result;
 }
+
 OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation op, string defValue, string scValue) {
-
+	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+	
+	int base = 0;
 
-	// convert the strings to integers
-	int defInt = atoi(defValue.c_str());
-	int scInt = atoi(scValue.c_str());
+	long long defInt;
+	long long scInt;
+
+	char * e1 = NULL;
+	char * e2 = NULL;
+	
+	// Convert the string defValue to a long long integer
+	try {
+		defInt = Common::StringToLongLong( ( char* ) defValue.c_str() , &e1 , base );
+	}catch (string errorMessage){
+		cout << errorMessage;	
+	}
+
+    // Convert the string scValue to a long long integer
+	try {
+		scInt = Common::StringToLongLong( ( char* ) scValue.c_str() , &e2 , base );
+	}catch (string errorMessage){
+		cout << errorMessage;	
+	}
+
+	if ( e1 != NULL ){
+		*e1 = NULL;
+	}
+
+	if ( e2 != NULL ){
+		*e2 = NULL;
+	}
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
 		if(scInt == defInt) {
@@ -413,20 +439,26 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 			result = OvalEnum::RESULT_FALSE;
 		}
 	} else if(op == OvalEnum::OPERATION_BITWISE_AND) {
-		// TODO need to implement
-		throw Exception("Error: not implemented:" + OvalEnum::OperationToString(op));
+		if ( ( defInt & scInt ) == defInt ){
+			result = OvalEnum::RESULT_TRUE;
+		}else{
+			result = OvalEnum::RESULT_FALSE;
+		}	
 	} else if(op == OvalEnum::OPERATION_BITWISE_OR) {		
-		// TODO need to implement
-		throw Exception("Error: not implemented:" + OvalEnum::OperationToString(op));
+		if ( ( defInt | scInt ) == defInt ){
+			result = OvalEnum::RESULT_TRUE;
+		}else{
+			result = OvalEnum::RESULT_FALSE;
+		}
 	} else {
-		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
 	} 
 
 	return result;
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation op, string defValue, string scValue) {
-
+	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
@@ -437,8 +469,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 		}
 	} else if(op == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {
 
-		string upperDefValue = ToUpper(defValue);
-		string upperSCValue = ToUpper(scValue);
+		string upperDefValue = Common::ToUpper(defValue);
+		string upperSCValue = Common::ToUpper(scValue);
 
 		if(upperDefValue.compare(upperSCValue) == 0) {
 			result = OvalEnum::RESULT_TRUE;
@@ -454,8 +486,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 		}
 	} else if(op == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL) {
 
-		string upperDefValue = ToUpper(defValue);
-		string upperSCValue = ToUpper(scValue);
+		string upperDefValue = Common::ToUpper(defValue);
+		string upperSCValue = Common::ToUpper(scValue);
 
 		if(upperDefValue.compare(upperSCValue) != 0) {
 			result = OvalEnum::RESULT_TRUE;
@@ -471,23 +503,10 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 			result = OvalEnum::RESULT_FALSE;
 		}
 	} else {
-		throw Exception("Error: Invalid operaion. operation: " + OvalEnum::OperationToString(op));
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
 	}
 
 	return result;
-}
-
-string EntityComparator::ToUpper(string s) {
-
-	string upperString;
-	string::const_iterator iter;
-
-	for(iter = s.begin(); iter != s.end(); iter++)
-	{ 
-		upperString += ::toupper(*iter);
-	}
-
-	return upperString;
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation op, string defValue, string scValue) {
@@ -496,12 +515,12 @@ OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation
 	
 	// Invalid ops first
 	if(op == OvalEnum::OPERATION_PATTERN_MATCH || op == OvalEnum::OPERATION_BITWISE_AND || op == OvalEnum::OPERATION_BITWISE_OR) {
-		throw Exception("Error: Invalid operation. operation: " + OvalEnum::OperationToString(op));	
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));	
 	}
 
 	// Create two vectors of the version components. 
-    IntVector* defValues = EntityComparator::ParseVersionStr(defValue);
-	IntVector* scValues = EntityComparator::ParseVersionStr(scValue);
+    LongLongVector* defValues = EntityComparator::ParseVersionStr(defValue);
+	LongLongVector* scValues = EntityComparator::ParseVersionStr(scValue);
 
 	// pad the vectors such that they are the same length
 	int lengthDiff = defValues->size() - scValues->size();
@@ -517,9 +536,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation
 
 	//	Loop through the vector of definition version values.
 	for(unsigned int i = 0; i < defValues->size(); i++) {
-		int def = defValues->at(i);
-		int sc = scValues->at(i); 
-		
+		long long def = defValues->at(i);
+		long long sc = scValues->at(i); 
 		bool isLastValue = false;
 		if(defValues->size() == (i+1)) {
 			isLastValue = true;
@@ -602,29 +620,42 @@ OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation
 	// delete the vectors of integers
 	delete defValues;
 	delete scValues;
-
+	
 	return result;
 }
 
-IntVector* EntityComparator::ParseVersionStr(string versionStr) {
+LongLongVector* EntityComparator::ParseVersionStr(string versionStr) {
 	
 	if(versionStr.compare("") == 0) {
 		throw Exception("Unable to parse version string. An empty string was provided.");
 	}
 	
-	IntVector* tokens = new IntVector();
+	LongLongVector* tokens = new LongLongVector();
 
-	// Get index of first delimiter
+    long long tokenInt;
+    char* endptr;
+	int base = 10;
+	
+    // Get index of first delimiter
 	size_t index = versionStr.find_first_not_of("0123456789"); 
 	
 	// Get index of last delimiter
 	size_t lastindex = versionStr.find_last_not_of("0123456789");
 	
 	if(index == string::npos) {
-
+        
 		// No delmiter found and not an empty string.
-		// Simply try to convert the versionStr to an int and return it as the only token.
-		int tokenInt = atoi(versionStr.c_str());
+		// Simply try to convert the versionStr to a long long integer and return it as the only token.
+        try {
+            tokenInt = Common::StringToLongLong( ( char* ) versionStr.c_str() , &endptr , base );
+        }catch (string errorMessage){
+            cout << errorMessage;	
+        }
+
+		if ( endptr != NULL ){
+			*endptr = NULL;
+		}
+
 		tokens->push_back(tokenInt);
 
 	} else {
@@ -760,8 +791,16 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 					// Found an int so add the length of the token to the totalTokenLength + 1 to account for the delimiter
 					totalTokenLength = totalTokenLength + strlen(token) + 1;
 
-					// Convert it to an int
-					int tokenInt = atoi(token);
+					// Convert the token to a long long integer
+					try {
+                        tokenInt = Common::StringToLongLong( ( char* ) token , &endptr , base );
+                    }catch (string errorMessage){
+                        cout << errorMessage;	
+                    }
+
+					if ( endptr != NULL ){
+						*endptr = NULL;
+					}
 
 					// Add it to the vector
 					tokens->push_back(tokenInt);
@@ -776,6 +815,7 @@ IntVector* EntityComparator::ParseVersionStr(string versionStr) {
 
 					// Last token was an int set flag to false
 					prevTokenNonInt = false;
+
 				}
 			}
 
@@ -833,3 +873,4 @@ string EntityComparator::GetReleaseFromEVR(string evrStr) {
 	string release = evrStr.substr(hyphen+1, count);
 	return release;
 }
+
