@@ -40,7 +40,7 @@ using namespace std;
 class ObjectEntity;
 
 /**
-	This class represents an entity in an Object as definted in the oval definition schema. 
+	This class represents an entity in an Object as defined in the oval definition schema. 
 	All new instances of this class are create with the AbsEntity::isObjectEntity flag set to true.
 */
 class ObjectEntity : public AbsEntity {
