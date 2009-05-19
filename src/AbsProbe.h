@@ -66,7 +66,7 @@ public:
 	*/
 	AbsProbe();
 
-	/** distroy the probe.
+	/** destroy the probe.
 	    Delete the regex object.
 		clear the item cache
 	*/
@@ -91,13 +91,13 @@ public:
 	virtual Item* CreateItem() = 0;
 
 	/**
-		Clear the cache of all itmes collected by all probes.
+		Clear the cache of all Items collected by all probes.
 	*/
 	static void ClearGlobalCache();
 
 protected:	
 	/**
-		Collects all Items on the systemt hat match the specifeid Object
+		Collects all Items on the system that match the specified Object.
 		@param object A Object* that specifies what information to collecto on the system.
 		@return A vector of Items found on the system.
 	*/
