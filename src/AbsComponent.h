@@ -57,9 +57,19 @@ public:
 		Each concrete component has a slightly different corresponding element to parse.
 	*/
 	virtual void Parse(DOMElement* componentElm) = 0;
-	/** Compute the value for the AbsComponent.
-		Each concrete component computes its value differently.
-	*/
+    /**
+     * Compute the value for the AbsComponent.
+     * Each concrete component computes its value differently.  However, there are
+     * some rules implementors must follow.
+     * <ol>
+     *   <li>The messages generated from computing sub-component values must be
+     *     aggregated into the message list for this component. See
+     *     ComponentValue::AppendMessage().</li>
+     *   <li>The flags generated from computing sub-component values must be
+     *     properly combined to obtain the flag for this component's value.  A
+     *     method has been provided for you: OvalEnum::CombineFlags().</li>
+     * </ol>
+     */
 	virtual ComponentValue* ComputeValue() = 0;
 	/** Return the variable values used to compute the concrete component's value.
 		Each concrete component uses variables differently and will return this set differently.
