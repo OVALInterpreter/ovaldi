@@ -68,6 +68,16 @@ public:
 	void SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn);
 
 private:
+    /**
+     * Does a cartesian cross combination (according to this function's operator)
+     * of the given two ComponentValue's, and returns the resulting ComponentValue.
+     * @param componentValue1 The first ComponentValue
+     * @param componentValue1 The second ComponentValue
+     * @return the combined ComponentValue
+     * @throw Exception if the arithmetic operator is not supported
+     */
+    ComponentValue* CombineTwoComponentValues(ComponentValue* componentValue1, ComponentValue* componentValue2);
+
     OvalEnum::ArithmeticOperation arithmeticOperation;
 };
 

@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "ArithmeticFunction.h"
+#include <iostream>
 
 //****************************************************************************************//
 //								Component Class											  //	
@@ -42,8 +43,9 @@ ArithmeticFunction::~ArithmeticFunction() {
 }
 
 // ***************************************************************************************	//
-//								 Public members												//
+//                                  Public members                                          //
 // ***************************************************************************************	//
+
 OvalEnum::ArithmeticOperation ArithmeticFunction::GetArithmeticOperation() {
 	return this->arithmeticOperation;
 }
@@ -55,12 +57,33 @@ void ArithmeticFunction::SetArithmeticOperation(OvalEnum::ArithmeticOperation op
 
 ComponentValue* ArithmeticFunction::ComputeValue() {
 
-	// create and populate a result ComponentValue
-	ComponentValue* result = new ComponentValue();
+    AbsComponentVector *components = GetComponents();
 
-    throw Exception("Error: unsupported function");
+    // assert components->size() >= 2... (xml validation should enforce this)
 
-	return result;	
+    ComponentValue *componentValue, *accumComponentValue;
+    AbsComponentVector::iterator componentIter;
+
+    // This algorithm works by incrementally combining all the ComponentValues
+    // two at a time.  E.g. if there are 3 components with 2, 3, and 4 values
+    // respectively, then first a 2x3 combination is done, resulting in a 6-value
+    // ComponentValue, then that is combined with the last 4-value ComponentValue
+    // resulting in a final 24-value ComponentValue.
+
+    componentIter = components->begin();
+    accumComponentValue = (*componentIter)->ComputeValue();
+    ++componentIter;
+
+    while (componentIter != components->end()) {
+        componentValue = (*componentIter)->ComputeValue();
+        ComponentValue *tempValue = this->CombineTwoComponentValues(accumComponentValue, componentValue);
+        delete componentValue;
+        delete accumComponentValue;
+        accumComponentValue = tempValue;
+        ++componentIter;
+    }
+
+	return accumComponentValue;
 }
 
 void ArithmeticFunction::Parse(DOMElement* componentElm) {
@@ -98,12 +121,63 @@ VariableValueVector* ArithmeticFunction::GetVariableValues() {
 		for(varIterator = tmp->begin(); varIterator != tmp->end(); varIterator++) {
 			values->push_back((*varIterator));
 		}
-		// BUG - These can not currenrtly be deleted. 
-		// The code is no consistant here. In places a new vector is returned
+		// BUG - These can not currently be deleted. 
+		// The code is not consistant here. In places a new vector is returned
 		// in others a reference to a vector that is managed by other code is returned.
 		//delete tmp;
 		//tmp = NULL;
 	}
 
 	return values;
+}
+
+// ***************************************************************************************	//
+//                                  Private members                                         //
+// ***************************************************************************************	//
+
+ComponentValue* ArithmeticFunction::CombineTwoComponentValues(ComponentValue* componentValue1, ComponentValue* componentValue2) {
+
+    ComponentValue *resultValue = new ComponentValue();
+    OvalEnum::ArithmeticOperation op = GetArithmeticOperation();
+
+    // Append all the component values' messages to our result value
+    resultValue->AppendMessages(componentValue1->GetMessages());
+    resultValue->AppendMessages(componentValue2->GetMessages());
+
+    IntVector flags;
+    flags.push_back(componentValue1->GetFlag());
+    flags.push_back(componentValue2->GetFlag());
+    OvalEnum::Flag combinedFlag = OvalEnum::CombineFlags(&flags);
+    resultValue->SetFlag(combinedFlag);
+    if (combinedFlag == OvalEnum::FLAG_ERROR)
+        return resultValue;
+
+    StringVector *values1 = componentValue1->GetValues();
+    StringVector *values2 = componentValue2->GetValues();
+
+    StringVector::iterator values1Iter, values2Iter;
+    for (values1Iter = values1->begin(); values1Iter != values1->end(); ++values1Iter) {
+        for (values2Iter = values2->begin(); values2Iter != values2->end(); ++values2Iter) {
+
+            double value1 = atof(values1Iter->c_str());
+            double value2 = atof(values2Iter->c_str());
+            double result;
+
+            switch (op) {
+            case OvalEnum::ARITHMETIC_ADD:
+                result = value1 + value2;
+                break;
+            case OvalEnum::ARITHMETIC_MULTIPLY:
+                result = value1 * value2;
+                break;
+            default:
+                delete resultValue;
+                throw Exception(string("Unhandled operator: ")+OvalEnum::ArithmeticOperationToString(op), OvalEnum::LEVEL_ERROR);
+            }
+
+            resultValue->AppendValue(Common::ToString(result));
+        }
+    }
+
+    return resultValue;
 }
