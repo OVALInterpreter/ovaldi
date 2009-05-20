@@ -468,6 +468,14 @@ string Common::ToString(unsigned long num) {
 	return result.str();
 }
 
+string Common::ToString(double num) {
+
+	ostringstream result;
+	result << num;
+
+	return result.str();
+}
+
 string Common::ToUpper(string s) {
 
 	string upperString;
@@ -714,7 +722,6 @@ long long Common::StringToLongLong( char* numstr , char** endptr , int base ){
 	return value;
 
 }
-
 
 //****************************************************************************************//
 //							CommonException Class										  //	

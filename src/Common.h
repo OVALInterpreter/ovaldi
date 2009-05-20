@@ -166,6 +166,9 @@ class Common {
 		static string	ToString(bool);
 		/** Return a the char as a string. */
 		static string	ToString(char);
+		/** Return a double as a string. */
+		static string	ToString(double);
+
 		/** Converts a string into a string of all uppercase characters.
 		 *	@param s The string that you would like to convert into all uppercase characters.
 		 *	@return A string of uppercase characters.
@@ -178,6 +181,7 @@ class Common {
 		 *	@return The long long integer value of the character string. If the value is outside the limit of LLONG_MAX or LLONG_MIN, the function will return LLONG_MAX if the value is positive, and LLONG_MIN if the value is negative. If the conversion was unsuccessful, the return value will be 0, and the errno variable will be set to the corresponding error code. If errno is equal to EINVAL, it indicates that the specified base value was invalid. If errno is equal to ERANGE, it indicates that the converted value exceeded the limit of LLONG_MIN or LLONGMAX. 
 		 */
 		static long long StringToLongLong(char* numstr , char** endptr , int base);
+
 		/** 
 		 *	Retrieve the date/time.  The final output will be in the format:
 		 *	yyyy-mm-ddThh:mm:ss	2006-08-16T14:21:38
