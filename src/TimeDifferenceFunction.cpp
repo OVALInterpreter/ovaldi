@@ -100,8 +100,16 @@ ComponentValue* TimeDifferenceFunction::ComputeValue() {
 		value2 = component2Value->GetValues()->at(0);
 	}
 
-	result->SetFlag(component2Value->GetFlag());
-	result->AppendMessages(component2Value->GetMessages());
+    // Combine the flag values of components 1 and 2, and set the new value
+    IntVector* flags = new IntVector();
+    flags->push_back(component1Value->GetFlag());
+    flags->push_back(component2Value->GetFlag());
+    result->SetFlag(OvalEnum::CombineFlags(flags));
+    delete flags;
+	
+	result->AppendMessages(component1Value->GetMessages());
+    result->AppendMessages(component2Value->GetMessages());
+
 
 	if(component2Value->GetFlag() == OvalEnum::FLAG_COMPLETE) {
 
