@@ -201,6 +201,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 	// We'll use these to parse the XML file.
 	XalanSourceTreeDOMSupport theDOMSupport;
 	XalanSourceTreeParserLiaison theLiaison(theDOMSupport);
+    theLiaison.setEntityResolver(new DummyEntityResolver());
 
 	// Hook the two together...
 	theDOMSupport.setParserLiaison(&theLiaison);
@@ -359,4 +360,28 @@ Item* XmlFileContentProbe::CreateItem() {
 						"xmlfilecontent_item");
 
 	return item;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DummyEntityResolver methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+InputSource* DummyEntityResolver::resolveEntity(const XMLCh *const publicId, const XMLCh *const systemId)
+{
+    return new DummyEntityResolver::NoOpInputSource();
+}
+
+BinInputStream* DummyEntityResolver::NoOpInputSource::makeStream() const
+{
+    return new DummyEntityResolver::DoNothingBinInputStream();
+}
+
+unsigned int DummyEntityResolver::DoNothingBinInputStream::curPos() const
+{
+    return 0;
+}
+
+unsigned int DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const toFill, const unsigned int maxToRead)
+{
+    return 0;
 }
