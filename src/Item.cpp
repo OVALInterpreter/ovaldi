@@ -47,6 +47,34 @@ Item::Item(int id , string xmlns, string xmlnsAlias, string schemaLocation, Oval
 	this->SetIsWritten(false);
 }
 
+Item::Item(const Item& item){
+
+    ItemEntityVector iev = item.elements;
+    ItemEntityVector::iterator it1;
+
+    for( it1 = iev.begin() ; it1 != iev.end() ; it1++ ){
+        ItemEntity* ie = new ItemEntity(**it1);
+        this->elements.push_back(ie);
+    }
+    
+    OvalMessageVector mv = item.messages;
+    OvalMessageVector::iterator it2;
+    
+    for( it2 = mv.begin() ; it2 != mv.end() ; it2++ ){
+        OvalMessage* m = new OvalMessage(**it2);
+        this->messages.push_back(m);
+    }
+
+    this->SetId(item.id);
+    this->SetName(item.name);
+    this->SetStatus(item.status);
+    this->SetXmlns(item.xmlns);
+    this->SetXmlnsAlias(item.xmlnsAlias);
+    this->SetSchemaLocation(item.schemaLocation);
+    this->SetIsWritten(item.isWritten);
+
+}
+
 Item::~Item() {
 	
 	this->DeleteElements();
@@ -296,7 +324,6 @@ bool Item::Equals(Item* item) {
 	bool isEqual = false;
 
 	try {
-
 		// compare name
 		if(this->GetName().compare(item->GetName()) == 0) {
 			// compare xmlns
@@ -386,6 +413,31 @@ ItemEntityVector* Item::GetElementsByName(string elementName) {
 	}
 
 	return matchingElements;
+}
+
+ItemEntity* Item::GetElementByName(string itemEntityNameStr) {
+    
+    ItemEntityVector* matchingElements = new ItemEntityVector();
+	ItemEntityVector::iterator iterator;
+
+	for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
+
+		ItemEntity* element = (ItemEntity*)(*iterator);
+
+		if(element->GetName().compare(itemEntityNameStr) == 0) {
+			matchingElements->push_back(element);   
+		}
+	}
+    
+    switch ( matchingElements->size() ){
+        case 0:
+            return new ItemEntity();
+        case 1:
+            return new ItemEntity(*(matchingElements->front()));
+        default:
+            throw Exception("Error: This Item has contains multiple ItemEntities with the name '"+itemEntityNameStr+"'.");
+    }
+        
 }
 
 void Item::Parse(DOMElement* scItemElm) {
@@ -493,17 +545,17 @@ Item* Item::GetItemById(string itemId) {
 //								 Private members											//
 // ***************************************************************************************	//
 void Item::DeleteElements() {
-	
 	ItemEntity* currentElement = NULL;
 	while(elements.size() != 0) {
+        
 	  	currentElement = elements[elements.size()-1];
 	  	elements.pop_back();
 	  	delete currentElement;
 	  	currentElement = NULL;
 	}
-
 	OvalMessage* currentMsg = NULL;
 	while(messages.size() != 0) {
+        
 	  	currentMsg = messages[messages.size()-1];
 	  	messages.pop_back();
 	  	delete currentMsg;
@@ -540,3 +592,4 @@ void Item::Cache(Item* item) {
 
 	Item::processedItemsMap.insert(ItemPair(item->GetId(), item));
 }
+
