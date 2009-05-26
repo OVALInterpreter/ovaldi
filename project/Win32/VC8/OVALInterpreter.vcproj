@@ -460,6 +460,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\InterfaceProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\LockoutPolicyProbe.cpp"
 					>
 				</File>
@@ -468,7 +472,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\PortProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\RegistryProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\SharedResourceProbe.cpp"
 					>
 				</File>
 				<File
@@ -497,6 +509,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\independent\VariableProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\VolumeProbe.cpp"
 					>
 				</File>
 				<File
@@ -1048,6 +1064,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\InterfaceProbe.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\LockoutPolicyProbe.h"
 					>
 				</File>
@@ -1056,7 +1076,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\PortProbe.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\RegistryProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\SharedResourceProbe.h"
 					>
 				</File>
 				<File
@@ -1085,6 +1113,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\independent\VariableProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\VolumeProbe.h"
 					>
 				</File>
 				<File
