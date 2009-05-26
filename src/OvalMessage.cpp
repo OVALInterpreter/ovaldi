@@ -39,6 +39,11 @@ OvalMessage::OvalMessage(string value, OvalEnum::Level level) {
 	this->SetLevel(level);
 }
 
+OvalMessage::OvalMessage(const OvalMessage& message ){
+    this->SetValue(message.value);
+    this->SetLevel(message.level);
+}
+
 OvalMessage::~OvalMessage() {
 }
 
