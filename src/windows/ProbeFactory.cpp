@@ -73,7 +73,15 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = GroupProbe::Instance();
 	} else if(objectName.compare("user_object") == 0) {
 		probe = UserProbe::Instance();
-	} else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
+	}else if(objectName.compare("sharedresource_object") == 0){
+		probe = SharedResourceProbe::Instance();
+	}else if(objectName.compare("volume_object") == 0){
+		probe = VolumeProbe::Instance();
+	}else if(objectName.compare("interface_object") == 0){
+		probe = InterfaceProbe::Instance();
+	}else if(objectName.compare("port_object") == 0){
+		probe = PortProbe::Instance();
+	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
 		if(WindowsCommon::IsVistaOrLater()) {
