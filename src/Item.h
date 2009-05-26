@@ -84,6 +84,9 @@ public:
 	/** Create a complete Item object. */
 	Item(int id = 0, string xmlns = "", string xmlnsAlias = "", string schemaLocation = "", OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, string name = "");
 	
+    /** Item copy constructor */
+    Item(const Item& item);
+
 	/** Clean up all the elements. */
 	~Item();
 
@@ -96,6 +99,12 @@ public:
 		@return Returns a vector of elements with a matching name. If no mathes are found the vector is empty. The caller should delete the returned vector but not its contents.
 	*/
 	ItemEntityVector* GetElementsByName(string elementName);
+
+    /** Return the ItemEntity with the specified name. If the Item contains multiple ItemEntities with the specified name, this method will indicate that an error has occurred. Note that this method should only be used with ItemEntities that can occur at most once in an Item.
+        @param itemEntityNameStr A string representing the name of the ItemEntity that you would like to retrieve.
+        @return Returns an ItemEntity with the specified name. If no matches are found an empty ItemEntity object is returned. If multiple ItemEntities are found an exception is thrown.  
+    */
+    ItemEntity* Item::GetElementByName(string itemEntityNameStr);
 
 	/** Parse the provided item element from an sc file into an Item object. */
 	void Parse(DOMElement* scItemElm);
