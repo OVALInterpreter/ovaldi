@@ -48,6 +48,10 @@ class OvalMessage  {
 public:
 	/** Create a complete OvalMessage object. */
 	OvalMessage(string value = "", OvalEnum::Level level = OvalEnum::LEVEL_INFO);
+    
+    /** OvalMessage copy constructor. */
+    OvalMessage(const OvalMessage& message);
+
 	~OvalMessage();
 
 	/** Write this message to the specified document. */
