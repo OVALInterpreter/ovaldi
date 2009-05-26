@@ -57,7 +57,12 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected bug in the EntityComparator::CompareBoolean() method such that when using the not equal operation, if the two boolean values are not equal, it will return true, and if the two boolean values are equal, it will return false.
 * Added support for the oval-def:time_difference function.  Allows for different time-date formats to be compared with each other and returns the difference between them in seconds.
 * Corrected bug in WindowsCommon::GetGroupsForUser(). Added code to ensure that user names are well formed before making api call. Thanks to Tim Harrison of National Institute of Standards and Technology for pointing out the defect.
-
+* Added support for the 'bitwise and' and 'bitwise or' operations in EntityComparator::CompareInteger().
+* Added the Common::StringToLongLong() method such that when strings are converted to integer values they are much less susceptible to integer overflow bugs as the long long datatype can hold a much larger range of integer values than the int datatype.
+* Added support for the win-def:interface_test.
+* Added support for the win-def:port_test.
+* Added support for the win-def:sharedresource_test.
+* Added support for the win-def:volume_test.
 
 ---------------------------------------
 ---        Version 5.5 build 4      ---
