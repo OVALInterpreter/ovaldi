@@ -42,8 +42,15 @@ ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, b
 	this->SetStatus(status);
 }
 
-ItemEntity::~ItemEntity() {
+ItemEntity::ItemEntity(const ItemEntity& itemEntity){
+    this->SetName(itemEntity.name);
+    this->SetValue(itemEntity.value);
+    this->SetDatatype(itemEntity.datatype);
+    this->SetIsObjectEntity(itemEntity.isObjectEntity);
+    this->SetStatus(itemEntity.scStatus);
+}
 
+ItemEntity::~ItemEntity() {
 }
 
 // ***************************************************************************************	//
