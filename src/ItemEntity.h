@@ -49,7 +49,12 @@ public:
 
 	/** Create a complete ItemEntity object. */
 	ItemEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
-	~ItemEntity();
+	
+    /** ItemEntity copy constructor. */
+    ItemEntity(const ItemEntity& itemEntity);
+
+    /** ItemEntity destructor. */
+    ~ItemEntity();
 
 	/** Return true if this ItemEntity is equal to the provided ItemEntity
 		Note: Status is not compared.
