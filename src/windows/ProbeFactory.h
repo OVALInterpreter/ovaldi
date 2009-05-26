@@ -67,7 +67,10 @@
 #include "WUAUpdateSearcherProbe.h"
 #include "UserSidProbe.h"
 #include "UserSid55Probe.h"
-
+#include "SharedResourceProbe.h"
+#include "VolumeProbe.h"
+#include "InterfaceProbe.h"
+#include "PortProbe.h"
 using namespace std;
 
 class AbsProbe;
