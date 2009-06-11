@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 
 	if (Common::GetVerifyXMLfile() == true) {
 
-		logMessage = " ** verifying the MD5 hash of'";
+		logMessage = " ** verifying the MD5 hash of '";
 		logMessage.append(Common::GetXMLfile());
 		logMessage.append("' file\n");
 
@@ -160,10 +160,10 @@ int main(int argc, char* argv[]) {
 		if (fpVerify == NULL) {
 
 			string errorMessage = "";
-			errorMessage.append("\nERROR: Unable to open the '");
+			errorMessage.append("Unable to open the '");
  			errorMessage.append(Common::GetXMLfile());
 			errorMessage.append("' file to verify it.  The program will terminate.\n");
-			cerr << errorMessage;
+			cerr << "\nERROR: " << errorMessage;
 			Log::Fatal(errorMessage);
 
 			exit(0);
@@ -188,11 +188,11 @@ int main(int argc, char* argv[]) {
 		{
 			string errorMessage = "";
 
-			errorMessage.append("\nERROR: The '");
+			errorMessage.append("The '");
 			errorMessage.append(Common::GetXMLfile());
-			errorMessage.append("' file is not valid.  The program will terminate.\n");
+			errorMessage.append("' file is not match the provided MD5 hash.  The program will terminate.\n");
 
-			cerr << errorMessage;
+			cerr << "ERROR: " << errorMessage;
 			Log::Fatal(errorMessage);
 
 			exit(0);
@@ -371,6 +371,11 @@ int main(int argc, char* argv[]) {
 		
 		//	run the analyzer
 		if(Common::GetLimitEvaluationToDefinitionIds()){
+
+            logMessage = " ** running the OVAL Definition analysis.\n";
+		    cout << logMessage;
+		    Log::UnalteredMessage(logMessage);
+
 			string idFile = Common::GetDefinitionIdsFile();
 
 			StringVector* ids = NULL;
@@ -381,7 +386,16 @@ int main(int argc, char* argv[]) {
 				ids = Common::ParseDefinitionIdsString();				
 			}				
 
-			analyzer->Run(ids);
+            if(ids->size() == 0) {
+                delete ids;
+                string errorMessage = "The list of definition ids to evaluate was empty. Verify that the appropriate command line arguments were used.";
+                cout << errorMessage << endl;
+                Log::Info(errorMessage);
+
+            } else {
+			    analyzer->Run(ids);
+                delete ids;
+            }
 			
 		} else {
 			analyzer->Run();
