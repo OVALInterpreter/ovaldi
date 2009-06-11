@@ -266,11 +266,11 @@ StringVector* Common::ParseDefinitionIdsFile() {
 		throw Exception("Error: An empty string was provided as the path to the definition ids file to parse.");
 	} else {
 		
+        definitionIds = new StringVector();
+
 		// parse the file to get the set of ids
 		DOMElement* definitionsElm = XmlCommon::FindElementNS(DocumentManager::GetEvaluationIdDocument(), "evalutation-definition-ids");
 		if(definitionsElm != NULL) {
-			
-			definitionIds = new StringVector();
 
 			DOMNodeList* definitionElms = definitionsElm->getChildNodes();
 			unsigned int i = 0;
