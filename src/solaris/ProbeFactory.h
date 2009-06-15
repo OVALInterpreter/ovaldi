@@ -45,6 +45,7 @@
 
 
 //	include the probe classes
+#include "FileProbe.h"
 #include "FileMd5Probe.h"
 #include "FileHashProbe.h"
 #include "FamilyProbe.h"
