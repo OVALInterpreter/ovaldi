@@ -152,17 +152,8 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 	Item *item = NULL;
 
-	string filePath = path;
-	if(fileName.compare("") != 0) {
-		if(path[path.length()-1] != '/')
-			filePath.append(1, '/');
+    string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
 
-		if(fileName[0] != '/') {
-			filePath.append(fileName);
-		} else {
-			filePath.append(fileName.substr(1, fileName.length()-2));
-		}
-	}
 
 	//////////////////////////////////////////////////////
 	/////////////////////  FileType  /////////////////////
