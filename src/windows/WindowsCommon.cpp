@@ -1881,7 +1881,7 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	bool enabled = true;
 
 	// need to split username from server name and domain.
-	size_t dash = userNameIn.find("\\");
+	size_t dash = userNameIn.rfind("\\");
 	string userName = "";
 	if(dash != string::npos ) {
 		userName = userNameIn.substr(dash+1, userNameIn.length());
