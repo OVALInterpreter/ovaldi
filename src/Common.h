@@ -190,6 +190,14 @@ class Common {
 		 */
 		static string	GetTimeStamp();
 
+        /**
+		 *	Build a valid filepath out of the input path and filename. 
+		 *	If the input filename is empty or null the path is returned.
+		 *	@param path non NULL string representing the path portion of the filepath
+		 *	@param filename string representing the filename
+        */
+        static string BuildFilePath(const string path, const string filename);
+
 		static char fileSeperator;
 		static string fileSeperatorStr;
 

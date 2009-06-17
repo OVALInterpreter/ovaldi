@@ -723,6 +723,28 @@ long long Common::StringToLongLong( char* numstr , char** endptr , int base ){
 
 }
 
+string Common::BuildFilePath(const string path, const string filename) {
+
+    if(path.compare("") != 0)
+        throw Exception("An empty path was specified when building a file path.");
+
+	string filePath = path;
+    if(filename.compare("") != 0) {
+        // Verify that the path that was passed into this function ends with a slash.  If
+        // it doesn't, then add one.
+        if (path[path.length()-1] != Common::fileSeperator)
+	        filePath.append(1, Common::fileSeperator);
+
+        if(filename[0] != Common::fileSeperator) {
+			filePath.append(filename);
+		} else {
+			filePath.append(filename.substr(1, filename.length()-2));
+		}
+    }
+
+    return filePath;
+}
+
 //****************************************************************************************//
 //							CommonException Class										  //	
 //****************************************************************************************//
