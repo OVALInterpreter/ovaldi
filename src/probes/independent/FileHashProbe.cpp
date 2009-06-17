@@ -102,15 +102,7 @@ ItemVector* FileHashProbe::CollectItems(Object* object) {
 			} else {
 
 				// build the path string
-				string filePath = fp->first;
-				if(filePath[filePath.length()-1] != Common::fileSeperator)
-					filePath.append(1, Common::fileSeperator);
-
-				if(fp->second[0] != Common::fileSeperator) {
-					filePath.append(fp->second);
-				} else {
-					filePath.append(fp->second.substr(1, fp->second.length()-2));
-				}
+                string filePath = Common::BuildFilePath((const string)fp->first, (const string)fp->second);
 
 				// create a new item
 				Item *item = NULL;

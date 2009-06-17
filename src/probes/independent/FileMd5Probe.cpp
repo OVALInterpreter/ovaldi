@@ -166,15 +166,8 @@ Item* FileMd5Probe::GetMd5(string path, string fileName) {
 
 	string errorMessage = "";
 	Item *item = NULL;
-	string filePath = path;
-	if(path[path.length()-1] != Common::fileSeperator)
-		filePath.append(1, Common::fileSeperator);
+	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
 
-	if(fileName[0] != Common::fileSeperator) {
-		filePath.append(fileName);
-	} else {
-		filePath.append(fileName.substr(1, fileName.length()-2));
-	}
 
 
 	try {
