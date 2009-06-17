@@ -138,19 +138,17 @@ public:
 
 	/** Get all trustee names on the system. 
 		This set consists of the following:
-		Get all local user trustee names
-		Get all local groups
-			- expand to get all members
-		Get all global groups
-			- expand to get all members
-		Get the trustee name of the system.
-		Resulting trustee names should be unique.
+        <ul>
+		<li>Get all local user trustee names</li>
+		<li>Get all local groups and expand to get all members</li>
+		<li>Get all global groups</li>
+        </ul>
 	*/
 	static StringSet* GetAllTrusteeNames();
 
 	/** Get all the Trustee SIDs on the system.
 		This method simply calls the WindowsCommon::GetAllTrusteeNames() method
-		and converts each returned name to a sid string. THe resulting set of sids is 
+		and converts each returned name to a sid string. The resulting set of sids is 
 		returned as a StringSet.		
 	*/
 	static StringSet* GetAllTrusteeSIDs();
@@ -218,7 +216,7 @@ public:
 	*/
 	static bool GetEnabledFlagForUser(string userNameIn);
 
-	/** Convert the FILETIME strucutre to an integer. */
+	/** Convert the FILETIME structure to an integer. */
 	static string ToString(FILETIME fTime);
 
 	/** Return a string representation of the DWORD */

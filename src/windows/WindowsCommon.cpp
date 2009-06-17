@@ -718,34 +718,8 @@ StringSet* WindowsCommon::GetAllTrusteeNames() {
 		StringSet* globalGroups = WindowsCommon::GetAllGlobalGroups();
 		for(iterator = globalGroups->begin(); iterator != globalGroups->end(); iterator++) {
 			allTrusteeNames->insert((*iterator));
-		
-			/**
-			4/23/2009 - don't try to expand global groups when gettign all users. This 
-			jumps off the systems and will expand all the domain.
-
-			// expand the group
-			try {
-				/**
-				Changing the resolvegroup flag to false should fix the recursion issue 
-				that occures when i try to get all users and still allow the code to do full recursion
-				when needed
-
-				WindowsCommon::GetGlobalGroupMembers((*iterator), allTrusteeNames, true, true);
-				
-				
-				WindowsCommon::GetGlobalGroupMembers((*iterator), allTrusteeNames, true, false);
-			} catch(Exception ex) {
-				Log::Debug(ex.GetErrorMessage());
-			}
-			*/
 		}
 		delete globalGroups;
-
-		// get the system's trustee name
-
-		// 4/23/2009 - don't want the system's trustee name -> doesn't process correctly anyway
-		// string systemName = WindowsCommon::LookUpLocalSystemName();
-		// allTrusteeNames->insert(systemName);	
 
 		Log::Debug("Completed getting all trustee names and found " + Common::ToString(WindowsCommon::allTrusteeNames->size()) + " names.");
 	}
@@ -1326,7 +1300,7 @@ void WindowsCommon::GetSidsFromPACL(PACL pacl, StringSet *sids) {
 					psid = (PSID)&((ACCESS_DENIED_ACE *)ace)->SidStart;
 				} else {
 					//TODO skip for now
-					Log::Debug("Unsupported AceType found when gettign sids from acl.");
+					Log::Debug("Unsupported AceType found when getting sids from acl.");
 				}
 
 				if(IsValidSid(psid)) {
@@ -1350,10 +1324,18 @@ void WindowsCommon::GetSidsFromPACL(PACL pacl, StringSet *sids) {
 				} else {
 					throw Exception("Invalid Sid found when getting SIDs from an ACL.");
 				}
-			}
+
+			} else {
+
+                string errMessage = WindowsCommon::GetErrorMessage(GetLastError());
+				throw Exception("Error while getting the ACE from the ACL. " + errMessage);
+            }
+
 		}
+
 	} else {
-		throw Exception("Could not retrieve ace information from acl");
+        string errMessage = WindowsCommon::GetErrorMessage(GetLastError());
+		throw Exception("Could not retrieve ace information from acl " + errMessage);
 	}
 }
 
