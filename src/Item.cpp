@@ -93,234 +93,87 @@ int Item::AssignId() {
 // ***************************************************************************************	//
 
 ItemEntityVector* Item::GetElements() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the elements field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return &this->elements;
 }
 
 void Item::SetElements(ItemEntityVector* elements) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the elements field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->elements = (*elements);
 }
 
 int Item::GetId() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the id field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->id;
 }
 
 void Item::SetId(int id) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the id field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->id = id;
 }
 
 void Item::SetIsWritten(bool isWritten) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the isWritten field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->isWritten = isWritten;
 }
 
 bool Item::GetIsWritten() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Get the isWritten field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->isWritten;
 }
 
 
 OvalMessageVector* Item::GetMessages() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Get the messages field's value
-	//
-	// -----------------------------------------------------------------------
 	return &this->messages;
 }
 void Item::SetMessages(OvalMessageVector* messages) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the messages field's value
-	//
-	// -----------------------------------------------------------------------
-	
-	this->messages = (*messages);
+    this->messages = (*messages);
 }
 
 string Item::GetName() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the name field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->name;
 }
 
 void Item::SetName(string name) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the name field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->name = name;
 }
 
 OvalEnum::SCStatus Item::GetStatus() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the status field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->status;
 }
 
 void Item::SetStatus(OvalEnum::SCStatus status) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the scStatus field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->status = status;
 }
 
 string Item::GetXmlns() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the xmlns field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->xmlns;
 }
 
 void Item::SetXmlns(string xmlns) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the xmlns field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->xmlns = xmlns;
 }
 
 string Item::GetXmlnsAlias() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the xmlnsAlias field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->xmlnsAlias;
 }
 
 void Item::SetXmlnsAlias(string xmlnsAlias) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the xmlnsAlias field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->xmlnsAlias = xmlnsAlias;
 }
 
 string Item::GetSchemaLocation() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the schemaLocation field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->schemaLocation;
 }
 
 void Item::SetSchemaLocation(string schemaLocation) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the schemaLocation field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->schemaLocation = schemaLocation;
 }
 
 void Item::AppendElement(ItemEntity* itemEntity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Add an element to the end of the elements vector
-	//
-	// -----------------------------------------------------------------------
-
 	this->elements.push_back(itemEntity);
 }
 
 void Item::AppendMessage(OvalMessage* msg) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Add an message to the end of the messages vector
-	//
-	// -----------------------------------------------------------------------
-
 	this->messages.push_back(msg);
 }
 
 bool Item::Equals(Item* item) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return true if this item is equal to the specified item.
-	//
-	//	NOTE: id and status are not compared
-	//	NOTE: Assumes that an object element will only ever occure once.
-	//	NOTE: Looks at only object elements
-	// -----------------------------------------------------------------------
+
 	bool isEqual = false;
 
 	try {
@@ -382,11 +235,6 @@ bool Item::Equals(Item* item) {
 }
 
 ItemEntityVector* Item::GetObjectElements() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return all object elements
-	// -----------------------------------------------------------------------
 
 	ItemEntityVector* objElms = new ItemEntityVector();
 

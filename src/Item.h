@@ -93,6 +93,14 @@ public:
 	/** Assign a new Item Id. */
 	static int AssignId();
 
+    /**
+        Return true if this item is equal to the specified item.
+        NOTE: id and status are not compared
+        NOTE: Assumes that an object element will only ever occure once.
+	    NOTE: Looks at only object elements
+        @param Item A pointer to the item to compare to.
+        @return true if this item is equal to the specified item.
+    */
 	bool Equals(Item* Item);
 
 	/** Return all elements with the specified name.
@@ -104,7 +112,7 @@ public:
         @param itemEntityNameStr A string representing the name of the ItemEntity that you would like to retrieve.
         @return Returns an ItemEntity with the specified name. If no matches are found an empty ItemEntity object is returned. If multiple ItemEntities are found an exception is thrown.  
     */
-    ItemEntity* Item::GetElementByName(string itemEntityNameStr);
+    ItemEntity* GetElementByName(string itemEntityNameStr);
 
 	/** Parse the provided item element from an sc file into an Item object. */
 	void Parse(DOMElement* scItemElm);
@@ -114,36 +122,58 @@ public:
 	*/
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemsElm);
 
+    /** Get the elements field's value. */
 	ItemEntityVector* GetElements();
+    /** Set the elements field's value. */
 	void SetElements(ItemEntityVector* elements);
 
+    /** Get the id field's value. */
 	int GetId();
+    /** Set the id field's value. */
 	void SetId(int id);
 
-	void SetIsWritten(bool isWritten);
+    /** Get the isWritten field's value. */
 	bool GetIsWritten();
-
+    /** Set the isWritten field's value. */
+	void SetIsWritten(bool isWritten);
+    
+    /** Get the messages field's value. */
 	OvalMessageVector* GetMessages();
+    /** Set the messages field's value. */
 	void SetMessages(OvalMessageVector* messages);
 
+    /** Get the name field's value. */
 	string GetName();
+    /** Set the name field's value. */
 	void SetName(string name);
 
+    /** Get the schemaLocation field's value. */
 	string GetSchemaLocation();
+    /** Set the schemaLocation field's value. */
 	void SetSchemaLocation(string schemaLocation);
 
+    /** Get the xmlns field's value. */
 	string GetXmlns();
+    /** Set the xmlns field's value. */
 	void SetXmlns(string xmlns);
 
+    /** Get the xmlnsAlias field's value. */
 	string GetXmlnsAlias();
+    /** Set the xmlnsAlias field's value. */
 	void SetXmlnsAlias(string xmlnsAlias);
 
+    /** Get the status field's value. */
 	OvalEnum::SCStatus GetStatus();
-	void SetStatus(OvalEnum::SCStatus status);
+	/** Set the status field's value. */
+    void SetStatus(OvalEnum::SCStatus status);
 
+    /** Add an element to the end of the elements for this item. */
 	void AppendElement(ItemEntity* itemEntity);
+
+    /** Add an message to the end of the messages for this item. */
 	void AppendMessage(OvalMessage* msg);
 
+    /** Return all object elements. */
 	ItemEntityVector* GetObjectElements();
 
 	/** Delete all items in the cache. */
@@ -170,7 +200,8 @@ private:
 	/** Cache the specified item. */
 	static void Cache(Item* item);
 
-	/** Search the cache of Items for the specifed Item. 
+	/** Search the cache of Items for the specifed Item.
+        @param id The id of the item to retrieve from the cache.
 		@return Returns the item with the specified id or NULL if not found.
 	*/
 	static Item* SearchCache(int id);
@@ -185,6 +216,7 @@ private:
 	string schemaLocation;
 	bool isWritten;
 
+    /** A static counter used to assign unique ids to each item. */
 	static int idCounter;
 
 	static ItemMap processedItemsMap;
