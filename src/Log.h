@@ -32,8 +32,12 @@
 #define LOG_H
 
 #include "Common.h"
+#include <fstream>
 #include <string>
 #include <stdio.h>
+#include <iostream>
+
+
 
 using namespace std;
 
@@ -145,7 +149,7 @@ private:
 	static int level;
 	static bool toScreen;
 	static bool initialized;
-	static FILE* fp;
+    static ofstream logFile;
 
 };
 

@@ -34,17 +34,17 @@
 int Log::level = Log::DEBUG;
 bool Log::toScreen = true;
 bool Log::initialized = false;
-string Log::logFilename = "oval.log";
-FILE* Log::fp = NULL;
+string Log::logFilename = "ovaldi.log";
+ofstream Log::logFile;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 void Log::Shutdown() {
 
-	if(fp != NULL) {
-		fclose(fp);
-	}
+    if(Log::logFile.is_open())
+        Log::logFile.close();
+
 	Log::initialized = false;
 }
 
@@ -62,11 +62,11 @@ void Log::Init(int level, string logFile, bool toScreen) {
 		Log::toScreen = toScreen;
 
 		// Reset the log file
-		Log::fp = NULL;
-		Log::fp = fopen(logFilename.c_str(), "w+"); 
-		if (Log::fp == NULL) {
-			throw Exception("Error initializing log system. Unable to clear log file.");
-		}
+        Log::logFile.open(logFilename.c_str(), ios_base::trunc & ios_base::out & ios_base::app);
+        if(!Log::logFile.is_open() ||Log::logFile.fail()) {
+            Log::logFile.close();
+            throw Exception("Error initializing log system. Unable to clear log file.");
+        }
 
 		Log::initialized = true;
 	}
@@ -78,7 +78,7 @@ void Log::UnalteredMessage(string msg) {
 
 	bool tmp = Log::toScreen;
 	Log::toScreen = false;
-	fputs(msg.c_str(), Log::fp);
+    Log::logFile << msg << endl;
 	Log::toScreen = tmp;
 }
 
@@ -169,8 +169,8 @@ bool Log::WriteToScreen() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 void Log::WriteLog(string logMessageIn, bool fileOnly) {
 
-	string tmp = logMessageIn + "\n";
-	fputs(tmp.c_str(), fp);
+    Log::logFile << logMessageIn << endl;
+    Log::logFile.flush();
 
 	if(Log::toScreen && !fileOnly) {
 		cout << logMessageIn << endl;
