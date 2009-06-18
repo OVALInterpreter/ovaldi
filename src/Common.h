@@ -235,6 +235,11 @@ class Common {
 */
 class CommonException : public Exception {
 	public:
+        /**
+            Set the error message and then set the severity to ERROR_FATAL. This is
+            done with the explicit call to the Exception class constructor that
+            takes a single string param.
+        */
 		CommonException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
 		~CommonException();
 };

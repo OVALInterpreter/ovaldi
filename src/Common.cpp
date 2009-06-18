@@ -725,7 +725,7 @@ long long Common::StringToLongLong( char* numstr , char** endptr , int base ){
 
 string Common::BuildFilePath(const string path, const string filename) {
 
-    if(path.compare("") != 0)
+    if(path.compare("") == 0)
         throw Exception("An empty path was specified when building a file path.");
 
 	string filePath = path;
@@ -749,23 +749,9 @@ string Common::BuildFilePath(const string path, const string filename) {
 //							CommonException Class										  //	
 //****************************************************************************************//
 CommonException::CommonException(string errMsgIn, int severity, Exception* ex) : Exception(errMsgIn, severity, ex) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the error message and then set the severity to ERROR_FATAL. This is 
-	//	done with the explicit call to the Exception class constructor that 
-	//	takes a single string param.
-	//
-	// -----------------------------------------------------------------------
 
 }
 
 CommonException::~CommonException() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 
 }
