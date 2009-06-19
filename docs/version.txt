@@ -39,7 +39,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for unix-def:runlevel_test.
 * Corrected handling of not applicable, error, and not evaluated flags on collected objects when the test has a existence check of EXISTENCE_ANY_EXIST.
 * Added NULL check to the VariableFactory to address NULL pointer exception that occured when processing variables that are referenced, but do not exist in the oval-definition document. Thanks to Lumension Security (http://www.lumension.com).
-* Added new logic that removes spaces in WQL filed names that would normally cause the WMI probe to error out. Thanks to Lumension Security (http://www.lumension.com).
+* Added new logic that removes spaces in WQL field names that would normally cause the WMI probe to error out. Thanks to Lumension Security (http://www.lumension.com).
 * Improved FileEffectiveRightsProbe to better handle collecting rights on all types of files. Added new logic utilizing the Authz API when it is supported. If not supported the code uses the old logic to use GetEffectiveRightsFromAcl(). This has all been moved to WindowsCommon. Thanks to Lumension Security (http://www.lumension.com).
 * Added common functionality to WindowsCommon for getting groups for a user and getting the enabled flag for a user. Thanks to Lumension Security (http://www.lumension.com).
 * Cleaned up comments for doxygen in several places.
@@ -50,7 +50,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected EntityComparator::ParseVersionStr() method that was misusing strtok. This lead to unpredictable results. In some cases the method succeeded correctly, in other cases it would fail unpredictably all depending on what was in memory at run time. Thanks to Michael Wiegand for finding and fixing the issue.
 * Added -l command line flag to allow the logging level to be set on the command line.
 * Removed UniqueStringVector and replaced all uses with StringSet.
-* Added support for win-def:user_sid__test. Thanks to Lumension Security (http://www.lumension.com).
+* Added support for win-def:user_sid_test. Thanks to Lumension Security (http://www.lumension.com).
 * Added support for win-def:user_sid_55_test. Thanks to Lumension Security (http://www.lumension.com).
 * Added check to make sure the os is Vista or later before trying to collect auditeventpolicysubcategories_objects.
 * Corrected bug in the EntityComparator::ParseVersionStr() method such that it will be up-to-date with the language specification (version 5.5) that allows for mixed delimiter characters in a version value. Also, additional error checking was added. 
@@ -63,6 +63,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:port_test.
 * Added support for the win-def:sharedresource_test.
 * Added support for the win-def:volume_test.
+* Added support for the oval-def:arithmetic function.
+* Corrected bug in processing of input defintion ids for limited definition evaluation. If a user provided an empty list o0f definition ids the interpreter woudl crash due to a null pointer exception.
+* Changed logging system to flush all log output as it occurs. Previously logging output was held in memory until it was automatically flushed. This ensures that the log file is actually written to as each write operation occurs.
 
 ---------------------------------------
 ---        Version 5.5 build 4      ---
