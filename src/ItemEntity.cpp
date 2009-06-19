@@ -109,19 +109,13 @@ void ItemEntity::SetStatus(OvalEnum::SCStatus scStatus) {
 bool ItemEntity::Equals(ItemEntity* entity) {
 
 	bool isEqual = false;
-	try {
-	
-		if(this->GetDatatype() == entity->GetDatatype()) {
-			if(this->GetName().compare(entity->GetName()) == 0) {
-				if(this->GetValue().compare(entity->GetValue()) == 0) {
-					isEqual = true;	
-				}
+
+	if(this->GetDatatype() == entity->GetDatatype()) {
+		if(this->GetName().compare(entity->GetName()) == 0) {
+			if(this->GetValue().compare(entity->GetValue()) == 0) {
+				isEqual = true;	
 			}
 		}
-	} catch (Exception ex) {
-		throw Exception("Error: An error occured with comparing two ItemEntities", ERROR_FATAL, &ex);
-	} catch(...) {
-		throw Exception("Error: An error occured with comparing two ItemEntities", ERROR_FATAL);
 	}
 
 	return isEqual;
