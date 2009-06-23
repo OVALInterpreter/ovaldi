@@ -62,8 +62,9 @@ void Log::Init(int level, string logFile, bool toScreen) {
 		Log::toScreen = toScreen;
 
 		// Reset the log file
-        Log::logFile.open(logFilename.c_str(), ios_base::trunc & ios_base::out & ios_base::app);
-        if(!Log::logFile.is_open() ||Log::logFile.fail()) {
+        Log::logFile.open(logFilename.c_str());
+        Log::logFile.setf(ios_base::trunc | ios_base::out | ios_base::app);
+        if(!Log::logFile.is_open() || Log::logFile.fail() || Log::logFile.bad()) {
             Log::logFile.close();
             throw Exception("Error initializing log system. Unable to clear log file.");
         }
