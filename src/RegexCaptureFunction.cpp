@@ -55,12 +55,42 @@ void RegexCaptureFunction::SetPattern(string pattern) {
 
 ComponentValue* RegexCaptureFunction::ComputeValue() {
 
-		// create and populate a result ComponentValue
-	ComponentValue* result = new ComponentValue();
+    AbsComponentVector *components = this->GetComponents();
 
-    throw Exception("Error: unsupported function");
+    //These functions only get 1 component (enforced by validation).
+    //  So assume there is only 1.
+    AbsComponent *comp = (*components)[0];
+    string regex = this->GetPattern();
+    ComponentValue *value = comp->ComputeValue();
 
-	return result;	
+    // create and populate a result ComponentValue
+    ComponentValue* result = new ComponentValue();
+    result->SetFlag(value->GetFlag());
+    result->AppendMessages(value->GetMessages());
+    if (result->GetFlag() == OvalEnum::FLAG_ERROR)
+    {
+        delete value;
+        return result;
+    }
+
+    StringVector matches;
+    StringVector *valueValues = value->GetValues();
+    this->reUtil.Reset();
+    for(StringVector::iterator valueIter = valueValues->begin(); valueIter != valueValues->end(); ++valueIter) {
+        matches.clear();
+        bool matchSucceeded = this->reUtil.GetMatchingSubstrings(regex.c_str(), valueIter->c_str(), &matches);
+        if (matchSucceeded) {
+            if (matches.empty())
+                result->AppendValue("");
+            else
+                result->AppendValue(matches[0]); // add the first capture, ignore any others.
+        }
+        else
+            result->AppendValue("");
+    }
+
+    delete value;
+    return result;	
 }
 
 void RegexCaptureFunction::Parse(DOMElement* componentElm) {

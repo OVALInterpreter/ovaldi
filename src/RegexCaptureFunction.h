@@ -33,6 +33,7 @@
 
 #include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
+#include "REGEX.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
@@ -41,7 +42,7 @@ using namespace std;
 	This class represents a RegexCaptureFunction component in a local_variable in the oval definition schema.
 
     The regex_capture function accepts one string component input and returns the first 
-    match in each component value, as matched against the regex pattern specified in the
+    capture in each component value, as matched against the regex pattern specified in the
     'pattern' attribute.
 
 */
@@ -68,6 +69,7 @@ public:
 
 private:
 	string pattern;
+    REGEX reUtil;
 };
 
 #endif
