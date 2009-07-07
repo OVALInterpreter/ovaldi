@@ -50,13 +50,18 @@ int main(int argc, char* argv[]) {
 #endif
 ///////////////////////		DEBUG	///////////////////////////////////////
 
-
+	try {
 // init the log system - set the log level here
 #ifdef _DEBUG
-	Log::Init(Log::DEBUG, "ovaldi.log", false);
+		Log::Init(Log::DEBUG, "ovaldi.log", false);
 #else
-	Log::Init(Log::INFO, "ovaldi.log", false);
+		Log::Init(Log::INFO, "ovaldi.log", false);
 #endif
+	} catch (Exception ex) {
+		cout << ex.GetErrorMessage() << endl;
+		return 1;
+	}
+
 
 	//////////////////////////////////////////////////////
 	///////////////////  Print Header  ///////////////////
