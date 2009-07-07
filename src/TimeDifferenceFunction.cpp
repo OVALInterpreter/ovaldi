@@ -674,7 +674,7 @@ time_t TimeDifferenceFunction::WinFiletimeValueToSeconds(string dateTimeValue){
 	struct tm * buildTime = localtime(&calculatedSeconds);
 
 	// Retrieve the number of seconds since the epoch for this date-time value 
-	calculatedSeconds = (time_t)((TimeDifferenceFunction::HexToDecimal(dateTimeValue)-116444736000000000)/10000000);
+	calculatedSeconds = (time_t)((TimeDifferenceFunction::HexToDecimal(dateTimeValue)-116444736000000000LL)/10000000);
 	
 	buildTime = localtime(&calculatedSeconds);
 
