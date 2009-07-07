@@ -364,6 +364,21 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 	}
 }
 
+string Item::UniqueString() {
+
+	string uniqueString;
+    uniqueString.append(this->GetXmlnsAlias());
+    uniqueString.append(this->GetName());
+
+
+    ItemEntityVector* myObjElms = this->GetObjectElements();
+	for(ItemEntityVector::iterator it = myObjElms->begin(); it != myObjElms->end(); it++) {
+		uniqueString.append((*it)->UniqueString());
+	}
+
+    return uniqueString;
+}
+
 Item* Item::GetItemById(string itemId) {
 
 	Item* item = NULL;

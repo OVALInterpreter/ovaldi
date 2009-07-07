@@ -56,16 +56,34 @@ class Item;
 typedef vector < Item*, allocator<Item*> > ItemVector;
 
 /**	
-	A pair for storing  item ids and Item objects together. 
+	A pair for storing item ids and Item objects together. 
 	Stores only pointers to the objects. 
 */
-typedef pair <int, Item* > ItemPair;
+typedef pair < int, Item* > ItemPair;
 
 /**	
 	A map for storing ItemPairs. 
+	Stores only pointers to the Item objects. 
+*/
+typedef map < int, Item* > ItemMap;
+
+/**	
+	A pair for storing item strings and Item objects together. 
 	Stores only pointers to the objects. 
 */
-typedef map <int, Item* > ItemMap;
+typedef pair < string, Item* > StringItemPair;
+
+/**	
+	A map for storing Items keyed off of each Item's string value.
+	Stores only pointers to the objects. 
+*/
+typedef map < string, Item* > StringKeyedItemMap;
+
+/**	
+	A pair of an StringKeyedItemMap::iterator and a bool.
+*/
+typedef pair < StringKeyedItemMap::iterator, bool > ItemCacheResult;
+
 
 /**
 	This class represents an Item in a system characteristics document.
@@ -121,6 +139,16 @@ public:
 		Make sure the item has not already been written to the sc file.
 	*/
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemsElm);
+
+    /** Create a unique string representation of the Item.
+        A unique string can be created for an Item by concatenating the results of each of the following:
+        <ul>
+            <li>getting the item xmlns alias</li>
+            <li>getting the item name</li>
+            <li>converting each object entity to a string</li>
+        </ul>
+    */
+    string UniqueString();
 
     /** Get the elements field's value. */
 	ItemEntityVector* GetElements();

@@ -67,6 +67,15 @@ public:
 	*/
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm);
 
+    /** Create a unique string representation of the ItemEntity.
+        A unique string can be created for an ItemEntity by concatenating the results of each of the following:
+        <ul>
+            <li>getting the ItemEntity name</li>
+            <li>getting the ItemEntity value</li>
+        </ul>
+    */
+    string UniqueString();
+
 	/** Parse the provided entity element */
 	void Parse(DOMElement* entityElm);
 

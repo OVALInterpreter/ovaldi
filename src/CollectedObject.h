@@ -91,6 +91,9 @@ public:
 
 	static CollectedObject* GetCollectedObject(string objectId);
 
+    /** Write all collected objects in the map of collected objects.
+		After writing delete the object to free memory.
+    */
 	static void WriteCollectedObjects();
 
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* collectObjectsElm);

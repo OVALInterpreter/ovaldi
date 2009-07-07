@@ -138,13 +138,6 @@ CollectedObject* CollectedObject::CreateNotSupported(AbsObject* absObject) {
 }
 
 void CollectedObject::WriteCollectedObjects() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Write all collected objects in the vector of collected objects.
-	//	After writing delete the object to free memory.
-	//
-	// -----------------------------------------------------------------------
 
 	CollectedObjectMap::iterator iterator;
 	for(iterator = CollectedObject::collectedObjectsMap.begin(); iterator != CollectedObject::collectedObjectsMap.end(); iterator++) {
@@ -527,7 +520,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 		}
 	}
 
-	// Add each reference - ensure taht each refernec is only written once.
+	// Add each reference - ensure that each reference is only written once.
 	if(this->GetReferences()->size() > 0) {
 		IntVector referenceIds;
 		ItemVector::iterator referenceIterator;
@@ -540,7 +533,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 				// add the item to the sc file
 				reference->Write(scFile, AbsDataCollector::Instance()->GetSCSystemDataElm());
 
-				// add the reference tot he collected obj element
+				// add the reference to the collected obj element
 				string refElementName = "reference";
 				DOMElement *newReferenceElm = scFile->createElement(XMLString::transcode(refElementName.c_str()));
 				newCollectedObjectElem->appendChild(newReferenceElm);

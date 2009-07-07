@@ -144,6 +144,10 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 	}
 }
 
+string ItemEntity::UniqueString() {
+	return this->GetName() + this->GetValue();
+}
+
 void ItemEntity::Parse(DOMElement* itemEntityElm) {
 	
 	this->SetName(XmlCommon::GetElementName(itemEntityElm));
