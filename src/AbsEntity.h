@@ -47,9 +47,7 @@ XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
 /** 
-	This class represents an AbsEntity in the oval definition and system characterisitcs schemas.
-	Since AbsEntities differ slightly between the definition and system characteristics schemas this class only
-	encapsulates the commonalities. 
+	This class aligns roughly with the EntityBaseType as defined in the oval-definition-schema. 
 */
 class AbsEntity {
 public:
