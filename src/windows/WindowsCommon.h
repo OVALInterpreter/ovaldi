@@ -279,6 +279,7 @@ private:
 		@param members A pointer to a set of members. All members that are found for the specified group will be added to this set.
 		@param includeSubGroups When true include subgroups in the set of groups that are reported.
 		@param resolveSubGroup When true recurse into any subgroups and expand them too.
+        @return True if the specified group exists.
 	*/
 	static bool GetGlobalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
 

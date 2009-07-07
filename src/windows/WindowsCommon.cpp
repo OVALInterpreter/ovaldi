@@ -186,6 +186,10 @@ string WindowsCommon::GetErrorMessage(DWORD dwLastError) {
     if(hModule != NULL)
         FreeLibrary(hModule);
 
+    // make sure there is no trailing new line
+    while(errMsg.at(errMsg.length()-1) == '\n' || errMsg.at(errMsg.length()-1) == '\r')
+        errMsg = errMsg.substr(0, errMsg.length()-1);
+
 	return errMsg;
 }
 
@@ -1125,7 +1129,7 @@ string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
 	domain_name = (LPTSTR)realloc(domain_name, domain_name_size * sizeof(TCHAR));
 	if (domain_name == NULL) {
 		free(trustee_name);
-		throw Exception("Could not allocate space. Cannot get domain_name for.");
+		throw Exception("Could not allocate space. Cannot get domain_name for sid.");
 	}
 	
 	// Call LookupAccountSid again to retrieve the name of the account and the
