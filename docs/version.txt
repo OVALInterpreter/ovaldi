@@ -66,6 +66,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the oval-def:arithmetic function.
 * Corrected bug in processing of input defintion ids for limited definition evaluation. If a user provided an empty list o0f definition ids the interpreter woudl crash due to a null pointer exception.
 * Changed logging system to flush all log output as it occurs. Previously logging output was held in memory until it was automatically flushed. This ensures that the log file is actually written to as each write operation occurs.
+* Reimplemented item cache in the AbsProbe class to support collecting larger data sets.
 
 ---------------------------------------
 ---        Version 5.5 build 4      ---
