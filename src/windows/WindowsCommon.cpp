@@ -1343,6 +1343,50 @@ void WindowsCommon::GetSidsFromPACL(PACL pacl, StringSet *sids) {
 	}
 }
 
+void WindowsCommon::GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames) {
+
+	ACL_SIZE_INFORMATION size_info;
+
+	if (GetAclInformation(pacl, &size_info, sizeof(size_info), AclSizeInformation)) {
+
+		for(unsigned int aceIdx = 0; aceIdx < size_info.AceCount; aceIdx++) {
+			void *ace = NULL;
+
+			if(GetAce(pacl, aceIdx, &ace)) {
+
+				ACE_HEADER *header = (ACE_HEADER *)ace;
+				PSID psid = NULL;
+
+				if(header->AceType == ACCESS_ALLOWED_ACE_TYPE) {
+					psid = (PSID)&((ACCESS_ALLOWED_ACE *)ace)->SidStart;
+				} else if(header->AceType == ACCESS_DENIED_ACE_TYPE) {
+					psid = (PSID)&((ACCESS_DENIED_ACE *)ace)->SidStart;
+				} else {
+					//TODO skip for now
+					Log::Debug("Unsupported AceType found when getting sids from acl.");
+				}
+
+				if(IsValidSid(psid)) {
+
+                    trusteeNames->insert(WindowsCommon::GetFormattedTrusteeName(psid));
+
+				} else {
+					throw Exception("Invalid Sid found when getting Trustee Names from an ACL.");
+				}
+
+			} else {
+
+                string errMessage = WindowsCommon::GetErrorMessage(GetLastError());
+				throw Exception("Error while getting the ACE from the ACL. " + errMessage);
+            }
+		}
+
+	} else {
+        string errMessage = WindowsCommon::GetErrorMessage(GetLastError());
+		throw Exception("Could not retrieve ace information from acl " + errMessage);
+	}
+}
+
 bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr) {
 
 	PSID psid = NULL;

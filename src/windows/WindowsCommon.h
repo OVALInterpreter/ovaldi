@@ -170,12 +170,19 @@ public:
 	*/
 	static PSID GetSIDForTrusteeSID(string trusteeSID);
 
-	/** Retrieve the set of SIDS as string from an ACL.
+	/** Retrieve the set of SIDS as strings from an ACL.
 		
-		@param pacl the ACL to  extract SID string from.
+		@param pacl the ACL to extract SID string from.
 		@param sids is a pointer to a set of strings that will be populated based on the input PACL.
 	*/
 	static void GetSidsFromPACL(PACL pacl, StringSet *sids);
+
+    /** Retrieve the set of trustee names as strings from an ACL.
+		
+		@param pacl the ACL to  extract trustee names from.
+		@param sids is a pointer to a set of strings that will be populated based on the input PACL.
+	*/
+    static void GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames);
 
 	/** Get the domain and sid string for the specifeid trustee name. Return true if the trustee is a group. */
 	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
