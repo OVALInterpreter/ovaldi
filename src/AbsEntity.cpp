@@ -205,8 +205,7 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 			// check the flag on the variable
 			if(this->GetVarRef()->GetFlag() == OvalEnum::FLAG_COMPLETE) { 
 				VariableValueVector* values = this->GetVarRef()->GetValues();
-				VariableValueVector::iterator iterator;
-				for(iterator = values->begin(); iterator != values->end(); iterator++) {
+				for(VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++) {
 					OvalEnum::ResultEnumeration tmp = OvalEnum::RESULT_ERROR;
 					if(this->GetDatatype() == OvalEnum::DATATYPE_BINARY) {
 						tmp = EntityComparator::CompareBinary(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
