@@ -66,21 +66,23 @@ private:
 	/** Get the effective rights for a trustee SID for the specified file. */
 	Item* GetEffectiveRights(string path, string fileName, string trusteeSID);
 
-	/** Identify all trustee SIDs for the specified trusteeSID ObjectEntity. */ 
-	StringSet* GetTrusteeSIDs(ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior);
+    /**
+        Return a set of all the SIDs that match the specified trusteeSID entity relative to the specified file.
+        @param fp The path and filename of the desired file as a StringPair
+        @param trusteeSID The truseeSID ObjectEntity that will be used to create the set of matching trustee SIDs
+        @param resolveGroupBehavior boolean flag used to indicate whether or not groups should be resolved
+        @param includeGroupBehavior boolean flag used to indicate whether or not groups shoudl be included in the resulting set of truseee SIDs
+    */
+    StringSet* GetTrusteeSIDsForFile(StringPair* fp, ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior);
 
-	/** Search all trustee SIDs on the the specifed file and return the set of SIDs the match the specified criteria. */
+	/** Search the input vector of all trustee SIDs and return the set of SIDs the match the specified criteria. */
 	void GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex = true);
 
-	/** Return true if the specfied trustee SID exists in the set of trustee SIDs.
-		
+	/** Return true if the specfied trustee SID exists in the set of trustee SIDs.		
 		@param trusteeSID The SID to look for.
 		@param trusteeSIDs The set of SIDs to search.
 	*/
 	bool TrusteeSIDExists(string trusteeSID, StringSet* trusteeSIDs);
-
-
-	Item* GetEffectiveRightsForSID(string path, string fileName, PSID psid);
 
 	/** Return true if the calling probe should report that the trustee SID does not exist.
 		If a trustee SID's operator is set to OPERATOR_EQUALS and the trustee SID does not exist
