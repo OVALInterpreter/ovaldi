@@ -328,7 +328,7 @@ bool WindowsCommon::IsGroupSID(string SID) {
 	try {
 		
         if(ConvertStringSidToSid(SID.c_str(), &pSID) == 0) {
-			throw Exception("Error encountered converting group string SID");
+			throw Exception("Error encountered converting group SID string to a SID");
 		}
 
 		if(!IsValidSid(pSID)) {
@@ -338,7 +338,7 @@ bool WindowsCommon::IsGroupSID(string SID) {
 		if(LookupAccountSid(NULL, pSID, nameBuffer, &nameBufferSize, domainNameBuffer, &domainNameBufferSize, &sidType) != 0)  {
 			isAccountGroup = IsAccountGroup(sidType, string(nameBuffer));
 		} else {
-			throw Exception("Error looking up SID.  Error: " + GetLastError());
+            throw Exception("Error looking up SID. " + WindowsCommon::GetErrorMessage(GetLastError()));
 		}
 
 	} catch(...) {
@@ -1462,7 +1462,7 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 
 		if(pSid == NULL) {
 			if(ConvertStringSidToSid(sidStr.c_str(), &pSid) == 0) {
-				throw Exception("Error encountered converting group string SID in WindowsCommon::ExpandGroupBySID");
+				throw Exception("Error encountered converting group SID string to a SID.");
 			}
 		}
 
