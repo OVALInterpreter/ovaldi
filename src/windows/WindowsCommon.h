@@ -252,6 +252,12 @@ public:
 	**/
 	static bool IsXPOrLater();
 
+    /** Convert a std:string into a null-terminated string of Unicode characters (16-bit).
+     *  @param str A std:string that want to convert to a null-terminated string of Unicode characters (16-bit).
+     *  @return A null-terminated string of Unicode characters (16-bit).
+     */
+	static LPWSTR StringToWide(string s);
+
 private:
 	
 	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
@@ -300,9 +306,6 @@ private:
 
 	/** Look up the local system name. */
 	static string LookUpLocalSystemName();
-
-	/** Convert string to wide */
-	static LPWSTR StringToWide(string s);
 
 	static StringSet* allTrusteeNames;
 	static StringSet* allTrusteeSIDs;
