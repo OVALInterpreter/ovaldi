@@ -390,7 +390,7 @@ Item* Item::GetItemById(string itemId) {
 	if(item == NULL) {
 
 		DOMElement* systemDataElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "system_data");
-		DOMElement* itemElm = XmlCommon::FindElementByAttribute(systemDataElm, "id", itemId);
+		DOMElement* itemElm = XmlCommon::FindElementByAttribute(systemDataElm, "id", itemId); // TODO - is there a faster search method to use???
 
 		if(itemElm == NULL) {
 			throw Exception("Unable to find specified item in system-characteristics document. Item id: " + itemId);
