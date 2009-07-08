@@ -134,7 +134,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 
 			StringPair* fp = (*iterator);
 
-			if(fp->second.compare("") == 0) {
+			// if there is no file name and the fileName obj entity is not set to nil
+			if(fp->second.compare("") == 0 && !fileName->GetNil()) {
 
 				Item* item = NULL;
 
@@ -167,7 +168,7 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 					//
 					// The file exists so lets get the trustees to then examine effective rights
 					//
-					StringSet* trusteeNames = this->GetTrusteeNames(fp->first, fp->second, trusteeName, resolveGroupBehavior, includeGroupBehavior);
+					StringSet* trusteeNames = this->GetTrusteeNamesForFile(fp, trusteeName, resolveGroupBehavior, includeGroupBehavior);
 					if(!trusteeNames->empty()) {
 						StringSet::iterator iterator;
 						for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
@@ -252,86 +253,151 @@ Item* FileEffectiveRightsProbe::CreateItem() {
 	return item;
 }
 
-StringSet* FileEffectiveRightsProbe::GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior) {
+StringSet* FileEffectiveRightsProbe::GetTrusteeNamesForFile(StringPair* fp, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior) {
 
-	StringSet* trusteeNames = new StringSet();
+	PACL pdacl = NULL;
+    PSID ownerSid;
+    PSID primaryGroupSid;
+	PSECURITY_DESCRIPTOR pSD = NULL;
+
+    StringSet* allTrusteeNames = new StringSet();
+    StringSet* workingTrusteeNames = new StringSet();
+    StringSet* resultingTrusteeNames = new StringSet();
+
+    string filePath;
 	
-	// load the set of all Trustee names
-	StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+    try {
 
-	Log::Debug("Found " + Common::ToString(allTrusteeNames->size()) + " trustee names when searching for all names.");
+        // start by getting the sids from the dacl, owner, and primary group off the file's security descriptor
 
-	// does this trusteeName use variables?
-	if(trusteeName->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
+		// build the path
+        filePath = Common::BuildFilePath((const string)fp->first, (const string)fp->second);
+
+        string baseErrMsg = "Error unable to get trustees for file: " + filePath;
+
+		DWORD res = GetNamedSecurityInfo(const_cast<char*>(filePath.c_str()), // object name
+							SE_FILE_OBJECT,						// object type
+							DACL_SECURITY_INFORMATION |			// information type
+							GROUP_SECURITY_INFORMATION | 
+							OWNER_SECURITY_INFORMATION, 			
+							&ownerSid,							// owner SID
+							&primaryGroupSid,   				// primary group SID
+							&pdacl,								// DACL
+							NULL,								// SACL
+							&pSD);								// Security Descriptor
+
+		if (res != ERROR_SUCCESS) {
+		    if (res == ERROR_FILE_NOT_FOUND) {
+			    // should never get here. 
+			    // before calling this function the file should already have been checked for existence.
+			    throw Exception( baseErrMsg + " Unable locate the specified file."); 
+		    } else {
+			    throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
+		    }
+	    }
+
+        // get sids from the dacl
+		WindowsCommon::GetTrusteeNamesFromPACL(pdacl, allTrusteeNames);
+
+        // insert the owner and primary group sids
+        allTrusteeNames->insert(WindowsCommon::GetFormattedTrusteeName(ownerSid));
+        allTrusteeNames->insert(WindowsCommon::GetFormattedTrusteeName(primaryGroupSid));
+
+        Log::Debug("Found " + Common::ToString(allTrusteeNames->size()) + " trustee names when searching for all trustee names on the security descriptor of: " + filePath);
+
+		// does this trusteeName use variables?
+		if(trusteeName->GetVarRef() == NULL) {
 			
-			// check that the trustee name exists
-			if(this->TrusteeNameExists(trusteeName->GetValue(), allTrusteeNames)) {
-				trusteeNames->insert(trusteeName->GetValue());
+			// proceed based on operation
+			if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
+				
+				// check that the trustee Name exists
+				if(this->TrusteeNameExists(trusteeName->GetValue(), allTrusteeNames)) {
+					workingTrusteeNames->insert(trusteeName->GetValue());
+				}
+
+			} else if(trusteeName->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
+				this->GetMatchingTrusteeNames(trusteeName->GetValue(), allTrusteeNames, workingTrusteeNames, false);
+			} else if(trusteeName->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
+				this->GetMatchingTrusteeNames(trusteeName->GetValue(), allTrusteeNames, workingTrusteeNames, true);
 			}
-
-		} else if(trusteeName->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			this->GetMatchingTrusteeNames(trusteeName->GetValue(), allTrusteeNames, trusteeNames, false);
-		} else if(trusteeName->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->GetMatchingTrusteeNames(trusteeName->GetValue(), allTrusteeNames, trusteeNames, true);
-		}		
-
-	} else {
-	
-		// loop through all trustee names on the system
-		// only keep those that match operation and value and var check
-		StringSet::iterator it;
-		ItemEntity* tmp = this->CreateItemEntity(trusteeName);
-		for(it = allTrusteeNames->begin(); it != allTrusteeNames->end(); it++) {
-			tmp->SetValue((*it));
-			if(trusteeName->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				trusteeNames->insert((*it));
+		} else {
+		
+			// loop through all trustee Names
+			// only keep those that match operation and value and var check
+			StringSet::iterator it;
+			ItemEntity* tmp = this->CreateItemEntity(trusteeName);
+			for(it = allTrusteeNames->begin(); it != allTrusteeNames->end(); it++) {
+				tmp->SetValue((*it));
+				if(trusteeName->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
+					workingTrusteeNames->insert((*it));
+				}
 			}
 		}
-	}
 
-	// using common code to get these do not delete they are cached.
-	//delete allTrusteeNames;
+		delete allTrusteeNames;
+        allTrusteeNames = NULL;
 
-	// apply the behaviors
-	StringSet* trusteeNamesSet = new StringSet();
-	if(!trusteeNames->empty()) {
-		
-		StringSet::iterator iterator;
-		StringSet::iterator it;
-		string domainStr = "";
-		string sidStr = "";
-		bool isGroup;
-
-		for(it = trusteeNames->begin(); it != trusteeNames->end(); it++) {
+		// apply the behaviors
+		for(StringSet::iterator it = workingTrusteeNames->begin(); it != workingTrusteeNames->end(); it++) {
 			// is this a group
-			isGroup = WindowsCommon::LookUpTrusteeName(&(*it), &sidStr, &domainStr);
+            bool isGroup = WindowsCommon::IsGroup((*it));
 
 			if(isGroup && resolveGroupBehavior) {
 
 				if(includeGroupBehavior) {
-					trusteeNamesSet->insert((*it));
+					resultingTrusteeNames->insert((*it));
 				}
 
 				// get the group members and add them to the set
 				StringSet* groupMembers = new StringSet();
-				WindowsCommon::ExpandGroup((*it), groupMembers, includeGroupBehavior, resolveGroupBehavior);
-				for(iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
-					trusteeNamesSet->insert((*iterator));
+                WindowsCommon::ExpandGroup((*it), groupMembers, includeGroupBehavior, resolveGroupBehavior);
+				for(StringSet::iterator iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
+					resultingTrusteeNames->insert((*iterator));
 				}
 				delete groupMembers;
 
 			} else {
-				trusteeNamesSet->insert((*it));
+				resultingTrusteeNames->insert((*it));
 			}
 		}
+   
+	} catch(...) {
+
+		if(pSD != NULL) {
+			LocalFree(pSD);
+		}
+
+        if(allTrusteeNames != NULL) {
+			delete allTrusteeNames;
+            allTrusteeNames = NULL;
+		}
+
+        if(workingTrusteeNames != NULL) {
+			delete workingTrusteeNames;
+            workingTrusteeNames = NULL;
+		}
+
+		if(resultingTrusteeNames != NULL) {
+			delete resultingTrusteeNames;
+            resultingTrusteeNames = NULL;
+		}
+
+        throw;
+    }
+
+	if(pSD != NULL) {
+		LocalFree(pSD);
 	}
 
-	Log::Debug("Found " + Common::ToString(trusteeNamesSet->size()) + " matching names after applying behaviors");
+    if(workingTrusteeNames != NULL) {
+		delete workingTrusteeNames;
+        workingTrusteeNames = NULL;
+	}
 
-	return trusteeNamesSet;
+    Log::Debug("Found " + Common::ToString(resultingTrusteeNames->size()) + " matching trustee names after applying behaviors on the security descriptor of: " + filePath);
+
+	return resultingTrusteeNames;
 }
 
 void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern, StringSet* allTrusteeNames, StringSet* trusteeNames, bool isRegex) {
@@ -369,17 +435,9 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 	PACCESS_MASK pAccessRights = NULL;
 	
 	// build the path
-	string filePath = path;
-	if(fileName.compare("") != 0) {
-		// Verify that the path that was passed into this function ends with a slash.  If
-		// it doesn't, then add one.
-		if (path[path.length()-1] != Common::fileSeperator)
-			filePath.append(1, Common::fileSeperator);
+	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
 
-		filePath.append(fileName);
-	}
 	string baseErrMsg = "Error unable to get effective rights for trustee: " + trusteeName + " from dacl for file: " + filePath;
-
 
 	try {
 
@@ -427,14 +485,14 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 		// need to seperatly determine if the generic bit should be set.
 		// the access mask that is returned never has the generic bits set. 
 		// Those bits can be determined by rolling up the object specific access bits
-		if((*pAccessRights) & FILE_GENERIC_READ)
-			mask[31] = '1';
-		if((*pAccessRights) & FILE_GENERIC_WRITE)
-			mask[30] = '1';
-		if((*pAccessRights) & FILE_GENERIC_EXECUTE)
-			mask[29] = '1';
-		if((*pAccessRights) & FILE_ALL_ACCESS)
-			mask[28] = '1';
+		//if((*pAccessRights) & FILE_GENERIC_READ)
+		//	mask[31] = '1';
+		//if((*pAccessRights) & FILE_GENERIC_WRITE)
+		//	mask[30] = '1';
+		//if((*pAccessRights) & FILE_GENERIC_EXECUTE)
+		//	mask[29] = '1';
+		//if((*pAccessRights) & FILE_ALL_ACCESS)
+		//	mask[28] = '1';
 
 		// read values in the access_mask
 		item->AppendElement(new ItemEntity("standard_delete", Common::ToString(mask[16]), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
@@ -483,7 +541,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 		LocalFree(pAccessRights);
 		pAccessRights = NULL;
 	}
-	
+
 	if(pSid != NULL) {
 		LocalFree(pSid);
 		pSid = NULL;

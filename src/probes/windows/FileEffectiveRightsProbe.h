@@ -44,7 +44,7 @@ using namespace std;
 
 
 /**
-	This class is responsible for collecting file information for windows fileeffictiverights_objects.
+	This class is responsible for collecting file information for windows fileeffectiverights_objects.
 */
 class FileEffectiveRightsProbe : public AbsProbe {
 
@@ -67,8 +67,14 @@ private:
 	/** Get the effective rights for a named trustee for the specified file. */
 	Item* GetEffectiveRights(string path, string fileName, string trusteeName);
 
-	/** Identify all trustee names for the specified trusteeName ObjectEntity. */ 
-	StringSet* GetTrusteeNames(string path, string fileName, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior);
+    /**
+        Return a set of all the trustee names that match the specified trusteeSID entity relative to the specified file.
+        @param fp The path and filename of the desired file as a StringPair
+        @param trusteeSID The truseeSID ObjectEntity that will be used to create the set of matching trustee SIDs
+        @param resolveGroupBehavior boolean flag used to indicate whether or not groups should be resolved
+        @param includeGroupBehavior boolean flag used to indicate whether or not groups shoudl be included in the resulting set of truseee SIDs
+    */
+    StringSet* GetTrusteeNamesForFile(StringPair* fp, ObjectEntity* trusteeName,  bool resolveGroupBehavior, bool includeGroupBehavior);
 
 	/** 
 		Select all Trustees that match the specified trusteeNamePattern. 
@@ -83,14 +89,6 @@ private:
 		@param trusteeNames The set for names to search.
 	*/
 	bool TrusteeNameExists(string trusteeName, StringSet* trusteeNames);
-
-	/** Get the account name, domain, and sid string for the specified SID. */
-	//void GetTrusteeInfoForSid(PSID psid, string* trusteeName, string* trusteeDomain, string* trusteeSid);
-
-	// 8/28/2006
-	//PSID GetSIDForTrusteeName(string trusteeName);
-
-	Item* GetEffectiveRightsForSID(string path, string fileName, PSID psid);
 
 	/** Return true if the calling probe should report that the trustee name does not exist.
 		If a trustee name's operator is set to OPERATOR_EQUALS and the trustee name does not exist
