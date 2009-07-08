@@ -311,8 +311,6 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDsForFile(StringPair* fp, Obj
 			if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS) {
 				
 				// check that the trustee SID exists
-                // TODO - why is this check of existence needed if i only add items where equality is used
-                // 7/7/2009 - remove this check
 				if(this->TrusteeSIDExists(trusteeSID->GetValue(), allTrusteeSIDs)) {
 					workingTrusteeSIDs->insert(trusteeSID->GetValue());
 				}
@@ -324,13 +322,6 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDsForFile(StringPair* fp, Obj
 			}
 		} else {
 		
-            // TODO - 7/7/2009 - this sees wrong. why is the code not 
-            //   - looping through the variable values 
-            //   - based on operation inserting into the working trustee sids vector
-            //     - operation = equals - just insert
-            //     - operation = not equals - call GetMatchingTrusteeSIDs
-            //     - operation = pattern match - call GetMatchingTrusteeSIDs
-
 			// loop through all trustee SIDs on the system
 			// only keep those that match operation and value and var check
 			StringSet::iterator it;
