@@ -139,15 +139,6 @@ private:
 		@return A set of unique items that have all been cached.
 	*/
 	ItemVector* CacheAllItems(ItemVector* items);
-
-	/**
-		Cache a single Item.
-		Check the cache of items for an existing duplicate item. If a duplicate is found return
-		it and delete the new Item otherwise cache the new item and return it.
-		@param item The new Item to be cached.
-		@return The ruesulting cahced Item.
-	*/
-	Item* CacheItem(Item* item);
     
 	/** 
 		The list of all ItemEntities created by the probe. 
@@ -155,11 +146,8 @@ private:
 	*/
 	ItemEntityVector createdItemEntities;
 
-	/** The cache of all Items created by a probe. */
-	ItemVector itemCache;
-
 	/** The cache of all Items created by all probes. */
-	static ItemVector globalItemCache;
+    static StringKeyedItemMap globalItemCache;
 };
 
 

@@ -30,57 +30,24 @@
 
 #include "AbsProbe.h"
 
-ItemVector AbsProbe::globalItemCache;
+StringKeyedItemMap AbsProbe::globalItemCache;
+
 //****************************************************************************************//
 //								AbsProbe Class											  //	
 //****************************************************************************************//
 
 AbsProbe::AbsProbe() {
-
 	myMatcher = new REGEX();
 }
 
 AbsProbe::~AbsProbe() {
 
 	delete myMatcher;
-
-	this->itemCache.clear();
 }
 
 //****************************************************************************************//
 //								Protected Memebers										  //	
 //****************************************************************************************//
-Item* AbsProbe::CacheItem(Item* newItem) {
-
-	Item* tmp = NULL;
-	// Loop through cache
-	ItemVector::iterator itemIterator;
-	for(itemIterator = this->itemCache.begin(); itemIterator != this->itemCache.end(); itemIterator++) {
-		
-		// Compare the new item to the cached item if they are the same
-		// break and return the cached item.
-		if(newItem->Equals((*itemIterator))) {
-			tmp = newItem;
-			newItem = (*itemIterator);
-			break;
-		} 
-	}
-
-	if(tmp != NULL) {
-		delete tmp;
-		tmp = NULL;
-	} else {
-		// to get here the newItem did not match the cached item
-		// so cache it
-		if(newItem->GetId() == 0) {
-			newItem->SetId(Item::AssignId());
-		}
-		this->itemCache.push_back(newItem);
-		AbsProbe::globalItemCache.push_back(newItem);
-	}
-	return newItem;
-}   
-
 ItemVector* AbsProbe::Run(Object* object) {
 
 	// create a vector of items that match the specified object
@@ -93,28 +60,47 @@ ItemVector* AbsProbe::Run(Object* object) {
 
 ItemVector* AbsProbe::CacheAllItems(ItemVector* items) {
 
-	ItemVector* cachedItems = new ItemVector();
-	while(items->size() > 0) {
-		Item* item = (*items)[items->size()-1];
-	  	items->pop_back();
+    ItemVector* cachedItems = new ItemVector();
+    
+	for(ItemVector::iterator itemIt = items->begin(); itemIt != items->end(); itemIt++) {
+        Item* cacheCandidateItem = (*itemIt);
 
-		Item* cachedItem = this->CacheItem(item);
-		cachedItems->push_back(cachedItem);
+        ItemCacheResult ret = AbsProbe::globalItemCache.insert(StringItemPair(cacheCandidateItem->UniqueString(), cacheCandidateItem));
+
+        // if a new elment was inserted ret.second will be true
+        if (ret.second == true) {
+
+            // need to id the item
+            if(cacheCandidateItem->GetId() == 0) {
+		    	cacheCandidateItem->SetId(Item::AssignId());
+		    }
+        } else {
+            // new element was not inserted so delete the current candidate item
+            delete cacheCandidateItem;
+            cacheCandidateItem = NULL;
+        }
+
+        // add the corresponding item in the global cache to the output of chacedItems
+        StringKeyedItemMap::iterator cachedItemIt = ret.first;
+        Item* retItem = (*cachedItemIt).second;
+        cachedItems->push_back(retItem);            
 	}
+
+    items->clear();
 	delete items;
 	items = NULL;
+
 	return cachedItems;
 }
 
 void AbsProbe::ClearGlobalCache() {
 
-	Item* item = NULL;
-	while(AbsProbe::globalItemCache.size() != 0) {
-	  	item = AbsProbe::globalItemCache[AbsProbe::globalItemCache.size()-1];
-	  	AbsProbe::globalItemCache.pop_back();
-	  	delete item;
+    for(StringKeyedItemMap::iterator it = AbsProbe::globalItemCache.begin(); it != AbsProbe::globalItemCache.end(); it++) {
+        Item* item = (*it).second;
+        delete item;
 	  	item = NULL;
-	}
+    }
+    AbsProbe::globalItemCache.clear();
 }
 
 ItemEntity* AbsProbe::CreateItemEntity(ObjectEntity* obj) {
