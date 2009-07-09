@@ -79,12 +79,6 @@ class SharedResourceProbe : public AbsProbe {
          */
         string SharedResourceProbe::GetSharedResourceType ( DWORD sharedType );
 
-        /** Converts a wide-character string of Unicode characters into a string of ASCII characters.
-         *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
-         *  @return A string of ASCII characters.
-         */
-        string SharedResourceProbe::UnicodeToAsciiString ( wchar_t* unicodeCharStr );
-
         /** Delete all of the Items in the resources ItemVector.
          *  @return Void.
          */
