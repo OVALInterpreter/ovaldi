@@ -2282,3 +2282,25 @@ bool WindowsCommon::IsXPOrLater() {
 		}
 	}
 }
+
+string WindowsCommon::UnicodeToAsciiString ( wchar_t* unicodeCharStr ) {
+    string asciiStr;
+    size_t length = wcslen ( unicodeCharStr ) + 1;
+    char* buffer = ( char* ) malloc ( sizeof ( char ) * length );
+
+    if ( _snprintf ( buffer , length - 1 , "%S" , unicodeCharStr ) < 0 ) {
+        asciiStr = "";
+
+    } else {
+        buffer[length-1] = '\0';
+        asciiStr = buffer;
+    }
+
+    if ( buffer != NULL ) {
+        free ( buffer );
+        buffer = NULL;
+    }
+
+    return asciiStr;
+}
+
