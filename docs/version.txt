@@ -34,6 +34,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 ---        Version 5.5 build ??     ---
 ---------------------------------------
+* Added support for the win-def:activedirectory_test.
+* Removed the UnicodeToAsciiString() method from the SharedResourceProbe class and moved it to the WindowsCommon class.
 * Corrected case insensitive comparisons in the EntityComparator. 
 * Corrected long standing conflict with msxml.h when building on windows systems
 * Added support for unix-def:runlevel_test.
