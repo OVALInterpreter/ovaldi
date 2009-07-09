@@ -47,7 +47,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("registry_object") == 0) {
 		probe = RegistryProbe::Instance();
 	} else if(objectName.compare("activedirectory_object") == 0) {
-//		probe = ActiveDirectoryProbe::Instance();
+		probe = ActiveDirectoryProbe::Instance();
 	} else if(objectName.compare("metabase_object") == 0) {
 //		probe = MetabaseProbe::Instance();
 	} else if(objectName.compare("wmi_object") == 0) {
