@@ -40,7 +40,7 @@
 
 
 //	include the probe classes
-//#include "ActiveDirectoryProbe.h"
+#include "ActiveDirectoryProbe.h"
 #include "FileProbe.h"
 #include "FileMd5Probe.h"
 #include "FileHashProbe.h"
