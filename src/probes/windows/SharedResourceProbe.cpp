@@ -208,8 +208,8 @@ void SharedResourceProbe::GetAllSharedResources() {
                 accessPerm = true;
             }
 
-            item->AppendElement ( new ItemEntity ( "netname" , SharedResourceProbe::UnicodeToAsciiString ( bufPtr->shi2_netname ) , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "local_path" , SharedResourceProbe::UnicodeToAsciiString ( bufPtr->shi2_path ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "netname" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_netname ) , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "local_path" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_path ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "max_uses" , Common::ToString ( bufPtr->shi2_max_uses ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "current_uses" , Common::ToString ( bufPtr->shi2_current_uses ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
             ( ( typeStr = SharedResourceProbe::GetSharedResourceType ( bufPtr->shi2_type ) ).compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR ) ) : item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
@@ -322,26 +322,6 @@ string SharedResourceProbe::GetSharedResourceType ( DWORD sharedType ) {
     return typeStr;
 }
 
-string SharedResourceProbe::UnicodeToAsciiString ( wchar_t* unicodeCharStr ) {
-    string asciiStr;
-    size_t length = wcslen ( unicodeCharStr ) + 1;
-    char* buffer = ( char* ) malloc ( sizeof ( char ) * length );
-
-    if ( _snprintf ( buffer , length - 1 , "%S" , unicodeCharStr ) < 0 ) {
-        asciiStr = "";
-
-    } else {
-        buffer[length-1] = '\0';
-        asciiStr = buffer;
-    }
-
-    if ( buffer != NULL ) {
-        free ( buffer );
-        buffer = NULL;
-    }
-
-    return asciiStr;
-}
 
 void SharedResourceProbe::DeleteSharedResources() {
     if ( SharedResourceProbe::resources != NULL ) {
