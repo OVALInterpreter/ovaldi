@@ -416,6 +416,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\ActiveDirectoryProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\AuditEventPolicyProbe.cpp"
 					>
 				</File>
@@ -1020,6 +1024,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\ActiveDirectoryProbe.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\AuditEventPolicyProbe.h"
 					>
 				</File>
@@ -1314,6 +1322,14 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\..\..\Program Files\Microsoft SDKs\Windows\v6.0A\Lib\ActiveDS.lib"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\..\Program Files\Microsoft SDKs\Windows\v6.0A\Lib\ADSIid.lib"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
