@@ -258,6 +258,13 @@ public:
      */
 	static LPWSTR StringToWide(string s);
 
+	/** Converts a wide-character string of Unicode characters into a string of ASCII characters.
+         *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
+         *  @return A string of ASCII characters.
+         */
+	static string UnicodeToAsciiString ( wchar_t* unicodeCharStr );
+
+
 private:
 	
 	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
