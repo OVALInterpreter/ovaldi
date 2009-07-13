@@ -171,7 +171,7 @@ Item* UserSidProbe::GetUserSidInfo(string userSid) {
 
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("user", userSid, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
 		// get the enabled flag
 		try {
