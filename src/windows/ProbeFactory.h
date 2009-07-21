@@ -71,6 +71,7 @@
 #include "VolumeProbe.h"
 #include "InterfaceProbe.h"
 #include "PortProbe.h"
+#include "ProcessProbe.h"
 using namespace std;
 
 class AbsProbe;
