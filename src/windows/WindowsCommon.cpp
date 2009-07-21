@@ -92,8 +92,8 @@ bool WindowsCommon::EnablePrivilege(string privilegeIn) {
 	HANDLE hAccessToken = NULL;
 
 	hProcess = GetCurrentProcess();
-
-	if(!OpenProcessToken(hProcess,									// handle to the process
+	
+	if(OpenProcessToken(hProcess,									// handle to the process
 						(TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES),	// requested access types 
 						&hAccessToken) == FALSE)					// new access token 
 	{
