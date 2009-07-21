@@ -83,13 +83,6 @@ private:
 	*/
 	void GetMatchingTrusteeNames(string trusteeNamePattern, StringSet* allTrusteeNames, StringSet* trusteeNames, bool isRegex = true);
 
-	/** Return ture if the specfied trustee name exists in the set of trustee names. 
-		
-		@param trusteeName The name to look for.
-		@param trusteeNames The set for names to search.
-	*/
-	bool TrusteeNameExists(string trusteeName, StringSet* trusteeNames);
-
 	/** Return true if the calling probe should report that the trustee name does not exist.
 		If a trustee name's operator is set to OPERATOR_EQUALS and the trustee name does not exist
 		at the specified path the caller should report that the trustee name was not found. When 

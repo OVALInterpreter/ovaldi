@@ -311,7 +311,7 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDsForFile(StringPair* fp, Obj
 			if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS) {
 				
 				// check that the trustee SID exists
-				if(this->TrusteeSIDExists(trusteeSID->GetValue(), allTrusteeSIDs)) {
+				if(WindowsCommon::TrusteeSIDExists(trusteeSID->GetValue())) {
 					workingTrusteeSIDs->insert(trusteeSID->GetValue());
 				}
 
@@ -322,7 +322,22 @@ StringSet* FileEffectiveRights53Probe::GetTrusteeSIDsForFile(StringPair* fp, Obj
 			}
 		} else {
 		
-			// loop through all trustee SIDs on the system
+			
+
+            if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS) {
+                // in the case of equals simply loop through all the 
+			    // variable values and add them to the set of all sids
+			    // if they exist on the system
+			    VariableValueVector::iterator iterator;
+			    for(iterator = trusteeSID->GetVarRef()->GetValues()->begin(); iterator != trusteeSID->GetVarRef()->GetValues()->end(); iterator++) {
+    				
+				    if(WindowsCommon::TrusteeSIDExists((*iterator)->GetValue())) {
+					    allTrusteeSIDs->insert((*iterator)->GetValue());
+				    }
+			    }
+            } 
+
+            // loop through all trustee SIDs on the Security Descriptor
 			// only keep those that match operation and value and var check
 			StringSet::iterator it;
 			ItemEntity* tmp = this->CreateItemEntity(trusteeSID);
@@ -409,27 +424,8 @@ void FileEffectiveRights53Probe::GetMatchingTrusteeSIDs(string trusteeSIDPattern
 	}
 }
 
-bool FileEffectiveRights53Probe::TrusteeSIDExists(string trusteeSID, StringSet* trusteeSIDs) {
-
-	bool exists = false;
-
-	StringSet::iterator iterator;
-	for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
-		if(trusteeSID.compare((*iterator)) == 0) {
-			exists = true;
-		}
-	}			
-
-	return exists;
-}
-
 Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileName, string trusteeSID) {
 	
-	//  Note: The original logic present in FileEffectiveRights53Probe  
-	//        utilized the API GetEffectiveRightsFromAcl.  This API was very 
-	//        restrictive in terms of what users could call it and on what files.
-	//        The Authz API set does not suffer from this restriction.
-
 	Log::Debug("Collecting effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
 
 	Item* item = NULL;
@@ -486,6 +482,8 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 			else
 				mask[j] = '0';
 		}
+
+        // TODO - what is the correct way to get the generic bits???
 
 		// need to seperatly determine if the generic bit should be set.
 		// the access mask that is returned never has the generic bits set. 
@@ -562,14 +560,14 @@ bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trus
 	if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeSID->GetNil()) {		
 		
 		if(trusteeSID->GetVarRef() == NULL) {
-			if(!this->TrusteeSIDExists(trusteeSID->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {		
+			if(!WindowsCommon::TrusteeSIDExists(trusteeSID->GetValue())) {		
 				trusteeSIDs->insert(trusteeSID->GetValue());
 				result = true;
 			}
 		} else {
 
 			for(VariableValueVector::iterator iterator = trusteeSID->GetVarRef()->GetValues()->begin(); iterator != trusteeSID->GetVarRef()->GetValues()->end(); iterator++) {
-				if(this->TrusteeSIDExists((*iterator)->GetValue(), WindowsCommon::GetAllTrusteeSIDs())) {
+				if(!WindowsCommon::TrusteeSIDExists((*iterator)->GetValue())) {
 					trusteeSIDs->insert((*iterator)->GetValue());
 					result = true;
 				}

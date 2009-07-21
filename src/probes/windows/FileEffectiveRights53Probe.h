@@ -78,21 +78,16 @@ private:
 	/** Search the input vector of all trustee SIDs and return the set of SIDs the match the specified criteria. */
 	void GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex = true);
 
-	/** Return true if the specfied trustee SID exists in the set of trustee SIDs.		
-		@param trusteeSID The SID to look for.
-		@param trusteeSIDs The set of SIDs to search.
-	*/
-	bool TrusteeSIDExists(string trusteeSID, StringSet* trusteeSIDs);
-
 	/** Return true if the calling probe should report that the trustee SID does not exist.
 		If a trustee SID's operator is set to OPERATOR_EQUALS and the trustee SID does not exist
-		the caller should report that the trustee SID was not found. When getting the value of the
-		trustee SID to check existence need to look for either a simple element value or a variable
-		with one or more values. If the return value is true the trusteeSIDs StringVector* paremeter
-		contains the set of trustee SIDs to report as not existing. Otherwise the the trusteeSIDs 
-		paramter is NULL. The caller is responsible for making sure that any memory allocated for the
-		trusteeSIDs parameter is cleaned up. The trusteeSIDs paramter should be input as NULL when the
-		function is called.
+		the caller should report that the trustee SID was not found. 
+
+        When getting the value of the trustee SID to check existence need to look for either a 
+        simple element value or a variable with one or more values. If the return value is true
+        the trusteeSIDs StringVector* paremeter contains the set of trustee SIDs to report as not
+        existing. Otherwise the the trusteeSIDs paramter is NULL. The caller is responsible for 
+        making sure that any memory allocated for the trusteeSIDs parameter is cleaned up. The 
+        trusteeSIDs paramter should be input as NULL when the function is called.
 	*/
 	bool ReportTrusteeSIDDoesNotExist(ObjectEntity* trusteeSID, StringSet* trusteeSIDs);
 };

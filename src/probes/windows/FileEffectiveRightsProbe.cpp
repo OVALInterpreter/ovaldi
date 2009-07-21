@@ -312,7 +312,7 @@ StringSet* FileEffectiveRightsProbe::GetTrusteeNamesForFile(StringPair* fp, Obje
 			if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
 				
 				// check that the trustee Name exists
-				if(this->TrusteeNameExists(trusteeName->GetValue(), allTrusteeNames)) {
+                if(WindowsCommon::TrusteeNameExists(trusteeName->GetValue())) {
 					workingTrusteeNames->insert(trusteeName->GetValue());
 				}
 
@@ -322,6 +322,19 @@ StringSet* FileEffectiveRightsProbe::GetTrusteeNamesForFile(StringPair* fp, Obje
 				this->GetMatchingTrusteeNames(trusteeName->GetValue(), allTrusteeNames, workingTrusteeNames, true);
 			}
 		} else {
+
+            if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
+                // in the case of equals simply loop through all the 
+			    // variable values and add them to the set of all names
+			    // if they exist on the system
+			    VariableValueVector::iterator iterator;
+			    for(iterator = trusteeName->GetVarRef()->GetValues()->begin(); iterator != trusteeName->GetVarRef()->GetValues()->end(); iterator++) {
+    				
+				    if(WindowsCommon::TrusteeNameExists((*iterator)->GetValue())) {
+					    allTrusteeNames->insert((*iterator)->GetValue());
+				    }
+			    }
+            }
 		
 			// loop through all trustee Names
 			// only keep those that match operation and value and var check
@@ -409,26 +422,7 @@ void FileEffectiveRightsProbe::GetMatchingTrusteeNames(string trusteeNamePattern
 	}
 }
 
-bool FileEffectiveRightsProbe::TrusteeNameExists(string trusteeName, StringSet* trusteeNames) {
-
-	bool exists = false;
-
-	StringSet::iterator iterator;
-	for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
-		if(trusteeName.compare((*iterator)) == 0) {
-			exists = true;
-		}
-	}			
-
-	return exists;
-}
-
 Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName, string trusteeName) {
-	
-	//  Note: The original logic present in FileEffectiveRightsProbe  
-	//        utilized the API GetEffectiveRightsFromAcl.  This API was very 
-	//        restrictive in terms of what users could call it and on what files.
-	//        The Authz API set does not suffer from this restriction.
 	
 	Item* item = NULL;
 	PSID pSid = NULL;
@@ -482,6 +476,7 @@ Item* FileEffectiveRightsProbe::GetEffectiveRights(string path, string fileName,
 				mask[j] = '0';
 		}
 
+        // TODO - what is the correct way to get the generic bits???
 		// need to seperatly determine if the generic bit should be set.
 		// the access mask that is returned never has the generic bits set. 
 		// Those bits can be determined by rolling up the object specific access bits
@@ -557,7 +552,7 @@ bool FileEffectiveRightsProbe::ReportTrusteeNameDoesNotExist(ObjectEntity *trust
 	if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeName->GetNil()) {		
 		
 		if(trusteeName->GetVarRef() == NULL) {
-			if(!this->TrusteeNameExists(trusteeName->GetValue(), WindowsCommon::GetAllTrusteeNames())) {
+            if(!WindowsCommon::TrusteeNameExists(trusteeName->GetValue())) {
 				trusteeNames->insert(trusteeName->GetValue());
 				result = true;
 			}
@@ -565,7 +560,7 @@ bool FileEffectiveRightsProbe::ReportTrusteeNameDoesNotExist(ObjectEntity *trust
 
 			VariableValueVector::iterator iterator;
 			for(iterator = trusteeName->GetVarRef()->GetValues()->begin(); iterator != trusteeName->GetVarRef()->GetValues()->end(); iterator++) {
-				if(this->TrusteeNameExists((*iterator)->GetValue(), WindowsCommon::GetAllTrusteeNames())) {
+                if(!WindowsCommon::TrusteeNameExists((*iterator)->GetValue())) {
 					trusteeNames->insert((*iterator)->GetValue());
 					result = true;
 				}
