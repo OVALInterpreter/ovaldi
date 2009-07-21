@@ -282,7 +282,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 			memset(macStr, 0, 128);
 			if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
 			  //printf("HW Address: %2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x\n", u[0], u[1], u[2], u[3], u[4], u[5]);
-			  sprintf(macStr, "%2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x", u[0], u[1], u[2], u[3], u[4], u[5]); 
+			  sprintf(macStr, "%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", u[0], u[1], u[2], u[3], u[4], u[5]); 
 			  tmpIfData->macAddress = macStr;
 			}
 			free(macStr);
