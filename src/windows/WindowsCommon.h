@@ -194,7 +194,7 @@ public:
 	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);
 
 	/** Retrieves list of sids for all local users */
-	static StringSet* WindowsCommon::GetAllLocalUserSids();
+	static StringSet* GetAllLocalUserSids();
 
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
