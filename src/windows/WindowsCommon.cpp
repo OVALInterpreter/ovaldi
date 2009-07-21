@@ -1506,7 +1506,7 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 
 		if(pSid == NULL) {
 			if(ConvertStringSidToSid(sidStr.c_str(), &pSid) == 0) {
-				throw Exception("Error encountered converting group SID string to a SID.");
+				throw Exception("Error encountered converting SID string to a SID.");
 			}
 		}
 
@@ -1694,7 +1694,7 @@ bool WindowsCommon::TrusteeSIDExists(const string trusteeSIDIn) {
 
 		if(pSid == NULL) {
 			if(ConvertStringSidToSid(trusteeSIDIn.c_str(), &pSid) == 0) {
-				throw Exception("Error encountered converting group SID string to a SID.");
+				throw Exception("Error encountered converting SID string to a SID.");
 			}
 		}
 
@@ -2204,11 +2204,6 @@ void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, 
 	//  - Finally retrieve the rights mask throuogh a call to AuthzAccessCheck
 	//    http://msdn.microsoft.com/en-us/library/aa375788(VS.85).aspx
 	//
-	//  Note: The original logic present in FileEffectiveRights53Probe and 
-	//        FileEffectiveRightsProbe utilized the API GetEffectiveRightsFromAcl.
-	//        This API was very restrictive in terms of what users could call
-	//        it and on what files.  The Authz API set does not suffer from
-	//        this restriction.
 	// -----------------------------------------------------------------------
 
 	Log::Debug("Calling the authz api to get effective rights");
