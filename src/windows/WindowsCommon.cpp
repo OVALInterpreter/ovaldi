@@ -1613,6 +1613,124 @@ string WindowsCommon::ToString(PSID pSID) {
 	return sidStr;
 }
 
+
+bool WindowsCommon::TrusteeNameExists(const string trusteeNameIn) {
+
+    bool trusteeNameExists = false;
+
+    PSID psid = NULL;
+	LPTSTR domain = NULL;
+	DWORD sidSize = 128;
+	DWORD domainSize = 128;
+	SID_NAME_USE sid_type;
+	BOOL retVal = FALSE;
+
+	do {
+		// Initial memory allocations for the SID and DOMAIN.
+		psid = (PSID)realloc(psid, sidSize);
+		if (psid == NULL) {
+			retVal = FALSE;
+			break;
+		}
+
+		domain = (LPTSTR)realloc(domain, domainSize);
+		if (domain == NULL) {
+			free(psid);
+			retVal = FALSE;
+			break;
+		}
+
+		// Call LookupAccountName to get the SID.
+		retVal = LookupAccountName(NULL,										// system name
+								   const_cast<char*>(trusteeNameIn.c_str()),	// account name
+								   psid,										// security identifier
+								   &sidSize,									// size of security identifier
+								   domain,										// domain name
+								   &domainSize,									// size of domain name
+								   &sid_type);									// SID-type indicator
+
+	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+   	LocalFree(psid);
+    free(domain);
+
+
+	if(retVal == TRUE) {
+	    trusteeNameExists = true;
+	} else {
+
+        DWORD error = GetLastError();
+        if(error == ERROR_NONE_MAPPED || error == ERROR_INVALID_HANDLE) {
+            trusteeNameExists = false;
+        } else if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
+			throw Exception("Unable to locate account: " + trusteeNameIn + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
+		} else {
+            string err = WindowsCommon::GetErrorMessage(error) ;
+			throw Exception("Error failed to look up account: " + trusteeNameIn + ". " + WindowsCommon::GetErrorMessage(error));
+		}
+	}
+
+    return trusteeNameExists;
+}
+
+bool WindowsCommon::TrusteeSIDExists(const string trusteeSIDIn) {
+
+    bool sidExists = false;
+
+    PSID pSid = NULL;
+	LPTSTR pAccountName = NULL;
+	DWORD accountNameSize = 128;
+	DWORD domainSize = 128;
+	SID_NAME_USE sid_type;
+	BOOL retVal = FALSE;
+
+	do {
+		// Initial memory allocations for the ACCOUNT and DOMAIN.
+		pAccountName = (LPTSTR)realloc(pAccountName, accountNameSize);
+		if (pAccountName == NULL) {
+			retVal = FALSE;
+			break;
+		}
+
+		if(pSid == NULL) {
+			if(ConvertStringSidToSid(trusteeSIDIn.c_str(), &pSid) == 0) {
+				throw Exception("Error encountered converting group SID string to a SID.");
+			}
+		}
+
+		// Call LookupAccountSid to get the account name and domain.
+		retVal = LookupAccountSid(NULL,							// system name
+								  pSid,							// security identifier
+								  pAccountName,					// account name
+								  &accountNameSize,				// security identifier
+								  NULL,						// domain name
+								  &domainSize,					// size of domain name
+								  &sid_type);					// SID-type indicator
+
+	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+	LocalFree(pSid);
+    if(pAccountName != NULL){
+		free(pAccountName);
+	}
+
+	if(retVal == TRUE) {
+        sidExists = true;
+	} else {
+			
+		DWORD error = GetLastError();
+        if(error == ERROR_NONE_MAPPED) {
+            sidExists = false;
+        } else if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
+			throw Exception("Unable to locate account: " + trusteeSIDIn + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
+		} else {
+			throw Exception("Error failed to look up account: " + trusteeSIDIn + ". " + WindowsCommon::GetErrorMessage(error));
+		}
+	}
+
+    return sidExists;
+}
+
 bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 
 	bool userExists = false;

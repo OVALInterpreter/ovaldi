@@ -259,11 +259,20 @@ public:
 	static LPWSTR StringToWide(string s);
 
 	/** Converts a wide-character string of Unicode characters into a string of ASCII characters.
-         *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
-         *  @return A string of ASCII characters.
-         */
+     *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
+     *  @return A string of ASCII characters.
+    */
 	static string UnicodeToAsciiString ( wchar_t* unicodeCharStr );
 
+    /** Return true if the specfied trustee name exists.		
+		@param trusteeNameIn The SID to look for.
+	*/
+    static bool TrusteeNameExists(const string trusteeNameIn);
+    
+    /** Return true if the specfied trustee SID exists.		
+		@param trusteeSIDIn The SID to look for.
+	*/
+    static bool TrusteeSIDExists(const string trusteeSIDIn);
 
 private:
 	
