@@ -126,7 +126,7 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
 
 void PasswordPolicyProbe::ArePasswordComplexityReverseEncryptionSet(std::string &passwordComplexity, std::string &reversibleEncryption) {
 
-	vector<WMIItem> wmiItems = WMIUtil::GetPropertyValues("root\\rsop\\computer", "Select * from RSOP_SecuritySettingBoolean", "Setting");
+	vector<WMIItem> wmiItems = WMIUtil::GetPropertyValues("root\\rsop\\computer", "Select * from RSOP_SecuritySettingBoolean", "KeyName", "Setting");
 
 	// When passwordComplexity and reversibleEncryption haven't been explicitly set they default to (true, false)
 	passwordComplexity = "1";
