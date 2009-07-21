@@ -102,22 +102,22 @@ private:
 	void SetFormat2(OvalEnum::DateTimeFormat format2);
 	
 	/** Convert a DateTime_YEAR_MONTH_DAY format date-time value to seconds **/
-	time_t TimeDifferenceFunction::YearMonthDayValueToSeconds(string dateTimeValue);
+	time_t YearMonthDayValueToSeconds(string dateTimeValue);
 	/** Convert a DateTime_MONTH_DAY_YEAR format date-time value to seconds **/
-	time_t TimeDifferenceFunction::MonthDayYearValueToSeconds(string dateTimeValue);
+	time_t MonthDayYearValueToSeconds(string dateTimeValue);
 	/** Convert a DateTime_DAY_MONTH_YEAR format date-time value to seconds **/
-	time_t TimeDifferenceFunction::DayMonthYearValueToSeconds(string dateTimeValue);
+	time_t DayMonthYearValueToSeconds(string dateTimeValue);
 	/** Convert a DateTime_WIN_FILETIME format date-time value to seconds **/
-	time_t TimeDifferenceFunction::WinFiletimeValueToSeconds(string dateTimeValue);
+	time_t WinFiletimeValueToSeconds(string dateTimeValue);
 	/** Convert a DateTime_SECONDS_SINCE_EPOCH format date-time value to seconds **/
-	time_t TimeDifferenceFunction::SecondsSinceEpochValueToSeconds(string dateTimeValue);
+	time_t SecondsSinceEpochValueToSeconds(string dateTimeValue);
 
 	/** Build a time structure (struct tm) and convert it to the time in seconds since the epoch **/
 	time_t buildTimeStructure(int,int,int,int=0,int=0,int=0);
 	/** Convert a string representation of a month into its corresponding numerical value **/
-	int TimeDifferenceFunction::MonthStrToInt(string monthValueStr);
+	int MonthStrToInt(string monthValueStr);
 	/** Convert a hexadecimal value to its equivalent decimal value **/
-	long long TimeDifferenceFunction::HexToDecimal(string hexTimeDateStr);
+	long long HexToDecimal(string hexTimeDateStr);
 };
 
 #endif
