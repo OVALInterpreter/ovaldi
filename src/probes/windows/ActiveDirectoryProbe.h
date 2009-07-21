@@ -67,7 +67,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param adsType A ADSTYPE value which represents the type of the Active Directory attribute.
          *  @return A string representation of an Active Directory attribute type.
          */
-        string ActiveDirectoryProbe::GetAdsType ( ADSTYPE adsType );
+        string GetAdsType ( ADSTYPE adsType );
 
         /** Retrieve a particular Active Directory item from the Active Directory cache using the Active Directory's naming context, relative distinguished name, and attribute as the key.
          *  @param namingContextStr A string that contains the naming context of an Active Directory item.  Possible values are 'domain', 'configuration', and 'schema'.
@@ -75,52 +75,52 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeStr A string that contains the naming context of an Active Directory item.
          *  @return The Item representing an Active Directory item whose naming context, relative distinguished name, and attribute match the specified values.
          */
-        Item* ActiveDirectoryProbe::GetActiveDirectoryData ( string namingContextStr , string relativeDnStr , string attributeStr );
+        Item* GetActiveDirectoryData ( string namingContextStr , string relativeDnStr , string attributeStr );
 
         /** Creates a distinguished name with the given naming context and relative distinguished name.
          *  @param namingContextStr A string that contains the naming context of an Active Directory item.  Possible values are 'domain', 'configuration', and 'schema'.
          *  @param relativeDnStr A string that contains the relative distinguished name of an Active Directory item.
          *  @return A string representing the distinguished name of an Active Directory item.
          */
-        string ActiveDirectoryProbe::BuildDistinguishedName ( string namingContextStr, string relativeDnStr );
+        string BuildDistinguishedName ( string namingContextStr, string relativeDnStr );
 
         /** Retrieve the domain components of the Active Directory.
          *  @return Void.
          */
-        string ActiveDirectoryProbe::GetDomainComponents();
+        string GetDomainComponents();
 
         /** Remove the base distinguished name from the distinguished name and return the relative distinguished name.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
          *  @param distinguishedNameStr A string that contains the relative distinguished name of the Active Directory item.
          *  @return A wstring value that represents the relative distinguished name of the distinguished name that was specified.
          */
-        string ActiveDirectoryProbe::RemoveDnBase ( string namingContextStr, string distinguishedNameStr );
+        string RemoveDnBase ( string namingContextStr, string distinguishedNameStr );
 
         /** Get the set of all naming context values on the system that match the object.
          *  @param namingContextEntity A ObjectEntity that represents the naming context entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet containing all of the naming context values specified in the ObjectEntity.
          */
-        StringSet* ActiveDirectoryProbe::GetNamingContexts ( ObjectEntity* namingContextEntity );
+        StringSet* GetNamingContexts ( ObjectEntity* namingContextEntity );
 
         /** Retrieve all of the matching naming context values.
          *  @param patternStr A string that contains the pattern to be matched.
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching naming context values.
          */
-        StringSet* ActiveDirectoryProbe::GetMatchingNamingContexts ( string patternStr , bool isRegex );
+        StringSet* GetMatchingNamingContexts ( string patternStr , bool isRegex );
 
         /** Determine if the specified naming context value exists.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
          *  @return A boolean value indicating whether or not a Active Directory item with the specified naming context value exists.
          */
-        bool ActiveDirectoryProbe::NamingContextExists ( string namingContextStr );
+        bool NamingContextExists ( string namingContextStr );
 
         /** Get the set of all relative distinguished names on the system that match the object.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
          *  @param relativeDnEntity A ObjectEntity that represents the relative distinguished name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the relative distinguished names specified in the ObjectEntity that also match the specified naming context.
          */
-        StringSet* ActiveDirectoryProbe::GetRelativeDns ( string namingContextStr , ObjectEntity* relativeDnEntity );
+        StringSet* GetRelativeDns ( string namingContextStr , ObjectEntity* relativeDnEntity );
 
         /** Retrieve all of the matching relative distinguished names.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
@@ -128,14 +128,14 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching relative distinguished names that also match the specified naming context.
          */
-        StringSet* ActiveDirectoryProbe::GetMatchingRelativeDns ( string namingContextStr , string patternStr , bool isRegex );
+        StringSet* GetMatchingRelativeDns ( string namingContextStr , string patternStr , bool isRegex );
 
         /** Deterimine if the specified relative distinguished name value exists.
          *  @param namingContextStr A string that contains the naming context value of the Active Directory item.
          *  @param relativeDnStr A string that contains the relative distinguished name of the Active Directory item.
          *  @return A boolean value indicating whether or not a Active Directory item with the specified naming context and relative distinguished name exists.
          */
-        bool ActiveDirectoryProbe::RelativeDnExists ( string namingContextStr , string relativeDnStr );
+        bool RelativeDnExists ( string namingContextStr , string relativeDnStr );
 
         /** Get the set of all Active Directory attributes on the system that match the object.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
@@ -143,7 +143,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeEntity A ObjectEntity that represents the attribute entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the attributes specified in the ObjectEntity that also match the specified naming context and relative distinguished name.
          */
-        StringSet* ActiveDirectoryProbe::GetAttributes ( string namingContextStr , string relativeDnStr , ObjectEntity* attributeEntity );
+        StringSet* GetAttributes ( string namingContextStr , string relativeDnStr , ObjectEntity* attributeEntity );
 
         /** Retrieve all of the matching Active Directory attributes.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
@@ -152,7 +152,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching attributes that also match the specified naming context and relative distinguished name.
          */
-        StringSet* ActiveDirectoryProbe::GetMatchingAttributes ( string namingContextStr , string relativeDnStr , string patternStr , bool isRegex );
+        StringSet* GetMatchingAttributes ( string namingContextStr , string relativeDnStr , string patternStr , bool isRegex );
 
         /** Deterimine if the specified attribute value exists.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
@@ -160,7 +160,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeStr A string that contains the attribute of the Active Directory item.
          *  @return A boolean value indicating whether or not a Active Directory item with the specified naming context, relative distinguished name, and attribute exists.
          */
-        bool ActiveDirectoryProbe::AttributeExists ( string namingContextStr , string relativeDnStr , string attributeStr );
+        bool AttributeExists ( string namingContextStr , string relativeDnStr , string attributeStr );
 
         /** Retrieves data from the Active Directory.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
@@ -169,35 +169,35 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param activeDirectoryData A pointer to a StringSet which contains all of the distinguished names or attributes depending on which value is specified for the activeDirectoryOperation.  This value should be NULL when not retrieving all of the Active Directory distinguished names or all of the attributes for a particular distinguished name.
          *  @return A boolean value indicating that operation performed was completed successfully.
          */
-        bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , string relativeDnStr , string activeDirectoryOperationStr , StringSet* activeDirectoryData );
+        bool QueryActiveDirectory ( string namingContextStr , string relativeDnStr , string activeDirectoryOperationStr , StringSet* activeDirectoryData );
 
         /** Converts an ADS_OCTET_STRING structure into its equivalent string representation.  Note that this function only works for the 'objectSid' and 'objectGUID' attributes.
          *  @param attributeStr A string that represents the attribute name whose value you are trying to convert.
          *  @return A string representation of the attribute's ADS_OCTET_STRING value.
          */
-        string ActiveDirectoryProbe::ConvertOctetString ( string attributeStr, ADS_OCTET_STRING* octetString );
+        string ConvertOctetString ( string attributeStr, ADS_OCTET_STRING* octetString );
 
         /** Converts SYSTEMTIME structure into its equivalent UTC time representation string.
          *  @param time A pointer to a SYSTEMTIME structure which represents the a time value of an Active Directory attribute.
          *  @return A string representation of the attribute's time value in UTC.
          */
-        string ActiveDirectoryProbe::BuildUTCTimeString ( SYSTEMTIME *time );
+        string BuildUTCTimeString ( SYSTEMTIME *time );
 
         /** Retrieve a string representation of the last ADSI error message.
          *  @param hResult A HRESULT that represents the return value of some ADSI API function call.
          *  @return A string representation of the last ADSI error message.
          */
-        string ActiveDirectoryProbe::GetLastAdsiErrorMessage ( HRESULT hResult );
+        string GetLastAdsiErrorMessage ( HRESULT hResult );
 
         /** Delete all of the distinguished names in the in the distinguished names StringSet*.
         *  @return Void.
         */
-        void ActiveDirectoryProbe::DeleteDistinguishedNames();
+        void DeleteDistinguishedNames();
 
         /** Delete all of the Active Directory items from the Active Directory cache.
         *  @return Void.
         */
-        void ActiveDirectoryProbe::DeleteActiveDirectoryCache();
+        void DeleteActiveDirectoryCache();
 
         /** The static instance of the ActiveDirectoryProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.
