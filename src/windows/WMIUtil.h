@@ -62,7 +62,7 @@ class WMIUtil {
 public:
 	~WMIUtil();
 
-	static std::vector<WMIItem> GetPropertyValues(std::string wmi_namespace, std::string wmi_query, std::string propertyName);
+	static std::vector<WMIItem> GetPropertyValues(std::string wmi_namespace, std::string wmi_query, std::string keyName, std::string propertyName);
 
 private:
 	static void Open(std::string wmi_namespace);
