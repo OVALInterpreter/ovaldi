@@ -59,12 +59,12 @@ class SharedResourceProbe : public AbsProbe {
          *  @param netNameStr A string that contains the share name of a Windows shared resource.
          *  @return The Item object whose share name matches the specified value.
          */
-        Item* SharedResourceProbe::GetSharedResource ( string netNameStr );
+        Item* GetSharedResource ( string netNameStr );
 
         /** Retrieve all of the Windows shared resources on the local system.
          *  @return Void.
          */
-        void SharedResourceProbe::GetAllSharedResources();
+        void GetAllSharedResources();
 
         /** Convert a SharedResource type DWORD value into its corresponding string value.
          *  Currently, as of Version 5.5, the OVAL Language only supports STYPE_DISKTREE, STYPE_PRINTQ,
@@ -77,12 +77,12 @@ class SharedResourceProbe : public AbsProbe {
          *  @param sharedType A DWORD value that contains a bitmask of flags that represent the type of the Windows shared resource.
          *  @return A string representing the type of the Windows shared resource.
          */
-        string SharedResourceProbe::GetSharedResourceType ( DWORD sharedType );
+        string GetSharedResourceType ( DWORD sharedType );
 
         /** Delete all of the Items in the resources ItemVector.
          *  @return Void.
          */
-        void SharedResourceProbe::DeleteSharedResources();
+        void DeleteSharedResources();
 
         /** The static instance of the SharedResourceProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.
