@@ -77,7 +77,7 @@ void WMIUtil::Open(std::string wmi_namespace) {
 
 // Input: map of key/property names
 // Returns: map of key/property names with value tacked onto end of property name after semicolon
-std::vector<WMIItem> WMIUtil::GetPropertyValues(std::string wmi_namespace, std::string wmi_query, std::string propertyName) {
+std::vector<WMIItem> WMIUtil::GetPropertyValues(std::string wmi_namespace, std::string wmi_query,std::string keyName, std::string propertyName) {
 
 	IWbemClassObject *pclsObj[1];
 	pclsObj[0] = NULL;
@@ -101,9 +101,9 @@ std::vector<WMIItem> WMIUtil::GetPropertyValues(std::string wmi_namespace, std::
 			VARIANT keyname;
 
 			// Get the keyname and determine if this is an object we should be concerned with.
-			HRESULT result = pclsObj[0]->Get(bstr_t("KeyName"), 0, &keyname, NULL, NULL);
+			HRESULT result = pclsObj[0]->Get(bstr_t(keyName.c_str()), 0, &keyname, NULL, NULL);
 
-			if(SUCCEEDED(result)) {				
+			if(SUCCEEDED(result)) {	
 				wmiItem.KeyName = GetStringFromVariant(keyname);
 
 				VariantClear(&keyname);
