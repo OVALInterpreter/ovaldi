@@ -59,24 +59,24 @@ class InterfaceProbe : public AbsProbe {
          *  @param nameStr A string that contains the name of a Windows interface.
          *  @return The Item object whose name matches the specified value.
          */
-        Item* InterfaceProbe::GetInterface ( string nameStr );
+        Item* GetInterface ( string nameStr );
 
         /** Retrieve all of the Windows interfaces on the local system.
          *  @return Void.
          */
-        void InterfaceProbe::GetAllInterfaces();
+        void GetAllInterfaces();
 
         /** Convert a interface type DWORD value into its corresponding string value.
          *  @param type A DWORD value that contains a bitmask of flags that represent the type of the Windows interface.
          *  @return A string representing the type of the Windows interface.
          */
-        string InterfaceProbe::GetInterfaceType ( DWORD interfaceType );
+        string GetInterfaceType ( DWORD interfaceType );
 
         /** Get the address type of a IPV4 address.
          *  @param type A DWORD value that contains a bitmask of flags that represent the type of the Windows interface address.
          *  @return A string representing the type of the Windows interface address.
          */
-        StringVector * InterfaceProbe::GetInterfaceAddressType ( DWORD addressType );
+        StringVector * GetInterfaceAddressType ( DWORD addressType );
 
         /** Calculate the broadcast address manually because Microsoft's documentation for the MIB_IPADDRROW structure states
          *  "The proper value for this member is not returned by the GetIpAddrTable() function". Please consult Microsoft's documentation
@@ -85,12 +85,12 @@ class InterfaceProbe : public AbsProbe {
          *  @param netMaskStr A string representing the subnet mask of the interface's IP address in dotted-quad notation.
          *  @return A string representing the interface's broadcast address in dotted-quad notation.
          */
-        string InterfaceProbe::CalculateBroadcastAddress ( string ipAddr , string netMask );
+        string CalculateBroadcastAddress ( string ipAddr , string netMask );
 
         /** Delete all of the Items in the ItemVector interfaces.
          *  @return Void.
          */
-        void InterfaceProbe::DeleteInterfaces();
+        void DeleteInterfaces();
 
         /** The static instance of the InterfaceProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.
