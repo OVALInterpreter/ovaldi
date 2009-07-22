@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
 			string result = XslCommon::ApplyXSL(Common::GetXMLfile(), Common::GetDefinitionSchematronPath());
 			// strip the xml declaration
 			if(result.compare("") != 0) {
-				size_t pos = result.find(">", 0);
+				size_t pos = result.rfind(">");
 				if(pos != string::npos) {
 					result = result.substr(pos+1, result.length()-pos);
 				}
