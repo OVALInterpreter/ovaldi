@@ -32,7 +32,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
----        Version 5.5 build ??     ---
+---        Version 5.5 build 23     ---
 ---------------------------------------
 * Added support for the win-def:process_test.
 * Updated the win-def:passwordpolicy_test such that it uses the new version of the WMIUtil::GetPropertyValues() method.
