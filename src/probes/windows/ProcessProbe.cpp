@@ -216,7 +216,7 @@ void ProcessProbe::BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 proce
             for ( StringStringMultiMap::iterator iterator = ProcessProbe::pathMap->begin(); iterator != ProcessProbe::pathMap->end(); iterator++ ) {
                 if ( ( position = deviceProcessImageNameStr.find ( iterator->first ) ) != string::npos ) {
                     deviceProcessImageNameStr.replace ( position, iterator->first.length(), iterator->second );
-                    deviceProcessImageNameStr = deviceProcessImageNameStr.substr ( 0, deviceProcessImageNameStr.find ( processEntry.szExeFile ) - 1 );
+                    deviceProcessImageNameStr = deviceProcessImageNameStr.substr ( 0, deviceProcessImageNameStr.rfind ( processEntry.szExeFile ) - 1 );
                 }
             }
 
