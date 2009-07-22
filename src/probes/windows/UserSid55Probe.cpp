@@ -153,7 +153,7 @@ Item* UserSid55Probe::GetUserSidInfo(string userSid) {
 	WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain);
 
 	// User is ?always? from local box so be sure to remove the "\" separation character
-	size_t idx = userName.find('\\', 0);
+	size_t idx = userName.rfind('\\', 0);
 
 	if((idx != string::npos) && (userName.length() != idx + 1)) {
 		
