@@ -68,11 +68,11 @@ bool ObjectCollector::IsApplicable(AbsObject* object) {
 
 	bool isApplicable = false;
 
-	if(object->GetXmlns().find("linux") != string::npos) {
+	if(object->GetXmlns().rfind("linux") != string::npos) {
 		isApplicable = true;
-	} else if(object->GetXmlns().find("unix") != string::npos) {
+	} else if(object->GetXmlns().rfind("unix") != string::npos) {
 		isApplicable = true;
-	} else if(object->GetXmlns().find("independent") != string::npos) {
+	} else if(object->GetXmlns().rfind("independent") != string::npos) {
 		isApplicable = true;
 	}
 
