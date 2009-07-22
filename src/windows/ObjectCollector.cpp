@@ -51,9 +51,9 @@ bool ObjectCollector::IsApplicable(AbsObject* object) {
 
 	bool isApplicable = false;
 
-	if(object->GetXmlns().find("windows") != string::npos) {
+	if(object->GetXmlns().rfind("windows") != string::npos) {
 		isApplicable = true;
-	} else if(object->GetXmlns().find("independent") != string::npos) {
+	} else if(object->GetXmlns().rfind("independent") != string::npos) {
 		isApplicable = true;
 	}
 
