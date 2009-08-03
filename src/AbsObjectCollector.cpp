@@ -341,6 +341,14 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 		combinedCollectedSet = collectedSet1;
 	}
 
+    /**
+        If the reult flag is OvalEnum::FLAG_COMPLETE it is possible that through the set operations
+        no matching items were found. If this occurs then we need to set the result flag to 
+        OvalEnum::FLAG_DOES_NOT_EXIST.
+    */
+    if(combinedCollectedSet->GetFlag() == OvalEnum::FLAG_COMPLETE && combinedCollectedSet->GetItems()->size() == 0)
+        combinedCollectedSet->SetFlag(OvalEnum::FLAG_DOES_NOT_EXIST);
+
 	return combinedCollectedSet;
 }
 
