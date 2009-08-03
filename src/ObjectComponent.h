@@ -44,18 +44,36 @@ using namespace std;
 */
 class ObjectComponent : public AbsComponent {
 public:
+
+    /** Create a complete ObjectComponent object/ */
 	ObjectComponent(string objectId = "", string itemField = "");
 	~ObjectComponent();
 
-	void Parse(DOMElement* componentElm); 
+    /** Parse the ObjectComponent element and populate the current ObjectComponent. */
+	void Parse(DOMElement* componentElm);
+
+
+    /** Calculate the value of this ObjectComponent
+        <ul>
+            <li>Make a call to AbsObjectCollector to collect the data</li>
+            <li>Get the resulting collected object and then get the matching Item(s)</li>
+            <li>Then look for the Item with the Entity named the same as this->itemField. If no matching items were found report it and return and empty set of values.</li>
+            <li>Then get that value and return it as a string.</li>
+        </ul>
+    */
 	ComponentValue* ComputeValue();
 
+    /** Return the variable values used to compute this component's value. */
 	VariableValueVector* GetVariableValues();
 
+    /** Return the objectId field's value. */
 	string GetObjectId();
+    /** Set the objectId field's value. */
 	void SetObjectId(string objectId);
 
+    /** Return the itemField field's value. */
 	string GetItemField();
+    /** Set the itemField field's value. */
 	void SetItemField(string itemField);
 
 private:

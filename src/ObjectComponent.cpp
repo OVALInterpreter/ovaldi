@@ -34,85 +34,35 @@
 //								ObjectComponent Class									  //	
 //****************************************************************************************//
 ObjectComponent::ObjectComponent(string objectId, string itemField) : AbsComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete ObjectComponent object
-	//
-	// -----------------------------------------------------------------------
-
 	this->SetObjectId(objectId);
 	this->SetItemField(itemField);
 }
 
 ObjectComponent::~ObjectComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 string ObjectComponent::GetObjectId() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the objectId field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->objectId;
 }
 
 void ObjectComponent::SetObjectId(string objectId) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the objectId field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->objectId = objectId;
 }
 
 string ObjectComponent::GetItemField() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the itemField field's value
-	//
-	// -----------------------------------------------------------------------
-
 	return this->itemField;
 }
 
 void ObjectComponent::SetItemField(string itemField) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the itemField field's value
-	//
-	// -----------------------------------------------------------------------
-
 	this->itemField = itemField;
 }
 
 ComponentValue* ObjectComponent::ComputeValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	calculate the value of this ObjectComponent
-	//	- make call to AbsObjectCollector
-	//	- get a collected object and then get the matching Item(s)
-	//	- then look for the Item with the Entity named the same as this->itemField
-	//	- then get that value and return it as a string.
-	// -----------------------------------------------------------------------
 
-	bool foundElm = false;
+    bool foundElm = false;
 	ItemVector* items = NULL;
 	string errorMsg = "";
 	OvalEnum::Flag collectedObjFlag = OvalEnum::FLAG_ERROR;
@@ -173,7 +123,7 @@ ComponentValue* ObjectComponent::ComputeValue() {
 			// This is an error because the collected object flag is set to COMPLETE or INCOMPLETE
 			// and there are no items associated with it.
 			result->SetFlag(OvalEnum::FLAG_ERROR);
-			result->AppendMessage("Error no items are associated witht eh specified collected object: " + this->GetObjectId());
+			result->AppendMessage("Error no items are associated with the specified collected object: " + this->GetObjectId());
 		}
 
 	} else {
@@ -189,24 +139,14 @@ ComponentValue* ObjectComponent::ComputeValue() {
 }
 
 void ObjectComponent::Parse(DOMElement* ObjectComponentElm) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	parse the ObjectComponent element
-	// -----------------------------------------------------------------------
-    
+	
 	this->SetObjectId(XmlCommon::GetAttributeByName(ObjectComponentElm, "object_ref"));
 	this->SetItemField(XmlCommon::GetAttributeByName(ObjectComponentElm, "item_field"));
 }
 
 VariableValueVector* ObjectComponent::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this component's value
-	// -----------------------------------------------------------------------
 
-	VariableValueVector* values = NULL;
+    VariableValueVector* values = NULL;
 	if(AbsDataCollector::GetIsRunning()) {
 		CollectedObject* collectedObject = AbsObjectCollector::Instance()->Run(this->GetObjectId());
 		values = collectedObject->GetVariableValues();
