@@ -55,7 +55,7 @@
 #include "InetListeningServersProbe.h"
 #include "ProcessProbe.h"
 //#include "ShadowProbe.h"
-//#include "InterfaceProbe.h"
+#include "InterfaceProbe.h"
 #include "EnvironmentVariableProbe.h"
 #include "XmlFileContentProbe.h"
 #include "TextFileContentProbe.h"

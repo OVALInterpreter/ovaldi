@@ -63,7 +63,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("inetd_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("interface_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = InterfaceProbe::Instance();
 	} else if(objectName.compare("password_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("process_object") == 0) {
