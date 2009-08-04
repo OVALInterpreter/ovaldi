@@ -113,6 +113,7 @@ OBJS = \
 	FileFinder.obj \
 	Filter.obj \
 	FilterEntity.obj \
+	InterfaceProbe.obj \
 	Item.obj \
 	ItemEntity.obj \
 	LiteralComponent.obj \
@@ -208,6 +209,7 @@ REL_OBJS = \
 	$(BUILDDIR)/FileFinder.obj \
 	$(BUILDDIR)/Filter.obj \
 	$(BUILDDIR)/FilterEntity.obj \
+	$(BUILDDIR)/InterfaceProbe.obj \
 	$(BUILDDIR)/Item.obj \
 	$(BUILDDIR)/ItemEntity.obj \
 	$(BUILDDIR)/LiteralComponent.obj \
