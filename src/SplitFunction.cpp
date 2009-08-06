@@ -29,6 +29,8 @@
 //****************************************************************************************//
 
 #include "SplitFunction.h"
+#include <algorithm>
+#include "Common.h"
 
 //****************************************************************************************//
 //								Component Class											  //	
@@ -55,12 +57,42 @@ void SplitFunction::SetDelimiter(string delimiter) {
 
 ComponentValue* SplitFunction::ComputeValue() {
 
-    throw Exception("Error: unsupported function");
+	AbsComponentVector *args = this->GetComponents();
 
-    // TODO - needs to be implemented
+	// only 1 arg allowed, enforced via schema
+	AbsComponent *arg = (*args)[0];
+	ComponentValue *argVal = arg->ComputeValue();
 
-	ComponentValue* result = new ComponentValue();	
-	return result;	
+	// create and populate a result ComponentValue
+	ComponentValue* result = new ComponentValue();
+	result->SetFlag(argVal->GetFlag());
+	result->AppendMessages(argVal->GetMessages());
+	if (result->GetFlag() == OvalEnum::FLAG_ERROR) {
+		delete argVal;
+		return result;
+	}
+
+	string delim = this->GetDelimiter();
+	StringVector *argValVals = argVal->GetValues();
+
+	for (StringVector::iterator iter = argValVals->begin();
+		iter != argValVals->end();
+		++iter) {
+
+		string::iterator endOfLastDelim = iter->begin();
+		string::iterator matchBeg = search(iter->begin(), iter->end(), delim.begin(), delim.end());
+		while (matchBeg != iter->end()) {
+			result->AppendValue(string(endOfLastDelim, matchBeg));
+
+			endOfLastDelim = matchBeg + delim.size();
+			matchBeg = search(endOfLastDelim, iter->end(), delim.begin(), delim.end());
+		}
+
+		result->AppendValue(string(endOfLastDelim, iter->end()));
+	}
+
+	delete argVal;
+	return result;
 }
 
 void SplitFunction::Parse(DOMElement* componentElm) {
