@@ -516,7 +516,7 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
         else 
             item->AppendElement(new ItemEntity("generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 
-		if((*pAccessRights) & FILE_READ_DATA)
+		if((*pAccessRights) & FILE_GENERIC_ALL)
             item->AppendElement(new ItemEntity("generic_all", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
         else 
             item->AppendElement(new ItemEntity("generic_all", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
