@@ -38,7 +38,7 @@
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
 #define VERSION "5.5"
-#define BUILD 23
+#define BUILD 25
 
 #define SCHEMA_VERSION "5.5"
 
