@@ -34,7 +34,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 ---        Version 5.5 build ??     ---
 ---------------------------------------
-
+* Corrected bug in processing of set objects. If a set object results in an empty set the collected item in the oval-system-characteristics file should have a flag value of 'does not exist'.
+* Added support for the oval-def:split function.
+* Added support for the unix-def:interface_test.
 
 ---------------------------------------
 ---        Version 5.5 build 23     ---
@@ -43,7 +45,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected long standing conflict with msxml.h when building on windows systems
 * Added support for unix-def:runlevel_test.
 * Corrected handling of not applicable, error, and not evaluated flags on collected objects when the test has a existence check of EXISTENCE_ANY_EXIST.
-* Added NULL check to the VariableFactory to address NULL pointer exception that occured when processing variables that are referenced, but do not exist in the oval-definition document. Thanks to Lumension Security (http://www.lumension.com).
+* Added NULL check to the VariableFactory to address NULL pointer exception that occurred when processing variables that are referenced, but do not exist in the oval-definition document. Thanks to Lumension Security (http://www.lumension.com).
 * Added new logic that removes spaces in WQL field names that would normally cause the WMI probe to error out. Thanks to Lumension Security (http://www.lumension.com).
 * Improved FileEffectiveRightsProbe to better handle collecting rights on all types of files. Added new logic utilizing the Authz API when it is supported. If not supported the code uses the old logic to use GetEffectiveRightsFromAcl(). This has all been moved to WindowsCommon. Thanks to Lumension Security (http://www.lumension.com).
 * Added common functionality to WindowsCommon for getting groups for a user and getting the enabled flag for a user. Thanks to Lumension Security (http://www.lumension.com).
@@ -69,7 +71,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:sharedresource_test.
 * Added support for the win-def:volume_test.
 * Added support for the oval-def:arithmetic function.
-* Corrected bug in processing of input defintion ids for limited definition evaluation. If a user provided an empty list o0f definition ids the interpreter would crash due to a null pointer exception.
+* Corrected bug in processing of input definition ids for limited definition evaluation. If a user provided an empty list o0f definition ids the interpreter would crash due to a null pointer exception.
 * Changed logging system to flush all log output as it occurs. Previously logging output was held in memory until it was automatically flushed. This ensures that the log file is actually written to as each write operation occurs.
 * Reimplemented item cache in the AbsProbe class to support collecting larger data sets.
 * Added support for the win-def:activedirectory_test.
@@ -125,7 +127,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---        Version 5.3 build 68     ---
 ---------------------------------------
 * Corrected bug in REGEX.cpp. Expanded the vector of integers for substrings to allow for more matching. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
-* Corrected bug in AbsObjectCollector::ProcessSet and AbsObjectCollector::Intersection wich caused set intersections to be improperly evaluated. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
+* Corrected bug in AbsObjectCollector::ProcessSet and AbsObjectCollector::Intersection which caused set intersections to be improperly evaluated. Thanks to Tony Worwood (tony.worwood@lumension.com) for tracking down the bug and fixing it. 
 * Improved source documentation.
 * Implemented resolve_group and include_group behaviors for win-def:fileeffectiverights_object.
 * Implemented escape_regex function defined in the oval-definitions-schema.
