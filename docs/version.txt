@@ -32,6 +32,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.6 build ??     ---
+---------------------------------------
+* Updated to support version 5.6 of the OVAL Language.
+
+---------------------------------------
 ---        Version 5.5 build 25     ---
 ---------------------------------------
 * Corrected bug in processing of set objects. If a set object results in an empty set the collected item in the oval-system-characteristics file should have a flag value of 'does not exist'.
