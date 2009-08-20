@@ -135,7 +135,7 @@ DOMElement* XmlCommon::CreateElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 
 ElementVector* XmlCommon::FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string nodeName, string attribute, string attValue, string xmlns) {
 
-	ElementVector *nodes		= new ElementVector();
+	ElementVector *nodes	= new ElementVector();
 	DOMElement *tmpNode		= NULL;
 	DOMNodeList *nodeList	= NULL;
 	int listLen				= 0;
@@ -298,7 +298,7 @@ DOMElement* XmlCommon::FindElementNS(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 DOMElement* XmlCommon::FindElementNS(DOMElement *element, string nodeName, string attribute, string attValue, string xmlns) {
 
 	DOMElement *tmpNode		= NULL;
-	DOMElement *result			= NULL;
+	DOMElement *result		= NULL;
 	DOMNodeList *nodeList	= NULL;
 	int listLen				= 0;
 	int index				= 0;

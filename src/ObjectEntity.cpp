@@ -132,4 +132,3 @@ void ObjectEntity::Parse(DOMElement* ObjectEntityElm) {
 		this->SetVarRef(NULL);
 	}
 }
-
