@@ -329,7 +329,7 @@
         <xsd:attribute name="version" type="xsd:nonNegativeInteger" use="required"/>
         <xsd:attribute name="check_existence" type="oval:ExistenceEnumeration" use="optional" default="at_least_one_exists"/>
         <xsd:attribute name="check" type="oval:CheckEnumeration" use="required"/>
-        <xsd:attribute name="c" type="oval:OperatorEnumeration" use="optional" default="AND"/>
+        <xsd:attribute name="state_operator" type="oval:OperatorEnumeration" use="optional" default="AND"/>
         <xsd:attribute name="comment" type="oval:NonEmptyStringType" use="required"/>
         <xsd:attribute name="deprecated" type="xsd:boolean" use="optional" default="false"/>        
     </xsd:complexType>
