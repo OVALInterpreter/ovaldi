@@ -54,15 +54,8 @@ void LocalVariable::SetComponent(AbsComponent* component) {
 }
 
 void LocalVariable::ComputeValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Compute the value of the component then create a VariableValue
-	//  for each value in the returned ComponentValue if the flag is set to complete
-	//  or incomplete.
-	// -----------------------------------------------------------------------
 
-	ComponentValue* value = this->GetComponent()->ComputeValue();
+    ComponentValue* value = this->GetComponent()->ComputeValue();
 
 	// set the flag for this variable
 	this->SetFlag(value->GetFlag());
@@ -113,13 +106,7 @@ void LocalVariable::Parse(DOMElement* localVariableElm) {
 }
 
 VariableValueVector* LocalVariable::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this variable's value
-	//	in this case just return the values used by the component.
-	// -----------------------------------------------------------------------
-	
+
 	VariableValueVector* values = NULL;
 
 	values = this->GetComponent()->GetVariableValues();

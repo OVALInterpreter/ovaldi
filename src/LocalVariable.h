@@ -49,7 +49,16 @@ public:
 
 	/** Parse the provided local_variable element into a LocalVariable. */
 	void Parse(DOMElement* localVariableElm);
+
+    /** Compute the value of the component.
+        Create a VariableValue for each value in the returned ComponentValue
+        if the flag is set to complete or incomplete. 
+    */
 	void ComputeValue();
+
+    /** Return the variable values used to compute this variable's value.
+        Here we can simply return the values used by the component.
+    */
 	VariableValueVector* GetVariableValues();
 	
 	/** Get the AbsComponent. */
