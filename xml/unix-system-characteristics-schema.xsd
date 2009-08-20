@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" elementFormDefault="qualified" version="5.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" elementFormDefault="qualified" version="5.6">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the UNIX specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
-          <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
+          <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Unix System Characteristics</schema>
-               <version>5.5</version>
-               <date>9/26/2008 7:31:01 AM</date>
-                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.6 RC 1</version>
+               <date>7/31/2009 3:39:17 PM</date>
+                <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="unix-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"/>
               <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -25,9 +25,21 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
+                              <xsd:element name="filepath" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Specifies the absolute path to a file on the machine.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="unixfileitemfilepath">
+                                                  <sch:rule context="unix-sc:file_item/unix-sc:filepath">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the filepath entity of a file_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
                               <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The path entity specifies the absolute path (excluding the filename) to a file on the machine.</xsd:documentation>
+                                        <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitempath">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:path">
@@ -87,7 +99,7 @@
                               </xsd:element>
                               <xsd:element name="a_time" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the time of the last access, in seconds since the last epoch.</xsd:documentation>
+                                        <xsd:documentation>This is the time that the file was last accessed, in seconds since the Unix epoch. The Unix epoch is the time 00:00:00 UTC on January 1, 1970.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitema_time">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:a_time">
@@ -99,7 +111,7 @@
                               </xsd:element>
                               <xsd:element name="c_time" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the time of the last change to the file's inode, which stores all.</xsd:documentation>
+                                        <xsd:documentation>This is the time of the last change to the file's inode, in seconds since the Unix epoch. The Unix epoch is the time 00:00:00 UTC on January 1, 1970. An inode is a Unix data structure that stores all of the information about a particular file.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitemc_time">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:c_time">
@@ -111,7 +123,7 @@
                               </xsd:element>
                               <xsd:element name="m_time" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the time of the last change to the file's contents.</xsd:documentation>
+                                        <xsd:documentation>This is the time of the last change to the file's contents, in seconds since the Unix epoch. The Unix epoch is the time 00:00:00 UTC on January 1, 1970.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitemm_time">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:m_time">
@@ -183,7 +195,7 @@
                               </xsd:element>
                               <xsd:element name="uwrite" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>Can the owner (user owner) of the file read this file or, if a directory, read the directory contents?</xsd:documentation>
+                                        <xsd:documentation>Can the owner (user owner) of the file write to this file or, if a directory, write to the directory?</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitemuwrite">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:uwrite">
@@ -219,7 +231,7 @@
                               </xsd:element>
                               <xsd:element name="gwrite" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>Can the group owner of the file write to this file or directory?</xsd:documentation>
+                                        <xsd:documentation>Can the group owner of the file write to this file, or if a directory, write to the directory?</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitemgwrite">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:gwrite">
@@ -255,7 +267,7 @@
                               </xsd:element>
                               <xsd:element name="owrite" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>Can the other users write to this file or directory?</xsd:documentation>
+                                        <xsd:documentation>Can the other users write to this file, or if a directory, write to the directory?</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixfileitemowrite">
                                                   <sch:rule context="unix-sc:file_item/unix-sc:owrite">
@@ -405,9 +417,21 @@
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
+                              <xsd:element name="type" type="unix-sc:EntityItemInterfaceType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This element specifies the type of interface.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="unixinterfaceitemtype">
+                                                  <sch:rule context="unix-sc:interface_item/unix-sc:type">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the type entity of an interface_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
                               <xsd:element name="hardware_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The hardware_addr entity is the hardware or MAC address of the physical network card.</xsd:documentation>
+                                        <xsd:documentation>The hardware_addr entity is the hardware or MAC address of the physical network card. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits.  Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unixinterfaceitemhardware_addr">
                                                   <sch:rule context="unix-sc:interface_item/unix-sc:hardware_addr">
@@ -769,9 +793,21 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
+                              <xsd:element name="filepath" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Specifies the absolute path to an SCCS file.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="sccsitemfilepath">
+                                                  <sch:rule context="unix-sc:sccs_item/unix-sc:filepath">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the filepath entity of a sccs_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
                               <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The path element specifies the directory component of the absolute path to an SCCS file.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="sccsitempath">
                                                   <sch:rule context="unix-sc:sccs_item/unix-sc:path">
@@ -783,7 +819,7 @@
                               </xsd:element>
                               <xsd:element name="filename" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The name of an SCCS file.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="sccsitemfilename">
                                                   <sch:rule context="unix-sc:sccs_item/unix-sc:filename">
@@ -1275,12 +1311,36 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="stream"/>
-                    <xsd:enumeration value="dgram"/>
-                    <xsd:enumeration value="raw"/>
-                    <xsd:enumeration value="seqpacket"/>
-                    <xsd:enumeration value="tli"/>
-                    <xsd:enumeration value=""/>
+                    <xsd:enumeration value="stream">
+                         <xsd:annotation>
+                              <xsd:documentation>The stream value is used to describe a stream socket.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="dgram">
+                         <xsd:annotation>
+                              <xsd:documentation>The dgram value is used to describe a datagram socket.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="raw">
+                         <xsd:annotation>
+                              <xsd:documentation>The raw value is used to describe a raw socket.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="seqpacket">
+                         <xsd:annotation>
+                              <xsd:documentation>The seqpacket value is used to describe a sequenced packet socket.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="tli">
+                         <xsd:annotation>
+                              <xsd:documentation>The tli value is used to describe all TLI endpoints.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                </xsd:restriction>
           </xsd:simpleContent>
      </xsd:complexType>
@@ -1305,7 +1365,11 @@
                               <xsd:documentation>The UNLISTED type is used to describe services that aren't listed in /etc/protocols or /etc/rpc.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
-                    <xsd:enumeration value=""/>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                </xsd:restriction>
           </xsd:simpleContent>
      </xsd:complexType>
@@ -1315,9 +1379,70 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="wait"/>
-                    <xsd:enumeration value="nowait"/>
-                    <xsd:enumeration value=""/>
+                    <xsd:enumeration value="wait">
+                         <xsd:annotation>
+                              <xsd:documentation>The value of 'wait' specifies that the server that is invoked by inetd will take over the listening socket associated with the service, and once launched, inetd will wait for that server to exit, if ever, before it resumes listening for new service requests.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="nowait">
+                         <xsd:annotation>
+                              <xsd:documentation>The value of 'nowait' specifies that the server that is invoked by inetd will not wait for any existing server to finish before taking over the listening socket associated with the service.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
+     <xsd:complexType name="EntityItemInterfaceType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityItemInterfaceType complex type restricts a string value to a specific set of values. These values describe the different interface types which are defined in 'if_arp.h'. The empty string is also allowed to support empty element associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:enumeration value="ARPHRD_ETHER">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_ETHER type is used to describe ethernet interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ARPHRD_FDDI">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_FDDI type is used to describe fiber distributed data interfaces (FDDI).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ARPHRD_LOOPBACK">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_LOOPBACK type is used to describe loopback interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ARPHRD_VOID">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_VOID type is used to describe unknown interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ARPHRD_PPP">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_PPP type is used to describe point-to-point protocol interfaces (PPP).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ARPHRD_SLIP">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_SLIP type is used to describe serial line internet protocol interfaces (SLIP).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ARPHRD_PRONET">
+                         <xsd:annotation>
+                              <xsd:documentation>The ARPHRD_PRONET type is used to describe PROnet token ring interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                </xsd:restriction>
           </xsd:simpleContent>
      </xsd:complexType>

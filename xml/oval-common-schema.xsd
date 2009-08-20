@@ -1,19 +1,49 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.6">
      <xsd:annotation>
           <xsd:documentation>The following is a description of the common types that are shared across the different schemas within Open Vulnerability and Assessment Language (OVAL). Each type is described in detail and should provide the information necessary to understand what each represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between these type is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Common</schema>
-               <version>5.5</version>
-               <date>9/26/2008 7:30:58 AM</date>
-                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.6 RC 1</version>
+               <date>7/31/2009 3:39:14 PM</date>
+                <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
               <sch:ns prefix="oval" uri="http://oval.mitre.org/XMLSchema/oval-common-5"/>
           </xsd:appinfo>
      </xsd:annotation>
      <!-- =============================================================================== -->
+     <!-- ===============================  GLOBAL ELEMENTS  ============================= -->
      <!-- =============================================================================== -->
+     <xsd:element name="deprecated_info" type="oval:DeprecatedInfoType">
+          <xsd:annotation>
+                <xsd:documentation>The deprecated_info element is used in documenting deprecation infromation for items in the OVAL Language.  It is declared globally as it can be found in any of the OVAL schemas and is used as part of the appinfo documentation and therefore it is not an element that can be declared locally and based off a global type..</xsd:documentation>
+          </xsd:annotation>
+     </xsd:element>
      <!-- =============================================================================== -->
+     <!-- ===============================  GLOBAL TYPES  ================================ -->
+     <!-- =============================================================================== -->
+     <xsd:complexType name="DeprecatedInfoType">
+          <xsd:annotation>
+                <xsd:documentation>The DeprecatedInfoType complex type defines a structure that will be used to flag schema-defined constructs as deprecated.  It holds information related to the version of OVAL when the contruct was deprecated along with a reason and comment.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:sequence>
+               <xsd:element name="version" type="xsd:decimal" minOccurs="1" maxOccurs="1">
+                    <xsd:annotation>
+                         <xsd:documentation>The required version child element details the version of OVAL in which the construct became deprecated.</xsd:documentation>
+                    </xsd:annotation>
+               </xsd:element>
+               <xsd:element name="reason" type="xsd:string" minOccurs="1" maxOccurs="1">
+                    <xsd:annotation>
+                         <xsd:documentation>The required reason child element is used to provide an explanation as to why an item was deprecated and to direct a reader to possible alternative structures within OVAL.</xsd:documentation>
+                    </xsd:annotation>
+               </xsd:element>
+               <xsd:element name="comment" type="xsd:string" minOccurs="0" maxOccurs="1">
+                    <xsd:annotation>
+                         <xsd:documentation>The optional comment child element is used to supply additional information regarding the element’s deprecated status.</xsd:documentation>
+                    </xsd:annotation>
+               </xsd:element>
+          </xsd:sequence>
+     </xsd:complexType>
      <xsd:complexType name="GeneratorType">
           <xsd:annotation>
                <xsd:documentation>The GeneratorType complex type defines an element that is used to hold information about when a particular OVAL document was compiled, what version of the schema was used, what tool compiled the document, and what version of that tools was used. </xsd:documentation>
@@ -53,12 +83,13 @@
                </xsd:extension>
           </xsd:simpleContent>
      </xsd:complexType>
+         
      <!-- =============================================================================== -->
      <!-- ===============================  ENUMERATIONS  ================================ -->
      <!-- =============================================================================== -->
      <xsd:simpleType name="CheckEnumeration">
           <xsd:annotation>
-               <xsd:documentation>The CheckEnumeration simple type defines acceptable check values, which are used to determine the final result of something based on the results of individual components. When used to define the relationship between objects and states, each check value defines how many of the matching objects must satisfy the given state for the test to return true. When used to define the relationship between instances of a given entity, the different check values defines how many instances must be true for the entity to return true. When used to define the relationship between entities and multiple variable values, each check value defines how many variable values must be true for the entity to return true.</xsd:documentation>
+               <xsd:documentation>The CheckEnumeration simple type defines acceptable check values, which are used to determine the final result of something based on the results of individual components. When used to define the relationship between objects and states, each check value defines how many of the matching objects (items except those with a status of does not exist) must satisfy the given state for the test to return true. When used to define the relationship between instances of a given entity, the different check values defines how many instances must be true for the entity to return true. When used to define the relationship between entities and multiple variable values, each check value defines how many variable values must be true for the entity to return true.</xsd:documentation>
                <xsd:appinfo>
                     <evaluation_documentation>Below are some tables that outline how each check attribute effects evaluation. The far left column identifies the check attribute in question. The middle column specifies the different combinations of individual results that the check attribute may bind together. (T=true, F=false, E=error, U=unknown, NE=not evaluated, NA=not applicable) For example, a 1+ under T means that one or more individual results are true, while a 0 under U means that zero individual results are unknown. The last column specifies what the final result would be according to each combination of individual results. Note that if the individual test is negated, then a true result is false and a false result is true, all other results stay as is.</evaluation_documentation>
                     <evaluation_chart xml:space="preserve">
@@ -119,28 +150,41 @@
           <xsd:restriction base="xsd:string">
                <xsd:enumeration value="all">
                     <xsd:annotation>
-                         <xsd:documentation>A value of 'all' means that a final result of true is given if all the individual results are true.</xsd:documentation>
+                         <xsd:documentation>A value of 'all' means that a final result of true is given if all the individual results under concideration are true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="at least one">
                     <xsd:annotation>
-                         <xsd:documentation>A value of 'at least one' means that a final result of true is given if at least one of the individual results is true.</xsd:documentation>
+                          <xsd:documentation>A value of 'at least one' means that a final result of true is given if at least one of the individual results under concideration is true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="none exist">
                     <xsd:annotation>
                          <xsd:documentation>A value of 'none exists' means that a test evaluates to true if no matching object exists that satisfy the data requirements.</xsd:documentation>
-                         <xsd:documentation>DEPRECATED: this value has been deprecated and will be removed with the next major version of the language.  One should use the other possible values in addition to the existance attributes instead of the 'none exist' value here.</xsd:documentation>
+                         <xsd:appinfo>
+                              <oval:deprecated_info>
+                                   <oval:version>5.3</oval:version>
+                                   <oval:reason>Replaced by the 'none satisfy' value. In version 5.3 of the OVAL Language, the checking of existence and state were separated into two distict checks CheckEnumeration (state) and ExistenceEnumeration (existence). Since CheckEnumeration is now used to specify how many objects should satisfy a given state for a test to return true, and no longer used for specifying how many objects must exist for a test to return true, a value of 'none exist' is no longer needed. See the 'none satisfy' value.</oval:reason>
+                                   <oval:comment>This value has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                              </oval:deprecated_info>
+                              <sch:pattern id="none_exist_value_dep">
+                                   <sch:rule context="/oval-def:oval_definitions/oval-def:tests/child::*">
+                                        <sch:report test="@check='none exist'">
+                                             DEPRECATED ATTRIBUTE VALUE IN: <sch:value-of select="name()"/> ATTRIBUTE VALUE:
+                                        </sch:report>
+                                   </sch:rule>
+                              </sch:pattern>                        
+                         </xsd:appinfo>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="none satisfy">
                     <xsd:annotation>
-                         <xsd:documentation>A value of 'none satisfy' means that a final result of true is given if none the individual results are true.</xsd:documentation>
+                          <xsd:documentation>A value of 'none satisfy' means that a final result of true is given if none the individual results under consideration are true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="only one">
                     <xsd:annotation>
-                         <xsd:documentation>A value of 'only one' means that a final result of true is given if one and only one of the individual results are true.</xsd:documentation>
+                          <xsd:documentation>A value of 'only one' means that a final result of true is given if one and only one of the individual results under concideration are true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>
@@ -203,7 +247,7 @@
           <xsd:annotation>
                <xsd:documentation>The ExistenceEnumeration simple type defines acceptable existence values, which are used to determine a result based on the existence of individual components. The main use for this is for a test regarding the existence of objects on the system.</xsd:documentation>
                <xsd:appinfo>
-                    <evaluation_documentation>Below are some tables that outline how each ExistenceEnumeration value effects evaluation of a given test.  Note that this is related to the existance of an object(s) and not the object(s) compliance with a state.  The left column identifies the ExistenceEnumeration value in question. The middle column specifies the different combinations of individual item status values that have been found in the system characteristics file related to the given object. (EX=exists, DE=does not exist, ER=error, NC=not collected) For example, a 1+ under EX means that one or more individual item status attributes are set to exists, while a 0 under NC means that zero individual item status attributes are set to not collected.  The last column specifies what the result of the existence piece would be according to each combination of individual item status values.</evaluation_documentation>
+                    <evaluation_documentation>Below are some tables that outline how each ExistenceEnumeration value effects evaluation of a given test.  Note that this is related to the existence of an object(s) and not the object(s) compliance with a state.  The left column identifies the ExistenceEnumeration value in question. The middle column specifies the different combinations of individual item status values that have been found in the system characteristics file related to the given object. (EX=exists, DE=does not exist, ER=error, NC=not collected) For example, a 1+ under EX means that one or more individual item status attributes are set to exists, while a 0 under NC means that zero individual item status attributes are set to not collected.  The last column specifies what the result of the existence piece would be according to each combination of individual item status values.</evaluation_documentation>
                     <evaluation_chart xml:space="preserve">
                ||  item status value count  ||
   attr value   ||                           || existence piece is
@@ -226,7 +270,7 @@
                ||  0+  |  0+  |  0   |  0+  ||  True 
                ||  1+  |  0+  |  1+  |  0+  ||  True
                ||  --  |  --  |  --  |  --  ||  False
- any           ||  0   |  0+  |  1+  |  0+  ||  Error
+ any_exist     ||  0   |  0+  |  1+  |  0+  ||  Error
                ||  --  |  --  |  --  |  --  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
                ||  --  |  --  |  --  |  --  ||  Not Applicable
@@ -239,7 +283,7 @@
 ---------------||---------------------------||------------------
                ||  1+  |  0+  |  0+  |  0+  ||  True 
                ||  0   |  1+  |  0   |  0   ||  False
- at_least_one  ||  0   |  0+  |  1+  |  0+  ||  Error
+at_least_one_exists  ||  0   |  0+  |  1+  |  0+  ||  Error
                ||  0   |  0+  |  0   |  1+  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
                ||  --  |  --  |  --  |  --  ||  Not Applicable
@@ -252,7 +296,7 @@
 ---------------||---------------------------||------------------
                ||  0   |  0+  |  0   |  0   ||  True 
                ||  1+  |  0+  |  0+  |  0+  ||  False
- none          ||  0   |  0+  |  1+  |  0+  ||  Error
+ none_exist          ||  0   |  0+  |  1+  |  0+  ||  Error
                ||  0   |  0+  |  0   |  1+  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
                ||  --  |  --  |  --  |  --  ||  Not Applicable
@@ -266,7 +310,7 @@
                ||  1   |  0+  |  0   |  0   ||  True 
                ||  2+  |  0+  |  0+  |  0+  ||  False
                ||  0   |  0+  |  0   |  0   ||  False
- only_one      ||  0,1 |  0+  |  1+  |  0+  ||  Error
+ only_one_exists      ||  0,1 |  0+  |  1+  |  0+  ||  Error
                ||  0,1 |  0+  |  0   |  1+  ||  Unknown
                ||  --  |  --  |  --  |  --  ||  Not Evaluated
                ||  --  |  --  |  --  |  --  ||  Not Applicable
@@ -405,7 +449,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="pattern match">
                     <xsd:annotation>
-                         <xsd:documentation>The 'pattern match' operation allows an item to be tested against a regular expression. When used by an entity in an OVAL Object, the regular expression represents the set of matching objects on the system. Patterns must comply with POSIX std 1003.2-1992, Section 2.8 - 'Regular Expression Notation'. Patterns can use both Basic and Extended Regular Expression notation.</xsd:documentation>
+                         <xsd:documentation>The 'pattern match' operation allows an item to be tested against a regular expression. When used by an entity in an OVAL Object, the regular expression represents the set of matching objects on the system. OVAL supports regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification (See: http://www.perl.com/doc/manual/html/pod/perlre.html).</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>

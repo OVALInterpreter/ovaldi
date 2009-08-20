@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ios-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" elementFormDefault="qualified" version="5.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ios-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios" elementFormDefault="qualified" version="5.6">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the IOS specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
-            <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
+            <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>IOS Definition</schema>
-                  <version>5.5</version>
-                  <date>9/26/2008 7:30:57 AM</date>
-                  <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.6 RC 1</version>
+                  <date>7/31/2009 3:39:13 PM</date>
+                  <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                    <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ios-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -37,7 +37,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -45,7 +45,7 @@
       </xsd:element>
       <xsd:element name="global_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The global_object element is used by a global test to define the object to be evaluated. For the most part this object checks for existance and is used without a state comparision. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The global_object element is used by a global test to define the object to be evaluated. For the most part this object checks for existence and is used without a state comparision. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -120,7 +120,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -251,7 +251,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -347,7 +347,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -422,7 +422,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -485,7 +485,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -611,13 +611,26 @@
             </xsd:complexType>
       </xsd:element>
     <!-- =============================================================================== -->
-    <!-- ================================  VERSION TEST  =============================== -->
+    <!-- ================================  VERSION TEST (deprecated) =================== -->
     <!-- =============================================================================== -->
     <xsd:element name="version_test" substitutionGroup="oval-def:test">
         <xsd:annotation>
-            <xsd:documentation>This test has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer version55_test.</xsd:documentation>
             <xsd:documentation>The version test is used to check the version of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
-            <xsd:appinfo>
+              <xsd:appinfo>
+                    <oval:deprecated_info>
+                          <oval:version>5.5</oval:version>
+                          <oval:reason>Replaced by the version55_test. Additional IOS version components were added to the version_state in order to support a wider range of IOS version strings. Also, the major_release and train_number entities were removed from the version_state element. A new test was created to reflect these changes. See the version55_test.</oval:reason>
+                          <oval:comment>This test has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                    </oval:deprecated_info>
+                    <sch:pattern id="iosvertst_dep">
+                          <sch:rule context="ios-def:version_test">
+                                <sch:report test="true()">
+                                      DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
+                                </sch:report>
+                          </sch:rule>
+                    </sch:pattern>                        
+              </xsd:appinfo>
+              <xsd:appinfo>
                 <sch:pattern id="iosvertst">
                     <sch:rule context="ios-def:version_test/ios-def:object">
                         <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/ios-def:version_object/@id"><sch:value-of select="../@id"/> - the object child element of a version_test must reference a version_object</sch:assert>
@@ -633,7 +646,7 @@
                 <xsd:extension base="oval-def:TestType">
                     <xsd:sequence>
                         <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                        <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:sequence>
                 </xsd:extension>
             </xsd:complexContent>
@@ -641,8 +654,21 @@
     </xsd:element>
     <xsd:element name="version_object" substitutionGroup="oval-def:object">
         <xsd:annotation>
-            <xsd:documentation>This object has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer version55_object.</xsd:documentation>
             <xsd:documentation>The version_object element is used by a version test to define the different version information associated with an IOS system. There is actually only one object relating to version and this is the system as a whole. Therefore, there are no child entities defined. Any OVAL Test written to check version will reference the same version_object which is basically an empty object element.</xsd:documentation>
+            <xsd:appinfo>
+                  <oval:deprecated_info>
+                        <oval:version>5.5</oval:version>
+                        <oval:reason>Replaced by the version55_object. Additional IOS version components were added to the version_state in order to support a wider range of IOS version strings.  Also, the major_release and train_number entities were removed from the version_state element. A new object was created to reflect these changes. See the version55_object.</oval:reason>
+                        <oval:comment>This object has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                  </oval:deprecated_info>
+                  <sch:pattern id="iosverobj_dep">
+                        <sch:rule context="ios-def:version_object">
+                              <sch:report test="true()">
+                                    DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
+                              </sch:report>
+                        </sch:rule>
+                  </sch:pattern>                        
+            </xsd:appinfo>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
@@ -652,8 +678,21 @@
     </xsd:element>
     <xsd:element name="version_state" substitutionGroup="oval-def:state">
         <xsd:annotation>
-            <xsd:documentation>This state has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer version55_state.</xsd:documentation>
             <xsd:documentation>The version_state element defines the version information held within a Cisco IOS Train. A Cisco IOS train is a vehicle for delivering releases that evolve from a common code base.</xsd:documentation>
+            <xsd:appinfo>
+                  <oval:deprecated_info>
+                        <oval:version>5.5</oval:version>
+                        <oval:reason>Replaced by the version55_state. Additional IOS version components were added to the version_state in order to support a wider range of IOS version strings.  Also, the major_release and train_number entities were removed from this version_state element. A new state was created to reflect these changes. See the version55_state.</oval:reason>
+                        <oval:comment>This state has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                  </oval:deprecated_info>
+                  <sch:pattern id="iosverste_dep">
+                        <sch:rule context="ios-def:version_state">
+                              <sch:report test="true()">
+                                    DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
+                              </sch:report>
+                        </sch:rule>
+                  </sch:pattern>                        
+            </xsd:appinfo>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
@@ -717,8 +756,14 @@
       <!-- =============================================================================== -->
       <xsd:complexType name="EntityStateTrainIdentifierType">
             <xsd:annotation>
-                <xsd:documentation>Note that this enumeration is used by the deprecated version_test and will be removed in version 6.0 of the language.</xsd:documentation>
-                <xsd:documentation>The EntityStateTrainIdentifierType complex type restricts a string value to a specific set of values. These values describe the possible types of trains in a Cisco IOS release. The empty string is also allowed to support empty emlement associated with variable references.</xsd:documentation>
+                  <xsd:documentation>The EntityStateTrainIdentifierType complex type restricts a string value to a specific set of values. These values describe the possible types of trains in a Cisco IOS release. The empty string is also allowed to support empty element associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+                <xsd:appinfo>
+                      <oval:deprecated_info>
+                            <oval:version>5.5</oval:version>
+                            <oval:reason>Additional IOS version components were added to the version_state in order to support a wider range of IOS version strings. Also, the train_number entity, which uses this enumeration, was removed from the version_state element. As a result, this enumeration is no longer needed.</oval:reason>
+                            <oval:comment>This enumeration has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                      </oval:deprecated_info>                
+                </xsd:appinfo>
             </xsd:annotation>
             <xsd:simpleContent>
                   <xsd:restriction base="oval-def:EntityStateStringType">
@@ -747,7 +792,11 @@
                                     <xsd:documentation>Supports broadband features and fixes defects.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
-                        <xsd:enumeration value=""/>
+                        <xsd:enumeration value="">
+                              <xsd:annotation>
+                                    <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
                   </xsd:restriction>
             </xsd:simpleContent>
       </xsd:complexType>

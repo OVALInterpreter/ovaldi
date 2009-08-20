@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" elementFormDefault="qualified" version="5.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" elementFormDefault="qualified" version="5.6">
     <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
     <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
     <xsd:annotation>
@@ -7,9 +7,9 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core System Characteristics</schema>
-            <version>5.5</version>
-            <date>9/26/2008 7:30:59 AM</date>
-            <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+            <version>5.6 RC 1</version>
+            <date>7/31/2009 3:39:15 PM</date>
+            <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
         </xsd:appinfo>
     </xsd:annotation>
@@ -146,7 +146,7 @@
             </xsd:element>
             <xsd:element name="mac_address" type="xsd:string" minOccurs="1" maxOccurs="1">
                 <xsd:annotation>
-                    <xsd:documentation>The required mac_address element holds teh mac address for the interface.</xsd:documentation>
+                    <xsd:documentation>The required mac_address element holds the MAC address for the interface. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits. Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:sequence>
@@ -166,7 +166,7 @@
         <xsd:annotation>
             <xsd:documentation>The ObjectType complex type provides a reference between items collected and a related global OVAL Object.</xsd:documentation>
             <xsd:documentation>If an OVAL Object does not exist on the system, then an object element is still provided but with the flag attribute set to 'does not exist' and with no reference child elements. This shows that the object was looked for but not found on the system. If no object element is written in this case, users of the system characteristics file will not know whether the object was not found or no attempt was made to collect it.</xsd:documentation>
-            <xsd:documentation>The required id attribute is the id of the global OVAL Object. The required version attribute is the specific version of the global OVAL Object that was used by the data collection engine. The version is necessary so that analysis using a system characteristics file knows exactly what was collected. The optional variable_instance identifier is a unique id that differentiates every unique instance of an object. Languages that include OVAL might reference the same definition multiple times. Each time a different set of values is supplied for the variables, resulting in multiple instances of an object to be defined by the OVAL System Characteristics file. (definitions that do not use variables can only have one unique instance) The inclusion of a unique instance identifier will allow the OVAL results file to report the correct item associated with an object for each combination of supplied values. The optional comment attribute provides a short description of the object. The required flag attribute holds information regarding the success of the data collection. For example, if there was an error looking for items that match the object specification, then the flag would be 'error'. Please refer to the description of FlagEnumeration for details about the different flag values.</xsd:documentation>
+            <xsd:documentation>The required id attribute is the id of the global OVAL Object. The required version attribute is the specific version of the global OVAL Object that was used by the data collection engine. The version is necessary so that analysis using a system characteristics file knows exactly what was collected. The optional variable_instance identifier is a unique id that differentiates each unique instance of an object. Capabilities that use OVAL may reference the same definition multiple times and provide different sets of variable values each time the definition is referenced. This will result in multiple instances of an object being included in the OVAL System Characteristics file (definitions that do not use variables can only have one unique instance). The inclusion of a unique instance identifier will allow the OVAL results file to report the correct item associated with an object for each combination of supplied values. The optional comment attribute provides a short description of the object. The required flag attribute holds information regarding the outcome of the data collection. For example, if there was an error looking for items that match the object specification, then the flag would be 'error'. Please refer to the description of FlagEnumeration for details about the different flag values.</xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
             <xsd:element name="message" type="oval:MessageType" minOccurs="0" maxOccurs="unbounded">
@@ -181,13 +181,13 @@
             </xsd:element>
             <xsd:element name="reference" type="oval-sc:ReferenceType" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
-                    <xsd:documentation>the optional reference element links the collected item found by the data collection engine and the global OVAL Object. A global OVAL Object my have multiple matching items on a system. For example a global file object that is a pattern match might match 10 different files on a specific system. In this case, there would be 10 reference elements, one for each of the files found on the system.</xsd:documentation>
+                    <xsd:documentation>The optional reference element links the collected item found by the data collection engine and the global OVAL Object. A global OVAL Object my have multiple matching items on a system. For example a global file object that is a pattern match might match 10 different files on a specific system. In this case, there would be 10 reference elements, one for each of the files found on the system.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="id" type="oval:ObjectIDPattern" use="required"/>
         <xsd:attribute name="version" type="xsd:nonNegativeInteger" use="required"/>
-        <xsd:attribute name="variable_instance" type="xsd:integer" use="optional" default="1"/>
+        <xsd:attribute name="variable_instance" type="xsd:nonNegativeInteger" use="optional" default="1"/>
         <xsd:attribute name="comment" type="xsd:string" use="optional"/>
         <xsd:attribute name="flag" type="oval-sc:FlagEnumeration" use="required"/>
     </xsd:complexType>
@@ -247,9 +247,9 @@
     <!-- =============================================================================== -->
     <xsd:simpleType name="FlagEnumeration">
         <xsd:annotation>
-            <xsd:documentation>The FlagEnumeration simple type defines the valid flags associated with a collected object. These flags are meant to provide information about how the specified object was handled by the data collector. In order to evaluate an OVAL Definition, information about the defined objects need to be available. The flags help detail the success of trying to collect information related to these objects.</xsd:documentation>
+            <xsd:documentation>The FlagEnumeration simple type defines the valid flags associated with a collected object. These flags are meant to provide information about how the specified object was handled by the data collector. In order to evaluate an OVAL Definition, information about the defined objects needs to be available. The flags help detail the outcome of attempting to collect information related to these objects..</xsd:documentation>
             <xsd:appinfo>
-                <evaluation_documentation>Below is a table that outlines how each FlagEnumeration value effects evaluation of a given test. Note that this is related to the existance of an object(s) and not the object(s) compliance with a state. The far left column identifies the ExistenceEnumeration value in question. The middle left column specifies the different combinations of individual item status values that have been found in the system characteristics file related to the given object. (EX=exists, DE=does not exist, ER=error, NC=not collected) For example, a 1+ under EX means that one or more individual item status attributes are set to exists, while a 0 under NC means that zero individual item status attributes are set to not collected. The middle right column. The last column specifies what the result of the existence piece would be according to each combination of individual item status values.</evaluation_documentation>
+                <evaluation_documentation>Below is a table that outlines how each FlagEnumeration value effects evaluation of a given test. Note that this is related to the existence of a set of items identified by an object and not each item’s compliance with a state. The left column identifies the FlagEnumeration value in question. The right column specifies the ResultEnumeration value that should be used when evaluating the collected object.</evaluation_documentation>
                 <evaluation_chart xml:space="preserve">
                  ||
   flag value     ||      test result is

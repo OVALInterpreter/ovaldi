@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:hpux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux" elementFormDefault="qualified" version="5.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:hpux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux" elementFormDefault="qualified" version="5.6">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the HP-UX specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
-            <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
+            <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>HP-UX Definition</schema>
-                  <version>5.5</version>
-                  <date>9/26/2008 7:30:56 AM</date>
-                  <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.6 RC 1</version>
+                  <date>7/31/2009 3:39:12 PM</date>
+                  <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="hpux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -27,7 +27,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -125,7 +125,7 @@
             </xsd:complexType>
       </xsd:element>
       <!-- =============================================================================== -->
-      <!-- ==============================  PATCH(53) TEST  =============================== -->
+      <!-- ==============================  PATCH TEST (53) =============================== -->
       <!-- =============================================================================== -->
       <xsd:element name="patch53_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
@@ -136,7 +136,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -248,7 +248,7 @@
       </xsd:element>
       <xsd:complexType name="Patch53Behaviors">
             <xsd:annotation>
-                  <xsd:documentation>These behaviors allow a more detailed definition of the patch53 objects being specified.</xsd:documentation>
+                  <xsd:documentation>The Patch53Behaviors complex type defines a number of behaviors that allow a more detailed definition of the patch53_object being specified.  Note that using these behaviors may result in some unique results.  For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in.</xsd:documentation>
             </xsd:annotation>
             <xsd:attribute name="supersedence" use="optional" default="false">
                   <xsd:annotation>
@@ -264,15 +264,28 @@
       <!-- =============================================================================== -->
       <xsd:element name="patch_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>This test has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer patch53_test.</xsd:documentation>
                   <xsd:documentation>From /usr/sbin/swlist -l patch PHxx_yyyyy. See swlist manpage for specific fields</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.3</oval:version>
+                              <oval:reason>Replaced by the patch53_test. The patch_name entity was removed from the patch_object element, and replaced with the swtype, area_patched, and patch_base entities, because the patch_name element can be constructed from the swtype, area_patched, and patch_base entities. Likewise, the patch_name entity was removed from the patch_state element for the same reason. Also, a behaviors entity was added to the patch_object to allow the object to match both the original patch and any superseding patches. A new test was created to reflect these changes. See the patch53_test.</oval:reason>
+                              <oval:comment>This test has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="patch_test_dep">
+                              <sch:rule context="hpux-def:patch_test">
+                                    <sch:report test="true()">
+                                          DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
+                                    </sch:report>
+                              </sch:rule>
+                        </sch:pattern>                        
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -280,7 +293,20 @@
       </xsd:element>
       <xsd:element name="patch_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>This object has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer patch53_object.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.3</oval:version>
+                              <oval:reason>Replaced by the patch53_object. The patch_name entity was removed from the patch_object element, and replaced with the swtype, area_patched, and patch_base entities, because the patch_name element can be constructed from the swtype, area_patched, and patch_base entities. Also, a behaviors entity was added to the patch_object to allow the object to match both the original patch and any superseding patches. A new object was created to reflect these changes. See the patch53_object.</oval:reason>
+                              <oval:comment>This object has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="patch_object_dep">
+                              <sch:rule context="hpux-def:patch_object">
+                                    <sch:report test="true()">
+                                          DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
+                                    </sch:report>
+                              </sch:rule>
+                        </sch:pattern>                        
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -310,7 +336,20 @@
       </xsd:element>
       <xsd:element name="patch_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>This state has been deprecated and will be removed in version 6.0 of the language. Recommend use of the newer patch53_state.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.3</oval:version>
+                              <oval:reason>Replaced by the patch53_state. The patch_name entity was removed from the patch_state element, and replaced with the swtype, area_patched, and patch_base entities, because the patch_name element can be constructed from the swtype, area_patched, and patch_base entities. A new state was created to reflect these changes. See the patch53_state.</oval:reason>
+                              <oval:comment>This state has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="patch_state_dep">
+                              <sch:rule context="hpux-def:patch_state">
+                                    <sch:report test="true()">
+                                          DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
+                                    </sch:report>
+                              </sch:rule>
+                        </sch:pattern>                        
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -381,7 +420,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -514,7 +553,7 @@
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
                                     <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
-                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>

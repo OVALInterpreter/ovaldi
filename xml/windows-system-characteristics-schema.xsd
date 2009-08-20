@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.6">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Windows specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
-          <xsd:documentation>The OVAL Schema is maintained by The Mitre Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
+          <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.5</version>
-               <date>9/26/2008 7:31:01 AM</date>
-                <terms_of_use>Copyright (c) 2002-2008, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.6 RC 1</version>
+               <date>7/31/2009 3:39:18 PM</date>
+                <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
               <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -1415,9 +1415,21 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
-                              <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="filepath" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>Specifies the absolute path to a file on the machine.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="fileitemfilepath">
+                                                  <sch:rule context="win-sc:file_item/win-sc:filepath">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the filepath entity of a file_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="fileitempath">
                                                   <sch:rule context="win-sc:file_item/win-sc:path">
@@ -1635,9 +1647,21 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
+                              <xsd:element name="filepath" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Specifies the absolute path to a file on the machine from which the DACL was retrieved.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="fileaudititemfilepath">
+                                                  <sch:rule context="win-sc:fileauditedpermissions_item/win-sc:filepath">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the filepath entity of a fileauditedpermissions_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
                               <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the absolute path to a file on the machine from which the DACL was retrieved.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the directory component of the absolute path to a file on the machine from which the DACL was retrieved.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="fileaudititempath">
                                                   <sch:rule context="win-sc:fileauditedpermissions_item/win-sc:path">
@@ -1673,12 +1697,17 @@
                               </xsd:element>
                               <xsd:element name="trustee_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This entity has been deprecated and will be removed in version 6.0 of the language.</xsd:documentation>
                                         <xsd:documentation>This element specifies the trustee name associated with this particular SACL.  A trustee can be a user, group, or program (such as a Windows service).  In a domain environment, trustee names should be identified in the form:  "domain\trustee name"   For local trustee names use:  "computer name\trustee name"  For built-in accounts on the system, use the trustee name without a domain.  For example: ADMINISTRATOR, SYSTEM, NETWORK_SERVICES, ADMINISTRATORS (group), etc.  Note that the built-in trustee names should be all caps as that is how the windows apis return them.</xsd:documentation>
                                         <xsd:appinfo>
+                                             <oval:deprecated_info>
+                                                  <oval:version>5.3</oval:version>
+                                                  <oval:reason>Replaced by the trustee_sid entity. This entity uses trustee names for identifying trustees. Trustee names are not unique, and a new entity was created to use trustee SIDs, which are unique. See the trustee_sid.</oval:reason>
+                                                  <oval:comment>This entity has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                             </oval:deprecated_info>
                                              <sch:pattern id="fileaudititemtrustee_name">
                                                   <sch:rule context="win-sc:fileauditedpermissions_item/win-sc:trustee_name">
-                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileauditedpermissions_item should be 'string'</sch:assert>
+                                                        <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileauditedpermissions_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -1928,6 +1957,18 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
+                              <xsd:element name="filepath" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Specifies the absolute path to a file on the machine from which the DACL was retrieved.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="ferititemfilepath">
+                                                  <sch:rule context="win-sc:fileeffectiverights_item/win-sc:filepath">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the filepath entity of a fileeffectiverights_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
                               <xsd:element name="path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This element specifies the absolute path to a file on the machine from which the DACL was retrieved.</xsd:documentation>
@@ -1966,12 +2007,17 @@
                               </xsd:element>
                               <xsd:element name="trustee_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This entity has been deprecated and will be removed in version 6.0 of the language.</xsd:documentation>
                                         <xsd:documentation>This element specifies the trustee name associated with this particular DACL.  A trustee can be a user, group, or program (such as a Windows service).  In a domain environment, trustee names should be identified in the form:  "domain\trustee name"   For local trustee names use:  "computer name\trustee name"  For built-in accounts on the system, use the trustee name without a domain.  For example: ADMINISTRATOR, SYSTEM, NETWORK_SERVICES, ADMINISTRATORS (group), etc.  Note that the built-in trustee names should be all caps as that is how the windows apis return them.</xsd:documentation>
                                         <xsd:appinfo>
+                                             <oval:deprecated_info>
+                                                  <oval:version>5.3</oval:version>
+                                                  <oval:reason>Replaced by the trustee_sid entity. This entity uses trustee names for identifying trustees. Trustee names are not unique, and a new entity was created to use trustee SIDs, which are unique. See the trustee_sid.</oval:reason>
+                                                  <oval:comment>This entity has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                             </oval:deprecated_info>
                                              <sch:pattern id="feritemtrustee_name">
                                                   <sch:rule context="win-sc:fileeffectiverights_item/win-sc:trustee_name">
-                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileeffectiverights_item should be 'string'</sch:assert>
+                                                        <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a fileeffectiverights_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2340,7 +2386,7 @@
                               </xsd:element>
                               <xsd:element name="hardware_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the the physical address of the adapter for this interface.</xsd:documentation>
+                                        <xsd:documentation>The hardware_addr entity is the hardware or MAC address of the physical network card. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits.  Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="wininterfaceitemhardware_addr">
                                                   <sch:rule context="win-sc:interface_item/win-sc:hardware_addr">
@@ -3129,12 +3175,17 @@
                               </xsd:element>
                               <xsd:element name="trustee_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This entity has been deprecated and will be removed in version 6.0 of the language.</xsd:documentation>
                                         <xsd:documentation>This element specifies the trustee name associated with this particular DACL.  A trustee can be a user, group, or program (such as a Windows service).  In a domain environment, trustee names should be identified in the form:  "domain\trustee name"   For local trustee names use:  "computer name\trustee name"  For built-in accounts on the system, use the trustee name without a domain.  For example: ADMINISTRATOR, SYSTEM, NETWORK_SERVICES, ADMINISTRATORS (group), etc.  Note that the built-in trustee names should be all caps as that is how the windows apis return them.</xsd:documentation>
                                         <xsd:appinfo>
+                                             <oval:deprecated_info>
+                                                  <oval:version>5.3</oval:version>
+                                                  <oval:reason>Replaced by the trustee_sid entity. This entity uses trustee names for identifying trustees. Trustee names are not unique, and a new entity was created to use trustee SIDs, which are unique. See the trustee_sid.</oval:reason>
+                                                  <oval:comment>This entity has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                             </oval:deprecated_info>
                                              <sch:pattern id="rapitemtrustee_name">
                                                   <sch:rule context="win-sc:regkeyauditedpermissions_item/win-sc:trustee_name">
-                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyauditedpermissions_item should be 'string'</sch:assert>
+                                                        <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyauditedpermissions_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3192,8 +3243,13 @@
                                    <xsd:annotation>
                                         <xsd:documentation>Windows NT/2000: The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state. Some object types do not support this access right.</xsd:documentation>
                                         <xsd:appinfo>
+                                             <oval:deprecated_info>
+                                                  <oval:version>5.6</oval:version>
+                                                  <oval:reason>This entity has been deprecated because registry keys do not support the SYNCHRONIZE standard access right.</oval:reason>
+                                             </oval:deprecated_info>
                                              <sch:pattern id="rapitemstandard_synchronize">
                                                   <sch:rule context="win-sc:regkeyauditedpermissions_item/win-sc:standard_synchronize">
+                                                       <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the standard_synchronize entity of a regkeyauditedpermissions_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
@@ -3422,12 +3478,17 @@
                               </xsd:element>
                               <xsd:element name="trustee_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This entity has been deprecated and will be removed in version 6.0 of the language.</xsd:documentation>
                                         <xsd:documentation>This element specifies the trustee name associated with this particular DACL.  A trustee can be a user, group, or program (such as a Windows service).  In a domain environment, trustee names should be identified in the form:  "domain\trustee name"   For local trustee names use:  "computer name\trustee name"  For built-in accounts on the system, use the trustee name without a domain.  For example: ADMINISTRATOR, SYSTEM, NETWORK_SERVICES, ADMINISTRATORS (group), etc.  Note that the built-in trustee names should be all caps as that is how the windows apis return them.</xsd:documentation>
                                         <xsd:appinfo>
+                                             <oval:deprecated_info>
+                                                  <oval:version>5.3</oval:version>
+                                                  <oval:reason>Replaced by the trustee_sid entity. This entity uses trustee names for identifying trustees. Trustee names are not unique, and a new entity was created to use trustee SIDs, which are unique. See the trustee_sid.</oval:reason>
+                                                  <oval:comment>This entity has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                             </oval:deprecated_info>
                                              <sch:pattern id="reritemtrustee_name">
                                                   <sch:rule context="win-sc:regkeyeffectiverights_item/win-sc:trustee_name">
-                                                      <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyeffectiverights_item should be 'string'</sch:assert>
+                                                        <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a regkeyeffectiverights_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3485,8 +3546,13 @@
                                    <xsd:annotation>
                                         <xsd:documentation>Windows NT/2000: The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state. Some object types do not support this access right.</xsd:documentation>
                                         <xsd:appinfo>
+                                             <oval:deprecated_info>
+                                                  <oval:version>5.6</oval:version>
+                                                  <oval:reason>This entity has been deprecated because registry keys do not support the SYNCHRONIZE standard access right.</oval:reason>
+                                             </oval:deprecated_info>
                                              <sch:pattern id="reritemstandard_synchronize">
                                                   <sch:rule context="win-sc:regkeyeffectiverights_item/win-sc:standard_synchronize">
+                                                       <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                                                        <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the standard_synchronize entity of a regkeyeffectiverights_item should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
@@ -3656,6 +3722,238 @@
                                              <sch:pattern id="reritemkey_wow64_res">
                                                   <sch:rule context="win-sc:regkeyeffectiverights_item/win-sc:key_wow64_res">
                                                        <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the key_wow64_res entity of a regkeyeffectiverights_item should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
+     <!-- ========================  SERVICE EFFECTIVE RIGHTS ITEM  ====================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="serviceeffectiverights_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>This item stores the effective rights of a service that a discretionary access control list (DACL) structure grants to a specified trustee.  The trustee's effective rights are determined by checking all access-allowed and access-denied access control entries (ACEs) in the DACL.  For help with this test see the GetEffectiveRightsFromAcl() api.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="service_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="false">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The service_name element specifies a service on the machine from which to retrieve the DACL.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_name">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_name">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <value-of select="../@id"/> - datatype attribute for the service_name entity of a serviceeffectiverights_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="trustee_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The trustee_sid element specifies the SID that is associated with a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemtrustee_sid">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:trustee_sid">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_sid entity of a serviceeffectiverights_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_delete" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the DeleteService function to delete the service.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemstandard_delete">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:standard_delete">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the standard_delete entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_read_control" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the QueryServiceObjectSecurity function to query the security descriptor of the service object.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemstandard_read_control">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:standard_read_control">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the standard_read_control entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_write_dac" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the SetServiceObjectSecurity function to modify the Dacl member of the service object's security descriptor.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemstandard_write_dac">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:standard_write_dac">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the standard_write_dac entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_write_owner" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the SetServiceObjectSecurity function to modify the Owner and Group members of the service object's security descriptor.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemstandard_write_owner">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:standard_write_owner">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the standard_write_owner entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_read" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Read access (STANDARD_RIGHTS_READ, SERVICE_QUERY_CONFIG, SERVICE_QUERY_STATUS, SERVICE_INTERROGATE, SERVICE_ENUMERATE_DEPENDENTS).</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemgeneric_read">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:generic_read">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the generic_read entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_write" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Write access (STANDARD_RIGHTS_WRITE, SERVICE_CHANGE_CONFIG).</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemgeneric_write">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:generic_write">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the generic_write entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_execute" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Execute access (STANDARD_RIGHTS_EXECUTE, SERVICE_START, SERVICE_STOP, SERVICE_PAUSE_CONTINUE, SERVICE_USER_DEFINED_CONTROL).</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemgeneric_execute">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:generic_execute">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the generic_execute entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_query_conf" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the QueryServiceConfig and QueryServiceConfig2 functions to query the service configuration.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_query_conf">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_query_conf">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_query_conf entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_change_conf" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration. </xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_change_conf">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_change_conf">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_change_conf entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_query_stat" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the QueryServiceStatusEx function to ask the service control manager about the status of the service.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_query_stat">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_query_stat">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_query_stat entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_enum_dependents" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the EnumDependentServices function to enumerate all the services dependent on the service.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_enum_dependents">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_enum_dependents">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_enum_dependents entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_start" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the StartService function to start the service.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_start">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_start">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_start entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_stop" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the ControlService function to stop the service.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_stop">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_stop">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_stop entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_pause" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the ControlService function to pause or continue the service.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_pause">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_pause">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_pause entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_interrogate" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the ControlService function to ask the service to report its status immediately.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_interrogate">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_interrogate">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_interrogate entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="service_user_defined" type="oval-sc:EntityItemBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This permission is required to call the ControlService function to specify a user-defined control code.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="svceitemservice_user_defined">
+                                                  <sch:rule context="win-sc:serviceeffectiverights_item/win-sc:service_user_defined">
+                                                       <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the service_user_defined entity of a serviceeffectiverights_state should be 'boolean'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -3880,6 +4178,58 @@
                                              <sch:pattern id="siditemtrustee_domain">
                                                   <sch:rule context="win-sc:sid_item/win-sc:trustee_domain">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_domain entity of a sid_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
+     <!-- =================================  SID SID ITEM   ============================= -->
+     <!-- =============================================================================== -->
+     <xsd:element name="sid_sid_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation/>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="trustee_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The security identifier (SID) of the specified trustee name.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="sidsiditemtrustee_sid">
+                                                  <sch:rule context="win-sc:sid_sid_item/win-sc:trustee_sid">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_sid entity of a sid_sid_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="trustee_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This element specifies the trustee name associated with a particular SID. In a domain environment, trustee names should be identified in the form: "domain\trustee name" For local trustee names use: "computer name\trustee name" For built-in accounts on the system, use the trustee name without a domain. For example: ADMINISTRATOR, SYSTEM, NETWORK_SERVICES, ADMINISTRATORS (group), etc. Note that the built-in trustee names should be all caps as that is how the windows apis return them.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="sidsiditemtrustee_name">
+                                                  <sch:rule context="win-sc:sid_sid_item/win-sc:trustee_name">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_name entity of a sid_sid_item should be 'string'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="trustee_domain" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The domain of the specified trustee name.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="sidsiditemtrustee_domain">
+                                                  <sch:rule context="win-sc:sid_sid_item/win-sc:trustee_domain">
+                                                       <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the trustee_domain entity of a sid_sid_item should be 'string'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -4464,11 +4814,31 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="MIB_IPADDR_DELETED"/>
-                    <xsd:enumeration value="MIB_IPADDR_DISCONNECTED"/>
-                    <xsd:enumeration value="MIB_IPADDR_DYNAMIC"/>
-                    <xsd:enumeration value="MIB_IPADDR_PRIMARY"/>
-                    <xsd:enumeration value="MIB_IPADDR_TRANSIENT"/>
+                    <xsd:enumeration value="MIB_IPADDR_DELETED">
+                         <xsd:annotation>
+                              <xsd:documentation>The stated IP address is being deleted. The unsigned short value that this corresponds to is 0x0040</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IPADDR_DISCONNECTED">
+                         <xsd:annotation>
+                              <xsd:documentation>The stated IP address is on a disconnected interface. The unsigned short value that this corresponds to is 0x0008.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IPADDR_DYNAMIC">
+                         <xsd:annotation>
+                              <xsd:documentation>The stated IP address is a dynamic IP address. The unsigned short value that this corresponds to is 0x0004.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IPADDR_PRIMARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The stated IP address is a primary IP address. The unsigned short value that this corresponds to is 0x0001.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IPADDR_TRANSIENT">
+                         <xsd:annotation>
+                              <xsd:documentation>The stated IP address is a transient IP address. The unsigned short value that this corresponds to is 0x0080</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4483,35 +4853,151 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="ADSTYPE_INVALID"/>
-                    <xsd:enumeration value="ADSTYPE_DN_STRING"/>
-                    <xsd:enumeration value="ADSTYPE_CASE_EXACT_STRING"/>
-                    <xsd:enumeration value="ADSTYPE_CASE_IGNORE_STRING"/>
-                    <xsd:enumeration value="ADSTYPE_PRINTABLE_STRING"/>
-                    <xsd:enumeration value="ADSTYPE_NUMERIC_STRING"/>
-                    <xsd:enumeration value="ADSTYPE_BOOLEAN"/>
-                    <xsd:enumeration value="ADSTYPE_INTEGER"/>
-                    <xsd:enumeration value="ADSTYPE_OCTET_STRING"/>
-                    <xsd:enumeration value="ADSTYPE_UTC_TIME"/>
-                    <xsd:enumeration value="ADSTYPE_LARGE_INTEGER"/>
-                    <xsd:enumeration value="ADSTYPE_PROV_SPECIFIC"/>
-                    <xsd:enumeration value="ADSTYPE_OBJECT_CLASS"/>
-                    <xsd:enumeration value="ADSTYPE_CASEIGNORE_LIST"/>
-                    <xsd:enumeration value="ADSTYPE_OCTET_LIST"/>
-                    <xsd:enumeration value="ADSTYPE_PATH"/>
-                    <xsd:enumeration value="ADSTYPE_POSTALADDRESS"/>
-                    <xsd:enumeration value="ADSTYPE_TIMESTAMP"/>
-                    <xsd:enumeration value="ADSTYPE_BACKLINK"/>
-                    <xsd:enumeration value="ADSTYPE_TYPEDNAME"/>
-                    <xsd:enumeration value="ADSTYPE_HOLD"/>
-                    <xsd:enumeration value="ADSTYPE_NETADDRESS"/>
-                    <xsd:enumeration value="ADSTYPE_REPLICAPOINTER"/>
-                    <xsd:enumeration value="ADSTYPE_FAXNUMBER"/>
-                    <xsd:enumeration value="ADSTYPE_EMAIL"/>
-                    <xsd:enumeration value="ADSTYPE_NT_SECURITY_DESCRIPTOR"/>
-                    <xsd:enumeration value="ADSTYPE_UNKNOWN"/>
-                    <xsd:enumeration value="ADSTYPE_DN_WITH_BINARY"/>
-                    <xsd:enumeration value="ADSTYPE_DN_WITH_STRING"/>
+                    <xsd:enumeration value="ADSTYPE_INVALID">
+                         <xsd:annotation>
+                              <xsd:documentation>The data type is invalid.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_DN_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of Distinguished Name (path) of a directory service object.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_CASE_EXACT_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of the case-sensitive type.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_CASE_IGNORE_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of the case-insensitive type.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_PRINTABLE_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is displayable on the screen or in print.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_NUMERIC_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a numeric value to be interpreted as text.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_BOOLEAN">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of a Boolean value.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_INTEGER">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of an integer value.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_OCTET_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a byte array.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_UTC_TIME">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of the universal time as expressed in Universal Time Coordinate (UTC).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_LARGE_INTEGER">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of a long integer value.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_PROV_SPECIFIC">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a provider-specific string.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_OBJECT_CLASS">
+                         <xsd:annotation>
+                              <xsd:documentation>Not used.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_CASEIGNORE_LIST">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of a list of case insensitive strings.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_OCTET_LIST">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of a list of octet strings.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_PATH">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a directory path.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_POSTALADDRESS">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of the postal address type.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_TIMESTAMP">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of a time stamp in seconds.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_BACKLINK">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a back link.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_TYPEDNAME">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a typed name.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_HOLD">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of the Hold data structure.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_NETADDRESS">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a net address.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_REPLICAPOINTER">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of a replica pointer.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_FAXNUMBER">
+                         <xsd:annotation>
+                              <xsd:documentation>The string is of a fax number.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_EMAIL">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of an e-mail message.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_NT_SECURITY_DESCRIPTOR">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of Windows NT/Windows 2000 Security Descriptor as represented by a byte array.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_UNKNOWN">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of an undefined type.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_DN_WITH_BINARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of ADS_DN_WITH_BINARY used for mapping a distinguished name to a non varying GUID. </xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ADSTYPE_DN_WITH_STRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The data is of ADS_DN_WITH_STRING used for mapping a distinguished name to a non-varying string value.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4526,10 +5012,26 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="AUDIT_FAILURE"/>
-                    <xsd:enumeration value="AUDIT_NONE"/>
-                    <xsd:enumeration value="AUDIT_SUCCESS"/>
-                    <xsd:enumeration value="AUDIT_SUCCESS_FAILURE"/>
+                    <xsd:enumeration value="AUDIT_FAILURE">
+                         <xsd:annotation>
+                              <xsd:documentation>The audit type AUDIT_FAILURE is used to perform audits on all unsuccessful occurrences of specified events when auditing is enabled.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="AUDIT_NONE">
+                         <xsd:annotation>
+                              <xsd:documentation>The audit type AUDIT_NONE is used to cancel all auditing options for the specified events.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="AUDIT_SUCCESS">
+                         <xsd:annotation>
+                              <xsd:documentation>The audit type AUDIT_SUCCESS is used to perform audits on all successful occurrences of the specified events when auditing is enabled.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="AUDIT_SUCCESS_FAILURE">
+                         <xsd:annotation>
+                              <xsd:documentation>The audit type AUDIT_SUCCESS_FAILURE is used to perform audits on all successful and unsuccessful occurrences of the specified events when auditing is enabled.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4544,12 +5046,36 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="FILE_ATTRIBUTE_DIRECTORY"/>
-                    <xsd:enumeration value="FILE_TYPE_CHAR"/>
-                    <xsd:enumeration value="FILE_TYPE_DISK"/>
-                    <xsd:enumeration value="FILE_TYPE_PIPE"/>
-                    <xsd:enumeration value="FILE_TYPE_REMOTE"/>
-                    <xsd:enumeration value="FILE_TYPE_UNKNOWN"/>
+                    <xsd:enumeration value="FILE_ATTRIBUTE_DIRECTORY">
+                         <xsd:annotation>
+                              <xsd:documentation>The handle identifies a directory.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="FILE_TYPE_CHAR">
+                         <xsd:annotation>
+                              <xsd:documentation>The specified file is a character file, typically an LPT device or a console.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="FILE_TYPE_DISK">
+                         <xsd:annotation>
+                              <xsd:documentation>The specified file is a disk file.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="FILE_TYPE_PIPE">
+                         <xsd:annotation>
+                              <xsd:documentation>The specified file is a socket, a named pipe, or an anonymous pipe.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="FILE_TYPE_REMOTE">
+                         <xsd:annotation>
+                              <xsd:documentation>Unused.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="FILE_TYPE_UNKNOWN">
+                         <xsd:annotation>
+                              <xsd:documentation>Either the type of the specified file is unknown, or the function failed.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4564,13 +5090,41 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="MIB_IF_TYPE_ETHERNET"/>
-                    <xsd:enumeration value="MIB_IF_TYPE_FDDI"/>
-                    <xsd:enumeration value="MIB_IF_TYPE_LOOPBACK"/>
-                    <xsd:enumeration value="MIB_IF_TYPE_OTHER"/>
-                    <xsd:enumeration value="MIB_IF_TYPE_PPP"/>
-                    <xsd:enumeration value="MIB_IF_TYPE_SLIP"/>
-                    <xsd:enumeration value="MIB_IF_TYPE_TOKENRING"/>
+                    <xsd:enumeration value="MIB_IF_TYPE_ETHERNET">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_ETHERNET type is used to describe ethernet interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IF_TYPE_FDDI">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_FDDI type is used to describe fiber distributed data interfaces (FDDI).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IF_TYPE_LOOPBACK">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_LOOPBACK type is used to describe loopback interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IF_TYPE_OTHER">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_OTHER type is used to describe unknown interfaces.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IF_TYPE_PPP">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_PPP type is used to describe point-to-point protocol interfaces (PPP).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IF_TYPE_SLIP">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_SLIP type is used to describe serial line internet protocol interfaces (SLIP).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="MIB_IF_TYPE_TOKENRING">
+                         <xsd:annotation>
+                              <xsd:documentation>The MIB_IF_TYPE_TOKENRING type is used to describe token ring interfaces..</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4585,9 +5139,21 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="domain"/>
-                    <xsd:enumeration value="configuration"/>
-                    <xsd:enumeration value="schema"/>
+                    <xsd:enumeration value="domain">
+                         <xsd:annotation>
+                              <xsd:documentation>The domain naming context contains Active Directory objects present in the specified domain (e.g. users, computers, groups, and other objects).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="configuration">
+                         <xsd:annotation>
+                              <xsd:documentation>The configuration naming context contains configuration data that is required for the Active Directory to operate as a directory service.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="schema">
+                         <xsd:annotation>
+                              <xsd:documentation>The schema naming context contains all of the Active Directory object definitions.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4602,8 +5168,16 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="TCP"/>
-                    <xsd:enumeration value="UDP"/>
+                    <xsd:enumeration value="TCP">
+                         <xsd:annotation>
+                              <xsd:documentation>The port uses the Transmission Control Protocol (TCP).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="UDP">
+                         <xsd:annotation>
+                              <xsd:documentation>The port uses the User Datagram Protocol (UDP).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
@@ -4618,11 +5192,31 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
-                    <xsd:enumeration value="HKEY_CLASSES_ROOT"/>
-                    <xsd:enumeration value="HKEY_CURRENT_CONFIG"/>
-                    <xsd:enumeration value="HKEY_CURRENT_USER"/>
-                    <xsd:enumeration value="HKEY_LOCAL_MACHINE"/>
-                    <xsd:enumeration value="HKEY_USERS"/>
+                    <xsd:enumeration value="HKEY_CLASSES_ROOT">
+                         <xsd:annotation>
+                              <xsd:documentation>This registry subtree contains information that associates file types with programs and configuration data for automation (e.g. COM objects and Visual Basic Programs).</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="HKEY_CURRENT_CONFIG">
+                         <xsd:annotation>
+                              <xsd:documentation>This registry subtree contains configuration data for the current hardware profile.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="HKEY_CURRENT_USER">
+                         <xsd:annotation>
+                              <xsd:documentation>This registry subtree contains the user profile of the user that is currently logged into the system.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="HKEY_LOCAL_MACHINE">
+                         <xsd:annotation>
+                              <xsd:documentation>This registry subtree contains information about the local system.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="HKEY_USERS">
+                         <xsd:annotation>
+                              <xsd:documentation>This registry subtree contains user-specific data.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
