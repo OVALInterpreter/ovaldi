@@ -115,6 +115,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
                 if(behavior->GetValue().compare("true") == 0) {
 				    resolveGroupBehavior = true;
                 }
+                Log::Info("Deprecated behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
             } else if(behavior->GetName().compare("max_depth") == 0 || behavior->GetName().compare("recurse_direction") == 0) {
                 // skip these they are supported in the file finder class.
 
