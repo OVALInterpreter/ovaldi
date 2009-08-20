@@ -205,7 +205,7 @@ Item* SidSidProbe::CreateItem() {
 						"win-sc", 
 						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows windows-system-characteristics-schema.xsd", 
 						OvalEnum::STATUS_ERROR, 
-						"sid_item");
+						"sid_sid_item");
 
 	return item;
 }
@@ -227,8 +227,8 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 			if(includeGroupBehavior) {
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 				items->push_back(item);
 			} 
@@ -251,8 +251,8 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 		} else {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			items->push_back(item);
 		}
