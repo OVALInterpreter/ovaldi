@@ -44,8 +44,8 @@ Test::Test() {
 	this->SetAnalyzed(false);
 	this->SetCheckExistence(OvalEnum::EXISTENCE_ALL_EXIST);
 	this->SetCheck(OvalEnum::CHECK_ALL);
+    this->SetStateOperator(OvalEnum::OPERATOR_AND);
 	this->SetObjectId("");
-	this->SetStateId("");
 }
 
 Test::~Test() {
@@ -57,6 +57,8 @@ Test::~Test() {
 	  	delete item;
 	  	item = NULL;
 	}
+
+    this->stateIds.clear();
 }
 
 // ***************************************************************************************	//
@@ -79,6 +81,13 @@ void Test::SetCheckExistence(OvalEnum::Existence checkExistence) {
 	this->checkExistence = checkExistence;
 }
 
+OvalEnum::Operator Test::GetStateOperator() {
+	return this->stateOperator;
+}
+
+void Test::SetStateOperator(OvalEnum::Operator stateOperator) {
+	this->stateOperator = stateOperator;
+}
 
 TestedItemVector* Test::GetTestedItems() {
 	return &this->testedItems;
@@ -132,14 +141,26 @@ Object* Test::GetReferencedObject() {
     return Object::GetObjectById(this->GetObjectId());
 }
 
-string Test::GetStateId() {
+StringSet* Test::GetStateIds() {
 
-	return this->stateId;
+	return &this->stateIds;
 }
 
-void Test::SetStateId(string stateId) {
+void Test::SetStateIds(StringSet stateIds) {
 
-	this->stateId = stateId;
+	this->stateIds = stateIds;
+}
+
+void Test::AppendStateId(string stateId) {
+    this->stateIds.insert(stateId);
+}
+
+bool Test::HasStateReference() {
+    if(this->stateIds.size() == 0 ) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 string Test::GetName() {
@@ -243,6 +264,7 @@ void Test::Write(DOMElement* parentElm) {
 		XmlCommon::AddAttribute(testElm, "version", Common::ToString(this->GetVersion()));
 		XmlCommon::AddAttribute(testElm, "check_existence", OvalEnum::ExistenceToString(this->GetCheckExistence()));
 		XmlCommon::AddAttribute(testElm, "check", OvalEnum::CheckToString(this->GetCheck()));
+        XmlCommon::AddAttribute(testElm, "state_operator", OvalEnum::OperatorToString(this->GetStateOperator()));
 		XmlCommon::AddAttribute(testElm, "result", OvalEnum::ResultToString(this->GetResult()));
 
 		if(this->GetVariableInstance() != 1) {
@@ -264,17 +286,18 @@ void Test::Write(DOMElement* parentElm) {
 			(*iterator1)->WriteTestedVariable(testElm);
 		}
 
-		// loop through all vars in the state
-		if(this->GetStateId().compare("") != 0) {
-			State* tmpState = State::SearchCache(this->GetStateId());
-			if(tmpState != NULL) { 
-				VariableValueVector::iterator iterator2;
-				VariableValueVector* stateVars = tmpState->GetVariableValues();
-				for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
-					(*iterator2)->WriteTestedVariable(testElm);
-				}
-			}
-		}
+		// loop through all vars in the states
+        for(StringSet::iterator it = this->GetStateIds()->begin(); it != this->GetStateIds()->end(); it++) {
+	    
+		    State* tmpState = State::SearchCache((*it));
+		    if(tmpState != NULL) { 
+			    VariableValueVector::iterator iterator2;
+			    VariableValueVector* stateVars = tmpState->GetVariableValues();
+			    for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
+				    (*iterator2)->WriteTestedVariable(testElm);
+			    }
+		    }		    
+        }
 	}
 }
 
@@ -289,6 +312,8 @@ void Test::Parse(DOMElement* testElm) {
 	this->SetVersion(atoi(XmlCommon::GetAttributeByName(testElm, "version").c_str()));
 	this->SetCheckExistence(OvalEnum::ToExistence(XmlCommon::GetAttributeByName(testElm, "check_existence")));
 	this->SetCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(testElm, "check")));
+    this->SetStateOperator(OvalEnum::ToOperator(XmlCommon::GetAttributeByName(testElm, "state_operator")));
+    
 
 	// to support version 5.3 it is best to just look for the deprected check = none exist 
 	// and replace it with the correct pair of check = any and check_existence = none_exist
@@ -304,11 +329,25 @@ void Test::Parse(DOMElement* testElm) {
 		this->SetObjectId(XmlCommon::GetAttributeByName(objectElm, "object_ref"));
 	}
     
-	// get the state element and the state id if it exists
-	DOMElement* stateElm = XmlCommon::FindElementNS(testElm, "state");
-	if(stateElm != NULL) {
-		string stateId = XmlCommon::GetAttributeByName(stateElm, "state_ref");
-		this->SetStateId(stateId);
+	// get the state elements and the state id if it exists
+    DOMNodeList *testElmChildren = testElm->getChildNodes();
+	unsigned int index = 0;
+	while(index < testElmChildren->getLength()) {
+		DOMNode *tmpNode = testElmChildren->item(index);
+
+		//	only concerned with ELEMENT_NODEs
+		if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+			DOMElement *testChildElm = (DOMElement*)tmpNode;
+			
+			//	get the name of the child
+			string childName = XmlCommon::GetElementName(testChildElm);
+			if(childName.compare("state") == 0) {				
+				// get the state's id
+				string stateId = XmlCommon::GetAttributeByName(testChildElm, "state_ref");
+                this->AppendStateId(stateId);
+			} 
+		}
+		index ++;
 	}
 
 	Test::Cache(this);
@@ -335,7 +374,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 
                 // Get the component name from the first part of the test name
-				// NOTE: Due to the inconsistent OVAL definition, this won't work for inetlisteningserver(s)
+				// NOTE: Due to the inconsistent OVAL object, test, items names this won't work for inetlisteningserver(s)
 				string componentName;
                 string::size_type loc = this->name.find("_", 0);
 				if( loc != string::npos ) {
@@ -437,7 +476,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 				
 				// the result should be error unless the check existence is set to any exist
 				// and the test does not have a state reference. In this case the result should be true
-				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && this->GetStateId().compare("") == 0) {
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && !this->HasStateReference()) {
 					
 					this->SetResult(OvalEnum::RESULT_TRUE);
 
@@ -452,7 +491,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 				// the result should be not applicable unless the check existence is set to any exist
 				// and the test does not have a state reference. In this case the result should be true
-				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && this->GetStateId().compare("") == 0) {
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && !this->HasStateReference()) {
 					
 					this->SetResult(OvalEnum::RESULT_TRUE);
 
@@ -467,7 +506,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 				// the result should be unknown unless the check existence is set to any exist
 				// and the test does not have a state reference. In this case the result should be true
-				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && this->GetStateId().compare("") == 0) {
+				if(this->GetCheckExistence() == OvalEnum::EXISTENCE_ANY_EXIST && !this->HasStateReference()) {
 					
 					this->SetResult(OvalEnum::RESULT_TRUE);
 
@@ -561,7 +600,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 
 				// if the existence result is true evaluate the check_state attribute if there is a state
 				if(existenceResult == OvalEnum::RESULT_TRUE) {
-					if(this->GetStateId().compare("") != 0) {
+					if(this->HasStateReference()) {
 						overallResult = this->EvaluateCheckState();
 					} else {
 						overallResult = existenceResult;
@@ -731,33 +770,40 @@ OvalEnum::ResultEnumeration Test::EvaluateCheckState() {
 	OvalEnum::ResultEnumeration stateResult = OvalEnum::RESULT_ERROR;
 
 	// is there a state associated with this test?
-	if(this->GetStateId().compare("") == 0) {
+	if(!this->HasStateReference()) {
 		// no state specified
 		// just report true...
 		stateResult = OvalEnum::RESULT_TRUE;
 
 	} else {
 
+        string currentStateId = "";
 		try {
+		    // analyze each tested item
+		    IntVector itemResults;
+		    for(TestedItemVector::iterator iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
 
-			State* state =  State::GetStateById(this->GetStateId());
+                // Compare the item to each state
+                IntVector stateResults;
+                for(StringSet::iterator it = this->GetStateIds()->begin(); it != this->GetStateIds()->end(); it++) {
+                    currentStateId = (*it);
+		            State* state =  State::GetStateById(currentStateId);
+			        OvalEnum::ResultEnumeration stateResult = state->Analyze((*iterator)->GetItem());				        
+			        stateResults.push_back(stateResult);
+                }
+                
+                // combine results based on the state_operator attribute
+                OvalEnum::ResultEnumeration itemResult = OvalEnum::CombineResultsByOperator(&stateResults, this->GetStateOperator());
+                (*iterator)->SetResult(itemResult);
+                itemResults.push_back(itemResult);
+		    }
 
-			// analyze each tested item
-			IntVector results;
-			TestedItemVector::iterator iterator;
-			for(iterator = this->GetTestedItems()->begin(); iterator != this->GetTestedItems()->end(); iterator++) {
-				OvalEnum::ResultEnumeration tmpResult;
-				tmpResult = state->Analyze((*iterator)->GetItem());
-				(*iterator)->SetResult(tmpResult);
-				results.push_back(tmpResult);
-			}
-
-			// combine results based on the check attribute
-			stateResult = OvalEnum::CombineResultsByCheck(&results, this->GetCheck());
+		    // combine results based on the check attribute
+		    stateResult = OvalEnum::CombineResultsByCheck(&itemResults, this->GetCheck());
 
 		} catch(Exception ex) {
 			this->SetResult(OvalEnum::RESULT_ERROR);
-			Log::Fatal("Unable to evaluate test " + this->GetId() + ". An error occured while processing the associated state " + this->GetStateId() + ". " + ex.GetErrorMessage());
+			Log::Fatal("Unable to evaluate test " + this->GetId() + ". An error occured while processing the associated state " + currentStateId + ". " + ex.GetErrorMessage());
 		}
 	}
 

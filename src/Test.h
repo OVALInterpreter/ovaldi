@@ -131,9 +131,13 @@ public:
     Object* GetReferencedObject();
 
 	/** Return the stateId field's value. */
-	string GetStateId();
-	/** Set the stateId field's value. */
-	void SetStateId(string stateId);
+	StringSet* GetStateIds();
+	/** Set the stateIds field's value. */
+	void SetStateIds(StringSet stateIds);
+    /** Add the stateId to the list of state ids. */
+	void AppendStateId(string stateId);
+    /** return true if the test has a state reference. */
+    bool HasStateReference();
 
 	/** Return the name field's value. */
 	string GetName();
@@ -159,6 +163,11 @@ public:
 	OvalEnum::Existence GetCheckExistence();
 	/** Set the checkExistence field's value. */
 	void SetCheckExistence(OvalEnum::Existence checkExistence);
+
+    /** Return the stateOperator field's value. */
+	OvalEnum::Operator GetStateOperator();
+	/** Set the stateOperator field's value. */
+	void SetStateOperator(OvalEnum::Operator stateOperator);
 
 	/** Return the testedItems field's value. */
 	TestedItemVector* GetTestedItems();
@@ -217,10 +226,11 @@ private:
 	OvalEnum::Check check;
 	OvalEnum::Existence checkExistence;
 	OvalEnum::Check checkState;
+    OvalEnum::Operator stateOperator;
 	TestedItemVector testedItems;
 	VariableValueVector testedVariables;
 	string objectId;
-	string stateId;
+	StringSet stateIds;
 	string name;
 
 	static TestMap processedTestsMap;
