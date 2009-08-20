@@ -271,14 +271,7 @@ string SharedResourceProbe::GetSharedResourceType ( DWORD sharedType ) {
         case STYPE_IPC:
             typeStr = "STYPE_IPC";
             break;
-        case STYPE_SPECIAL:
-            typeStr = "STYPE_SPECIAL";
-            break;
-        case STYPE_TEMPORARY:
-            typeStr = "STYPE_TEMPORARY";
-            break;
-            //TODO V5.6 - Uncomment the following code and to remove the STYPE_SPECIAL and STYPE_TEMPORARY case statements
-            /*case ( STYPE_SPECIAL | STYPE_DISKTREE ) :
+            case ( STYPE_SPECIAL | STYPE_DISKTREE ) :
                 typeStr = "STYPE_DISKTREE_SPECIAL";
                 break;
             case ( STYPE_TEMPORARY | STYPE_DISKTREE ) :
@@ -313,7 +306,7 @@ string SharedResourceProbe::GetSharedResourceType ( DWORD sharedType ) {
                 break;
             case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_IPC ) :
                 typeStr = "STYPE_IPC_SPECIAL_TEMPORARY";
-                break;*/
+                break;
         default:
             typeStr = "";
             break;
