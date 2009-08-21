@@ -245,6 +245,30 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 	return result;
 }
 
+OvalEnum::Flag AbsEntity::GetEntityValues(StringVector &values) {
+	
+	OvalEnum::Flag flagResult = OvalEnum::FLAG_COMPLETE;
+
+	if (this->GetVarRef() == NULL)
+		values.push_back(this->GetValue());
+	else {
+		AbsVariable *var = this->GetVarRef();
+		flagResult = var->GetFlag();
+
+		if (flagResult == OvalEnum::FLAG_COMPLETE) {
+
+			VariableValueVector *vvv = var->GetValues();
+			for(VariableValueVector::iterator iter = vvv->begin(); iter != vvv->end(); ++iter)
+				values.push_back((*iter)->GetValue());
+
+        } else if (flagResult == OvalEnum::FLAG_ERROR) {
+            throw Exception ("Unable to calculate variable values for variable: " + var->GetId());
+        }
+	}
+
+    return flagResult;
+}
+
 //****************************************************************************************//
 //							AbsEntityException Class									  //	
 //****************************************************************************************//

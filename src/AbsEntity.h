@@ -95,6 +95,21 @@ public:
 	*/
 	OvalEnum::ResultEnumeration Analyze(ItemEntity* scElement);
 
+    /**
+	 * Gets values for the given entity.  Insulates me from having
+	 * to care whether they were defined literally or via var_ref.
+	 * The given StringVector is populated with the values.
+	 * <p>
+	 * If the given entity uses a var_ref, the return value will be
+	 * the flag value of the referenced variable.  If the flag is not
+	 * FLAG_COMPLETE, no values are added to the StringVector.
+	 * </p><p>
+	 * If the specified entity does not use a var_ref, FLAG_COMPLETE is
+     * returned.
+	 *</p>
+     */
+    OvalEnum::Flag GetEntityValues(StringVector &values);
+
 	/** 
 		Return a vector of variable values that were used for this entity.
 	*/
