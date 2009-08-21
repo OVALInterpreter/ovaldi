@@ -57,6 +57,9 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 	// get the hive, key, and name from the provided object
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
+    ObjectEntity* filePath = object->GetElementByName("filepath");
+    if(filePath != NULL)
+        throw ProbeException("The filepath entity is not currently supported.");
 	ObjectEntity* xpath = object->GetElementByName("xpath");
 	
 	// check datatypes - only allow string

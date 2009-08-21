@@ -83,6 +83,10 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 	// get the path and file name
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
+    ObjectEntity* filePath = object->GetElementByName("filepath");
+    if(filePath != NULL)
+        throw ProbeException("The filepath entity is not currently supported.");
+
 	ObjectEntity* trusteeName = object->GetElementByName("trustee_name");
 
 	// check trustee datatypes - only allow string
