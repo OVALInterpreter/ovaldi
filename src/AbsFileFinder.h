@@ -66,7 +66,7 @@ public:
 		set to NULL because no matching filenames were found at the path.
 
 		See also AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity* fileName) to 
-		determine if the fact the the filename was nopt found should be reported by the calling probe.
+		determine if the fact the the filename was not found should be reported by the calling probe.
 	*/
 	StringPairVector* SearchFiles(ObjectEntity* path, ObjectEntity* fileName, BehaviorVector* behaviors);
 
