@@ -34,7 +34,7 @@
 #pragma warning(disable:4786)
 
 #include "FileFinder.h"
-#include "AbsProbe.h"
+#include "AbsEffectiveRightsProbe.h"
 #include "WindowsCommon.h"
 
 #include <aclapi.h>
@@ -45,9 +45,11 @@ using namespace std;
 /**
 	This class is responsible for collecting file information for windows fileeffictiverights53_objects.
 */
-class FileEffectiveRights53Probe : public AbsProbe {
+class FileEffectiveRights53Probe : public AbsEffectiveRightsProbe {
 
 public:
+
+	/** FileEffectiveRights53Probe destructor */
 	~FileEffectiveRights53Probe();
 	
 	ItemVector* CollectItems(Object* object);
@@ -59,37 +61,22 @@ public:
 	static AbsProbe* Instance();
 
 private:
+	
+	/** FileEffectiveRights53Probe constructor */
 	FileEffectiveRights53Probe();
 
+	/** Get the effective rights for a trustee SID for the specified path and filename.
+     *  @param path A string that contains the path of the file that you want to get the effective rights of.
+	 *  @param fileName A string that contains the name of the file that you want to get the effective rights of.
+     *  @param trusteeSID A string that contains the trustee SID of the file that you want to get the effective rights of.
+     *  @return The item that contains the file effective rights of the specified path, filename, and trustee SID.
+     */
+	Item* GetEffectiveRights(string path, string fileName, string trusteeSID); 
+
+	/** The static instance of the FileEffectiveRights53Probe.
+     *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.
+     */
 	static FileEffectiveRights53Probe* instance;
-
-	/** Get the effective rights for a trustee SID for the specified file. */
-	Item* GetEffectiveRights(string path, string fileName, string trusteeSID);
-
-    /**
-        Return a set of all the SIDs that match the specified trusteeSID entity relative to the specified file.
-        @param fp The path and filename of the desired file as a StringPair
-        @param trusteeSID The truseeSID ObjectEntity that will be used to create the set of matching trustee SIDs
-        @param resolveGroupBehavior boolean flag used to indicate whether or not groups should be resolved
-        @param includeGroupBehavior boolean flag used to indicate whether or not groups shoudl be included in the resulting set of truseee SIDs
-    */
-    StringSet* GetTrusteeSIDsForFile(StringPair* fp, ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior);
-
-	/** Search the input vector of all trustee SIDs and return the set of SIDs the match the specified criteria. */
-	void GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex = true);
-
-	/** Return true if the calling probe should report that the trustee SID does not exist.
-		If a trustee SID's operator is set to OPERATOR_EQUALS and the trustee SID does not exist
-		the caller should report that the trustee SID was not found. 
-
-        When getting the value of the trustee SID to check existence need to look for either a 
-        simple element value or a variable with one or more values. If the return value is true
-        the trusteeSIDs StringVector* paremeter contains the set of trustee SIDs to report as not
-        existing. Otherwise the the trusteeSIDs paramter is NULL. The caller is responsible for 
-        making sure that any memory allocated for the trusteeSIDs parameter is cleaned up. The 
-        trusteeSIDs paramter should be input as NULL when the function is called.
-	*/
-	bool ReportTrusteeSIDDoesNotExist(ObjectEntity* trusteeSID, StringSet* trusteeSIDs);
 };
 
 #endif
