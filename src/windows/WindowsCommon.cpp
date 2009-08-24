@@ -2103,16 +2103,18 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
     return enabled;
 }
 
-void WindowsCommon::GetEffectiveRightsForFile(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {	
+void WindowsCommon::GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights) {	
 
 	if(WindowsCommon::IsXPOrLater()) {
-		WindowsCommon::GetEffectiveRightsForFileAuthz(pSid, filePath, pAccessRights);
+		WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(objectType, pSid, objectNameStr, pAccessRights);
 	} else {
-		WindowsCommon::GetEffectiveRightsForFileAcl(pSid, filePath, pAccessRights);
+		WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(objectType, pSid, objectNameStr, pAccessRights);
 	}
 }
 
-void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {
+
+
+void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -2130,14 +2132,14 @@ void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PA
 	Log::Debug("Calling the acl api to get effective rights");
 
 
-	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid) + " from dacl for file: " + (*filePath);
+	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid) + " from dacl for Windows object: " + (*objectNameStr);
 
 	DWORD res;
 	PACL pdacl;
 	PSECURITY_DESCRIPTOR pSD;
 
-	res = GetNamedSecurityInfo(const_cast<char*>((*filePath).c_str()),	// object name
-							   SE_FILE_OBJECT,							// object type
+	res = GetNamedSecurityInfo(const_cast<char*>((*objectNameStr).c_str()),	// object name
+							   objectType,							// object type
 							   DACL_SECURITY_INFORMATION |				// information type
 							   PROTECTED_DACL_SECURITY_INFORMATION |
 							   UNPROTECTED_DACL_SECURITY_INFORMATION, 			
@@ -2147,14 +2149,8 @@ void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PA
 							   NULL,									// SACL
 							   &pSD);									// Security Descriptor
 
-	if (res != ERROR_SUCCESS) {
-		if (res == ERROR_FILE_NOT_FOUND) {
-			// should never get here. 
-			// before calling this function the file should already have been checked for existence.
-			throw Exception( baseErrMsg + " Unable locate the specified file."); 
-		} else {
-			throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
-		}
+	if (res != ERROR_SUCCESS) {	
+		throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 	} 
 
 
@@ -2188,7 +2184,7 @@ void WindowsCommon::GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PA
 	Log::Debug("Finished calling the acl api to get effective rights");
 }
 
-void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, PACCESS_MASK pAccessRights) {	
+void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights) {	
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -2212,8 +2208,8 @@ void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, 
 	AUTHZ_CLIENT_CONTEXT_HANDLE hClientContext = NULL;	
 	AUTHZ_RESOURCE_MANAGER_HANDLE hAuthzResourceManager = NULL;	
 
-	DWORD res = GetNamedSecurityInfo(const_cast<char*>((*filePath).c_str()),// object name
-									 SE_FILE_OBJECT,						// object type
+	DWORD res = GetNamedSecurityInfo(const_cast<char*>((*objectNameStr).c_str()),// object name
+									 objectType,						// object type
 									 DACL_SECURITY_INFORMATION |			// information type
 									 GROUP_SECURITY_INFORMATION |
 									 OWNER_SECURITY_INFORMATION,
@@ -2224,13 +2220,7 @@ void WindowsCommon::GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, 
 									 &pSD);								   // Security Descriptor
 
 	if (res != ERROR_SUCCESS) {
-		if (res == ERROR_FILE_NOT_FOUND) {
-			// should never get here. 
-			// before calling this function the file should already have been checked for existence.
-			throw Exception("Unable locate the specified file."); 
-		} else {
-			throw Exception("Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
-		}
+		throw Exception("Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 	} 
 
 	// Check to see if a valid security descriptor was returned.  
@@ -2417,3 +2407,35 @@ string WindowsCommon::UnicodeToAsciiString ( wchar_t* unicodeCharStr ) {
     return asciiStr;
 }
 
+string WindowsCommon::GetObjectType ( SE_OBJECT_TYPE objectType ) {
+    switch ( objectType ) {
+        case SE_UNKNOWN_OBJECT_TYPE:
+            return "SE_UNKNOWN_OBJECT_TYPE";
+        case SE_FILE_OBJECT:
+            return "SE_FILE_OBJECT";
+        case SE_SERVICE:
+            return "SE_SERVICE";
+        case SE_PRINTER:
+            return "SE_PRINTER";
+        case SE_REGISTRY_KEY:
+            return "SE_REGISTRY_KEY";
+        case SE_LMSHARE:
+            return "SE_LMSHARE";
+        case SE_KERNEL_OBJECT:
+            return "SE_KERNEL_OBJECT";
+        case SE_WINDOW_OBJECT:
+            return "SE_WINDOW_OBJECT";
+        case SE_DS_OBJECT:
+            return "SE_DS_OBJECT";
+        case SE_DS_OBJECT_ALL:
+            return "SE_DS_OBJECT_ALL";
+        case SE_PROVIDER_DEFINED_OBJECT:
+            return "SE_PROVIDER_DEFINED_OBJECT";
+        case SE_WMIGUID_OBJECT:
+            return "SE_WMIGUID_OBJECT";
+        case SE_REGISTRY_WOW64_32KEY:
+            return "SE_REGISTRY_WOW64_32KEY";
+        default:
+            return "";
+    }
+}
