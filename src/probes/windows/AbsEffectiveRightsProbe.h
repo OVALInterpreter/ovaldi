@@ -39,9 +39,9 @@
 
 /** 
 	The AbsEffectiveRightsProbe class provides several methods used by all effective rights probes including a
-	method for retrieving all of the trustee SIDs for a particular Windows object, a method for retrieving all
-	of the matching trustee SIDs, and a method for determining whether or not a trustee SID should be reported
-	as non-existent.
+	method for retrieving all of the trustees for a particular Windows object, a method for retrieving all
+	of the matching trustees, and a method for determining whether or not a trustee should be reported
+	as non-existent. In the following documentation, trustee refers to both trustee SIDs and trustee names.
 */
 
 class AbsEffectiveRightsProbe : public AbsProbe {
@@ -55,39 +55,41 @@ class AbsEffectiveRightsProbe : public AbsProbe {
         ~AbsEffectiveRightsProbe();
 
         /**
-            Return a set of all of the SIDs that match the specified trustee SID entity relative to the specified Windows object.
+            Return a set of all of the trustees that match the specified trustee entity relative to the specified Windows object.
             @param windowsObjectType A SE_OBJECT_TYPE that specifies the type of the Windows object.
             @param objectNameStr A string value that contains the name of the Windows object.
-            @param trusteeSIDEntity A pointer to the trustee SID ObjectEntity that will be used to create the set of matching trustee SIDs.
+            @param trusteeEntity A pointer to the trustee ObjectEntity that will be used to create the set of matching trustees.
+			@param isSID A boolean value that specifies whether or not the trusteeEntity is a SID.
             @param resolveGroupBehavior A boolean value that specifies whether or not groups should be resolved.
-            @param includeGroupBehavior A boolean value that specifies whether or not groups should be included in the resulting set of trustee SIDs.
-            @return A pointer to a StringSet containing all of the SIDs that match the specified trustee SID ObjectEntity.
+            @param includeGroupBehavior A boolean value that specifies whether or not groups should be included in the resulting set of trustees.
+            @return A pointer to a StringSet containing all of the trustees that match the specified trustee ObjectEntity.
         */
-        StringSet* GetTrusteeSIDsForWindowsObject ( SE_OBJECT_TYPE windowsObjectType, string objectNameStr, ObjectEntity* trusteeSIDEntity,  bool resolveGroupBehavior, bool includeGroupBehavior );
+        StringSet* GetTrusteesForWindowsObject ( SE_OBJECT_TYPE windowsObjectType, string objectNameStr, ObjectEntity* trusteeEntity, bool isSID, bool resolveGroupBehavior, bool includeGroupBehavior );
 
-        /** Search the input vector of all trustee SIDs and return the set of SIDs the match the specified criteria.
-            @param trusteeSIDPatternStr A string value that contains the trustee SID pattern to be matched.
-            @param allTrusteeSIDs A pointer to a StringSet that contains all of the trustee SIDs.
-            @param trusteeSIDs A pointer to a StringSet that is used to store all of the matching trustee SIDs.
+        /** Search the input vector of all trustees and return the set of trustees the match the specified criteria.
+            @param trusteePatternStr A string value that contains the trustee pattern to be matched.
+            @param allTrustees A pointer to a StringSet that contains all of the trustees.
+            @param trustees A pointer to a StringSet that is used to store all of the matching trustees.
             @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
             @return Void.
         */
-        void GetMatchingTrusteeSIDs ( string trusteeSIDPatternStr, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex );
+        void GetMatchingTrustees ( string trusteePatternStr, StringSet* allTrustees, StringSet* trustees, bool isRegex );
 
-        /** Return true if the calling probe should report that the trustee SID does not exist.
-            If a trustee SID's operator is set to OPERATOR_EQUALS and the trustee SID does not exist
-            the caller should report that the trustee SID was not found. When getting the value of the
-            trustee SID to check its existence, we need to look for either a simple element value or a
-            variable element with one or more values. If the return value is true, the trusteeSIDs
-            StringSet* parameter contains the set of trustee SIDs to report as not existing.
-            Otherwise, the the trusteeSID's parameter is NULL. The caller is responsible for
-            making sure that any memory allocated for the trusteeSID's parameter is cleaned up. The
-            trusteeSID's parameter should be input as NULL when the function is called.
-            @param trusteeSIDEntity A pointer to the trustee SID ObjectEntity that specifies the trustee SIDs whose existence should be checked.
-            @param trusteeSIDS A pointer to a StringSet that contains the non-existent trustee SIDs.
-            @return A boolean value that specifies whether or not the calling probe should report that a trustee SID does not exist.
+        /** Return true if the calling probe should report that the trustee does not exist.
+            If a trustees operator is set to OPERATOR_EQUALS and the trustee does not exist
+            the caller should report that the trustee was not found. When getting the value of the
+            trustee to check its existence, we need to look for either a simple element value or a
+            variable element with one or more values. If the return value is true, the trustees
+            StringSet* parameter contains the set of trustees to report as not existing.
+            Otherwise, the the trustee's parameter is NULL. The caller is responsible for
+            making sure that any memory allocated for the trustee's parameter is cleaned up. The
+            trustee's parameter should be input as NULL when the function is called.
+            @param trusteeEntity A pointer to the trustee ObjectEntity that specifies the trustees whose existence should be checked.
+            @param trustees A pointer to a StringSet that contains the non-existent trustees.
+			@param isSID A boolean value that specifies whether or not the trustee entity is a SID.
+            @return A boolean value that specifies whether or not the calling probe should report that a trustee does not exist.
         */
-        bool ReportTrusteeSIDDoesNotExist ( ObjectEntity *trusteeSIDEntity, StringSet* trusteeSIDs );
+        bool ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, StringSet* trustees, bool isSID );
 };
 
 #endif
