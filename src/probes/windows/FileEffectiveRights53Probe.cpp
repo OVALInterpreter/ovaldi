@@ -173,7 +173,8 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 					//
 					// The file exists so lets get the sids to then examine effective rights
 					//
-                    StringSet* trusteeSIDs = this->GetTrusteeSIDsForFile(fp, trusteeSID, resolveGroupBehavior, includeGroupBehavior);
+					string filePathStr = Common::BuildFilePath((const string)fp->first, (const string)fp->second);
+                    StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject(SE_FILE_OBJECT, filePathStr, trusteeSID, true, resolveGroupBehavior, includeGroupBehavior);
 					if(!trusteeSIDs->empty()) {
 						StringSet::iterator iterator;
 						for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
@@ -195,7 +196,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 						Log::Debug("No matching SIDs found when getting effective rights for object: " + object->GetId());
 
 						StringSet* trusteeSIDs = new StringSet();
-						if(this->ReportTrusteeSIDDoesNotExist(trusteeSID, trusteeSIDs)) {
+						if(this->ReportTrusteeDoesNotExist(trusteeSID, trusteeSIDs, true)) {
 
 							StringSet::iterator iterator;
 							for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
@@ -258,177 +259,6 @@ Item* FileEffectiveRights53Probe::CreateItem() {
 	return item;
 }
 
-StringSet* FileEffectiveRights53Probe::GetTrusteeSIDsForFile(StringPair* fp, ObjectEntity* trusteeSID,  bool resolveGroupBehavior, bool includeGroupBehavior) {
-
-	PACL pdacl = NULL;
-    PSID ownerSid;
-    PSID primaryGroupSid;
-	PSECURITY_DESCRIPTOR pSD = NULL;
-	StringSet* allTrusteeSIDs = new StringSet();
-    StringSet* workingTrusteeSIDs = new StringSet();
-    StringSet* resultingTrusteeSIDs = new StringSet();
-    string filePath;
-	
-    try {
-
-        // start by getting the sids from the dacl, owner, and primary group off the file's security descriptor
-
-		// build the path
-        filePath = Common::BuildFilePath((const string)fp->first, (const string)fp->second);
-
-        string baseErrMsg = "Error unable to get trustees for file: " + filePath;
-
-		DWORD res = GetNamedSecurityInfo(const_cast<char*>(filePath.c_str()), // object name
-							SE_FILE_OBJECT,						// object type
-							DACL_SECURITY_INFORMATION |			// information type
-							GROUP_SECURITY_INFORMATION | 
-							OWNER_SECURITY_INFORMATION, 			
-							&ownerSid,							// owner SID
-							&primaryGroupSid,   				// primary group SID
-							&pdacl,								// DACL
-							NULL,								// SACL
-							&pSD);								// Security Descriptor
-
-		if (res != ERROR_SUCCESS) {
-		    if (res == ERROR_FILE_NOT_FOUND) {
-			    // should never get here. 
-			    // before calling this function the file should already have been checked for existence.
-			    throw Exception( baseErrMsg + " Unable locate the specified file."); 
-		    } else {
-			    throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. System error message: " + WindowsCommon::GetErrorMessage(res)); 
-		    }
-	    }
-
-        // get sids from the dacl
-		WindowsCommon::GetSidsFromPACL(pdacl, allTrusteeSIDs);
-
-        // insert the owner and primary group sids
-        allTrusteeSIDs->insert(WindowsCommon::ToString(ownerSid));
-        allTrusteeSIDs->insert(WindowsCommon::ToString(primaryGroupSid));
-
-        Log::Debug("Found " + Common::ToString(allTrusteeSIDs->size()) + " trustee SIDs when searching for all SIDs on the security descriptor of: " + filePath);
-
-
-		// does this trusteeSID use variables?
-		if(trusteeSID->GetVarRef() == NULL) {
-			
-			// proceed based on operation
-			if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-				
-				// check that the trustee SID exists
-				if(WindowsCommon::TrusteeSIDExists(trusteeSID->GetValue())) {
-					workingTrusteeSIDs->insert(trusteeSID->GetValue());
-				}
-
-			} else if(trusteeSID->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-				this->GetMatchingTrusteeSIDs(trusteeSID->GetValue(), allTrusteeSIDs, workingTrusteeSIDs, false);
-			} else if(trusteeSID->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-				this->GetMatchingTrusteeSIDs(trusteeSID->GetValue(), allTrusteeSIDs, workingTrusteeSIDs, true);
-			}
-		} else {
-		
-			
-
-            if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-                // in the case of equals simply loop through all the 
-			    // variable values and add them to the set of all sids
-			    // if they exist on the system
-			    VariableValueVector::iterator iterator;
-			    for(iterator = trusteeSID->GetVarRef()->GetValues()->begin(); iterator != trusteeSID->GetVarRef()->GetValues()->end(); iterator++) {
-    				
-				    if(WindowsCommon::TrusteeSIDExists((*iterator)->GetValue())) {
-					    allTrusteeSIDs->insert((*iterator)->GetValue());
-				    }
-			    }
-            } 
-
-            // loop through all trustee SIDs on the Security Descriptor
-			// only keep those that match operation and value and var check
-			StringSet::iterator it;
-			ItemEntity* tmp = this->CreateItemEntity(trusteeSID);
-			for(it = allTrusteeSIDs->begin(); it != allTrusteeSIDs->end(); it++) {
-				tmp->SetValue((*it));
-				if(trusteeSID->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-					workingTrusteeSIDs->insert((*it));
-				}
-			}
-		}
-
-		delete allTrusteeSIDs;
-        allTrusteeSIDs = NULL;
-
-		// apply the behaviors
-		for(StringSet::iterator it = workingTrusteeSIDs->begin(); it != workingTrusteeSIDs->end(); it++) {
-			// is this a group
-			bool isGroup = WindowsCommon::IsGroupSID((*it));
-
-			if(isGroup && resolveGroupBehavior) {
-
-				if(includeGroupBehavior) {
-					resultingTrusteeSIDs->insert((*it));
-				}
-
-				// get the group members and add them to the set
-				StringSet* groupMembers = new StringSet();
-				WindowsCommon::ExpandGroupBySID((*it), groupMembers, includeGroupBehavior, resolveGroupBehavior);
-				for(StringSet::iterator iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
-					resultingTrusteeSIDs->insert((*iterator));
-				}
-				delete groupMembers;
-
-			} else {
-				resultingTrusteeSIDs->insert((*it));
-			}
-		}
-   
-	} catch(...) {
-
-		if(pSD != NULL) {
-			LocalFree(pSD);
-		}
-
-        if(allTrusteeSIDs != NULL) {
-			delete allTrusteeSIDs;
-            allTrusteeSIDs = NULL;
-		}
-
-        if(workingTrusteeSIDs != NULL) {
-			delete workingTrusteeSIDs;
-            workingTrusteeSIDs = NULL;
-		}
-
-		if(resultingTrusteeSIDs != NULL) {
-			delete resultingTrusteeSIDs;
-            resultingTrusteeSIDs = NULL;
-		}
-
-        throw;
-    }
-
-	if(pSD != NULL) {
-		LocalFree(pSD);
-	}
-
-    if(workingTrusteeSIDs != NULL) {
-		delete workingTrusteeSIDs;
-        workingTrusteeSIDs = NULL;
-	}
-
-    Log::Debug("Found " + Common::ToString(resultingTrusteeSIDs->size()) + " matching SIDs after applying behaviors on the security descriptor of: " + filePath);
-
-	return resultingTrusteeSIDs;
-}
-
-void FileEffectiveRights53Probe::GetMatchingTrusteeSIDs(string trusteeSIDPattern, StringSet* allTrusteeSIDs, StringSet* trusteeSIDs, bool isRegex) {
-
-	StringSet::iterator iterator;
-	for(iterator = allTrusteeSIDs->begin(); iterator != allTrusteeSIDs->end(); iterator++) {
-		if(this->IsMatch(trusteeSIDPattern, (*iterator), isRegex)) {
-			trusteeSIDs->insert((*iterator));
-		}
-	}
-}
-
 Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileName, string trusteeSID) {
 	
 	Log::Debug("Collecting effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
@@ -473,9 +303,8 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 
 		// get the rights
 		Log::Debug("Getting rights mask for file: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
-		WindowsCommon::GetEffectiveRightsForFile(pSid, &filePath, pAccessRights);
-   
-
+		WindowsCommon::GetEffectiveRightsForWindowsObject(SE_FILE_OBJECT, pSid, &filePath, pAccessRights);
+	
         if((*pAccessRights) & DELETE)
             item->AppendElement(new ItemEntity("standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
         else 
@@ -604,29 +433,4 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 	}
 
 	return item;
-}
-
-bool FileEffectiveRights53Probe::ReportTrusteeSIDDoesNotExist(ObjectEntity *trusteeSID, StringSet* trusteeSIDs) {
-	
-	bool result = false;
-	
-	if(trusteeSID->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeSID->GetNil()) {		
-		
-		if(trusteeSID->GetVarRef() == NULL) {
-			if(!WindowsCommon::TrusteeSIDExists(trusteeSID->GetValue())) {		
-				trusteeSIDs->insert(trusteeSID->GetValue());
-				result = true;
-			}
-		} else {
-
-			for(VariableValueVector::iterator iterator = trusteeSID->GetVarRef()->GetValues()->begin(); iterator != trusteeSID->GetVarRef()->GetValues()->end(); iterator++) {
-				if(!WindowsCommon::TrusteeSIDExists((*iterator)->GetValue())) {
-					trusteeSIDs->insert((*iterator)->GetValue());
-					result = true;
-				}
-			}
-		}
-	}
-
-	return  result;
 }
