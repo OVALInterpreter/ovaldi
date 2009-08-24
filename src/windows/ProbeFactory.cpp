@@ -83,6 +83,10 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = PortProbe::Instance();
 	}else if (objectName.compare("process_object") == 0){
 		probe = ProcessProbe::Instance();
+	}else if (objectName.compare("printereffectiverights_object") == 0){
+		probe = PrinterEffectiveRightsProbe::Instance();
+	}else if (objectName.compare("serviceeffectiverights_object") == 0){
+		probe = ServiceEffectiveRightsProbe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
