@@ -37,12 +37,12 @@
 #include <net/if_arp.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
-#include <sys/socket.h>
 
 // the static fields
 InterfaceProbe* InterfaceProbe::instance = NULL;
 
 InterfaceProbe::InterfaceProbe() {
+	this->SetupHardwareTypes();
 }
 
 InterfaceProbe::~InterfaceProbe() {
@@ -200,8 +200,8 @@ void InterfaceProbe::GetAllInterfaces() {
 	struct sockaddr broadAddr; // the type of struct ifreq.ifr_broadaddr
 	struct sockaddr netmask;   // the type of struct ifreq.ifr_netmask
 
-	ItemEntity *nameEntity = NULL, *hwAddrEntity = NULL, *ipAddrEntity = NULL,
-		*broadAddrEntity = NULL, *netmaskEntity = NULL;
+	ItemEntity *nameEntity = NULL, *hwTypeEntity = NULL, *hwAddrEntity = NULL,
+		*ipAddrEntity = NULL, *broadAddrEntity = NULL, *netmaskEntity = NULL;
 	ItemEntityVector flagEntities;
 
 	// All the ioctl() calls we make require a real socket to work off of.
@@ -250,9 +250,11 @@ void InterfaceProbe::GetAllInterfaces() {
 
 			hwAddr = req.ifr_hwaddr;
 
-			// There is no item entity for hardware type yet.  So this will remain
-			// unused for now (except to check whether we can get a mac address).
 			sa_family_t hwType = hwAddr.sa_family;
+
+			string hwTypeStr = this->HardwareTypeToString(hwType);
+			if (!hwTypeStr.empty())
+				hwTypeEntity = new ItemEntity("type", hwTypeStr);
 
 			if (hwType == ARPHRD_ETHER) {
 				char *hwaddr_data = hwAddr.sa_data;
@@ -329,6 +331,8 @@ void InterfaceProbe::GetAllInterfaces() {
 		// according to the schema.
 
 		item->AppendElement(nameEntity);
+		if (hwTypeEntity != NULL)
+			item->AppendElement(hwTypeEntity);
 		if (hwAddrEntity != NULL)
 			item->AppendElement(hwAddrEntity);
 		if (ipAddrEntity != NULL)
@@ -410,6 +414,23 @@ StringVector InterfaceProbe::GetInterfaceNames() {
 	close(s);
 
 	return names;
+}
+
+void InterfaceProbe::SetupHardwareTypes() {
+	this->hardwareTypeNameMap[ARPHRD_ETHER] = "ARPHRD_ETHER";
+	this->hardwareTypeNameMap[ARPHRD_FDDI] = "ARPHRD_FDDI";
+	this->hardwareTypeNameMap[ARPHRD_LOOPBACK] = "ARPHRD_LOOPBACK";
+	this->hardwareTypeNameMap[ARPHRD_VOID] = "ARPHRD_VOID";
+	this->hardwareTypeNameMap[ARPHRD_PPP] = "ARPHRD_PPP";
+	this->hardwareTypeNameMap[ARPHRD_SLIP] = "ARPHRD_SLIP";
+	this->hardwareTypeNameMap[ARPHRD_PRONET] = "ARPHRD_PRONET";
+}
+
+string InterfaceProbe::HardwareTypeToString(sa_family_t hwFamily) {
+	HardwareTypeNameMap::iterator iter = this->hardwareTypeNameMap.find(hwFamily);
+	if (iter == this->hardwareTypeNameMap.end())
+		return "";
+	return iter->second;
 }
 
 ItemEntityVector InterfaceProbe::ProcessFlags(short flags) {

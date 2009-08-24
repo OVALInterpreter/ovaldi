@@ -35,6 +35,9 @@
 #include "ItemEntity.h"
 #include "Common.h"
 
+// For the sa_family_t type.
+#include <sys/socket.h>
+
 using namespace std;
 
 /**
@@ -77,6 +80,15 @@ class InterfaceProbe : public AbsProbe {
 	 */
 	StringVector GetInterfaceNames();
 
+	/** Populates the map containing hardware type names. */
+	void SetupHardwareTypes();
+
+	/**
+	 * Gets the OVAL hardware type name for the given value, or ""
+	 * if one is not defined.
+	 */
+	string HardwareTypeToString(sa_family_t hwFamily);
+
 	/**
 	 * Creates ItemEntity objects for the given flags.
 	 */
@@ -84,6 +96,11 @@ class InterfaceProbe : public AbsProbe {
 
 	/** A vector that holds cached information about all interfaces on the system */
 	ItemVector interfaces;
+
+	typedef map<sa_family_t,string> HardwareTypeNameMap;
+
+	/** Maps hardware type constants to names */
+	HardwareTypeNameMap hardwareTypeNameMap;
 
 	/** Singleton instance */
 	static InterfaceProbe* instance;
