@@ -72,6 +72,8 @@
 #include "InterfaceProbe.h"
 #include "PortProbe.h"
 #include "ProcessProbe.h"
+#include "PrinterEffectiveRightsProbe.h"
+#include "ServiceEffectiveRightsProbe.h"
 using namespace std;
 
 class AbsProbe;
