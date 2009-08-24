@@ -235,9 +235,6 @@ public:
 	*/
 	static string ToString(PSID pSid);
 
-	/** Return the access mask for the file for the specifed SID. **/
-	static void GetEffectiveRightsForFile(PSID pSid, string* filePath, PACCESS_MASK pAccessRights);
-
 	/** Return true if the current os is Vista or later. 
 		The return value is calculated once and the result is stored in a static private variable.
 
@@ -274,15 +271,24 @@ public:
 	*/
     static bool TrusteeSIDExists(const string trusteeSIDIn);
 
+	/** Return the access mask for the Windows object for the specified SID. */
+	static void GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
+
+	/** Return the access mask for the Windows object for the specifed SID. */
+	static void GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
+
+	/** Return the access mask for the Windows object for the specifed SID. */
+	static void GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
+
+	/** Get the string representation of a SE_OBJECT_TYPE.
+		@param objectType The SE_OBJECT_TYPE value that you want to get the string representation of.
+        @return A string representation of the specified SE_OBJECT_TYPE.
+	*/
+	static string GetObjectType ( SE_OBJECT_TYPE objectType );
+
 private:
 	
 	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
-
-	/** Return the access mask for the file for the specifed SID. **/
-	static void GetEffectiveRightsForFileAcl(PSID pSid, string* filePath, PACCESS_MASK pAccessRights);
-
-	/** Return the access mask for the file for the specifed SID. **/
-	static void GetEffectiveRightsForFileAuthz(PSID pSid, string* filePath, PACCESS_MASK pAccessRights);
 
 	/** Split Trustee name between domain and account portion */
 	static void SplitTrusteeName(string trusteeName, string *domainName, string *accountName);
