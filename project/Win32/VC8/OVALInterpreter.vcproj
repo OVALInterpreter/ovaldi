@@ -496,6 +496,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\SharedResourceProbe.cpp"
 					>
 				</File>
@@ -1113,6 +1117,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\RegistryProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.h"
 					>
 				</File>
 				<File
