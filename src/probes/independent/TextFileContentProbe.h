@@ -90,14 +90,14 @@ public:
 	
 	ItemVector* CollectItems(Object* object);
 
-	/**  Return a new Item created for storing text file content information */
-	Item* CreateItem();
-
 	/** Gets single instance of the TextFileContentProbe. Uses lazy initialization. */
 	static AbsProbe* Instance();
 
 private:
 	TextFileContentProbe();
+
+	/**  Return a new Item created for storing text file content information */
+	Item* CreateItem();
 
 	/** The static Singleton instance of the TextFileContentFileProbe. */
 	static TextFileContentProbe* instance;

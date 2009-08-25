@@ -51,9 +51,6 @@ public:
 	 */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing group information */
-	Item* CreateItem();
-
 	/** Ensure that the GroupProbe is a singleton. */
 	static AbsProbe* Instance();
 
@@ -61,6 +58,9 @@ private:
 	GroupProbe();
 
 	static GroupProbe* instance;
+
+	/** Return a new Item created for storing group information */
+	Item* CreateItem();
 
 	/** Return a populated Item if the group exists and has any members. */
 	Item* GetGroupMembers(string groupName);

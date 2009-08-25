@@ -48,14 +48,14 @@ public:
 	/** Run the AuditEventPolicyProbe */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing audit event policy information. */
-	Item* CreateItem();
-		
 	/** Ensure that the AuditEventPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	AuditEventPolicyProbe();
+
+    /** Return a new Item created for storing audit event policy information. */
+	Item* CreateItem();
 
 	/** Read the Audit options and set the value of the ItemEntity.
 		LSA Policy defines a mask for the valid event auditing options. 

@@ -55,14 +55,14 @@ public:
 	/** Get all the files on the system that match the pattern and generate and md5 and sha1 */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing file hash information */
-	Item* CreateItem();
-
 	/** Ensure that the FileHashProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	FileHashProbe();
+
+	/** Return a new Item created for storing file hash information */
+	Item* CreateItem();
 
 	static FileHashProbe* instance;
 

@@ -52,15 +52,15 @@ class InterfaceProbe : public AbsProbe {
 	/** Get all the files on the system that match the pattern and collect their attributes. */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing file information */
-	Item* CreateItem();
-
 	/** Ensure that the InterfaceProbe is a singleton. */
 	static AbsProbe* Instance();
 
 	private:
 
 	InterfaceProbe();
+
+	/** Return a new Item created for storing file information */
+	Item* CreateItem();
 
 	/**
 	 * Gets an Item for the named interface, or NULL if no

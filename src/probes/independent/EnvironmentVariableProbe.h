@@ -49,18 +49,21 @@ public:
 	/** Run the environment variable probe */
 	ItemVector* CollectItems(Object* object);
 
-	/**  */
-	Item* CreateItem();
-
 	/** Ensure that the EnvironmentVariableProbe is a singleton. */
 	static AbsProbe* Instance();
 	
 private:
 	EnvironmentVariableProbe();
+    
+	/**  */
+	Item* CreateItem();
+
 	/** Get all the environment variables currently defined. */
 	StringPairVector* GetAllEnvs();
+
 	/** The static instance of the EnvironmentVariableProbe. 
-	All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes. */
+	    All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes. 
+    */
 	static EnvironmentVariableProbe *instance;
 };
 

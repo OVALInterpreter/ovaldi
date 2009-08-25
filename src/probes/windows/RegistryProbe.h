@@ -49,9 +49,6 @@ public:
 	/** Run the registry probe. Return a vector of Items. */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing registry information. */
-	Item* CreateItem();
-
 	/** Ensure that the RegistryProbe is a singleton. */
 	static AbsProbe* Instance();
 	
@@ -60,6 +57,9 @@ private:
 	RegistryProbe();
 
 	static RegistryProbe* instance;
+
+	/** Return a new Item created for storing registry information. */
+	Item* CreateItem();
 
 	/** Return the set of hives to be collected. 
 	    If the operation is set to equals simply return the hive as an ItemEntity.

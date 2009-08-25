@@ -62,13 +62,14 @@ public:
 	~RPMInfoProbe();       
 
 	ItemVector* CollectItems(Object* object);
-	Item* CreateItem();
 
 	/** Ensure that the RPMInfoProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	RPMInfoProbe();
+    
+	Item* CreateItem();
 
 	/**
 		Return the name of all rpms on the system that match the specirfied Object entity's criteria.

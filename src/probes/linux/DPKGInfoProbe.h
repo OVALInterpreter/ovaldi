@@ -59,7 +59,6 @@ public:
 	~DPKGInfoProbe();       
 
 	ItemVector* CollectItems(Object* object);
-	Item* CreateItem();
 
 	/** Ensure that the DPKGInfoProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -68,6 +67,8 @@ private:
 	string StatusFile;
 
 	DPKGInfoProbe();
+    
+	Item* CreateItem();
 
 	/**
 		Return the name of all debs on the system that match the specirfied Object entity's criteria.

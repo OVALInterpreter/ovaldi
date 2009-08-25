@@ -94,12 +94,13 @@ public:
 	~InetListeningServersProbe();       
 
 	ItemVector* CollectItems(Object* object);
-	Item* CreateItem();
 
 	static AbsProbe* Instance();
 
 private:
 	InetListeningServersProbe();
+    
+	Item* CreateItem();
 
 	/**
 		Get the set of all protocols on the system that match the object

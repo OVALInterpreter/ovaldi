@@ -60,15 +60,15 @@ public:
 	/** Get all the files on the system that match the pattern and collect their attributes. */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing file information */
-	Item* CreateItem();
-
 	/** Ensure that the FileProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 
 	FileProbe();
+
+	/** Return a new Item created for storing file information */
+	Item* CreateItem();
 
 	static FileProbe* instance;
 

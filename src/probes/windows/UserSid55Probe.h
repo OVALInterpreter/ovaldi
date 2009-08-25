@@ -47,9 +47,6 @@ public:
 	
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing user sid55 information. */
-	Item* CreateItem();
-
 	/** Ensure that the UserSid55Probe is a singleton. */
 	static AbsProbe* Instance();
 
@@ -57,6 +54,9 @@ private:
 	static UserSid55Probe* instance;
 
 	UserSid55Probe();
+
+	/** Return a new Item created for storing user sid55 information. */
+	Item* CreateItem();
 
 	Item* GetUserSidInfo(string userSid);
 

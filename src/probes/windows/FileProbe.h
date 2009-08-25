@@ -58,9 +58,6 @@ public:
 	/** Get all the files on the system that match the pattern. */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing file information */
-	Item* CreateItem();
-
 	/** Gets single instance of the FileProbe. Uses lazy initialization. */
 	static AbsProbe* Instance();
 
@@ -69,6 +66,9 @@ private:
 
 	/** The static Singleton instance of the FileProbe. */
 	static FileProbe* instance;
+    
+	/** Return a new Item created for storing file information */
+	Item* CreateItem();
 
 	/** Collectect all file attributes for the specified file on the specified path. */
 	Item* GetFileAttributes(string path, string fileName);

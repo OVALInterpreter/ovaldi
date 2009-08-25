@@ -46,8 +46,6 @@ class PortProbe : public AbsProbe {
 
         ItemVector* CollectItems ( Object* object );
 
-        Item* CreateItem();
-
         /** Ensure that the PortProbe is a singleton. */
         static AbsProbe* Instance();
 
@@ -55,6 +53,8 @@ class PortProbe : public AbsProbe {
 
         /** PortProbe constructor. */
         PortProbe();
+
+        Item* CreateItem();
 
         /** Build an Item containing all of the port state entities.
          *  @param localAddressStr A string that contains the local address of a Windows port in dotted-quad notation.

@@ -45,9 +45,6 @@ public:
 	/** Run the variable probe */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing variable information */
-	Item* CreateItem();
-
 	/** Ensure that the VariableProbe is a singleton. */
 	static AbsProbe* Instance();
 	
@@ -60,6 +57,9 @@ private:
 	StringVector* GetVariableIds();
 
 	VariableProbe();
+
+	/** Return a new Item created for storing variable information */
+	Item* CreateItem();
 
 	static VariableProbe *instance;
 };

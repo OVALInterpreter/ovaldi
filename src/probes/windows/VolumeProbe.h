@@ -47,8 +47,6 @@ class VolumeProbe : public AbsProbe {
 
         ItemVector* CollectItems ( Object* object );
 
-        Item* CreateItem();
-
         /** Ensure that the VolumeProbe is a singleton. */
         static AbsProbe* Instance();
 
@@ -56,6 +54,8 @@ class VolumeProbe : public AbsProbe {
 
         /** VolumeProbe constructor. */
         VolumeProbe();
+
+        Item* CreateItem();
 
         /** Retrieve all of the Windows volumes on the local system.
          *  @return Void.

@@ -50,9 +50,6 @@ public:
      */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing user information */
-	Item* CreateItem();
-
 	/** Ensure that the UserProbe is a singleton. */
 	static AbsProbe* Instance();
 
@@ -61,6 +58,9 @@ private:
 
 	static UserProbe* instance;
 
+	/** Return a new Item created for storing user information */
+	Item* CreateItem();
+    
 	/** Return an item for the specified user name. 
 	    If the user is not found return and item with the status set to does not exist
 	*/

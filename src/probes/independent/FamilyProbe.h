@@ -44,15 +44,15 @@ public:
 	/** Run the FamilyProbe */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing family information. */
-	Item* CreateItem();
-
 	/** Ensure that the FamilyProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	/** sets the family at compile time. **/
 	FamilyProbe();
+
+	/** Return a new Item created for storing family information. */
+	Item* CreateItem();
 
 	static FamilyProbe *instance;
 

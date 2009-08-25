@@ -54,13 +54,14 @@ public:
 	
 	/** Get all the files on the system that match the pattern and generate an md5 */
 	ItemVector* CollectItems(Object* object);
-	Item* CreateItem();
 
 	/** Ensure that the FileMd5Probe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	FileMd5Probe();
+    
+	Item* CreateItem();
 
 	static FileMd5Probe* instance;
 

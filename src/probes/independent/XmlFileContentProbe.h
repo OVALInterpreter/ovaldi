@@ -92,15 +92,15 @@ public:
 	*/
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing xml file content information. */
-	Item* CreateItem();
-
 	/** Gets single instance of the XmlFileContentProbe. Uses lazy initialization. */
 	static AbsProbe* Instance();
 
 protected:
 
 	XmlFileContentProbe();
+
+	/** Return a new Item created for storing xml file content information. */
+	Item* CreateItem();
 
 	/** The static Singleton instance of the XmlFileContentProbe. */
 	static XmlFileContentProbe* instance;

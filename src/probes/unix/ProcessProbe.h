@@ -62,14 +62,14 @@ public:
     
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing process information. */
-	Item* CreateItem();
-
 	/** Ensure that the ProcessProbe is a singleton. */
 	static AbsProbe* Instance();
 	  
 private:
 	ProcessProbe();
+
+	/** Return a new Item created for storing process information. */
+	Item* CreateItem();
 
 	/** 
 		Return the set of all process commands on the ssytem that match the specified object entities criteria.

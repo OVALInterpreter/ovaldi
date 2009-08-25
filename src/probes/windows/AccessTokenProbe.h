@@ -63,8 +63,6 @@ public:
 	
 	*/
 	ItemVector* CollectItems(Object* object);
-	/** Return a new Item created for storing accesstoken information. */
-	Item* CreateItem();
 
 	/** Ensure that the AccessTokenProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -72,6 +70,9 @@ public:
 
 private:
 	AccessTokenProbe();
+
+    /** Return a new Item created for storing accesstoken information. */
+	Item* CreateItem();
 
 	static AccessTokenProbe* instance;
 

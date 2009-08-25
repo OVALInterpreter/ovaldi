@@ -58,8 +58,6 @@ class ProcessProbe : public AbsProbe {
 
         ItemVector* CollectItems ( Object* object );
 
-        Item* CreateItem();
-
         /** Ensure that the ProcessProbe is a singleton. */
         static AbsProbe* Instance();
 
@@ -67,6 +65,8 @@ class ProcessProbe : public AbsProbe {
 
         /** ProcessProbe constructor. */
         ProcessProbe();
+
+        Item* CreateItem();
 
         /** Retrieve all of the Windows processes on the local system.
          *  @return Void.

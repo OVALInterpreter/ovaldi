@@ -54,15 +54,15 @@ public:
 	~UnameProbe();
 	
 	ItemVector* CollectItems(Object* object);
-
-	/** Return a new Item created for storing uname information */
-	Item* CreateItem();
 		
 	/** Ensure that the UnameProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	UnameProbe();
+
+	/** Return a new Item created for storing uname information */
+	Item* CreateItem();
 
 	static UnameProbe *instance;
 };

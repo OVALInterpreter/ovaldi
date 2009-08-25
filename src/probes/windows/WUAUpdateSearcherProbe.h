@@ -63,9 +63,6 @@ public:
 	/** Run the probe. */
 	ItemVector* CollectItems(Object* object);
 
-	/**  Return a new Item created for storing wuaupdatesearcher information */
-	Item* CreateItem();
-
 	/** Ensure that the WUAUpdateSearcherProbe is a singleton. */
 	static AbsProbe* Instance();
 
@@ -76,6 +73,9 @@ private:
 	WUAUpdateSearcherProbe();
 
 	static WUAUpdateSearcherProbe* instance;
+
+   	/**  Return a new Item created for storing wuaupdatesearcher information */
+	Item* CreateItem();
 
     /** Get the set of all search criteria string for the specified ObjectEntity. */
     ItemEntityVector* GetSearchCriteria(ObjectEntity* search_criteria);

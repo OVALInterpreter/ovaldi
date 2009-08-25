@@ -45,8 +45,6 @@ class InterfaceProbe : public AbsProbe {
 
         ItemVector* CollectItems ( Object* object );
 
-        Item* CreateItem();
-
         /** Ensure that the Interface probe is a singleton. */
         static AbsProbe* Instance();
 
@@ -54,6 +52,8 @@ class InterfaceProbe : public AbsProbe {
 
         /** Interface constructor. */
         InterfaceProbe();
+
+        Item* CreateItem();
 
         /** Retrieve a particular Item from the ItemVector interfaces using the interface's name as the key.
          *  @param nameStr A string that contains the name of a Windows interface.

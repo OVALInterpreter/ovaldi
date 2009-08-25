@@ -82,9 +82,6 @@ public:
 	*/
 	ItemVector* CollectItems(Object* object);
 
-	/**  Return a new Item created for storing wmi information */
-	Item* CreateItem();
-
 	/** Ensure that the WMIProbe is a singleton. */
 	static AbsProbe* Instance();
 
@@ -92,6 +89,9 @@ private:
 	WMIProbe();
 
 	static WMIProbe* instance;
+
+    /**  Return a new Item created for storing wmi information */
+	Item* CreateItem();
 
 	/** Query WMI for data. */
 	Item* GetWMI(ItemEntity*, ItemEntity*);

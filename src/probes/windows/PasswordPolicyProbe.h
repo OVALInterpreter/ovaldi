@@ -49,15 +49,15 @@ public:
 	/** Run the probe. */
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing password policy information. */
-	Item* CreateItem();
-		
 	/** Ensure that the PasswordPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
 	PasswordPolicyProbe();
-	
+
+	/** Return a new Item created for storing password policy information. */
+	Item* CreateItem();
+			
     /**
         Checks to see if password_complaexity and reversible_encryption are set.
 

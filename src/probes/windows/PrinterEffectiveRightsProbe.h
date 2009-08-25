@@ -49,9 +49,6 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 		
 		ItemVector* CollectItems(Object* object);
 
-		/** Return a new Item created for storing printer information */
-		Item* CreateItem();
-
 		/** Ensure that the PrinterEffectiveRightsProbe is a singleton. */
 		static AbsProbe* Instance();
 
@@ -59,6 +56,9 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 	
 		/** PrinterEffectiveRightsProbe constructor */
 		PrinterEffectiveRightsProbe();
+
+		/** Return a new Item created for storing printer information */
+		Item* CreateItem();
 
 		/** Get the set of all printers on the system that match the object.
    		 *  @param printerNameEntity A ObjectEntity that represents the printer_name entity in an Object as defined in the OVAL Definition Schema.

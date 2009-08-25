@@ -54,16 +54,16 @@ public:
 	
 	ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing file information */
-	Item* CreateItem();
-
 	/** Ensure that the FileEffectiveRights53Probe is a singleton. */
 	static AbsProbe* Instance();
 
 private:
-	
-	/** FileEffectiveRights53Probe constructor */
+
+    /** FileEffectiveRights53Probe constructor */
 	FileEffectiveRights53Probe();
+
+    /** Return a new Item created for storing file information */
+	Item* CreateItem();
 
 	/** Get the effective rights for a trustee SID for the specified path and filename.
      *  @param path A string that contains the path of the file that you want to get the effective rights of.

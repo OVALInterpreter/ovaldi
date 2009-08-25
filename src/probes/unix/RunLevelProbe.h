@@ -98,14 +98,14 @@ class RunLevelProbe : public AbsProbe {
     
     ItemVector* CollectItems( Object* object );
 
-	  /** Return a new Item created for storing runlevel information. */
-	  Item* CreateItem();
-
 	  /** Ensure that the RunLevelProbe is a singleton. */
 	  static AbsProbe * Instance();
  
   private: // Private Methods
-	  RunLevelProbe();
+	  RunLevelProbe();    
+
+	  /** Return a new Item created for storing runlevel information. */
+	  Item* CreateItem();
 
     /**
       Checks runlevel object entity operations and datatypes

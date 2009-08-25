@@ -46,8 +46,6 @@ public:
 	~SidProbe();
 	
 	ItemVector* CollectItems(Object* object);
-	/** Return a new Item created for storing sid information. */
-	Item* CreateItem();
 
 	/** Ensure that the SidProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -56,6 +54,9 @@ private:
 	SidProbe();
 
 	static SidProbe* instance;
+
+	/** Return a new Item created for storing sid information. */
+	Item* CreateItem();
 
 	/** Get account information for the specified account name.
 		Support behaviors. Resulting Items are pushed on to the 
