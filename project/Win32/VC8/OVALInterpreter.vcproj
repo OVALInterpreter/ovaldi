@@ -404,6 +404,10 @@
 				Name="probes"
 				>
 				<File
+					RelativePath="..\..\..\src\probes\windows\AbsEffectiveRightsProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\AbsFileFinder.cpp"
 					>
 				</File>
@@ -477,6 +481,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\PortProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.cpp"
 					>
 				</File>
 				<File
@@ -1016,6 +1024,10 @@
 				Name="probes"
 				>
 				<File
+					RelativePath="..\..\..\src\probes\windows\AbsEffectiveRightsProbe.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\AbsFileFinder.h"
 					>
 				</File>
@@ -1089,6 +1101,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\PortProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.h"
 					>
 				</File>
 				<File
