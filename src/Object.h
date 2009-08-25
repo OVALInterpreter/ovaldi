@@ -82,7 +82,7 @@ public:
     /** Set the elements field's value. */
 	void SetElements(AbsEntityVector* elements);
 
-    /** Return the set of elements with the specified name. */
+    /** Return the element with the specified name. */
 	ObjectEntity* GetElementByName(string elementName);
 
     /** Add an element to the end of the elements vector. */

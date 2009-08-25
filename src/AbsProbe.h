@@ -83,14 +83,6 @@ public:
 	ItemVector* Run(Object* object);
 	
 	/**
-		Create an Item for storing the type of data that the probe collects.
-		Each probe has its own implementation of this function. Probes set the 
-		name, xmlns alias, schema location, and xmlns for the new item.
-		@return A new Item.
-	*/
-	virtual Item* CreateItem() = 0;
-
-	/**
 		Clear the cache of all Items collected by all probes.
 	*/
 	static void ClearGlobalCache();
@@ -102,6 +94,14 @@ protected:
 		@return A vector of Items found on the system.
 	*/
 	virtual ItemVector* CollectItems(Object* object) = 0;
+
+    /**
+		Create an Item for storing the type of data that the probe collects.
+		Each probe has its own implementation of this function. Probes set the 
+		name, xmlns alias, schema location, and xmlns for the new item.
+		@return A new Item.
+	*/
+	virtual Item* CreateItem() = 0;
 
 	/**
 		Create a new ItemEntity based on the specifeid ObjectEntity.
