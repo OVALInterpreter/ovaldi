@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.6 RC 1</version>
-                  <date>7/31/2009 3:39:18 PM</date>
+                  <version>5.6 RC 2</version>
+                  <date>8/24/2009 2:27:59 PM</date>
                   <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -1983,6 +1983,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -2406,6 +2407,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -2866,6 +2868,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -3311,6 +3314,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -3772,6 +3776,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -5310,6 +5315,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -5703,6 +5709,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -6162,6 +6169,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -6577,6 +6585,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -7034,6 +7043,7 @@
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
                               <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -8844,6 +8854,7 @@
                         <xsd:choice>
                             <xsd:element ref="oval-def:set" minOccurs="0"/>
                             <xsd:sequence minOccurs="0">
+                                <xsd:element name="behaviors" type="win-def:WuaUpdateSearcherBehaviors" minOccurs="0"/>
                                 <xsd:element name="search_criteria" type="oval-def:EntityObjectStringType">
                                     <xsd:annotation>
                                         <xsd:documentation>The search_criteria entity specifies a search criteria to use when generating a search result.  The string used for the search criteria entity must match the custom search language for Search method of the IUpdateSearcher interface.  The string consists of criteria that are evaluated to determine which updates to return.  The Search method performs a synchronous search for updates by using the current configured search options.   For more information about possible search criteria, please see the Search method of the IUpdateSearcher interface.</xsd:documentation>
@@ -8875,36 +8886,46 @@
         <xsd:complexType>			
             <xsd:complexContent>				
                 <xsd:extension base="oval-def:StateType">
-                    <xsd:sequence>
-                        <xsd:element name="search_criteria" type="oval-def:EntityStateStringType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>The search_criteria entity specifies a string to examine the search criteria that was used to generate the object set.  Note that since this entity is part of the state, it is not used to determine the object set, but rather is used to test the search criteria that was actually used.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="wuaupdatesearcherstesearchcriteria">
-                                        <sch:rule context="win-def:wuaupdatesearcher_state/win-def:search_criteria">
-                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the search_criteria entity of a wuaupdatesearcher_state should be 'string'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="update_id" type="oval-def:EntityStateStringType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>The update_id enity specifies a string that represents a revision-independent identifier of an update.  This information is part of the IUpdateIdentity interface that is part of the result of the IUpdateSearcher interface's Search method.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="wuaupdatesearchersteupdateid">
-                                        <sch:rule context="win-def:wuaupdatesearcher_state/win-def:update_id">
-                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the update_id entity of a wuaupdatesearcher_state should be 'string'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
-                            </xsd:annotation>
-                        </xsd:element>
+                  <xsd:sequence>
+                      <xsd:element name="search_criteria" type="oval-def:EntityStateStringType" minOccurs="0">
+                          <xsd:annotation>
+                              <xsd:documentation>The search_criteria entity specifies a string to examine the search criteria that was used to generate the object set.  Note that since this entity is part of the state, it is not used to determine the object set, but rather is used to test the search criteria that was actually used.</xsd:documentation>
+                              <xsd:appinfo>
+                                  <sch:pattern id="wuaupdatesearcherstesearchcriteria">
+                                      <sch:rule context="win-def:wuaupdatesearcher_state/win-def:search_criteria">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
+                                      </sch:rule>
+                                  </sch:pattern>
+                              </xsd:appinfo>
+                          </xsd:annotation>
+                      </xsd:element>
+                      <xsd:element name="update_id" type="oval-def:EntityStateStringType" minOccurs="0">
+                          <xsd:annotation>
+                              <xsd:documentation>The update_id enity specifies a string that represents a revision-independent identifier of an update.  This information is part of the IUpdateIdentity interface that is part of the result of the IUpdateSearcher interface's Search method.</xsd:documentation>
+                              <xsd:appinfo>
+                                  <sch:pattern id="wuaupdatesearchersteupdateid">
+                                      <sch:rule context="win-def:wuaupdatesearcher_state/win-def:update_id">
+                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
+                                      </sch:rule>
+                                  </sch:pattern>
+                              </xsd:appinfo>
+                          </xsd:annotation>
+                      </xsd:element>
                     </xsd:sequence>					
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
-    </xsd:element>
+      </xsd:element>
+      <xsd:complexType name="WuaUpdateSearcherBehaviors">
+            <xsd:annotation>
+                  <xsd:documentation>The WuaUpdateSearcherBehaviors complex type defines behaviors that allow a more detailed definition of the wuaupdatesearcher_object being specified.  Note that using these behaviors may result in some unique results.  For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="include_superseded_updates" use="optional"  type="xsd:boolean" default="true">
+                  <xsd:annotation>
+                        <xsd:documentation>'include_superseded_updates' is a boolean flag that when set to true indicates that the search results should include updates that are superseded by other updates in the search results. When set to 'false' superseded updates should be excluded from the set of matching update items. The default value is 'true'.</xsd:documentation>
+                  </xsd:annotation>
+            </xsd:attribute>
+      </xsd:complexType>
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
