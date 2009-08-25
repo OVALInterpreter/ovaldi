@@ -77,6 +77,13 @@ class ActiveDirectoryProbe : public AbsProbe {
          */
         Item* GetActiveDirectoryData ( string namingContextStr , string relativeDnStr , string attributeStr );
 
+        /** Retrieves the object class of the Active Directory item with the specified naming context and relative distinguished name.
+         *  @param namingContextStr A string that contains the naming context of the Active Directory item.
+         *  @param relativeDnStr A string that contains the relative distinguished name of the Active Directory item.
+         *  @return A string value that contains the object class of the Active Directory item with the specified naming context and relative distinguished name.
+         */
+        string GetObjectClass ( string namingContextStr , string relativeDnStr );
+
         /** Creates a distinguished name with the given naming context and relative distinguished name.
          *  @param namingContextStr A string that contains the naming context of an Active Directory item.  Possible values are 'domain', 'configuration', and 'schema'.
          *  @param relativeDnStr A string that contains the relative distinguished name of an Active Directory item.
