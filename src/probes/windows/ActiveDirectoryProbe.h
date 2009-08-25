@@ -61,6 +61,7 @@ class ActiveDirectoryProbe : public AbsProbe {
         /** ActiveDirectoryProbe constructor. */
         ActiveDirectoryProbe();
 
+		/** Return a new Item created for storing Active Directory information. */
         Item* CreateItem();
 
         /** Converts the Active Directory attribute type into its string representation.
