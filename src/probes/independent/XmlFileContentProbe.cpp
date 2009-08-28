@@ -171,14 +171,11 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
 
-	XALAN_USING_XALAN(XSLException)
-
-	//XALAN_USING_XERCES(XMLPlatformUtils)
+    XALAN_USING_XALAN(XSLException)
+	XALAN_USING_XERCES(XMLPlatformUtils)
 	XALAN_USING_XALAN(XPathEvaluator)
-	XMLPlatformUtils::Initialize();
-	XPathEvaluator::initialize();
-
 	XALAN_USING_XERCES(LocalFileInputSource)
+	XALAN_USING_XALAN(NodeRefList)
 	XALAN_USING_XALAN(XalanDocument)
 	XALAN_USING_XALAN(XalanDocumentPrefixResolver)
 	XALAN_USING_XALAN(XalanDOMString)
@@ -187,8 +184,11 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 	XALAN_USING_XALAN(XalanSourceTreeDOMSupport)
 	XALAN_USING_XALAN(XalanSourceTreeParserLiaison)
 	XALAN_USING_XALAN(XObjectPtr)
-	XALAN_USING_XALAN(NodeRefList)
-	XALAN_USING_XALAN(CharVectorType)
+	XALAN_USING_XALAN(CharVectorType)	
+	XALAN_USING_XALAN(XObject)	
+
+	XMLPlatformUtils::Initialize();
+	XPathEvaluator::initialize();
 
 	// Initialize the XalanSourceTree subsystem...
 	XalanSourceTreeInit	theSourceTreeInit;
@@ -200,88 +200,86 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 	// Hook the two together...
 	theDOMSupport.setParserLiaison(&theLiaison);
-		
-	try {
 
+    try{				
 		const XalanDOMString theFileName(filePath.c_str());
 
 		// Create an input source that represents a local file...
-		const LocalFileInputSource theInputSource(theFileName.c_str());
+		const LocalFileInputSource	theInputSource(theFileName.c_str());
 
 		// Parse the document...
 		XalanDocument* theDocument = NULL;
 		try {
 			theDocument = theLiaison.parseXMLStream(theInputSource);
-
 		} catch(...) {
 			theDocument = NULL;
 			// this should never happen at this point only documents that exist should get here
-			//string errMsg = "Error: The specified document does not exist: " + filePath;
 		}
 
 		if(theDocument == NULL) {
 			throw ProbeException("Error: Unable to parse the current document: " + filePath);
-		} else {
+		}else { 
 
-			XalanDocumentPrefixResolver	thePrefixResolver(theDocument);
+		XalanDocumentPrefixResolver thePrefixResolver(theDocument);
 
-			XPathEvaluator theEvaluator;
+		XPathEvaluator theEvaluator;
 
-			// find the context node...
-			XalanNode* const theContextNode =
-					theEvaluator.selectSingleNode(	theDOMSupport,
-													theDocument,
-													XalanDOMString(contextNode.c_str()).c_str(),
-													thePrefixResolver);
+		// find the context node...
+		XalanNode* const theContextNode = theEvaluator.selectSingleNode(  theDOMSupport,
+																		  theDocument,
+																		  XalanDOMString(contextNode.c_str()).c_str(),
+																		  thePrefixResolver);
 
-			if (theContextNode == 0) {
-				throw ProbeException("Error the specified context node, \'" + contextNode + "\' was not found.");
-			} else {
-
-				// evaluate the expression...
-				/*const XObjectPtr theResult = XObjectPtr(
+		if (theContextNode == 0) {
+			throw ProbeException("Error the specified context node, \'" + contextNode + "\' was not found.");
+		}else{
+			
+			// evaluate the expression...
+			const XObjectPtr theResult = (
 				theEvaluator.evaluate(
 						theDOMSupport,
 						theContextNode,
 						XalanDOMString(xpath.c_str()).c_str(),
-						thePrefixResolver));*/
+						thePrefixResolver));
 
-				NodeRefList nodeList;
-				theEvaluator.selectNodeList(nodeList,
-											theDOMSupport,
-											theContextNode,
-											XalanDOMString(xpath.c_str()).c_str(),
-											thePrefixResolver);
+			item = this->CreateItem();
+			item->SetStatus(OvalEnum::STATUS_EXISTS);
+			item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("xpath", xpath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			
+			switch ( ( theResult.get() )->getType() ){
+				case XObject::eTypeBoolean:
+				case XObject::eTypeNumber:
+				case XObject::eTypeString:{
+					
+					string value;
+					const CharVectorType chVec = TranscodeToLocalCodePage((theResult.get())->str());
+					
+					for( int i=0; chVec[i] !='\0'; i++)
+						value += chVec[i]; 
 
+					item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
-				if(nodeList.getLength() <= 0) {
-					// no nodes were found
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("xpath", xpath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+					break;
+				}
+				case XObject::eTypeNodeSet:{
+					
+					NodeRefList list = (NodeRefList)theResult->nodeset();
+					
+					if ( list.getLength() <= 0 ){
+						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+						item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+					}
 
-				} else {
-
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("xpath", xpath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-
-					// add each value returned.
-					int length = nodeList.getLength();
-					for(int i = 0; i < length; i++) {
-						XalanNode* node = nodeList.item(i);
-
+					for(unsigned int i = 0 ;  i < list.getLength() ; i++){
+						XalanNode* node = list.item(i); 
 						if(node->getNodeType() == XalanNode::TEXT_NODE) {
-							
 							const CharVectorType chVec = TranscodeToLocalCodePage(node->getNodeValue());
 							string value;
+					
 							for( int i=0; chVec[i] !='\0'; i++)
-								value += chVec[i];
+								value += chVec[i]; 
 
 							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
@@ -289,24 +287,41 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 							const CharVectorType chVec = TranscodeToLocalCodePage(node->getNodeValue());
 							string value;
+
 							for( int i=0; chVec[i] !='\0'; i++)
 								value += chVec[i];
 
 							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
-						} else {
-
-							throw ProbeException("Error: invalid xpath specified. An xpath is only allowed to select text nodes or attribute nodes from a document.");
+						} 
+						
+						else {
+						
+							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+							OvalMessage* m = new OvalMessage("An xpath expression is only allowed to select text nodes or attributes from a document.");
+							item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+							item->AppendMessage(m);
+							throw ProbeException("Error: invalid xpath specified. An xpath expression is only allowed to select text nodes or attributes from a document.");
 						}
 					}
+					break;
+				}
+				default:{
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					OvalMessage* m = new OvalMessage("An xpath object must be of type boolean, number, string, or node-set.");
+					item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendMessage(m);
+					throw ProbeException("Error: invalid xpath object type was specified. An xpath object must be of type boolean, number, string, or node-set.");
 				}
 			}
+			
 		}
-
-		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
+	}
+	
+	XPathEvaluator::terminate();
+	XMLPlatformUtils::Terminate();
 
 	} catch(const XSLException& theException) {
+		
 		// Convert the XSLException message to a string
 		ostringstream m;
 		m << (theException.getMessage());
