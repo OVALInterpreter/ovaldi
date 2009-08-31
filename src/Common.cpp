@@ -117,9 +117,15 @@ bool Common::GetVerifyXMLfile()
 	return verifyXMLfile;
 }
 
-string Common::GetXSLFilename()
-{
-    return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::xslFile;	
+string Common::GetXSLFilename(){
+	// if the the XSL filename is not specified use the default path and filename
+	if ( Common::xslFile.compare("results_to_html.xsl") == 0 ){
+		return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::xslFile;
+	}
+	// otherwise use the specififed value
+	else{
+		return Common::xslFile;	
+	}
 }
 string Common::GetXSLOutputFilename()
 {
