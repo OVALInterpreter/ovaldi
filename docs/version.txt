@@ -39,6 +39,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Updated the win-def:activedirectory_test so that it aligns with Version 5.6 of the OVAL Language. Please see the following link for more information. http://n2.nabble.com/Proposal-to-Modify-the-win-def-activedirectory-test-and-the-ind-def-ldap-test-tp3351022ef20093.html 
 * Closed the OVAL float datatype bug in the EntityComparator::CompareFloat() method.
 * Added support for the win-def:serviceeffectiverights_test.
+* Fixed a bug in the ind-def:xmlfilecontent_test probe that caused it to report errors on valid XPath expressions.
+* Fixed a bug in the Common::GetXSLFilename() method that caused it to always add the schema path to the input provided with the '-t' command line argument.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
