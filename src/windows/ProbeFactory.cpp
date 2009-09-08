@@ -87,6 +87,10 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = PrinterEffectiveRightsProbe::Instance();
 	}else if (objectName.compare("serviceeffectiverights_object") == 0){
 		probe = ServiceEffectiveRightsProbe::Instance();
+	}else if (objectName.compare("regkeyeffectiverights_object") == 0 ){
+		probe = RegKeyEffectiveRightsProbe::Instance();
+	}else if (objectName.compare("regkeyeffectiverights53_object") == 0 ){
+		probe = RegKeyEffectiveRights53Probe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
