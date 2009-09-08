@@ -65,7 +65,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("interface_object") == 0) {
 		probe = InterfaceProbe::Instance();
 	} else if(objectName.compare("password_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = PasswordProbe::Instance();
 	} else if(objectName.compare("process_object") == 0) {
 		probe = ProcessProbe::Instance();
 	} else if(objectName.compare("runlevel_object") == 0) {
