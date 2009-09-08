@@ -855,6 +855,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\windows\RegistryFinder.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\windows\SystemInfo.cpp"
 					>
 				</File>
@@ -1329,6 +1333,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\windows\ProbeFactory.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\windows\RegistryFinder.h"
 					>
 				</File>
 				<File
