@@ -74,6 +74,8 @@
 #include "ProcessProbe.h"
 #include "PrinterEffectiveRightsProbe.h"
 #include "ServiceEffectiveRightsProbe.h"
+#include "RegKeyEffectiveRightsProbe.h"
+#include "RegKeyEffectiveRights53Probe.h"
 using namespace std;
 
 class AbsProbe;
