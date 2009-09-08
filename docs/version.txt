@@ -46,6 +46,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the FileEffectiveRights53Probe::GetEffectiveRights() method that caused the generic_read, generic_write, and generic_execute entities to be set incorrectly.
 * Added support for registry behaviors.
 * Updated the win-def:registry_test to support registry behaviors.
+* Added support for the win-def:regkeyeffectiverights_test.
+* Added support for the win-def:regkeyeffectiverights53_test.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
