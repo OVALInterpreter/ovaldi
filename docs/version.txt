@@ -44,6 +44,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the win-def:activedirectory_test probe that caused it to fail when connecting to certain Active Directories.  This bug was fixed by specifying the DNS name of the server in the LDAP ADsPath.
 * Fixed a bug in the FileEffectiveRightsProbe::GetEffectiveRights() method that caused the generic_read, generic_write, and generic_execute entities to be set incorrectly.
 * Fixed a bug in the FileEffectiveRights53Probe::GetEffectiveRights() method that caused the generic_read, generic_write, and generic_execute entities to be set incorrectly.
+* Added support for registry behaviors.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
