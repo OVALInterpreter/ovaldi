@@ -496,6 +496,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\RegKeyEffectiveRights53Probe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\RegKeyEffectiveRightsProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.cpp"
 					>
 				</File>
@@ -1121,6 +1129,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\RegistryProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\RegKeyEffectiveRights53Probe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\RegKeyEffectiveRightsProbe.h"
 					>
 				</File>
 				<File
