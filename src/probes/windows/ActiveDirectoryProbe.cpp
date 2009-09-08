@@ -47,7 +47,7 @@ ActiveDirectoryProbe* ActiveDirectoryProbe::instance = NULL;
 ActiveDirectoryProbe::ActiveDirectoryProbe() {
     ActiveDirectoryProbe::distinguishedNames = NULL;
     activeDirectoryCache = new ActiveDirectoryMap();
-    domainName = ActiveDirectoryProbe::GetDomainComponents();
+    ActiveDirectoryProbe::GetDomainComponents();
 }
 
 ActiveDirectoryProbe::~ActiveDirectoryProbe() {
@@ -365,7 +365,7 @@ string ActiveDirectoryProbe::BuildDistinguishedName ( string namingContextStr, s
 }
 
 
-string ActiveDirectoryProbe::GetDomainComponents() {
+void ActiveDirectoryProbe::GetDomainComponents() {
     DOMAIN_CONTROLLER_INFO* DomainControllerInfo = NULL;
     DWORD dReturn = 0L;
     ULONG dcFlags;
@@ -395,7 +395,8 @@ string ActiveDirectoryProbe::GetDomainComponents() {
             throw ProbeException ( "Error: NetApiBufferFree() was unable to free the memory allocated for the DOMAIN_CONTROLLER_INFO structure. Microsoft System Error (" + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
         }
 
-        return retDomainStr;
+        ActiveDirectoryProbe::dnsName = domainStr;
+        ActiveDirectoryProbe::domainName = retDomainStr;
 
     } else {
         throw ProbeException ( "Error: DsGetDcName() was unable to retrieve the name of the specified domain controller. Microsoft System Error (" + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
@@ -737,9 +738,13 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
     }
 
     if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::GET_ALL_DISTINGUISHED_NAMES ) == 0 ) {
+        pathNameStr.append ( ActiveDirectoryProbe::dnsName );
+        pathNameStr.append ( "/" );
         pathNameStr.append ( ActiveDirectoryProbe::domainName );
 
     } else {
+        pathNameStr.append ( ActiveDirectoryProbe::dnsName );
+        pathNameStr.append ( "/" );
         pathNameStr.append ( distinguishedNameStr );
     }
 
