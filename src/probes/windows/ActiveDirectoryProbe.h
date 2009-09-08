@@ -61,7 +61,7 @@ class ActiveDirectoryProbe : public AbsProbe {
         /** ActiveDirectoryProbe constructor. */
         ActiveDirectoryProbe();
 
-		/** Return a new Item created for storing Active Directory information. */
+        /** Return a new Item created for storing Active Directory information. */
         Item* CreateItem();
 
         /** Converts the Active Directory attribute type into its string representation.
@@ -95,7 +95,7 @@ class ActiveDirectoryProbe : public AbsProbe {
         /** Retrieve the domain components of the Active Directory.
          *  @return Void.
          */
-        string GetDomainComponents();
+        void GetDomainComponents();
 
         /** Remove the base distinguished name from the distinguished name and return the relative distinguished name.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
@@ -220,6 +220,9 @@ class ActiveDirectoryProbe : public AbsProbe {
 
         /** The string that contains the base distinguished name of the Active Directory */
         string domainName;
+
+        /** The string that contains the domain name that is used to create the base distinguished name of the Active Directory */
+        string dnsName;
 
         /** String constant representing the domain naming context value */
         static const string NAMING_CONTEXT_TYPE_DOMAIN;
