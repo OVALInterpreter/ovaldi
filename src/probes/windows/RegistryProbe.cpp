@@ -57,17 +57,6 @@ AbsProbe* RegistryProbe::Instance() {
 
 ItemVector* RegistryProbe::CollectItems(Object *object) {
 
-
-	//	If in verbose logging mode write out a record for each match found 
-	//	even if a later refinement excludes that match. For example, if
-	//	a key pattern match is specified of .* all keys will match. Now a name
-	//	of 'foo' under the key has been specified. In verbose mode a record for 
-	//	all keys that matched will be printed and any key that doesn't have 
-	//	a name of 'foo under it will have a message stating that the name was 
-	//	not found. If not in verbose mode only keys that have a matching name 
-	//	are printed.
-
-	// get the hive, key, and name from the provided object
 	ObjectEntity* hive = object->GetElementByName("hive");
 	ObjectEntity* key = object->GetElementByName("key");
 	ObjectEntity* name = object->GetElementByName("name");
@@ -94,56 +83,138 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 		throw ProbeException("Error: invalid operation specified on name. Found: " + OvalEnum::OperationToString(name->GetOperation()));
 	}
 
-	// TODO - determine how to support behaviors.
-	if(object->GetBehaviors()->size() != 0) {
-		throw ProbeException("Error: (RegistryProbe) Behaviors are not supported."); 
-	}
-
 	ItemVector *collectedItems = new ItemVector();
+	RegistryFinder registryFinder;
+	RegKeyVector* registryKeys = registryFinder.SearchRegistries(hive, key, name,object->GetBehaviors());
 
-	// get all the hives
-	ItemEntityVector* hives = this->GetHives(hive);
-	ItemEntityVector::iterator hiveIt;
-	for(hiveIt = hives->begin(); hiveIt != hives->end(); hiveIt++) {
-		
-		// get all keys for the hive if the key is not nil
-		if(key->GetNil()) {
-			// get the registry item.
-			Item* item = this->GetRegistryKey((*hiveIt), NULL, NULL);
-			if(item != NULL) {
-				collectedItems->push_back(item);
-			}
-		} else {
+	if(registryKeys->size() > 0) {
+		RegKeyVector::iterator iterator;
+		for(iterator = registryKeys->begin(); iterator != registryKeys->end(); iterator++) {
 
-			ItemEntityVector* keys = this->GetKeys(key, (*hiveIt));
-			ItemEntityVector::iterator keyIt;
-			for(keyIt = keys->begin(); keyIt != keys->end(); keyIt++) {
+			RegKey* registryKey = (*iterator);
+			
+			if ( (registryKey->GetKey()).compare("") == 0 ){
+				Item* item = NULL;
 
-				// get all names for the hive and key if the name is not nil
-				if(name->GetNil()) {
-						// get the registry item.
-						Item* item = this->GetRegistryKey((*hiveIt), (*keyIt), NULL);
-						if(item != NULL) {
-							collectedItems->push_back(item);
-						}
-				} else {
-					ItemEntityVector* names = this->GetNames(name, (*hiveIt), (*keyIt));
-					ItemEntityVector::iterator nameIt;
-					for(nameIt = names->begin(); nameIt != names->end(); nameIt++) {
-
-						// get the registry item.
-						Item* item = this->GetRegistryKey((*hiveIt), (*keyIt), (*nameIt));
-						if(item != NULL) {
-							collectedItems->push_back(item);
-						}
+				StringSet* keys = NULL;
+				if((keys = registryFinder.ReportKeyDoesNotExist(registryKey->GetHive(), key)) != NULL ) {
+					for(StringSet::iterator iterator = keys->begin(); iterator != keys->end(); iterator++) {
+						item = this->CreateItem();
+						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("key", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						collectedItems->push_back(item);
 					}
-					delete names;
+				} else {
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_EXISTS);
+					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					collectedItems->push_back(item);
+				}
+
+				if ( keys != NULL ){
+					keys->clear();
+					delete keys;
+					keys = NULL;
+				}
+
+			}else{			
+				if((registryKey->GetName()).compare("") == 0) {
+					Item* item = NULL;
+
+					StringSet* names = NULL;
+					if((names = registryFinder.ReportNameDoesNotExist(registryKey->GetHive(), registryKey->GetKey(), name)) != NULL) {
+						for(StringSet::iterator iterator = names->begin(); iterator != names->end(); iterator++) {
+							item = this->CreateItem();
+							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+							item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("name", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+							collectedItems->push_back(item);
+						}
+					} else {
+						item = this->CreateItem();
+						item->SetStatus(OvalEnum::STATUS_EXISTS);
+						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						collectedItems->push_back(item);
+					}
+					if ( names != NULL ){
+						names->clear();
+						delete names;
+						names = NULL;
+					}
+				} else {
+					Item* item = this->GetRegistryKey( registryKey->GetHive(), registryKey->GetKey(), registryKey->GetName());
+					if(item != NULL) {
+						collectedItems->push_back(item);
+					}
+					item = NULL;
 				}
 			}
-			delete keys;
+
+			delete registryKey;
+		}
+	}else {
+		StringSet* hives = NULL;
+		if ( (hives = registryFinder.ReportHiveDoesNotExist(hive)) != NULL ){
+			for(StringSet::iterator iterator1 = hives->begin(); iterator1 != hives->end(); iterator1++) {
+				Item* item = NULL;
+				item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				collectedItems->push_back(item);
+			}
+			if ( hives != NULL ){
+				hives->clear();
+				delete hives;
+				hives = NULL;
+			}
+		}else{
+			Item* item = NULL;
+			StringSet* hives = registryFinder.GetHives(hive);
+			for(StringSet::iterator iterator1 = hives->begin(); iterator1 != hives->end() ; iterator1++){
+				StringSet* keys = NULL;
+				if((keys = registryFinder.ReportKeyDoesNotExist(*iterator1, key)) != NULL) {
+					for(StringSet::iterator iterator2 = keys->begin(); iterator2 != keys->end(); iterator2++) {
+						item = this->CreateItem();
+						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+						item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));	
+						collectedItems->push_back(item);
+					}
+				} else {
+					StringSet* keys = registryFinder.GetKeys(*iterator1,key,object->GetBehaviors());
+					for(StringSet::iterator iterator2 = keys->begin() ; iterator2 != keys->end() ; iterator2++){
+						StringSet* names = NULL;
+						if((names = registryFinder.ReportNameDoesNotExist(*iterator1, *iterator2, name)) != NULL) {			
+							for(StringSet::iterator iterator3 = names->begin(); iterator3 != names->end(); iterator3++) {
+								item = this->CreateItem();
+								item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+								item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("name", (*iterator3), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+								collectedItems->push_back(item);
+							}
+						}
+						if ( names != NULL ){
+							names->clear();
+							delete names;
+							names = NULL;
+						}
+					}
+					if ( keys != NULL ){
+						keys->clear();
+						delete keys;
+						keys = NULL;
+					}
+				}	
+			}
 		}
 	}
-	delete hives;
+
+	registryKeys->clear();
+	delete registryKeys;
 
 	return collectedItems;
 }
@@ -163,255 +234,32 @@ Item* RegistryProbe::CreateItem() {
 	return item;
 }
 
-void RegistryProbe::GetMatchingHives(string pattern, ItemEntityVector* hives, bool isRegex) {
-
-	try {
-		if(this->IsMatch(pattern, "HKEY_CLASSES_ROOT", isRegex)) {
-			ItemEntity* entity = this->CreateItemEntity(NULL);
-			entity->SetName("hive");
-			entity->SetValue("HKEY_CLASSES_ROOT");
-			hives->push_back(entity);
-		}
-
-		if(this->IsMatch(pattern, "HKEY_CURRENT_CONFIG", isRegex)) {
-			ItemEntity* entity = this->CreateItemEntity(NULL);
-			entity->SetName("hive");
-			entity->SetValue("HKEY_CURRENT_CONFIG");
-			hives->push_back(entity);
-		}
-
-		if(this->IsMatch(pattern, "HKEY_CURRENT_USER", isRegex)) {
-			ItemEntity* entity = this->CreateItemEntity(NULL);
-			entity->SetName("hive");
-			entity->SetValue("HKEY_CURRENT_USER");
-			hives->push_back(entity);
-		}
-
-		if(this->IsMatch(pattern, "HKEY_LOCAL_MACHINE", isRegex)) {
-			ItemEntity* entity = this->CreateItemEntity(NULL);
-			entity->SetName("hive");
-			entity->SetValue("HKEY_LOCAL_MACHINE");
-			hives->push_back(entity);
-		}
-
-		if(this->IsMatch(pattern, "HKEY_USERS", isRegex)) {
-			ItemEntity* entity = this->CreateItemEntity(NULL);
-			entity->SetName("hive");
-			entity->SetValue("HKEY_USERS");
-			hives->push_back(entity);
-		}
-		
-	} catch(REGEXException ex) {
-		if(ex.GetSeverity() == ERROR_WARN) {
-			string pcreMsg = "";
-			pcreMsg.append("Registry Keys Probe Warning - while searching for matching hives:\n");
-			pcreMsg.append("-----------------------------\n");
-			pcreMsg.append(ex.GetErrorMessage());
-			Log::Debug(pcreMsg);
-		}
-		
-		throw;
-	}
-}
-
-void RegistryProbe::GetMatchingKeys(string hiveIn, string keyIn, string pattern, ItemEntityVector* keys, bool isRegex) {
-
-	HKEY hkey;								//	pointer to the key that will be opened
-	LONG res;								//	result from enumerating the subkeys
-	LONG openRes;							//	result from opening the key
-	LPTSTR lpName = (LPTSTR)malloc(1024);	//	buffer to store the subkey name
-	DWORD dwName = 1024;					//	number of chars in the subkey
-	DWORD dwIndex = 0;						//	index of subkey to enumerate
-	FILETIME ftLastWriteTime;				//	time the cur subkey was last written to
-	string workingKey = "";					//	The name of the keyIn and the subkey concatenated
-	string errorMessage = "";				//	
-
-	/////////////////////////////////////////////////////////////////
-	//	Open the specified key
-	/////////////////////////////////////////////////////////////////
-	HKEY rootKey = GetRootKey(hiveIn);
-	if(rootKey == NULL) {
-		free(lpName);
-		errorMessage.append("(RegistryProbe) The registry hive '");
-		errorMessage.append(hiveIn);
-		errorMessage.append("' does not exist.");
-		throw ProbeException(errorMessage);
-	}
-			
-
-	openRes = RegOpenKeyEx(	rootKey,		// handle to open hive
-							keyIn.c_str(),	// subkey name
-							0,				// reserved
-							KEY_READ,		// security access mask
-							&hkey);			// pointer to open key
-
-	/////////////////////////////////////////////////////////////////
-	//	Check attempt to open key
-	/////////////////////////////////////////////////////////////////
-	if (openRes == ERROR_SUCCESS) {
-
-		for (dwIndex = 0, res = ERROR_SUCCESS; res == ERROR_SUCCESS; dwIndex++) {
-			//	Get the working key as a string
-			workingKey = keyIn;
-			if(workingKey.compare("") != 0) {
-
-				if(workingKey.at(workingKey.length()-1) != '\\') {
-					workingKey.append("\\");
-				}
-			}
-
-			//	Reset the buffer and the buffer size
-			dwName = 1024;
-			ZeroMemory(lpName, dwName);
-						
-			res = RegEnumKeyEx(	hkey,				// handle to key to enumerate
-								dwIndex,			// subkey index
-								lpName,				// subkey name
-								&dwName,			// size of subkey buffer
-								NULL,				// reserved
-								NULL,				// class string buffer
-								NULL,				// size of class string buffer
-								&ftLastWriteTime);	// last write time
-
-			//	Check results
-			if(res == ERROR_SUCCESS) {
-
-				//	Add the subkey to the working key
-				workingKey.append(lpName);
-
-				//	Make recursive call
-				this->GetMatchingKeys(hiveIn, workingKey, pattern, keys);
-
-				//	If a match add the new key to the keys vector
-				if(this->IsMatch(pattern, workingKey, isRegex)) {
-					ItemEntity* entity = this->CreateItemEntity(NULL);
-					entity->SetName("key");
-					entity->SetValue(workingKey);
-					keys->push_back(entity);
-				}
-			}
-		}
-	}
-
-	free(lpName);
+Item* RegistryProbe::GetRegistryKey(string hive, string key, string name) {
 	
-	RegCloseKey(hkey);	
-}
-
-void RegistryProbe::GetMatchingNames(string hiveIn, string keyIn, string pattern, ItemEntityVector* names, bool isRegex) {
-
-	HKEY hkey;								//	pointer to the key that will be opened
-	LONG res;								//	result from enumerating the subkeys
-	LONG openRes;							//	result from opening the key
-	LPTSTR lpName = (LPTSTR)malloc(1024);	//	buffer to store the subkey name
-	DWORD dwName = 1024;					//	number of chars in the subkey
-	DWORD dwIndex = 0;						//	index of subkey to enumerate
-	string name = "";						//	The name of the keyIn and the subkey concatenated
-	string errorMessage = "";				//
-
-	/////////////////////////////////////////////////////////////////
-	//	Open the specified key
-	/////////////////////////////////////////////////////////////////
-	HKEY rootKey = GetRootKey(hiveIn);
-	if(rootKey == NULL) {
-		free(lpName);
-		errorMessage.append("(RegistryProbe) The registry hive '");
-		errorMessage.append(hiveIn);
-		errorMessage.append("' does not exist.");
-		throw ProbeException(errorMessage);
-	}
-			
-
-	openRes = RegOpenKeyEx(	rootKey,		// handle to open hive
-							keyIn.c_str(),	// subkey name
-							0,				// reserved
-							KEY_QUERY_VALUE,// security access mask
-							&hkey);			// pointer to open key
-
-	/////////////////////////////////////////////////////////////////
-	//	Check attempt to open key
-	/////////////////////////////////////////////////////////////////
-	if (openRes == ERROR_SUCCESS) {
-
-		try {
-			myMatcher->Reset();
-			for (dwIndex = 0, res = ERROR_SUCCESS; res == ERROR_SUCCESS; dwIndex++) {
-
-				//	Reset the buffer and the buffer size
-				dwName = 1024;
-				ZeroMemory(lpName, dwName);
-						
-				res = RegEnumValue(	hkey,		// handle to key to query
-									dwIndex,	// index of value to query
-									lpName,		// value buffer
-									&dwName,	// size of value buffer
-									NULL,		// reserved
-									NULL,		// type buffer
-									NULL,		// data buffer
-									NULL);		// size of data buffer
-
-				//	Check results
-				if(res == ERROR_SUCCESS) {
-
-					//	Get the name
-					name = "";
-					name.append(lpName);
-
-					//	If a match add the new name to the names vector
-					if(this->IsMatch(pattern, name, isRegex)) {
-						ItemEntity* entity = this->CreateItemEntity(NULL);
-						entity->SetName("name");
-						entity->SetValue(name);
-						names->push_back(entity);
-					}
-				}
-			}
-		} catch(REGEXException ex) {
-			if(ex.GetSeverity() == ERROR_WARN) {
-
-				string pcreMsg = "";
-				pcreMsg.append("Registry Keys Probe Warning - when searching for matching names:\n");
-				pcreMsg.append("-----------------------------\n");
-				pcreMsg.append(ex.GetErrorMessage());
-				Log::Debug(pcreMsg);
-			} else {
-				free(lpName);
-				throw;
-			}
-		}
-	}
-
-	free(lpName);
-	
-	RegCloseKey(hkey);	
-}
-
-Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntity* name) {
-
     HKEY hkey;
 	DWORD parse_depth = 0;
 	LONG res;
 	Item* item = NULL;
 
 	// Check hive
-	HKEY rootKey = this->GetRootKey(hive->GetValue());		
+	HKEY rootKey = RegistryFinder::GetHKeyHandle(hive,"");		
 	if(rootKey == NULL) {
 	
-		item->AppendElement(new ItemEntity("hive", hive->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 		return item;
 
 	} else {
 
 		item = this->CreateItem();
-		item->AppendElement(new ItemEntity("hive", hive->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-		// check and get key if key is not nil
-		if(key == NULL) {
+		// Check and get key if key is not nil
+		if(key.compare("") ==  0) {
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
 		} else {
 			res = RegOpenKeyEx(rootKey,					// handle to open hive
-							key->GetValue().c_str(),	// subkey name
+							key.c_str(),				// subkey name
 							0,							// reserved
 							KEY_READ,					// security access mask
 							&hkey);						// pointer to open key
@@ -419,18 +267,18 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 			if (res != ERROR_SUCCESS) {
 				if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
 
-					item->AppendElement(new ItemEntity("key", key->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
 				} else if (res == ERROR_INVALID_HANDLE) {
 
 					string errorMessage = "";
 					errorMessage.append("(RegistryProbe) The handle for the registry key '");
-					errorMessage.append(key->GetValue());
+					errorMessage.append(key);
 					errorMessage.append("' is not valid.");
 							
 					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("key", key->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
 					item->SetStatus(OvalEnum::STATUS_ERROR);
 					// I chose to make this an item returned with an error because at a minimum the 
 					// hive was found. Note that the other option is to throw and exception which 
@@ -445,13 +293,13 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 
 					string errorMessage = "";
 					errorMessage.append("(RegistryProbe) Unable to get values for registry key '");
-					errorMessage.append(key->GetValue());
+					errorMessage.append(key);
 					errorMessage.append("'.  Error Code - ");
 					errorMessage.append(errorCodeBuffer);
 					errorMessage.append(" - " + systemErrMsg);
 					
 					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("key", key->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
 					item->SetStatus(OvalEnum::STATUS_ERROR);
 					// I chose to make this an item returned with an error because at a minimum the 
 					// hive was found. Note that the other option is to throw and exception which 
@@ -461,11 +309,11 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 
 			} else {
 
-				// add the key to the result item
-				item->AppendElement(new ItemEntity("key", key->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+				// Add the key to the result item
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-				// if name not nil get the name
-				if(name == NULL) {
+				// If name not nil get the name
+				if(name.compare("") == 0) {
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 				} else {
 				
@@ -476,7 +324,7 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 					// buffer size parameter, the function returns the value ERROR_MORE_DATA, and stores
 					// the required buffer size, in bytes, into valuelen.
 					res = RegQueryValueEx(hkey,						// handle to key
-										name->GetValue().c_str(),	// value name
+										name.c_str(),	// value name
 										NULL,						// reserved
 										NULL,						// type buffer
 										NULL,						// data buffer
@@ -488,7 +336,7 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 					// Retrieve the type and value for the specified name associated with an open registry
 					// key.
 					res = RegQueryValueEx(hkey,						// handle to key
-										name->GetValue().c_str(),	// value name
+										name.c_str(),	// value name
 										NULL,						// reserved
 										&type,						// type buffer
 										value,						// data buffer
@@ -496,7 +344,7 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 
 					if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
 						
-						item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
 					} else if (res != ERROR_SUCCESS) {
@@ -508,13 +356,13 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 						
 						string errorMessage = "";
 						errorMessage.append("Unable to get type and value for the specified name: '");
-						errorMessage.append(name->GetValue());
+						errorMessage.append(name);
 						errorMessage.append("'.  Error Code - ");
 						errorMessage.append(errorCodeBuffer);
 						errorMessage.append(" - " + systemErrMsg);
 						
 						item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-						item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 						item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 						item->SetStatus(OvalEnum::STATUS_ERROR);
@@ -522,11 +370,11 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 					//	Only call RetrieveInfo() if res == ERROR_SUCCESS
 					} else {
 
-						// now add the name entity.
-						item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						// Now add the name entity.
+						item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->SetStatus(OvalEnum::STATUS_EXISTS);
 						// We now have all the info we need.
-						this->RetrieveInfo(hive->GetValue(), key->GetValue(), name->GetValue(), type, value, valuelen, item);
+						this->RetrieveInfo(hive, key, name, type, value, valuelen, item);
 					}
 
 					free(value);
@@ -535,68 +383,8 @@ Item* RegistryProbe::GetRegistryKey(ItemEntity* hive, ItemEntity* key, ItemEntit
 			}
 		} 
 	}
-
+	
 	return item;
-}
-
-HKEY RegistryProbe::GetRootKey(string hiveIn) {
-
-	if (hiveIn.compare("HKEY_LOCAL_MACHINE") == 0) {
-        return HKEY_LOCAL_MACHINE;
-    } else if (hiveIn.compare("HKEY_USERS") == 0) {
-        return HKEY_USERS;
-    } else if (hiveIn.compare("HKEY_CURRENT_USER") == 0) {
-        return HKEY_CURRENT_USER;
-    } else if (hiveIn.compare("HKEY_CURRENT_CONFIG") == 0) {
-        return HKEY_CURRENT_CONFIG;
-    } else if (hiveIn.compare("HKEY_CLASSES_ROOT") == 0) {
-        return HKEY_CLASSES_ROOT;
-    } else {
-		return NULL;
-    }
-}
-
-void RegistryProbe::KeyPatternMatch(ItemEntity* hive, string pattern, ItemEntityVector* keys, bool isRegex) {
-
-	string patternOut= "";
-	string constantPortionOut= "";
-	this->myMatcher->GetConstantPortion(pattern, "\\", &patternOut, &constantPortionOut);
-	// Remove extra slashes
-	constantPortionOut = myMatcher->RemoveExtraSlashes(constantPortionOut);
-
-	if(patternOut.compare("") != 0) {
-		try {
-			myMatcher->Reset();
-
-			//	Call search function with
-			//	the constant portion found as the key and
-			//	the entire pattern as the pattern
-			this->GetMatchingKeys(hive->GetValue(), constantPortionOut, pattern, keys, isRegex);
-
-		} catch(REGEXException ex) {
-
-			if(ex.GetSeverity() == ERROR_WARN) {
-				string pcreMsg = "";
-				pcreMsg.append("Registry Keys Probe Warning - while searching for matching keys:\n");
-				pcreMsg.append("\t" + ex.GetErrorMessage());
-				Log::Debug(pcreMsg);
-			} else {
-				throw;
-			}
-		}
-
-	} else {
-
-		//	There are no pattern matching chars treat this as a normal path 
-		//	after removing the double '\'
-		pattern = myMatcher->RemoveExtraSlashes(pattern);
-		if(this->KeyExists(hive->GetValue(), pattern)) {
-			ItemEntity* entity = this->CreateItemEntity(NULL);
-			entity->SetName("key");
-			entity->SetValue(pattern);
-			keys->push_back(entity);
-		}
-	}
 }
 
 void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn, 
@@ -623,11 +411,6 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 					if (strlen(binaryBuf) == 1) 
 						value.append("0");
 					value.append(binaryBuf);
-
-					// add a space only if not at the end of the string
-					/*if(x < (valuelenIn - 1)) {
-						value.append(" ");
-					}*/
 				}
 				item->AppendElement(new ItemEntity("value",  value, OvalEnum::DATATYPE_BINARY, false, OvalEnum::STATUS_EXISTS));
 
@@ -752,315 +535,4 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 				break;
 			}
 	}
-}
-
-ItemEntityVector* RegistryProbe::GetHives(ObjectEntity* hive) {
-
-	ItemEntityVector* hives = new ItemEntityVector();
-
-	// does this hive use variables?
-	if(hive->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(hive->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			ItemEntity* tmp = this->CreateItemEntity(hive);
-			tmp->SetValue(hive->GetValue());
-			hives->push_back(tmp);
-
-		} else if(hive->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			// turn the provided hive value into a negative pattern match
-			// then get all that match the pattern
-			this->GetMatchingHives(hive->GetValue(), hives, false);
-
-		} else if(hive->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->GetMatchingHives(hive->GetValue(), hives);
-		}		
-
-	} else {
-
-		// Get all hives
-		ItemEntityVector allHives;
-		this->GetMatchingHives(".*", &allHives);
-
-		// loop through all hives on the system
-		// only keep hives that match operation and value and var check
-		ItemEntityVector::iterator iterator;
-		for(iterator = allHives.begin(); iterator != allHives.end(); iterator++) {
-			
-			if(hive->Analyze((*iterator)) == OvalEnum::RESULT_TRUE) {
-				hives->push_back((*iterator));
-			}
-		}
-	}
-
-	return hives;
-}
-
-ItemEntityVector* RegistryProbe::GetKeys(ObjectEntity* key, ItemEntity* hive) {
-
-	ItemEntityVector* keys = new ItemEntityVector();
-
-	// does this key use variables?
-	if(key->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(key->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			ItemEntity* tmp = this->CreateItemEntity(key);
-			tmp->SetValue(key->GetValue());
-			keys->push_back(tmp);
-
-		} else if(key->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			// turn the provided key value into a negative pattern match
-			// then get all that match the pattern
-			this->GetMatchingKeys(hive->GetValue(), "", key->GetValue(), keys, false);
-
-		} else if(key->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->KeyPatternMatch(hive, key->GetValue(), keys);
-		}		
-
-	} else {
-
-		// Get all keys
-		ItemEntityVector allKeys;
-
-		if(key->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all keys
-			// if they exist on the system
-			VariableValueVector::iterator iterator;
-			for(iterator = key->GetVarRef()->GetValues()->begin(); iterator != key->GetVarRef()->GetValues()->end(); iterator++) {
-				
-				if(this->KeyExists(hive->GetValue(),(*iterator)->GetValue())) {
-					ItemEntity* tmp = this->CreateItemEntity(key);
-					tmp->SetValue((*iterator)->GetValue());
-					allKeys.push_back(tmp);
-				}
-			}
-
-		} else {
-            this->KeyPatternMatch(hive, ".*", &allKeys);
-		}
-	
-		// loop through all keys on the system
-		// only keep keys that match operation and value and var check
-		ItemEntityVector::iterator it;
-		for(it = allKeys.begin(); it != allKeys.end(); it++) {
-			
-			if(key->Analyze((*it)) == OvalEnum::RESULT_TRUE) {
-				keys->push_back((*it));
-			}
-		}
-	}
-
-	return keys;
-}
-
-ItemEntityVector* RegistryProbe::GetNames(ObjectEntity* name, ItemEntity* hive, ItemEntity* key) {
-
-	ItemEntityVector* names = new ItemEntityVector();
-
-	// does this name use variables?
-	if(name->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(name->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			ItemEntity* tmp = this->CreateItemEntity(name);
-			tmp->SetValue(name->GetValue());
-			names->push_back(tmp);
-
-		} else if(name->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			// turn the provided key value into a negative pattern match
-			// then get all that match the pattern
-			this->GetMatchingNames(hive->GetValue(), key->GetValue(), name->GetValue(), names, false);
-
-		} else if(name->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->GetMatchingNames(hive->GetValue(), key->GetValue(), name->GetValue(), names);
-		}		
-
-	} else {
-
-		// Get all keys
-		ItemEntityVector allNames;
-
-		if(name->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all names
-			// if they exist on the system
-			VariableValueVector::iterator iterator;
-			for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
-				
-				if(this->NameExists(hive->GetValue(), key->GetValue(), (*iterator)->GetValue())) {
-					ItemEntity* tmp = this->CreateItemEntity(name);
-					tmp->SetValue((*iterator)->GetValue());
-					allNames.push_back(tmp);
-				}
-			}
-
-		} else {
-			this->GetMatchingNames(hive->GetValue(), key->GetValue(), ".*", &allNames);
-		}
-	
-		// loop through all hives on the system
-		// only keep hives that match operation and value and var check
-		ItemEntityVector::iterator it;
-		for(it = allNames.begin(); it != allNames.end(); it++) {
-			
-			if(name->Analyze((*it)) == OvalEnum::RESULT_TRUE) {
-				names->push_back((*it));
-			}
-		}
-	}
-
-	return names;
-}
-
-bool RegistryProbe::KeyExists(string hive, string key) {
-
-	bool exists = false;
-	HKEY hkey;
-	DWORD parse_depth = 0;
-	LONG res;
-
-	// Check hive
-	HKEY rootKey = this->GetRootKey(hive);		
-	if(rootKey != NULL) {
-		res = RegOpenKeyEx(rootKey,					// handle to open hive
-						key.c_str(),				// subkey name
-						0,							// reserved
-						KEY_READ,					// security access mask
-						&hkey);						// pointer to open key
-
-		if (res != ERROR_SUCCESS) {
-			if (res == ERROR_FILE_NOT_FOUND) {
-				exists = false;
-
-			} else if (res == ERROR_INVALID_HANDLE) {
-
-				string errorMessage = "";
-				errorMessage.append("(RegistryProbe) The handle for the registry key '");
-				errorMessage.append(key);
-				errorMessage.append("' is not valid.");							
-				throw ProbeException(errorMessage);
-
-			} else {
-				
-				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
-				char errorCodeBuffer[20];
-				_ltoa(res, errorCodeBuffer, 20);
-				string errorMessage = "";
-				errorMessage.append("Error: Unable to check existence of registry key '");
-				errorMessage.append(key);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
-				errorMessage.append(" - " + systemErrMsg);
-				throw ProbeException(errorMessage);
-			}		
-		} else {
-			RegCloseKey(hkey);
-			exists = true;				
-		}			
-	}
-
-	return exists;
-}
-
-bool RegistryProbe::NameExists(string hive, string key, string name) {
-
-	bool exists = false;
-	HKEY hkey;
-	DWORD parse_depth = 0;
-	LONG res;
-
-	// Check hive
-	HKEY rootKey = this->GetRootKey(hive);		
-	if(rootKey != NULL) {
-
-			res = RegOpenKeyEx(rootKey,					// handle to open hive
-							key.c_str(),				// subkey name
-							0,							// reserved
-							KEY_READ,					// security access mask
-							&hkey);						// pointer to open key
-
-			if (res != ERROR_SUCCESS) {
-				if (res == ERROR_FILE_NOT_FOUND) {
-				exists = false;
-
-			} else if (res == ERROR_INVALID_HANDLE) {
-
-				string errorMessage = "";
-				errorMessage.append("(RegistryProbe) The handle for the registry key '");
-				errorMessage.append(key);
-				errorMessage.append("' is not valid.");							
-				throw ProbeException(errorMessage);
-
-			} else {
-				
-				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
-				char errorCodeBuffer[20];
-				_ltoa(res, errorCodeBuffer, 20);
-				string errorMessage = "";
-				errorMessage.append("Error: Unable to check existence of registry key '");
-				errorMessage.append(key);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
-				errorMessage.append(" - " + systemErrMsg);
-				throw ProbeException(errorMessage);
-			}	
-
-		} else {
-			
-			DWORD type = 0;
-			DWORD valuelen = 0;
-
-			// Determine how big the buffer must be to store the data.  By specifying NULL for the
-			// buffer size parameter, the function returns the value ERROR_MORE_DATA, and stores
-			// the required buffer size, in bytes, into valuelen.
-			res = RegQueryValueEx(hkey,						// handle to key
-								name.c_str(),				// value name
-								NULL,						// reserved
-								NULL,						// type buffer
-								NULL,						// data buffer
-								&valuelen);					// size of data buffer
-
-			// Allocate space for the buffer.
-			LPBYTE value = (LPBYTE) malloc(valuelen);
-
-			// Retrieve the type and value for the specified name associated with an open registry
-			// key.
-			res = RegQueryValueEx(hkey,						// handle to key
-								name.c_str(),				// value name
-								NULL,						// reserved
-								&type,						// type buffer
-								value,						// data buffer
-								&valuelen);					// size of data buffer
-
-			if (res == ERROR_FILE_NOT_FOUND) {
-
-				exists = false;
-
-			} else if (res != ERROR_SUCCESS) {
-				
-				free(value);
-
-				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
-				char errorCodeBuffer[20];
-				_ltoa(res, errorCodeBuffer, 20);
-				string errorMessage = "";
-				errorMessage.append("Unable to get values for the specified name: '");
-				errorMessage.append(name);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
-				errorMessage.append(" - " + systemErrMsg);
-				throw ProbeException(errorMessage);
-
-			} else {
-				exists = true;
-			}
-
-			free(value);
-			RegCloseKey(hkey);
-		}
-	}
-
-	return exists;
 }
