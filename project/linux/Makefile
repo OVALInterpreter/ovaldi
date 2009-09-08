@@ -164,6 +164,7 @@ OBJS = \
 	FileHashProbe.obj \
 	VariableProbe.obj \
 	RunLevelProbe.obj \
+	PasswordProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
 	OBJS += RPMInfoProbe.obj
@@ -260,6 +261,7 @@ REL_OBJS = \
 	$(BUILDDIR)/FileHashProbe.obj \
 	$(BUILDDIR)/VariableProbe.obj \
 	$(BUILDDIR)/RunLevelProbe.obj \
+	$(BUILDDIR)/PasswordProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
 	REL_OBJS += $(BUILDDIR)/RPMInfoProbe.obj
