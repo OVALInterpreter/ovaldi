@@ -40,7 +40,7 @@
 #define VERSION "5.6"
 #define BUILD 0
 
-#define SCHEMA_VERSION "5.5"
+#define SCHEMA_VERSION "5.6"
 
 string Version::GetMinumumCompatibleVersion() {
 
