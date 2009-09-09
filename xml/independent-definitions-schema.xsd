@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Independent Definition</schema>
-                  <version>5.6 RC 2</version>
-                  <date>8/24/2009 2:27:55 PM</date>
+                  <version>5.6</version>
+                  <date>9/9/2009 9:44:33 AM</date>
                   <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ind-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"/>
@@ -955,7 +955,7 @@
                                     <xsd:choice minOccurs="1" maxOccurs="1">
                                           <xsd:element ref="oval-def:set" minOccurs="0" maxOccurs="1"/>
                                           <xsd:sequence minOccurs="0" maxOccurs="1">
-                                                <xsd:element name="behaviors" type="ind-def:TextfilecontentBehaviors" minOccurs="0" maxOccurs="1"/>
+                                                <xsd:element name="behaviors" type="ind-def:Textfilecontent54Behaviors" minOccurs="0" maxOccurs="1"/>
                                                 <xsd:choice>
                                                       <xsd:sequence>
                                                             <xsd:element name="filepath" type="oval-def:EntityObjectStringType">
@@ -1001,7 +1001,7 @@
                                                 <xsd:element name="pattern" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The pattern entity defines a chunk of text in a file and is represented using a regular expression. A subexpression (using parentheses) can call out a piece of the text block to test. For example, the pattern abc(.*)xyz would look for a block of text in the file that starts with abc and ends with xyz, with the subexpression being all the characters that exist in between. The value of the subexpression can then be tested using the subexpression entity of a textfilecontent54_state. Note that if the pattern, starting at the same point in the file, matches more than one block of text, then it matches the longest. For example, given a file with abcdefxyzxyzabc, then the pattern abc(.*)xyz would match the block abcdefxyzxyz. Subexpressions also match the longest possible substrings, subject to the constraint that the whole match be as long as possible, with subexpressions starting earlier in the pattern taking priority over ones starting later.</xsd:documentation>
-                                                            <xsd:documentation>Note that when using regular expressions, OVAL supports regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification (See: http://www.perl.com/doc/manual/html/pod/perlre.html).</xsd:documentation>
+                                                            <xsd:documentation>Note that when using regular expressions, OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="txt54objpattern">
                                                                         <sch:rule context="ind-def:textfilecontent54_object/ind-def:pattern">
@@ -1128,6 +1128,50 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
+      <xsd:complexType name="Textfilecontent54Behaviors">
+            <xsd:annotation>
+                  <xsd:documentation>The Textfilecontent54Behaviors complex type defines a number of behaviors that allow a more detailed definition of the textfilecontent54_object being specified.  Note that using these behaviors may result in some unique results.  For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in.</xsd:documentation>
+                  <xsd:documentation>It is important to note that the ‘max_depth’ and ‘recurse_direction’ attributes of the ‘behaviors’ element do not apply to the ‘filepath’ element, only to the ‘path’ and ‘filename’ elements.  This is because the ‘filepath’ element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="max_depth" use="optional" default="1">
+                  <xsd:annotation>
+                        <xsd:documentation>'max_depth' defines the maximum depth of recursion to perform when a recurse_direction is specified. A value of '0' is equivalent to no recursion, '1' means to step only one directory level up/down, and so on. The default value is '-1' meaning no limitation. Note that the default recurse_direction behavior is 'none' so even though max_depth specifies no limitation by default, the recurse_direction behavior turns recusion off.</xsd:documentation>
+                  </xsd:annotation>
+                  <xsd:simpleType>
+                        <xsd:restriction base="xsd:integer">
+                              <xsd:fractionDigits value="0"/>
+                              <xsd:minInclusive value="-1"/>
+                        </xsd:restriction>
+                  </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="recurse_direction" use="optional" default="none">
+                  <xsd:annotation>
+                        <xsd:documentation>'recurse_direction' defines the direction, either 'up' to parent directories, or 'down' into child directories to recursively search for files. When recursing up or down, one is limited by the max_depth behavior. Note that it is not an error if max_depth specifies a certain level of recursion and that level does not exist. Recursing should only go as deep as available. The default value is 'none' for no recursion.</xsd:documentation>
+                  </xsd:annotation>
+                  <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                              <xsd:enumeration value="none"/>
+                              <xsd:enumeration value="up"/>
+                              <xsd:enumeration value="down"/>
+                        </xsd:restriction>
+                  </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="ignore_case" type="xsd:boolean" use="optional" default="false">
+                  <xsd:annotation>
+                        <xsd:documentation>'ignore_case' indicates whether case should be considered when matching system values against the regular expression provided by the pattern entity. This behavior is intended to align with the Perl regular expression 'i' modifier: if true, case will be ignored.  If false, case will not be ignored. The default is false.</xsd:documentation>
+                  </xsd:annotation>                  
+            </xsd:attribute>
+            <xsd:attribute name="multiline" type="xsd:boolean" use="optional" default="true">
+                  <xsd:annotation>
+                        <xsd:documentation>'multiline' enables multiple line semantics in the regular expression provided by the pattern entity. This behavior is intended to align with the Perl regular expression 'm' modifier: if true, the '^' and '$' metacharacters will match both at the beginning/end of a string, and immediately after/before newline characters.  If false, they will match only at the beginning/end of a string.  The default is true.</xsd:documentation>
+                  </xsd:annotation>                  
+            </xsd:attribute>
+            <xsd:attribute name="singleline" type="xsd:boolean" use="optional" default="false">
+                  <xsd:annotation>
+                        <xsd:documentation>'singleline' enables single line semantics in the regular expression provided by the pattern entity. This behavior is intended to align with the Perl regular expression 's' modifier: if true, the '.' metacharacter will match newlines. If false, it will not.  The default is false.</xsd:documentation>
+                  </xsd:annotation>                  
+            </xsd:attribute>
+      </xsd:complexType>
       <!-- =============================================================================== -->
       <!-- ==========================  TEXT FILE CONTENT TEST  =========================== -->
       <!-- =============================================================================== -->
@@ -1223,7 +1267,7 @@
                                                 <xsd:element name="line" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The line element represents a line in the file and is represented using a regular expression. A single subexpression can be called out using parentheses. The value of this subexpression can then be checked using a textfilecontent_state.</xsd:documentation>
-                                                            <xsd:documentation>Note that when using regular expressions, OVAL supports regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification (See: http://www.perl.com/doc/manual/html/pod/perlre.html).</xsd:documentation>
+                                                            <xsd:documentation>Note that when using regular expressions, OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="txtobjline">
                                                                         <sch:rule context="ind-def:textfilecontent_object/ind-def:line">
@@ -1542,7 +1586,7 @@
                                                 </xsd:choice>
                                                 <xsd:element name="xpath" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>Specifies an Xpath expression describing the nodes to look at. Any valid Xpath 1.0 statement is usable with one exception, at most one field may be identified in the Xpath. This is because the value_of element in the data section is only designed to work against a single field. The only valid operator for xpath is equals since there is an infinite number of possible xpaths and determinining all those that do not equal a give xpath would be impossible.</xsd:documentation>
+                                                            <xsd:documentation>Specifies an Xpath expression describing the text node(s) or attribute(s) to look at. Any valid Xpath 1.0 statement is usable with one exception, at most one field may be identified in the Xpath. This is because the value_of element in the data section is only designed to work against a single field. The only valid operator for xpath is equals since there is an infinite number of possible xpaths and determinining all those that do not equal a give xpath would be impossible.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="xmlobjxpath">
                                                                         <sch:rule context="ind-def:xmlfilecontent_object/ind-def:xpath">
@@ -1606,7 +1650,7 @@
                                     </xsd:element>
                                     <xsd:element name="xpath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>Specifies an Xpath expression describing the nodes to look at.</xsd:documentation>
+                                                <xsd:documentation>Specifies an Xpath expression describing the text node(s) or attribute(s) to look at.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="xmlstexpath">
                                                             <sch:rule context="ind-def:xmlfilecontent_state/ind-def:xpath">
@@ -1618,7 +1662,7 @@
                                     </xsd:element>
                                     <xsd:element name="value_of" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The value element checks the value of the nodes found.</xsd:documentation>
+                                                <xsd:documentation>The value_of element checks the value(s) of the text node(s) or attribute(s) found.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="xmlstevalue_of">
                                                             <sch:rule context="ind-def:xmlfilecontent_state/ind-def:value_of">

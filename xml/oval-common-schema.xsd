@@ -5,8 +5,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Common</schema>
-               <version>5.6 RC 2</version>
-               <date>8/24/2009 2:27:57 PM</date>
+               <version>5.6</version>
+               <date>9/9/2009 9:44:35 AM</date>
                 <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
               <sch:ns prefix="oval" uri="http://oval.mitre.org/XMLSchema/oval-common-5"/>
           </xsd:appinfo>
@@ -449,7 +449,7 @@ at_least_one_exists  ||  0   |  0+  |  1+  |  0+  ||  Error
                </xsd:enumeration>
                <xsd:enumeration value="pattern match">
                     <xsd:annotation>
-                         <xsd:documentation>The 'pattern match' operation allows an item to be tested against a regular expression. When used by an entity in an OVAL Object, the regular expression represents the set of matching objects on the system. OVAL supports regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification (See: http://www.perl.com/doc/manual/html/pod/perlre.html).</xsd:documentation>
+                         <xsd:documentation>The 'pattern match' operation allows an item to be tested against a regular expression. When used by an entity in an OVAL Object, the regular expression represents the set of matching objects on the system.  OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>

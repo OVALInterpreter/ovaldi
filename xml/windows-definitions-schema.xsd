@@ -7,15 +7,15 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.6 RC 2</version>
-                  <date>8/24/2009 2:27:59 PM</date>
+                  <version>5.6</version>
+                  <date>9/9/2009 9:44:39 AM</date>
                   <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
                   <sch:pattern id="affected_platform">
                         <sch:rule context="oval-def:affected[@family='windows']">
-                              <sch:assert test="not(oval-def:platform) or oval-def:platform='Microsoft Windows 95' or oval-def:platform='Microsoft Windows 98' or oval-def:platform='Microsoft Windows ME' or oval-def:platform='Microsoft Windows NT' or oval-def:platform='Microsoft Windows 2000' or oval-def:platform='Microsoft Windows XP' or oval-def:platform='Microsoft Windows Server 2003' or oval-def:platform='Microsoft Windows Vista' or oval-def:platform='Microsoft Windows Server 2008'">
+                              <sch:assert test="not(oval-def:platform) or oval-def:platform='Microsoft Windows 95' or oval-def:platform='Microsoft Windows 98' or oval-def:platform='Microsoft Windows ME' or oval-def:platform='Microsoft Windows NT' or oval-def:platform='Microsoft Windows 2000' or oval-def:platform='Microsoft Windows XP' or oval-def:platform='Microsoft Windows Server 2003' or oval-def:platform='Microsoft Windows Vista' or oval-def:platform='Microsoft Windows Server 2008' or oval-def:platform='Microsoft Windows 7'">
                                     <sch:value-of select="../../@id"/> - the value "<sch:value-of select="oval-def:platform"/>" found in platform element as part of the affected element is not a valid windows platform.</sch:assert>
                         </sch:rule>
                   </sch:pattern>
@@ -7124,7 +7124,7 @@
                                      <xsd:sequence minOccurs="0">
                                            <xsd:element name="service_name" type="oval-def:EntityObjectStringType">
                                                  <xsd:annotation>
-                                                       <xsd:documentation>The service_name element describes a service to be collected.</xsd:documentation>
+                                                       <xsd:documentation>The service_name element describes a service to be collected. Note that the service_name element should contain the actual name of the service and not its display name that is found in Control Panel->Administrative Tools->Services.  For example, if you wanted to check the effective rights of the Automatic Updates service you would specify 'wuauserv' for the service_name element not 'Automatic Updates'.</xsd:documentation>
                                                        <xsd:appinfo>
                                                              <sch:pattern id="svcerobjservice_name">
                                                                    <sch:rule context="win-def:serviceeffectiverights_object/win-def:service_name">
@@ -7164,7 +7164,7 @@
                           <xsd:sequence>
                                 <xsd:element name="service_name" type="oval-def:EntityStateStringType" minOccurs="0">
                                       <xsd:annotation>
-                                            <xsd:documentation>The service_name element specifies a service on the machine from which to retrieve the DACL.</xsd:documentation>
+                                            <xsd:documentation>The service_name element specifies a service on the machine from which to retrieve the DACL. Note that the service_name element should contain the actual name of the service and not its display name that is found in Control Panel->Administrative Tools->Services.  For example, if you wanted to check the effective rights of the Automatic Updates service you would specify 'wuauserv' for the service_name element not 'Automatic Updates'.</xsd:documentation>
                                             <xsd:appinfo>
                                                   <sch:pattern id="svcersteservice_name">
                                                         <sch:rule context="win-def:serviceeffectiverights_state/win-def:service_name">

@@ -37,8 +37,8 @@
         <xsd:documentation>This schema defines an xml format for inputing a set of OVAL Definition ids into the reference OVAL Interpreter for evaluation.</xsd:documentation>
         <xsd:appinfo>
             <schema>OVAL Definition Interpreter - Evaluation Id Schema</schema>
-            <version>5.3</version>
-            <date>01/02/2008 11:19:01 AM</date>
+            <version>5.6</version>
+            <date>09/09/2009 11:19:01 AM</date>
         </xsd:appinfo>
     </xsd:annotation>
     
