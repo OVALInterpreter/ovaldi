@@ -56,6 +56,31 @@
 using namespace std;
 
 /**
+  A service that is started or killed at a particular runlevel. This would most likely be stored
+  in a map where the key is the runlevel.  Because of this, the class itself does not contain a
+  runlevel identifing member. It is an item for a GIVEN runlevel.
+ */
+class runlevel_item
+{
+  public:
+    runlevel_item() : is_start( false ) {}
+    runlevel_item( const string &name, const bool is_start ) : service_name(name), is_start(is_start) {}
+    ~runlevel_item(){}
+
+    runlevel_item( const runlevel_item &r1 ) { this->copy_item( r1 ); }
+    runlevel_item & operator= ( const runlevel_item &rhs ) { this->copy_item( rhs ); return *this; }
+
+    string  service_name;
+    bool    is_start;
+  
+
+  private:
+    void copy_item( const runlevel_item &r1 ) { this->service_name = r1.service_name; this->is_start = r1.is_start; }
+};
+
+
+
+/**
   Comparator used by STL (char *) containers with uniqueness constructs.
  */
 struct ltstr_comparator
@@ -81,9 +106,25 @@ struct ltchr_comparator
 
 
 
+
+/**
+  Comparator used by STL (runlevel_item) containers with uniqueness constructs.
+ */
+struct ltrunlevel_item_comparator
+{
+  bool operator() ( const runlevel_item &r1, const runlevel_item &r2 )
+  {
+    return ( strcmp( r1.service_name.c_str(), r2.service_name.c_str() ) < 0 );
+  }
+
+};
+
+
+
 typedef set<char, ltchr_comparator> CharSet;
 typedef set<const char *, ltstr_comparator> CharPtrSet;
-typedef map<const char, CharPtrSet *, ltchr_comparator> SetMap;
+typedef set<runlevel_item, ltrunlevel_item_comparator> RunLevelItemSet;
+typedef map<const char, RunLevelItemSet, ltchr_comparator> SetMap;
 
 
 /**
@@ -141,10 +182,11 @@ class RunLevelProbe : public AbsProbe {
 
     /**
       Dereferences the symbolic link desegnated by fullPath.  Then sends the derefernced path to _handleReg(...)
+      @param the name of the symbolic link
       @param fullPath the path to the symbolic link
       @param the runlevel in which the service pointed to by @fullPath is to be executed at
     */
-    void          _handleLink( const char * fullPath,  const char runlevel );
+    void          _handleLink( const char * filename,  const char * fullPath,  const char runlevel );
 
     /**
       Adds the script to the _runlevels map for given runlevel if the file pointed to by dir and filename is valid
@@ -174,12 +216,6 @@ class RunLevelProbe : public AbsProbe {
     void          _analyzeRunlevels();
     
     /**
-      Deallocates the memory contained by the given set
-      @param rlSet the set which contains dynamically allocated memory
-    */
-    void          _deallocateSet( CharPtrSet * rlSet );
-    
-    /**
       Erases the contents of the _runlevels  map which contains sets of dynamically allocated memory.
     */
     void          _deallocateMap( );
@@ -199,7 +235,7 @@ class RunLevelProbe : public AbsProbe {
       @param start the runlevel_item start entity ( should always be true )
       @return a new runlevel_item object.  This is cleaned up by the ProbeFactory.
     */ 
-    Item *        _makeRunlevelItem( const char runlevel, const char * service_name, bool kill = false, bool start = true );
+    Item *        _makeRunlevelItem( const char runlevel, const runlevel_item &r1 );
 
     /**
       Generates all the runlevel_item objects for the given runlevel_object we are processing
@@ -207,7 +243,7 @@ class RunLevelProbe : public AbsProbe {
       @param services the set of services dictated by the service_name runlevel_object entity
       @return a vectory of runlevel_item objects.  This should be cleared up by the ProbeFactory.
     */
-    ItemVector  * _getItemEntities( CharSet * runlevelSet, CharPtrSet * services ); 
+    ItemVector  * _getItemEntities( CharSet * runlevelSet, RunLevelItemSet * services ); 
 
     /**
       Generates a set of runlevels dictated by the runlevel runlevel_object entity
@@ -226,7 +262,7 @@ class RunLevelProbe : public AbsProbe {
       @insertUnequalNonRegex true if the service_name runlevel_object entity has a "not equal" operation
       @return a set of services being used in the given runlevels 
     */
-    CharPtrSet  * _getMatchingServiceNames ( string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex = false );
+    RunLevelItemSet  * _getMatchingServiceNames ( string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex = false );
 
     /**
       Calls  ItemEntity::Analyze() method to validate the data collected for the given entity (service_name)
@@ -234,7 +270,7 @@ class RunLevelProbe : public AbsProbe {
       @param entity the service_name entity for the working runlevel_object
       @return a set of validated services.  This must be deleted after use.
     */
-    CharPtrSet  * _analyzeContainer( CharPtrSet * workingSet, ObjectEntity * entity );
+    RunLevelItemSet  * _analyzeContainer( RunLevelItemSet * workingSet, ObjectEntity * entity );
 
     /**
       Calls  ItemEntity::Analyze() method to validate the data collected for the given entity (runlevel)
@@ -256,7 +292,23 @@ class RunLevelProbe : public AbsProbe {
       @param service_name the service_name runlevel_object entity being worked with
       @return a set of validated services as dictated by the object entity.  This must be deleted after use.
     */
-    CharPtrSet  * _getServiceData( ObjectEntity * service_name, CharSet * runlevels );
+    RunLevelItemSet  * _getServiceData( ObjectEntity * service_name, CharSet * runlevels );
+
+    /**
+      Determines if a script is a "Start" script or a "Kill" script based on the first character of the filename:
+      an 'K' determines a "Kill" script and anything else means a "Start" script.
+      @param  fileName the script (could be a symlink) filename
+      @return true if the given filename corresponds to a start script.
+    */
+    bool  _isStart( const char * fileName );
+
+    /**
+      Places the given run level item in the _runlevel map
+      @param runlevel the runlevel in which the runlevel item executes
+      @param rli the runlevel item
+
+    */
+    void _populateMap( const char runlevel, const runlevel_item &rli );
 
     /**
       Determines whether or not the supplied value should be inserted into a container.
@@ -267,7 +319,7 @@ class RunLevelProbe : public AbsProbe {
       @return true if the value warrants an insertion
     */
     bool          _isInsertable( string pattern, string value, bool isRegex, bool insertUnequalNonRegex );
-    
+  
   private:  // Private Member Variables 
 	  static RunLevelProbe *  _instance;
 

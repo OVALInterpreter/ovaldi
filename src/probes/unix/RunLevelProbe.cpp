@@ -74,11 +74,11 @@ RunLevelProbe::Instance(){
 
 ItemVector * 
 RunLevelProbe::CollectItems( Object* object ){
-  ItemVector    * collectedItems  = NULL;
-  CharSet       * runlevelSet     = NULL;
-  CharPtrSet    * serviceSet      = NULL;
-  ObjectEntity  * service_name    = object->GetElementByName("service_name"),
-                * runlevel        = object->GetElementByName("runlevel");
+  ItemVector      * collectedItems  = NULL;
+  CharSet         * runlevelSet     = NULL;
+  RunLevelItemSet * serviceSet      = NULL;
+  ObjectEntity    * service_name    = object->GetElementByName("service_name"),
+                  * runlevel        = object->GetElementByName("runlevel");
     
   _verifyRunlevelObjectAttr( service_name, runlevel ); // throws ProbException
   
@@ -164,16 +164,16 @@ RunLevelProbe::_chrToStr( char chr ) const {
 
 
 Item *
-RunLevelProbe::_makeRunlevelItem( const char runlevel, const char * service_name, bool kill, bool start ) {
-  Item * item = this->CreateItem();
-  char * runlevelToStr  = _chrToStr( runlevel );
-  string  runlevelStr   = runlevelToStr;
+RunLevelProbe::_makeRunlevelItem( const char runlevel, const runlevel_item &rli ) {
+  Item *  item = this->CreateItem();
+  char *  runlevelToStr  = _chrToStr( runlevel );
+  bool    start = rli.is_start; 
 
   item->SetStatus( OvalEnum::STATUS_EXISTS );
-  item->AppendElement( new ItemEntity( "service_name", service_name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+  item->AppendElement( new ItemEntity( "service_name", rli.service_name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
   item->AppendElement( new ItemEntity( "runlevel", runlevelToStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-  item->AppendElement( new ItemEntity( "start", "true", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-  item->AppendElement( new ItemEntity( "kill", "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+  item->AppendElement( new ItemEntity( "start", ( start ) ? "true" : "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+  item->AppendElement( new ItemEntity( "kill", ( !start ) ? "true" : "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 
   delete runlevelToStr;
   return item;
@@ -184,19 +184,19 @@ RunLevelProbe::_makeRunlevelItem( const char runlevel, const char * service_name
 
 
 ItemVector *
-RunLevelProbe::_getItemEntities( CharSet * runlevelSet, CharPtrSet * services ) {
-  ItemVector  * items   = new ItemVector();
-  CharPtrSet  * mapSet  = NULL;  
-  CharSet::iterator     runlevel_iter;
-  CharPtrSet::iterator  service_iter; 
+RunLevelProbe::_getItemEntities( CharSet * runlevelSet, RunLevelItemSet * services ) {
+  ItemVector      * items   = new ItemVector();
+  RunLevelItemSet   mapSet;  
+  CharSet::iterator           runlevel_iter;
+  RunLevelItemSet::iterator   service_iter; 
       
   for( runlevel_iter = runlevelSet->begin(); runlevel_iter != runlevelSet->end(); runlevel_iter++ ){
     char runlevel_chr = (*runlevel_iter);
     mapSet = _runlevels[ runlevel_chr ];
-    for( service_iter = mapSet->begin(); service_iter != mapSet->end(); service_iter++ ){
-      const char * service_name = (*service_iter);
-      if ( services->find( service_name ) != services->end() ){
-        Item * item = _makeRunlevelItem( runlevel_chr, service_name );
+    for( service_iter = mapSet.begin(); service_iter != mapSet.end(); service_iter++ ){
+      runlevel_item rli = (*service_iter);
+      if ( services->find( rli ) != services->end() ){
+        Item * item = _makeRunlevelItem( runlevel_chr, rli );
         items->push_back( item );
       }
     }
@@ -231,13 +231,13 @@ RunLevelProbe::_analyzeContainer( CharSet * workingSet, ObjectEntity * entity ) 
 
 
 
-CharPtrSet * 
-RunLevelProbe::_analyzeContainer( CharPtrSet * workingSet, ObjectEntity * entity ) {
-  CharPtrSet * rtnSet = new CharPtrSet();
+RunLevelItemSet * 
+RunLevelProbe::_analyzeContainer( RunLevelItemSet * workingSet, ObjectEntity * entity ) {
+  RunLevelItemSet * rtnSet = new RunLevelItemSet();
   ItemEntity * item   = this->CreateItemEntity( entity );  // memory cleaned up automatically by the ProbeFactory
   
-  for ( CharPtrSet::iterator iter = workingSet->begin(); iter != workingSet->end(); iter++ ){
-    item->SetValue( (*iter) );
+  for ( RunLevelItemSet::iterator iter = workingSet->begin(); iter != workingSet->end(); iter++ ){
+    item->SetValue( (*iter).service_name );
     if( entity->Analyze( item ) == OvalEnum::RESULT_TRUE ){
       rtnSet->insert( *iter );
     }
@@ -307,22 +307,22 @@ RunLevelProbe::_getMatchingRunlevels( string pattern, bool isRegex, bool insertU
   a given runlevel_test so the map loses it's appeal in that scenario.
  **/
 
-CharPtrSet *
+RunLevelItemSet *
 RunLevelProbe::_getMatchingServiceNames ( string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex ) {
-  CharPtrSet * matches =  new CharPtrSet();
+  RunLevelItemSet * matches =  new RunLevelItemSet();
   
   // iterate over the set of runlevels
   for ( CharSet::iterator runlevel_iter = working_runlevels->begin(); runlevel_iter != working_runlevels->end(); runlevel_iter++ ){
     char runlevel = (*runlevel_iter);
     
     // get services for given runlevel
-    SetMap::iterator map_iter   = _runlevels.find( runlevel );
-    CharPtrSet * rlSet      = (*map_iter).second;
+    SetMap::iterator  map_iter   = _runlevels.find( runlevel );
+    RunLevelItemSet   rlSet      = (*map_iter).second;
 
-    for( CharPtrSet::iterator iter = rlSet->begin(); iter != rlSet->end(); ++iter ){
-      const char * service_name = *iter;
-      bool insert = _isInsertable( pattern, service_name, isRegex, insertUnequalNonRegex );
-      if ( insert == true ) matches->insert( service_name ); 
+    for( RunLevelItemSet::iterator iter = rlSet.begin(); iter != rlSet.end(); ++iter ){
+      runlevel_item rli = *iter;
+      bool insert = _isInsertable( pattern, rli.service_name, isRegex, insertUnequalNonRegex );
+      if ( insert == true ) matches->insert( rli ); 
     } 
   }
 
@@ -355,12 +355,12 @@ RunLevelProbe::_getRunLevelData( ObjectEntity * runlevel ){
 
 
 
-CharPtrSet *
+RunLevelItemSet *
 RunLevelProbe::_getServiceData( ObjectEntity * service_name, CharSet * runlevels ){
   bool    isRegex                 = ( service_name->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH );
   bool    insertUnequalNonRegex   = ( service_name->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL );
-  CharPtrSet    * rtnSet          = NULL,
-                * workingSet      = NULL;
+  RunLevelItemSet * rtnSet        = NULL,
+                  * workingSet    = NULL;
 
   if( service_name->GetVarRef() == NULL )
     workingSet =  _getMatchingServiceNames( service_name->GetValue(), runlevels, isRegex, insertUnequalNonRegex );
@@ -412,43 +412,47 @@ RunLevelProbe::_constructFullPath( const char * path, const char * filename ) co
 
 
 
-/**
-  We could do :
-  foo_set = _runlevels[ key ];  
-
-  Instead of 
-  iter = _runlevels.find( key );
-  if( iter != _runlevels.end() ) foo_set = (*iter).second;
-  
-  But that will insert unwanted keys into the map because the "[]" 
-  operator will insert <key> when <key> is not found;
- */
-
 void
-RunLevelProbe::_handleReg( const char * filename, const char runlevel ){
-  CharPtrSet      *rlSet  = NULL;
-  SetMap::iterator iter   = _runlevels.find( runlevel );
-
-  if( iter != _runlevels.end() ){
-    rlSet = (*iter).second;
-    rlSet->insert( filename );
-  }
-  else { // key not found
-    rlSet = new CharPtrSet();
-    rlSet->insert( filename );
-    _runlevels[ runlevel ] = rlSet;
-  }
+RunLevelProbe::_populateMap( const char runlevel, const runlevel_item &rli ){
+  RunLevelItemSet &rlSet = _runlevels[ runlevel ];
+  rlSet.insert( rli );
 }
 
 
 
 
+/**
+ * If the filename found within /etc/rc[0-9].d starts with a K, the service is meant to be
+ * killed.  If it starts with a S it is meant to be started.
+ **/
+bool
+RunLevelProbe::_isStart( const char * filename ){
+  return filename[0] != 'K';
+}
+
+
+
 void
-RunLevelProbe::_handleLink( const char * fullPath,  const char runlevel ){
-  char    buffer[BUFLEN + 1];
-  char *  serviceName   = new char[BUFLEN + 1],
-       *  lastSlash     = NULL;
-  int     nchars        = 0;
+RunLevelProbe::_handleReg( const char * filename, const char runlevel ){
+  runlevel_item item;
+
+  item.service_name = filename;
+  item.is_start     = _isStart( filename );
+  
+  _populateMap( runlevel, item );
+}
+
+
+
+
+
+void
+RunLevelProbe::_handleLink( const char * filename, const char * fullPath,  const char runlevel ){
+  char            buffer[BUFLEN + 1];
+  char *          serviceName   = new char[BUFLEN + 1],
+       *          lastSlash     = NULL;
+  int             nchars        = 0;
+  runlevel_item   item;
 
   memset( buffer, (char)NULL, BUFLEN + 1 );
   memset( serviceName, (char)NULL, BUFLEN + 1 );
@@ -461,7 +465,10 @@ RunLevelProbe::_handleLink( const char * fullPath,  const char runlevel ){
     strncpy( serviceName, lastSlash, BUFLEN );
   }
 
-  _handleReg( serviceName, runlevel );
+  item.service_name = serviceName;
+  item.is_start     = _isStart( filename );
+  
+  _populateMap( runlevel, item );
 }
 
 
@@ -478,7 +485,7 @@ RunLevelProbe::_addRunlevelItem( const char * dir, const char * filename, const 
     stat( fullPath, &st_file );
 
     if( st_file.st_mode & S_IFLNK ){
-      _handleLink( fullPath, runlevel );
+      _handleLink( filename, fullPath, runlevel );
     }
     else if( st_file.st_mode & S_IFREG ){
       _handleReg( filename, runlevel );
@@ -539,28 +546,15 @@ RunLevelProbe::_analyzeRunlevels ( ){
 
 
 
-void 
-RunLevelProbe::_deallocateSet( CharPtrSet * rlSet ){
-  CharPtrSet::iterator iter;
-
-  for( iter = rlSet->begin(); iter != rlSet->end(); iter++ ){
-    if( (*iter) != NULL ) delete[] (*iter);
-    rlSet->erase(iter);
-  }
-}
-
-
 
 void 
 RunLevelProbe::_deallocateMap( ){
   SetMap::iterator iter;
 
   for( iter = _runlevels.begin(); iter != _runlevels.end(); iter++ ){
-    CharPtrSet * rl_set = (*iter).second;
-    _deallocateSet( rl_set );
+    RunLevelItemSet rl_set = (*iter).second;
     _runlevels.erase( iter );
   }
+
 }
-
-
 
