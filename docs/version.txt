@@ -49,6 +49,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:regkeyeffectiverights_test.
 * Added support for the win-def:regkeyeffectiverights53_test.
 * Added support for the unix-def:password_test.
+* Corrected bug in RunLevelProbe causing Kill or Start scripts appearing with incorrect values in the results.xml file.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
