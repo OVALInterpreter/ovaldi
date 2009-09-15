@@ -144,7 +144,7 @@ private:
 	/**
 		Get all protocols on the system that match the specified pattern.
 		@param pattern a string used that protocols are compared against.
-		@param isRegex a bool that is indicates how system protocols should be compared against the specifed pattern
+		@param isRegex a bool that is indicates how system protocols should be compared against the specified pattern
 		@return The set of matching protocols.
 	*/
 	StringVector* GetMatchingProtocols(string pattern, bool isRegex);
