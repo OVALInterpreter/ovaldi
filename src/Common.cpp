@@ -310,10 +310,10 @@ StringVector* Common::ParseDefinitionIdsString() {
 	REGEX* regex = new REGEX();
 	if(!regex->IsMatch(Common::DEFINITION_ID_LIST.c_str(), definitionIdsString.c_str())) {
 		delete regex;
-		throw Exception("Error: Invalid parameter format. Expected a comma seperated list of definition ids. No spaces are allowed.");
+		throw Exception("Error: Invalid parameter format. Expected a comma separated list of definition ids. No spaces are allowed.");
 	}
 
-	// break the comma seperated string into definition ids.
+	// break the comma separated string into definition ids.
 	StringVector* definitionIds = new StringVector();
 	const char delm = ',';
 
@@ -341,7 +341,7 @@ StringVector* Common::ParseDefinitionIdsString() {
 				}	
 				delete definitionIds;
 				delete regex;
-				throw Exception("Error: Invalid parameter format. Expected a comma seperated list of definition ids. No spaces are allowed. Found invalid definition id");
+				throw Exception("Error: Invalid parameter format. Expected a comma separated list of definition ids. No spaces are allowed. Found invalid definition id");
 			}
 
 			// add it to the vector
