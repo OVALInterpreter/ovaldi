@@ -111,7 +111,7 @@ private:
     /** Cache the specified Object. */
 	static void Cache(Object* object);
 
-	/** Search the cache of Objects for the specifed Object. 
+	/** Search the cache of Objects for the specified Object. 
 		@return Returns the object with the specified id or NULL if not found.
 	*/
 	static Object* SearchCache(string id);
