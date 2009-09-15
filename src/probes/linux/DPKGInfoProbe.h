@@ -81,7 +81,7 @@ private:
 	/**
 		Get all deb names on the system that match the specified pattern.
 		@param pattern a string used that deb names are compared against.
-		@param isRegex a bool that is indicates how system deb names should be compared against the specifed pattern
+		@param isRegex a bool that is indicates how system deb names should be compared against the specified pattern
 		@return The set of matching names.
 	*/
 	StringVector* GetMatchingDPKGNames(string pattern, bool isRegex);
@@ -89,7 +89,7 @@ private:
 	/**
 		Return true if the specifeid deb exists on the system.
 		@param name a string that hold the name of the deb to check for.
-		@result The result of checking for the specifed deb on the system.
+		@result The result of checking for the specified deb on the system.
 	*/
 	bool DPKGExists(string name);
 
