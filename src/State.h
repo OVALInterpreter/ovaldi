@@ -64,7 +64,7 @@ public:
 	/** Parse the provided state element from a oval definition file into a State object. */
 	void Parse(DOMElement* stateElm);
 
-	/** Sarch the cache of States for the specifed State. 
+	/** Sarch the cache of States for the specified State. 
 		Return NULL if not found
 	*/
 	static State* SearchCache(string id);
