@@ -139,7 +139,7 @@ public:
 	void SetAnalyzed(bool analyzed);
 
 	/** 
-		Search the cache of definitions for the specifed definition. 
+		Search the cache of definitions for the specified definition. 
 		@return Returns the cached Definition or NULL if not found.
 	*/
 	static Definition* SearchCache(string id);
