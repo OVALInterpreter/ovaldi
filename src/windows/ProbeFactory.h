@@ -94,9 +94,9 @@ class ProbeFactory {
 
 public:
 	/** \callgraph
-		Factory method. Based on the specifed object name return the appropriate probe.
+		Factory method. Based on the specified object name return the appropriate probe.
 		@param objectName a string taht corresponds to the name of an object in the oval definition schema.
-		@return The probe for the specifed object or NULL.
+		@return The probe for the specified object or NULL.
 	*/
 	static AbsProbe* GetProbe(string objectName);
 
