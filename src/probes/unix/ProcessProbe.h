@@ -82,7 +82,7 @@ private:
 	/**
 		Get all commands on the system that match the specified pattern.
 		@param pattern a string used that commands are compared against.
-		@param isRegex a bool that is indicates how system commands should be compared against the specifed pattern
+		@param isRegex a bool that is indicates how system commands should be compared against the specified pattern
 		@return The set of matching commands.
 	*/
 	StringVector* GetMatchingCommands(string pattern, bool isRegex);
@@ -90,7 +90,7 @@ private:
 	/**
 		Return true if the specifeid command exists on the system.
 		@param command a string that hold the name of the rpm to check for.
-		@result The result of checking for the specifed rpm on the system.
+		@result The result of checking for the specified rpm on the system.
 	*/
 	bool CommandExists(string command);
 
