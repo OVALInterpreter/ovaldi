@@ -80,7 +80,7 @@ private:
 	/** Cache the specified filter. */
 	static void Cache(Filter* filter);
 
-	/** Search the cache of Filters for the specifed filter. 
+	/** Search the cache of Filters for the specified filter. 
 		@return Returns a filter object with the specified id or NULL if not found
 	*/
 	static Filter* SearchCache(string id);
