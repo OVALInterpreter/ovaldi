@@ -136,7 +136,7 @@ public:
 	static void RemovetAttributeByName(DOMElement*, string);
 	/** Convert the XMLCh* to a string and handle memory allocation. */
 	static string ToString(const XMLCh*);
-	/** Add the specifed namespace to the root element in the specified document. */
+	/** Add the specified namespace to the root element in the specified document. */
 	static void AddXmlns(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string newXmlnsUri, string newXmlnsAlias = "");
 	/** Add the specified schema location to the document. 
 		Ensures that schema locations are unique. 
@@ -152,7 +152,7 @@ public:
 	*/
 	static void CopyNamespaces(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* source, XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* dest); 
 	
-	/** Return the namespace of the specifed element or null if no namespace is present. */
+	/** Return the namespace of the specified element or null if no namespace is present. */
 	static string GetNamespace(DOMElement*);
 };
 
