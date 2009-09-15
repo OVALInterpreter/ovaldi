@@ -173,7 +173,7 @@ public:
 	TestedItemVector* GetTestedItems();
 	/** Set the testedItems field's value. */
 	void SetTestedItems(TestedItemVector* testedItems);
-	/** Add the specifed TestedItem to the set of tested Items. */
+	/** Add the specified TestedItem to the set of tested Items. */
 	void AppendTestedItem(TestedItem* testedItem);
 
 	/** Return the testedVariables field's value **/
@@ -212,7 +212,7 @@ private:
 	*/
 	void Parse(DOMElement* testElm);
 
-	/** Search the cache of Tests for the specifed Test. 
+	/** Search the cache of Tests for the specified Test. 
 	    Return NULL if not found 
 	*/
 	static Test* SearchCache(string id);
