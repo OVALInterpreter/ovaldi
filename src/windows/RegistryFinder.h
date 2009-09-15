@@ -114,7 +114,7 @@ class RegistryFinder {
          *  @param keyEntity A ObjectEntity that represents the key entity in an Object as defined in the OVAL Definition Schema.
          *  @param nameEntity A ObjectEntity that represents the name entity in an Object as defined in the OVAL Definition Schema.
          *  @param behaviors A BehaviorVector that represents the behaviors that should be applied to the registry keys.
-         *  @return A RegKeyVector that contains all of the registry key items that match the specifed criteria.
+         *  @return A RegKeyVector that contains all of the registry key items that match the specified criteria.
         */
         RegKeyVector* SearchRegistries ( ObjectEntity* hiveEntity, ObjectEntity* keyEntity, ObjectEntity* nameEntity, BehaviorVector* behaviors );
 
