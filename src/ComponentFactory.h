@@ -55,7 +55,7 @@ using namespace std;
 class ComponentFactory {
 
 public:
-	/** Return the appropriate component based on the specifed component element.*/
+	/** Return the appropriate component based on the specified component element.*/
 	static AbsComponent* GetComponent(DOMElement* componentElm);
 };
 
