@@ -116,7 +116,7 @@ public:
 	/** Create a string listing of all messages. */
 	string ListMessages();
 
-	/** Search the cache of variables for the specifed variable. 
+	/** Search the cache of variables for the specified variable. 
 		return NULL if not found.
 	*/
 	static AbsVariable* SearchCache(string id);
