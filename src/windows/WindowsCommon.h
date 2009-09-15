@@ -274,10 +274,10 @@ public:
 	/** Return the access mask for the Windows object for the specified SID. */
 	static void GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
 
-	/** Return the access mask for the Windows object for the specifed SID. */
+	/** Return the access mask for the Windows object for the specified SID. */
 	static void GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
 
-	/** Return the access mask for the Windows object for the specifed SID. */
+	/** Return the access mask for the Windows object for the specified SID. */
 	static void GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
 
 	/** Get the string representation of a SE_OBJECT_TYPE.
