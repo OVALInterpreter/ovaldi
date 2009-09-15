@@ -228,7 +228,7 @@ private:
 	/** Cache the specified item. */
 	static void Cache(Item* item);
 
-	/** Search the cache of Items for the specifed Item.
+	/** Search the cache of Items for the specified Item.
         @param id The id of the item to retrieve from the cache.
 		@return Returns the item with the specified id or NULL if not found.
 	*/
