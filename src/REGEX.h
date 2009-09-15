@@ -108,7 +108,7 @@ public:
 	*/
 	void GetConstantPortion(string patternIn, string delimIn, string *patternOut, string *constOut);
 	
-	/**	Return true if the searchString matches the specifed pattern.
+	/**	Return true if the searchString matches the specified pattern.
 
 		Regular expression support is provided by the REGEX library package,
 		which is open source software, written by Philip Hazel, and copyright
@@ -118,7 +118,7 @@ public:
 	*/
 	bool IsMatch(const char *patternIn, const char *searchStringIn);
 
-	/**	Return true if the searchString matches the specifed pattern including the set of matched substrings.
+	/**	Return true if the searchString matches the specified pattern including the set of matched substrings.
 		If the input regex identifies any subexpressions the matching substrings for those subexpressions
 		are pushed onto the substrings input parameter.
 
