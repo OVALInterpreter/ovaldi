@@ -71,8 +71,8 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariable
 				throw Exception("An unknown error occured while parsing external variable file: " + Common::GetExternalVariableFile());
 			}
 		} else {
-			Log::Debug("The external variable file does not exist! The definitions being evaluated rely on external variables for proper evaluation. Values for external variables must be specifed in an external variables file. " + varFile);
-			throw Exception("The external variable file does not exist! The definitions being evaluated rely on external variables for proper evaluation. Values for external variables must be specifed in an external variables file. " + varFile);
+			Log::Debug("The external variable file does not exist! The definitions being evaluated rely on external variables for proper evaluation. Values for external variables must be specified in an external variables file. " + varFile);
+			throw Exception("The external variable file does not exist! The definitions being evaluated rely on external variables for proper evaluation. Values for external variables must be specified in an external variables file. " + varFile);
 		}
 	}
 
