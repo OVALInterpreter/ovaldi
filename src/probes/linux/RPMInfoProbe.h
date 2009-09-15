@@ -82,7 +82,7 @@ private:
 	/**
 		Get all rpm names on the system that match the specified pattern.
 		@param pattern a string used that rpm names are compared against.
-		@param isRegex a bool that is indicates how system rpm names should be compared against the specifed pattern
+		@param isRegex a bool that is indicates how system rpm names should be compared against the specified pattern
 		@return The set of matching names.
 	*/
 	StringVector* GetMatchingRPMNames(string pattern, bool isRegex);
@@ -90,7 +90,7 @@ private:
 	/**
 		Return true if the specifeid rpm exists on the system.
 		@param name a string that hold the name of the rpm to check for.
-		@result The result of checking for the specifed rpm on the system.
+		@result The result of checking for the specified rpm on the system.
 	*/
 	bool RPMExists(string name);
 
