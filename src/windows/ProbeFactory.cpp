@@ -117,6 +117,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = VariableProbe::Instance();
 	} else if(objectName.compare("textfilecontent_object") == 0) {
 		probe = TextFileContentProbe::Instance();
+	} else if(objectName.compare("textfilecontent54_object") == 0) {
+		probe = TextFileContent54Probe::Instance();
 	} else if(objectName.compare("xmlfilecontent_object") == 0) {
 		probe = XmlFileContentProbe::Instance();
 	} else if(objectName.compare("filehash_object") == 0) {

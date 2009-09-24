@@ -76,6 +76,7 @@
 #include "ServiceEffectiveRightsProbe.h"
 #include "RegKeyEffectiveRightsProbe.h"
 #include "RegKeyEffectiveRights53Probe.h"
+#include "TextFileContent54Probe.h"
 using namespace std;
 
 class AbsProbe;
