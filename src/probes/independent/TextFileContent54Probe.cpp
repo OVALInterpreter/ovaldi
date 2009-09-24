@@ -150,8 +150,6 @@ void TextFileContent54Probe::GetItems(string path, string fileName,
 									int matchOptions,
 									ItemVector* collectedItems) {
 
-	Item *item = NULL;
-
 	// construct the file path
 	string filePath = Common::BuildFilePath(path, fileName);
 
