@@ -73,9 +73,11 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = ShadowProbe::Instance();
 	} else if(objectName.compare("uname_object") == 0) {
 		probe = UnameProbe::Instance();
+	} else if(objectName.compare("textfilecontent54_object") == 0) {
+		probe = TextFileContent54Probe::Instance();
 
 // here are the objects defined in the linux schema
 #ifdef PACKAGE_DPKG

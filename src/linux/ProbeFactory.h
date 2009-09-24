@@ -54,12 +54,14 @@
 
 #include "InetListeningServersProbe.h"
 #include "ProcessProbe.h"
-//#include "ShadowProbe.h"
+#include "ShadowProbe.h"
 #include "PasswordProbe.h"
 #include "InterfaceProbe.h"
+#include "PasswordProbe.h"
 #include "EnvironmentVariableProbe.h"
 #include "XmlFileContentProbe.h"
 #include "TextFileContentProbe.h"
+#include "TextFileContent54Probe.h"
 #include "VariableProbe.h"
 #include "RunLevelProbe.h"
 
