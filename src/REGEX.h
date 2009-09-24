@@ -130,6 +130,15 @@ public:
 	*/
 	bool GetMatchingSubstrings(const char *patternIn, const char *searchStringIn, StringVector* substrings);
 
+	/**
+	 * Whereas GetMatchingSubstrings(const char*,const char*,StringVector*) returns details on the first
+	 * match found, this method collects information on all matches found.  'matches' is a vector of vectors
+	 * which will be modified to contain the matching results.  Each element of the outer vector is a match
+	 * of the pattern.  Each element of the inner vector contains the bit of text which matched overall (as
+	 * the first vector element) and matches for all captured substrings (in subsequent elements).
+	 */
+	void GetAllMatchingSubstrings(const string& pattern, const string& searchString, vector<StringVector> &matches, int matchOptions=0);
+
 	/** 
 		This function takes a string and searches for all the double '\'s. 
 		Each double '\' //	is converted to a single '\'
@@ -138,6 +147,18 @@ public:
 
 	/** Set the match count back to zero */
 	void	Reset();
+
+	/**
+	 * Define some constants for matching.  These
+	 * are currently set to their PCRE equivalents.
+	 * We define our own to insulate ourselves from
+	 * the underlying regex implementation.
+	 */
+	enum MatchOptions {
+		SINGLELINE = PCRE_DOTALL,
+		MULTILINE = PCRE_MULTILINE,
+		IGNORE_CASE = PCRE_CASELESS
+	};
 
 private:
 	/**

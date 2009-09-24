@@ -456,6 +456,99 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 	return(result);
 }
 
+void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& searchString, vector<StringVector> &matches, int matchOptions) {
+	pcre *re;
+	const char* error;
+	int errOffset;
+	static const int MAX_CAPTURED_VALUES = 100; //includes the overall match
+	static const int MIN_CAPTURED_VALUES = 10; //includes the overall match
+
+	re = pcre_compile(
+		pattern.c_str(),  /* the pattern */
+		matchOptions,     /* our given options */
+		&error,           /* for error message */
+		&errOffset,       /* for error offset */
+		NULL);            /* use default character tables */
+
+	//	Check for compile errors
+	if(re == NULL) {
+		string errMsg = "Error: Failed to compile the specifed regular expression pattern.";
+		errMsg += "\n\tPattern: " + pattern;
+		errMsg += "\n\tOffset: " + Common::ToString(errOffset);
+		errMsg += "\n\tMessage: " + string(error);
+		throw REGEXException(errMsg);
+	}
+
+	// Try to be semi-intelligent about choosing the size of the "ovector".
+	// Use the capture count as a guide.  I think the returned value only
+	// counts parenthesized subexpressions and does not include the overall
+	// match (so I need to include space for 1 extra value).
+	int numCaptures;
+	int errCode = pcre_fullinfo(re, NULL, PCRE_INFO_CAPTURECOUNT, &numCaptures);
+
+	if (errCode < 0) {
+		pcre_free(re);
+		throw REGEXException(string("Pattern analysis failed!  Error code = ") + Common::ToString(errCode));
+	}
+
+	// safety check: don't let ovecSize be too large or too small
+	if (numCaptures > MAX_CAPTURED_VALUES-1)
+		numCaptures = MAX_CAPTURED_VALUES-1;
+	if (numCaptures < MIN_CAPTURED_VALUES-1)
+		numCaptures = MIN_CAPTURED_VALUES-1;
+	int ovecSize = (numCaptures+1)*3;
+    int *ovector = new int[ovecSize];
+
+	int matchCount;
+	int matchOffset = 0;
+	StringVector match;
+	do {
+		memset(ovector, 0, ovecSize);
+
+		matchCount = pcre_exec(
+			re,
+			NULL,
+			searchString.c_str(),
+			searchString.size(),
+			matchOffset,
+			0,
+			ovector,
+			ovecSize);
+
+		if (matchCount > 0) {
+			match.clear();
+			for (int i=0; i<matchCount; i++)
+				if (ovector[i*2] > -1)
+					match.push_back(searchString.substr(ovector[i*2], ovector[i*2+1]-ovector[i*2]));
+				else
+					match.push_back("");
+
+			matches.push_back(match);
+			matchOffset = ovector[1];
+
+		} else if (matchCount == 0) {
+			pcre_free(re);
+			delete[] ovector;
+			throw REGEXException(string("Regex match error: too many captured values! (> ")+Common::ToString(ovecSize/3)+")");
+
+		} else if (matchCount != PCRE_ERROR_NOMATCH) {
+			pcre_free(re);
+			delete[] ovector;
+
+			string errMsg = "Error: PCRE returned error code (" + Common::ToString(matchCount);
+			errMsg += ") While evaluating the following regex: ";
+			errMsg += pattern;
+			// I am not gonna quote the search string in the error message because it
+			// could be very large.
+			throw REGEXException(errMsg);
+		}
+
+	} while(matchCount > 0);
+
+	pcre_free(re);
+	delete[] ovector;
+}
+
 string REGEX::RemoveExtraSlashes(string strIn) {
 
 	string doubleSlash ="\\\\";
