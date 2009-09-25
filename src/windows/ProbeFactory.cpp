@@ -48,8 +48,6 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = RegistryProbe::Instance();
 	} else if(objectName.compare("activedirectory_object") == 0) {
 		probe = ActiveDirectoryProbe::Instance();
-	} else if(objectName.compare("metabase_object") == 0) {
-//		probe = MetabaseProbe::Instance();
 	} else if(objectName.compare("wmi_object") == 0) {
 		probe = WMIProbe::Instance();
 	} else if(objectName.compare("passwordpolicy_object") == 0) {
@@ -91,6 +89,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = RegKeyEffectiveRightsProbe::Instance();
 	}else if (objectName.compare("regkeyeffectiverights53_object") == 0 ){
 		probe = RegKeyEffectiveRights53Probe::Instance();
+	}else if (objectName.compare("group_sid_object") == 0 ){
+		probe = GroupSidProbe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
