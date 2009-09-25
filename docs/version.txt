@@ -50,6 +50,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:regkeyeffectiverights53_test.
 * Added support for the unix-def:password_test.
 * Corrected bug in RunLevelProbe causing Kill or Start scripts appearing with incorrect values in the results.xml file.
+* Added support for the win-def:group_sid_test.
+* Fixed a bug in the ProcessProbe::GetAllProcesses() method that was causing the Process32First() API call to fail.  
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
