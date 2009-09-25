@@ -45,10 +45,8 @@
 #include "FileMd5Probe.h"
 #include "FileHashProbe.h"
 #include "FamilyProbe.h"
-//#include "MetabaseKeyProbe.h"
 #include "RegistryProbe.h"
 #include "EnvironmentVariableProbe.h"
-//#include "RegistryEffectiveRightsProbe.h"
 #include "TextFileContentProbe.h"
 #include "XmlFileContentProbe.h"
 #include "VariableProbe.h"
@@ -77,6 +75,8 @@
 #include "RegKeyEffectiveRightsProbe.h"
 #include "RegKeyEffectiveRights53Probe.h"
 #include "TextFileContent54Probe.h"
+#include "GroupSidProbe.h"
+
 using namespace std;
 
 class AbsProbe;
