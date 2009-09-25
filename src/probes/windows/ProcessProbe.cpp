@@ -163,6 +163,8 @@ void ProcessProbe::GetAllProcesses() {
     ProcessProbe::GetLogicalPathToDevicePath();
     ProcessProbe::GetAllCommandLineValues();
 
+	processEntry.dwSize = sizeof(PROCESSENTRY32);
+
     if ( Process32First ( processHandle, &processEntry ) ) {
         ProcessProbe::BuildProcessItem ( processHandle, processEntry );
 
