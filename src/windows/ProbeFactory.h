@@ -77,6 +77,7 @@
 #include "TextFileContent54Probe.h"
 #include "GroupSidProbe.h"
 #include "FileAuditedPermissionsProbe.h"
+#include "FileAuditedPermissions53Probe.h"
 
 using namespace std;
 
