@@ -2301,6 +2301,66 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objec
 	Log::Debug("Finished calling the authz api to get effective rights");
 }
 
+void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pSuccessfulAuditedPermissions, PACCESS_MASK pFailedAuditPermissions ) {
+    Log::Debug ( "Calling the ACL API to get the audited permissions" );
+    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + WindowsCommon::ToString ( pSid ) + " from sacl for Windows object: " + ( *objectNameStr ) + ".";
+    DWORD res;
+    PACL psacl;
+
+    // The SE_SECURITY_NAME privilege is needed to read the SACL.
+    if ( !WindowsCommon::EnablePrivilege ( SE_SECURITY_NAME ) ) {
+        throw Exception ( "Error: The SeSecurityPrivilege could not be enabled. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+    }
+	
+    res = GetNamedSecurityInfo ( const_cast<char*> ( ( *objectNameStr ).c_str() ), // object name
+                                 objectType,									   // object type
+                                 SACL_SECURITY_INFORMATION |					   // information type
+                                 PROTECTED_SACL_SECURITY_INFORMATION |
+                                 UNPROTECTED_SACL_SECURITY_INFORMATION,
+                                 NULL,                                             // owner SID
+                                 NULL,                                             // primary group SID
+                                 NULL,                                             // DACL
+                                 &psacl,                                           // SACL
+                                 NULL );                                           // Security Descriptor
+
+    if ( res != ERROR_SUCCESS ) {
+        throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+    }
+	
+    ULONG size;
+    EXPLICIT_ACCESS* entries = NULL;
+
+    if ( ( res = GetExplicitEntriesFromAcl ( psacl, &size, &entries ) ) == ERROR_SUCCESS ) {
+        string pSidStr = WindowsCommon::ToString ( pSid );
+
+        for ( unsigned int i = 0 ; i < size ; i++ ) {
+            PSID sid = entries[i].Trustee.ptstrName;
+
+            if ( pSidStr.compare ( WindowsCommon::ToString ( sid ) ) == 0 ) {
+                if ( entries[i].grfAccessMode == SET_AUDIT_SUCCESS ) {
+                    *pSuccessfulAuditedPermissions = entries[i].grfAccessPermissions;
+                }
+
+                if ( entries[i].grfAccessMode == SET_AUDIT_FAILURE ) {
+                    *pFailedAuditPermissions = entries[i].grfAccessPermissions;
+                }
+            }
+        }
+
+		LocalFree ( entries );
+        entries = NULL;
+
+    } else {
+        string errMsg = WindowsCommon::GetErrorMessage ( res );
+		throw Exception ( baseErrMsg + " System error message: " + errMsg );
+    }
+
+    if ( !WindowsCommon::DisableAllPrivileges() ) {
+        throw Exception ( "Error: All of the privileges could not be disabled. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+    }
+
+    Log::Debug ( "Finished calling the ACL API to get the audited permissions" );
+}
 
 bool WindowsCommon::IsVistaOrLater() {
 
