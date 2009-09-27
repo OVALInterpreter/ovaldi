@@ -58,6 +58,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the AbsEffectiveRightsProbe::GetTrusteesForWindowsObject() method that was causing the owner and primary group trustees to be added as trustee SIDs when they should have been added as trustee names.
 * Added support for the win-def:fileauditedpermissions_test.
 * Added support for the win-def:fileauditedpermissions53_test. 
+* Added support for the win-def:regkeyauditedpermissions_test.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
