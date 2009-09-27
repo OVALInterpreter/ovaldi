@@ -93,6 +93,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = GroupSidProbe::Instance();
 	}else if (objectName.compare("fileauditedpermissions_object") == 0 ){
 		probe = FileAuditedPermissionsProbe::Instance();
+	}else if (objectName.compare("fileauditedpermissions53_object") == 0 ){
+		probe = FileAuditedPermissions53Probe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
