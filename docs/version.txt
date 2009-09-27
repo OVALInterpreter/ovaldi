@@ -59,6 +59,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:fileauditedpermissions_test.
 * Added support for the win-def:fileauditedpermissions53_test. 
 * Added support for the win-def:regkeyauditedpermissions_test.
+* Added support for the win-def:regkeyauditedpermissions53_test.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
