@@ -440,6 +440,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\FileEffectiveRights53Probe.cpp"
 					>
 				</File>
@@ -1081,6 +1085,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\independent\FamilyProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.h"
 					>
 				</File>
 				<File
