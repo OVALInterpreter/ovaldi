@@ -97,6 +97,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileAuditedPermissions53Probe::Instance();
 	}else if (objectName.compare("regkeyauditedpermissions_object") == 0 ){
 		probe = RegKeyAuditedPermissionsProbe::Instance();
+	}else if (objectName.compare("regkeyauditedpermissions53_object") == 0 ){
+		probe = RegKeyAuditedPermissions53Probe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
