@@ -52,6 +52,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Corrected bug in RunLevelProbe causing Kill or Start scripts appearing with incorrect values in the results.xml file.
 * Added support for the win-def:group_sid_test.
 * Fixed a bug in the ProcessProbe::GetAllProcesses() method that was causing the Process32First() API call to fail.  
+* Added support for ind-def:textfilecontent54_test
+* Added support for unix-def:shadow_test
+* Added support for oval-def:regex_capture
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
