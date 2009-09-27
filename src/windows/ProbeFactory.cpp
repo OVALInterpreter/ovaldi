@@ -91,6 +91,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = RegKeyEffectiveRights53Probe::Instance();
 	}else if (objectName.compare("group_sid_object") == 0 ){
 		probe = GroupSidProbe::Instance();
+	}else if (objectName.compare("fileauditedpermissions_object") == 0 ){
+		probe = FileAuditedPermissionsProbe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
