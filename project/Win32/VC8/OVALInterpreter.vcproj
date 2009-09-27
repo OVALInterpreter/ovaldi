@@ -508,6 +508,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\RegKeyAuditedPermissions53Probe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\RegKeyAuditedPermissionsProbe.cpp"
 					>
 				</File>
@@ -1161,6 +1165,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\RegistryProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\RegKeyAuditedPermissions53Probe.h"
 					>
 				</File>
 				<File
