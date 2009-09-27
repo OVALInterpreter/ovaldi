@@ -79,6 +79,7 @@
 #include "FileAuditedPermissionsProbe.h"
 #include "FileAuditedPermissions53Probe.h"
 #include "RegKeyAuditedPermissionsProbe.h"
+#include "RegKeyAuditedPermissions53Probe.h"
 
 using namespace std;
 
