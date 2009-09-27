@@ -71,13 +71,17 @@ StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE
             throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error (" + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
         }
 
-        // Get sids from the dacl
-        if ( isSID ) WindowsCommon::GetSidsFromPACL ( pdacl, allTrustees );
-		else WindowsCommon::GetTrusteeNamesFromPACL(pdacl, allTrustees);
-
-        // Insert the owner and primary group sids
-        allTrustees->insert ( WindowsCommon::ToString ( owner ) );
-        allTrustees->insert ( WindowsCommon::ToString ( primaryGroup ) );
+        // Get sids from the dacl and insert the owner and primary group sids
+		if ( isSID ){
+			WindowsCommon::GetSidsFromPACL ( pdacl, allTrustees );
+			allTrustees->insert ( WindowsCommon::ToString ( owner ) );
+			allTrustees->insert ( WindowsCommon::ToString ( primaryGroup ) );
+		}else{
+			WindowsCommon::GetTrusteeNamesFromPACL(pdacl, allTrustees);
+			allTrustees->insert(WindowsCommon::GetFormattedTrusteeName(owner));
+			allTrustees->insert(WindowsCommon::GetFormattedTrusteeName(primaryGroup));
+		}
+		
         Log::Debug ( "Found " + Common::ToString ( allTrustees->size() ) + " trustee SIDs when searching for all SIDs on the security descriptor of: " + objectNameStr );
 
         // Does this trusteeSIDEntity use variables?
