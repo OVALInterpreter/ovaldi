@@ -76,6 +76,7 @@
 #include "RegKeyEffectiveRights53Probe.h"
 #include "TextFileContent54Probe.h"
 #include "GroupSidProbe.h"
+#include "FileAuditedPermissionsProbe.h"
 
 using namespace std;
 
