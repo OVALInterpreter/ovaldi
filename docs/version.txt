@@ -60,6 +60,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:fileauditedpermissions53_test. 
 * Added support for the win-def:regkeyauditedpermissions_test.
 * Added support for the win-def:regkeyauditedpermissions53_test.
+* Fixed a bug in REGEX.cpp so that it supports the '|' regular expression meta-character.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
