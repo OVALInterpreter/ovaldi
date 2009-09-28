@@ -32,6 +32,21 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.6 build 3      ---
+---------------------------------------
+* Added support for the win-def:group_sid_test.
+* Fixed a bug in the ProcessProbe::GetAllProcesses() method that was causing the Process32First() API call to fail.  
+* Added support for ind-def:textfilecontent54_test
+* Added support for unix-def:shadow_test
+* Added support for oval-def:regex_capture
+* Fixed a bug in the AbsEffectiveRightsProbe::GetTrusteesForWindowsObject() method that was causing the owner and primary group trustees to be added as trustee SIDs when they should have been added as trustee names.
+* Added support for the win-def:fileauditedpermissions_test.
+* Added support for the win-def:fileauditedpermissions53_test. 
+* Added support for the win-def:regkeyauditedpermissions_test.
+* Added support for the win-def:regkeyauditedpermissions53_test.
+* Fixed a bug in REGEX.cpp so that it supports the '|' regular expression meta-character.
+
+---------------------------------------
 ---        Version 5.6 build 1      ---
 ---------------------------------------
 * Updated to support version 5.6 of the OVAL Language.
@@ -50,17 +65,6 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the win-def:regkeyeffectiverights53_test.
 * Added support for the unix-def:password_test.
 * Corrected bug in RunLevelProbe causing Kill or Start scripts appearing with incorrect values in the results.xml file.
-* Added support for the win-def:group_sid_test.
-* Fixed a bug in the ProcessProbe::GetAllProcesses() method that was causing the Process32First() API call to fail.  
-* Added support for ind-def:textfilecontent54_test
-* Added support for unix-def:shadow_test
-* Added support for oval-def:regex_capture
-* Fixed a bug in the AbsEffectiveRightsProbe::GetTrusteesForWindowsObject() method that was causing the owner and primary group trustees to be added as trustee SIDs when they should have been added as trustee names.
-* Added support for the win-def:fileauditedpermissions_test.
-* Added support for the win-def:fileauditedpermissions53_test. 
-* Added support for the win-def:regkeyauditedpermissions_test.
-* Added support for the win-def:regkeyauditedpermissions53_test.
-* Fixed a bug in REGEX.cpp so that it supports the '|' regular expression meta-character.
 
 ---------------------------------------
 ---        Version 5.5 build 25     ---
