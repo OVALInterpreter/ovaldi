@@ -22,11 +22,9 @@
                 xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
                 version="1.0"><!--Implementers: please note that overriding process-prolog or process-root is 
     the preferred method for meta-stylesheets to use where possible. -->
-<xsl:param name="archiveDirParameter" tunnel="yes"/>
-   <xsl:param name="archiveNameParameter" tunnel="yes"/>
-   <xsl:param name="fileNameParameter" tunnel="yes"/>
-   <xsl:param name="fileDirParameter" tunnel="yes"/>
-
+<xsl:param name="archiveDirParameter"/>
+   <xsl:param name="archiveNameParameter"/>
+   <xsl:param name="fileNameParameter" />
    <!--PHASES-->
 
 
