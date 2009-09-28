@@ -70,7 +70,7 @@ public:
 		This function takes a string and searches for all regular expression characters. 
 		If one is found and it is not already escaped it is escaped with a '\' The regular
 		expression chars are stored in a string. The following chars need to be escaped:
-		^ $ \ . [ ] ( ) * + ? 
+		^ $ \ . [ ] ( ) * + ? |
 	*/
 	string EscapeRegexChars(string);
 
@@ -79,7 +79,7 @@ public:
 		If one is found its location is returned. If none are found -1 is returned. Only 
 		regular expression chars that are not escaped are considered. The following are 
 		considered regular expression chars if they are not escaped:
-		^ $ \ . [ ] ( ) * + ?
+		^ $ \ . [ ] ( ) * + ? |
 	*/
 	int FindFirstRegexChar(const string stringIn);
 
@@ -88,7 +88,7 @@ public:
 		If one is found its location is returned. If none are found -1 is returned. Only
 		regular expression chars that are not escaped are considered. The following are
 		considered regular expression chars if they are not escaped:
-        ^ $ \ . [ ] ( ) { } * + ?
+        ^ $ \ . [ ] ( ) { } * + ? |
 	*/
 	int FindLastRegexChar(const string stringIn);
 
