@@ -40,7 +40,7 @@ REGEX::~REGEX() {
 
 string REGEX::EscapeRegexChars(string stringIn) {
 	
-	string regexChars ="^$\\.[](){}*+?";
+	string regexChars = "^$\\.[](){}*+?|";
 	string fixedString = stringIn;
 	string prevChar = "";
 
@@ -73,7 +73,7 @@ string REGEX::EscapeRegexChars(string stringIn) {
 
 int REGEX::FindFirstRegexChar(const string stringIn) {
 	
-	string regexChars	= "^$\\.[](){}*+?";
+	string regexChars	= "^$\\.[](){}*+?|";
 	string prevChar		= "";
 	string curChar		= "";
 	string nextChar		= "";
@@ -133,7 +133,7 @@ int REGEX::FindFirstRegexChar(const string stringIn) {
 
 int REGEX::FindLastRegexChar(const string stringIn) {
 
-	string regexChars	= "^$\\.[](){}*+?";
+	string regexChars	= "^$\\.[](){}*+?|";
 	string prevChar		= "";
 	size_t pos	= string::npos;
 	int slashCount		= 0;
