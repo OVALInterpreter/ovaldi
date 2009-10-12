@@ -291,6 +291,10 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
         pAccessRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
 
         if ( pAccessRights == NULL ) {
+			if ( pSid != NULL ) {
+                free ( pSid );
+                pSid = NULL;
+            }
             throw ProbeException ( baseErrMsg + " Out of memory! Unable to allocate memory for access rights." );
         }
 
@@ -424,7 +428,7 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
             }
 
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -438,7 +442,7 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
     }
 
     if ( pSid != NULL ) {
-        LocalFree ( pSid );
+        free ( pSid );
         pSid = NULL;
     }
 

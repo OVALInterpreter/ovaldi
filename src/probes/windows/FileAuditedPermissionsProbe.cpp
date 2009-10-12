@@ -264,7 +264,7 @@ Item* FileAuditedPermissionsProbe::GetAuditedPermissions ( string path, string f
 
         if ( pSuccessfulAuditedPermissions == NULL ) {
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -276,7 +276,7 @@ Item* FileAuditedPermissionsProbe::GetAuditedPermissions ( string path, string f
 
         if ( pFailedAuditPermissions == NULL ) {
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -328,7 +328,7 @@ Item* FileAuditedPermissionsProbe::GetAuditedPermissions ( string path, string f
             }
 
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -347,7 +347,7 @@ Item* FileAuditedPermissionsProbe::GetAuditedPermissions ( string path, string f
     }
 
     if ( pSid != NULL ) {
-        LocalFree ( pSid );
+        free ( pSid );
         pSid = NULL;
     }
 

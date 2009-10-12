@@ -276,7 +276,7 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
 
         if ( pSuccessfulAuditedRights == NULL ) {
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -288,7 +288,7 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
 
         if ( pFailedAuditRights == NULL ) {
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -340,7 +340,7 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
             }
 
             if ( pSid != NULL ) {
-                LocalFree ( pSid );
+                free ( pSid );
                 pSid = NULL;
             }
 
@@ -359,7 +359,7 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
     }
 
     if ( pSid != NULL ) {
-        LocalFree ( pSid );
+        free ( pSid );
         pSid = NULL;
     }
 
