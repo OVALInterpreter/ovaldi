@@ -315,11 +315,11 @@ StringVector* Common::ParseDefinitionIdsString() {
 
 	// break the comma separated string into definition ids.
 	StringVector* definitionIds = new StringVector();
-	const char delm = ',';
+	const char *delm = ",";
 
 	char* theString = (char*)malloc(sizeof(char)*(definitionIdsString.length()+1));
 	theString = strcpy(theString, definitionIdsString.c_str());
-	char* token = strtok(theString, &delm);		
+	char* token = strtok(theString, delm);		
 
 	if(token == NULL) {
 		if(theString != NULL) {
@@ -348,7 +348,7 @@ StringVector* Common::ParseDefinitionIdsString() {
 			definitionIds->push_back(tokenStr);
 
 			//	Get the next token
-			token = strtok(NULL, &delm);
+			token = strtok(NULL, delm);
 		}
 	}
 
