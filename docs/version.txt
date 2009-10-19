@@ -32,6 +32,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.6 build ??      ---
+---------------------------------------
+* Fixed bug in Common::ParseDefinitionIdsString() misuse of strtok.
+
+---------------------------------------
 ---        Version 5.6 build 3      ---
 ---------------------------------------
 * Added support for the win-def:group_sid_test.
