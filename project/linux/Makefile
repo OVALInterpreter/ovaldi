@@ -166,7 +166,9 @@ OBJS = \
 	RunLevelProbe.obj \
 	PasswordProbe.obj \
 	ShadowProbe.obj \
-	TextFileContent54Probe.obj
+	TextFileContent54Probe.obj \
+	InetdProbe.obj \
+	XinetdProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
 	OBJS += RPMInfoProbe.obj
@@ -265,7 +267,9 @@ REL_OBJS = \
 	$(BUILDDIR)/RunLevelProbe.obj \
 	$(BUILDDIR)/PasswordProbe.obj \
 	$(BUILDDIR)/ShadowProbe.obj \
-	$(BUILDDIR)/TextFileContent54Probe.obj
+	$(BUILDDIR)/TextFileContent54Probe.obj \
+	$(BUILDDIR)/InetdProbe.obj \
+	$(BUILDDIR)/XinetdProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
 	REL_OBJS += $(BUILDDIR)/RPMInfoProbe.obj
