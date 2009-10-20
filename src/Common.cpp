@@ -751,6 +751,31 @@ string Common::BuildFilePath(const string path, const string filename) {
     return filePath;
 }
 
+void Common::TrimStart(string &str) {
+	// isspace is apparently overloaded, so the compiler doesn't know how to
+	//   instantiate the ptr_fun template with isspace... So I gotta use this
+	//   little	workaround to tell it which one to use.
+	int (*myisspace)(int) = isspace;
+
+	string::iterator iter = find_if(str.begin(), str.end(), not1(ptr_fun(myisspace)));
+	str.replace(str.begin(), iter, "");
+}
+
+void Common::TrimEnd(string &str) {
+	int (*myisspace)(int) = isspace;
+
+	// there isn't a reverse find_if that I could find (ha)... so I just
+	// use the same alg with reverse iterators.
+	string::reverse_iterator riter = find_if(str.rbegin(), str.rend(), not1(ptr_fun(myisspace)));
+	string::iterator iter = riter.base();
+	str.replace(iter, str.end(), "");
+}
+
+void Common::TrimString(string &str) {
+	Common::TrimStart(str);
+	Common::TrimEnd(str);
+}
+
 //****************************************************************************************//
 //							CommonException Class										  //	
 //****************************************************************************************//

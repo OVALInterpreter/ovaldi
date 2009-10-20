@@ -59,6 +59,8 @@
 #include <sstream>
 #include <algorithm>
 #include <utility>
+#include <functional>
+#include <cctype>
 
 
 #include "XmlCommon.h"
@@ -197,6 +199,15 @@ class Common {
 		 *	@param filename string representing the filename
         */
         static string BuildFilePath(const string path, const string filename);
+
+		/** Removes whitespace at the start of the given string. */
+		static void TrimStart(std::string& str);
+
+		/** Removes whitespace at the end of the given string. */
+		static void TrimEnd(std::string& str);
+
+		/** Removes whitespace at the start and end of the given string. */
+		static void TrimString(std::string& str);
 
 		static char fileSeperator;
 		static string fileSeperatorStr;
