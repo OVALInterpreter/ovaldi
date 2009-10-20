@@ -64,6 +64,8 @@
 #include "TextFileContent54Probe.h"
 #include "VariableProbe.h"
 #include "RunLevelProbe.h"
+#include "XinetdProbe.h"
+#include "InetdProbe.h"
 
 using namespace std;
 

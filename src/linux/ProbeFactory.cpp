@@ -56,12 +56,16 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = VariableProbe::Instance();
 	} else if(objectName.compare("xmlfilecontent_object") == 0) {
 		probe = XmlFileContentProbe::Instance();
+	} else if(objectName.compare("textfilecontent54_object") == 0) {
+		probe = TextFileContent54Probe::Instance();
 
 // here are the objects defined in the unix schema
 	} else if(objectName.compare("file_object") == 0) {
 		probe = FileProbe::Instance();	
 	} else if(objectName.compare("inetd_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = InetdProbe::Instance();
+	} else if(objectName.compare("xinetd_object") == 0) {
+		probe = XinetdProbe::Instance();
 	} else if(objectName.compare("interface_object") == 0) {
 		probe = InterfaceProbe::Instance();
 	} else if(objectName.compare("password_object") == 0) {
@@ -76,8 +80,6 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = ShadowProbe::Instance();
 	} else if(objectName.compare("uname_object") == 0) {
 		probe = UnameProbe::Instance();
-	} else if(objectName.compare("textfilecontent54_object") == 0) {
-		probe = TextFileContent54Probe::Instance();
 
 // here are the objects defined in the linux schema
 #ifdef PACKAGE_DPKG
