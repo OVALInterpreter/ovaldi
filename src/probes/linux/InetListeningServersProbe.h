@@ -91,16 +91,16 @@ typedef vector < NetstatRecord*, allocator<NetstatRecord*> > NetstatRecordVector
 */
 class InetListeningServersProbe : public AbsProbe {
 public:
-	~InetListeningServersProbe();       
+	virtual ~InetListeningServersProbe();       
 
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	static AbsProbe* Instance();
 
 private:
 	InetListeningServersProbe();
     
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/**
 		Get the set of all protocols on the system that match the object

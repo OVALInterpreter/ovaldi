@@ -56,9 +56,9 @@ using namespace std;
 */
 class DPKGInfoProbe : public AbsProbe {
 public:
-	~DPKGInfoProbe();       
+	virtual ~DPKGInfoProbe();       
 
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the DPKGInfoProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -68,7 +68,7 @@ private:
 
 	DPKGInfoProbe();
     
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/**
 		Return the name of all debs on the system that match the specirfied Object entity's criteria.

@@ -39,10 +39,10 @@ using namespace std;
 */
 class FamilyProbe : public AbsProbe {
 public:
-	~FamilyProbe();
+	virtual ~FamilyProbe();
 	
 	/** Run the FamilyProbe */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the FamilyProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -52,7 +52,7 @@ private:
 	FamilyProbe();
 
 	/** Return a new Item created for storing family information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static FamilyProbe *instance;
 

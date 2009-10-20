@@ -90,7 +90,7 @@ public:
 	    Note 3: this probe should allow for a context node to be provided
 	    for now the context node will default to '/' (document root)
 	*/
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Gets single instance of the XmlFileContentProbe. Uses lazy initialization. */
 	static AbsProbe* Instance();
@@ -100,7 +100,7 @@ protected:
 	XmlFileContentProbe();
 
 	/** Return a new Item created for storing xml file content information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** The static Singleton instance of the XmlFileContentProbe. */
 	static XmlFileContentProbe* instance;

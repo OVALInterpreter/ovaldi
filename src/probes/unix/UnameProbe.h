@@ -51,9 +51,9 @@ using namespace std;
 
 class UnameProbe : public AbsProbe {
 public:
-	~UnameProbe();
+	virtual ~UnameProbe();
 	
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 		
 	/** Ensure that the UnameProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -62,7 +62,7 @@ private:
 	UnameProbe();
 
 	/** Return a new Item created for storing uname information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static UnameProbe *instance;
 };

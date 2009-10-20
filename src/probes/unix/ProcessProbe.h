@@ -58,9 +58,9 @@ using namespace std;
 */
 class ProcessProbe : public AbsProbe {
 public:
-	~ProcessProbe();
+	virtual ~ProcessProbe();
     
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the ProcessProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -69,7 +69,7 @@ private:
 	ProcessProbe();
 
 	/** Return a new Item created for storing process information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** 
 		Return the set of all process commands on the ssytem that match the specified object entities criteria.

@@ -50,10 +50,10 @@ using namespace std;
 class FileMd5Probe : public AbsProbe {
 
 public:
-	~FileMd5Probe();
+	virtual ~FileMd5Probe();
 	
 	/** Get all the files on the system that match the pattern and generate an md5 */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the FileMd5Probe is a singleton. */
 	static AbsProbe* Instance();
@@ -61,7 +61,7 @@ public:
 private:
 	FileMd5Probe();
     
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static FileMd5Probe* instance;
 

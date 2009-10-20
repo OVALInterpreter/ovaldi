@@ -44,10 +44,10 @@ extern char ** _environ;
 */
 class EnvironmentVariableProbe : public AbsProbe {
 public:
-	~EnvironmentVariableProbe();
+	virtual ~EnvironmentVariableProbe();
 	
 	/** Run the environment variable probe */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the EnvironmentVariableProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -56,7 +56,7 @@ private:
 	EnvironmentVariableProbe();
     
 	/**  */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Get all the environment variables currently defined. */
 	StringPairVector* GetAllEnvs();

@@ -40,10 +40,10 @@ using namespace std;
 */
 class VariableProbe : public AbsProbe {
 public:
-	~VariableProbe();
+	virtual ~VariableProbe();
 	
 	/** Run the variable probe */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the VariableProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -59,7 +59,7 @@ private:
 	VariableProbe();
 
 	/** Return a new Item created for storing variable information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static VariableProbe *instance;
 };

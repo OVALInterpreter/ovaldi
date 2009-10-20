@@ -135,9 +135,9 @@ typedef map<const char, RunLevelItemSet, ltchr_comparator> SetMap;
 class RunLevelProbe : public AbsProbe {
 
   public: // Public Methods
-	  ~RunLevelProbe();
-    
-    ItemVector* CollectItems( Object* object );
+	  virtual ~RunLevelProbe();
+
+	  virtual ItemVector* CollectItems( Object* object );
 
 	  /** Ensure that the RunLevelProbe is a singleton. */
 	  static AbsProbe * Instance();
@@ -146,7 +146,7 @@ class RunLevelProbe : public AbsProbe {
 	  RunLevelProbe();    
 
 	  /** Return a new Item created for storing runlevel information. */
-	  Item* CreateItem();
+	  virtual Item* CreateItem();
 
     /**
       Checks runlevel object entity operations and datatypes

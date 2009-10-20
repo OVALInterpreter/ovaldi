@@ -50,10 +50,10 @@ using namespace std;
 class FileHashProbe : public AbsProbe {
 
 public:
-	~FileHashProbe();
+	virtual ~FileHashProbe();
 	
 	/** Get all the files on the system that match the pattern and generate and md5 and sha1 */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the FileHashProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -62,7 +62,7 @@ private:
 	FileHashProbe();
 
 	/** Return a new Item created for storing file hash information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static FileHashProbe* instance;
 

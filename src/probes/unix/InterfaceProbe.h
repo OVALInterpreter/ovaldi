@@ -47,10 +47,10 @@ class InterfaceProbe : public AbsProbe {
 
 	public:
 
-	~InterfaceProbe();
+	virtual ~InterfaceProbe();
 
 	/** Get all the files on the system that match the pattern and collect their attributes. */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the InterfaceProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -60,7 +60,7 @@ class InterfaceProbe : public AbsProbe {
 	InterfaceProbe();
 
 	/** Return a new Item created for storing file information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/**
 	 * Gets an Item for the named interface, or NULL if no

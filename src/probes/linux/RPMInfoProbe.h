@@ -59,9 +59,9 @@ using namespace std;
 */
 class RPMInfoProbe : public AbsProbe {
 public:
-	~RPMInfoProbe();       
+	virtual ~RPMInfoProbe();       
 
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the RPMInfoProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -69,7 +69,7 @@ public:
 private:
 	RPMInfoProbe();
     
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/**
 		Return the name of all rpms on the system that match the specirfied Object entity's criteria.
