@@ -42,30 +42,11 @@ string REGEX::EscapeRegexChars(string stringIn) {
 	
 	string regexChars = "^$\\.[](){}*+?|";
 	string fixedString = stringIn;
-	string prevChar = "";
 
 	size_t pos = fixedString.find_first_of(regexChars, 0);
 	while (pos != string::npos) {
-
-		//	ensure that the char is not already escaped
-		if(pos == 0) {
-
-			// insert the escape char at the beginning of the string
-			fixedString.insert(0, "\\");
-
-			pos = fixedString.find_first_of(regexChars, pos+2);
-
-		} else {
-			prevChar = fixedString.at(pos-1);
-			if(prevChar.compare("\\") != 0) {
-
-				fixedString.insert(pos, "\\");
-
-				pos = fixedString.find_first_of(regexChars, pos+2);
-			} else {
-				pos = fixedString.find_first_of(regexChars, pos+1);
-			}
-		}
+		fixedString.insert(pos, "\\");
+		pos = fixedString.find_first_of(regexChars, pos+2);			
 	}
 
 	return fixedString;	
