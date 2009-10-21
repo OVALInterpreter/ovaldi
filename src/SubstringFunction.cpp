@@ -83,7 +83,21 @@ ComponentValue* SubstringFunction::ComputeValue() {
 		StringVector::iterator iterator;
 		for(iterator = componentValue->GetValues()->begin(); iterator != componentValue->GetValues()->end(); iterator++) {
 			string currentValue = (*iterator);
-			string newValue = currentValue.substr(this->GetStart()-1, this->GetLength());
+			string newValue = "";
+			
+			// Initialize substring_start to the first character in the string.  This case applies if substring_start is less than or equal to 1.
+			int start = 0;
+
+			// Initialize substring_length to the length of the string.  This case applies if substring_length is less than 0 or greater than or equal to the length of the string.
+			int end = currentValue.length();
+			
+			// If substring_start is greater than 1 use the specified value.
+			if ( this->GetStart() > 1 ) start = this->GetStart() - 1;
+
+			// If substring_length is greater than -1 and less than the the length of the string use the specified value.
+			if ( ( this->GetLength() > -1 ) && ( this->GetLength() < end ) ) end = this->GetLength(); 
+
+			newValue = currentValue.substr(start,end);		
 			values->push_back(newValue);
 		}
 		result->SetValues(values);
