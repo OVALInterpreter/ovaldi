@@ -95,7 +95,7 @@ public:
 	/** Gets single instance of the XmlFileContentProbe. Uses lazy initialization. */
 	static AbsProbe* Instance();
 
-protected:
+private:
 
 	XmlFileContentProbe();
 
