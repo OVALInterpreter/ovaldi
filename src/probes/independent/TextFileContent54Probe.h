@@ -46,14 +46,14 @@ public:
 
 	virtual ItemVector* CollectItems(Object* object);
 
-	/**  Return a new Item created for storing text file content information */
-	virtual Item* CreateItem();
-
 	/** Gets single instance of the TextFileContent54Probe. Uses lazy initialization. */
 	static AbsProbe* Instance();
 
 private:
 	TextFileContent54Probe();
+
+	/**  Return a new Item created for storing text file content information */
+	virtual Item* CreateItem();
 
 	/** The static Singleton instance of the TextFileContent54FileProbe. */
 	static TextFileContent54Probe* instance;
