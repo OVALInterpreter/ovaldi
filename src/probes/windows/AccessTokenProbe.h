@@ -46,7 +46,7 @@ using namespace std;
 */
 class AccessTokenProbe : public AbsProbe {
 public:
-	~AccessTokenProbe();
+	virtual ~AccessTokenProbe();
 
 	/** Run the access token probe. 
 		Return a vector of Items. 
@@ -62,7 +62,7 @@ public:
 		   for the group.
 	
 	*/
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the AccessTokenProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -72,7 +72,7 @@ private:
 	AccessTokenProbe();
 
     /** Return a new Item created for storing accesstoken information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static AccessTokenProbe* instance;
 

@@ -43,9 +43,9 @@ using namespace std;
 */
 class SidProbe : public AbsProbe {
 public:
-	~SidProbe();
+	virtual ~SidProbe();
 	
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the SidProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -56,7 +56,7 @@ private:
 	static SidProbe* instance;
 
 	/** Return a new Item created for storing sid information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Get account information for the specified account name.
 		Support behaviors. Resulting Items are pushed on to the 

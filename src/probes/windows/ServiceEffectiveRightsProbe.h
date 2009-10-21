@@ -48,9 +48,9 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
     public:
 
         /** ServiceEffectiveRightsProbe destructor */
-        ~ServiceEffectiveRightsProbe();
+        virtual ~ServiceEffectiveRightsProbe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the ServiceEffectiveRightsProbe is a singleton. */
         static AbsProbe* Instance();
@@ -61,7 +61,7 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
         ServiceEffectiveRightsProbe();
 
         /** Return a new Item created for storing service information */
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Get the effective rights for a trustee SID for the specified service.
          *  @param serviceNameStr A string that contains the name of the service that you want to get the effective rights of.

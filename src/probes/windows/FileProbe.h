@@ -53,10 +53,10 @@ using namespace std;
 class FileProbe : public AbsProbe {
 
 public:
-	~FileProbe();
+	virtual ~FileProbe();
 	
 	/** Get all the files on the system that match the pattern. */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Gets single instance of the FileProbe. Uses lazy initialization. */
 	static AbsProbe* Instance();
@@ -68,7 +68,7 @@ private:
 	static FileProbe* instance;
     
 	/** Return a new Item created for storing file information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Collectect all file attributes for the specified file on the specified path. */
 	Item* GetFileAttributes(string path, string fileName);

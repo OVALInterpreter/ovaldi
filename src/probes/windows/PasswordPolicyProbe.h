@@ -44,10 +44,10 @@ using namespace std;
 
 class PasswordPolicyProbe : public AbsProbe {
 public:
-	~PasswordPolicyProbe();
+	virtual ~PasswordPolicyProbe();
 	
 	/** Run the probe. */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the PasswordPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -56,7 +56,7 @@ private:
 	PasswordPolicyProbe();
 
 	/** Return a new Item created for storing password policy information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 			
     /**
         Checks to see if password_complaexity and reversible_encryption are set.

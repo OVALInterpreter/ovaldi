@@ -46,9 +46,9 @@ class FileAuditedPermissions53Probe : public AbsEffectiveRightsProbe {
 
     public:
         /** FileAuditedPermissions53Probe destructor. */
-        ~FileAuditedPermissions53Probe();
+        virtual ~FileAuditedPermissions53Probe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the FileAuditedPermissions53Probe is a singleton. */
         static AbsProbe* Instance();
@@ -59,7 +59,7 @@ class FileAuditedPermissions53Probe : public AbsEffectiveRightsProbe {
         FileAuditedPermissions53Probe();
 
         /** Return a new Item created for storing file information. */
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Get the audited permissions for a trustee SID for the specified path and filename.
          *  @param path A string that contains the path of the file that you want to get the audited permissions of.

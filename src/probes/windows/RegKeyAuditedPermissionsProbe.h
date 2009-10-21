@@ -46,9 +46,9 @@ class RegKeyAuditedPermissionsProbe : public AbsEffectiveRightsProbe {
 
     public:
         /** RegKeyAuditedPermissionsProbe destructor. */
-        ~RegKeyAuditedPermissionsProbe();
+       virtual ~RegKeyAuditedPermissionsProbe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the RegKeyAuditedPermissionsProbe is a singleton. */
         static AbsProbe* Instance();
@@ -59,7 +59,7 @@ class RegKeyAuditedPermissionsProbe : public AbsEffectiveRightsProbe {
         RegKeyAuditedPermissionsProbe();
 
         /** Return a new Item created for storing regkeyauditedpermissions_item information. */
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Get the audited permissions for a trustee name for the specified hive and registry key.
          *  @param hiveStr A string that contains the hive of the registry key that you want to get the audited permissions of.

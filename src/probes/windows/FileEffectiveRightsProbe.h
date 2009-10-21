@@ -50,9 +50,9 @@ class FileEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 
 public:
 	/** FileEffectiveRightsProbe destructor */
-	~FileEffectiveRightsProbe();
+	virtual ~FileEffectiveRightsProbe();
 	
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the FileEffectiveRightsProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -63,7 +63,7 @@ private:
 	FileEffectiveRightsProbe();
 
 	/** Return a new Item created for storing file information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Get the effective rights for a trustee name for the specified path and filename.
      *  @param path A string that contains the path of the file that you want to get the effective rights of.

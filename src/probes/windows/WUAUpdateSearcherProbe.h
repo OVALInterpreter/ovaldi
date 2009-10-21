@@ -58,10 +58,10 @@ using namespace std;
 class WUAUpdateSearcherProbe : public AbsProbe {
 
 public:
-	~WUAUpdateSearcherProbe();
+	virtual ~WUAUpdateSearcherProbe();
 
 	/** Run the probe. */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the WUAUpdateSearcherProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -75,7 +75,7 @@ private:
 	static WUAUpdateSearcherProbe* instance;
 
    	/**  Return a new Item created for storing wuaupdatesearcher information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
     /** Get the set of all search criteria string for the specified ObjectEntity. */
     ItemEntityVector* GetSearchCriteria(ObjectEntity* search_criteria);

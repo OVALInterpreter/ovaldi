@@ -73,14 +73,14 @@ using namespace std;
 class WMIProbe : public AbsProbe {
 
 public:
-	~WMIProbe();
+	virtual ~WMIProbe();
 
 	/** Run the probe.
 	    Get the namespace and wql query to run.  Note that niether entity
 	    allows a pattern match so you don't have to worry about resolving
 	    regular expressions.
 	*/
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the WMIProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -91,7 +91,7 @@ private:
 	static WMIProbe* instance;
 
     /**  Return a new Item created for storing wmi information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Query WMI for data. */
 	Item* GetWMI(ItemEntity*, ItemEntity*);

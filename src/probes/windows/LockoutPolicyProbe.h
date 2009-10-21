@@ -44,10 +44,10 @@ using namespace std;
 
 class LockoutPolicyProbe : public AbsProbe {
 public:
-	~LockoutPolicyProbe();
+	virtual ~LockoutPolicyProbe();
 	
 	/** Run the LockoutPolicyProbe */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 		
 	/** Ensure that the LockoutPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -56,7 +56,7 @@ private:
 	LockoutPolicyProbe();
 
 	/** Return a new Item created for storing lockout policy information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	static LockoutPolicyProbe *instance;
 };

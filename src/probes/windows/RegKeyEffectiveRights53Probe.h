@@ -50,9 +50,9 @@ class RegKeyEffectiveRights53Probe : public AbsEffectiveRightsProbe {
 
     public:
         /** RegKeyEffectiveRights53Probe destructor */
-        ~RegKeyEffectiveRights53Probe();
+        virtual ~RegKeyEffectiveRights53Probe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the RegKeyEffectiveRights53Probe is a singleton. */
         static AbsProbe* Instance();
@@ -63,7 +63,7 @@ class RegKeyEffectiveRights53Probe : public AbsEffectiveRightsProbe {
         RegKeyEffectiveRights53Probe();
 
         /** Return a new Item created for storing regkeyeffectiverights53_item information */
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Get the effective rights for a trustee name for the specified hive and registry key.
          *  @param hiveStr A string that contains the hive of the registry key that you want to get the effective rights of.

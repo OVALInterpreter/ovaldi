@@ -43,13 +43,13 @@ using namespace std;
 */
 class GroupProbe : public AbsProbe {
 public:
-	~GroupProbe();
+	virtual ~GroupProbe();
 	
 	/** Run the group probe. Return a vector of Items
 		Relies on the WindowsCommon class for searching for and enumerating
 		Groups. 
 	 */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the GroupProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -60,7 +60,7 @@ private:
 	static GroupProbe* instance;
 
 	/** Return a new Item created for storing group information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Return a populated Item if the group exists and has any members. */
 	Item* GetGroupMembers(string groupName);

@@ -42,13 +42,13 @@ using namespace std;
 */
 class UserProbe : public AbsProbe {
 public:
-	~UserProbe();
+	virtual ~UserProbe();
 	
 	/** Run the user probe. 
 	    Return a vector of Items
 		Relies on the WindowsCommon class to search for and enumerate users.
      */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the UserProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -59,7 +59,7 @@ private:
 	static UserProbe* instance;
 
 	/** Return a new Item created for storing user information */
-	Item* CreateItem();
+	virtual Item* CreateItem();
     
 	/** Return an item for the specified user name. 
 	    If the user is not found return and item with the status set to does not exist

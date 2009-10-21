@@ -49,9 +49,9 @@ class ActiveDirectoryProbe : public AbsProbe {
     public:
 
         /** ActiveDirectoryProbe destructor. */
-        ~ActiveDirectoryProbe();
+        virtual ~ActiveDirectoryProbe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the ActiveDirectoryProbe is a singleton. */
         static AbsProbe* Instance();
@@ -62,7 +62,7 @@ class ActiveDirectoryProbe : public AbsProbe {
         ActiveDirectoryProbe();
 
         /** Return a new Item created for storing Active Directory information. */
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Converts the Active Directory attribute type into its string representation.
          *  @param adsType A ADSTYPE value which represents the type of the Active Directory attribute.

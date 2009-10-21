@@ -42,9 +42,9 @@ class PortProbe : public AbsProbe {
     public:
 
         /** PortProbe destructor. */
-        ~PortProbe();
+        virtual ~PortProbe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the PortProbe is a singleton. */
         static AbsProbe* Instance();
@@ -54,7 +54,7 @@ class PortProbe : public AbsProbe {
         /** PortProbe constructor. */
         PortProbe();
 
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Build an Item containing all of the port state entities.
          *  @param localAddressStr A string that contains the local address of a Windows port in dotted-quad notation.

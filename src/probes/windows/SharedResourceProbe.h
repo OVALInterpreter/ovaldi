@@ -41,9 +41,9 @@ class SharedResourceProbe : public AbsProbe {
     public:
 
         /** SharedResourceProbe destructor. */
-        ~SharedResourceProbe();
+        virtual ~SharedResourceProbe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the SharedResourceProbe is a singleton. */
         static AbsProbe* Instance();
@@ -53,7 +53,7 @@ class SharedResourceProbe : public AbsProbe {
         /** SharedResourceProbe constructor. */
         SharedResourceProbe();
         
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Retrieve a particular Item from the shared resource's ItemVector using the shared resource's netname as the key.
          *  @param netNameStr A string that contains the share name of a Windows shared resource.

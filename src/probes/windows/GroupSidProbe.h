@@ -45,9 +45,9 @@ class GroupSidProbe : public AbsProbe {
     public:
 
         /** GroupSidProbe destructor. */
-        ~GroupSidProbe();
+        virtual ~GroupSidProbe();
 
-        ItemVector* CollectItems ( Object* object );
+        virtual ItemVector* CollectItems ( Object* object );
 
         /** Ensure that the GroupSidProbe is a singleton. */
         static AbsProbe* Instance();
@@ -58,7 +58,7 @@ class GroupSidProbe : public AbsProbe {
         GroupSidProbe();
 
         /** Return a new Item created for storing group SID information. */
-        Item* CreateItem();
+        virtual Item* CreateItem();
 
         /** Retrieve an Item that contains all of the user SIDs that are members of the specified group SID.
          *  @param groupSIDStr A string that contains the SID of the group whose users you would like to enumerate.

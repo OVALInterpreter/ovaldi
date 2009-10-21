@@ -43,9 +43,9 @@ using namespace std;
 */
 class UserSid55Probe : public AbsProbe {
 public:
-	~UserSid55Probe();
+	virtual ~UserSid55Probe();
 	
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the UserSid55Probe is a singleton. */
 	static AbsProbe* Instance();
@@ -56,7 +56,7 @@ private:
 	UserSid55Probe();
 
 	/** Return a new Item created for storing user sid55 information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	Item* GetUserSidInfo(string userSid);
 

@@ -43,10 +43,10 @@ using namespace std;
 
 class AuditEventPolicyProbe : public AbsProbe {
 public:
-	~AuditEventPolicyProbe();
+	virtual ~AuditEventPolicyProbe();
 	
 	/** Run the AuditEventPolicyProbe */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the AuditEventPolicyProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -55,7 +55,7 @@ private:
 	AuditEventPolicyProbe();
 
     /** Return a new Item created for storing audit event policy information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Read the Audit options and set the value of the ItemEntity.
 		LSA Policy defines a mask for the valid event auditing options. 

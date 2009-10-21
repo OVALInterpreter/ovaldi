@@ -43,10 +43,10 @@ using namespace std;
 class RegistryProbe : public AbsProbe {
 public:
 	/** RegistryProbe destructor. */
-	~RegistryProbe();
+	virtual ~RegistryProbe();
 	
 	/** Run the registry probe. Return a vector of Items. */
-	ItemVector* CollectItems(Object* object);
+	virtual ItemVector* CollectItems(Object* object);
 
 	/** Ensure that the RegistryProbe is a singleton. */
 	static AbsProbe* Instance();
@@ -57,7 +57,7 @@ private:
 	RegistryProbe();
 
 	/** Return a new Item created for storing registry information. */
-	Item* CreateItem();
+	virtual Item* CreateItem();
 
 	/** Return a new Item containing the data for the specified registry item.
 	 *  @param hive A string that contains the hive of the registry key that you want to obtain.

@@ -52,7 +52,7 @@ class AbsEffectiveRightsProbe : public AbsProbe {
         AbsEffectiveRightsProbe();
 
         /** AbsEffectiveRightsProbe destructor. */
-        ~AbsEffectiveRightsProbe();
+        virtual ~AbsEffectiveRightsProbe();
 
         /**
             Return a set of all of the trustees that match the specified trustee entity relative to the specified Windows object.
