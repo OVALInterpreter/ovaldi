@@ -97,7 +97,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				Item* item = NULL;
 
 				StringSet* keys = NULL;
-				if((keys = registryFinder.ReportKeyDoesNotExist(registryKey->GetHive(), key)) != NULL ) {
+				if( !(key->GetNil()) && (keys = registryFinder.ReportKeyDoesNotExist(registryKey->GetHive(), key)) != NULL ) {
 					for(StringSet::iterator iterator = keys->begin(); iterator != keys->end(); iterator++) {
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
@@ -109,6 +109,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					if ( !(key->GetNil()) ) item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 					collectedItems->push_back(item);
 				}
 
@@ -119,7 +120,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				}
 
 			}else{			
-				if((registryKey->GetName()).compare("") == 0) {
+				if((registryKey->GetName()).compare("") == 0 && name->GetNil() ) {
 					Item* item = NULL;
 
 					StringSet* names = NULL;
@@ -254,133 +255,122 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name) {
 		item = this->CreateItem();
 		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-		// Check and get key if key is not nil
-		if(key.compare("") ==  0) {
-			item->SetStatus(OvalEnum::STATUS_EXISTS);
-		} else {
-			res = RegOpenKeyEx(rootKey,					// handle to open hive
-							key.c_str(),				// subkey name
-							0,							// reserved
-							KEY_READ,					// security access mask
-							&hkey);						// pointer to open key
+		res = RegOpenKeyEx(rootKey,					// handle to open hive
+						key.c_str(),				// subkey name
+						0,							// reserved
+						KEY_READ,					// security access mask
+						&hkey);						// pointer to open key
 
-			if (res != ERROR_SUCCESS) {
-				if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
+		if (res != ERROR_SUCCESS) {
+			if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
 
-					item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-				} else if (res == ERROR_INVALID_HANDLE) {
+			} else if (res == ERROR_INVALID_HANDLE) {
 
-					string errorMessage = "";
-					errorMessage.append("(RegistryProbe) The handle for the registry key '");
-					errorMessage.append(key);
-					errorMessage.append("' is not valid.");
-							
-					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
-					item->SetStatus(OvalEnum::STATUS_ERROR);
-					// I chose to make this an item returned with an error because at a minimum the 
-					// hive was found. Note that the other option is to throw and exception which 
-					// would result in an error on the collected object.
-
-				} else {
-					
-					string systemErrMsg = WindowsCommon::GetErrorMessage(res);
-
-					char errorCodeBuffer[20];
-					_ltoa(res, errorCodeBuffer, 20);
-
-					string errorMessage = "";
-					errorMessage.append("(RegistryProbe) Unable to get values for registry key '");
-					errorMessage.append(key);
-					errorMessage.append("'.  Error Code - ");
-					errorMessage.append(errorCodeBuffer);
-					errorMessage.append(" - " + systemErrMsg);
-					
-					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
-					item->SetStatus(OvalEnum::STATUS_ERROR);
-					// I chose to make this an item returned with an error because at a minimum the 
-					// hive was found. Note that the other option is to throw and exception which 
-					// would result in an error on the collected object. 
-					
-				}		
+				string errorMessage = "";
+				errorMessage.append("(RegistryProbe) The handle for the registry key '");
+				errorMessage.append(key);
+				errorMessage.append("' is not valid.");
+						
+				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+				// I chose to make this an item returned with an error because at a minimum the 
+				// hive was found. Note that the other option is to throw and exception which 
+				// would result in an error on the collected object.
 
 			} else {
-
-				// Add the key to the result item
-				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-
-				// If name not nil get the name
-				if(name.compare("") == 0) {
-					item->SetStatus(OvalEnum::STATUS_EXISTS);
-				} else {
 				
-					DWORD type = 0;
-					DWORD valuelen = 0;
+				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
 
-					// Determine how big the buffer must be to store the data.  By specifying NULL for the
-					// buffer size parameter, the function returns the value ERROR_MORE_DATA, and stores
-					// the required buffer size, in bytes, into valuelen.
-					res = RegQueryValueEx(hkey,						// handle to key
-										name.c_str(),	// value name
-										NULL,						// reserved
-										NULL,						// type buffer
-										NULL,						// data buffer
-										&valuelen);					// size of data buffer
+				char errorCodeBuffer[20];
+				_ltoa(res, errorCodeBuffer, 20);
 
-					// Allocate space for the buffer.
-					LPBYTE value = (LPBYTE) malloc(valuelen);
+				string errorMessage = "";
+				errorMessage.append("(RegistryProbe) Unable to get values for registry key '");
+				errorMessage.append(key);
+				errorMessage.append("'.  Error Code - ");
+				errorMessage.append(errorCodeBuffer);
+				errorMessage.append(" - " + systemErrMsg);
+				
+				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+				// I chose to make this an item returned with an error because at a minimum the 
+				// hive was found. Note that the other option is to throw and exception which 
+				// would result in an error on the collected object. 
+				
+			}		
 
-					// Retrieve the type and value for the specified name associated with an open registry
-					// key.
-					res = RegQueryValueEx(hkey,						// handle to key
-										name.c_str(),	// value name
-										NULL,						// reserved
-										&type,						// type buffer
-										value,						// data buffer
-										&valuelen);					// size of data buffer
+		} else {
 
-					if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
-						
-						item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+			// Add the key to the result item
+			item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			
+			DWORD type = 0;
+			DWORD valuelen = 0;
 
-					} else if (res != ERROR_SUCCESS) {
+			// Determine how big the buffer must be to store the data.  By specifying NULL for the
+			// buffer size parameter, the function returns the value ERROR_MORE_DATA, and stores
+			// the required buffer size, in bytes, into valuelen.
+			res = RegQueryValueEx(hkey,						// handle to key
+								name.c_str(),	// value name
+								NULL,						// reserved
+								NULL,						// type buffer
+								NULL,						// data buffer
+								&valuelen);					// size of data buffer
 
-						string systemErrMsg = WindowsCommon::GetErrorMessage(res);
+			// Allocate space for the buffer.
+			LPBYTE value = (LPBYTE) malloc(valuelen);
 
-						char errorCodeBuffer[20];
-						_ltoa(res, errorCodeBuffer, 20);
-						
-						string errorMessage = "";
-						errorMessage.append("Unable to get type and value for the specified name: '");
-						errorMessage.append(name);
-						errorMessage.append("'.  Error Code - ");
-						errorMessage.append(errorCodeBuffer);
-						errorMessage.append(" - " + systemErrMsg);
-						
-						item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-						item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-						item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-						item->SetStatus(OvalEnum::STATUS_ERROR);
+			// Retrieve the type and value for the specified name associated with an open registry
+			// key.
+			res = RegQueryValueEx(hkey,						// handle to key
+								name.c_str(),	// value name
+								NULL,						// reserved
+								&type,						// type buffer
+								value,						// data buffer
+								&valuelen);					// size of data buffer
 
-					//	Only call RetrieveInfo() if res == ERROR_SUCCESS
-					} else {
+			if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
+				
+				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-						// Now add the name entity.
-						item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->SetStatus(OvalEnum::STATUS_EXISTS);
-						// We now have all the info we need.
-						this->RetrieveInfo(hive, key, name, type, value, valuelen, item);
-					}
+			} else if (res != ERROR_SUCCESS) {
 
-					free(value);
-				}
-				RegCloseKey(hkey);
+				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
+
+				char errorCodeBuffer[20];
+				_ltoa(res, errorCodeBuffer, 20);
+				
+				string errorMessage = "";
+				errorMessage.append("Unable to get type and value for the specified name: '");
+				errorMessage.append(name);
+				errorMessage.append("'.  Error Code - ");
+				errorMessage.append(errorCodeBuffer);
+				errorMessage.append(" - " + systemErrMsg);
+				
+				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
+				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+
+			//	Only call RetrieveInfo() if res == ERROR_SUCCESS
+			} else {
+
+				// Now add the name entity.
+				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+				item->SetStatus(OvalEnum::STATUS_EXISTS);
+				// We now have all the info we need.
+				this->RetrieveInfo(hive, key, name, type, value, valuelen, item);
 			}
+
+			free(value);
+			RegCloseKey(hkey);
 		} 
 	}
 	
