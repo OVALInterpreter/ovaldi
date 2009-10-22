@@ -32,7 +32,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
----        Version 5.6 build ??      ---
+---        Version 5.6 build ??     ---
 ---------------------------------------
 * Fixed a heap corruption bug in the win-def:fileauditedpermissions_test, the win-def:fileeffectiverights_test, the win-def:regkeyauditedpermissions_test, and the win-def:regkeyeffectiverights_test that caused OVALDI to stop working under Windows Vista and caused Windows to trigger a breakpoint when run in debug mode.
 * Fixed bug in Common::ParseDefinitionIdsString() misuse of strtok.
