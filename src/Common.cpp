@@ -55,6 +55,7 @@ bool    Common::noXsl                 = false;
 string  Common::xslFile			      = "results_to_html.xsl";
 string  Common::xslOutputFile		  = "results.html";
 
+string Common::logFileLocation	      = "";
 
 bool    Common::doDefinitionSchematron   = false;
 string  Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
@@ -131,6 +132,11 @@ string Common::GetXSLOutputFilename()
 {
 	return Common::xslOutputFile;	
 }
+
+string Common::GetLogFileLocation(){
+	return Common::logFileLocation;
+}
+
 bool Common::GetNoXsl() {
 	return Common::noXsl;
 }
@@ -221,6 +227,10 @@ void Common::SetXSLOutputFilename(string in) {
 }
 void Common::SetNoXsl(bool noXsl) {
 	Common::noXsl = noXsl;
+}
+
+void Common::SetLogFileLocation(string in){
+	Common::logFileLocation = in;
 }
 
 void Common::SetDefinitionIdsString(string definitionIdsString) {
