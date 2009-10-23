@@ -116,6 +116,7 @@ class Common {
 		static bool		GetVerifyXMLfile();
 		static string	GetXSLFilename();
 		static string	GetXSLOutputFilename();
+		static string   GetLogFileLocation();
 		static bool     GetNoXsl();
 		static string   GetDefinitionIdsString();
 		static bool     GetLimitEvaluationToDefinitionIds();
@@ -135,6 +136,7 @@ class Common {
 		static void		SetVerifyXMLfile(bool);
 		static void 	SetXSLFilename(string);
 		static void		SetXSLOutputFilename(string);
+		static void		SetLogFileLocation(string);
 		static void     SetNoXsl(bool);
 		static void     SetDefinitionIdsString(string definitionIdsString);
 		static void     SetLimitEvaluationToDefinitionIds(bool set);
@@ -224,6 +226,7 @@ class Common {
 		static bool noXsl;
 		static string xslFile;
 		static string xslOutputFile;
+		static string logFileLocation;
 		static string xmlfileMD5;
 		static bool	generateMD5;
 		static bool useProvidedData;
