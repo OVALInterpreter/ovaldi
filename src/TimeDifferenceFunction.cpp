@@ -64,10 +64,10 @@ void TimeDifferenceFunction::SetFormat2(OvalEnum::DateTimeFormat format2) {
 ComponentValue* TimeDifferenceFunction::ComputeValue() {
 	
 	AbsComponentVector * components = this->GetComponents();
-	AbsComponent * component1;
-	AbsComponent * component2;
-	ComponentValue* component1Value;
-	ComponentValue* component2Value;
+	AbsComponent * component1 = NULL;
+	AbsComponent * component2 = NULL;
+	ComponentValue* component1Value = NULL;
+	ComponentValue* component2Value = NULL;
 	ComponentValue* result = new ComponentValue();
 	string value1;
 	string value2;
@@ -79,7 +79,6 @@ ComponentValue* TimeDifferenceFunction::ComputeValue() {
 	// One component was specified
 	if ( components->size() == 1 ){
 		time_t currentTime = time(NULL);
-		component1 = NULL;
 		component2 = components->at(0);	
 		component1Value = new ComponentValue();
 		component1Value->SetFlag(OvalEnum::FLAG_COMPLETE);
@@ -100,89 +99,89 @@ ComponentValue* TimeDifferenceFunction::ComputeValue() {
 		value2 = component2Value->GetValues()->at(0);
 	}
 
-    // Combine the flag values of components 1 and 2, and set the new value
-    IntVector* flags = new IntVector();
-    flags->push_back(component1Value->GetFlag());
-    flags->push_back(component2Value->GetFlag());
-    result->SetFlag(OvalEnum::CombineFlags(flags));
-    delete flags;
-	
-	result->AppendMessages(component1Value->GetMessages());
-    result->AppendMessages(component2Value->GetMessages());
-
-
-	if(component2Value->GetFlag() == OvalEnum::FLAG_COMPLETE) {
-
-		unsigned int component1Size = component1Value->GetValues()->size();
-		unsigned int component2Size = component2Value->GetValues()->size();
-
-		// Perform the timedifference operation on the Cartesian product of the two components.
-		// For example assume a local_variable specifies the timedifference function and has two sub-components 
-		// under this function: the first component returns multiple values "04/02/2009" and "04/03/2009", and the second component
-		// returns multiple values "02/02/2005" and "02/03/2005" and "02/04/2005". The local_variable element would be evaluated to have six
-		// values:  (ToSeconds("04/02/2009") - ToSeconds("02/02/2005")), (ToSeconds("04/02/2009") - ToSeconds("02/03/2005")),
-		// (ToSeconds("04/02/2009") - ToSeconds("02/04/2005")), (ToSeconds("04/03/2009") - ToSeconds("02/02/2005")), 
-		// (ToSeconds("04/03/2009") - ToSeconds("02/03/2005")), and (ToSeconds("04/03/2009") - ToSeconds("02/04/2005")).
+	if ( component1Value != NULL && component2Value != NULL ){
+		// Combine the flag values of components 1 and 2, and set the new value
+		IntVector* flags = new IntVector();
+		flags->push_back(component1Value->GetFlag());
+		flags->push_back(component2Value->GetFlag());
+		result->SetFlag(OvalEnum::CombineFlags(flags));
+		delete flags;
 		
-		for(unsigned int counter1 = 0 ; counter1 < component1Size ; counter1++){
-			for(unsigned int counter2 = 0 ; counter2 < component2Size ; counter2++){
-				string currentComponent2Value = component2Value->GetValues()->at(counter2);
-				string currentComponent1Value ="";
+		result->AppendMessages(component1Value->GetMessages());
+		result->AppendMessages(component2Value->GetMessages());
 
-				if ( component1 == NULL ){
-					firstTime = time(NULL);
-				}
-				
-				// Get time in seconds for component1
-				else{
-					// Get corresponding value in component1
-					currentComponent1Value = component1Value->GetValues()->at(counter1);
+		if(component2Value->GetFlag() == OvalEnum::FLAG_COMPLETE) {
 
-					// Get the number of seconds since the epoch using the function that corresponds to specified date-time format
-					if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_YEAR_MONTH_DAY)) == 0 ) {
-						firstTime = TimeDifferenceFunction::YearMonthDayValueToSeconds(currentComponent1Value);
-					} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_MONTH_DAY_YEAR)) == 0) {
-						firstTime = TimeDifferenceFunction::MonthDayYearValueToSeconds(currentComponent1Value);
-					} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_DAY_MONTH_YEAR)) == 0) {
-						firstTime = TimeDifferenceFunction::DayMonthYearValueToSeconds(currentComponent1Value);
-					} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_WIN_FILETIME)) == 0) {
-						firstTime = TimeDifferenceFunction::WinFiletimeValueToSeconds(currentComponent1Value);
-					} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_SECONDS_SINCE_EPOCH)) == 0) {
-						firstTime = TimeDifferenceFunction::SecondsSinceEpochValueToSeconds(currentComponent1Value);
+			unsigned int component1Size = component1Value->GetValues()->size();
+			unsigned int component2Size = component2Value->GetValues()->size();
+
+			// Perform the timedifference operation on the Cartesian product of the two components.
+			// For example assume a local_variable specifies the timedifference function and has two sub-components 
+			// under this function: the first component returns multiple values "04/02/2009" and "04/03/2009", and the second component
+			// returns multiple values "02/02/2005" and "02/03/2005" and "02/04/2005". The local_variable element would be evaluated to have six
+			// values:  (ToSeconds("04/02/2009") - ToSeconds("02/02/2005")), (ToSeconds("04/02/2009") - ToSeconds("02/03/2005")),
+			// (ToSeconds("04/02/2009") - ToSeconds("02/04/2005")), (ToSeconds("04/03/2009") - ToSeconds("02/02/2005")), 
+			// (ToSeconds("04/03/2009") - ToSeconds("02/03/2005")), and (ToSeconds("04/03/2009") - ToSeconds("02/04/2005")).
+			
+			for(unsigned int counter1 = 0 ; counter1 < component1Size ; counter1++){
+				for(unsigned int counter2 = 0 ; counter2 < component2Size ; counter2++){
+					string currentComponent2Value = component2Value->GetValues()->at(counter2);
+					string currentComponent1Value ="";
+
+					if ( component1 == NULL ){
+						firstTime = time(NULL);
+					}
+					
+					// Get time in seconds for component1
+					else{
+						// Get corresponding value in component1
+						currentComponent1Value = component1Value->GetValues()->at(counter1);
+
+						// Get the number of seconds since the epoch using the function that corresponds to specified date-time format
+						if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_YEAR_MONTH_DAY)) == 0 ) {
+							firstTime = TimeDifferenceFunction::YearMonthDayValueToSeconds(currentComponent1Value);
+						} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_MONTH_DAY_YEAR)) == 0) {
+							firstTime = TimeDifferenceFunction::MonthDayYearValueToSeconds(currentComponent1Value);
+						} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_DAY_MONTH_YEAR)) == 0) {
+							firstTime = TimeDifferenceFunction::DayMonthYearValueToSeconds(currentComponent1Value);
+						} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_WIN_FILETIME)) == 0) {
+							firstTime = TimeDifferenceFunction::WinFiletimeValueToSeconds(currentComponent1Value);
+						} else if(format1.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_SECONDS_SINCE_EPOCH)) == 0) {
+							firstTime = TimeDifferenceFunction::SecondsSinceEpochValueToSeconds(currentComponent1Value);
+						} else {
+							if ( result != NULL ){
+								delete result;
+								result = NULL;
+							}
+							throw Exception("Error: An unsupported date-time format value \'" + format1 + "\' was found.");
+						}
+					}
+
+					// Get time in seconds for component2
+					if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_YEAR_MONTH_DAY)) == 0 ) {
+						secondTime = TimeDifferenceFunction::YearMonthDayValueToSeconds(currentComponent2Value);
+					} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_MONTH_DAY_YEAR)) == 0) {
+						secondTime = TimeDifferenceFunction::MonthDayYearValueToSeconds(currentComponent2Value);
+					} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_DAY_MONTH_YEAR)) == 0) {
+						secondTime = TimeDifferenceFunction::DayMonthYearValueToSeconds(currentComponent2Value);
+					} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_WIN_FILETIME)) == 0) {
+						secondTime = TimeDifferenceFunction::WinFiletimeValueToSeconds(currentComponent2Value);
+					} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_SECONDS_SINCE_EPOCH)) == 0) {
+						secondTime = TimeDifferenceFunction::SecondsSinceEpochValueToSeconds(currentComponent2Value);
 					} else {
 						if ( result != NULL ){
 							delete result;
 							result = NULL;
 						}
-						throw Exception("Error: An unsupported date-time format value \'" + format1 + "\' was found.");
+						throw Exception("Error: An unsupported date-time format value \'" + format2 + "\' was found.");
 					}
+				
+					// Calculate the time difference between corresponding date-time values					
+					result->AppendValue(Common::ToString((long int)(firstTime-secondTime)));
 				}
-
-				// Get time in seconds for component2
-				if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_YEAR_MONTH_DAY)) == 0 ) {
-					secondTime = TimeDifferenceFunction::YearMonthDayValueToSeconds(currentComponent2Value);
-				} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_MONTH_DAY_YEAR)) == 0) {
-					secondTime = TimeDifferenceFunction::MonthDayYearValueToSeconds(currentComponent2Value);
-				} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_DAY_MONTH_YEAR)) == 0) {
-					secondTime = TimeDifferenceFunction::DayMonthYearValueToSeconds(currentComponent2Value);
-				} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_WIN_FILETIME)) == 0) {
-					secondTime = TimeDifferenceFunction::WinFiletimeValueToSeconds(currentComponent2Value);
-				} else if(format2.compare(OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_SECONDS_SINCE_EPOCH)) == 0) {
-					secondTime = TimeDifferenceFunction::SecondsSinceEpochValueToSeconds(currentComponent2Value);
-				} else {
-					if ( result != NULL ){
-						delete result;
-						result = NULL;
-					}
-					throw Exception("Error: An unsupported date-time format value \'" + format2 + "\' was found.");
-				}
-			
-				// Calculate the time difference between corresponding date-time values					
-				result->AppendValue(Common::ToString((long int)(firstTime-secondTime)));
 			}
 		}
 	}
-	
 
 	if ( components->size() == 1 && component1Value != NULL ){
 		delete component1Value;
@@ -247,7 +246,7 @@ time_t TimeDifferenceFunction::YearMonthDayValueToSeconds(string dateTimeValue){
 	
 	string dateTimeFormatStr = OvalEnum::DateTimeFormatToString(OvalEnum::DATETIME_YEAR_MONTH_DAY);
 	time_t calculatedSeconds;
-	int index;
+	size_t index;
 	string year;
 	string month;
 	string day;
@@ -821,7 +820,7 @@ int TimeDifferenceFunction::MonthStrToInt(string monthValueStr){
 // Convert a hex string to its corresponding decimal value
 long long TimeDifferenceFunction::HexToDecimal(string hexTimeDateStr){
 	char * hexCStr = (char*) malloc (sizeof(char)*(hexTimeDateStr.length()+1));
-	unsigned long long value = 0;
+	long long value = 0;
 	int length = hexTimeDateStr.length();
 	int bitpos = length-1;
 	double base = 16;
