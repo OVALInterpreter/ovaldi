@@ -368,91 +368,85 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 	
-	int base = 0;
-
-	long long defInt;
-	long long scInt;
-
-	char * e1 = NULL;
-	char * e2 = NULL;
-	
-	// Convert the string defValue to a long long integer
 	try {
+		int base = 0;
+		long long defInt = 0;
+		long long scInt = 0;
+		char * e1 = NULL;
+		char * e2 = NULL;
+
+		// Convert the string defValue to a long long intege
 		defInt = Common::StringToLongLong( ( char* ) defValue.c_str() , &e1 , base );
-	}catch (string errorMessage){
-		cout << errorMessage;	
-	}
-
-    // Convert the string scValue to a long long integer
-	try {
+	
+		// Convert the string scValue to a long long integer
 		scInt = Common::StringToLongLong( ( char* ) scValue.c_str() , &e2 , base );
+
+		if ( e1 != NULL ){
+			*e1 = (char) NULL;
+		}
+
+		if ( e2 != NULL ){
+			*e2 = (char) NULL;
+		}
+
+		if(op == OvalEnum::OPERATION_EQUALS) {
+			if(scInt == defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
+			if(scInt != defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_LESS_THAN) {
+			
+			if(scInt < defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_LESS_THAN_OR_EQUAL) {
+			
+			if(scInt <= defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_GREATER_THAN) {
+			
+			if(scInt > defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL) {
+			
+			if(scInt >= defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_BITWISE_AND) {
+			if ( ( defInt & scInt ) == defInt ){
+				result = OvalEnum::RESULT_TRUE;
+			}else{
+				result = OvalEnum::RESULT_FALSE;
+			}	
+		} else if(op == OvalEnum::OPERATION_BITWISE_OR) {		
+			if ( ( defInt | scInt ) == defInt ){
+				result = OvalEnum::RESULT_TRUE;
+			}else{
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else {
+			throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
+		} 
 	}catch (string errorMessage){
 		cout << errorMessage;	
 	}
-
-	if ( e1 != NULL ){
-		*e1 = NULL;
-	}
-
-	if ( e2 != NULL ){
-		*e2 = NULL;
-	}
-
-	if(op == OvalEnum::OPERATION_EQUALS) {
-		if(scInt == defInt) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
-		if(scInt != defInt) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else if(op == OvalEnum::OPERATION_LESS_THAN) {
-		
-		if(scInt < defInt) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else if(op == OvalEnum::OPERATION_LESS_THAN_OR_EQUAL) {
-		
-		if(scInt <= defInt) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else if(op == OvalEnum::OPERATION_GREATER_THAN) {
-		
-		if(scInt > defInt) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else if(op == OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL) {
-		
-		if(scInt >= defInt) {
-			result = OvalEnum::RESULT_TRUE;
-		} else {
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else if(op == OvalEnum::OPERATION_BITWISE_AND) {
-		if ( ( defInt & scInt ) == defInt ){
-			result = OvalEnum::RESULT_TRUE;
-		}else{
-			result = OvalEnum::RESULT_FALSE;
-		}	
-	} else if(op == OvalEnum::OPERATION_BITWISE_OR) {		
-		if ( ( defInt | scInt ) == defInt ){
-			result = OvalEnum::RESULT_TRUE;
-		}else{
-			result = OvalEnum::RESULT_FALSE;
-		}
-	} else {
-		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
-	} 
 
 	return result;
 }
@@ -653,7 +647,7 @@ LongLongVector* EntityComparator::ParseVersionStr(string versionStr) {
         }
 
 		if ( endptr != NULL ){
-			*endptr = NULL;
+			*endptr = (char) NULL;
 		}
 
 		tokens->push_back(tokenInt);
@@ -799,7 +793,7 @@ LongLongVector* EntityComparator::ParseVersionStr(string versionStr) {
                     }
 
 					if ( endptr != NULL ){
-						*endptr = NULL;
+						*endptr = (char) NULL;
 					}
 
 					// Add it to the vector
@@ -821,7 +815,7 @@ LongLongVector* EntityComparator::ParseVersionStr(string versionStr) {
 
 			// Check for multiple consecutive delimiters in a version string
 			// Compare the length of the original version string to the totalTokenLength - 1 to remove the extra delimiter that was added when the last int token was found
-			if ( strlen(versionStr.c_str()) != (totalTokenLength-1) ){
+			if ( ((int)strlen(versionStr.c_str())) != (totalTokenLength-1) ){
 				
 				if(theString != NULL) {
 					free(theString);
