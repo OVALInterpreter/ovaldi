@@ -50,19 +50,6 @@ int main(int argc, char* argv[]) {
 #endif
 ///////////////////////		DEBUG	///////////////////////////////////////
 
-	try {
-// init the log system - set the log level here
-#ifdef _DEBUG
-		Log::Init(Log::DEBUG, "ovaldi.log", false);
-#else
-		Log::Init(Log::INFO, "ovaldi.log", false);
-#endif
-	} catch (Exception ex) {
-		cout << ex.GetErrorMessage() << endl;
-		return 1;
-	}
-
-
 	//////////////////////////////////////////////////////
 	///////////////////  Print Header  ///////////////////
 	//////////////////////////////////////////////////////
@@ -86,14 +73,33 @@ int main(int argc, char* argv[]) {
 	headerMessage.append(timeBuffer);
 	headerMessage.append("\n");
 
-	// Send header to console and log file.
+	// Send header to console.
 	cout << headerMessage;
-	Log::UnalteredMessage(headerMessage);
 
 	//////////////////////////////////////////////////////
 	/////////  Parse Command-line Options  ///////////////
 	//////////////////////////////////////////////////////
 	ProcessCommandLine(argc, argv);
+	
+	//////////////////////////////////////////////////////
+	/////////  Initialize the Log System  ////////////////
+	//////////////////////////////////////////////////////
+
+	try {
+		// init the log system - set the log level here
+		#ifdef _DEBUG
+			Log::Init(Log::DEBUG, Common::GetLogFileLocation(), false);
+		#else
+			Log::Init(Log::INFO, "ovaldi.log", false);
+		#endif
+	} catch (Exception ex) {
+		cout << "*** Log initialization error: " << ex.GetErrorMessage() << "\n\n\n----------------------------------------------------" << endl;
+		Usage();
+		return 1;
+	}
+
+	// Now that the log has been initialized send the header to the log file.
+	Log::UnalteredMessage(headerMessage);
 
 	//////////////////////////////////////////////////////
 	//////////////////  Check MD5 Flag  //////////////////
@@ -359,7 +365,7 @@ int main(int argc, char* argv[]) {
 		///////////////		Run Analysis		//////////////
 		//////////////////////////////////////////////////////
 
-		// create a results docuemnt
+		// create a results document
 		DocumentManager::SetResultDocument(processor->CreateDOMDocumentNS("http://oval.mitre.org/XMLSchema/oval-results-5", "oval_results"));
 
 		//	Create the analyzer
@@ -479,10 +485,8 @@ void ProcessCommandLine(int argc, char* argv[]) {
 	// have run out of arguments to check.
 
 	try {
-
 		while (argc > 1) {
 			// Make sure that the switch control starts with a dash.
-
 			if (argv[1][0] != '-') {
 				if ((argc == 2) && (Common::GetVerifyXMLfile() == true)) {
 					Common::SetXMLfileMD5(argv[1]);
@@ -593,7 +597,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 				// ********  don't compare xmlfile to MD5 hash  ******** //
 				case 'm':
-
+					
 					Common::SetVerifyXMLfile(false);
 
 					break;
@@ -661,6 +665,20 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 				
+				// **********  write ovaldi.log to a specific location  ***************** //
+				case 'y':
+					
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit(0);
+					} else {
+						Common::SetLogFileLocation(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+
 				// **********  log level  ********** //
 				case 'l':
 
@@ -730,10 +748,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 		}
 
 	} catch(Exception ex) {
-
-		cout << "*** Input error: " << ex.GetErrorMessage() << "\n\n\n----------------------------------------------------" << endl;
-		Log::Fatal("*** Input error: "  + ex.GetErrorMessage() + "\n\n\n----------------------------------------------------\n");
-
+		cout << "*** Input error: " << ex.GetErrorMessage() << " Note that this message has not been written to the log file.\n\n\n----------------------------------------------------" << endl;
 		Usage();
 		exit(0);
 	}
@@ -788,6 +803,7 @@ void Usage() {
 	cout << "Other Options:" << endl;
 	cout << "   -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4)" << endl;
 	cout << "   -p           = print all information and error messages." << endl;
+	cout << "   -y           = save the ovaldi.log file to a specific location." << endl;
 	cout << "   -z           = return md5 of current oval-definitions file." << endl;
 	cout << endl;
 }
