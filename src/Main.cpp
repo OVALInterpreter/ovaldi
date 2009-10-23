@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 		#ifdef _DEBUG
 			Log::Init(Log::DEBUG, Common::GetLogFileLocation(), false);
 		#else
-			Log::Init(Log::INFO, "ovaldi.log", false);
+			Log::Init(Log::INFO, Common::GetLogFileLocation(), false);
 		#endif
 	} catch (Exception ex) {
 		cout << "*** Log initialization error: " << ex.GetErrorMessage() << "\n\n\n----------------------------------------------------" << endl;
