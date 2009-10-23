@@ -1203,8 +1203,16 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 
 		} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
+		if (domain != NULL)
+			free(domain);
+
 	} catch(...) {
+		if (pSid != NULL)
+			free(pSid);
 		
+		if (domain != NULL)
+			free(domain);
+
 		Log::Debug("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
 		throw Exception("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
 	}
@@ -1213,7 +1221,10 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 	if(!IsValidSid(pSid)) {
 		
 		if(pSid != NULL)
-			LocalFree(pSid);
+			free(pSid);
+
+		if (domain != NULL)
+			free(domain);
 
 		throw Exception("Error looking up sid for account: " + trusteeName + ". Invalid sid found.");
 	}
@@ -1651,7 +1662,7 @@ bool WindowsCommon::TrusteeNameExists(const string trusteeNameIn) {
 
 	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
-   	LocalFree(psid);
+   	free(psid);
     free(domain);
 
 
