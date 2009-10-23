@@ -281,7 +281,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				if(this->IsMatch(pattern, dirToSearch, isRegex))
 					pathVector->push_back(dirToSearch);
 
-				GetPathsForPattern(dirToSearch, pattern, pathVector);
+				GetPathsForPattern(dirToSearch, pattern, pathVector, isRegex);
 			
 			}
 		} while (FindNextFile(hFind, &FindFileData));
