@@ -402,6 +402,7 @@ bool WindowsCommon::IsGroup(string trusteeName) {
 		
 		if(retVal != FALSE) {
 			isGroup = WindowsCommon::IsAccountGroup(sidUse, trusteeName);
+			break;
 		}
 	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
@@ -1201,6 +1202,9 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 									&domainSize,							// size of domain name
 									&sidUse);								// SID-type indicator
 
+			if ( retVal )
+				break;
+
 		} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
 		if (domain != NULL)
@@ -1431,6 +1435,9 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 								   &domainSize,									// size of domain name
 								   &sid_type);									// SID-type indicator
 
+		if ( retVal )
+			break;
+
 	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
 	if(retVal == TRUE) {
@@ -1529,6 +1536,9 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 								  pDomain,						// domain name
 								  &domainSize,					// size of domain name
 								  &sid_type);					// SID-type indicator
+
+		if ( retVal )
+			break;
 
 	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
@@ -1659,6 +1669,9 @@ bool WindowsCommon::TrusteeNameExists(const string trusteeNameIn) {
 								   domain,										// domain name
 								   &domainSize,									// size of domain name
 								   &sid_type);									// SID-type indicator
+		
+		if ( retVal )
+			break;
 
 	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
@@ -1717,6 +1730,9 @@ bool WindowsCommon::TrusteeSIDExists(const string trusteeSIDIn) {
 								  NULL,						// domain name
 								  &domainSize,					// size of domain name
 								  &sid_type);					// SID-type indicator
+	
+		if ( retVal )
+			break;
 
 	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
