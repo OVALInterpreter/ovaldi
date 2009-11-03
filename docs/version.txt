@@ -38,7 +38,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed bug in Common::ParseDefinitionIdsString() misuse of strtok.
 * Fixed a bug in the SubstringFunction::ComputeValue() method so that it now properly supports substring_start values that are less than 1.
 * Fixed a bug in the win-def:registry_test so that it properly supports the collection of a registry key's default value.
-* Fixed a bug in the REGEX::EscapeRegexChars() method such that it escapes all regular expression characters regardless of whether or not the regular expression character has been escaped. For example, if you had the string '\.test*?' it would evaluate to '\\\.test\*\?' instead of '\\.test\*\?'. 
+* Fixed a bug in the REGEX::EscapeRegexChars() method such that it escapes all regular expression characters regardless of whether or not the regular expression character has been escaped. For example, if you had the string '\.test*?' it would evaluate to '\\\.test\*\?' instead of '\\.test\*\?'.
+* Fixed a few bugs in WindowsCommon.cpp that caused OVALDI to go into an infinite loop during data collection.  Thanks to Jens Miltner (http://sourceforge.net/users/jmiltner) for reporting these bugs and for providing the code to fix them. 
 
 ---------------------------------------
 ---        Version 5.6 build 3      ---
