@@ -158,7 +158,15 @@ bool Common::GetDoDefinitionSchematron() {
 }
 
 string Common::GetDefinitionSchematronPath() {
-	return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::definitionSchematronPath;
+	
+	// if the filepath to the XSL schematron file is not specified use the default path and filename
+	if ( Common::definitionSchematronPath.compare("oval-definitions-schematron.xsl") == 0 ){
+		return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::definitionSchematronPath;
+	}
+	// otherwise use the specififed value
+	else{
+		return Common::definitionSchematronPath;
+	}
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
