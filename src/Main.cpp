@@ -111,8 +111,8 @@ int main(int argc, char* argv[]) {
 		// stripped before computing the hash, resulting in the wrong hash
 		// being produced.
 
-		FILE* fpVerify = fopen(Common::GetXMLfile().c_str(), "rb");
-		if (fpVerify == NULL) {
+		ifstream in(Common::GetXMLfile().c_str(), ios::in|ios::binary);
+		if (!in) {
 			cerr << endl << "** ERROR: Could not open file. The specified definition file does not exist.";
 			Log::UnalteredMessage("\n** ERROR: Could not open file. The specified definition file does not exist.");
 			exit(0);
@@ -121,11 +121,11 @@ int main(int argc, char* argv[]) {
 		// Create the md5 hash.  This constructor creates a new md5 object,
 		// updates the hash, finalizes the hash, and closes the FILE object.
 
-		MD5 context(fpVerify);
+		Digest digest;
 
 		// Get the hash and print it to the screen.
 
-		string hashBuf = context.hex_digest();
+		string hashBuf = digest.digest(in, Digest::MD5);
 		cout << endl << hashBuf << endl;
 		Log::UnalteredMessage(hashBuf);
 
@@ -167,9 +167,8 @@ int main(int argc, char* argv[]) {
 		// it in binary mode.  If not, ctrl+m characters will be stripped before computing
 		// the hash, resulting in the wrong hash being produced.
 
-		FILE* fpVerify = fopen(Common::GetXMLfile().c_str(), "rb");
-		if (fpVerify == NULL) {
-
+		ifstream in(Common::GetXMLfile().c_str(), ios::in|ios::binary);
+		if (!in) {
 			string errorMessage = "";
 			errorMessage.append("Unable to open the '");
  			errorMessage.append(Common::GetXMLfile());
@@ -183,9 +182,9 @@ int main(int argc, char* argv[]) {
 		// Create the md5 hash.  This constructor creates a new md5 object, updates the
 		// hash, finalizes the hash, and closes the FILE object.
 		
-		MD5 context(fpVerify);
+		Digest digest;
 
-		string hashBuf = context.hex_digest();
+		string hashBuf = digest.digest(in, Digest::MD5);
 
 		// Compare (without regard to case) the MD5 hash we just created with the one
 		// given by the user.  If the two do not match, then exit the application.  Make
@@ -467,6 +466,7 @@ int main(int argc, char* argv[]) {
 	Log::Shutdown();
 
 	return 0;
+
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

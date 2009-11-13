@@ -167,9 +167,9 @@ Item* FileMd5Probe::GetMd5(string path, string fileName) {
 	//	FileAttribute
 	// -----------------------------------------------------------------------
 
-	string errorMessage = "";
+	string errorMessage;
 	Item *item = NULL;
-	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
+	string filePath = Common::BuildFilePath(path, fileName);
 
 
 
@@ -179,30 +179,29 @@ Item* FileMd5Probe::GetMd5(string path, string fileName) {
 		////////////////////////  MD5  ///////////////////////
 		//////////////////////////////////////////////////////
 
-		char buf[1024];
-		FILE* fp = NULL;
-		fp = fopen(filePath.c_str(), "r");
-		if (fp == NULL) {
-			/*
-			errorMessage.append("(FileMd5Probe) Unable to get MD5 information for the file '");
-			errorMessage.append(filePath);
-			errorMessage.append("' \n");
-			*/
+		item = this->CreateItem();
+		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+
+		ifstream in(filePath.c_str(), ios::in|ios::binary);
+
+		if (!in) {
+			
+			errorMessage = "(FileMd5Probe) Unable to get MD5 information for the file '" +
+							filePath +
+							"' \n";
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(errorMessage));
+			ItemEntity* md5Entity = new ItemEntity("md5", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			item->AppendElement(md5Entity);
 		
 		} else {
 			// Create the md5 hash.  This constructor creates a new md5 object, updates the hash,
 			// finalizes the hash, and closes the FILE object.
-			
-			MD5 context(fp);
 
-			memset(buf, '\0', sizeof(buf));
-			SNPRINTF(buf, sizeof(buf)-1, "%s", context.hex_digest());
-			buf[sizeof(buf)-1] = '\0';
-			item = this->CreateItem();
+			string digestVal = this->digest.digest(in, Digest::MD5);
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("md5", buf, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("md5", digestVal));
 		}
 
 		//////////////////////////////////////////////////////

@@ -37,13 +37,15 @@ WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
           B. Xerces Library
           C. Xalan Library
           D. RPM Libraries
-          E. APT Libraries 
-          F. Building the OVAL Interpreter
+          E. APT Libraries
+          F. OpenSSL Library
+          G. Building the OVAL Interpreter
   III   PCRE
   IV    XERCES
   V     XALAN
-  VI    REPORTING PROBLEMS
-  VII   USEFUL LINKS
+  VI    OPENSSL
+  VII   REPORTING PROBLEMS
+  VIII  USEFUL LINKS
 
 -- I -- OVERVIEW --
 
@@ -145,8 +147,18 @@ Follow the instruction below to setup and install the supporting libraries.
       For more information about APT please visit:
         http://en.wikipedia.org/wiki/Advanced_Packaging_Tool
 
- 
-  F. Building the OVAL Interpreter
+  F. OpenSSL Library
+
+       You can get source from http://openssl.org/source/ and build it yourself,
+       or you can usually get a binary package using an installer specific to
+       your flavor of Linux (e.g. RPM for redhat, APT for debian).  The ovaldi
+       makefile already includes the proper variables and commandline to link to
+       OpenSSL. 
+
+       For more information about OpenSSL please visit:
+         http://openssl.org
+
+  G. Building the OVAL Interpreter
 
       After installing the PCRE, Xerces, and Xalan libraries, change into the 
       directory:
@@ -210,15 +222,31 @@ For more information about Xalan visit:
 
 The source code is also available at the above Web site.
 
+-- VI -- OPENSSL --
 
--- VI -- REPORTING PROBLEMS --
+The OVAL Interpreter uses the open-source OpenSSL library.
+
+  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
+  the OpenSSL License and the original SSLeay license apply to the toolkit.
+  See below for the actual license texts. Actually both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL
+  please contact openssl-core@openssl.org.
+
+Also, see the file LICENSE.openssl.
+
+For more information about OpenSSL visit:
+    http://openssl.org/
+
+The source code is also available at the above Web site.
+
+-- VII -- REPORTING PROBLEMS --
 
 To report a problem with OVAL Interpreter, please
 send an email with a brief description of the problem to 
 oval@mitre.org. Include the platform the Interpreter was run on, and
 the version of the Interpreter and definitions file.
 
--- VII -- USEFUL LINKS --
+-- VIII -- USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org
 

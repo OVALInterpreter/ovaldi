@@ -27,47 +27,51 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+#ifndef DIGEST_H
+#define DIGEST_H
 
-#ifndef FILEHASHPROBE_H
-#define FILEHASHPROBE_H
-
-#include "FileFinder.h"
-#include "AbsProbe.h"
-#include <Digest.h>
+#include "Exception.h"
+#include <string>
+#include <iostream>
+#include <openssl/evp.h>
 
 /**
-	This class is responsible for collecting file hash data.
-	This class should be platform independant.
-*/
-class FileHashProbe : public AbsProbe {
-
+ * Encapsulates an openssl message digest context.  Instances of this
+ * class compute digests on any sort of data.
+ */
+class Digest
+{
 public:
-	virtual ~FileHashProbe();
-	
-	/** Get all the files on the system that match the pattern and generate and md5 and sha1 */
-	virtual ItemVector* CollectItems(Object* object);
+	enum DigestType {
+		MD5,
+		SHA1
+	};
 
-	/** Ensure that the FileHashProbe is a singleton. */
-	static AbsProbe* Instance();
-
-private:
-	FileHashProbe();
-
-	/** Return a new Item created for storing file hash information */
-	virtual Item* CreateItem();
-
-	static FileHashProbe* instance;
+	Digest();
+	virtual ~Digest(void);
 
 	/**
-	 * Computes the given digest for the given file and updates
-	 * the given item and item entity.
+	 * Digests data from the given stream and returns the digest value
+	 * as a hex string.
 	 */
-	void GetDigest(const std::string& filePath,
-					Item* item,
-					Digest::DigestType digestType,
-					const std::string& entityName);
+	std::string digest(std::istream &in, DigestType digestType);
 
-	Digest digest;
+	/**
+	 * Convenience function for generating a digest of the given file.
+	 */
+	std::string digest(const std::string& fileName, DigestType digestType);
+
+private:
+	const EVP_MD* getDigest(DigestType digestType);
+
+	EVP_MD_CTX context;
 };
+
+class DigestException : public Exception {
+public:
+	DigestException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+	~DigestException();
+};
+
 
 #endif

@@ -51,7 +51,6 @@
 
 
 #include "XmlProcessor.h"
-#include "MD5.h"
 #include "AbsDataCollector.h"
 #include "Version.h"
 #include "Analyzer.h"

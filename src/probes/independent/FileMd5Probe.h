@@ -33,13 +33,7 @@
 
 #include "FileFinder.h"
 #include "AbsProbe.h"
-#include "MD5.h"
-
-#ifdef WIN32
-	#define SNPRINTF _snprintf
-#else
-	#define SNPRINTF snprintf
-#endif
+#include <Digest.h>
 
 using namespace std;
 
@@ -66,6 +60,8 @@ private:
 	static FileMd5Probe* instance;
 
 	Item* GetMd5(string path, string fileName);
+
+	Digest digest;
 };
 
 #endif

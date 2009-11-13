@@ -47,9 +47,10 @@ for more information.
   IV   PCRE
   V    XERCES
   VI   XALAN
-  VII  TROUBLESHOOTING
-  VIII REPORTING PROBLEMS
-  IX   USEFUL LINKS
+  VII  OPENSSL
+  VIII TROUBLESHOOTING
+  IX   REPORTING PROBLEMS
+  X    USEFUL LINKS
 
 
 -- I -- INSTALLATION --
@@ -472,8 +473,24 @@ For more information about Xalan visit:
 
 The source code is also available at the above Web site.
 
+-- VII -- OPENSSL --
 
--- VII -- TROUBLESHOOTING --
+The OVAL Interpreter uses the open-source OpenSSL library.
+
+  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
+  the OpenSSL License and the original SSLeay license apply to the toolkit.
+  See below for the actual license texts. Actually both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL
+  please contact openssl-core@openssl.org.
+
+Also, see the file LICENSE.openssl.
+
+For more information about OpenSSL visit:
+    http://openssl.org/
+
+The source code is also available at the above Web site.
+
+-- VIII -- TROUBLESHOOTING --
 
 *********************************** 
 
@@ -543,7 +560,7 @@ for errors that are not common.  These could signify something that
 is working incorrectly.
 
 
--- VIII -- REPORTING PROBLEMS --
+-- IX -- REPORTING PROBLEMS --
 
 To report a problem with the OVAL Interpreter, please post a bug report
 on the OVAL Interpreter SourceForge site 
@@ -558,7 +575,7 @@ OVAL Web Site and join the "OVAL Repository Forum".
 http://oval.mitre.org/community/registration.html
 
 
--- IX ­ USEFUL LINKS --
+-- X ­ USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org/
 

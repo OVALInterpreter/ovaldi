@@ -29,6 +29,9 @@
 //****************************************************************************************//
 
 #include "FileHashProbe.h"
+#include <fstream>
+#include <iomanip>
+#include <sstream>
 
 //****************************************************************************************//
 //								FileHashProbe Class										  //	
@@ -36,7 +39,6 @@
 FileHashProbe* FileHashProbe::instance = NULL;
 
 FileHashProbe::FileHashProbe() {
-
 }
 
 FileHashProbe::~FileHashProbe() {
@@ -105,7 +107,7 @@ ItemVector* FileHashProbe::CollectItems(Object* object) {
 			} else {
 
 				// build the path string
-                string filePath = Common::BuildFilePath((const string)fp->first, (const string)fp->second);
+                string filePath = Common::BuildFilePath(fp->first, fp->second);
 
 				// create a new item
 				Item *item = NULL;
@@ -115,14 +117,10 @@ ItemVector* FileHashProbe::CollectItems(Object* object) {
 				item->AppendElement(new ItemEntity("filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
 				// call the hashing functions
-				this->GetMd5(filePath, item);
-				this->GetSha1(filePath, item);
+				this->GetDigest(filePath, item, Digest::MD5, "md5");
+				this->GetDigest(filePath, item, Digest::SHA1, "sha1");
 
-				if(item != NULL) {
-					collectedItems->push_back(item);
-				}
-				item = NULL;
-
+				collectedItems->push_back(item);
 			}
 
 			delete fp;
@@ -164,56 +162,20 @@ Item* FileHashProbe::CreateItem() {
 	return item;
 }
 
-void FileHashProbe::GetMd5(string filePath, Item* item) {
+void FileHashProbe::GetDigest(const std::string& filePath,
+								Item* item,
+								Digest::DigestType digestType,
+								const std::string& entityName) {
+
+	ItemEntity *digestEntity = new ItemEntity(entityName);
+	item->AppendElement(digestEntity);
 
 	try {
-
-		//////////////////////////////////////////////////////
-		////////////////////////  MD5  ///////////////////////
-		//////////////////////////////////////////////////////
-
-		char buf[1024];
-		FILE* fp = NULL;
-		fp = fopen(filePath.c_str(), "r");
-		if (fp == NULL) {
-			string errorMessage = "(FileHashProbe) Unable to get MD5 information for the file '";
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendElement(new ItemEntity("md5", buf, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-			item->AppendMessage(new OvalMessage(errorMessage));
-		
-		} else {
-			// Create the md5 hash.  This constructor creates a new md5 object, updates the hash,
-			// finalizes the hash, and closes the FILE object.
-			
-			MD5 context(fp);
-
-			memset(buf, '\0', sizeof(buf));
-			SNPRINTF(buf, sizeof(buf)-1, "%s", context.hex_digest());
-			buf[sizeof(buf)-1] = '\0';
-			item->AppendElement(new ItemEntity("md5", buf, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-		}
-
-		//////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////
-	} catch(ProbeException ex) {	
-	
-		Log::Debug(ex.GetErrorMessage());
-
-	} catch(...) {	
-	
-		string errMsg = "";
-		errMsg.append("(FileMd5Probe) Unknown error attempting to get md5 information for the file '");
-		errMsg.append(filePath);
-		errMsg.append("'");
-		Log::Debug(errMsg);		
+		string digest = this->digest.digest(filePath, digestType);
+		digestEntity->SetValue(digest);
+	} catch (DigestException e) {
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+		digestEntity->SetStatus(OvalEnum::STATUS_ERROR);
+		item->AppendMessage(new OvalMessage("Couldn't compute digest: "+e.GetErrorMessage()));
 	}
-}
-
-void FileHashProbe::GetSha1(string filePath, Item* item) {
-	
-	// TODO: need to find an implementation of the sha1 algorithm and implement this function.
-	
-	item->AppendElement(new ItemEntity("sha1", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-	item->AppendMessage(new OvalMessage("sha1 hashing of files is not currently supported."));
 }
