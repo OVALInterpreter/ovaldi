@@ -56,7 +56,7 @@ CPPFLAGS = -Wall -O
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
@@ -119,7 +119,6 @@ OBJS = \
 	LiteralComponent.obj \
 	LocalVariable.obj \
 	Log.obj \
-	MD5.obj \
 	Object.obj \
 	ObjectComponent.obj \
 	ObjectEntity.obj \
@@ -168,7 +167,8 @@ OBJS = \
 	ShadowProbe.obj \
 	TextFileContent54Probe.obj \
 	InetdProbe.obj \
-	XinetdProbe.obj
+	XinetdProbe.obj \
+	Digest.obj
 
 ifneq (${PACKAGE_RPM}, )
 	OBJS += RPMInfoProbe.obj
@@ -220,7 +220,6 @@ REL_OBJS = \
 	$(BUILDDIR)/LiteralComponent.obj \
 	$(BUILDDIR)/LocalVariable.obj \
 	$(BUILDDIR)/Log.obj \
-	$(BUILDDIR)/MD5.obj \
 	$(BUILDDIR)/Object.obj \
 	$(BUILDDIR)/ObjectComponent.obj \
 	$(BUILDDIR)/ObjectEntity.obj \
@@ -269,7 +268,8 @@ REL_OBJS = \
 	$(BUILDDIR)/ShadowProbe.obj \
 	$(BUILDDIR)/TextFileContent54Probe.obj \
 	$(BUILDDIR)/InetdProbe.obj \
-	$(BUILDDIR)/XinetdProbe.obj
+	$(BUILDDIR)/XinetdProbe.obj \
+	$(BUILDDIR)/Digest.obj
 
 ifneq (${PACKAGE_RPM}, )
 	REL_OBJS += $(BUILDDIR)/RPMInfoProbe.obj
