@@ -77,7 +77,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib libeay32MTd.lib"
 				OutputFile="Debug/ovaldiD.exe"
 				Version="2.0"
 				LinkIncremental="2"
@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib libeay32MT.lib"
 				OutputFile="Release/ovaldi.exe"
 				Version="5.0"
 				LinkIncremental="1"
@@ -609,6 +609,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\src\Digest.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\DocumentManager.cpp"
 					>
 				</File>
@@ -639,31 +643,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\Log.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\src\MD5.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1248,6 +1227,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\Digest.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\DocumentManager.h"
 					>
 				</File>
@@ -1257,10 +1240,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\Log.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\src\MD5.h"
 					>
 				</File>
 				<File
