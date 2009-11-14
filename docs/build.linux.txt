@@ -151,9 +151,12 @@ Follow the instruction below to setup and install the supporting libraries.
 
        You can get source from http://openssl.org/source/ and build it yourself,
        or you can usually get a binary package using an installer specific to
-       your flavor of Linux (e.g. RPM for redhat, APT for debian).  The ovaldi
-       makefile already includes the proper variables and commandline to link to
-       OpenSSL. 
+       your flavor of Linux (e.g. RPM for redhat, APT for debian).  You will
+       probably need a developer version of the package so that you get the
+       header files necessary to compile against.  The ovaldi makefile already
+       includes the proper variables and commandline to link to OpenSSL, and
+       should work if the libraries and headers are in standard places.  If not,
+       you may need to make adjustments.
 
        For more information about OpenSSL please visit:
          http://openssl.org
