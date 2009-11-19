@@ -153,6 +153,10 @@ void Log::SetToScreen(bool screen) {
 	Log::toScreen = screen;
 }
 
+bool Log::GetToScreen(){
+	return Log::toScreen;
+}
+
 bool Log::IsDebug() {
 	return (Log::GetLevel() <= Log::DEBUG);
 }
