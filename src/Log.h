@@ -101,6 +101,7 @@ public:
 	static void SetLevel(string strLevel);
 	static void SetLevel(int level);
 	static void SetToScreen(bool screen);
+	static bool GetToScreen();
 
 	/** Return true if the Logger the current level is less than or equal to DEBUG. */
 	static bool IsDebug();
