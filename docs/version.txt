@@ -41,6 +41,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the REGEX::EscapeRegexChars() method such that it escapes all regular expression characters regardless of whether or not the regular expression character has been escaped. For example, if you had the string '\.test*?' it would evaluate to '\\\.test\*\?' instead of '\\.test\*\?'.
 * Fixed a few bugs in WindowsCommon.cpp that caused OVALDI to go into an infinite loop during data collection.  Thanks to Jens Miltner (http://sourceforge.net/users/jmiltner) for reporting these bugs and for providing the code to fix them. 
 * Fixed a bug in the Common::GetDefinitionSchematronPath() method that would prefix the definition schematron path with the XML schema path even if the definition schematron path was specified resulting in an incorrect definition schematron path.  Thanks to Tim Harrison (http://sourceforge.net/users/tharriso/) for reporting this bug and for explaining how this bug could be fixed.
+* Fixed a bug in the main() function that was causing the '-p' command line option to be ignored.
 
 ---------------------------------------
 ---        Version 5.6 build 3      ---
