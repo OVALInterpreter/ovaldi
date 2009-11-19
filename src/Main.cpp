@@ -76,6 +76,14 @@ int main(int argc, char* argv[]) {
 	// Send header to console.
 	cout << headerMessage;
 
+	#ifdef _DEBUG
+		Log::SetLevel(Log::DEBUG);
+		Log::SetToScreen(false);
+	#else
+		Log::SetLevel(Log::INFO);
+		Log::SetToScreen(false);
+	#endif
+
 	//////////////////////////////////////////////////////
 	/////////  Parse Command-line Options  ///////////////
 	//////////////////////////////////////////////////////
@@ -87,11 +95,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		// init the log system - set the log level here
-		#ifdef _DEBUG
-			Log::Init(Log::DEBUG, Common::GetLogFileLocation(), false);
-		#else
-			Log::Init(Log::INFO, Common::GetLogFileLocation(), false);
-		#endif
+		Log::Init(Log::GetLevel(), Common::GetLogFileLocation(), Log::GetToScreen());	
 	} catch (Exception ex) {
 		cout << "*** Log initialization error: " << ex.GetErrorMessage() << "\n\n\n----------------------------------------------------" << endl;
 		Usage();
