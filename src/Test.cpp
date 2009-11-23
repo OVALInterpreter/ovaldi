@@ -825,7 +825,7 @@ Test* Test::GetTestById(string testId) {
 	// if not found try to parse it.
 	if(test == NULL) {
 
-		DOMElement* testsElm = XmlCommon::FindElement(DocumentManager::GetDefinitionDocument(), "tests");
+		DOMElement* testsElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(),"tests");
 		DOMElement* testElm = XmlCommon::FindElementByAttribute(testsElm, "id", testId);
 
 		if(testElm == NULL) {
