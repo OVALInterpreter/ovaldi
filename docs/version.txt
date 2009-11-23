@@ -42,6 +42,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a few bugs in WindowsCommon.cpp that caused OVALDI to go into an infinite loop during data collection.  Thanks to Jens Miltner (http://sourceforge.net/users/jmiltner) for reporting these bugs and for providing the code to fix them. 
 * Fixed a bug in the Common::GetDefinitionSchematronPath() method that would prefix the definition schematron path with the XML schema path even if the definition schematron path was specified resulting in an incorrect definition schematron path.  Thanks to Tim Harrison (http://sourceforge.net/users/tharriso/) for reporting this bug and for explaining how this bug could be fixed.
 * Fixed a bug in the main() function that was causing the '-p' command line option to be ignored.
+* Fixed a bug in the Test::GetTestById() method that caused a test not to be found if the test in the OVAL definition used an XML namespace.
+* Fixed a bug in the State::GetStateById() method that caused a state not to be found if the state in the OVAL definition used an XML namespace.
 
 ---------------------------------------
 ---        Version 5.6 build 3      ---
