@@ -175,7 +175,7 @@ State* State::GetStateById(string stateId) {
 	// if not found try to parse it.
 	if(state == NULL) {
 
-		DOMElement* statesElm = XmlCommon::FindElement(DocumentManager::GetDefinitionDocument(), "states");
+		DOMElement* statesElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(), "states");
 		DOMElement* stateElm = XmlCommon::FindElementByAttribute(statesElm, "id", stateId);
 
 		if(stateElm == NULL) {
