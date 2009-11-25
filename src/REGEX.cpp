@@ -190,7 +190,7 @@ void REGEX::GetConstantPortion(string patternIn, string delimIn, string *pattern
 	while((nextDelim = (*patternOut).find(delimIn, 0)) != string::npos)
 	{
 		//	Get the next substring
-		tmpStr = (*patternOut).substr(0, nextDelim+1+delimLen);
+		tmpStr = (*patternOut).substr(0, nextDelim+delimLen);
 
 		//	Make sure the substring is constant
 		if(IsConstant(tmpStr))
@@ -199,7 +199,7 @@ void REGEX::GetConstantPortion(string patternIn, string delimIn, string *pattern
 			(*constOut)  = (*constOut)  + tmpStr;
 
 			// Remove the string from the pattern
-			(*patternOut) = (*patternOut).substr(nextDelim+1+delimLen, (*patternOut).length()-nextDelim+1+delimLen);
+			(*patternOut) = (*patternOut).substr(nextDelim+delimLen);
 			
 		}else{
 			
