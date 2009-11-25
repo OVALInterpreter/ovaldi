@@ -81,7 +81,7 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 
 	} else if(recurseDirection.compare("down") == 0 && maxDepth != 0) {
 		StringVector::iterator path;
-		for(path = paths->begin(); path != paths->end(); path++) {
+for(path = paths->begin(); path != paths->end(); path++) {
 			this->DownwardPathRecursion(behaviorPaths, (*path), maxDepth);
 		}
 	}
@@ -102,19 +102,23 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 
 	string patternOut= "";
 	string constPortion= "";
-	string fileSeperatorStr = "";
-	fileSeperatorStr+=Common::fileSeperator;
-	this->fileMatcher->GetConstantPortion(regex, fileSeperatorStr, &patternOut, &constPortion);
-	// Remove extra slashes
-	constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+	string fileSeperatorStr = Common::fileSeperatorStr;
 
+	// This optimization only applies when the regex is anchored to
+	// the beginning of paths. (regex has to start with '^')
+	if (isRegex && !regex.empty() && regex[0] == '^') {		
+		this->fileMatcher->GetConstantPortion(regex, fileSeperatorStr, &patternOut, &constPortion);
+		// Remove extra slashes
+		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+	}
+	
 	// Found a constant portion
 	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
 
 		//	Call search function
 		this->GetPathsForPattern(constPortion, regex, paths, isRegex);
 
-	//	No constant portion.
+		//	No constant portion.
 	} else if(constPortion.compare("") == 0) { 
 		
 		try  {
