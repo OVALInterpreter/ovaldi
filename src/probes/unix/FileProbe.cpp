@@ -209,34 +209,34 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	//////////////////////////////////////////////////////
 	char gidBuf[16];
     snprintf(gidBuf, sizeof(gidBuf), "%u", sbuf.st_gid);
-	item->AppendElement(new ItemEntity("group_id", gidBuf, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("group_id", gidBuf));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  user_id  /////////////////////
 	//////////////////////////////////////////////////////
 	char uidBuf[16];
     snprintf(uidBuf, sizeof(uidBuf), "%u", sbuf.st_uid);
-	item->AppendElement(new ItemEntity("user_id", uidBuf, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("user_id", uidBuf));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  a_time	 /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("a_time", Common::ToString((long)sbuf.st_atime), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("a_time", Common::ToString((long)sbuf.st_atime)));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  c_time	 /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("c_time", Common::ToString((long)sbuf.st_ctime), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("c_time", Common::ToString((long)sbuf.st_ctime)));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  m_time	 /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("m_time", Common::ToString((long)sbuf.st_mtime), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("m_time", Common::ToString((long)sbuf.st_mtime)));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  size     /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("size", Common::ToString((long)sbuf.st_size), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("size", Common::ToString((long)sbuf.st_size), OvalEnum::DATATYPE_INTEGER));
 
 	// File permissions
 
@@ -247,7 +247,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_ISUID)
 		suid = 1;
 
-	item->AppendElement(new ItemEntity("suid", Common::ToString(suid), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("suid", Common::ToString(suid), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  SGID  ///////////////////////
@@ -256,7 +256,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_ISGID)
 		sgid = 1;
 
-	item->AppendElement(new ItemEntity("sgid", Common::ToString(sgid), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("sgid", Common::ToString(sgid), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  STICKY  //////////////////////
@@ -265,7 +265,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_ISVTX)
 		sticky = 1;
 
-	item->AppendElement(new ItemEntity("sticky", Common::ToString(sticky), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("sticky", Common::ToString(sticky), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  UREAD  //////////////////////
@@ -274,7 +274,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IRUSR)
 		uread = 1;
 
-	item->AppendElement(new ItemEntity("uread", Common::ToString(uread), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("uread", Common::ToString(uread), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  UWRITE  //////////////////////
@@ -284,7 +284,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IWUSR)
 		uwrite = 1;
 
-	item->AppendElement(new ItemEntity("uwrite", Common::ToString(uwrite), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("uwrite", Common::ToString(uwrite), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  UEXEC  //////////////////////
@@ -294,7 +294,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IXUSR)
 		uexec = 1;
 
-	item->AppendElement(new ItemEntity("uexec", Common::ToString(uexec), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("uexec", Common::ToString(uexec), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  GREAD  //////////////////////
@@ -304,7 +304,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IRGRP)
 		gread = 1;
 
-	item->AppendElement(new ItemEntity("gread", Common::ToString(gread), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("gread", Common::ToString(gread), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  GWRITE  //////////////////////
@@ -314,7 +314,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IWGRP)
 		gwrite = 1;
 
-	item->AppendElement(new ItemEntity("gwrite", Common::ToString(gwrite), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("gwrite", Common::ToString(gwrite), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  GEXEC  //////////////////////
@@ -324,7 +324,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IXGRP)
 		gexec = 1;
 
-	item->AppendElement(new ItemEntity("gexec", Common::ToString(gexec), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("gexec", Common::ToString(gexec), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  OREAD  //////////////////////
@@ -334,7 +334,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IROTH)
 		oread = 1;
 
-	item->AppendElement(new ItemEntity("oread", Common::ToString(oread), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("oread", Common::ToString(oread), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  OWRITE  //////////////////////
@@ -344,7 +344,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IWOTH)
 		owrite = 1;
 
-	item->AppendElement(new ItemEntity("owrite", Common::ToString(owrite), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("owrite", Common::ToString(owrite), OvalEnum::DATATYPE_BOOLEAN));
 
 	//////////////////////////////////////////////////////
 	///////////////////////  OEXEC  //////////////////////
@@ -354,7 +354,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	if (mode & S_IXOTH)
 		oexec = 1;
 
-	item->AppendElement(new ItemEntity("oexec", Common::ToString(oexec), OvalEnum::DATATYPE_BOOLEAN, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("oexec", Common::ToString(oexec), OvalEnum::DATATYPE_BOOLEAN));
 
 	return item;
 }
