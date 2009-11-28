@@ -85,11 +85,14 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 
 	string patternOut= "";
 	string constPortion= "";
-	string fileSeperatorStr = "";
-	fileSeperatorStr+=Common::fileSeperator;
-	this->fileMatcher->GetConstantPortion(regex, fileSeperatorStr, &patternOut, &constPortion);
-	// Remove extra slashes
-	constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+
+	// This optimization only applies when the regex is anchored to
+	// the beginning of paths. (regex has to start with '^')
+	if (isRegex && !regex.empty() && regex[0] == '^') {		
+		this->fileMatcher->GetConstantPortion(regex, Common::fileSeperator, &patternOut, &constPortion);
+		// Remove extra slashes
+		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+	}
 
 	// Found a constant portion
 	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
