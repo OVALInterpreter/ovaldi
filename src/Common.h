@@ -211,8 +211,13 @@ class Common {
 		/** Removes whitespace at the start and end of the given string. */
 		static void TrimString(std::string& str);
 
+		static bool IsRegexChar(char c);
+
 		static char fileSeperator;
 		static string fileSeperatorStr;
+
+		/** All chars which are not interpreted literally in a regex. */
+		static const string REGEX_CHARS;
 
 		
 
@@ -242,6 +247,7 @@ class Common {
 
 		/** format required for a list of definitions ids */
 		static const string DEFINITION_ID_LIST;
+
 };
 
 /** 

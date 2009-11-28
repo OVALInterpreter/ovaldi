@@ -68,6 +68,7 @@ bool    Common::limitEvaluationToDefinitionIds = false;
 string  Common::definitionIds                  = "";
 string  Common::definitionIdsFile              = "";
 
+const string Common::REGEX_CHARS = "^$\\.[](){}*+?|";
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Accessors  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -792,6 +793,10 @@ void Common::TrimEnd(string &str) {
 void Common::TrimString(string &str) {
 	Common::TrimStart(str);
 	Common::TrimEnd(str);
+}
+
+bool Common::IsRegexChar(char c) {
+	return Common::REGEX_CHARS.find(c) != string::npos;
 }
 
 //****************************************************************************************//
