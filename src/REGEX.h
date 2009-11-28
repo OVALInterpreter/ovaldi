@@ -84,15 +84,6 @@ public:
 	int FindFirstRegexChar(const string stringIn);
 
 	/**
-		This function takes a string and searches for the last regular expression character. 
-		If one is found its location is returned. If none are found -1 is returned. Only
-		regular expression chars that are not escaped are considered. The following are
-		considered regular expression chars if they are not escaped:
-        ^ $ \ . [ ] ( ) { } * + ? |
-	*/
-	int FindLastRegexChar(const string stringIn);
-
-	/**
 		Return both the constant portion of a string and the remaining pattern. 
 		If no constant portion is found set constOut to "" If the entire string
 		is constant set patternOut to "". The input delimiter is used to ensure
@@ -106,7 +97,7 @@ public:
 	
 		If an error occures an exception is thrown
 	*/
-	void GetConstantPortion(string patternIn, string delimIn, string *patternOut, string *constOut);
+	void GetConstantPortion(string patternIn, char delimIn, string *patternOut, string *constOut);
 	
 	/**	Return true if the searchString matches the specified pattern.
 

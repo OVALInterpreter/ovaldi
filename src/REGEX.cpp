@@ -40,13 +40,12 @@ REGEX::~REGEX() {
 
 string REGEX::EscapeRegexChars(string stringIn) {
 	
-	string regexChars = "^$\\.[](){}*+?|";
 	string fixedString = stringIn;
 
-	size_t pos = fixedString.find_first_of(regexChars, 0);
+	size_t pos = fixedString.find_first_of(Common::REGEX_CHARS, 0);
 	while (pos != string::npos) {
 		fixedString.insert(pos, "\\");
-		pos = fixedString.find_first_of(regexChars, pos+2);			
+		pos = fixedString.find_first_of(Common::REGEX_CHARS, pos+2);			
 	}
 
 	return fixedString;	
@@ -54,124 +53,41 @@ string REGEX::EscapeRegexChars(string stringIn) {
 
 int REGEX::FindFirstRegexChar(const string stringIn) {
 	
-	string regexChars	= "^$\\.[](){}*+?|";
-	string prevChar		= "";
-	string curChar		= "";
-	string nextChar		= "";
-	unsigned int pos	= string::npos;
-	int slashCount		= 0;
-	int prevIndex		= 0;
-
-	pos = stringIn.find_first_of(regexChars, 0);
-
-	//	Check that one is found
-	if(pos == string::npos)
-		return -1;
-
-	while (pos != string::npos)
-	{
-		//	ensure that the char is not escaped
-		prevIndex = pos-1;
-		if(prevIndex == -1)
-			prevChar = "";
-		else
-			prevChar = stringIn.at(prevIndex);
-
-		curChar = stringIn.at(pos);
-		nextChar = stringIn.at(pos+1);
-		
-		//	If a '\' check that the next char is a '\'
-		if (strncmp(curChar.c_str(), "\\", 1) == 0)
-		{
-			if(strncmp(nextChar.c_str(), "\\", 1) == 0)
-			{
-				pos = stringIn.find_first_of(regexChars, pos+2);
-
-			}else
-			{
-				break;
+	for (string::size_type i = 0; i < stringIn.size(); ++i) {
+		if (stringIn[i] == '\\') {
+			// treat "\" at the end of a string as a literal char, not a regex
+			// char.
+			if (i < stringIn.size() - 1) {
+				// if the char following '\' is a regex char, ignore it.
+				// Otherwise, it's some sort of character class, and we
+				// found our regex char.
+				if (Common::IsRegexChar(stringIn[i+1]))
+					++i;
+				else
+					return i;
 			}
-			
-		}else
-		{
-			//	Get count of consecutive previous '\'s
-			slashCount = 0;
-			while(prevChar.compare("\\") == 0 && prevIndex > 0)
-			{
-				slashCount++;
-				prevChar = stringIn.at(--prevIndex);
-			}
-
-			if(slashCount % 2 == 0)
-				break;
-			
-			pos = stringIn.find_first_of(regexChars, pos+1);
-		}
+		} else if (Common::IsRegexChar(stringIn[i]))
+			return i;
 	}
 
-	return pos;	
+	return -1;
 }
 
-int REGEX::FindLastRegexChar(const string stringIn) {
-
-	string regexChars	= "^$\\.[](){}*+?|";
-	string prevChar		= "";
-	size_t pos	= string::npos;
-	int slashCount		= 0;
-	int prevIndex		= 0;
-
-	pos = stringIn.find_last_of(regexChars, stringIn.length());
-
-	// Check that at least one regex character is found.
-
-	if (pos == string::npos) return -1;
-
-	while (pos != string::npos)
-	{
-		// Ensure that the char in question is not escaped.
-
-		prevIndex = pos-1;
-
-		if ((prevIndex) == -1) prevChar = "";
-		else prevChar = stringIn.at(prevIndex);
-
-		if (strncmp(prevChar.c_str(), "\\", 1) == 0)
-		{
-			// We have to make sure the preceeding slash is not part of a double slash as
-			// that would negate the escape.  Get count of consecutive previous '\'s.  If
-			// it is an even number, then the regex character in question is not escaped.
-
-			slashCount = 1;
-			prevChar = stringIn.at(--prevIndex);
-
-			while(prevChar.compare("\\") == 0 && prevIndex > 0)
-			{
-				slashCount++;
-				prevChar = stringIn.at(--prevIndex);
-			}
-
-			if(slashCount % 2 == 0) break;
-			
-			pos = stringIn.find_last_of(regexChars, (pos - slashCount - 1));
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	return pos;	
-}
-
-void REGEX::GetConstantPortion(string patternIn, string delimIn, string *patternOut, string *constOut) {
+void REGEX::GetConstantPortion(string patternIn, char delimIn, string *patternOut, string *constOut) {
 	
 	size_t nextDelim = string::npos;
-	int delimLen = delimIn.length();
 	(*patternOut) = patternIn;
 	(*constOut) = "";
 	string tmpStr;
 	bool rmCarrot = false;
 	bool rmDollar = false;
+
+	// If the delim char is a regex char, it will appear in the path
+	// regex escaped.
+	string escapedDelim(1, delimIn);
+	if (Common::IsRegexChar(delimIn))
+		escapedDelim = "\\"+escapedDelim;
+	int delimLen = escapedDelim.length();
 
 	//	Check if the pattern starts with a carrot (^)
 	if((*patternOut).at(0) == '^')
@@ -187,7 +103,7 @@ void REGEX::GetConstantPortion(string patternIn, string delimIn, string *pattern
 		rmDollar = true;
 	}
 
-	while((nextDelim = (*patternOut).find(delimIn, 0)) != string::npos)
+	while((nextDelim = (*patternOut).find(escapedDelim)) != string::npos)
 	{
 		//	Get the next substring
 		tmpStr = (*patternOut).substr(0, nextDelim+delimLen);
@@ -234,12 +150,12 @@ bool REGEX::IsConstant(string pattern) {
 
 	size_t regexChar = string::npos;
 	bool constant = true;
-	
-	regexChar = FindFirstRegexChar(pattern);
-	
+
 	//	If length is 0 return true
 	if(pattern.length() == 0)
 		return true;
+
+	regexChar = FindFirstRegexChar(pattern);
 
 	if( regexChar != string::npos )
 	{
