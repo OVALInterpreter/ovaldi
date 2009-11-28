@@ -107,7 +107,7 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 	// This optimization only applies when the regex is anchored to
 	// the beginning of paths. (regex has to start with '^')
 	if (isRegex && !regex.empty() && regex[0] == '^') {		
-		this->fileMatcher->GetConstantPortion(regex, fileSeperatorStr, &patternOut, &constPortion);
+		this->fileMatcher->GetConstantPortion(regex, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes
 		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
 	}
@@ -189,13 +189,13 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 		// only consider dirs
 		if(S_ISDIR(statbuf.st_mode) == 1) {
 
-			// record it if it matches the regex.
-			if(this->IsMatch(pattern.c_str(), dirIn.c_str(), isRegex))
-				pathVector->push_back(dirIn);
-
 			//	Append a '/'
 			if(dirIn.at(dirIn.length()-1) != Common::fileSeperator)
 				dirIn.append("/");
+
+			// record it if it matches the regex.
+			if(this->IsMatch(pattern.c_str(), dirIn.c_str(), isRegex))
+				pathVector->push_back(dirIn);
 
 			//	Open the directory
 			dp = opendir(dirIn.c_str());
