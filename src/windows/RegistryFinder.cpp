@@ -545,8 +545,8 @@ void RegistryFinder::FindKeys ( string hiveStr, string regexStr, StringSet* keys
     string patternOutStr = "";
     string constPortionStr = "";
     string keySeparatorStr = "";
-    keySeparatorStr += RegistryFinder::keySeparator;
-    this->registryMatcher->GetConstantPortion ( regexStr, keySeparatorStr, &patternOutStr, &constPortionStr );
+
+    this->registryMatcher->GetConstantPortion ( regexStr, RegistryFinder::keySeparator, &patternOutStr, &constPortionStr );
     constPortionStr = this->registryMatcher->RemoveExtraSlashes ( constPortionStr );
 
     if ( constPortionStr.compare ( "" ) != 0 && patternOutStr.compare ( "" ) != 0 ) {
