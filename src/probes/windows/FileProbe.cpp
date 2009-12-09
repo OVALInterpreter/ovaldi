@@ -525,6 +525,12 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 		//////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////
+
+		//Close the file handle
+		if ( CloseHandle(hFile) == 0 ){
+			Log::Debug("Error: Unable to close the handle for "+filePath);
+		}
+
 	} catch(ProbeException ex) {	
 	
 		Log::Debug(ex.GetErrorMessage());
