@@ -488,6 +488,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\MetabaseProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\PasswordPolicyProbe.cpp"
 					>
 				</File>
@@ -1124,6 +1128,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\LockoutPolicyProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\MetabaseProbe.h"
 					>
 				</File>
 				<File
