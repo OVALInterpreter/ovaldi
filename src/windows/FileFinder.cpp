@@ -224,85 +224,87 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 		if ((dirIn.empty() == true) || (dirIn == ""))
 			return;
 
-		// Verify that the path that was passed into this function ends with a slash.  If
-		// it doesn't, then add one.
-		if (dirIn[dirIn.length()-1] != Common::fileSeperator)
-			dirIn.append(1, Common::fileSeperator);
-		
-		// Append a '*' to the end of the path to signify that we want to find all files
-		// in given directory.
-		string findDir;
-		findDir = dirIn + "*";
+		if ( this->PathExists(dirIn) ){
 
-		// Find the first file in the directory.  If this fails, then there is no reason
-		// to continue.
-		WIN32_FIND_DATA FindFileData;
-		HANDLE hFind = INVALID_HANDLE_VALUE;
+			// Verify that the path that was passed into this function ends with a slash.  If
+			// it doesn't, then add one.
+			if (dirIn[dirIn.length()-1] != Common::fileSeperator)
+				dirIn.append(1, Common::fileSeperator);
+			
+			if(this->IsMatch(pattern, dirIn, isRegex))
+				pathVector->push_back(dirIn);
 
-		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
-		if (hFind == INVALID_HANDLE_VALUE) {
+			// Append a '*' to the end of the path to signify that we want to find all files
+			// in given directory.
+			string findDir;
+			findDir = dirIn + "*";
 
-			DWORD errorNum = GetLastError();
+			// Find the first file in the directory.  If this fails, then there is no reason
+			// to continue.
+			WIN32_FIND_DATA FindFileData;
+			HANDLE hFind = INVALID_HANDLE_VALUE;
 
-			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
+			hFind = FindFirstFile(findDir.c_str(), &FindFileData);
+			if (hFind == INVALID_HANDLE_VALUE) {
 
-				// if the file is not found just return no need to report an error
-				return;
+				DWORD errorNum = GetLastError();
 
-			} else {
+				if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
+
+					// if the file is not found just return no need to report an error
+					return;
+
+				} else {
+					
+					// report other errors that might occure
+					string msg = WindowsCommon::GetErrorMessage(errorNum);
+					string errorMessage = "";
+					errorMessage.append("Error while seaching for matching file paths. " + msg);
+					errorMessage.append(" Directory: ");
+					errorMessage.append(dirIn);
+					errorMessage.append(" Pattern: ");
+					errorMessage.append(pattern);
+					throw FileFinderException(errorMessage);
+				}
+			}
+
+			//	Loop through each file in the directory.  
+			//	If a sub-directory is found, make a recursive call to GetFilePathsForPattern to search its contents.
+			//	If a file is found get the file path and check it against the pattern
+
+			do {
+
+				// Skip ., .., and System Volume 
+				if ((strncmp(FindFileData.cFileName, ".", 1) == 0) ||
+					(strncmp(FindFileData.cFileName, "..", 2) == 0) ||
+					(strncmp(FindFileData.cFileName, "System Volume Information", 25) == 0))
+				{
 				
-				// report other errors that might occure
+				// Found a dir
+				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+
+					string dirToSearch = dirIn;					
+					dirToSearch.append(FindFileData.cFileName);
+					GetPathsForPattern(dirToSearch, pattern, pathVector, isRegex);
+				
+				}
+			} while (FindNextFile(hFind, &FindFileData));
+
+			//	Close the handle to the file search object.
+			if(!FindClose(hFind)) {
+
+				DWORD errorNum = GetLastError();
 				string msg = WindowsCommon::GetErrorMessage(errorNum);
 				string errorMessage = "";
-				errorMessage.append("Error while seaching for matching file paths. " + msg);
+				errorMessage.append("Error: Unable to close search handle while trying to search for matching paths. " + msg);
 				errorMessage.append(" Directory: ");
 				errorMessage.append(dirIn);
 				errorMessage.append(" Pattern: ");
 				errorMessage.append(pattern);
-				throw FileFinderException(errorMessage);
+				throw FileFinderException(errorMessage);	
 			}
+
 		}
-
-		//	Loop through each file in the directory.  
-		//	If a sub-directory is found, make a recursive call to GetFilePathsForPattern to search its contents.
-		//	If a file is found get the file path and check it against the pattern
-
-		do {
-
-			// Skip ., .., and System Volume 
-			if ((strncmp(FindFileData.cFileName, ".", 1) == 0) ||
-				(strncmp(FindFileData.cFileName, "..", 2) == 0) ||
-				(strncmp(FindFileData.cFileName, "System Volume Information", 25) == 0))
-			{
-			
-			// Found a dir
-			} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-
-				string dirToSearch = dirIn;					
-				dirToSearch.append(FindFileData.cFileName);
-
-				if(this->IsMatch(pattern, dirToSearch, isRegex))
-					pathVector->push_back(dirToSearch);
-
-				GetPathsForPattern(dirToSearch, pattern, pathVector, isRegex);
-			
-			}
-		} while (FindNextFile(hFind, &FindFileData));
-
-		//	Close the handle to the file search object.
-		if(!FindClose(hFind)) {
-
-			DWORD errorNum = GetLastError();
-			string msg = WindowsCommon::GetErrorMessage(errorNum);
-			string errorMessage = "";
-			errorMessage.append("Error: Unable to close search handle while trying to search for matching paths. " + msg);
-			errorMessage.append(" Directory: ");
-			errorMessage.append(dirIn);
-			errorMessage.append(" Pattern: ");
-			errorMessage.append(pattern);
-			throw FileFinderException(errorMessage);	
-		}
-
 	//	Just need to ensure that all exceptions have a nice message. 
 	//	So rethrow the exceptions I created catch the others and format them.
 	} catch(Exception ex) {
