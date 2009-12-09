@@ -301,7 +301,7 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 			}
 
 			//	If not a directory check if a match
-			if(S_ISREG(statbuf.st_mode) == 0) {
+			if(S_ISREG(statbuf.st_mode)) {
 				string fileName = dirp->d_name;
 				if(this->IsMatch(pattern, fileName, isRegex))
 					fileNames->push_back(fileName);
