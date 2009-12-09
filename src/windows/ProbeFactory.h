@@ -80,6 +80,7 @@
 #include "FileAuditedPermissions53Probe.h"
 #include "RegKeyAuditedPermissionsProbe.h"
 #include "RegKeyAuditedPermissions53Probe.h"
+#include "MetabaseProbe.h"
 
 using namespace std;
 
