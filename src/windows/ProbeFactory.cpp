@@ -99,6 +99,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = RegKeyAuditedPermissionsProbe::Instance();
 	}else if (objectName.compare("regkeyauditedpermissions53_object") == 0 ){
 		probe = RegKeyAuditedPermissions53Probe::Instance();
+	}else if (objectName.compare("metabase_object") == 0 ){
+		probe = MetabaseProbe::Instance();
 	}else if(objectName.compare("auditeventpolicysubcategories_object") == 0) {
 		
 		// Supported on vista and later
