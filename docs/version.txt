@@ -44,7 +44,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the main() function that was causing the '-p' command line option to be ignored.
 * Fixed a bug in the Test::GetTestById() method that caused a test not to be found if the test in the OVAL definition used an XML namespace.
 * Fixed a bug in the State::GetStateById() method that caused a state not to be found if the state in the OVAL definition used an XML namespace.
-
+* Added support for the win-def:metabase_test.
 ---------------------------------------
 ---        Version 5.6 build 3      ---
 ---------------------------------------
