@@ -46,7 +46,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the State::GetStateById() method that caused a state not to be found if the state in the OVAL definition used an XML namespace.
 * Added support for the win-def:metabase_test.
 * Fixed a bug in the FileProbe::GetFileAttributes() method (Windows) so that it now closes the file handle.
-* Fixed a bug in the FileFinder::GetPathsForPattern() method such that it now adds the constant portion of the specified regular expression to the list of matching paths if the constant portion exists and matches the complete regular expression. 
+* Fixed a bug in the FileFinder::GetPathsForPattern() method such that it now adds the constant portion of the specified regular expression to the list of matching paths if the constant portion exists and matches the complete regular expression.
+* Added support for the xsd:choice structure on files which allows for the use of either the path and filename entities or the filepath entity.
+
 ---------------------------------------
 ---        Version 5.6 build 3      ---
 ---------------------------------------
