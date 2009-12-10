@@ -246,7 +246,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex) {
+void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -303,8 +303,14 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 			//	If not a directory check if a match
 			if(S_ISREG(statbuf.st_mode)) {
 				string fileName = dirp->d_name;
-				if(this->IsMatch(pattern, fileName, isRegex))
-					fileNames->push_back(fileName);
+				if ( isFilePath ){
+					string filepath = Common::BuildFilePath(path,fileName);
+					if(this->IsMatch(pattern,filepath,isRegex))
+						fileNames->push_back(filepath);
+				}else{
+					if(this->IsMatch(pattern, fileName, isRegex))
+						fileNames->push_back(fileName);
+				}
 			}
 		}
 

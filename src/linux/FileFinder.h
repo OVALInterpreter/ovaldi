@@ -62,7 +62,7 @@ private:
 	bool PathExists(string path);
 	bool FileNameExists(string path, string fileName);
 	void FindPaths(string regex, StringVector* paths, bool isRegex = true);
-	void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true);
+	void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
 	void GetPathsForPattern(string dirIn, string pattern, StringVector* pathVector, bool isRegex = true);	
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
