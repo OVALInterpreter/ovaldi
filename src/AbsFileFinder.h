@@ -54,7 +54,10 @@ using namespace std;
 */
 class AbsFileFinder {
 public:
+	/** AbsFileFinder constructor. */
 	AbsFileFinder();
+
+	/** AbsFileFinder destructor. */
 	virtual ~AbsFileFinder();
 
 	/** Return the set of filepaths as a vector of StringPairs that match the specified criteria. 
@@ -70,6 +73,12 @@ public:
 	*/
 	StringPairVector* SearchFiles(ObjectEntity* path, ObjectEntity* fileName, BehaviorVector* behaviors);
 
+	/** Return the set of filepaths as a vector of StringPairs that match the specified filepath ObjectEntity.
+	 *  @param filePath A ObjectEntity that represents the filepath(s) to retrieve. 
+	 *  @return A StringPairVector that contains all of matching filepaths where a StringPair represents the path and filename components of a matching filepath.
+	 */
+	StringPairVector* SearchFiles(ObjectEntity* filePath);
+
 	/** Return a vector of paths that match the specified criteria. */
 	StringVector* GetPaths(ObjectEntity* path, BehaviorVector* behaviors);
 
@@ -79,6 +88,12 @@ public:
 	*/
 	StringVector* GetFileNames(string path, ObjectEntity* fileName, BehaviorVector* behaviors = NULL);
 
+	/** Return a StringVector of filepaths that match the specified filePath ObjectEntity. 
+	 *  @param filePath A ObjectEntity that represents the filepath(s) to retrieve.
+	 *  @return A StringVector that contains all of the matching filepaths specified by the filePath ObjectEntity.
+	 */
+	StringVector* GetFilePaths(ObjectEntity* filePath);
+	
 	/** Return true if the calling probe should report that the path does not exist.
 		If a path's operator is set to OPERATOR_EQUALS and the path does not exist
 		the caller should report that the path was not found. When getting the value 
@@ -103,6 +118,13 @@ public:
 	*/
 	bool ReportFileNameDoesNotExist(string path, ObjectEntity* fileName, StringVector* fileNames);
 
+	/** Return true if the calling probe should report that the filepath does not exist.
+	 *  @param filePath A ObjectEntity that represents the filePath entity in an Object as defined in the OVAL Definition Schema.
+	 *  @param filePaths A StringVector that will be used to store all of the filepaths specified in the ObjectEntity that do not exist on the system.
+	 *  @return A boolean value that indicates whether or not there are filepaths that do not exist on the system that need to be reported.
+	 */
+	bool ReportFilePathDoesNotExist(ObjectEntity* filePath, StringVector* filePaths);
+
 protected:
 	
 	/** Return the set of matching paths after applying behaviors */
@@ -118,7 +140,7 @@ protected:
 	virtual void FindPaths(string regex, StringVector* paths, bool isRegex = true) = 0;
 	
 	/** Get the set of files in the specified directory that match the specified pattern. */
-	virtual void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true) = 0;
+	virtual void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false) = 0;
 	
 	/** Get the full path of the parent directory as a string. */
 	//virtual string GetParentDirectory(string path) = 0;
@@ -133,8 +155,6 @@ protected:
 	*/
 	bool IsMatch(string pattern, string value, bool isRegex = true);
 
-	REGEX *fileMatcher;
-
 	/** Do a recusive search down the file system until the specified maxDepth is hit. 
 	    Each directory traversed is added to the set of paths. If maxDepth is a positive
 		number it is decremented with each recursive call and recursion stops when the 
@@ -148,6 +168,23 @@ protected:
 		maxDepth is 0. If maxDepth is -1 recursion continues until no parent directory 
 		is found and a recursive call can not be made. */
 	void UpwardPathRecursion(StringVector* paths, string path, int maxDepth);
+
+	/** Get the set of filepaths that match the specified pattern. 
+	 *  @param pattern A string that contains the regular expression to be used during the matching process.
+	 *  @param filePaths A StringVector that will be used to store all of the matching filepaths.
+	 *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
+	 *  @return Void.
+	 */
+	void GetFilePathsForPattern(string pattern, StringVector* filePaths, bool isRegex = true);
+	
+	/** Return true if the specified filepath is found.
+	 *  @param filePath A string that represents the filepath whose existence you would like to determine.
+	 *  @return A boolean value that indicates whether or not the specified filepath exists.
+	 */
+	bool FilePathExists(string filePath);
+
+	REGEX *fileMatcher;
+
 };
 
 /** 

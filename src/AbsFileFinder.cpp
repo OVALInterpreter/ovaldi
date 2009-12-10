@@ -51,7 +51,6 @@ StringPairVector* AbsFileFinder::SearchFiles(ObjectEntity* path, ObjectEntity* f
 	StringVector* paths = this->GetPaths(path, behaviors);
 	StringVector::iterator pathIt;
 	for(pathIt = paths->begin(); pathIt != paths->end(); pathIt++) {
-		
 		// get all files if the file is not nil
 		if(fileName->GetNil()) {
 
@@ -63,17 +62,26 @@ StringPairVector* AbsFileFinder::SearchFiles(ObjectEntity* path, ObjectEntity* f
 			StringVector* fileNames = this->GetFileNames((*pathIt), fileName);
 			StringVector::iterator fileNameIt;
 			for(fileNameIt = fileNames->begin(); fileNameIt != fileNames->end(); fileNameIt++) {
-
 				StringPair* filePath = new StringPair((*pathIt), (*fileNameIt));
 				filePaths->push_back(filePath);
-
 			}
 			delete fileNames;
 		}
 	}
 	delete paths;
-
 	return filePaths;
+}
+
+StringPairVector* AbsFileFinder::SearchFiles(ObjectEntity* filePath){
+	StringVector* filePaths = this->GetFilePaths(filePath);
+	StringPairVector* filePathsPair = new StringPairVector();
+	for(StringVector::iterator it = filePaths->begin() ; it != filePaths->end() ; it++){
+		StringPair* fp = Common::SplitFilePath(*it);
+		filePathsPair->push_back(fp);
+	}
+	delete filePaths;
+	filePaths = NULL;
+	return filePathsPair;
 }
 
 StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behaviors) {
@@ -246,6 +254,36 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 	}
 }
 
+void AbsFileFinder::GetFilePathsForPattern(string pattern, StringVector* filePaths, bool isRegex){
+	StringVector* paths = new StringVector();
+	if ( isRegex ){
+		StringPair* fp = Common::SplitFilePath(pattern);
+		this->FindPaths(fp->first,paths,isRegex);
+		if ( fp != NULL ){
+			delete fp;
+			fp = NULL;
+		}
+	}else{
+		this->FindPaths(".*",paths,isRegex);
+	}
+	for(StringVector::iterator it = paths->begin() ; it != paths->end() ; it++){
+		this->GetFilesForPattern(*it, pattern, filePaths, isRegex, true);
+	}
+	delete paths;
+	paths = NULL;
+}
+
+bool AbsFileFinder::FilePathExists(string filePath){
+	bool exists = false;
+	StringPair* fpComponents = Common::SplitFilePath(filePath);
+	if ( fpComponents != NULL ){
+		exists = this->FileNameExists(fpComponents->first, fpComponents->second);
+		delete fpComponents;
+		fpComponents = NULL;
+	}
+	return exists;
+}
+
 StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName, BehaviorVector* behaviors) {
 
 	StringVector* fileNames = new StringVector();
@@ -278,12 +316,10 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName, B
 			// if they exist on the system
 			VariableValueVector::iterator iterator;
 			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
-				
 				if(this->FileNameExists(path, (*iterator)->GetValue())) {
 					fileNames->push_back((*iterator)->GetValue());
 				}
 			}
-
 		} else {
 	
 			// for not equals and pattern match fetch all files that
@@ -315,6 +351,77 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName, B
 	}
 
 	return fileNames;
+}
+
+StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
+
+	StringVector* filePaths = new StringVector();
+
+	// does this filePath use variables?
+	if(filePath->GetVarRef() == NULL) {
+		
+		// proceed based on operation
+		if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS) {
+			if(this->FilePathExists(filePath->GetValue())) {
+				filePaths->push_back(filePath->GetValue());
+			}
+
+		} else if(filePath->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
+			// turn the provided filePath value into a negative pattern match
+			// then get all that match the pattern
+			this->GetFilePathsForPattern(filePath->GetValue(), filePaths, false);
+
+		} else if(filePath->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
+			this->GetFilePathsForPattern(filePath->GetValue(), filePaths, true);
+		}		
+
+	} else {
+
+		StringVector* allfilePaths = new StringVector();
+
+		if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS) {
+			// in the case of equals simply loop through all the 
+			// variable values and add them to the set of all file names
+			// if they exist on the system
+			VariableValueVector::iterator iterator;
+			for(iterator = filePath->GetVarRef()->GetValues()->begin(); iterator != filePath->GetVarRef()->GetValues()->end(); iterator++) {
+				
+				if(this->FilePathExists((*iterator)->GetValue())) {
+					filePaths->push_back((*iterator)->GetValue());
+				}
+			}
+
+		} else {
+	
+			// for not equals and pattern match fetch all files that
+			// match any of the variable values.		
+
+			// loop through all variable values and call GetFilePathsForPattern
+			VariableValueVector* values = filePath->GetVariableValues();
+			VariableValueVector::iterator iterator;
+			for(iterator = values->begin(); iterator != values->end(); iterator++) {
+				if(filePath->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
+					this->GetFilePathsForPattern((*iterator)->GetValue(), allfilePaths, false);
+				} else {
+					this->GetFilePathsForPattern((*iterator)->GetValue(), allfilePaths, true);
+				}
+			}
+		}
+
+		// only keep files that match operation and value and var check
+		ItemEntity* tmp = new ItemEntity("filepath","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		StringVector::iterator it;
+		for(it = allfilePaths->begin(); it != allfilePaths->end(); it++) {
+			tmp->SetValue((*it));
+			if(filePath->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
+				filePaths->push_back((*it));
+			}
+		}
+		delete tmp;
+		delete allfilePaths;
+	}
+
+	return filePaths;
 }
 
 bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* paths) {
@@ -361,6 +468,32 @@ bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileNa
 			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
 				if(!this->FileNameExists(path, (*iterator)->GetValue())) {
 					fileNames->push_back((*iterator)->GetValue());
+					result = true;
+				}
+			}
+		}
+	}
+
+	return  result;
+}
+
+bool AbsFileFinder::ReportFilePathDoesNotExist(ObjectEntity *filePath, StringVector* filePaths) {
+
+	bool result = false;
+	
+	if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS) {		
+		
+		if(filePath->GetVarRef() == NULL) {
+			if(!this->FilePathExists(filePath->GetValue())) {
+				filePaths->push_back(filePath->GetValue());
+				result = true;
+			}
+		} else {
+
+			VariableValueVector::iterator iterator;
+			for(iterator = filePath->GetVarRef()->GetValues()->begin(); iterator != filePath->GetVarRef()->GetValues()->end(); iterator++) {
+				if(!this->FilePathExists((*iterator)->GetValue())) {
+					filePaths->push_back((*iterator)->GetValue());
 					result = true;
 				}
 			}
