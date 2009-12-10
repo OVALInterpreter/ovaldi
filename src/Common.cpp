@@ -770,6 +770,25 @@ string Common::BuildFilePath(const string path, const string filename) {
     return filePath;
 }
 
+StringPair* Common::SplitFilePath(const string filepath) {
+	if(filepath.compare("") == 0 ){
+        throw Exception("An empty-string filepath was specified when splitting a filepath.");
+	}
+
+	StringPair* fpComponents = NULL;
+	size_t position = filepath.rfind(Common::fileSeperator);
+	
+	if ( position != string::npos ){
+		fpComponents = new StringPair();
+		fpComponents->first = filepath.substr(0,position);
+		fpComponents->second = filepath.substr(position+1,filepath.length());
+		// add a file separator at the end of the path.
+		(fpComponents->first).append(1, Common::fileSeperator);
+	}
+    
+	return fpComponents;
+}
+
 void Common::TrimStart(string &str) {
 	// isspace is apparently overloaded, so the compiler doesn't know how to
 	//   instantiate the ptr_fun template with isspace... So I gotta use this

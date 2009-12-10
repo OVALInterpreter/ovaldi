@@ -202,6 +202,13 @@ class Common {
         */
         static string BuildFilePath(const string path, const string filename);
 
+		/**
+		 *	Split a valid filepath into its path and filename components. 
+		 *	@param filepath a non-NULL, non-empty, string representing the filepath that you would like split.
+		 *	@return a pointer to a StringPair that contains the path and filename components of the specified filepath.
+         */
+		static StringPair* SplitFilePath(const string filepath);
+
 		/** Removes whitespace at the start of the given string. */
 		static void TrimStart(std::string& str);
 
