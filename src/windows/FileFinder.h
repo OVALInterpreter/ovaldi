@@ -68,7 +68,7 @@ private:
 	/** This function gets all file names that match a given pattern on the spaecified path.
 	    If a match is found the filename is pushed on to a vector of strings.
 	*/
-	void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true);
+	void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
 
 	/** Search the file system for paths that match the provided regex.
 	    Attempt to break off a constant portion of the path to spead up searching. 

@@ -323,7 +323,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex) {
+void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
 
 	try {
 
@@ -384,10 +384,17 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 			} else {
 			
 				string fileName = FindFileData.cFileName;
-	
+
 				//	Check pattern
-				if(this->IsMatch(pattern, fileName, isRegex))
-					fileNames->push_back(fileName);
+				if ( isFilePath ){
+					string filepath = Common::BuildFilePath(path, fileName);
+					if(this->IsMatch(pattern, filepath, isRegex))
+						fileNames->push_back(filepath);
+				}else{
+					if(this->IsMatch(pattern, fileName, isRegex))
+						fileNames->push_back(fileName);
+				}
+
 			}
 		} while (FindNextFile(hFind, &FindFileData));
 
