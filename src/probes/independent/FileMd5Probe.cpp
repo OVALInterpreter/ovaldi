@@ -66,8 +66,20 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
     if(filePath != NULL)
         throw ProbeException("The filepath entity is not currently supported.");
 
+	#ifdef WIN32
+	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
+		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
+	}
+	#endif
+
 	FileFinder fileFinder;
 	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+
+	#ifdef WIN32
+	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
+		Log::Message("Error: Unable to disable all privileges.");
+	}
+	#endif
 
 	if(filePaths->size() > 0) {
 		// Loop through all file paths
