@@ -34,6 +34,10 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 ---        Version 5.6 build ?      ---
 ---------------------------------------
+* Added support for the unix-def:xinetd_test.
+* Added support for the unix-def:inetd_test.
+* Added the ability to specify a location for the log file using the '-y' command line option.
+* Fixed a bug in the Windows FileFinder::GetPathsForPattern() method that was causing the path value to be interpreted as a regular expression when the not equals operation was specified.
 * Fixed a heap corruption bug in the win-def:fileauditedpermissions_test, the win-def:fileeffectiverights_test, the win-def:regkeyauditedpermissions_test, and the win-def:regkeyeffectiverights_test that caused OVALDI to stop working under Windows Vista and caused Windows to trigger a breakpoint when run in debug mode.
 * Fixed bug in Common::ParseDefinitionIdsString() misuse of strtok.
 * Fixed a bug in the SubstringFunction::ComputeValue() method so that it now properly supports substring_start values that are less than 1.
@@ -41,10 +45,19 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the REGEX::EscapeRegexChars() method such that it escapes all regular expression characters regardless of whether or not the regular expression character has been escaped. For example, if you had the string '\.test*?' it would evaluate to '\\\.test\*\?' instead of '\\.test\*\?'.
 * Fixed a few bugs in WindowsCommon.cpp that caused OVALDI to go into an infinite loop during data collection.  Thanks to Jens Miltner (http://sourceforge.net/users/jmiltner) for reporting these bugs and for providing the code to fix them. 
 * Fixed a bug in the Common::GetDefinitionSchematronPath() method that would prefix the definition schematron path with the XML schema path even if the definition schematron path was specified resulting in an incorrect definition schematron path.  Thanks to Tim Harrison (http://sourceforge.net/users/tharriso/) for reporting this bug and for explaining how this bug could be fixed.
+* Replaced all hashing functionality with OpenSSL via a new Digest class.
+* Added SHA-1 hash support to the ind-def:filehash_test.
 * Fixed a bug in the main() function that was causing the '-p' command line option to be ignored.
 * Fixed a bug in the Test::GetTestById() method that caused a test not to be found if the test in the OVAL definition used an XML namespace.
 * Fixed a bug in the State::GetStateById() method that caused a state not to be found if the state in the OVAL definition used an XML namespace.
+* Fixed a bug in the UNIX FileProbe::GetFileAttributes() method that was setting the isObjectEntity flag for the entities group_id, user_id, a_time, c_time, m_time, size, suid, sgid, sticky, uread, uwrite, uexec, gread, gwrite, gexec, oread, owrite, and oexec to true when they should have been set to false.     
+* Fixed a bug in the UNIX FileProbe::GetFileAttributes() method that was setting the type of the size entity to OvalEnum::DATATYPE_STRING instead of OvalEnum::DATATYPE_INTEGER.
+* Fixed a off-by-one error in the REGEX::GetConstantPortion() method.
+* Changed all occurrences of the regular expression prefix optimization such that it is only applied when the regular expression begins with the '^' character.
+* Changed the REGEX::GetConstantPortion() method such that it takes the file separator as a character instead of a string.
+* Changed the FileFinder::GetPathsForPattern() method so that all paths to directories will end with the file separator character.
 * Added support for the win-def:metabase_test.
+* Fixed a bug in FileFinder::GetFilesForPattern() method such that it will now collect regular files instead of any file that is not a regular file. 
 * Fixed a bug in the FileProbe::GetFileAttributes() method (Windows) so that it now closes the file handle.
 * Fixed a bug in the FileFinder::GetPathsForPattern() method such that it now adds the constant portion of the specified regular expression to the list of matching paths if the constant portion exists and matches the complete regular expression.
 * Added support for the xsd:choice structure on files which allows for the use of either the path and filename entities or the filepath entity.
