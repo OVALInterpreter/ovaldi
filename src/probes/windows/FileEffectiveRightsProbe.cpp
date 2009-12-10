@@ -129,8 +129,16 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 		}		
 	}
 
+	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
+		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
+	}
+
 	FileFinder fileFinder;
 	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+
+	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
+		Log::Message("Error: Unable to disable all privileges.");
+	}
 
 	if(filePaths->size() > 0) {
 		// Loop through all file paths
