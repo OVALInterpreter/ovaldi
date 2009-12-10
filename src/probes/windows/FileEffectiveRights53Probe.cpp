@@ -84,8 +84,6 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
     ObjectEntity* filePath = object->GetElementByName("filepath");
-    if(filePath != NULL)
-        throw ProbeException("The filepath entity is not currently supported.");
 
 	ObjectEntity* trusteeSID = object->GetElementByName("trustee_sid");
 
@@ -130,9 +128,26 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 	}
 
 	FileFinder fileFinder;
-	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+	StringPairVector* filePaths = NULL;
+	
+	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
+		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
+	}
+	
+	if(filePath != NULL){
+		if ( (object->GetBehaviors())->size() > 0 ){
+			throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
+		}
+		filePaths = fileFinder.SearchFiles(filePath);	
+	}else{
+		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+	}
 
-	if(filePaths->size() > 0) {
+	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
+		Log::Message("Error: Unable to disable all privileges.");
+	}
+
+	if(filePaths != NULL && filePaths->size() > 0) {
 		// Loop through all file paths
 		StringPairVector::iterator iterator;
 		for(iterator = filePaths->begin(); iterator != filePaths->end(); iterator++) {
@@ -152,6 +167,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 						collectedItems->push_back(item);
@@ -203,6 +219,7 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 
 								Item* item = this->CreateItem();
 								item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 								item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 								item->AppendElement(new ItemEntity("filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 								item->AppendElement(new ItemEntity("trustee_sid", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
@@ -224,22 +241,62 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 		}
 
 	} else {
-		// if no filepaths check if the code should report that the path does not exist
-		StringVector paths;
-		if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+		if ( filePath != NULL ){
+			StringVector fpaths;
+			if (fileFinder.ReportFilePathDoesNotExist(filePath,&fpaths)){
+				StringVector statusValues;
+				Item* item = NULL;
+				StringPair* fpComponents = NULL;
 
-			Item* item = NULL;
-			StringVector::iterator iterator;
-			for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
+				// build path ObjectEntity to pass to ReportPathDoesNotExist to retrieve the status of the path value
+				ObjectEntity* pathStatus = new ObjectEntity("path","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
+				// build filename ObjectEntity to pass to ReportFileNameDoesNotExist to retrieve the status of the filename value
+				ObjectEntity* fileNameStatus = new ObjectEntity("filename","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
+				
+				for(StringVector::iterator iterator = fpaths.begin(); iterator != fpaths.end(); iterator++) {
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					fpComponents = Common::SplitFilePath(*iterator);
+					pathStatus->SetValue(fpComponents->first);
+					fileNameStatus->SetValue(fpComponents->second);
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					collectedItems->push_back(item);
+					
+					if ( fpComponents != NULL ){
+						delete fpComponents;
+						fpComponents = NULL;
+					}
+				}
 
-				item = this->CreateItem();
-				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-				collectedItems->push_back(item);
+				if ( pathStatus != NULL ){
+					delete pathStatus;
+					pathStatus = NULL;
+				}
+				if ( fileNameStatus != NULL ){
+					delete fileNameStatus;
+					fileNameStatus = NULL;
+				}
+			}
+		}else{
+			StringVector paths;
+			if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+				Item* item = NULL;
+				StringVector::iterator iterator;
+				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					collectedItems->push_back(item);
+				}
 			}
 		}
 	}
-	delete filePaths;
+	if ( filePaths != NULL ){
+		delete filePaths;
+		filePaths = NULL;
+	}
 
 	return collectedItems;
 }
@@ -290,6 +347,7 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 		Log::Debug("Creating item to hold file effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("trustee_sid", trusteeSID, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
