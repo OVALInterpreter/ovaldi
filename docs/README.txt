@@ -48,9 +48,10 @@ for more information.
   V    XERCES
   VI   XALAN
   VII  OPENSSL
-  VIII TROUBLESHOOTING
-  IX   REPORTING PROBLEMS
-  X    USEFUL LINKS
+  VIII OPENLDAP
+  IX   TROUBLESHOOTING
+  X    REPORTING PROBLEMS
+  XI   USEFUL LINKS
 
 
 -- I -- INSTALLATION --
@@ -250,7 +251,7 @@ for more information.
 
      Input Validation Options:
       -a dir name  = path to the directory that contains the OVAL schema and other xml resources. DEFAULT="xml"
-	  -m           = do not verify the oval-definitions file with an MD5 hash
+      -m           = do not verify the oval-definitions file with an MD5 hash
       -n           = perform Schematron validation of the oval-definitions file.
       -c filename  = path to xsl for oval-definitions Schematron validation. 
                      DEFAULT="oval-definitions-schematron.xsl"    
@@ -273,6 +274,7 @@ for more information.
      Other Options:
       -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
       -p           = print all information and error messages.
+      -y           = save the ovaldi.log file to a specific location.
       -z           = return md5 of current oval-definitions file.
 
 
@@ -308,7 +310,7 @@ for more information.
      -a -- Specifies the pathname of the directory that contains the OVAL
            schema and other xml resources. DEFAULT="xml"
 	 
-	 -m -- Run without requiring an MD5 checksum.  Running the
+     -m -- Run without requiring an MD5 checksum.  Running the
            Interpreter with this option DISABLES an important security
            feature.  In normal usage, a trusted checksum provided on the
            command line is used to verify the integrity of the OVAL
@@ -359,8 +361,10 @@ for more information.
      -l -- Logging level.  Log messages at the specified level. 
 	       (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
 
-	-p -- Verbose output.  Print all information and error message to the 
+     -p -- Verbose output.  Print all information and error message to the 
            console.
+
+     -y -- Save the ovaldi.log file to a specific location. 
 
      -z -- Calculates and prints to the screen the MD5 checksum of the
            current data file (definitions.xml by default, or as specified
@@ -490,7 +494,24 @@ For more information about OpenSSL visit:
 
 The source code is also available at the above Web site.
 
--- VIII -- TROUBLESHOOTING --
+-- VIII -- OPENLDAP --
+  
+The Definition Interpreter utilizes the open source OpenLDAP library to
+execute the LDAP probe.  The binary was compiled with version 2.3.27 of the
+OpenLDAP library.  From the OpenLDAP Web site:
+
+  "The OpenLDAP Project is a collaborative effort to develop a robust,  
+  commercial-grade, fully featured, and open source LDAP suite of  
+  applications and development tools. The project is managed by a
+  worldwide community of volunteers that use the Internet to communicate,
+  plan, and develop the OpenLDAP Suite and its related documentation."
+
+For more information about OpenLDAP visit:
+  http://www.openldap.org/
+
+The source code is also available at the above Web site.
+
+-- IX -- TROUBLESHOOTING --
 
 *********************************** 
 
@@ -560,7 +581,7 @@ for errors that are not common.  These could signify something that
 is working incorrectly.
 
 
--- IX -- REPORTING PROBLEMS --
+-- X -- REPORTING PROBLEMS --
 
 To report a problem with the OVAL Interpreter, please post a bug report
 on the OVAL Interpreter SourceForge site 
@@ -575,7 +596,7 @@ OVAL Web Site and join the "OVAL Repository Forum".
 http://oval.mitre.org/community/registration.html
 
 
--- X ­ USEFUL LINKS --
+-- XI ­ USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org/
 
