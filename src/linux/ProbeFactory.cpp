@@ -58,6 +58,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = XmlFileContentProbe::Instance();
 	} else if(objectName.compare("textfilecontent54_object") == 0) {
 		probe = TextFileContent54Probe::Instance();
+	 else if(objectName.compare("ldap_object") == 0) {
+		probe = LDAPProbe::Instance();
 
 // here are the objects defined in the unix schema
 	} else if(objectName.compare("file_object") == 0) {

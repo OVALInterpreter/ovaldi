@@ -66,6 +66,7 @@
 #include "RunLevelProbe.h"
 #include "XinetdProbe.h"
 #include "InetdProbe.h"
+#include "LDAPProbe.h"
 
 using namespace std;
 
