@@ -81,6 +81,7 @@
 #include "RegKeyAuditedPermissionsProbe.h"
 #include "RegKeyAuditedPermissions53Probe.h"
 #include "MetabaseProbe.h"
+#include "LDAPProbe.h"
 
 using namespace std;
 

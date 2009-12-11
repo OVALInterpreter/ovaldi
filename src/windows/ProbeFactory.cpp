@@ -135,6 +135,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileHashProbe::Instance();
 	} else if(objectName.compare("filemd5_object") == 0) {
 		probe = FileMd5Probe::Instance();
+	} else if(objectName.compare("ldap_object") == 0) {
+		probe = LDAPProbe::Instance();
 	} else {
 		Log::Info(objectName + " is not currently supported.");
 	}
