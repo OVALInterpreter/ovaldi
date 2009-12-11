@@ -484,6 +484,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\independent\LDAPProbe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\LockoutPolicyProbe.cpp"
 					>
 				</File>
@@ -1124,6 +1128,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\InterfaceProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\independent\LDAPProbe.h"
 					>
 				</File>
 				<File
