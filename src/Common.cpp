@@ -514,6 +514,19 @@ string Common::ToUpper(string s) {
 	return upperString;
 }
 
+string Common::ToLower(string s) {
+
+	string lowerString;
+	string::const_iterator iter;
+
+	for(iter = s.begin(); iter != s.end(); iter++)
+	{ 
+		lowerString += ::tolower(*iter);
+	}
+
+	return lowerString;
+}
+
 long long Common::StringToLongLong( char* numstr , char** endptr , int base ){
 
 	string numstrStr = numstr;

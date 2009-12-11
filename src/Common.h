@@ -180,6 +180,13 @@ class Common {
 		 *	@return A string of uppercase characters.
 		 */
 		static string ToUpper(string s);
+
+		/** Converts a string into a string of all lowercase characters.
+		 *	@param s The string that you would like to convert into all lowercase characters.
+		 *	@return A string of lowercase characters.
+		 */
+		static string Common::ToLower(string s);
+		
 		/** Converts a string into a long long integer. At some point, we might want to consider placing the error checking code in a separate method to allow more flexibility with the StringToLongLong() method. 
 		 *	@param numstr Pointer to the character string that you would like to convert into a long long integer.
 		 *	@param endptr Points to the first character in the character string that cannot be converted.
