@@ -56,7 +56,7 @@ CPPFLAGS = -Wall -O
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
@@ -168,7 +168,8 @@ OBJS = \
 	TextFileContent54Probe.obj \
 	InetdProbe.obj \
 	XinetdProbe.obj \
-	Digest.obj
+	Digest.obj \
+	LDAPProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
 	OBJS += RPMInfoProbe.obj
@@ -269,7 +270,8 @@ REL_OBJS = \
 	$(BUILDDIR)/TextFileContent54Probe.obj \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
-	$(BUILDDIR)/Digest.obj
+	$(BUILDDIR)/Digest.obj \
+	$(BUILDDIR)/LDAPProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
 	REL_OBJS += $(BUILDDIR)/RPMInfoProbe.obj
