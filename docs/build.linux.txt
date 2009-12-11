@@ -39,13 +39,15 @@ WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
           D. RPM Libraries
           E. APT Libraries
           F. OpenSSL Library
-          G. Building the OVAL Interpreter
+          G. OpenLDAP Library
+          H. Building the OVAL Interpreter
   III   PCRE
   IV    XERCES
   V     XALAN
   VI    OPENSSL
-  VII   REPORTING PROBLEMS
-  VIII  USEFUL LINKS
+  VII	OPENLDAP
+  VIII  REPORTING PROBLEMS
+  IX    USEFUL LINKS
 
 -- I -- OVERVIEW --
 
@@ -69,15 +71,15 @@ Download the appropriate installation files from the OVAL Web site.
 
   C. Supporting Libraries
 
-       The Interpreter relies on three c/c++ libraries that can be found
-       on the web. See sections III - V for more information about the
+       The Interpreter relies on five c/c++ libraries that can be found
+       on the web. See sections III - VII for more information about the
        specific libraries used and where to download their source from.
      
 -- II -- BUILD INSTRUCTIONS --
 
 The following instructions describe how to build the OVAL Interpreter on a
 Linux system.  The OVAL Interpreter has been built and tested on Red Hat 
-32 bit versions of Enterprise Linux 3 and 4. The source distribution includes
+32 bit versions of Enterprise Linux 3, 4, and 5. The source distribution includes
 a Makefile that has can be used to build the Interpreter on Linux systems.
 Before the Interpreter can be built the supporting libraries must be installed.
 Follow the instruction below to setup and install the supporting libraries.
@@ -161,7 +163,24 @@ Follow the instruction below to setup and install the supporting libraries.
        For more information about OpenSSL please visit:
          http://openssl.org
 
-  G. Building the OVAL Interpreter
+  G. OpenLDAP Library
+  
+      The Definition Interpreter utilizes the open source OpenLDAP library to
+      execute the LDAP probe.  From the OpenLDAP Web site:
+
+      "The OpenLDAP Project is a collaborative effort to develop a robust, 
+      commercial-grade, fully featured, and open source LDAP suite of 
+      applications and development tools. The project is managed by a
+      worldwide community of volunteers that use the Internet to communicate,
+      plan, and develop the OpenLDAP Suite and its related documentation."
+
+      For more information about OpenLDAP visit:
+        
+        http://www.openldap.org/
+
+      The source code is also available at the above Web site.	
+  	
+  H. Building the OVAL Interpreter
 
       After installing the PCRE, Xerces, and Xalan libraries, change into the 
       directory:
@@ -242,14 +261,32 @@ For more information about OpenSSL visit:
 
 The source code is also available at the above Web site.
 
--- VII -- REPORTING PROBLEMS --
+-- VII -- OPENLDAP --
+  
+      The Definition Interpreter utilizes the open source OpenLDAP library to
+      execute the LDAP probe.  The binary was compiled with version 2.3.27 of the
+      OpenLDAP library.  From the OpenLDAP Web site:
+
+      "The OpenLDAP Project is a collaborative effort to develop a robust, 
+      commercial-grade, fully featured, and open source LDAP suite of 
+      applications and development tools. The project is managed by a
+      worldwide community of volunteers that use the Internet to communicate,
+      plan, and develop the OpenLDAP Suite and its related documentation."
+
+      For more information about OpenLDAP visit:
+        
+        http://www.openldap.org/
+
+      The source code is also available at the above Web site.	
+
+-- VIII -- REPORTING PROBLEMS --
 
 To report a problem with OVAL Interpreter, please
 send an email with a brief description of the problem to 
 oval@mitre.org. Include the platform the Interpreter was run on, and
 the version of the Interpreter and definitions file.
 
--- VIII -- USEFUL LINKS --
+-- IX -- USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org
 
