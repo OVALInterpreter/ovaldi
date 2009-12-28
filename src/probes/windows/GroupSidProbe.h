@@ -27,8 +27,8 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
-#ifndef GroupSidProbe_H
-#define GroupSidProbe_H
+#ifndef GROUPSIDPROBE_H
+#define GROUPSIDPROBE_H
 
 #pragma warning(disable:4786)
 
