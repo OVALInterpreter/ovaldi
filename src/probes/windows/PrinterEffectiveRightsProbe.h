@@ -64,20 +64,20 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
    		 *  @param printerNameEntity A ObjectEntity that represents the printer_name entity in an Object as defined in the OVAL Definition Schema.
 		 *  @return A StringSet that contains all of the printers specified in the ObjectEntity.
 		 */
-		StringSet* PrinterEffectiveRightsProbe::GetPrinters ( ObjectEntity* printerNameEntity );
+		StringSet* GetPrinters ( ObjectEntity* printerNameEntity );
 
 		/** Retrieve all of the matching printers.
 		 *  @param patternStr A string that contains the pattern to be matched.
 		 *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
 		 *  @return A StringSet containing all of the matching printers.
 		 */
-		StringSet* PrinterEffectiveRightsProbe::GetMatchingPrinters ( string patternStr , bool isRegex );
+		StringSet* GetMatchingPrinters ( string patternStr , bool isRegex );
 
 		/** Determine if the printer exists on the system.
 		 *  @param printerNameStr A string that contains the name of the printer whose existenc you want to check.
 		 *  @return A boolean value that specifies whether or not the printer exists on the system.
 		 */
-		bool PrinterEffectiveRightsProbe::PrinterExists ( string printerNameStr );
+		bool PrinterExists ( string printerNameStr );
 
 		/** Retrieve all of the printers on the system.
 		 *  @return A pointer to a StringSet that contains all of the printers on the system.
