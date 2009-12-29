@@ -74,20 +74,20 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
          *  @param serviceNameEntity A ObjectEntity that represents the service_name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the services specified in the ObjectEntity.
          */
-        StringSet* ServiceEffectiveRightsProbe::GetServices ( ObjectEntity* serviceNameEntity );
+        StringSet* GetServices ( ObjectEntity* serviceNameEntity );
 
         /** Retrieve all of the matching services.
          *  @param patternStr A string that contains the pattern to be matched.
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching services.
          */
-        StringSet* ServiceEffectiveRightsProbe::GetMatchingServices ( string patternStr , bool isRegex );
+        StringSet* GetMatchingServices ( string patternStr , bool isRegex );
 
         /** Determine if the service exists on the system.
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
          *  @return A boolean value that specifies whether or not the service exists on the system.
          */
-        bool ServiceEffectiveRightsProbe::ServiceExists ( string serviceNameStr );
+        bool ServiceExists ( string serviceNameStr );
 
         /** Retrieve all of the services on the system.
          *  @return A pointer to a StringSet that contains all of the services on the system.
