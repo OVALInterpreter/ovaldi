@@ -173,7 +173,7 @@ class RegistryFinder {
 		 *	@param keyStr A string representing the key portion of the registry key.
          *  @return A string representing the registry key.
 		 */
-		static string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keyStr);
+		static string BuildRegistryKey(const string hiveStr, const string keyStr);
 				
 		/** Convert the hive name to the abbreviated hive name used by the Windows object for registry keys.
 		 *	@param hiveStr A string representing the hive portion of the registry key.
