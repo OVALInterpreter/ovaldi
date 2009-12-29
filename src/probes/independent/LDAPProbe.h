@@ -194,7 +194,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param item A Item that will have ldaptype and value ItemEntities appended to it.
 		 *  @return Void.
 		 */
-		void LDAPProbe::GetLdapItem ( string suffixStr, string relativeDnStr, string attributeStr, Item* item );
+		void GetLdapItem ( string suffixStr, string relativeDnStr, string attributeStr, Item* item );
 
 		/** Retrieve all of the attribute value types specified in the subschemasubentry attribute of the RootDSE entry.
 		 * @return a TypeMapMap containing all of the individual subschemas and their corresponding attributes and LDAP datatypes.
@@ -271,16 +271,16 @@ class LDAPProbe : public AbsProbe {
 		static const string SCOPE_SUBTREE;
 
 		/** A string that represents the namingcontexts attribute. */
-		static const string LDAPProbe::NAMING_CONTEXTS_ATTRIBUTE;
+		static const string NAMING_CONTEXTS_ATTRIBUTE;
 
 		/** A string that represents the subschemasubentry attribute. */
-		static const string LDAPProbe::SUBSCHEMA_SUBENTRY_ATTRIBUTE;
+		static const string SUBSCHEMA_SUBENTRY_ATTRIBUTE;
 
 		/** A string that represents the attributetypes attribute. */
-		static const string LDAPProbe::ATTRIBUTE_TYPES_ATTRIBUTE;
+		static const string ATTRIBUTE_TYPES_ATTRIBUTE;
 
 		/** A string that represents the objectclass attribute. */
-		static const string LDAPProbe::OBJECT_CLASS_ATTRIBUTE;
+		static const string OBJECT_CLASS_ATTRIBUTE;
 
 		/** A map of maps for storing multiple schemas and there associated attribute types and attribute type datatypes. */
 		TypeMapMap* types;
