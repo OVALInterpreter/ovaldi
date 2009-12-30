@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
 		if (!in) {
 			cerr << endl << "** ERROR: Could not open file. The specified definition file does not exist.";
 			Log::UnalteredMessage("\n** ERROR: Could not open file. The specified definition file does not exist.");
-			exit(0);
+			exit( EXIT_FAILURE );
 		}
 
 		// Create the md5 hash.  This constructor creates a new md5 object,
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
 		cout << endl << hashBuf << endl;
 		Log::UnalteredMessage(hashBuf);
 
-		exit(0);
+		exit( EXIT_SUCCESS );
 	}
 
 	//////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
 			cerr << errorMessage;
 			Log::Fatal(errorMessage);
 
-			exit(0);
+			exit( EXIT_FAILURE );
 		}
 	#endif
 
@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
 			cerr << "\nERROR: " << errorMessage;
 			Log::Fatal(errorMessage);
 
-			exit(0);
+			exit( EXIT_FAILURE );
 		}
 
 		// Create the md5 hash.  This constructor creates a new md5 object, updates the
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
 			cerr << "ERROR: " << errorMessage;
 			Log::Fatal(errorMessage);
 
-			exit(0);
+			exit( EXIT_FAILURE );
 		}
 	}
 
@@ -267,7 +267,7 @@ int main(int argc, char* argv[]) {
 
 			cerr << errorMessage;
 			Log::Fatal(errorMessage);
-			exit(0);
+			exit( EXIT_FAILURE );
 		}
 
 
@@ -295,7 +295,7 @@ int main(int argc, char* argv[]) {
 
 				cerr << errorMessage;
 				Log::Fatal(errorMessage);
-				exit(0);
+				exit( EXIT_FAILURE );
 			} else {
 				logMessage = "     - Schematron validation succeeded\n";
 				cout << logMessage;
@@ -499,7 +499,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 					continue;
 				} else {
 					Usage();
-					exit(0);
+					exit( EXIT_FAILURE );
 				}
 			}
 
@@ -511,7 +511,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetDataFile(argv[2]);
 						++argv;
@@ -524,7 +524,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 				case 'h':
 
 					Usage();
-					exit(0);
+					exit( EXIT_SUCCESS );
 
 					break;
 
@@ -533,7 +533,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetDataFile(argv[2]);
 						Common::SetUseProvidedData(true);
@@ -552,7 +552,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetDefinitionIdsString(argv[2]);
 						Common::SetLimitEvaluationToDefinitionIds(true);
@@ -567,7 +567,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetDefinitionIdsFile(argv[2]);
 						Common::SetLimitEvaluationToDefinitionIds(true);
@@ -589,7 +589,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetDefinitionSchematronPath(argv[2]);
 						Common::SetDoDefinitionSchematron(true);
@@ -611,7 +611,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetXMLfile(argv[2]);
 						++argv;
@@ -625,7 +625,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetOutputFilename(argv[2]);
 						++argv;
@@ -646,7 +646,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetXSLFilename(argv[2]);
 						++argv;
@@ -660,7 +660,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetXSLOutputFilename(argv[2]);
 						++argv;
@@ -674,7 +674,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 					
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetLogFileLocation(argv[2]);
 						++argv;
@@ -688,7 +688,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Log::SetLevel(argv[2]);
 						++argv;
@@ -710,7 +710,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					if ((argc < 3) || (argv[2][0] == '-')) {
 						Usage();
-						exit(0);
+						exit( EXIT_FAILURE );
 					} else {
 						Common::SetExternalVariableFile(argv[2]);
 						++argv;
@@ -724,7 +724,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 				if ((argc < 3) || (argv[2][0] == '-')) {
 					Usage();
-					exit(0);
+					exit( EXIT_FAILURE );
 				} else {
 					Common::SetSchemaPath(argv[2]);
 					++argv;
@@ -744,7 +744,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 				default:
 
 					Usage();
-					exit(0);
+					exit( EXIT_SUCCESS );
 			}
 
 			++argv;
@@ -754,7 +754,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 	} catch(Exception ex) {
 		cout << "*** Input error: " << ex.GetErrorMessage() << " Note that this message has not been written to the log file.\n\n\n----------------------------------------------------" << endl;
 		Usage();
-		exit(0);
+		exit( EXIT_FAILURE );
 	}
 
 	////////////////////////////////////////////////////////////
@@ -765,7 +765,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 		cerr << endl << "You must supply the MD5 hash for the xmlfile or use the -m ";
 		cerr << "command to skip the MD5 check." << endl;
 		Usage();
-		exit(0);
+		exit( EXIT_FAILURE );
 	}
 }
 
