@@ -226,17 +226,22 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 		if ( this->PathExists(dirIn) ){
 
-			// Verify that the path that was passed into this function ends with a slash.  If
-			// it doesn't, then add one.
-			if (dirIn[dirIn.length()-1] != Common::fileSeperator)
-				dirIn.append(1, Common::fileSeperator);
-			
+			// Make sure that the directory does not end with a file separator.
+			if ( dirIn.at(dirIn.length()-1) == Common::fileSeperator )
+				dirIn.erase(dirIn.length()-1,1);
+
 			if(this->IsMatch(pattern, dirIn, isRegex))
 				pathVector->push_back(dirIn);
 
 			// Append a '*' to the end of the path to signify that we want to find all files
 			// in given directory.
 			string findDir;
+	
+			// Verify that the path that was passed into this function ends with a slash.  If
+	 		// it doesn't, then add one.
+	 		if (dirIn[dirIn.length()-1] != Common::fileSeperator)
+	 			dirIn.append(1, Common::fileSeperator);
+
 			findDir = dirIn + "*";
 
 			// Find the first file in the directory.  If this fails, then there is no reason
