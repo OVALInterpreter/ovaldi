@@ -158,6 +158,10 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 	//
 	// -----------------------------------------------------------------------
 
+	//	Make sure the dir does not end with a file separator!
+	if(dirIn.at(dirIn.length()-1) == Common::fileSeperator)
+		dirIn.resize(dirIn.size()-1); // this will drop the last char
+
 	try {
 
 		struct stat statbuf;
@@ -189,10 +193,6 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 		// only consider dirs
 		if(S_ISDIR(statbuf.st_mode) == 1) {
 
-			//	Append a '/'
-			if(dirIn.at(dirIn.length()-1) != Common::fileSeperator)
-				dirIn.append("/");
-
 			// record it if it matches the regex.
 			if(this->IsMatch(pattern.c_str(), dirIn.c_str(), isRegex))
 				pathVector->push_back(dirIn);
@@ -212,9 +212,8 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				if(strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
 					continue;
 
-				//	append the name after the "/"
-				tmp = dirIn;
-				tmp.append(dirp->d_name);
+				//	append the name
+				tmp = dirIn + Common::fileSeperator + dirp->d_name;
 
 				// Nake recursive call
 				GetPathsForPattern(tmp, pattern, pathVector, isRegex);
