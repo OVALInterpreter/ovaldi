@@ -10,12 +10,12 @@
 
 The MITRE Corporation developed the OVAL Interpreter to 
 demonstrate the usability of the OVAL Language. The source for
-the Interpreter is freely available for reference use. This
+the OVAL Interpreter is freely available for reference use. This
 document describes the steps you need to build the OVAL 
 Interpreter.
 
-For information about using the Interpreter refer to the ReadMe.txt
-file included with the Interpreter, or the OVAL Web site.
+For information about using the OVAL Interpreter refer to the README.txt
+file included with the OVAL Interpreter, or the OVAL Web site.
 
       OVAL Interpreter:
       http://oval.mitre.org/language/download/interpreter/index.html
@@ -23,7 +23,7 @@ file included with the Interpreter, or the OVAL Web site.
 BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE
 TERMS AND CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS,
 DO NOT USE THE OVAL INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED
-WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
+WITH THE OVAL INTERPRETER, OR http://oval.mitre.org/oval/about/bsd_license.html.
 
 
 -- CONTENTS --
@@ -47,40 +47,46 @@ WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
 
 -- I -- OVERVIEW --
 
-Download the appropriate installation files from the OVAL Web site.
+Download the appropriate installation files from the OVAL Interpreter SourceForge site.
 
   A. Source Distributions
 
-       The source for the Interpreter is freely available on the OVAL
-       Web site.  There is currently a .zip file for windows users that
-       contains all the source code as well as a VC7.1 project 
-       interpreter.  To download the source go to:
+       The source for the OVAL Interpreter is freely available on the OVAL
+       Interpreter SourceForge site.  There is currently a .zip file for
+	   Windows users that contains all of the source code as well as a Visual
+	   C++ project for the OVAL Interpreter.  To download the source go to:
 
-            http://oval.mitre.org/language/download/interpreter/index.html
-
+            http://sourceforge.net/projects/ovaldi/files/
+		
+	   The latest source for the OVAL Interpreter is also freely available on
+	   the OVAL Interpreter SourceForge site and can be accessed via SVN.
+	   Please see the following link for more information:
+	   
+	       http://sourceforge.net/scm/?type=svn&group_id=215469
+		
   B. Source Distribution Contents
 
        The source code distribution contains the source for
-       the OVAL Interpreter and a Visual C++ 7.1 project. The source 
+       the OVAL Interpreter and a Visual C++ project. The source 
        distribution does not include the source for the libraries
-       needed to compile the Interpreter. 
+       needed to compile the OVAL Interpreter. 
 
   C. Supporting Libraries
 
-       The Interpreter relies on three c/c++ libraries that can be found
-       on the web. See sections III - V for more information about the
+       The OVAL Interpreter relies on four C/C++ libraries that can be found
+       on the Web. See sections III - VI for more information about the
        specific libraries used and where to download their source from.
 
 
 -- II -- BUILD INSTRUCTIONS --
 
 The following instructions describe how to build the OVAL Interpreter 
-on a Windows system.  The OVAL Interpreter has been built on windows 
+on a Windows system.  The OVAL Interpreter has been built on Windows 
 and tested on Windows 2000 and Windows XP Pro using VC8. The source 
-distribution includes a project file that has can be used to build the
-Interpreter.  Before the Interpreter can be built the supporting libraries
-must be installed. Follow the instruction below to setup and install the
-supporting libraries.
+distribution includes a project file that can be used to build the
+OVAL Interpreter.  Before the OVAL Interpreter can be built, the supporting
+libraries must be installed. Follow the instruction below to setup and
+install the supporting libraries.
 
   A. PCRE (Perl-compatible regular-expression) Library
  
@@ -94,7 +100,7 @@ supporting libraries.
        developer files, and documentation on your machine.  Run this setup
        program and follow the instructions provided. 
 
-       After the installation is complete you must add the PCRE lib and
+       After the installation is complete, you must add the PCRE lib and
        include directories to Visual C++. Add the following directory to 
        the include files search path:
        
@@ -105,14 +111,15 @@ supporting libraries.
           <installed path>\lib
 
        In Visual C++ 7 the UI for setting up directories can be found by clicking the
-       "Tools" menu then selecting "Options..." next selecting the "Project" folder
+       "Tools" menu then selecting "Options...", next selecting the "Project" folder,
        and then choosing the "VC++ Directories" item.     
 
 
   B. Xerces Library
 
-       Download install a binary distribution of version 2.7.0 of the xerces-c 
-       library. The download file can be found at:
+       Download and install a binary distribution of the xerces-c library.
+	   The OVAL Interpreter currently uses version 2.7.0 of the xerces-c
+	   library. The binary distribution file can be found at:
 
           http://archive.apache.org/dist/xml/xerces-c/binaries/
 
@@ -132,8 +139,10 @@ supporting libraries.
        and then choosing the "VC++ Directories" item. 
 
   C. Xalan Library
-       Download install a binary distribution of version 1.10.0 of the xalan-c 
-       library. The download file can be found at:
+      
+	   Download and install a binary distribution of the xalan-c library. The OVAL Interpreter
+	   currently uses version 1.10.0 of the xalan-c library. The binary distribution file can
+	   be found at:
 
           http://archive.apache.org/dist/xml/xalan-c/binaries/
 
@@ -180,14 +189,14 @@ supporting libraries.
       for the OVAL Interpreter. The project is in:
 
          Visual C++ 8:
-         <installed path>\Interpreters\project\Win32\VC8\OVALInterpreter.vcproj
+         <path to ovaldi directory>\project\Win32\VC8\OVALInterpreter.vcproj
 
       From the build menu simply select "build" to build the OVAL Interpreter.
       Note that a "Debug" and a "Release" build configuration is provided.
  
 -- III -- PCRE --
 
-The OVAL Interpreter uses the open source PCRE library.  The Interpreter
+The OVAL Interpreter uses the open source PCRE library.  The OVAL Interpreter
 currently uses version 6.3 of the PCRE library.  From the PCRE Web site:
 
   "Regular expression support is provided by the PCRE library 
@@ -198,7 +207,7 @@ For more information about PCRE visit:
 
     http://www.pcre.org
 
-To download the source code for PCRE, please use the following ftp
+To download the source code for PCRE, please use the following FTP
 site:
 
     ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
@@ -222,7 +231,7 @@ The source code is also available at the above Web site.
 -- V -- XALAN --
 
 The OVAL Interpreter uses the open source Xalan library.  The
-binary was compiled with version 1.10 of the xalan-c library.  From
+binary was compiled with version 1.10.0 of the xalan-c library.  From
 the Xalan Web site:
 
   "This product includes software developed by the Apache Software
@@ -240,8 +249,8 @@ The OVAL Interpreter uses the open-source OpenSSL library.
 
   The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
   the OpenSSL License and the original SSLeay license apply to the toolkit.
-  See below for the actual license texts. Actually both licenses are BSD-style
-  Open Source licenses. In case of any license issues related to OpenSSL
+  See below for the actual license texts. Actually, both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL,
   please contact openssl-core@openssl.org.
 
 Also, see the file LICENSE.openssl.
@@ -253,19 +262,22 @@ The source code is also available at the above Web site.
 
 -- VII -- REPORTING PROBLEMS --
 
-To report a problem with either OVAL Definition Interpreter, please
-send an email with a brief description of the problem to 
-oval@mitre.org. Include the platform the Interpreter was run on, and
-the version of the Interpreter and definitions file.
+To report a problem with OVAL Interpreter, please add a bug tracker item,
+or create a post on the OVAL Interpreter Help Project Forum, with a brief
+description of the problem on the OVAL Interpreter SourceForge site
+(http://sourceforge.net/projects/ovaldi/support). Please include the
+platform the OVAL Interpreter was run on, the version of the OVAL
+Interpreter, and the OVAL Definitions document that was used.
 
 -- VIII -- USEFUL LINKS -- 
 
 OVAL Web site -- http://oval.mitre.org
 
-OVAL Interpreter Source Code -- 
-http://oval.mitre.org/language/download/interpreter/index.html
+OVAL Interpreter Source Code -- http://sourceforge.net/projects/ovaldi/files/
 
-Terms of Use -- http://oval.mitre.org/about/bsd_license.html
+Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
+
+OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland

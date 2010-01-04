@@ -10,12 +10,12 @@
 
 The MITRE Corporation developed the OVAL Interpreter to 
 demonstrate the usability of the OVAL Language. The source for
-the Interpreter is freely available for reference use. This
+the OVAL Interpreter is freely available for reference use. This
 document describes the steps you need to build the OVAL 
-Interpreter.
+Interpreter on a Linux system.
 
-For information about using the Interpreter refer to the ReadMe.txt
-file included with the Interpreter, or the OVAL Web site.
+For information about using the OVAL Interpreter refer to the README.txt
+file included with the OVAL Interpreter, or the OVAL Web site.
 
       OVAL Interpreter:
       http://oval.mitre.org/language/download/interpreter/index.html
@@ -23,7 +23,7 @@ file included with the Interpreter, or the OVAL Web site.
 BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE
 TERMS AND CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS,
 DO NOT USE THE OVAL INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED
-WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
+WITH THE OVAL INTERPRETER, OR http://oval.mitre.org/oval/about/bsd_license.html.
 
 
 -- CONTENTS --
@@ -51,27 +51,33 @@ WITH THE INTERPRETER, OR http://oval.mitre.org/about/bsd_license.html.
 
 -- I -- OVERVIEW --
 
-Download the appropriate installation files from the OVAL Web site.
+Download the appropriate installation files from the OVAL Interpreter SourceForge site.
 
   A. Source Distributions
 
-       The source for the Interpreter is freely available on the OVAL
-       Web site.  There is currently a bzipped tarball for linux users 
-       that contains all the source code as well as a Makefile for 
-       the interpreter.  To download the source go to:
+       The source for the OVAL Interpreter is freely available on the OVAL
+	   Interpreter SourceForge site.  There is currently a bzipped tarball for Linux users 
+       that contains all of the source code as well as a Makefile for 
+       the OVAL Interpreter.  To download the source go to:
 
-            http://oval.mitre.org/language/download/interpreter/index.html
+            http://sourceforge.net/projects/ovaldi/files/
 
+	   The latest source for the OVAL Interpreter is also freely available on
+	   the OVAL Interpreter SourceForge site and can be accessed via SVN.
+	   Please see the following link for more information:
+	   
+	       http://sourceforge.net/scm/?type=svn&group_id=215469		
+			
   B. Source Distribution Contents
 
        The source code distribution contains the source for
        the OVAL Interpreter. The source distribution does not include
-       the source for the libraries needed to compile the Interpreter.
+       the source for the libraries needed to compile the OVAL Interpreter.
 
 
   C. Supporting Libraries
 
-       The Interpreter relies on five c/c++ libraries that can be found
+       The OVAL Interpreter relies on five c/c++ libraries that can be found
        on the web. See sections III - VII for more information about the
        specific libraries used and where to download their source from.
      
@@ -80,25 +86,25 @@ Download the appropriate installation files from the OVAL Web site.
 The following instructions describe how to build the OVAL Interpreter on a
 Linux system.  The OVAL Interpreter has been built and tested on Red Hat 
 32 bit versions of Enterprise Linux 3, 4, and 5. The source distribution includes
-a Makefile that has can be used to build the Interpreter on Linux systems.
-Before the Interpreter can be built the supporting libraries must be installed.
+a Makefile that can be used to build the OVAL Interpreter on Linux systems.
+Before the OVAL Interpreter can be built, the supporting libraries must be installed.
 Follow the instruction below to setup and install the supporting libraries.
 
   A. PCRE (Perl-compatible regular-expression) Library
  
-       Red Hat Enterprise 3 and Red Hat 9 generally include the PCRE 
+       Red Hat and Red Hat Enterprise Linux generally include the PCRE 
        library.  If it has not been installed your system, it is easiest
        to simply install the pcre-devel RPM, available from Red Hat via
        your install media or Internet download method.
 
   B. Xerces Library
 
-       The Definition Interpreter uses the open source Xerces library.  The
+       The OVAL Interpreter uses the open source Xerces library.  The
        binary was compiled with version 2.7.0 of the xerces-c library.  From
        the Xerces Web site:
 
          "This product includes software developed by the Apache Software
-	 Foundation (http://www.apache.org/)."
+	     Foundation (http://www.apache.org/)."
 
        For more information about Xerces visit:
 
@@ -112,12 +118,12 @@ Follow the instruction below to setup and install the supporting libraries.
 
   C. Xalan Library
 
-       The Definition Interpreter uses the open source Xalan library.  The
+       The OVAL Interpreter uses the open source Xalan library.  The
        binary was compiled with version 1.10.0 of the xalan-c library.  From
        the Xalan Web site:
 
          "This product includes software developed by the Apache Software
-	 Foundation (http://www.apache.org/)."
+	     Foundation (http://www.apache.org/)."
 
        For more information about Xerces visit:
 
@@ -131,9 +137,9 @@ Follow the instruction below to setup and install the supporting libraries.
 
   D. RPM
 
-      The Definition Interpreter can be compiled to utilize libraries provided by 
+      The OVAL Interpreter can be compiled to utilize libraries provided by 
       the RPM Package Manager (RPM) in order to complete certain RPM-specific tasks.
-      Utilizing RPM libraries will allow the Definition Interpreter to execute RPM
+      Utilizing RPM libraries will allow the OVAL Interpreter to execute RPM
       Probes.
 
       For more information about RPM please visit:
@@ -141,9 +147,9 @@ Follow the instruction below to setup and install the supporting libraries.
 
   E. APT
 
-      The Definition Interpreter can be compiled to utilize libraries provided by 
+      The OVAL Interpreter can be compiled to utilize libraries provided by 
       the Advanced Packaging Tool (APT) in order to complete certain APT-specific tasks.
-      Utilizing APT libraries will allow the Definition Interpreter to execute DPKG
+      Utilizing APT libraries will allow the OVAL Interpreter to execute DPKG
       Probes.
       
       For more information about APT please visit:
@@ -155,7 +161,7 @@ Follow the instruction below to setup and install the supporting libraries.
        or you can usually get a binary package using an installer specific to
        your flavor of Linux (e.g. RPM for redhat, APT for debian).  You will
        probably need a developer version of the package so that you get the
-       header files necessary to compile against.  The ovaldi makefile already
+       header files necessary to compile against.  The ovaldi Makefile already
        includes the proper variables and commandline to link to OpenSSL, and
        should work if the libraries and headers are in standard places.  If not,
        you may need to make adjustments.
@@ -165,7 +171,7 @@ Follow the instruction below to setup and install the supporting libraries.
 
   G. OpenLDAP Library
   
-      The Definition Interpreter utilizes the open source OpenLDAP library to
+      The OVAL Interpreter utilizes the open source OpenLDAP library to
       execute the LDAP probe.  From the OpenLDAP Web site:
 
       "The OpenLDAP Project is a collaborative effort to develop a robust, 
@@ -185,14 +191,13 @@ Follow the instruction below to setup and install the supporting libraries.
       After installing the PCRE, Xerces, and Xalan libraries, change into the 
       directory:
 
-        <installed path>\Interpreter\project\linux
+        <path to ovaldi directory>\project\linux
 
-      From that directory, simply run "make" to build the XML Definition
-      Interpreter.
+      From that directory, simply run "make" to build the OVAL Interpreter.
  
 -- III -- PCRE --
 
-The Interpreter uses the open source PCRE library.  The Interpreter
+The OVAL Interpreter uses the open source PCRE library.  The OVAL Interpreter
 currently uses version 6.3 of the PCRE library.  From the PCRE Web site:
 
   "Regular expression support is provided by the PCRE library 
@@ -203,14 +208,14 @@ For more information about PCRE visit:
 
     http://www.pcre.org
 
-To download the source code for PCRE, please use the following ftp
+To download the source code for PCRE, please use the following FTP
 site:
 
     ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
 
 -- IV -- XERCES --
 
-The Definition Interpreter uses the open source Xerces library.  The
+The OVAL Interpreter uses the open source Xerces library.  The
 binary was compiled with version 2.7.0 of the xerces-c library.  From
 the Xerces Web site:
 
@@ -231,7 +236,7 @@ The source code is also available at the above Web site.
 
 -- V -- XALAN --
 
-The Definition Interpreter uses the open source Xalan library.  The
+The OVAL Interpreter uses the open source Xalan library.  The
 binary was compiled with version 1.10.0 of the xalan-c library.  From
 the Xalan Web site:
 
@@ -250,8 +255,8 @@ The OVAL Interpreter uses the open-source OpenSSL library.
 
   The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
   the OpenSSL License and the original SSLeay license apply to the toolkit.
-  See below for the actual license texts. Actually both licenses are BSD-style
-  Open Source licenses. In case of any license issues related to OpenSSL
+  See below for the actual license texts. Actually, both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL,
   please contact openssl-core@openssl.org.
 
 Also, see the file LICENSE.openssl.
@@ -263,7 +268,7 @@ The source code is also available at the above Web site.
 
 -- VII -- OPENLDAP --
   
-      The Definition Interpreter utilizes the open source OpenLDAP library to
+      The OVAL Interpreter utilizes the open source OpenLDAP library to
       execute the LDAP probe.  The binary was compiled with version 2.3.27 of the
       OpenLDAP library.  From the OpenLDAP Web site:
 
@@ -281,18 +286,22 @@ The source code is also available at the above Web site.
 
 -- VIII -- REPORTING PROBLEMS --
 
-To report a problem with OVAL Interpreter, please
-send an email with a brief description of the problem to 
-oval@mitre.org. Include the platform the Interpreter was run on, and
-the version of the Interpreter and definitions file.
+To report a problem with OVAL Interpreter, please add a bug tracker item,
+or create a post on the OVAL Interpreter Help Project Forum, with a brief
+description of the problem on the OVAL Interpreter SourceForge site
+(http://sourceforge.net/projects/ovaldi/support). Please include the
+platform that the OVAL Interpreter was run on, the version of the OVAL
+Interpreter, and the OVAL Definitions document that was used.
 
 -- IX -- USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org
 
-OVAL Interpreter Source Code -- http://oval.mitre.org/language/download/interpreter/index.html
+OVAL Interpreter Source Code -- http://sourceforge.net/projects/ovaldi/files/
 
-Terms of Use -- http://oval.mitre.org/about/bsd_license.html
+Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
+
+OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland
