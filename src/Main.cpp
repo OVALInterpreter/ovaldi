@@ -807,7 +807,7 @@ void Usage() {
 	cout << "Other Options:" << endl;
 	cout << "   -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4)" << endl;
 	cout << "   -p           = print all information and error messages." << endl;
-	cout << "   -y           = save the ovaldi.log file to a specific location." << endl;
+	cout << "   -y <string>  = save the ovaldi.log file to a specific location." << endl;
 	cout << "   -z           = return md5 of current oval-definitions file." << endl;
 	cout << endl;
 }
