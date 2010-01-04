@@ -275,8 +275,6 @@ OVAL Web site -- http://oval.mitre.org
 
 OVAL Interpreter Source Code -- http://sourceforge.net/projects/ovaldi/files/
 
-Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
-
 OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
 ----------------------------------------------------------
