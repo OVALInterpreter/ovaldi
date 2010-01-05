@@ -1,4 +1,4 @@
-   	
+
 
 ****************************************************
 
@@ -12,21 +12,20 @@ The MITRE Corporation developed the Open Vulnerability and Assessment
 Language (OVAL) Interpreter to provide the OVAL Community with an open
 source reference implementation of the OVAL Language and its OVAL Definitions.
 The OVAL Interpreter uses OVAL Definitions to gather security relevant
-configuration information on a computer (e.g., rpm parameters, 
-registry keys, file information, etc.), analyze the information for 
-vulnerabilities and configuration issues, and report the results of the 
-analysis for each OVAL Definition. 
+configuration information on a computer (e.g., rpm parameters, registry keys,
+file information, etc.), analyze the information for vulnerabilities and
+configuration issues, and report the results of the analysis for each OVAL
+Definition. 
 
-You may download the OVAL Interpreter to any computer you wish, and to as
-many computers as you wish.  
+You may download the OVAL Interpreter to any computer you wish, and to as many
+computers as you wish.  
 
-BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE
-TERMS AND CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS, DO NOT
-USE THE OVAL INTERPRETER.
+BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE TERMS AND 
+CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS, DO NOT USE THE OVAL 
+INTERPRETER.
 
-Please refer to the terms.txt file or 
+For more information, please refer to the terms.txt file or: 
 http://oval.mitre.org/oval/about/bsd_license.html 
-for more information.
 
 
 -- CONTENTS --
@@ -35,7 +34,7 @@ for more information.
          A. Red Hat Linux 
          B. Sun Solaris
          C. Microsoft Windows
-		 D. Mac OS
+         D. Mac OS
   II   USING THE OVAL INTERPRETER
          A. Required Privileges
          B. Data Protection
@@ -72,12 +71,11 @@ for more information.
 
        # rpm -ivh <OVAL Interpreter RPM>
 
-       The RPM places the following files on the system.  To learn their
-       exact location after install, run:  rpm -ql ovaldi.
+       The RPM places the following files on the system.  To learn their exact
+       location after install, run:  rpm -ql ovaldi.
 
        Executables:
-       ovaldi.sh - Shell Script to simplify execution of the OVAL
-	               Interpreter
+       ovaldi.sh - Shell Script to simplify execution of the OVAL Interpreter
        ovaldi - OVAL Interpreter binary
 
        Libraries:
@@ -93,18 +91,19 @@ for more information.
 
        XML Schema:
        OVAL Schema files
-       evaluation-ids.xsd - XML Schema that defines a format for inputing a 
-                            set of OVAL Definition ids to evaluate.
+       evaluation-ids.xsd - XML Schema that defines a format for inputing a set
+                            of OVAL Definition ids to evaluate.
        xmldsig-core-schema.xsd - XML Digital Signature Schema
 
        XSL:
-       oval-definitions-schematron.xsl - OVAL Definition Schematron validation rules
-       results_to_html.xsl - A simple XSL that formats an OVAL Results document as HTML
+       oval-definitions-schematron.xsl - OVAL Definition Schematron validation
+                                         rules
+       results_to_html.xsl - A simple XSL that formats an OVAL Results document
+                             as HTML
  
-       The .so file for the Xerces library must be made accessible to
-       the OVAL Interpreter binary.  The ovaldi RPM places a 
-       pre-compiled version in /usr/lib/ovaldi and appends this directory
-       to your /etc/ld.so.conf file.
+       The .so file for the Xerces library must be made accessible to the OVAL
+       Interpreter binary.  The ovaldi RPM places a pre-compiled version in 
+       /usr/lib/ovaldi and appends this directory to your /etc/ld.so.conf file.
 
        To run the OVAL Interpreter, run:
 
@@ -112,10 +111,10 @@ for more information.
 
        A result summary will be output to the screen, and a detailed OVAL System
        Characteristics and OVAL Results document will be output to the current
-	   working directory.  By default, the OVAL System Characteristics document will be named
-	   system-characteristics.xml and the OVAL Results document will be named
-	   results.xml.
-	
+       working directory. By default, the OVAL System Characteristics document
+       will be named system-characteristics.xml and the OVAL Results document
+       will be named results.xml.
+    
   B. Sun Solaris Installation
 
        Not yet supported.
@@ -124,14 +123,13 @@ for more information.
   C. Microsoft Windows Installation
      
        The OVAL Interpreter can be installed and run on
-       Microsoft Windows NT/2000/XP/Server 2003/Vista/Server 2008.
+       Microsoft Windows NT/2000/XP/Server 2003/Vista/Server 2008/Windows 7.
 
        Install the OVAL Interpreter by running the installer
-       executable -  	ovaldi-X.X.X-setup.exe
+       executable -      ovaldi-X.X.X-setup.exe
 
-       The installer is a self-extracting zip archive that prompts
-       the user for an installation directory 
-       ('C:\Program Files\OVAL\ovaldi' by default)
+       The installer is a self-extracting zip archive that prompts the user for
+       an installation directory ('C:\Program Files\OVAL\ovaldi' by default)
        and installs the OVAL Interpreter and its supporting files.
 
        Executables:
@@ -151,13 +149,15 @@ for more information.
 
        XML Schema:
        OVAL Schema files
-       evaluation-ids.xsd - XML Schema that defines a format for inputing a 
-                            set of OVAL Definition ids to evaluate.
+       evaluation-ids.xsd - XML Schema that defines a format for inputing a set
+                            of OVAL Definition ids to evaluate.
        xmldsig-core-schema.xsd - XML Digital Signature Schema
 
        XSL:
-       oval-definitions-schematron.xsl - OVAL Definition Schematron validation rules
-       results_to_html.xsl - A simple XSL that formats an OVAL Results document as HTML
+       oval-definitions-schematron.xsl - OVAL Definition Schematron validation 
+                                         rules
+       results_to_html.xsl - A simple XSL that formats an OVAL Results document
+                             as HTML
 
   D. Mac OS Installation
 
@@ -168,17 +168,16 @@ for more information.
 
   A. Required Privileges -- IMPORTANT NOTE:
 
-     In order to collect all of the system configuration data required
-     to correctly evaluate OVAL Definitions, the OVAL Interpreter
-     MUST BE RUN WITH ADMINISTRATOR/ROOT PRIVILEGES.
+     In order to collect all of the system configuration data required to 
+     correctly evaluate OVAL Definitions, the OVAL Interpreter MUST BE RUN WITH
+     ADMINISTRATOR/ROOT PRIVILEGES.
 
      Certain system data referenced by OVAL Definitions is only
-     available to privileged accounts.  This includes information
-     about running processes, and potentially registry key and file
-     information (depending on local security settings).  While it is 
-     possible to run the OVAL Interpreter as a non-privileged user, 
-     the results of the analysis may not convey the true state of the
-     system.
+     available to privileged accounts.  This includes information about running
+     processes, and potentially registry key and file information (depending on
+     local security settings).  While it is possible to run the OVAL 
+     Interpreter as a non-privileged user, the results of the analysis may not
+     convey the true state of the system.
 
 
   B. Data Protection -- IMPORTANT NOTE:
@@ -206,9 +205,9 @@ for more information.
 
      Additionally it is recommended that you join the 
      "oval-discussion-list" email list.  A lightly moderated public
-	 forum for discussion related to new and previously posted OVAL
-	 Repository content, as well as the vulnerabilities and configuration
-	 issues themselves that affect OVAL Definition writing. To
+     forum for discussion related to new and previously posted OVAL
+     Repository content, as well as the vulnerabilities and configuration
+     issues themselves that affect OVAL Definition writing. To
      subscribe to the list, go to the Forum Sign-Up page on the
      OVAL Web Site.
 
@@ -265,7 +264,7 @@ for more information.
                      DEFAULT="oval-definitions-schematron.xsl"    
 
      Data Collection Options:
-	  -a dir name  = path to the directory that contains the OVAL schema and other xml resources. DEFAULT="xml"
+      -a dir name  = path to the directory that contains the OVAL schema and other xml resources. DEFAULT="xml"
       -i filename  = path to input System Characteristics file. Evaluation will
                      be based on the contents of the file.
 
@@ -297,16 +296,16 @@ for more information.
      -v -- Specifies the pathname of the OVAL Variables document to use.
            If a file is not specified, the OVAL Interpreter will default to
            "external-variables.xml" in the OVAL Interpreter installation
-		   directory.		   
+           directory.           
 
      -e -- Specifies a set of OVAL Definition ids to evaluate in the input
            OVAL Definitions document. OVAL Definition ids should be comma 
            separated without spaces. All OVAL Definitions in the list
            are evaluated in the input OVAL Definitions document if they
            exist in the input OVAL Definitions document. Any OVAL Definition ids
-		   that are not found will be assigned an error status. Any OVAL Definitions
-		   in the input OVAL Definitions document that are not in the list will be
-		   marked as 'Not Evaluated'.            
+           that are not found will be assigned an error status. Any OVAL Definitions
+           in the input OVAL Definitions document that are not in the list will be
+           marked as 'Not Evaluated'.            
 
      -f -- Specifies a the path to an XML file containing the set of
            OVAL Definition ids to evaluate in the input OVAL Definitions
@@ -315,8 +314,8 @@ for more information.
            evaluated if they exist in the input OVAL Definitions document. Any
            Definition ids not found will be assigned an error status. Any 
            OVAL Definitions in the input OVAL Definitions document that are not in the list
-		   will be marked as 'Not Evaluated'.  
-	 
+           will be marked as 'Not Evaluated'.  
+     
      -m -- Run without requiring an MD5 checksum.  Running the OVAL
            Interpreter with this option DISABLES an important security
            feature.  In normal usage, a trusted checksum provided on the
@@ -339,9 +338,9 @@ for more information.
            then the Interpreter will default to 
            "oval-definitions-schematron.xsl" in the OVAL Interpreter installation directory.
 
-	 -a -- Specifies the pathname of the directory that contains the OVAL
+     -a -- Specifies the pathname of the directory that contains the OVAL
            Schema and other XML resources. DEFAULT="xml"
-		   
+           
      -i -- Specifies the pathname of a OVAL System Characteristics document that
            is to be used as the basis of the analysis.  In this mode,
            the OVAL Interpreter does not perform data collection on the
@@ -369,7 +368,7 @@ for more information.
            will default to "results.html" in the OVAL Interpreter directory.
 
      -l -- Logging level.  Log messages at the specified level. 
-	       (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
+           (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
 
      -p -- Verbose output.  Print all information and error message to the 
            console.
@@ -630,7 +629,7 @@ OVAL Interpreter SourceForge Site -- http://sourceforge.net/projects/ovaldi/
 
 OVAL Repository -- http://oval.mitre.org/repository/
 
-Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
+OVAL Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
 
 OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
@@ -645,6 +644,6 @@ CVE -- http://cve.mitre.org/
 Making Security Measurable - http://msm.mitre.org/
 
 ----------------------------------------------------------
-OVAL is sponsored by US-CERT at the U.S. Department of Homeland
-Security. OVAL and the OVAL logo are trademarks of The MITRE
-Corporation. Copyright 2002-2010, The MITRE Corporation (www.mitre.org).
+OVAL is sponsored by US-CERT at the U.S. Department of Homeland Security. OVAL
+and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2010,
+The MITRE Corporation (www.mitre.org).
