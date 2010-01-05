@@ -226,10 +226,6 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 		if ( this->PathExists(dirIn) ){
 
-			// Make sure that the directory does not end with a file separator.
-			if ( dirIn.at(dirIn.length()-1) == Common::fileSeperator )
-				dirIn.erase(dirIn.length()-1,1);
-
 			if(this->IsMatch(pattern, dirIn, isRegex))
 				pathVector->push_back(dirIn);
 
