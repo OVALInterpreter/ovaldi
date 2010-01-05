@@ -546,9 +546,12 @@ void RegistryFinder::FindKeys ( string hiveStr, string regexStr, StringSet* keys
     string constPortionStr = "";
     string keySeparatorStr = "";
 
-    this->registryMatcher->GetConstantPortion ( regexStr, RegistryFinder::keySeparator, &patternOutStr, &constPortionStr );
-    constPortionStr = this->registryMatcher->RemoveExtraSlashes ( constPortionStr );
-
+	// This optimization only applies when the regex is anchored to
+	// the beginning of keys. (regex has to start with '^')
+	if (isRegex && !regexStr.empty() && regexStr[0] == '^') {	
+		this->registryMatcher->GetConstantPortion ( regexStr, RegistryFinder::keySeparator, &patternOutStr, &constPortionStr );
+		constPortionStr = this->registryMatcher->RemoveExtraSlashes ( constPortionStr );
+	}
     if ( constPortionStr.compare ( "" ) != 0 && patternOutStr.compare ( "" ) != 0 ) {
         this->GetRegistriesForPattern ( hiveStr, constPortionStr, regexStr, keys, isRegex );
 
@@ -691,6 +694,10 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
         return;
     }
 
+	if ( RegistryFinder::KeyExists(hiveStr,keyStr) && this->IsMatch( regexStr , keyStr , isRegex ) ){
+		keys->insert( keyStr );
+	}		
+
     // Verify that the key that was passed into this function ends with a slash.  If it doesn't, then add one.
     if ( keyStr[keyStr.length()-1] != RegistryFinder::keySeparator ) {
         keyStr.append ( 1, RegistryFinder::keySeparator );
@@ -713,11 +720,6 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
             string newKeyStr = keyStr;
             newKeyStr.append ( nameStr );
 			this->GetRegistriesForPattern( hiveStr, newKeyStr , regexStr, keys , isRegex );
-
-			if ( this->IsMatch( regexStr , newKeyStr , isRegex ) ){
-				keys->insert( newKeyStr );
-			}
-			
             size = MAX_PATH;
             ++index;
         }
