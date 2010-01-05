@@ -51,11 +51,10 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the Test::GetTestById() method that caused a test not to be found if the test in the OVAL definition used an XML namespace.
 * Fixed a bug in the State::GetStateById() method that caused a state not to be found if the state in the OVAL definition used an XML namespace.
 * Fixed a bug in the UNIX FileProbe::GetFileAttributes() method that was setting the isObjectEntity flag for the entities group_id, user_id, a_time, c_time, m_time, size, suid, sgid, sticky, uread, uwrite, uexec, gread, gwrite, gexec, oread, owrite, and oexec to true when they should have been set to false.     
-* Fixed a bug in the UNIX FileProbe::GetFileAttributes() method that was setting the type of the size entity to OvalEnum::DATATYPE_STRING instead of OvalEnum::DATATYPE_INTEGER.
-* Fixed a off-by-one error in the REGEX::GetConstantPortion() method.
+* Fixed a bug in the UNIX FileProbe::GetFileAttributes() method so that it now sets the datatype of the size entity of the unix-sc:file_item to OvalEnum::DATATYPE_INTEGER.
+* Fixed a bug in the REGEX::GetConstantPortion() method such that it now works when the path separator character is also a regular expression character.
 * Changed all occurrences of the regular expression prefix optimization such that it is only applied when the regular expression begins with the '^' character.
 * Changed the REGEX::GetConstantPortion() method such that it takes the file separator as a character instead of a string.
-* Changed the Windows and Linux FileFinder::GetPathsForPattern() methods so that all paths to directories will end with the file separator character.
 * Added support for the win-def:metabase_test.
 * Fixed a bug in the Linux FileFinder::GetFilesForPattern() method such that it will now collect regular files instead of any file that is not a regular file. 
 * Fixed a bug in the Windows FileProbe::GetFileAttributes() method so that it now closes the file handle.
