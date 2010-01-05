@@ -158,10 +158,6 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 	//
 	// -----------------------------------------------------------------------
 
-	//	Make sure the dir does not end with a file separator!
-	if(dirIn.at(dirIn.length()-1) == Common::fileSeperator)
-		dirIn.resize(dirIn.size()-1); // this will drop the last char
-
 	try {
 
 		struct stat statbuf;
@@ -206,6 +202,12 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				return;
 			}
 
+			//if the directory doesn't end in a file separator add it
+
+			if (dirIn.at(dirIn.length()-1) != Common::fileSeperator)
+			  dirIn.append(1, Common::fileSeperator);
+
+
 			//	Loop through all names in the directory and make recursive call
 			while((dirp = readdir(dp)) != NULL) {
 				//	Ignore dot and dot-dot
@@ -213,7 +215,8 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 					continue;
 
 				//	append the name
-				tmp = dirIn + Common::fileSeperator + dirp->d_name;
+			      
+				tmp = dirIn + dirp->d_name;
 
 				// Nake recursive call
 				GetPathsForPattern(tmp, pattern, pathVector, isRegex);
