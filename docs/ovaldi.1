@@ -1,17 +1,16 @@
-.TH ovaldi 1 "January 4, 2010" "Version 5.6.4" "USER COMMANDS"
+.TH ovaldi 1 "January 5, 2010" "Version 5.6.4" "USER COMMANDS"
 .SH NAME
 ovaldi \- a reference interpreter for the Open Vulnerability and Assessment Language
 .SH SYNOPSIS
 .B ovaldi
 [\-a dir name] [\-c filename] [\-d filename] [\-e <string>] [\-f filename] [\-i filename] [\-l <integer>] [\-o filename] [\-r filename] [\-t filename] [\-v filename] [\-x filename] [\-hmnpsyz] [MD5Hash]
 .SH DESCRIPTION
-The MITRE Corporation developed the Open Vulnerability and Assessment
-Language (OVAL) Interpreter to provide the OVAL Community with an open
-source reference implementation of the OVAL Language and its OVAL Definitions.
-The OVAL Interpreter uses OVAL Definitions to gather security relevant
-configuration information on a computer (e.g., rpm parameters,
-registry keys, file information, etc.), analyze the information for
-vulnerabilities and configuration issues, and report the results of the
+The MITRE Corporation developed the Open Vulnerability and Assessment Language
+(OVAL) Interpreter to provide the OVAL Community with an open source reference
+implementation of the OVAL Language. The OVAL Interpreter uses OVAL Definitions
+to gather security relevant configuration information on a computer (e.g., rpm
+parameters, registry keys, file information, etc.), analyze the information for
+vulnerabilities and configuration issues, and report the results of the 
 analysis for each OVAL Definition.
 .SH OPTIONS
 .TP
@@ -29,67 +28,66 @@ specified then the OVAL Interpreter will default to "external-variables.xml" in
 the OVAL Interpreter directory.
 .TP
 .B \-e definition id list
-Specifies a list of OVAL Definition ids to evaluate in the input OVAL Definitions
-document. Supply OVAL Definition ids as a comma separated list like: 
+Specifies a list of OVAL Definition ids to evaluate in the input OVAL 
+Definitions document. Supply OVAL Definition ids as a comma separated list
+like: 
 oval:com.example:def:123,oval:com.example:def:234
 .TP
 .B \-f filename
-Path to a file containing a list of OVAL Definitions to be evaluated. The 
-file must comply with the evaluation-id schema.
+Path to a file containing a list of OVAL Definitions to be evaluated. The file
+must comply with the evaluation-id schema.
 .TP
 .B \-m
 Run without requiring an MD5 checksum.  Running the OVAL Interpreter with this
 option DISABLES an important security feature.  In normal usage, a trusted
-checksum provided on the command line is used to verify the integrity of
-the OVAL Definitions document.
+checksum provided on the command line is used to verify the integrity of the
+OVAL Definitions document.
 
-Use of this option is recommended only when testing your own draft
-OVAL Definitions before submitting them to the OVAL Community Forum for public
+Use of this option is recommended only when testing your own draft OVAL
+Definitions before submitting them to the OVAL Community Forum for public 
 review.
 .TP
 .B \-n
 Perform Schematron validation of the OVAL Definitions document.
 .TP
 .B \-c filename
-Specifies the pathname of the oval-definitions-schematron.xsl
-to be used for Schematron validation. If none is specified 
-then the OVAL Interpreter will default to "oval-definitions-schematron.xsl"
-in the OVAL Interpreter directory.
+Specifies the pathname of the oval-definitions-schematron.xsl to be used for
+Schematron validation. If none is specified then the OVAL Interpreter will 
+default to "oval-definitions-schematron.xsl" in the OVAL Interpreter directory.
 .TP
 .B \-a dir name
-Specifies the pathname of the directory that contains the OVAL
-Schema and other XML resources. DEFAULT="xml"
+Specifies the pathname of the directory that contains the OVAL Language Schema
+and other XML resources. DEFAULT="xml"
 .TP
 .B \-i filename
-Specifies the pathname of a OVAL System Characteristics document that is to be used
-as the basis of the analysis.  In this mode, the OVAL Interpreter does not
-perform data collection on the local system, but relies upon the input
-file, which may have been generated on another system.
+Specifies the pathname of a OVAL System Characteristics document that is to be
+used as the basis of the analysis.  In this mode, the OVAL Interpreter does not
+perform data collection on the local system, but relies upon the input file, 
+which may have been generated on another system.
 .TP
 .B \-d filename
-Specifies the pathname of the file to which collected configuration data is
-to be saved. This data is stored in the format defined by the OVAL Systems
+Specifies the pathname of the file to which collected configuration data is to
+be saved. This data is stored in the format defined by the OVAL Systems
 Characteristics Schema.
 .TP
 .B \-r filename
-Specifies the pathname of the file to which analysis results are to be
-saved.  This data is stored according to the format defined by the OVAL
-Results Schema.  If none is specified than the OVAL Interpreter will default to
-"results.xml" in the OVAL Interpreter directory.
+Specifies the pathname of the file to which analysis results are to be saved.
+This data is stored according to the format defined by the OVAL Results Schema.
+If none is specified than the OVAL Interpreter will default to "results.xml" in
+the OVAL Interpreter directory.
 .TP
 .B \-s
 If set do not apply the XSL to the OVAL Results xml.
 .TP
 .B \-t filename
-Specifies the pathname of the XSL file which should be used to
-transform the OVAL Results document. If none is specified then the
-OVAL Interpreter will default to "results_to_html.xsl" in the OVAL
-Interpreter directory.
+Specifies the pathname of the XSL file which should be used to transform the 
+OVAL Results document. If none is specified then the OVAL Interpreter will 
+default to "results_to_html.xsl" in the OVAL Interpreter directory.
 .TP
 .B \-x filename
-Specifies the pathname of the file which XSL transform results
-are to be saved.  If none is specified then the OVAL Interpreter
-will default to "results.html" in the OVAL Interpreter directory.
+Specifies the pathname of the file which XSL transform results are to be saved.
+If none is specified then the OVAL Interpreter will default to "results.html" 
+in the OVAL Interpreter directory.
 .TP
 .B \-l <integer>
 Logging level.  Log messages at the specified level. 
@@ -99,17 +97,18 @@ Logging level.  Log messages at the specified level.
 Verbose output. Print all information and error message to the console.
 .TP
 .B \-y dir name
-Save the ovaldi.log file to a specific location.  The default location is
-the current working directory when the executable is run.
+Save the ovaldi.log file to a specific location.  The default location is the
+current working directory when the executable is run.
 .TP
 .B \-z
-Calculates and prints to the screen the MD5 checksum of the current data
-file (definitions.xml by default, or as specified by the \-o option).  This
-can be used to manually compare the current file with the trusted checksum
-available from the OVAL Web site.
+Calculates and prints to the screen the MD5 checksum of the current data file
+(definitions.xml by default, or as specified by the \-o option).  This can be
+used to manually compare the current file with the trusted checksum available
+from the OVAL Web site.
 .SH EXAMPLES
 .TP
-Run the OVAL Interpreter against the Linux OVAL Definitions document, without verifying MD5 checksum:
+Run the OVAL Interpreter against an OVAL Definitions document, without 
+verifying MD5 checksum:
 .B ovaldi
 \-a /usr/share/ovaldi
 \-o linux.definitions.xml
@@ -117,6 +116,6 @@ Run the OVAL Interpreter against the Linux OVAL Definitions document, without ve
 .SH FILES
 .TP
 /usr/share/ovaldi/*.xsd
-The OVAL Schema files for the OVAL language.
+The OVAL Language scheam files.
 .SH AUTHOR
 Man page written by Jonathan Baker (bakerj@mitre.org)
