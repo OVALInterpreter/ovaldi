@@ -163,8 +163,9 @@ protected:
 
 	/** 
 		Create a set of items that exist only in one of the specified sets. 
-		From the schema documentation....
-		The intersection of two sets in OVAL results in a set that contains 
+		From the oval-definitions-schema documentation...
+		
+        The intersection of two sets in OVAL results in a set that contains 
 		everything that belongs to both sets in the collection, but nothing else. 
 		If A and B are sets, then the intersection of A and B contains all 
 		the elements of A that also belong to B, but no other elements.

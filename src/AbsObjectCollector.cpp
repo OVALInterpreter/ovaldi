@@ -168,8 +168,7 @@ bool AbsObjectCollector::ExistsInSet(ItemVector* itemSet, Item* item) {
 
 	bool exists = false;
 	
-	ItemVector::iterator iterator;
-	for(iterator = itemSet->begin(); iterator != itemSet->end(); iterator++) {
+	for(ItemVector::iterator iterator = itemSet->begin(); iterator != itemSet->end(); iterator++) {
 		if(item->GetId() == (*iterator)->GetId()) {
 			exists = true;
 			break;
@@ -212,16 +211,8 @@ CollectedSet* AbsObjectCollector::Intersection(CollectedSet* collectedSet1, Coll
 	ItemVector* itemSet2 = collectedSet2->GetItems();
 
 	// Add the items from set 1 that exist in set 2
-	ItemVector::iterator iterator;
-	for(iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
+	for(ItemVector::iterator iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(this->ExistsInSet(itemSet2, (*iterator))) {
-			resultItems->push_back((*iterator));
-		}
-	}
-
-	// Add the items from set 2 that exist in set 1
-	for(iterator = itemSet2->begin(); iterator != itemSet2->end(); iterator++) {
-		if(this->ExistsInSet(itemSet1, (*iterator))) {
 			resultItems->push_back((*iterator));
 		}
 	}
