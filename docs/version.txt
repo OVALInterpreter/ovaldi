@@ -32,7 +32,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
----        Version 5.6 build ?      ---
+---        Version 5.6 build 4      ---
 ---------------------------------------
 * Added support for the unix-def:xinetd_test.
 * Added support for the unix-def:inetd_test.
@@ -62,6 +62,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the xsd:choice structure on files which allows for the use of either the path and filename entities or the filepath entity.
 * Enabled the SE_BACKUP_NAME privilege when searching for files on Windows because it provides the interpreter with read access to all files and directories. Any other access attempts, with this privilege enabled, will still go through the ACL.
 * Added support for the ind-def:ldap_test.
+* Fixed bug in AbsObjectCollector::Intersection() to ensure that the resulting set contains only unique items.
 
 ---------------------------------------
 ---        Version 5.6 build 3      ---
