@@ -34,8 +34,8 @@
 #
 
 #
-# Test to make sure the user has either supplied their own defs or
-# that they exist in the default location.
+# Test to make sure the user has either supplied their own OVAL
+# Definitions document or that one exists in the default location.
 #
 if [ $# == 1 ]; then
   DEFS="$1"
@@ -57,12 +57,12 @@ fi
 DATE=`/bin/date +%F--%T`
 
 #
-# Next, run the definition interpreter pointing it to the locations of the
+# Next, run the OVAL Interpreter pointing it to the locations of the
 # files it uses.
 #
 
 cd /var/log/ovaldi
-/usr/sbin/ovaldi -d /var/log/ovaldi/data-$DATE.xml \
+/usr/sbin/ovaldi -d /var/log/ovaldi/system-characteristics-$DATE.xml \
      -r /var/log/ovaldi/results-$DATE.xml \
      -a /usr/share/ovaldi \
      -x /var/log/ovaldi/results-$DATE.html \
@@ -70,6 +70,6 @@ cd /var/log/ovaldi
      -m \
 
 echo ...
-echo Results-related files are stored in /var/log/ovaldi.
+echo The OVAL System Characteristics and OVAL Results documents are stored in /var/log/ovaldi.
 echo ...
 
