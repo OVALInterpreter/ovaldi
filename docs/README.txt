@@ -633,9 +633,9 @@ OVAL Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
 
 OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
-CCE -- http://cpe.mitre.org/
+CCE -- http://cce.mitre.org/
 
-CPE -- http://cce.mitre.org/
+CPE -- http://cpe.mitre.org/
 
 CWE -- http://cwe.mitre.org/
 
