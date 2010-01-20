@@ -37,7 +37,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a ObjectComponent in a local_variable in the oval definition schema.
@@ -46,7 +45,7 @@ class ObjectComponent : public AbsComponent {
 public:
 
     /** Create a complete ObjectComponent object/ */
-	ObjectComponent(string objectId = "", string itemField = "");
+	ObjectComponent(std::string objectId = "", std::string itemField = "");
 	~ObjectComponent();
 
     /** Parse the ObjectComponent element and populate the current ObjectComponent. */
@@ -67,18 +66,18 @@ public:
 	VariableValueVector* GetVariableValues();
 
     /** Return the objectId field's value. */
-	string GetObjectId();
+	std::string GetObjectId();
     /** Set the objectId field's value. */
-	void SetObjectId(string objectId);
+	void SetObjectId(std::string objectId);
 
     /** Return the itemField field's value. */
-	string GetItemField();
+	std::string GetItemField();
     /** Set the itemField field's value. */
-	void SetItemField(string itemField);
+	void SetItemField(std::string itemField);
 
 private:
-	string objectId;
-	string itemField;
+	std::string objectId;
+	std::string itemField;
 };
 
 #endif

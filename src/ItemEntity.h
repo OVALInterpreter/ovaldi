@@ -39,7 +39,6 @@
 #include "OvalEnum.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents an entity in an Item as defined in the oval system characteristics schema.
@@ -48,7 +47,7 @@ class ItemEntity {
 public:
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
 	
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
@@ -74,7 +73,7 @@ public:
             <li>getting the ItemEntity value</li>
         </ul>
     */
-    string UniqueString();
+    std::string UniqueString();
 
 	/** Parse the provided entity element */
 	void Parse(DOMElement* entityElm);
@@ -86,16 +85,16 @@ public:
 	void SetStatus(OvalEnum::SCStatus status);
 
 	/** Return the name field's value. */
-	string GetName();
+	std::string GetName();
 
 	/** Set the name field's value. */
-	void SetName(string name);
+	void SetName(std::string name);
 
 	/** Return the value field's value. */
-	string GetValue();
+	std::string GetValue();
 
 	/** Set the value field's value. */
-	void SetValue(string value);
+	void SetValue(std::string value);
 
 	/** Get the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
@@ -111,8 +110,8 @@ public:
 
 private:
 	OvalEnum::SCStatus scStatus;
-	string name;
-	string value;
+	std::string name;
+	std::string value;
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
 };
@@ -121,6 +120,6 @@ private:
 	A vector for storing ItemEntity objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < ItemEntity*, allocator<ItemEntity*> > ItemEntityVector;
+typedef std::vector < ItemEntity* > ItemEntityVector;
 
 #endif

@@ -40,12 +40,10 @@
 #include "Lm.h"
 #endif
 
-#ifdef LINUX
+#if defined LINUX || defined SUNOS
 #include "ldap.h"
 typedef int ULONG;
 #endif
-
-using namespace std;
 
 /**
 	This class is responsible for collecting ldap information for ldap_objects.
@@ -53,10 +51,10 @@ using namespace std;
 */
 
 /** A map for storing attributes and their corresponding datatypes. */
-typedef map < string , string > TypeMap;
+typedef std::map < std::string , std::string > TypeMap;
 
 /** A map for storing schemas and their TypeMaps that contain their attributes and corresponding datatypes. */
-typedef map < string , TypeMap* > TypeMapMap;
+typedef std::map < std::string , TypeMap* > TypeMapMap;
 
 class LDAPProbe : public AbsProbe {
 
@@ -83,7 +81,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param hostnameStr A string that represents the hostname of the LDAP server.
 		 *  @return A LDAP structure for accessing the LDAP server.
 		 */
-		LDAP* OpenConnection ( string hostname );
+		LDAP* OpenConnection ( std::string hostname );
 
 		/** Close the connection to the LDAP server.
 		 *  @param ldap The LDAP structure that is used for accessing the LDAP server.
@@ -106,7 +104,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @return A boolean value indicating whether or not a LDAP item with the specified suffix exists.
 		 */
-		bool SuffixExists ( string suffixStr );
+		bool SuffixExists ( std::string suffixStr );
 
 		/** Get the set of all relative distinguished names on the system that match the object.
 		 *  @param suffixStr A string that contains the suffix to be used during the matching process.
@@ -114,14 +112,14 @@ class LDAPProbe : public AbsProbe {
 		 *  @param scopeBehavior A integer value that specifies the scope from which to search for relative distinguished names.
 		 *  @return A StringSet that contains all of the relative distinguished names specified in the ObjectEntity that also match the specified suffix.
 		 */
-		StringSet* GetRelativeDns ( string suffixStr, ObjectEntity* relativeDnEntity, int scopeBehavior );
+		StringSet* GetRelativeDns ( std::string suffixStr, ObjectEntity* relativeDnEntity, int scopeBehavior );
 
 		/** Deterimine if the specified relative distinguished name exists.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param relativeDnStr A string that contains the relative distinguished name of the LDAP item.
 		 *  @return A boolean value indicating whether or not a LDAP item with the specified suffix and relative distinguished name exists.
 		 */
-		bool RelativeDnExists ( string suffixStr, string relativeDnStr );
+		bool RelativeDnExists ( std::string suffixStr, std::string relativeDnStr );
 
 		/** Get the set of all LDAP attributes on the system that match the object.
 		 *  @param suffixStr A string that contains the suffix to be used during the matching process.
@@ -129,7 +127,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param attributeEntity A ObjectEntity that represents the attribute entity in an Object as defined in the OVAL Definition Schema.
 		 *  @return A StringSet that contains all of the attributes specified in the ObjectEntity that also match the specified suffix and relative distinguished name.
 		 */
-		StringSet* GetAttributes ( string suffixStr, string relativeDnStr, ObjectEntity* attributeEntity );
+		StringSet* GetAttributes ( std::string suffixStr, std::string relativeDnStr, ObjectEntity* attributeEntity );
 
 		/** Deterimine if the specified attribute exists.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
@@ -137,40 +135,40 @@ class LDAPProbe : public AbsProbe {
 		 *  @param attributeStr A string that contains the attribute of the LDAP item.
 		 *  @return A boolean value indicating whether or not a LDAP item with the specified suffix, relative distinguished name, and attribute exists.
 		 */
-		bool AttributeExists ( string suffixStr, string relativeDnStr, string attributeStr );
+		bool AttributeExists ( std::string suffixStr, std::string relativeDnStr, std::string attributeStr );
 
 		/** Build a distinguished name from its suffix and relative distinguished name components.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param relativeDnStr A string that contains the relative distinguished name of the LDAP item.
 		 *  @return A string value that represents the distinguished name of the specified suffix and relative distinguished name components.
 		 */
-		string BuildDistinguishedName ( string suffixStr, string relativeDnStr );
+		std::string BuildDistinguishedName ( std::string suffixStr, std::string relativeDnStr );
 
 		/** Retrieve the relative distinguished name component of the specified distinguished name.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param distinguishedNameStr A string that contains the distinguished name of the LDAP item.
 		 *  @return A string value that represents the relative distinguished name of the specified distinguished name.
 		 */
-		string RemoveDnBase ( string suffixStr, string distinguishedNameStr );
+		std::string RemoveDnBase ( std::string suffixStr, std::string distinguishedNameStr );
 
 		/** Retrieve the object class of the specified LDAP item exists.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param relativeDnStr A string that contains the relative distinguished name of the LDAP item.
 		 *  @return A string value representing the object class of the LDAP item with the specified suffix and relative distinguished name.
 		 */
-		string GetObjectClass ( string suffixStr, string relativeDnStr );
+		std::string GetObjectClass ( std::string suffixStr, std::string relativeDnStr );
 
 		/** Retrieve the location of the LDAP server. For Windows, this method retrieves the location using DsGetDcName() and for UNIX\Linux it retrieves the first entry from '/etc/ldap.conf'.
 		 * @return A string value that represents the location of the LDAP server.
 		 */
-		string GetLDAPServerLocation();
+		std::string GetLDAPServerLocation();
 
 		/** Retrieve all of the attributes for the specified LDAP item.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param relativeDnStr A string that contains the relative distinguished name of the LDAP item.
 		 *  @return A StringSet that contains all of the attributes for the LDAP item with the specified suffix and relative distinguished name.
 		 */
-		StringSet* GetAllAttributes ( string suffixStr, string relativeDnStr );
+		StringSet* GetAllAttributes ( std::string suffixStr, std::string relativeDnStr );
 
 		/** Retrieve all of the distinguished names for the specified LDAP item and scope.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
@@ -178,14 +176,14 @@ class LDAPProbe : public AbsProbe {
 		 *  @param scopeBehavior A integer value that specifies the scope from which to search for distinguished names.
 		 *  @return A StringSet that contains all of the distinguished names for the LDAP item with the specified suffix, relative distinguished name, and scope.
 		 */
-		StringSet* GetAllDistinguishedNames ( string suffixStr, string relativeDnStr, int scopeBehavior );
+		StringSet* GetAllDistinguishedNames ( std::string suffixStr, std::string relativeDnStr, int scopeBehavior );
 
 		/** Determine if the specified LDAP item exists.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param relativeDnStr A string that contains the relative distinguished name of the LDAP item.
 		 *  @return A boolean value indicating whether or not the a LDAP item with the specified suffix and relative distinguished name exist.
 		 */
-		bool ObjectExists ( string suffixStr, string relativeDnStr );
+		bool ObjectExists ( std::string suffixStr, std::string relativeDnStr );
 
 		/** Append the a ldaptype ItemEntity, and any value ItemEntities, to the specified Item if they exist.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
@@ -194,7 +192,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param item A Item that will have ldaptype and value ItemEntities appended to it.
 		 *  @return Void.
 		 */
-		void GetLdapItem ( string suffixStr, string relativeDnStr, string attributeStr, Item* item );
+		void GetLdapItem ( std::string suffixStr, std::string relativeDnStr, std::string attributeStr, Item* item );
 
 		/** Retrieve all of the attribute value types specified in the subschemasubentry attribute of the RootDSE entry.
 		 * @return a TypeMapMap containing all of the individual subschemas and their corresponding attributes and LDAP datatypes.
@@ -205,7 +203,7 @@ class LDAPProbe : public AbsProbe {
 		 * @param oid A string values that represents the OID that you would like to convert into an LDAP datatype.
 		 * @return A string value that represents the LDAP datatype.
 		 */
-		string GetDataType ( string oid );
+		std::string GetDataType ( std::string oid );
 
 		/** Retrieve all of the values for the specified suffix, relative distinguished name, and attribute.  This method only retrieves values of attributes that are represented by ASCII characters.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
@@ -213,19 +211,19 @@ class LDAPProbe : public AbsProbe {
 		 *  @param attributeStr A string that contains the attribute of the LDAP item.
 		 * @return A StringVector containg all of the values for the specified suffix, relative distinguished name, and attribute.
 		 */
-		StringVector* GetCharacterValues ( string suffixStr, string relativeDnStr, string attributeStr );
+		StringVector* GetCharacterValues ( std::string suffixStr, std::string relativeDnStr, std::string attributeStr );
 
 		/** Remove quotes from the specified string.
 		 * @param str A string value that you want to remove the quotes from.
 		 * @return A string value of the specifed string with any beginning and ending quotes removed.
 		 */
-		string RemoveQuotes ( string str );
+		std::string RemoveQuotes ( std::string str );
 
 		/** Retrieve the error message for the specified error code.
 		 * @param error A ULONG error value that you want the error message for.
 		 * @return A string representation of the specified error code.
 		 */
-		string GetErrorMessage ( ULONG error );
+		std::string GetErrorMessage ( ULONG error );
 
 		/** Determine if there are any suffixes that do not exist that need to be reported.
 		 *  @param suffixEntity A ObjectEntity that represents the suffix entity in an Object as defined in the OVAL Definition Schema.
@@ -240,7 +238,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param relativednsDne A StringVector that will be used to contain all of the relative distinguished names specified in the ObjectEntity that do not exist on the system.
 		 *  @return A boolean value that indicates whether or not there are relative distinguished names that do not exist that need to be reported.
 		 */
-		bool ReportRelativeDnDoesNotExist ( string suffixStr, ObjectEntity* relativeDnEntity, StringVector* relativeDnsDne );
+		bool ReportRelativeDnDoesNotExist ( std::string suffixStr, ObjectEntity* relativeDnEntity, StringVector* relativeDnsDne );
 
 		/** Determine if there are any attributes that do not exist for the specified suffix and relative distinguished name that need to be reported.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
@@ -249,7 +247,7 @@ class LDAPProbe : public AbsProbe {
 		 *  @param attributesDne A StringVector that will be used to contain all of the attributes specified in the ObjectEntity that do not exist on the system.
 		 *  @return A boolean value that indicates whether or not there are attributes that do not exist that need to be reported.
 		 */
-		bool ReportAttributeDoesNotExist ( string suffixStr, string relativeDnStr, ObjectEntity *attributeEntity, StringVector *attributesDne );
+		bool ReportAttributeDoesNotExist ( std::string suffixStr, std::string relativeDnStr, ObjectEntity *attributeEntity, StringVector *attributesDne );
 
 		/** Delete all of the stored types.
 		 *  @return Void.
@@ -262,25 +260,25 @@ class LDAPProbe : public AbsProbe {
 		static LDAPProbe *instance;
 
 		/** A string that represents the BASE scope. */
-		static const string SCOPE_BASE;
+		static const std::string SCOPE_BASE;
 
 		/** A string that represents the ONE scope. */
-		static const string SCOPE_ONE;
+		static const std::string SCOPE_ONE;
 
 		/** A string that represents the SUBTREE scope. */
-		static const string SCOPE_SUBTREE;
+		static const std::string SCOPE_SUBTREE;
 
 		/** A string that represents the namingcontexts attribute. */
-		static const string NAMING_CONTEXTS_ATTRIBUTE;
+		static const std::string NAMING_CONTEXTS_ATTRIBUTE;
 
 		/** A string that represents the subschemasubentry attribute. */
-		static const string SUBSCHEMA_SUBENTRY_ATTRIBUTE;
+		static const std::string SUBSCHEMA_SUBENTRY_ATTRIBUTE;
 
 		/** A string that represents the attributetypes attribute. */
-		static const string ATTRIBUTE_TYPES_ATTRIBUTE;
+		static const std::string ATTRIBUTE_TYPES_ATTRIBUTE;
 
 		/** A string that represents the objectclass attribute. */
-		static const string OBJECT_CLASS_ATTRIBUTE;
+		static const std::string OBJECT_CLASS_ATTRIBUTE;
 
 		/** A map of maps for storing multiple schemas and there associated attribute types and attribute type datatypes. */
 		TypeMapMap* types;

@@ -68,7 +68,6 @@
 #include "InetdProbe.h"
 #include "LDAPProbe.h"
 
-using namespace std;
 
 
 class AbsProbe;
@@ -91,7 +90,7 @@ public:
 		@param objectName a string taht corresponds to the name of an object in the oval definition schema.
 		@return The probe for the specified object or NULL.
 	*/
-	static AbsProbe* GetProbe(string objectName);
+	static AbsProbe* GetProbe(std::string objectName);
 
 	/** 
 		Shutdown the ProbeFactory.

@@ -41,8 +41,6 @@
 	#define SNPRINTF snprintf
 #endif
 
-using namespace std;
-
 /**
 	This class is responsible for collecting data for the ind-sc:textfilecontent_item defined OVAL System Characteristics Schema.
 	This class should be platform independent.
@@ -105,14 +103,14 @@ private:
 	/** Return true if the specified line matches the criteria in the ObjectEntity. 
 		If true any resulting substrings are returned on the substrings vector. 
 	*/
-	bool GetSubstrings(string lineFromFile, ObjectEntity* line, StringVector* substrings);
+	bool GetSubstrings(std::string lineFromFile, ObjectEntity* line, StringVector* substrings);
 
 	/** Read the specified file one line at time if any matching line is found with matching 
 		subexpressions create a new item and add it topt he set of collectedItems. If none 
 		are found the set is returned empty. Calls out to the GetSubstrings function to 
 		determine if a given line in a file matches the criteria specified in the ObjectEntity. 
 	*/
-	void GetLines(string path, string fileName, ObjectEntity* line, ItemVector* collectedItems);
+	void GetLines(std::string path, std::string fileName, ObjectEntity* line, ItemVector* collectedItems);
 };
 
 #endif

@@ -37,10 +37,9 @@
 #include "Analyzer.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class AbsCriteria;
-typedef vector < AbsCriteria*, allocator<AbsCriteria*> > AbsCriteriaVector;
+typedef std::vector < AbsCriteria* > AbsCriteriaVector;
 
 /**
 	This class represent criteria in an oval definition.
@@ -49,7 +48,7 @@ typedef vector < AbsCriteria*, allocator<AbsCriteria*> > AbsCriteriaVector;
 class Criteria : public AbsCriteria {
 
 public:
-	Criteria(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, string comment = "", OvalEnum::Operator op = OvalEnum::OPERATOR_AND);
+	Criteria(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, std::string comment = "", OvalEnum::Operator op = OvalEnum::OPERATOR_AND);
 	~Criteria();
 
 	void Write(DOMElement* parent);
@@ -57,8 +56,8 @@ public:
 	OvalEnum::ResultEnumeration Analyze();
 	OvalEnum::ResultEnumeration NotEvaluated();
 
-	string GetComment();
-	void SetComment(string comment);
+	std::string GetComment();
+	void SetComment(std::string comment);
 
 	OvalEnum::Operator GetOperator();
 	void SetOperator(OvalEnum::Operator op);
@@ -68,7 +67,7 @@ public:
 	void AppendChildCriteria(AbsCriteria* childCriteria);
 
 private:
-	string comment;
+	std::string comment;
 	AbsCriteriaVector childCriteria;
 	OvalEnum::Operator op;
 };

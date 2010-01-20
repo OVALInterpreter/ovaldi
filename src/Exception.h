@@ -33,8 +33,6 @@
 
 #include <string>
 
-using namespace std;
-
 #define ERROR_FATAL 10
 #define ERROR_WARN 5
 #define ERROR_NOTICE 1
@@ -44,20 +42,20 @@ using namespace std;
 */
 class Exception {
 	public:
-		Exception(string msg = "", int severity = ERROR_FATAL, Exception *cause = NULL);
+		Exception(std::string msg = "", int severity = ERROR_FATAL, Exception *cause = NULL);
 		~Exception();
 
-		string GetErrorMessage();
+		std::string GetErrorMessage();
 		int GetSeverity();
 		Exception* GetCause();
 
-		void SetErrorMessage(string);
+		void SetErrorMessage(std::string);
 		void SetSeverity(int);
 		void SetCause(Exception* ex);
 
 	private:
 		int severity;
-		string errorMessage;
+		std::string errorMessage;
 		Exception* cause;
 };
 

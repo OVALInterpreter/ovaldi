@@ -30,6 +30,7 @@
 
 #include "ProbeFactory.h"
 
+using namespace std;
 
 AbsProbeSet ProbeFactory::_probes;
 

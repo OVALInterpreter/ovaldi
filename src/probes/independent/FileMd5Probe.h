@@ -35,7 +35,6 @@
 #include "AbsProbe.h"
 #include <Digest.h>
 
-using namespace std;
 
 /**
 	This class is responsible for collecting file md5 data.
@@ -59,7 +58,7 @@ private:
 
 	static FileMd5Probe* instance;
 
-	Item* GetMd5(string path, string fileName);
+	Item* GetMd5(std::string path, std::string fileName);
 
 	Digest digest;
 };

@@ -38,6 +38,8 @@
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 
+using namespace std;
+
 // the static fields
 InterfaceProbe* InterfaceProbe::instance = NULL;
 

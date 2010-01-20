@@ -42,9 +42,7 @@
 #include <cstring>
 #include <vector>
 
-using namespace std;
-
-typedef vector < string, allocator<string> > StringVector;
+typedef std::vector < std::string > StringVector;
 
 /**	The MAXMATCHES constant should be used by any search method to ensure that
 	endless/excessive matching searching doesn't occure. With out some sort of 
@@ -72,7 +70,7 @@ public:
 		expression chars are stored in a string. The following chars need to be escaped:
 		^ $ \ . [ ] ( ) * + ? |
 	*/
-	string EscapeRegexChars(string);
+	std::string EscapeRegexChars(std::string);
 
 	/**
 		This function takes a string and searches for the first regular	expression character that is not escaped. 
@@ -81,7 +79,7 @@ public:
 		considered regular expression chars if they are not escaped:
 		^ $ \ . [ ] ( ) * + ? |
 	*/
-	int FindFirstRegexChar(const string stringIn);
+	int FindFirstRegexChar(const std::string stringIn);
 
 	/**
 		Return both the constant portion of a string and the remaining pattern. 
@@ -97,7 +95,7 @@ public:
 	
 		If an error occures an exception is thrown
 	*/
-	void GetConstantPortion(string patternIn, char delimIn, string *patternOut, string *constOut);
+	void GetConstantPortion(std::string patternIn, char delimIn, std::string *patternOut, std::string *constOut);
 	
 	/**	Return true if the searchString matches the specified pattern.
 
@@ -128,13 +126,13 @@ public:
 	 * of the pattern.  Each element of the inner vector contains the bit of text which matched overall (as
 	 * the first vector element) and matches for all captured substrings (in subsequent elements).
 	 */
-	void GetAllMatchingSubstrings(const string& pattern, const string& searchString, vector<StringVector> &matches, int matchOptions=0);
+	void GetAllMatchingSubstrings(const std::string& pattern, const std::string& searchString, std::vector<StringVector> &matches, int matchOptions=0);
 
 	/** 
 		This function takes a string and searches for all the double '\'s. 
 		Each double '\' //	is converted to a single '\'
 	*/
-	string	RemoveExtraSlashes(string);
+	std::string	RemoveExtraSlashes(std::string);
 
 	/** Set the match count back to zero */
 	void	Reset();
@@ -156,7 +154,7 @@ private:
 		Return true if the specified pattern is constant. 
 		If the string is of length = 0 return true.
 	*/
-	bool IsConstant(string);
+	bool IsConstant(std::string);
 
 	int matchCount;
 };
@@ -171,7 +169,7 @@ public:
 		This is done with the explicit call to the Exception class constructor that 
 		takes a string msg and an int severity param.
 	*/
-	REGEXException(string errMsgIn = "", int severity = ERROR_FATAL);
+	REGEXException(std::string errMsgIn = "", int severity = ERROR_FATAL);
 
 	~REGEXException();
 };

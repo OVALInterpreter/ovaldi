@@ -64,7 +64,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace	std;
 
 
 /** 
@@ -95,18 +94,18 @@ public:
 	static XmlProcessor* Instance();
 	
 	/** Create a new DOMDocument with the specified root element. */ 
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	CreateDOMDocument(string root);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	CreateDOMDocument(std::string root);
 	/** Create a new DOMDocument with the specified qualifiedName and default namespace. */ 
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	CreateDOMDocumentNS(string namespaceURI, string qualifiedName);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	CreateDOMDocumentNS(std::string namespaceURI, std::string qualifiedName);
 	/** Parse the specified file and return a DOMDocument. 
 		'filePathIn' should be the complete path to the desired file.
 		When validating and xml file the schema must be in the same directory as the file.  
 	*/
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	ParseFile(string);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	ParseFile(std::string);
 	/** Write the DOMDocument to the specified XML file.
 		filePath is the filename and path to the file that will be written
 	*/
-	void WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, string filePath,	bool writeToFile=true);
+	void WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, std::string filePath,	bool writeToFile=true);
 
 private:
 	/** Init the XmlProcessor
@@ -124,7 +123,7 @@ private:
 */
 class XmlProcessorException	: public Exception {
 public:
-	XmlProcessorException(string errMsgIn =	"",	int	severity = ERROR_FATAL);
+	XmlProcessorException(std::string errMsgIn =	"",	int	severity = ERROR_FATAL);
 	~XmlProcessorException();
 };
 
@@ -138,7 +137,7 @@ public:
 	~XmlProcessorErrorHandler();
 
 	bool getSawErrors()	const;
-	string getErrorMessages() const;
+	std::string getErrorMessages() const;
 
 	bool handleError(const DOMError& domError);
 	void resetErrors();
@@ -158,7 +157,7 @@ private:
 	/**
 		This string	is used	to store all error messages	that are generated 
 	*/
-	string	errorMessages;
+	std::string	errorMessages;
 };
 
 #endif

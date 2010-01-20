@@ -30,6 +30,8 @@
 
 #include "REGEX.h"
 
+using namespace std;
+
 REGEX::REGEX() {
 	this->matchCount = 0;
 }

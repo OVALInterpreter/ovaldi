@@ -30,6 +30,8 @@
 
 #include "AbsProbe.h"
 
+using namespace std;
+
 StringKeyedItemMap AbsProbe::globalItemCache;
 
 //****************************************************************************************//

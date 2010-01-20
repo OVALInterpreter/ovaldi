@@ -37,8 +37,6 @@
 #include <string>
 
 
-using namespace std;
-
 /**
 	This class is responsible for collecting information about unix password_objects.
 */
@@ -65,7 +63,7 @@ class PasswordProbe : public AbsProbe {
 	Item *CreateItemFromPasswd(struct passwd const *pwInfo);
 
 	/** Finds a single item by name. */
-	Item *GetSingleItem(const string& username);
+	Item *GetSingleItem(const std::string& username);
 
 	/** Finds multiple items according to the given object entity. */
 	ItemVector *GetMultipleItems(Object *passwordObject);

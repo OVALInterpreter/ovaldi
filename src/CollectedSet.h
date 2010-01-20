@@ -42,7 +42,6 @@
 #include "OvalEnum.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents an CollectedSet in an oval definition schema.
@@ -86,7 +85,7 @@ private:
 */
 class CollectedSetException : public Exception {
 	public:
-		CollectedSetException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		CollectedSetException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~CollectedSetException();
 };
 

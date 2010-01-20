@@ -31,6 +31,8 @@
 
 #include "Version.h"
 
+using namespace std;
+
 // Define the version.  The build and date are automatically updated
 // prior to each build.
 //

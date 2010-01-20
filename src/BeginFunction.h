@@ -35,7 +35,6 @@
 #include "ComponentFactory.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a BeginFunction component in a local_variable in the oval definition schema.
@@ -49,7 +48,7 @@ class BeginFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete BeginFunction object. */
-	BeginFunction(string charIn = "");
+	BeginFunction(std::string charIn = "");
 	~BeginFunction();
 
 	/** Parse the begin element and its child component element. */
@@ -62,12 +61,12 @@ public:
 	VariableValueVector* GetVariableValues();
 
 	/** Get the character field's value. */
-	string GetCharacter();
+	std::string GetCharacter();
 	/** Set the character field's value. */
-	void SetCharacter(string charIn);
+	void SetCharacter(std::string charIn);
 
 private:
-	string character;
+	std::string character;
 };
 
 #endif

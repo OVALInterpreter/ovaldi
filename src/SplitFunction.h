@@ -35,7 +35,6 @@
 #include "ComponentFactory.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a SplitFunction component in a local_variable in the oval definition schema.
@@ -51,7 +50,7 @@ class SplitFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete SplitFunction object. */
-	SplitFunction(string delimiter = "");
+	SplitFunction(std::string delimiter = "");
 	~SplitFunction();
 
 	/** Parse the substring element and its child component element. */
@@ -64,12 +63,12 @@ public:
 	VariableValueVector* GetVariableValues();
 
 	/** Get the delimiter field's value. */
-	string GetDelimiter();
+	std::string GetDelimiter();
 	/** Set the delimiter field's value. */
-	void SetDelimiter(string delimiter);
+	void SetDelimiter(std::string delimiter);
 
 private:
-	string delimiter;
+	std::string delimiter;
 };
 
 #endif

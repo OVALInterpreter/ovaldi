@@ -35,8 +35,6 @@
 #include "OvalEnum.h"
 #include "REGEX.h"
 
-using namespace std;
-
 /**
 	This class is a container for all comparison methods between definition entities and item entities.
 */
@@ -46,17 +44,17 @@ public:
 	/** Compare two binary values based on the specified operation 
         Binary values must match the following regex "[0-9a-fA-F]"
     */
-	static OvalEnum::ResultEnumeration CompareBinary(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareBinary(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
 	/** Compare two boolean values based on the specified operation.
 	    May have the following input values: {true, false, 1, 0)
 	*/
-	static OvalEnum::ResultEnumeration CompareBoolean(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareBoolean(OvalEnum::Operation op, std::string defValue, std::string scValue);
 	
 	/** Compare two evr strings based on the specified operation. 
 		This code motivated (strongly) by librpm's rpmdsCompare().
 	*/
-	static OvalEnum::ResultEnumeration CompareEvrString(OvalEnum::Operation, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareEvrString(OvalEnum::Operation, std::string defValue, std::string scValue);
 
 	/** 
      * Compare to floats based on the specified operation. 
@@ -67,24 +65,24 @@ public:
      * by the character 'E' or 'e', followed by an integer exponent.  The special values positive and negative
      * infinity and not-a-number have are represented by INF, -INF and NaN, respectively.
      */
-	static OvalEnum::ResultEnumeration CompareFloat(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareFloat(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
 	/** Compare to integers based on the specified operation. 
 	 *	Since these integers come from an xsd:integer the code needs to allow for very large integers.
      *	The range of allowed integers is: -9223372036854775808 to 9223372036854775807.
 	*/
-	static OvalEnum::ResultEnumeration CompareInteger(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareInteger(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
 	/** Compare two float values based on the specified operation. */
-	static OvalEnum::ResultEnumeration CompareIosVersion(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareIosVersion(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
 	/** Compare two string values based on the specified operation. */
-	static OvalEnum::ResultEnumeration CompareString(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareString(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
 	/** Compare two version strings based on the input operation. 
 		@return Returns the result of the comparison.
 	*/
-	static OvalEnum::ResultEnumeration CompareVersion(OvalEnum::Operation op, string defValue, string scValue);
+	static OvalEnum::ResultEnumeration CompareVersion(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
 private:
 
@@ -96,7 +94,7 @@ private:
 		If a given component of the version string can not be converted to an integer an error is thrown.
 		If a delimiter is found but no integer components are found an error is thrown.		
 	*/
-	static LongLongVector* ParseVersionStr(string versionStr);
+	static LongLongVector* ParseVersionStr(std::string versionStr);
 
 	// copied from lib/rpmvercmp.c
 	static int rpmvercmp(const char * a, const char * b);
@@ -107,9 +105,9 @@ private:
 	static int xislower(int c);
 	static int xisupper(int c);
 
-	static string GetEpochFromEVR(string evrStr);
-	static string GetVersionFromEVR(string evrStr);
-	static string GetReleaseFromEVR(string evrStr);
+	static std::string GetEpochFromEVR(std::string evrStr);
+	static std::string GetVersionFromEVR(std::string evrStr);
+	static std::string GetReleaseFromEVR(std::string evrStr);
 
 };
 

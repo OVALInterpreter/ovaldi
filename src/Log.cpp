@@ -30,6 +30,8 @@
 
 #include "Log.h"
 
+using namespace std;
+
 // Initialize static variables.
 int Log::level = Log::DEBUG;
 bool Log::toScreen = true;

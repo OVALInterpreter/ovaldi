@@ -30,6 +30,7 @@
 
 #include "ArithmeticFunction.h"
 
+using namespace std;
 
 //****************************************************************************************//
 //								Component Class											  //	

@@ -33,7 +33,6 @@
 
 #include "AbsProbe.h"
 
-using namespace std;
 
 /**
 	This class is responsible for collecting data for the ind-sc:textfilecontent_item defined OVAL System Characteristics Schema.
@@ -62,7 +61,7 @@ private:
 	 * Gets all matches of the given pattern(s) from the given file, and appends
 	 * corresponding items onto the given vector.
 	 */
-	void GetItems(string path, string fileName,
+	void GetItems(std::string path, std::string fileName,
 				ObjectEntity *patternEntity,
 				ObjectEntity *instanceEntity,
 				int matchOptions,
@@ -72,9 +71,9 @@ private:
 	 * Gets all matches of the given pattern(s) from the given file contents,
 	 * and appends corresponding items onto the given vector.
 	 */
-	void GetMatches(const string& path,
-					const string& fileName,
-					const string& fileContents,
+	void GetMatches(const std::string& path,
+					const std::string& fileName,
+					const std::string& fileContents,
 					ObjectEntity *patternEntity,
 					ObjectEntity *instanceEntity,
 					int matchOptions,

@@ -48,8 +48,6 @@
 #define SCHED_CLASS_LEN 128
 #define TTY_LEN PATH_MAX
 
-using namespace std;
-
 /**
 	Data collector for process test.
 
@@ -85,31 +83,31 @@ private:
 		@param isRegex a bool that is indicates how system commands should be compared against the specified pattern
 		@return The set of matching commands.
 	*/
-	StringVector* GetMatchingCommands(string pattern, bool isRegex);
+	StringVector* GetMatchingCommands(std::string pattern, bool isRegex);
 
 	/**
 		Return true if the specifeid command exists on the system.
 		@param command a string that hold the name of the rpm to check for.
 		@result The result of checking for the specified rpm on the system.
 	*/
-	bool CommandExists(string command);
+	bool CommandExists(std::string command);
 
 	/**
 		Get all the information for the command.
 		@param command a string representing the command to collect information about.
 		@param items a vector of items that matched the command.
 	*/
-	void GetPSInfo(string command, ItemVector* items);
+	void GetPSInfo(std::string command, ItemVector* items);
 
 	/**
 		Read /proc/<pid>/cmdline to gather the application name and startup arguments
 	*/
-	int RetrieveCommandLine(char *process, char *cmdline, string *errMsg);
+	int RetrieveCommandLine(char *process, char *cmdline, std::string *errMsg);
 
 	/**
 		Read the stat file for a specific process
 	*/
-	int RetrieveStatFile(char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg);
+	int RetrieveStatFile(char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
 
 	/**
 		 Since there appears to be no simple way to convert the 'tty' value contained in
@@ -124,17 +122,17 @@ private:
 		Read the value contained in '/proc/uptime/' so that we can calculate
 		the start time and exec time of the running processes.
 	*/
-	int RetrieveUptime(unsigned long *uptime, string *errMsg);
+	int RetrieveUptime(unsigned long *uptime, std::string *errMsg);
 
 	/**
 		Convert the input seconds and conveert to a string format for exec time.
     */
-	string FormatExecTime(unsigned long execTime);
+	std::string FormatExecTime(unsigned long execTime);
 
 	/**
 		Convert the input seconds and convert to a string format for start time.
     */
-	string FormatStartTime(unsigned long startTime);
+	std::string FormatStartTime(unsigned long startTime);
 
 	static ProcessProbe *instance;
 };

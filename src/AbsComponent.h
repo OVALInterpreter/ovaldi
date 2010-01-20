@@ -38,7 +38,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This calss is the base class for all types of variable components.
@@ -81,6 +80,6 @@ public:
 	A vector for storing AbsComponent objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < AbsComponent*, allocator<AbsComponent*> > AbsComponentVector;
+typedef std::vector < AbsComponent* > AbsComponentVector;
 
 #endif

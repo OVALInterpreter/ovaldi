@@ -30,6 +30,8 @@
 
 #include "Filter.h"
 
+using namespace std;
+
 AbsStateMap Filter::processedFiltersMap;
 
 //****************************************************************************************//

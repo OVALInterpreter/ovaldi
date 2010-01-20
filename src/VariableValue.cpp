@@ -30,6 +30,8 @@
 
 #include "VariableValue.h"
 
+using namespace std;
+
 VariableValueVector VariableValue::vars;
 
 //****************************************************************************************//

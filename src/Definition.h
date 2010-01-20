@@ -36,7 +36,6 @@
 #include "Criteria.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class Criteria;
 
@@ -46,19 +45,19 @@ class Definition;
 	A vector for storing Definition objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < Definition*, allocator<Definition*> > DefinitionVector;
+typedef std::vector < Definition* > DefinitionVector;
 
 /**	
 	A pair for storing definition ids and Definition objects together. 
 	Stores only pointers to the objects. 
 */
-typedef pair <string, Definition* > DefinitionPair;
+typedef std::pair <std::string, Definition* > DefinitionPair;
 
 /**	
 	A map for storing DefinitionPairs. 
 	Stores only pointers to the objects. 
 */
-typedef map <string, Definition* > DefinitionMap;
+typedef std::map <std::string, Definition* > DefinitionMap;
 
 /**
 	This class represents an oval definition.
@@ -124,9 +123,9 @@ public:
 	void SetCriteria(Criteria* criteria);
     
 	/** Return the id field's value. */
-	string GetId();
+	std::string GetId();
 	/** Set the id field's value. */
-	void SetId(string id);
+	void SetId(std::string id);
 
 	/** Return the written field's value. */
 	bool GetWritten();
@@ -142,7 +141,7 @@ public:
 		Search the cache of definitions for the specified definition. 
 		@return Returns the cached Definition or NULL if not found.
 	*/
-	static Definition* SearchCache(string id);
+	static Definition* SearchCache(std::string id);
 
 	/** Clear the cache of processed definitions. */
 	static void ClearCache();
@@ -155,7 +154,7 @@ public:
 
 		If the definition is not found an exception is thrown. 
 	*/
-	static Definition* GetDefinitionById(string definitionId);
+	static Definition* GetDefinitionById(std::string definitionId);
 
 private:
 
@@ -166,7 +165,7 @@ private:
 	int variableInstance;
 	OvalEnum::ResultEnumeration result;
 	Criteria* criteria;
-	string id;
+	std::string id;
 	bool written;
 	bool analyzed;
 

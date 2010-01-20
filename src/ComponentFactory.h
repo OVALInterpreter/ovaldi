@@ -45,7 +45,6 @@
 #include "TimeDifferenceFunction.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class is a Factory class for getting parsed components of a local varaible.

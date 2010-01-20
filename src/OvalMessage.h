@@ -39,7 +39,6 @@
 #include "OvalEnum.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents an OvalMessage in the oval schema
@@ -47,7 +46,7 @@ using namespace std;
 class OvalMessage  {
 public:
 	/** Create a complete OvalMessage object. */
-	OvalMessage(string value = "", OvalEnum::Level level = OvalEnum::LEVEL_INFO);
+	OvalMessage(std::string value = "", OvalEnum::Level level = OvalEnum::LEVEL_INFO);
     
     /** OvalMessage copy constructor. */
     OvalMessage(const OvalMessage& message);
@@ -55,14 +54,14 @@ public:
 	~OvalMessage();
 
 	/** Write this message to the specified document. */
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm, string prefix);
+	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm, std::string prefix);
 	/** Parse the supplied message element into a message object. */
 	void Parse(DOMElement* msgElm);
 
 	/** Return the value field's value. */
-	string GetValue();
+	std::string GetValue();
 	/** Set the value field's value. */
-	void SetValue(string value);
+	void SetValue(std::string value);
 
 	/** Return the Level field's value. */
 	OvalEnum::Level GetLevel();
@@ -70,10 +69,10 @@ public:
 	void SetLevel(OvalEnum::Level level);
 
 	/** Make string representation of object. */
-	string ToString();
+	std::string ToString();
 
 private:
-	string value;
+	std::string value;
 	OvalEnum::Level level;
 };
 
@@ -81,6 +80,6 @@ private:
 	A vector for storing OvalMessage objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < OvalMessage*, allocator<OvalMessage*> > OvalMessageVector;
+typedef std::vector < OvalMessage* > OvalMessageVector;
 
 #endif

@@ -34,10 +34,9 @@
 #include "XmlCommon.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class VariableValue;
-typedef vector < VariableValue*, allocator<VariableValue*> > VariableValueVector;
+typedef std::vector < VariableValue* > VariableValueVector;
 
 /**
 	This class represents a variable value.
@@ -45,28 +44,28 @@ typedef vector < VariableValue*, allocator<VariableValue*> > VariableValueVector
 */
 class VariableValue {
 public:
-	VariableValue(string id = "", string value = "");
+	VariableValue(std::string id = "", std::string value = "");
 	~VariableValue();
 
 	void Parse(DOMElement* variableValueElm);
 	void Write(DOMElement* collectedObjectElm);
 	void WriteTestedVariable(DOMElement* parentElm);
 
-	string GetId();
-	void SetId(string id);
+	std::string GetId();
+	void SetId(std::string id);
 
-	string GetValue();
-	void SetValue(string value);
+	std::string GetValue();
+	void SetValue(std::string value);
 
 	static void ClearCache();
 
 private:
-	string id;
-	string value;
+	std::string id;
+	std::string value;
 
 	static VariableValueVector vars;
 };
 
-typedef vector < VariableValue*, allocator<VariableValue*> > VariableValueVector;
+typedef std::vector < VariableValue* > VariableValueVector;
 
 #endif

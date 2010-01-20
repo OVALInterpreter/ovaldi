@@ -33,15 +33,13 @@
 
 #include "AbsVariable.h"
 
-using namespace std;
-
 /**
 	This class represents an constant_variable in the oval definition schema.
 */
 class ConstantVariable : public AbsVariable {
 public:
 
-	ConstantVariable(string id = "", string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
+	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 	~ConstantVariable();
 
 	void Parse(DOMElement* constantVariableElm);

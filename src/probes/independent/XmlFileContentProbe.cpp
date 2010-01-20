@@ -30,6 +30,8 @@
 
 #include "XmlFileContentProbe.h"
 
+using namespace std;
+
 XmlFileContentProbe* XmlFileContentProbe::instance = NULL;
 
 XmlFileContentProbe::XmlFileContentProbe() {

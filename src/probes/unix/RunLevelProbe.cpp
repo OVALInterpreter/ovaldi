@@ -30,6 +30,7 @@
 
 #include "RunLevelProbe.h"
 
+using namespace std;
 
 //****************************************************************************************//
 //                               RunLevelProbe Class                                      //

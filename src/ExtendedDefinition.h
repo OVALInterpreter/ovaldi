@@ -36,7 +36,6 @@
 #include "Analyzer.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class AbsCriteria;
 class Definition;

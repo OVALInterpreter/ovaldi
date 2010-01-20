@@ -44,16 +44,14 @@
 /// 110 characters + 20 characters for the program name, it appears. 
 #define NETSTAT_BUFLEN 200
 
-using namespace std;
-
 /**
 	Store the results of a call to netstat.
 */
 class NetstatResult {
  public:
-	NetstatResult(string e, string t) : errText(e), text(t){};
-	string errText;
-	string text;
+	NetstatResult(std::string e, std::string t) : errText(e), text(t){};
+	std::string errText;
+	std::string text;
 };
 
 /**
@@ -63,28 +61,28 @@ class NetstatRecord {
 
 public: 
 	NetstatRecord(){};
-	NetstatRecord(string pr, string la, string lp, string lfa, string pn, string fa, string fp, string ffa, int p, string u) :
+	NetstatRecord(std::string pr, std::string la, std::string lp, std::string lfa, std::string pn, std::string fa, std::string fp, std::string ffa, int p, std::string u) :
 	  protocol(pr), local_address(la), local_port(lp), local_full_address(lfa), program_name(pn), foreign_address(fa), foreign_port(fp),
 		  foreign_full_address(ffa), pid(p), user_id(u){};
 	~NetstatRecord(){};
 	
-	string protocol;
-	string local_address;
-	string local_port;
-	string local_full_address;
-	string program_name;
-	string foreign_address;
-	string foreign_port;
-	string foreign_full_address;
+	std::string protocol;
+	std::string local_address;
+	std::string local_port;
+	std::string local_full_address;
+	std::string program_name;
+	std::string foreign_address;
+	std::string foreign_port;
+	std::string foreign_full_address;
 	int pid;
-	string user_id;
+	std::string user_id;
 };
 
 /**
 	A vector for storing NetstatRecord objects.
 	All objects are stored by reference.
 */
-typedef vector < NetstatRecord*, allocator<NetstatRecord*> > NetstatRecordVector;
+typedef std::vector < NetstatRecord* > NetstatRecordVector;
 
 /**
 	Red Hat data collector for inetlisteningservers_test.
@@ -109,11 +107,11 @@ private:
 	/**
 		Get the set of all local addresses on the system that match the object
 	*/
-	StringVector* GetLocalAddresses(string protocolStr, ObjectEntity* localAddress);
+	StringVector* GetLocalAddresses(std::string protocolStr, ObjectEntity* localAddress);
 	/**
 		Get the set of all local ports on the system that match the object
 	*/
-	StringVector* GetLocalPorts(string protocolStr, string localAddressStr, ObjectEntity* localPort);
+	StringVector* GetLocalPorts(std::string protocolStr, std::string localAddressStr, ObjectEntity* localPort);
 
 	/**
 		Collect all information that matches the specified program name.
@@ -122,24 +120,24 @@ private:
 		@param localPort a string the local port 
 		@param itesm a ItemVector* a vector of items that matched the specified protocol, port, and address
 	*/
-	Item* GetNetstat(string protocol, string localAddress, string localPort);
+	Item* GetNetstat(std::string protocol, std::string localAddress, std::string localPort);
 
 	/**
 		Check that the specified protocol exists on the system.
 		@param protocol a string representing the program name to look for.
 		@result The result of searching for the specified program name.
 	*/
-	bool ProtocolExists(string protocol);
+	bool ProtocolExists(std::string protocol);
 
 	/**
 		Check that the specified local address exists on the system.
 	*/
-	bool LocalAddressExists(string protocolStr, string localAddress);
+	bool LocalAddressExists(std::string protocolStr, std::string localAddress);
 
 	/**
 		Check that the specified local port exists on the system.
 	*/
-	bool LocalPortExists(string protocolStr, string localAddressStr, string localPort);
+	bool LocalPortExists(std::string protocolStr, std::string localAddressStr, std::string localPort);
 
 	/**
 		Get all protocols on the system that match the specified pattern.
@@ -147,19 +145,19 @@ private:
 		@param isRegex a bool that is indicates how system protocols should be compared against the specified pattern
 		@return The set of matching protocols.
 	*/
-	StringVector* GetMatchingProtocols(string pattern, bool isRegex);
+	StringVector* GetMatchingProtocols(std::string pattern, bool isRegex);
 
 	/**
 		Get all local addresses on the system that match the specified pattern.
 		@return The set of matching local addresses.
 	*/
-	StringVector* GetMatchingLocalAddresses(string protocolStr, string pattern, bool isRegex);
+	StringVector* GetMatchingLocalAddresses(std::string protocolStr, std::string pattern, bool isRegex);
 
 	/**
 		Get all local ports on the system that match the specified pattern.
 		@return The set of matching local ports.
 	*/
-	StringVector* GetMatchingLocalPorts(string protocolStr, string localAddressStr, string pattern, bool isRegex);
+	StringVector* GetMatchingLocalPorts(std::string protocolStr, std::string localAddressStr, std::string pattern, bool isRegex);
 
 	/**
 		Start a child processand make a call to netstat.

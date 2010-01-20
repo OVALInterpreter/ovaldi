@@ -38,8 +38,6 @@
 #include "Version.h"
 #include "Item.h"
 
-using namespace std;
-
 /**
 	The Analyzer class is the starting point for the oval analysis.
 */
@@ -91,7 +89,7 @@ public:
 private:
 
 	/** Format a pair of definition id and result value as a string for display. */
-	string ResultPairToStr(StringPair* pair);
+	std::string ResultPairToStr(StringPair* pair);
 
 	/** Initialize the results document adding the basic structure to it. */
 	void InitResultsDocument();
@@ -118,7 +116,7 @@ private:
 */
 class AnalyzerException : public Exception {
 	public:
-		AnalyzerException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
+		AnalyzerException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
 		~AnalyzerException();
 };
 

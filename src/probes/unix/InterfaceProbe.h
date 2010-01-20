@@ -38,7 +38,6 @@
 // For the sa_family_t type.
 #include <sys/socket.h>
 
-using namespace std;
 
 /**
 	This class is responsible for collecting information about unix interface_objects.
@@ -68,7 +67,7 @@ class InterfaceProbe : public AbsProbe {
 	 * not be deleted; it is a member of a shared cache of
 	 * interface items.
 	 */
-	Item* GetInterface(const string &name);
+	Item* GetInterface(const std::string &name);
 
 	/**
 	 * Caches info about all of the interfaces on the local system.
@@ -87,7 +86,7 @@ class InterfaceProbe : public AbsProbe {
 	 * Gets the OVAL hardware type name for the given value, or ""
 	 * if one is not defined.
 	 */
-	string HardwareTypeToString(sa_family_t hwFamily);
+	std::string HardwareTypeToString(sa_family_t hwFamily);
 
 	/**
 	 * Creates ItemEntity objects for the given flags.
@@ -97,7 +96,7 @@ class InterfaceProbe : public AbsProbe {
 	/** A vector that holds cached information about all interfaces on the system */
 	ItemVector interfaces;
 
-	typedef map<sa_family_t,string> HardwareTypeNameMap;
+	typedef std::map<sa_family_t,std::string> HardwareTypeNameMap;
 
 	/** Maps hardware type constants to names */
 	HardwareTypeNameMap hardwareTypeNameMap;

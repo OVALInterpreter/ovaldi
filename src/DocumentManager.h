@@ -34,7 +34,6 @@
 #include "Common.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class manages all documents in the application.

@@ -62,20 +62,20 @@ class InetdProbe : public AbsProbe {
 	 * Gets the next "line" of the given stream, where here, a "line"
 	 * is a complete configuration entry, including continuation lines.
 	 */
-	void NextVirtualLine(istream& in, string& line);
+	void NextVirtualLine(std::istream& in, std::string& line);
 
 	/**
 	 * Gets the next actual line of the given stream, which is not
 	 * a comment or a blank line.
 	 */
-	void NextLine(istream& in, string& line);
+	void NextLine(std::istream& in, std::string& line);
 
 	/**
 	 * Breaks up the given line into pieces and creates an item.  If
 	 * one could not be created, e.g. because it didn't match the object,
 	 * or the line was malformed, NULL is returned.
 	 */
-	Item* Line2Item(const string& line, ObjectEntity *nameEntity, ObjectEntity* protocolEntity);
+	Item* Line2Item(const std::string& line, ObjectEntity *nameEntity, ObjectEntity* protocolEntity);
 
 	/** Stores our read-ahead line */
 	std::string tmpLine;

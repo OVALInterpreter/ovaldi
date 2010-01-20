@@ -34,7 +34,6 @@
 #include "Common.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 
 class Behavior;
@@ -43,7 +42,7 @@ class Behavior;
 	A vector for storing Behavior objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < Behavior*, allocator<Behavior*> > BehaviorVector;
+typedef std::vector < Behavior* > BehaviorVector;
 
 /**
 	This class represents a behavior in the oval definition schema
@@ -52,24 +51,24 @@ typedef vector < Behavior*, allocator<Behavior*> > BehaviorVector;
 class Behavior {
 public:
 	/** Create a complete Behavior object. */
-	Behavior(string name = "", string value = "");
+	Behavior(std::string name = "", std::string value = "");
 	~Behavior();
 
 	/** Parses the set of behaviors specified on an object and returns then as a vector. */ 
 	static BehaviorVector* Parse(DOMElement* behaviorsElement);
 
 	/** Get the value of a named behavior in the specified set of behaviors. */
-	static string GetBehaviorValue(BehaviorVector* behaviors, string name);
+	static std::string GetBehaviorValue(BehaviorVector* behaviors, std::string name);
 
-	string GetName();
-	void SetName(string name);
+	std::string GetName();
+	void SetName(std::string name);
 
-	string GetValue();
-	void SetValue(string value);
+	std::string GetValue();
+	void SetValue(std::string value);
 
 private:
-	string name;
-	string value;
+	std::string name;
+	std::string value;
 };
 
 #endif

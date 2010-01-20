@@ -49,9 +49,6 @@
 #include "CollectedSet.h"
 #include "AbsProbe.h"
 
-//	namespaces
-using namespace std;
-
 // forward declarations
 class AbsProbe;
 class SetObject;
@@ -61,7 +58,7 @@ class CollectedObject;
 class CollectedSet;
 class Filter;
 class AbsState;
-typedef vector < AbsState*, allocator<AbsState*> > AbsStateVector;
+typedef std::vector < AbsState* > AbsStateVector;
 
 
 struct probe_comparator {
@@ -71,7 +68,7 @@ struct probe_comparator {
 };
 
 
-typedef set<AbsProbe *, probe_comparator> AbsProbeSet;
+typedef std::set<AbsProbe *, probe_comparator> AbsProbeSet;
 
 
 /**
@@ -93,7 +90,7 @@ public:
 	    This interpreter will never create a collected object based on an
 	    object other than a set object that is flagged as incomplete.
 	*/
-	CollectedObject* Run(string objectId);
+	CollectedObject* Run(std::string objectId);
 
 protected:
 	AbsObjectCollector();
@@ -192,7 +189,7 @@ protected:
 */
 class AbsObjectCollectorException : public Exception {
 	public:
-		AbsObjectCollectorException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		AbsObjectCollectorException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~AbsObjectCollectorException();
 };
 

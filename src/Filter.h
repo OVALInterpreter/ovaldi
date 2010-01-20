@@ -35,7 +35,6 @@
 #include "FilterEntity.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class FilterEntity;
 class Item;
@@ -52,7 +51,7 @@ public:
 	/** Get a Filter object for the specified state id.
 		Manages the cache of filters.
 	*/
-	static Filter* GetFilter(string statieId);
+	static Filter* GetFilter(std::string statieId);
 
 	/** Analyze the specified Item return the boolean result for the Item. */
 	bool Analyze(Item* item);	
@@ -72,10 +71,10 @@ private:
 		Parse the state element with the specified id into a Filter object.
 		@param id a string that hold the id of a state in an oval definition file to be parsed.
 	*/
-	Filter(string id);
+	Filter(std::string id);
 
 	/** Create a complete Filter object setting all properties. */
-	Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
+	Filter(std::string id, std::string name, std::string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
 
 	/** Cache the specified filter. */
 	static void Cache(Filter* filter);
@@ -83,7 +82,7 @@ private:
 	/** Search the cache of Filters for the specified filter. 
 		@return Returns a filter object with the specified id or NULL if not found
 	*/
-	static Filter* SearchCache(string id);
+	static Filter* SearchCache(std::string id);
 
 	static AbsStateMap processedFiltersMap;
 };

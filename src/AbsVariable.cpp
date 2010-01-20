@@ -30,6 +30,8 @@
 
 #include "AbsVariable.h"
 
+using namespace std;
+
 AbsVariableMap AbsVariable::processedVariableCache;
 
 //****************************************************************************************//

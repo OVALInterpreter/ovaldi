@@ -35,8 +35,6 @@
 #include "ComponentFactory.h"
 #include "VariableFactory.h"
 
-using namespace std;
-
 /**
 	This class represents an local_variable in an oval definition schema.
 */
@@ -44,7 +42,7 @@ class LocalVariable : public AbsVariable {
 public:
 
 	/** Create a complete LocalVariable. */
-	LocalVariable(string id = "", string name = "local_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
+	LocalVariable(std::string id = "", std::string name = "local_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 	~LocalVariable();
 
 	/** Parse the provided local_variable element into a LocalVariable. */

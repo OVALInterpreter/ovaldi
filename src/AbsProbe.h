@@ -44,12 +44,11 @@
 #include "Object.h"
 #include "ObjectEntity.h"
 
-using namespace std;
 
 class Object;
 class ObjectEntity;
 class Item;
-typedef vector < Item*, allocator<Item*> > ItemVector;
+typedef std::vector < Item* > ItemVector;
 
 /**
 	This class in the base for all probes. 
@@ -124,7 +123,7 @@ protected:
 		@param isRegex a bool that dictates how to apply the pattern. If true apply the pattern as a regular expression otherwise use a string compare for not equals. 
 		@return The result of the comparison betweent eh two string values.
 	*/
-	bool IsMatch(string pattern, string value, bool isRegex = true);
+	bool IsMatch(std::string pattern, std::string value, bool isRegex = true);
 
 
 	/** All probes make use of the regular expression processor for pattern matching. */
@@ -157,7 +156,7 @@ private:
 class ProbeException : public Exception {
 	public:
 
-		ProbeException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
+		ProbeException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
 		~ProbeException();
 };
 

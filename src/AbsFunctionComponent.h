@@ -34,7 +34,6 @@
 #include "AbsComponent.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents abstract function component in a local_varaible in the oval definition schema.

@@ -44,7 +44,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /** 
 	This class aligns roughly with the EntityBaseType as defined in the oval-definition-schema. 
@@ -63,7 +62,7 @@ public:
 		@param varCheck an OvalEnum::Check that represents the var_check attribute for the entity.
 		@param nil a bool that represents the xsi:nil attribute for the entity.
 	*/
-	AbsEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
+	AbsEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
 		AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
 
 	/**
@@ -116,14 +115,14 @@ public:
 	VariableValueVector* GetVariableValues(); 
 
 	/** Return the name field's value. */
-	string GetName();
+	std::string GetName();
 	/** Set the name field's value. */
-	void SetName(string name);
+	void SetName(std::string name);
 
 	/** Return the value field's value. */
-	string GetValue();
+	std::string GetValue();
 	/** Set the value field's value. */
-	void SetValue(string value);
+	void SetValue(std::string value);
 
 	/** Return the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
@@ -156,8 +155,8 @@ public:
 	void SetVarRef(AbsVariable* varRef);
 
 private:
-	string name;
-	string value;
+	std::string name;
+	std::string value;
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
 	OvalEnum::Check varCheck;
@@ -171,14 +170,14 @@ private:
 	A vector for storing AbsEntity objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < AbsEntity*, allocator<AbsEntity*> > AbsEntityVector;
+typedef std::vector < AbsEntity* > AbsEntityVector;
 
 /** 
 	This class represents an Exception that occured while processing an entity.
 */
 class AbsEntityException : public Exception {
 	public:
-		AbsEntityException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		AbsEntityException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~AbsEntityException();
 };
 

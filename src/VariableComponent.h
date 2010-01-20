@@ -37,7 +37,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a VariableComponent in a local_variable in the oval definition schema.

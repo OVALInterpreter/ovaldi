@@ -47,7 +47,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
 
 class UnameProbe : public AbsProbe {
 public:
