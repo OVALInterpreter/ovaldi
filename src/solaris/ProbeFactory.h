@@ -55,9 +55,11 @@
 #include "TextFileContentProbe.h"
 #include "XmlFileContentProbe.h"
 #include "VariableProbe.h"
+#include "InetdProbe.h"
+#include "PasswordProbe.h"
+#include "ShadowProbe.h"
+#include "InterfaceProbe.h"
 // SOLARIS PORT NOTICE: Add other probes here to support collection of solaris specific objects.
-
-using namespace std;
 
 class AbsProbe;
 
@@ -79,16 +81,16 @@ public:
 		@param objectName a string taht corresponds to the name of an object in the oval definition schema.
 		@return The probe for the specified object or NULL.
 	*/
-	static AbsProbe* GetProbe(string objectName);
+	static AbsProbe* GetProbe(std::string objectName);
 
 	/** 
 		Shutdown the ProbeFactory.
 	*/
 	static void Shutdown();
-};
-
 
 private:
   static AbsProbeSet _probes;
+};
+
 
 #endif
