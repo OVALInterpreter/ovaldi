@@ -152,7 +152,6 @@ OBJS = \
  ProbeFactory.obj \
  SystemInfo.obj \
  FileProbe.obj \
- InetListeningServersProbe.obj \
  ProcessProbe.obj \
  UnameProbe.obj \
  TextFileContentProbe.obj \
@@ -253,7 +252,6 @@ REL_OBJS = \
 	$(BUILDDIR)/SplitFunction.obj \
 	$(BUILDDIR)/SystemInfo.obj \
 	$(BUILDDIR)/FileProbe.obj \
-	$(BUILDDIR)/InetListeningServersProbe.obj \
 	$(BUILDDIR)/ProcessProbe.obj \
 	$(BUILDDIR)/UnameProbe.obj \
 	$(BUILDDIR)/TextFileContentProbe.obj \
