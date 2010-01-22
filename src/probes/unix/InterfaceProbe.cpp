@@ -194,16 +194,20 @@ void InterfaceProbe::GetAllInterfaces() {
 	StringVector interfaceNames = GetInterfaceNames();
 
 	struct ifreq req;
+#ifdef SUNOS
+	// gotta get MAC address via an ARP ioctl on solaris
+	struct arpreq arp;
+#endif
 	int result;
 
 	short flags = 0;           // the type of struct ifreq.ifr_flags
-	struct sockaddr hwAddr;    // the type of struct ifreq.ifr_hwaddr
+	struct sockaddr hwAddr;    // the type of struct ifreq.ifr_hwaddr (or arp.arp_ha on solaris)
 	struct sockaddr ipAddr;    // the type of struct ifreq.ifr_addr
 	struct sockaddr broadAddr; // the type of struct ifreq.ifr_broadaddr
 	struct sockaddr netmask;   // the type of struct ifreq.ifr_netmask
 
-	ItemEntity *nameEntity = NULL, *hwTypeEntity = NULL, *hwAddrEntity = NULL,
-		*ipAddrEntity = NULL, *broadAddrEntity = NULL, *netmaskEntity = NULL;
+	ItemEntity *nameEntity, *hwTypeEntity, *hwAddrEntity,
+		*ipAddrEntity, *broadAddrEntity, *netmaskEntity;
 	ItemEntityVector flagEntities;
 
 	// All the ioctl() calls we make require a real socket to work off of.
@@ -214,6 +218,9 @@ void InterfaceProbe::GetAllInterfaces() {
 	for (StringVector::iterator iter = interfaceNames.begin();
 		 iter != interfaceNames.end();
 		 ++iter) {
+
+		nameEntity = hwTypeEntity = hwAddrEntity = ipAddrEntity = broadAddrEntity =
+			netmaskEntity = NULL;
 
 		Log::Debug(string("Querying interface ") + (*iter) + "...");
 
@@ -244,40 +251,6 @@ void InterfaceProbe::GetAllInterfaces() {
 												OvalEnum::LEVEL_ERROR));
 			item->SetStatus(OvalEnum::STATUS_ERROR);
 		}
-
-		// hardware address/type
-		strcpy(req.ifr_name, iter->c_str());
-		result = ioctl(s, SIOCGIFHWADDR, &req);
-		if (result >= 0) {
-
-			hwAddr = req.ifr_hwaddr;
-
-			sa_family_t hwType = hwAddr.sa_family;
-
-			string hwTypeStr = this->HardwareTypeToString(hwType);
-			if (!hwTypeStr.empty())
-				hwTypeEntity = new ItemEntity("type", hwTypeStr);
-
-			if (hwType == ARPHRD_ETHER) {
-				char *hwaddr_data = hwAddr.sa_data;
-
-				// enough space for a mac address (6 2-char bytes, 5 separating colons and a null char)
-				char macAddress[20];
-
-				sprintf(macAddress, "%02X-%02X-%02X-%02X-%02X-%02X",
-						hwaddr_data[0] & 0xFF, hwaddr_data[1] & 0xFF, hwaddr_data[2] & 0xFF,
-						hwaddr_data[3] & 0xFF, hwaddr_data[4] & 0xFF, hwaddr_data[5] & 0xFF);
-				hwAddrEntity = new ItemEntity("hardware_addr", macAddress);
-			}
-
-		} else {
-			hwAddrEntity = new ItemEntity("hardware_addr", "", OvalEnum::DATATYPE_STRING,
-										  false, OvalEnum::STATUS_ERROR);
-			item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFHWADDR: " + strerror(errno),
-												OvalEnum::LEVEL_ERROR));
-			item->SetStatus(OvalEnum::STATUS_ERROR);
-		}
-
 
 		// The following requests require an ipv4 interface.  If the initial
 		// ioctl fails, we won't throw an exception; we'll just leave off
@@ -317,7 +290,11 @@ void InterfaceProbe::GetAllInterfaces() {
 			strcpy(req.ifr_name, iter->c_str());
 			result = ioctl(s, SIOCGIFNETMASK, &req);
 			if (result >= 0) {
-				netmask = req.ifr_netmask;
+				// solaris doesn't have ifr_netmask... ifr_addr yields
+				// the same thing and works on both solaris and linux, so I will use
+				// that instead.
+				//netmask = req.ifr_netmask;
+				netmask = req.ifr_addr;
 				addrPtr = (struct sockaddr_in *)&netmask;
 				netmaskEntity = new ItemEntity("netmask", inet_ntoa(addrPtr->sin_addr));
 			} else {
@@ -327,6 +304,65 @@ void InterfaceProbe::GetAllInterfaces() {
 													OvalEnum::LEVEL_ERROR));
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 			}
+		}
+
+		// hardware address/type
+#ifdef SUNOS
+		// on solaris, this requires having obtained the interface address first.
+		memset(&arp, 0, sizeof(arp));
+		arp.arp_pa = ipAddr;
+		result = ioctl(s, SIOCGARP, &arp);
+#else
+		strcpy(req.ifr_name, iter->c_str());
+		result = ioctl(s, SIOCGIFHWADDR, &req);
+#endif
+		if (result >= 0) {
+#ifdef SUNOS
+			// I don't know how to get the hardware type on solaris.  (The types
+			// are defined in the if_arp header and named ARPHRD_*, so you'd think
+			// it might have something to do with the ARP ioctl(), but
+			// arp_ha.sa_family doesn't seem to be filled out.)  So if the ioctl
+			// succeeds at all, I will assume that the hw type is ethernet...
+			// Is there a better way of doing this??
+			hwAddr = arp.arp_ha;
+			sa_family_t hwType = ARPHRD_ETHER;
+#else
+			hwAddr = req.ifr_hwaddr;
+			sa_family_t hwType = hwAddr.sa_family;
+#endif
+
+			string hwTypeStr = this->HardwareTypeToString(hwType);
+			
+			if (!hwTypeStr.empty())
+				hwTypeEntity = new ItemEntity("type", hwTypeStr);
+
+			if (hwType == ARPHRD_ETHER) {
+				char *hwaddr_data = hwAddr.sa_data;
+
+				// enough space for a mac address (6 2-char bytes, 5 separating colons and a null char)
+				char macAddress[20];
+
+				sprintf(macAddress, "%02X-%02X-%02X-%02X-%02X-%02X",
+						hwaddr_data[0] & 0xFF, hwaddr_data[1] & 0xFF, hwaddr_data[2] & 0xFF,
+						hwaddr_data[3] & 0xFF, hwaddr_data[4] & 0xFF, hwaddr_data[5] & 0xFF);
+				hwAddrEntity = new ItemEntity("hardware_addr", macAddress);
+			}
+
+		} else if (!(flags & IFF_LOOPBACK)) {
+			// on solaris I don't know how to get a hardware type, and the SIOCGARP
+			// ioctl fails on the loopback... so a special check here to avoid having
+			// errors on the loopback item.
+			hwAddrEntity = new ItemEntity("hardware_addr", "", OvalEnum::DATATYPE_STRING,
+										  false, OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(errorMsgPrefix +
+#ifdef SUNOS
+												"ioctl SIOCGARP: " +
+#else
+												"ioctl SIOCGIFHWADDR: " +
+#endif
+												strerror(errno),
+												OvalEnum::LEVEL_ERROR));
+			item->SetStatus(OvalEnum::STATUS_ERROR);
 		}
 
 		// Now, add all the entities we made to our item, in the proper order
@@ -377,7 +413,11 @@ StringVector InterfaceProbe::GetInterfaceNames() {
 	do {
 		recordsAllocated += 5;
 		ifc.ifc_len = recordsAllocated * sizeof(struct ifreq);
-		__caddr_t tmpBuf  = (__caddr_t)realloc(ifc.ifc_buf, ifc.ifc_len);
+#ifdef SUNOS
+		caddr_t tmpBuf = (caddr_t)realloc(ifc.ifc_buf, ifc.ifc_len);
+#else
+		__caddr_t tmpBuf = (__caddr_t)realloc(ifc.ifc_buf, ifc.ifc_len);
+#endif
 
 		// make sure the allocation succeeded
 		if (tmpBuf == NULL) {
@@ -420,12 +460,30 @@ StringVector InterfaceProbe::GetInterfaceNames() {
 
 void InterfaceProbe::SetupHardwareTypes() {
 	this->hardwareTypeNameMap[ARPHRD_ETHER] = "ARPHRD_ETHER";
+
+#ifdef ARPHRD_FDDI
 	this->hardwareTypeNameMap[ARPHRD_FDDI] = "ARPHRD_FDDI";
+#endif
+
+#ifdef ARPHRD_LOOPBACK
 	this->hardwareTypeNameMap[ARPHRD_LOOPBACK] = "ARPHRD_LOOPBACK";
+#endif
+
+#ifdef ARPHRD_VOID
 	this->hardwareTypeNameMap[ARPHRD_VOID] = "ARPHRD_VOID";
+#endif
+
+#ifdef ARPHRD_PPP
 	this->hardwareTypeNameMap[ARPHRD_PPP] = "ARPHRD_PPP";
+#endif
+
+#ifdef ARPHRD_SLIP
 	this->hardwareTypeNameMap[ARPHRD_SLIP] = "ARPHRD_SLIP";
+#endif
+
+#ifdef ARPHRD_PRONET
 	this->hardwareTypeNameMap[ARPHRD_PRONET] = "ARPHRD_PRONET";
+#endif
 }
 
 string InterfaceProbe::HardwareTypeToString(sa_family_t hwFamily) {
@@ -461,18 +519,33 @@ ItemEntityVector InterfaceProbe::ProcessFlags(short flags) {
 	if (flags & IFF_ALLMULTI)
 		entities.push_back(new ItemEntity("flag", "ALLMULTI"));
 
+#ifdef IFF_MASTER
 	if (flags & IFF_MASTER)
 		entities.push_back(new ItemEntity("flag", "MASTER"));
+#endif
+
+#ifdef IFF_SLAVE
 	if (flags & IFF_SLAVE)
 		entities.push_back(new ItemEntity("flag", "SLAVE"));
+#endif
+
 	if (flags & IFF_MULTICAST)
 		entities.push_back(new ItemEntity("flag", "MULTICAST"));
+
+#ifdef IFF_PORTSEL
 	if (flags & IFF_PORTSEL)
 		entities.push_back(new ItemEntity("flag", "PORTSEL"));
+#endif
+
+#ifdef IFF_AUTOMEDIA
 	if (flags & IFF_AUTOMEDIA)
 		entities.push_back(new ItemEntity("flag", "AUTOMEDIA"));
+#endif
+
+#ifdef IFF_DYNAMIC
 	if (flags & IFF_DYNAMIC)
 		entities.push_back(new ItemEntity("flag", "DYNAMIC"));
+#endif
 
 	return entities;
 }
