@@ -28,36 +28,69 @@
 //
 //****************************************************************************************//
 
-//SOLARIS PORT NOTICE:
-
-//This code is copied from the linux version of this file. I assume that in this case there
-//are is no need to change this code to run on solaris os. When a port to solaris is provided 
-//this code needs to be tested.
-
 #include "FileFinder.h"
 
+using namespace std;
+
 FileFinder::FileFinder() {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	// -----------------------------------------------------------------------
 
 }
 
 FileFinder::~FileFinder() {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//	Do nothing for now
-	// -----------------------------------------------------------------------
 
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors) {
+	
+	// Process the behaviors to identify any additional paths.
+	// initialize these default values based on the defaults 
+	// set in the oval definitions schema
+	string recurseDirection = Behavior::GetBehaviorValue(behaviors, "recurse_direction");
+	if(recurseDirection.compare("") == 0) {
+		recurseDirection = "none";
+	}
+
+	string maxDepthStr = Behavior::GetBehaviorValue(behaviors, "max_depth");
+	int maxDepth = -1;
+	if(maxDepthStr.compare("") != 0) {
+		maxDepth = atoi(maxDepthStr.c_str());
+		if(maxDepth < -1) 
+			maxDepth = -1;
+	}
+
+	string recurseStr = Behavior::GetBehaviorValue(behaviors, "recurse");
+	if(recurseStr.compare("") != 0) {
+		throw ProbeException("Unsupported behavior: recurse");
+	}
+
+	string recurse_file_systemStr = Behavior::GetBehaviorValue(behaviors, "recurse_file_system");
+	if(recurse_file_systemStr.compare("") != 0) {
+		throw ProbeException("Unsupported behavior: recurse_file_system");
+	}
+
+
+	// only need to address recurseDirection up & down if maxDepth is not 0
+	StringVector* behaviorPaths = new StringVector();
+	if(recurseDirection.compare("up") == 0 && maxDepth != 0) {
+		StringVector::iterator path;
+		for(path = paths->begin(); path != paths->end(); path++) {
+			this->UpwardPathRecursion(behaviorPaths, (*path), maxDepth);
+		}
+
+	} else if(recurseDirection.compare("down") == 0 && maxDepth != 0) {
+		StringVector::iterator path;
+for(path = paths->begin(); path != paths->end(); path++) {
+			this->DownwardPathRecursion(behaviorPaths, (*path), maxDepth);
+		}
+	}
+
+	return behaviorPaths;
+}
+
 void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 	// -----------------------------------------------------------------------
 	//
@@ -71,19 +104,23 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 
 	string patternOut= "";
 	string constPortion= "";
-	string fileSeperatorStr = "";
-	fileSeperatorStr+=Common::fileSeperator;
-	this->fileMatcher->GetConstantPortion(regex, fileSeperatorStr, &patternOut, &constPortion);
-	// Remove extra slashes
-	constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+	string fileSeperatorStr = Common::fileSeperatorStr;
 
+	// This optimization only applies when the regex is anchored to
+	// the beginning of paths. (regex has to start with '^')
+	if (isRegex && !regex.empty() && regex[0] == '^') {		
+		this->fileMatcher->GetConstantPortion(regex, Common::fileSeperator, &patternOut, &constPortion);
+		// Remove extra slashes
+		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+	}
+	
 	// Found a constant portion
 	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
 
 		//	Call search function
 		this->GetPathsForPattern(constPortion, regex, paths, isRegex);
 
-	//	No constant portion.
+		//	No constant portion.
 	} else if(constPortion.compare("") == 0) { 
 		
 		try  {
@@ -158,10 +195,6 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 			if(this->IsMatch(pattern.c_str(), dirIn.c_str(), isRegex))
 				pathVector->push_back(dirIn);
 
-			//	Append a '/'
-			if(dirIn.at(dirIn.length()-1) != Common::fileSeperator)
-				dirIn.append("/");
-
 			//	Open the directory
 			dp = opendir(dirIn.c_str());
 			if(dp == NULL) {
@@ -171,15 +204,21 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				return;
 			}
 
+			//if the directory doesn't end in a file separator add it
+
+			if (dirIn.at(dirIn.length()-1) != Common::fileSeperator)
+			  dirIn.append(1, Common::fileSeperator);
+
+
 			//	Loop through all names in the directory and make recursive call
 			while((dirp = readdir(dp)) != NULL) {
 				//	Ignore dot and dot-dot
 				if(strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
 					continue;
 
-				//	append the name after the "/"
-				tmp = dirIn;
-				tmp.append(dirp->d_name);
+				//	append the name
+			      
+				tmp = dirIn + dirp->d_name;
 
 				// Nake recursive call
 				GetPathsForPattern(tmp, pattern, pathVector, isRegex);
@@ -211,7 +250,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, BehaviorVector* behaviors, StringVector* fileNames, bool isRegex) {
+void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -266,10 +305,16 @@ void FileFinder::GetFilesForPattern(string path, string pattern, BehaviorVector*
 			}
 
 			//	If not a directory check if a match
-			if(S_ISREG(statbuf.st_mode) == 0) {
+			if(S_ISREG(statbuf.st_mode)) {
 				string fileName = dirp->d_name;
-				if(this->IsMatch(pattern, fileName, isRegex))
-					fileNames->push_back(fileName);
+				if ( isFilePath ){
+					string filepath = Common::BuildFilePath(path,fileName);
+					if(this->IsMatch(pattern,filepath,isRegex))
+						fileNames->push_back(filepath);
+				}else{
+					if(this->IsMatch(pattern, fileName, isRegex))
+						fileNames->push_back(fileName);
+				}
 			}
 		}
 
@@ -349,4 +394,81 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 	}
 
 	return exists;
+}
+
+StringVector* FileFinder::GetChildDirectories(string path) {
+	// -----------------------------------------------------------------------
+	//
+	//  ABSTRACT
+	//
+	//  This function returns the set of child directories in the specified directory.
+	//	The caller is responsible for deleting the StringVector* of child paths.
+	//
+	// -----------------------------------------------------------------------
+
+	StringVector* childDirs = new StringVector();
+	try {
+
+		struct stat statbuf;
+		struct dirent *dirp;
+		DIR *dp;
+
+		//	Call stat 
+		if(lstat(path.c_str(), &statbuf) < 0) {
+			// dir does not exist
+			return childDirs; 
+		}
+
+		// only consider dirs
+		if(S_ISDIR(statbuf.st_mode) == 1) {
+
+			//	Append a '/'
+			if(path.at(path.length()-1) != Common::fileSeperator)
+				path.append("/");
+
+			//	Open the directory
+			dp = opendir(path.c_str());
+			if(dp == NULL) {
+				//	Error opening directory
+				//	not sure this error matters
+				// cout << "Failed to open the directory" << endl;
+				return childDirs;
+			}
+
+			//	Loop through all names in the directory and make recursive call
+			while((dirp = readdir(dp)) != NULL) {
+				//	Ignore dot and dot-dot
+				if(strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
+					continue;
+
+				//	append the name after the "/"
+				string childDir = path;	
+				childDir.append(dirp->d_name);
+				
+				childDirs->push_back(childDir);
+			}
+
+
+			//	Close the directory
+			if(closedir(dp) < 0) {
+				//	Error closing the directory
+				//	not sure this error matters
+				// cout << "Failed to close the directory" << endl;
+				return childDirs;
+			}
+		}
+
+	//	Just need to ensure that all exceptions have a nice message. 
+	//	So rethrow the exceptions I created catch the others and format them.
+	} catch(Exception ex) {
+		throw;
+	} catch(...) {
+
+		string errorMessage = "";
+		errorMessage.append("Error: An unspecified error was encountered while trying to get child directories. Parent Directory: ");
+		errorMessage.append(path);
+		throw FileFinderException(errorMessage);
+	}
+
+	return childDirs;
 }

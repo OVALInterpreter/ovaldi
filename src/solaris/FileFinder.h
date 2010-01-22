@@ -28,12 +28,6 @@
 //
 //****************************************************************************************//
 
-//SOLARIS PORT NOTICE:
-
-//This code is copied from the linux version of this file. I assume that in this case there
-//are is no need to change this code to run on solaris os. When a port to solaris is provided 
-//this code needs to be tested.
-
 #ifndef FILEFINDER_H
 #define FILEFINDER_H
 
@@ -47,22 +41,31 @@
 #include <dirent.h>
 #include <limits.h>
 
-using namespace std;
-
 /**
-	This class is the solaris file searching implmentation used by this application
+	This class is the linux file searching implmentation used by this application
 */
 class FileFinder : public AbsFileFinder {
 public:
 	FileFinder();
 	~FileFinder();
 
-protected:
-	bool PathExists(string path);
-	bool FileNameExists(string path, string fileName);
-	void FindPaths(string regex, StringVector* paths, bool isRegex = true);
-	void GetFilesForPattern(string path, string pattern, BehaviorVector* behaviors, StringVector* fileNames, bool isRegex = true);
-	void GetPathsForPattern(string dirIn, string pattern, StringVector* pathVector, bool isRegex = true);	
+private:
+	/** Return the set of matching paths after applying behaviors.
+	    The only defined behaviors for unix files are:
+		recurse_direction, max_depth, recurse, and recurse_file_system
+		Currently only recurse_direction and max_depth are implemented.
+	*/
+	StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
+
+	bool PathExists(std::string path);
+	bool FileNameExists(std::string path, std::string fileName);
+	void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
+	void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
+	void GetPathsForPattern(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
+	/** Get the full path of all child directories as a StringVector. 
+	    The caller is responsible for deleting the StringVector* of child paths.
+	*/
+	StringVector* GetChildDirectories(std::string path);
 };
 
 #endif
