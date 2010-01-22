@@ -36,6 +36,8 @@
 
 #include "ProbeFactory.h"
 
+using namespace std;
+
 AbsProbeSet ProbeFactory::_probes;
 
 // ***************************************************************************************	//
@@ -80,11 +82,11 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = FileProbe::Instance();	
 	} else if(objectName.compare("inetd_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = InetdProbe::Instance();
 	} else if(objectName.compare("interface_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = InterfaceProbe::Instance();
 	} else if(objectName.compare("password_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = PasswordProbe::Instance();
 	} else if(objectName.compare("process_object") == 0) {
 		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = ProcessProbe::Instance();
@@ -93,7 +95,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = ShadowProbe::Instance();
 	} else if(objectName.compare("uname_object") == 0) {
 		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = UnameProbe::Instance();
