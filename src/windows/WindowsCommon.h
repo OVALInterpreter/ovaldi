@@ -280,7 +280,7 @@ public:
 	/** Return the access mask for the Windows object for the specified SID. */
 	static void GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
 
-	/** Return the successful and failure audit access masks for the Windows object for the specifed SID. 
+	/** Return the successful and failure audit access masks for the Windows object for the specified SID. 
 	  * @param objectType A SE_OBJECT_TYPE that specifies the type of the Windows object.
       * @param pSid A pointer to a SID structure that specifies the SID whose audit access masks that you would like to obtain.
 	  * @param objectNameStr A string value that contains the name of the Windows object.

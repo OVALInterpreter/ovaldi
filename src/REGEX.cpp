@@ -202,7 +202,7 @@ bool REGEX::IsMatch(const char *patternIn, const char *searchStringIn) {
 	//	Check for compile errors
 	if(compiledPattern == NULL)
 	{
-		string errMsg = "Error: Failed to compile the specifed regular expression pattern.\n\tPattern: ";
+		string errMsg = "Error: Failed to compile the specified regular expression pattern.\n\tPattern: ";
 		errMsg.append(patternIn);
 		errMsg.append("\n\tOffset: ");
 		
@@ -271,7 +271,7 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 	//	Check for compile errors
 	if(compiledPattern == NULL) {
 
-		string errMsg = "Error: Failed to compile the specifed regular expression pattern.\n\tPattern: ";
+		string errMsg = "Error: Failed to compile the specified regular expression pattern.\n\tPattern: ";
 		errMsg.append(patternIn);
 		errMsg.append("\n\tOffset: ");
 		
@@ -369,7 +369,7 @@ void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& search
 
 	//	Check for compile errors
 	if(re == NULL) {
-		string errMsg = "Error: Failed to compile the specifed regular expression pattern.";
+		string errMsg = "Error: Failed to compile the specified regular expression pattern.";
 		errMsg += "\n\tPattern: " + pattern;
 		errMsg += "\n\tOffset: " + Common::ToString(errOffset);
 		errMsg += "\n\tMessage: " + string(error);
