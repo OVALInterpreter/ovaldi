@@ -485,10 +485,11 @@ RunLevelProbe::_addRunlevelItem( const char * dir, const char * filename, const 
     fullPath = _constructFullPath( dir, filename );
     stat( fullPath, &st_file );
 
-    if( st_file.st_mode & S_IFLNK ){
+	if( S_ISLNK(st_file.st_mode) ){
       _handleLink( filename, fullPath, runlevel );
     }
-    else if( st_file.st_mode & S_IFREG ){
+
+	else if( S_ISREG(st_file.st_mode) ){
       _handleReg( filename, runlevel );
     }
     else ;  // Directories, Pipes, Sockets, etc. cannot be used -- only Symbolic Links and Regular Files (scripts and binary executables)
