@@ -685,7 +685,8 @@ void XinetdProbe::ReadFileToString(const string& fileName, string &contents) {
 		throw ProbeException(string("Couldn't open file ")+fileName);
 
 	while(in && count == sizeof(buf)) {
-		count = in.readsome(buf, sizeof(buf));
+		in.read(buf, sizeof(buf));
+		count = in.gcount();
 		contents.append(buf, count);
 	}
 
@@ -714,8 +715,25 @@ void XinetdProbe::CanonicalizeFileName(string& fileName) {
 	errno = 0;
 	char *canonFileName = realpath(fileName.c_str(), NULL);
 
-	if (errno != 0)
-		throw ProbeException(string("Error canonicalizing xinetd config file ")+fileName+": "+strerror(errno));
+	if (errno != 0) {
+		// I found that on solaris, passing NULL as the second param is
+		// not supported!  Arrggghhh.... ok, so if passing NULL fails,
+		// I will try again, with a buffer of size PATH_MAX.  If that
+		// fails, then I will throw an exception!
+		int pathMaxBytes = PATH_MAX*sizeof(char);
+		char *resolvedName = (char*)malloc(pathMaxBytes);
+		if (resolvedName == NULL)
+			throw ProbeException("Error canonicalizing xinetd config file "+fileName+": could not allocate PATH_MAX chars ("+Common::ToString(pathMaxBytes)+" bytes) for canonicalized name: "+strerror(errno));
+
+		errno = 0;
+		canonFileName = realpath(fileName.c_str(), resolvedName);
+		if (errno != 0) {
+			free(resolvedName);
+			throw ProbeException("Error canonicalizing xinetd config file "+fileName+": "+strerror(errno));
+		}
+	}
+
+	//Log::Debug("Canonicalized "+fileName+" to "+canonFileName);
 
 	fileName = canonFileName;
 	free(canonFileName);
