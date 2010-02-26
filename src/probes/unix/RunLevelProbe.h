@@ -43,12 +43,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifndef INIT_DIR
-#define INIT_DIR  "/etc/rc.d/init.d"
-#endif  /* INIT_DIR */
-
 #ifndef RC_DIR
-#define RC_DIR    "/etc/rc.d"
+#  ifdef LINUX
+#    define RC_DIR "/etc/rc.d"
+#  elif defined SUNOS
+#    define RC_DIR "/etc"
+#  endif
 #endif  /* RC_DIR */
 
 #define BUFLEN    1024
