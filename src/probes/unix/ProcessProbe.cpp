@@ -38,8 +38,25 @@ using namespace std;
 
 ProcessProbe *ProcessProbe::instance = NULL;
 
+#ifdef SUNOS
 
+namespace {
 
+	// private stuff used to find tty device paths on solaris.
+	string devPath;
+	dev_t dev;
+
+	int searcher(const char *filename, const struct stat *st, int filetype) {
+		if (filetype != FTW_F || !S_ISCHR(st->st_mode) || dev != st->st_rdev)
+			return 0;
+		
+		devPath = filename;
+		return 1;
+	}
+
+}
+
+#endif
 
 ProcessProbe::ProcessProbe() {}
 
@@ -83,11 +100,11 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 
 	ItemVector *collectedItems = new ItemVector();
 
-	StringVector* commands = this->GetCommands(command);
+	StringPairVector* commands = this->GetCommands(command);
 	if(commands->size() > 0) {
-		StringVector::iterator iterator;
+		StringPairVector::iterator iterator;
 		for(iterator = commands->begin(); iterator != commands->end(); iterator++) {		
-			this->GetPSInfo((*iterator), collectedItems);
+			this->GetPSInfo((*iterator)->first, (*iterator)->second, collectedItems);
 		}
 	} else {
 
@@ -114,8 +131,7 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 		}
 	}
 
-	commands->clear();
-	delete commands;
+	this->DeleteCommands(commands);
 
 	return collectedItems;
 }  
@@ -143,61 +159,61 @@ Item* ProcessProbe::CreateItem() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 
-StringVector* ProcessProbe::GetCommands(ObjectEntity* command) {
+StringPairVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 
-	StringVector* commands = NULL;
+	StringPairVector* commands;
+	StringVector commandEntityValues;
+	StringVector::size_type numEntityValues;
+	string pid;
 
-	// does this name use variables?
-	if(command->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(command->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			commands = new StringVector();
-			// if the command exists add it to the list 
-			if(this->CommandExists(command->GetValue())) {
-				commands->push_back(command->GetValue());
-			}
-
-		} else if(command->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			
-			commands = this->GetMatchingCommands(command->GetValue(), false);
-
-		} else if(command->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			commands = this->GetMatchingCommands(command->GetValue(), true);
-		}		
-
-	} else {
-
-		commands = new StringVector();
-
-		// Get all names
-		StringVector allCommands;
-
-		if(command->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all names
-			// if they exist on the system
-			VariableValueVector::iterator iterator;
-			for(iterator = command->GetVarRef()->GetValues()->begin(); iterator != command->GetVarRef()->GetValues()->end(); iterator++) {
-				
-				if(this->CommandExists((*iterator)->GetValue())) {
-					allCommands.push_back((*iterator)->GetValue());
-				}
-			}
-
-		} else {
-            this->GetMatchingCommands(".*", &allCommands);
-		}
+	command->GetEntityValues(commandEntityValues); // ignoring flag return value for now
+	numEntityValues = commandEntityValues.size();
 	
-		// loop through all names on the system
-		// only keep names that match operation and value and var check
+	switch(command->GetOperation()) {
+
+	case OvalEnum::OPERATION_EQUALS:
+		commands = new StringPairVector();
+		for (StringVector::iterator iter = commandEntityValues.begin();
+			 iter != commandEntityValues.end();
+			 ++iter) {
+			if (this->CommandExists(*iter, pid))
+				commands->push_back(new pair<string,string>(*iter, pid));
+		}
+		break;
+		
+	case OvalEnum::OPERATION_NOT_EQUAL:
+		if (numEntityValues == 1)
+			commands = this->GetMatchingCommands(commandEntityValues[0], false);
+		else
+			commands = this->GetMatchingCommands("", true); //gets all commands
+		break;
+		
+	case OvalEnum::OPERATION_PATTERN_MATCH:
+		if (numEntityValues == 1)
+			commands = this->GetMatchingCommands(commandEntityValues[0], true);
+		else
+			commands = this->GetMatchingCommands("", true); //gets all commands
+		break;
+		
+	default:
+		throw ProbeException("ProcessProbe: unsupported operation: "+OvalEnum::OperationToString(command->GetOperation()));
+		break;
+	}
+
+	// If var_ref was specified, we need to make a second pass since
+	// in some cases above, we punted on actually satisfying the criteria
+	// (and just got everything).  And at the least, we should check that
+	// the var_check is satisfied.
+	if (command->GetVarRef() != NULL) {
 		ItemEntity* tmp = this->CreateItemEntity(command);
-		StringVector::iterator it;
-		for(it = allCommands.begin(); it != allCommands.end(); it++) {
-			tmp->SetValue((*it));
-			
-			if(command->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				commands->push_back((*it));
+		StringPairVector::iterator it;
+		for(it = commands->begin(); it != commands->end(); ) {
+			tmp->SetValue((*it)->first);
+			if(command->Analyze(tmp) == OvalEnum::RESULT_TRUE)
+				++it;
+			else {
+				delete *it;
+				it = commands->erase(it);
 			}
 		}
 	}
@@ -205,7 +221,8 @@ StringVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 	return commands;
 }
 
-void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
+#ifdef LINUX
+void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	string errMsg = "";
 
@@ -235,6 +252,10 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 		throw ProbeException(errMsg);
     }
 
+	string procDir = "/proc/" + pidStr;
+	struct stat st;
+
+	/*
 	DIR *proc;
 	struct dirent *readProc;
 
@@ -248,7 +269,11 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 		// Loop through all of the files - we're only concerned with those that
 		// start with a digit
 		while((readProc = readdir(proc)) != NULL) {
-			if(isdigit(readProc->d_name[0])) {
+		if(isdigit(readProc->d_name[0])) {
+*/
+	if (stat(procDir.c_str(), &st) != 0)
+		return; // oops, this process went away when we weren't looking
+
 				// Clear the ps values
 				memset(cmdline, 0, CMDLINE_LEN + 1);
 				memset(schedulingClass, 0, SCHED_CLASS_LEN + 1);
@@ -258,9 +283,9 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 				errMsg = "";
 
 				// Retrieve the command line with arguments
-				status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				status = RetrieveCommandLine(pidStr.c_str(), cmdline, &errMsg);
 				if(status < 0) { 
-				    closedir(proc);
+					//				    closedir(proc);
 					throw ProbeException(errMsg);
 
 				// If the command line matches the input command line get the remaining 
@@ -272,7 +297,7 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 					item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
 					// Read the 'stat' file for the remaining process parameters
-					status = RetrieveStatFile(readProc->d_name, &uid, &pid, &ppid, &priority, &starttime, &errMsg);
+					status = RetrieveStatFile(pidStr.c_str(), &uid, &pid, &ppid, &priority, &starttime, &errMsg);
 					if(status < 0) {
 						item->AppendMessage(new OvalMessage(errMsg));
 					} else {
@@ -280,7 +305,7 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 						// We can retrieve a value for the tty from the 'stat' file, but it's unclear
 						// how you convert that to a device name.  Therefore, we ignore that value
 						// and grab the device stdout(fd/0) is attached to.
-						RetrieveTTY(readProc->d_name, ttyName);
+						RetrieveTTY(pidStr.c_str(), ttyName);
 
 						// The Linux start time is represented as the number of jiffies (1/100 sec)
 						// that the application was started after the last system reboot.  To get an
@@ -312,134 +337,14 @@ void ProcessProbe::GetPSInfo(string command, ItemVector* items) {
 
 					items->push_back(item); 
 				}
-			}
+				/*			}
 		} // else
     closedir(proc);
   }
+				*/
 }
 
-bool ProcessProbe::CommandExists(string command) {
-	bool exists = false;
-	string errMsg = "";
-
-	// Process Parameters
-	char cmdline[CMDLINE_LEN + 1];
-
-	DIR *proc;
-	struct dirent *readProc;
-
-	// Step into the /proc directory
-	if((proc = opendir("/proc")) == NULL) {
-		errMsg.append("ProcessProbe: Could not open /proc");
-		throw ProbeException(errMsg);
-
-	} else {
-
-		// Loop through all of the files - we're only concerned with those that
-		// start with a digit
-		while((readProc = readdir(proc)) != NULL) {
-			if(isdigit(readProc->d_name[0])) {
-				// Clear the ps values
-				memset(cmdline, 0, CMDLINE_LEN + 1);
-				errMsg = "";
-
-				// Retrieve the command line with arguments
-				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
-				if(status < 0) { 
-					closedir(proc);
-					throw ProbeException(errMsg);
-
-				// If the command line matches the input command line return true
-				} else if(status == 0 && command.compare(cmdline) == 0) {
-					exists = true;
-					break;
-				}
-			}
-		} // else
-    closedir(proc);
-  }
-  return exists;
-}
-
-StringVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
-	StringVector* commands = new StringVector();
-	string errMsg = "";
-
-	// Process Parameters
-	char cmdline[CMDLINE_LEN + 1];
-
-	DIR *proc;
-	struct dirent *readProc;
-
-	// Step into the /proc directory
-	if((proc = opendir("/proc")) == NULL) {
-		errMsg.append("ProcessProbe: Could not open /proc");
-		throw ProbeException(errMsg);
-
-	} else {
-
-		// Loop through all of the files - we're only concerned with those that
-		// start with a digit
-		while((readProc = readdir(proc)) != NULL) {
-			if(isdigit(readProc->d_name[0])) {
-				// Clear the ps values
-				memset(cmdline, 0, CMDLINE_LEN + 1);
-				errMsg = "";
-
-				// Retrieve the command line with arguments
-				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
-				if(status < 0) { 
-					closedir(proc);
-					throw ProbeException(errMsg);
-
-				// If the command line matches the input command line store it
-				} else if(status == 0 && this->IsMatch(pattern, cmdline, isRegex)) {
-					commands->push_back(cmdline);
-				}
-			}
-		} // else
-    closedir(proc);
-  }
-  return commands;
-}
-
-int ProcessProbe::RetrieveCommandLine(char *process, char *cmdline, string *errMsg) {
-	int i = 0;
-	int bytes = 0;
-	FILE *cmdlineFile = NULL;
-
-	// Build the absolute path to the command line file
-	string cmdlinePath = "/proc/";
-	cmdlinePath.append(process);
-	cmdlinePath.append("/cmdline");
-
-	// Open the file for reading
-	if((cmdlineFile = fopen(cmdlinePath.c_str(), "r")) == NULL) {
-		errMsg->append("ProcessProbe: Unable to obtain command line for pid: ");
-		errMsg->append(process);
-		return(-1);
-
-	} else {
-    
-		// Read the contents of the file, and convert all of the NULL's
-		// separating the args to spaces.
-		//
-		bytes = fread(cmdline, sizeof(char), CMDLINE_LEN, cmdlineFile);
-	    
-		// Remember to leave the trailing NULL (bytes - 1).
-		for(i = 0; i < bytes - 1; i++) {
-			if(cmdline[i] == '\0') {
-				cmdline[i] = ' ';
-			}
-		}
-	}
-
-	fclose(cmdlineFile); 
-
-	return(0);
-}
-
-int ProcessProbe::RetrieveStatFile(char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
+int ProcessProbe::RetrieveStatFile(const char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
 
   // Stat File parameters.  While we're really only concerned with gathering the parameters
   // that are passed in, these variables are good placeholders in case we decide to collect
@@ -490,7 +395,7 @@ int ProcessProbe::RetrieveStatFile(char *process, int *uid, int *pid, int *ppid,
   return(0);
 }
 
-void ProcessProbe::RetrieveTTY(char *process, char *ttyName) {
+void ProcessProbe::RetrieveTTY(const char *process, char *ttyName) {
   int bytes = 0;
 
   // Generate the absolute path name for the stdout(0) file in 'fd'
@@ -525,7 +430,286 @@ int  ProcessProbe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
   return(0);
 }
 
-string ProcessProbe::FormatExecTime(unsigned long execTime) {
+#elif defined SUNOS
+
+void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
+
+	string psinfoFileName = "/proc/"+pidStr+"/psinfo";
+	psinfo_t info;
+	FILE *fp;
+	pid_t pid, ppid;
+	dev_t tty;
+	timestruc_t startTime, execTime;
+	int priority;
+	string schedClass;
+	uid_t userId;
+	string formattedStartTime, formattedExecTime;
+	string devicePath;
+	Item *item;
+
+	errno = 0;
+	if ((fp = fopen(psinfoFileName.c_str(), "rb")) == NULL) {
+		// Processes come and go; if it went away, that's ok.
+		// No need to report.  If there was some other
+		// error, throw an exception.
+		if (errno == ENOENT)
+			return;
+
+		throw ProbeException("ProcessProbe: Error opening "+psinfoFileName+": "+strerror(errno));
+	}
+
+	if (fread(&info, sizeof(psinfo_t), 1, fp) < 1) {
+		// the psinfo file for some reason was too small, or
+		// there was some other error...
+		fclose(fp);
+		throw ProbeException("ProcessProbe: Error reading process info from "+psinfoFileName+": "+strerror(errno));
+	}
+
+	fclose(fp);
+
+	execTime = info.pr_time;
+	startTime = info.pr_start;
+	pid = info.pr_pid;
+	ppid = info.pr_ppid;
+
+	//note that this priority is for the "representative" lwp.  I guess
+	//in general, priority is not a property of a process, but a lwp
+	//(a thread).
+	priority = info.pr_lwp.pr_pri;
+
+	// also a lwp property, not a process property
+	schedClass = info.pr_lwp.pr_clname;
+	
+	tty = info.pr_ttydev;
+	userId = info.pr_uid;
+	
+	formattedExecTime = this->FormatExecTime(execTime.tv_sec);
+	formattedStartTime = this->FormatStartTime(startTime.tv_sec);
+
+	devicePath = this->GetDevicePath(tty);
+
+	item = this->CreateItem();
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	item->AppendElement(new ItemEntity("command", command, OvalEnum::DATATYPE_STRING, true));
+	item->AppendElement(new ItemEntity("exec_time", formattedExecTime));
+	item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER));
+	item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
+	item->AppendElement(new ItemEntity("priority", Common::ToString(priority)));
+	item->AppendElement(new ItemEntity("scheduling_class", schedClass));
+	item->AppendElement(new ItemEntity("start_time", formattedStartTime));
+	if (!devicePath.empty())
+		item->AppendElement(new ItemEntity("tty", devicePath));
+	item->AppendElement(new ItemEntity("user_id", Common::ToString(userId)));
+	
+	items->push_back(item);
+}
+
+string ProcessProbe::GetDevicePath(dev_t tty) {
+	StringVector deviceDirs = this->GetDeviceSearchDirs();
+
+	// the last ditch fallback... search all of /dev
+	deviceDirs.push_back("/dev");
+
+	for (StringVector::iterator iter = deviceDirs.begin();
+		 iter != deviceDirs.end();
+		 ++iter) {
+		
+		::dev = tty;
+		errno = 0;
+		int err = ftw(iter->c_str(), ::searcher, 10);
+
+		if (err > 0)
+			return ::devPath;
+		else if (err < 0 && errno != ENOENT)
+			// if an error occurs finding the tty device path, we will just
+			// leave off the entity, not halt the collection.  Don't show
+			// a message for ENOENT because /etc/ttysrch can list directories
+			// which don't exist, and we don't want to spam users...
+			Log::Message("ProcessProbe: Error occurred during search for device path under "+*iter+": "+strerror(errno));
+	}
+
+	return "";
+}
+
+StringVector ProcessProbe::GetDeviceSearchDirs() {
+	StringVector dirs;
+	string line;
+	ifstream file("/etc/ttysrch");	
+
+	if (file) {
+		while(getline(file, line)) {
+			Common::TrimString(line);
+			if (line.empty() || line[0] == '#')
+				continue; // skip blanks and comments
+
+			// Mimic documented behavior of ttyname(3C), and ignore
+			// dirs which don't start with "/dev".
+			if (!this->IsMatch("^/dev", line, true))
+				continue;
+
+			// each directory can have some modifier chars... ignore them.  Just
+			// grab the first space-delimited substring.
+			string::iterator firstSpace = find_if(line.begin(), line.end(), (int (*)(int))isspace);
+			dirs.push_back(line.substr(0, firstSpace - line.begin()));
+		}
+	}
+
+	return dirs;
+}
+
+#endif
+
+bool ProcessProbe::CommandExists(string command, string &pid) {
+	bool exists = false;
+	string errMsg = "";
+
+	// Process Parameters
+	char cmdline[CMDLINE_LEN + 1];
+
+	DIR *proc;
+	struct dirent *readProc;
+
+	// Step into the /proc directory
+	if((proc = opendir("/proc")) == NULL) {
+		errMsg.append("ProcessProbe: Could not open /proc");
+		throw ProbeException(errMsg);
+
+	} else {
+
+		// Loop through all of the files - we're only concerned with those that
+		// start with a digit
+		while((readProc = readdir(proc)) != NULL) {
+			if(isdigit(readProc->d_name[0])) {
+				// Clear the ps values
+				memset(cmdline, 0, CMDLINE_LEN + 1);
+				errMsg = "";
+
+				// Retrieve the command line with arguments
+				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				if(status < 0) { 
+					closedir(proc);
+					throw ProbeException(errMsg);
+
+				// If the command line matches the input command line return true
+				} else if(status == 0 && command.compare(cmdline) == 0) {
+					exists = true;
+					pid = readProc->d_name;
+					break;
+				}
+			}
+		} // else
+    closedir(proc);
+  }
+  return exists;
+}
+
+StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
+	StringPairVector* commands = new StringPairVector();
+	string errMsg = "";
+
+	// Process Parameters
+	char cmdline[CMDLINE_LEN + 1];
+
+	DIR *proc;
+	struct dirent *readProc;
+
+	// Step into the /proc directory
+	if((proc = opendir("/proc")) == NULL) {
+		errMsg.append("ProcessProbe: Could not open /proc");
+		this->DeleteCommands(commands);
+		throw ProbeException(errMsg);
+
+	} else {
+
+		// Loop through all of the files - we're only concerned with those that
+		// start with a digit
+		while((readProc = readdir(proc)) != NULL) {
+			if(isdigit(readProc->d_name[0])) {
+				// Clear the ps values
+				memset(cmdline, 0, CMDLINE_LEN + 1);
+				errMsg = "";
+
+				// Retrieve the command line with arguments
+				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				if(status < 0) { 
+					closedir(proc);
+					this->DeleteCommands(commands);
+					throw ProbeException(errMsg);
+
+				// If the command line matches the input command line store it
+				} else if(status == 0 && this->IsMatch(pattern, cmdline, isRegex)) {
+					commands->push_back(new pair<string,string>(cmdline, readProc->d_name));
+				}
+			}
+		} // else
+    closedir(proc);
+  }
+
+  return commands;
+}
+
+int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string *errMsg) {
+	FILE *cmdlineFile = NULL;
+
+	// Build the absolute path to the command line file
+	string cmdlinePath = "/proc/";
+	cmdlinePath.append(process);
+
+#ifdef LINUX
+	int i = 0;
+	int bytes = 0;
+	cmdlinePath.append("/cmdline");
+
+	// Open the file for reading
+	if((cmdlineFile = fopen(cmdlinePath.c_str(), "r")) == NULL) {
+		errMsg->append("ProcessProbe: Unable to obtain command line for pid: ");
+		errMsg->append(process);
+		return(-1);
+
+	} else {
+    
+		// Read the contents of the file, and convert all of the NULL's
+		// separating the args to spaces.
+		//
+		bytes = fread(cmdline, sizeof(char), CMDLINE_LEN, cmdlineFile);
+	    
+		// Remember to leave the trailing NULL (bytes - 1).
+		for(i = 0; i < bytes - 1; i++) {
+			if(cmdline[i] == '\0') {
+				cmdline[i] = ' ';
+			}
+		}
+	}
+
+	fclose(cmdlineFile); 
+
+#elif defined SUNOS
+
+	cmdlinePath += "/psinfo";
+	if ((cmdlineFile = fopen(cmdlinePath.c_str(), "rb")) == NULL) {
+		*errMsg = string("ProcessProbe: Unable to obtain command line for pid: ") + process;
+		return(-1);
+	} else {
+
+		psinfo_t info;
+		errno = 0;
+		if (fread(&info, sizeof(psinfo_t), 1, cmdlineFile) < 1) {
+			*errMsg = string("ProcessProbe: Unable to obtain commandline for pid ")+process+": error reading "+cmdlinePath+": "+strerror(errno);
+			fclose(cmdlineFile);
+			return -1;
+		}
+
+		fclose(cmdlineFile);
+
+		strncpy(cmdline, info.pr_psargs, CMDLINE_LEN);
+		cmdline[CMDLINE_LEN] = '\0'; // ensure null-termination		
+	}
+
+#endif
+	return(0);
+}
+
+string ProcessProbe::FormatExecTime(time_t execTime) {
 
 	/**
 		This is the cumulative CPU time, formatted in [DD-]HH:MM:SS where DD is the number of days when execution time is 24 hours or more.
@@ -537,35 +721,25 @@ string ProcessProbe::FormatExecTime(unsigned long execTime) {
 		Divide remainder by 60 to get minutes, remainder is seconds
 	*/
 
-	string execTimeStr = "";
-	unsigned long days = execTime/86400;
-	if(days > 0) {
-		if(days > 9) execTimeStr = Common::ToString(days);
-		else execTimeStr = "0" + Common::ToString(days);
+	time_t days = execTime/86400;
+	time_t hours = (execTime%86400)/3600;
+	time_t minutes = ((execTime%86400)%3600)/60;
+	time_t seconds = ((execTime%86400)%3600)%60;
 
-		execTimeStr.append("-");
-	}	
+	ostringstream sstr;
+	sstr << setfill('0');
 
-	unsigned long hours = (execTime%86400)/3600;
-	if(hours > 9) execTimeStr.append("" + Common::ToString(hours));
-	else execTimeStr.append("0" + Common::ToString(hours));
+	if (days > 0)
+		sstr << setw(2) << days << '-';
 
-	execTimeStr.append(":");
+	sstr << setw(2) << hours << ':'
+		 << setw(2) << minutes << ':'
+		 << setw(2) << seconds;
 
-	unsigned long minutes = ((execTime%86400)%3600)/60;
-	if(minutes > 9) execTimeStr.append("" + Common::ToString(minutes));
-	else execTimeStr.append("0" + Common::ToString(minutes));
-
-	execTimeStr.append(":");
-
-	unsigned long seconds = ((execTime%86400)%3600)%60;
-	if(seconds > 9) execTimeStr.append("" + Common::ToString(seconds));
-	else execTimeStr.append("0" + Common::ToString(seconds));
-
-	return execTimeStr;
+	return sstr.str();
 }
 
-string ProcessProbe::FormatStartTime(unsigned long startTime) {
+string ProcessProbe::FormatStartTime(time_t startTime) {
 
 	/** 
 		This is the time of day the process started formatted in HH:MM:SS if the 
@@ -603,4 +777,15 @@ string ProcessProbe::FormatStartTime(unsigned long startTime) {
 	}
 
 	return startTimeStr;
+}
+
+void ProcessProbe::DeleteCommands(StringPairVector *commands) {
+	if (commands == NULL) return;
+	
+	for(StringPairVector::iterator iter = commands->begin();
+		iter != commands->end();
+		++iter)
+		delete *iter;
+
+	delete commands;
 }
