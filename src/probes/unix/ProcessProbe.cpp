@@ -255,22 +255,6 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	string procDir = "/proc/" + pidStr;
 	struct stat st;
 
-	/*
-	DIR *proc;
-	struct dirent *readProc;
-
-	// Step into the /proc directory
-	if((proc = opendir("/proc")) == NULL) {
-		errMsg.append("ProcessProbe: Could not open /proc");
-		throw ProbeException(errMsg);
-
-	} else {
-
-		// Loop through all of the files - we're only concerned with those that
-		// start with a digit
-		while((readProc = readdir(proc)) != NULL) {
-		if(isdigit(readProc->d_name[0])) {
-*/
 	if (stat(procDir.c_str(), &st) != 0)
 		return; // oops, this process went away when we weren't looking
 
