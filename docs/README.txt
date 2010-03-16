@@ -172,8 +172,8 @@ http://oval.mitre.org/oval/about/bsd_license.html
        Also, on some Windows systems, the OVAL Interpreter may fail with the
        following error message when executed.
 
-         “The application failed to initialize properly (0xc0150002). Click
-          OK to terminate the application.” 
+         "The application failed to initialize properly (0xc0150002). Click
+          OK to terminate the application."
 
        This error message occurs when the run-time components of Visual Studio,
        that are required to run an application developed with Visual Studio, are
@@ -181,8 +181,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
        Interpreter, please install the VC++ redistributable package that can be
        obtained at the following link. 
 
-         http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97
-         -4AB7-A40D-3802B2AF5FC2&displaylang=en 
+         http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
 
        The VC++ redistributable package will install the required run-time
        components. 
