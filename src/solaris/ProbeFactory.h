@@ -59,6 +59,10 @@
 #include "PasswordProbe.h"
 #include "ShadowProbe.h"
 #include "InterfaceProbe.h"
+#include "LDAPProbe.h"
+#include "TextFileContent54Probe.h"
+#include "XinetdProbe.h"
+#include "RunLevelProbe.h"
 // SOLARIS PORT NOTICE: Add other probes here to support collection of solaris specific objects.
 
 class AbsProbe;

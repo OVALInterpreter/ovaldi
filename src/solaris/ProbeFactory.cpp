@@ -73,9 +73,15 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("textfilecontent_object") == 0) {
 		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = TextFileContentProbe::Instance();
+	} else if(objectName.compare("textfilecontent54_object") == 0) {
+		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
+		probe = TextFileContent54Probe::Instance();
 	} else if(objectName.compare("xmlfilecontent_object") == 0) {
 		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = XmlFileContentProbe::Instance();
+
+	} else if(objectName.compare("ldap_object") == 0) {
+		probe = LDAPProbe::Instance();
 
 // here are the objects defined in the unix schema
 	} else if(objectName.compare("file_object") == 0) {
@@ -91,7 +97,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = ProcessProbe::Instance();
 	} else if(objectName.compare("runlevel_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = RunLevelProbe::Instance();
 	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
@@ -99,6 +105,9 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("uname_object") == 0) {
 		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = UnameProbe::Instance();
+	} else if(objectName.compare("xinetd_object") == 0) {
+		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
+		probe = XinetdProbe::Instance();
 
 // here are the solaris specific objects
 	} else if(objectName.compare("isainfo_object") == 0) {
