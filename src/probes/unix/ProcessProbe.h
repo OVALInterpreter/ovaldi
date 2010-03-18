@@ -42,12 +42,12 @@
 #include <sys/stat.h>
 
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <string>
 
 #ifdef SUNOS
+#include <fstream>
 #include <procfs.h>
 #include <ftw.h>
 #include <algorithm>
@@ -152,6 +152,16 @@ private:
 	 * vector is returned if the file wasn't found or couldn't be read.
 	 */
 	StringVector GetDeviceSearchDirs();
+
+	/**
+	 * Solaris-specific: Reads info from the specified file into \p info.
+	 * \param[in] psinfoFileName the full path to the file to read
+	 * \param[out] info Receives info about the process
+	 * \param[out] errMsg Will receive any error message.  If the file was not found,
+	 *             it will remain unmodified.  Other errors produce a message.
+	 * \return false if the file was not found or an error occurred, true otherwise.
+	 */
+	bool ReadPSInfoFromFile(const std::string psinfoFileName, psinfo_t &info, std::string &errMsg);
 
 #endif
 

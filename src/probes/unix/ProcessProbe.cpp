@@ -420,7 +420,6 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	string psinfoFileName = "/proc/"+pidStr+"/psinfo";
 	psinfo_t info;
-	FILE *fp;
 	pid_t pid, ppid;
 	dev_t tty;
 	timestruc_t startTime, execTime;
@@ -430,27 +429,17 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	string formattedStartTime, formattedExecTime;
 	string devicePath;
 	Item *item;
+	string errMsg;
 
-	errno = 0;
-	if ((fp = fopen(psinfoFileName.c_str(), "rb")) == NULL) {
-		// Processes come and go; if it went away, that's ok.
-		// No need to report.  If there was some other
-		// error, throw an exception.
-		if (errno == ENOENT)
+	if (!this->ReadPSInfoFromFile(psinfoFileName, info, errMsg)) {
+		// if empty, the file was just not found which is ok.  A
+		// process can go away at any time.
+		if (errMsg.empty())
 			return;
 
-		throw ProbeException("ProcessProbe: Error opening "+psinfoFileName+": "+strerror(errno));
+		throw ProbeException(errMsg);
 	}
-
-	if (fread(&info, sizeof(psinfo_t), 1, fp) < 1) {
-		// the psinfo file for some reason was too small, or
-		// there was some other error...
-		fclose(fp);
-		throw ProbeException("ProcessProbe: Error reading process info from "+psinfoFileName+": "+strerror(errno));
-	}
-
-	fclose(fp);
-
+	
 	execTime = info.pr_time;
 	startTime = info.pr_start;
 	pid = info.pr_pid;
@@ -481,10 +470,13 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	item->AppendElement(new ItemEntity("priority", Common::ToString(priority)));
 	item->AppendElement(new ItemEntity("scheduling_class", schedClass));
 	item->AppendElement(new ItemEntity("start_time", formattedStartTime));
-	if (!devicePath.empty())
+	if (devicePath.empty())
+		item->AppendElement(new ItemEntity("tty", "", OvalEnum::DATATYPE_STRING,
+										   false, OvalEnum::STATUS_DOES_NOT_EXIST));
+	else
 		item->AppendElement(new ItemEntity("tty", devicePath));
 	item->AppendElement(new ItemEntity("user_id", Common::ToString(userId)));
-	
+
 	items->push_back(item);
 }
 
@@ -497,7 +489,7 @@ string ProcessProbe::GetDevicePath(dev_t tty) {
 	for (StringVector::iterator iter = deviceDirs.begin();
 		 iter != deviceDirs.end();
 		 ++iter) {
-		
+
 		::dev = tty;
 		errno = 0;
 		int err = ftw(iter->c_str(), ::searcher, 10);
@@ -518,8 +510,9 @@ string ProcessProbe::GetDevicePath(dev_t tty) {
 StringVector ProcessProbe::GetDeviceSearchDirs() {
 	StringVector dirs;
 	string line;
-	ifstream file("/etc/ttysrch");	
-
+	ifstream file("/etc/ttysrch");
+	int (*intisspace)(int)  = isspace;
+	
 	if (file) {
 		while(getline(file, line)) {
 			Common::TrimString(line);
@@ -533,12 +526,48 @@ StringVector ProcessProbe::GetDeviceSearchDirs() {
 
 			// each directory can have some modifier chars... ignore them.  Just
 			// grab the first space-delimited substring.
-			string::iterator firstSpace = find_if(line.begin(), line.end(), (int (*)(int))isspace);
+			string::iterator firstSpace = find_if(line.begin(), line.end(), intisspace);
 			dirs.push_back(line.substr(0, firstSpace - line.begin()));
 		}
 	}
 
 	return dirs;
+}
+
+bool ProcessProbe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &info, string &errMsg) {
+	errno = 0;
+	ifstream psinfoFile(psinfoFileName.c_str(), ios::in | ios::binary);
+
+	if (!psinfoFile) {
+		// Processes come and go; if it went away, that's ok.
+		// No need to report.  If there was some other
+		// error, throw an exception.
+		if (errno == ENOENT)
+			return false;
+
+		errMsg = "ProcessProbe: Error opening "+psinfoFileName+": "+strerror(errno);
+		return false;
+	}
+
+	errno = 0;
+	psinfoFile.read((char*)&info, sizeof(psinfo_t));
+	
+	if (!psinfoFile) {
+		errMsg = "ProcessProbe: Error reading "+psinfoFileName;
+
+		// give errno a chance to tell us what happened.  If it's zero, we check
+		// how many bytes were read.  If too few, make up our own error message
+		// (there is no errno value for premature end-of-file afaik).
+		// If neither occurred, we can't usefully describe the error.
+		if (errno != 0)
+			errMsg += string(": ") + strerror(errno);
+		else if (psinfoFile.gcount() < (streamsize)sizeof(psinfo_t))
+			errMsg += string(": ") + "Premature end-of-file encountered";
+
+		return false;
+	}
+
+	return true;
 }
 
 #endif
@@ -633,13 +662,12 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
 }
 
 int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string *errMsg) {
-	FILE *cmdlineFile = NULL;
-
 	// Build the absolute path to the command line file
 	string cmdlinePath = "/proc/";
 	cmdlinePath.append(process);
 
 #ifdef LINUX
+	FILE *cmdlineFile = NULL;
 	int i = 0;
 	int bytes = 0;
 	cmdlinePath.append("/cmdline");
@@ -670,24 +698,13 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 #elif defined SUNOS
 
 	cmdlinePath += "/psinfo";
-	if ((cmdlineFile = fopen(cmdlinePath.c_str(), "rb")) == NULL) {
-		*errMsg = string("ProcessProbe: Unable to obtain command line for pid: ") + process;
-		return(-1);
-	} else {
+	psinfo_t info;
+	
+	if (!this->ReadPSInfoFromFile(cmdlinePath, info, *errMsg))
+		return -1;
 
-		psinfo_t info;
-		errno = 0;
-		if (fread(&info, sizeof(psinfo_t), 1, cmdlineFile) < 1) {
-			*errMsg = string("ProcessProbe: Unable to obtain commandline for pid ")+process+": error reading "+cmdlinePath+": "+strerror(errno);
-			fclose(cmdlineFile);
-			return -1;
-		}
-
-		fclose(cmdlineFile);
-
-		strncpy(cmdline, info.pr_psargs, CMDLINE_LEN);
-		cmdline[CMDLINE_LEN] = '\0'; // ensure null-termination		
-	}
+	strncpy(cmdline, info.pr_psargs, CMDLINE_LEN);
+	cmdline[CMDLINE_LEN] = '\0'; // ensure null-termination		
 
 #endif
 	return(0);
