@@ -176,7 +176,7 @@ RunLevelProbe::_makeRunlevelItem( const char runlevel, const runlevel_item &rli 
   item->AppendElement( new ItemEntity( "start", ( start ) ? "true" : "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
   item->AppendElement( new ItemEntity( "kill", ( !start ) ? "true" : "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 
-  delete runlevelToStr;
+  delete[] runlevelToStr;
   return item;
 }
 
@@ -436,10 +436,16 @@ RunLevelProbe::_isStart( const char * filename ){
 void
 RunLevelProbe::_handleReg( const char * filename, const char runlevel ){
   runlevel_item item;
+  REGEX re;
+  StringVector matches;
 
-  item.service_name = filename;
+  if (re.GetMatchingSubstrings("^[SK]\\d+(.+)$", filename, &matches))
+    item.service_name = matches[0];
+  else
+    item.service_name = filename;
+
   item.is_start     = _isStart( filename );
-  
+
   _populateMap( runlevel, item );
 }
 
@@ -470,6 +476,7 @@ RunLevelProbe::_handleLink( const char * filename, const char * fullPath,  const
   item.is_start     = _isStart( filename );
   
   _populateMap( runlevel, item );
+  delete[] serviceName;
 }
 
 
@@ -495,7 +502,7 @@ RunLevelProbe::_addRunlevelItem( const char * dir, const char * filename, const 
     else ;  // Directories, Pipes, Sockets, etc. cannot be used -- only Symbolic Links and Regular Files (scripts and binary executables)
   }
 
-  if( fullPath ) delete fullPath;
+  if( fullPath ) delete[] fullPath;
 }
 
 
@@ -541,7 +548,7 @@ RunLevelProbe::_analyzeRunlevels ( ){
   for( unsigned int i = 0; i < sizeof( runlevelTypes ) / sizeof(char); ++i ){
     char * runlevelDir = _generateRunlevelDir( runlevelTypes[i] );
     _analyzeRunlevelDir( runlevelDir, runlevelTypes[i] );
-    delete runlevelDir;
+    delete[] runlevelDir;
   }
 }
 
