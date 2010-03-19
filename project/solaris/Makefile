@@ -46,9 +46,8 @@ EXECUTABLE = $(OUTDIR)/ovaldi
 
 # The location of the c++ compiler.
 ifeq (${CXX}, )
- CXX=/usr/bin/g++
+ CXX=/usr/sfw/bin/g++
 endif
-
 
 # General options that should be used by g++.
 CPPFLAGS = -Wall -O -DBSD_COMP
@@ -56,24 +55,10 @@ CPPFLAGS = -Wall -O -DBSD_COMP
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap -lsocket -lnsl
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lsocket -lnsl
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
-
-# Determine what package management system is being used 
-PACKAGE_RPM  = $(shell /usr/bin/env rpm  --version 2>/dev/null)
-PACKAGE_DPKG = $(shell /usr/bin/env dpkg --version 2>/dev/null)
-PACKAGE_MANAGERS = 
-
-ifneq (${PACKAGE_RPM}, )
-	LIBS += -lrpm -lrpmdb -lrpmio
-	PACKAGE_MANAGERS += -DPACKAGE_RPM
-endif
-ifneq (${PACKAGE_DPKG}, )
-	LIBS += -lapt-pkg
-	PACKAGE_MANAGERS += -DPACKAGE_DPKG
-endif
 
 # What object code are we expecting?
 OBJS = \
@@ -167,15 +152,7 @@ OBJS = \
  TextFileContent54Probe.obj \
  InetdProbe.obj \
  XinetdProbe.obj \
- Digest.obj \
- LDAPProbe.obj
-
-ifneq (${PACKAGE_RPM}, )
-	OBJS += RPMInfoProbe.obj
-endif
-ifneq (${PACKAGE_DPKG}, )
-	OBJS += DPKGInfoProbe.obj
-endif
+ Digest.obj
 
 REL_OBJS = \
 	$(BUILDDIR)/Main.obj \
@@ -268,15 +245,7 @@ REL_OBJS = \
 	$(BUILDDIR)/TextFileContent54Probe.obj \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
-	$(BUILDDIR)/Digest.obj \
-	$(BUILDDIR)/LDAPProbe.obj
-
-ifneq (${PACKAGE_RPM}, )
-	REL_OBJS += $(BUILDDIR)/RPMInfoProbe.obj
-endif
-ifneq (${PACKAGE_DPKG}, )
-	REL_OBJS += $(BUILDDIR)/DPKGInfoProbe.obj
-endif
+	$(BUILDDIR)/Digest.obj
 
 # Search the output directory for object files
 vpath %.obj $(BUILDDIR)
@@ -313,10 +282,10 @@ create-dir:
 
 set-platform:
 	@if [ ${PLATFORM} = SUNOS ]; then \
-		make sunos; \
+		$(MAKE) sunos; \
 	fi; \
 	if  [ ${PLATFORM} = LINUX ]; then \
-		make linux; \
+		$(MAKE) linux; \
 	fi;
 
 linux: build
@@ -337,10 +306,10 @@ build : $(OBJS)
 
 clean :
 	@if [ $(PLATFORM) = LINUX ]; then \
-		make clean-linux; \
+		$(MAKE) clean-linux; \
 	fi; \
 	if  [ $(PLATFORM) = SUNOS ]; then \
-		make clean-sunos; \
+		$(MAKE) clean-sunos; \
 	fi;
 
 clean-linux:
