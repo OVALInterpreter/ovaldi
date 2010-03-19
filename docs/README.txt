@@ -159,6 +159,34 @@ http://oval.mitre.org/oval/about/bsd_license.html
        results_to_html.xsl - A simple XSL that formats an OVAL Results document
                              as HTML
 
+       To run the OVAL Interpreter, run:
+
+       ovaldi.exe -m -o definitions.xml 
+
+       A result summary will be output to the screen, and a detailed OVAL System
+       Characteristics and OVAL Results document will be output to the current
+       working directory. By default, the OVAL System Characteristics document
+       will be named system-characteristics.xml and the OVAL Results document
+       will be named results.xml.
+
+       Also, on some Windows systems, the OVAL Interpreter may fail with the
+       following error message when executed.
+
+         "The application failed to initialize properly (0xc0150002). Click
+          OK to terminate the application."
+
+       This error message occurs when the run-time components of Visual Studio,
+       that are required to run an application developed with Visual Studio, are
+       not installed. If you receive this error message while executing the OVAL
+       Interpreter, please install the VC++ redistributable package that can be
+       obtained at the following link. 
+
+         http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+
+       The VC++ redistributable package will install the required run-time
+       components. 
+
+
   D. Mac OS Installation
 
        Not yet supported.

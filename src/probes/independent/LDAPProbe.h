@@ -215,7 +215,7 @@ class LDAPProbe : public AbsProbe {
 
 		/** Remove quotes from the specified string.
 		 * @param str A string value that you want to remove the quotes from.
-		 * @return A string value of the specifed string with any beginning and ending quotes removed.
+		 * @return A string value of the specified string with any beginning and ending quotes removed.
 		 */
 		std::string RemoveQuotes ( std::string str );
 
