@@ -85,7 +85,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 
 The following instructions describe how to build the OVAL Interpreter on a
 Linux system.  The OVAL Interpreter has been built and tested on Red Hat 
-32 bit versions of Enterprise Linux 3, 4, and 5. The source distribution includes
+32 bit versions of Enterprise Linux 5. The source distribution includes
 a Makefile that can be used to build the OVAL Interpreter on Linux systems.
 Before the OVAL Interpreter can be built, the supporting libraries must be installed.
 Follow the instruction below to setup and install the supporting libraries.
@@ -198,7 +198,7 @@ Follow the instruction below to setup and install the supporting libraries.
 -- III -- PCRE --
 
 The OVAL Interpreter uses the open source PCRE library.  The OVAL Interpreter
-currently uses version 6.3 of the PCRE library.  From the PCRE Web site:
+currently uses version 8.x of the PCRE library.  From the PCRE Web site:
 
   "Regular expression support is provided by the PCRE library 
    package, which is open source software, written by Philip Hazel,

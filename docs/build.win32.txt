@@ -197,7 +197,7 @@ install the supporting libraries.
 -- III -- PCRE --
 
 The OVAL Interpreter uses the open source PCRE library.  The OVAL Interpreter
-currently uses version 6.3 of the PCRE library.  From the PCRE Web site:
+currently uses version 8.x of the PCRE library.  From the PCRE Web site:
 
   "Regular expression support is provided by the PCRE library 
    package, which is open source software, written by Philip Hazel,
