@@ -425,8 +425,8 @@ string Common::GetTimeStamp() {
 	todayTime = localtime(&tmpTime);
 	
 	// Build the time string.
-	char *format = "%Y-%m-%dT%H:%M:%S";
-	strftime(tmpbuf, 128-1, format, todayTime);
+	string format = "%Y-%m-%dT%H:%M:%S";
+	strftime(tmpbuf, 128-1, format.c_str(), todayTime);
 
 	// Make sure the buffer is null terminated.
 	tmpbuf[sizeof(tmpbuf)-1] = '\0';
