@@ -43,7 +43,9 @@ FamilyProbe::FamilyProbe() {
 		myFamily = "unix";
 	#elif SUNOS
 		myFamily = "unix";
-	#else
+	#elif DARWIN
+                myFamily = "macos";
+        #else
 		myFamily = "error";
 	#endif
 }
