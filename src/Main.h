@@ -39,8 +39,10 @@
 
 #ifdef LINUX
 	#define STRNICMP strnicmp
+#elif defined DARWIN
+        #define STRNICMP strnicmp
 #elif defined SUNOS
-#  define STRNICMP strncasecmp
+        #define STRNICMP strncasecmp
 #endif
 
 
