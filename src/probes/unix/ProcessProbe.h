@@ -54,6 +54,10 @@
 #include <cctype>
 #endif
 
+#ifdef DARWIN
+#include <sys/sysctl.h>
+#endif
+
 // Define some buffer lengths
 #define CMDLINE_LEN 1024
 #define SCHED_CLASS_LEN 128
