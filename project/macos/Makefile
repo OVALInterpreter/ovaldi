@@ -34,13 +34,13 @@ BUILDDIR = ${OUTDIR}/obj
 
 # source directories
 SRCDIR = ../../src
-LINUXDIR = ${SRCDIR}/linux
+MACOSDIR = ${SRCDIR}/macos
 UNIXPROBEDIR = ${SRCDIR}/probes/unix
-LINUXPROBEDIR = ${SRCDIR}/probes/linux
+MACOSPROBEDIR = ${SRCDIR}/probes/macos
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
-CURRENTDIR = ../project/linux
+CURRENTDIR = ../project/macos
 
-INCDIRS = -I/usr/local/include -I/usr/include -I$(LINUXDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${LINUXPROBEDIR} -I${INDEPENDENTPROBEDIR}
+INCDIRS = -I/usr/local/include -I/usr/include -I$(MACOSDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/usr/include/pcre -I/opt/local/include -I/usr/local/include -I/usr/include
 
 EXECUTABLE = $(OUTDIR)/ovaldi
 
@@ -53,10 +53,10 @@ endif
 # General options that should be used by g++.
 CPPFLAGS = -Wall -O
 
-LIBDIR = -L/usr/local/lib -L/usr/lib
+LIBDIR = -L/usr/local/lib -L/usr/lib -L/opt/local/lib  
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap -llber
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
@@ -152,7 +152,6 @@ OBJS = \
 	ProbeFactory.obj \
 	SystemInfo.obj \
 	FileProbe.obj \
-	InetListeningServersProbe.obj \
 	ProcessProbe.obj \
 	UnameProbe.obj \
 	TextFileContentProbe.obj \
@@ -162,14 +161,15 @@ OBJS = \
 	FileMd5Probe.obj \
 	FileHashProbe.obj \
 	VariableProbe.obj \
-	RunLevelProbe.obj \
 	PasswordProbe.obj \
-	ShadowProbe.obj \
 	TextFileContent54Probe.obj \
 	InetdProbe.obj \
 	XinetdProbe.obj \
 	Digest.obj \
-	LDAPProbe.obj
+	LDAPProbe.obj \
+        #InetListeningServersProbe.obj \
+	#RunLevelProbe.obj \
+        #ShadowProbe.obj \
 
 ifneq (${PACKAGE_RPM}, )
 	OBJS += RPMInfoProbe.obj
@@ -253,7 +253,6 @@ REL_OBJS = \
 	$(BUILDDIR)/SplitFunction.obj \
 	$(BUILDDIR)/SystemInfo.obj \
 	$(BUILDDIR)/FileProbe.obj \
-	$(BUILDDIR)/InetListeningServersProbe.obj \
 	$(BUILDDIR)/ProcessProbe.obj \
 	$(BUILDDIR)/UnameProbe.obj \
 	$(BUILDDIR)/TextFileContentProbe.obj \
@@ -264,14 +263,15 @@ REL_OBJS = \
 	$(BUILDDIR)/FileMd5Probe.obj \
 	$(BUILDDIR)/FileHashProbe.obj \
 	$(BUILDDIR)/VariableProbe.obj \
-	$(BUILDDIR)/RunLevelProbe.obj \
 	$(BUILDDIR)/PasswordProbe.obj \
-	$(BUILDDIR)/ShadowProbe.obj \
 	$(BUILDDIR)/TextFileContent54Probe.obj \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
 	$(BUILDDIR)/Digest.obj \
 	$(BUILDDIR)/LDAPProbe.obj
+	#$(BUILDDIR)InetListeningServersProbe.obj \  
+        #$(BUILDDIR)RunLevelProbe.obj \
+        #$(BUILDDIR)/ShadowProbe.obj \
 
 ifneq (${PACKAGE_RPM}, )
 	REL_OBJS += $(BUILDDIR)/RPMInfoProbe.obj
@@ -283,9 +283,9 @@ endif
 # Search the output directory for object files
 vpath %.obj $(BUILDDIR)
 vpath %.cpp $(SRCDIR)
-vpath %.cpp $(LINUXDIR)
+vpath %.cpp $(MACOSDIR)
 vpath %.cpp $(UNIXPROBEDIR)
-vpath %.cpp $(LINUXPROBEDIR)
+vpath %.cpp $(MACOSPROBEDIR)
 vpath %.cpp $(INDEPENDENTPROBEDIR)
 
 
@@ -319,12 +319,16 @@ set-platform:
 	fi; \
 	if  [ ${PLATFORM} = LINUX ]; then \
 		make linux; \
-	fi;
+	fi; \
+        if  [ ${PLATFORM} = MACOS ]; then \                                                                                                                                                                                              
+		make macos; \
+        fi;
 
 linux: build
 
 sunos: build
 
+macos: build
 
 update:
 #	-rm $(BUILDDIR)/Version.obj
@@ -343,7 +347,11 @@ clean :
 	fi; \
 	if  [ $(PLATFORM) = SUNOS ]; then \
 		make clean-sunos; \
-	fi;
+	fi; \
+        if  [ $(PLATFORM) = MACOS ]; then \
+        	make clean-macos; \
+        fi; \
+
 
 clean-linux:
 	-rm -rf $(OUTDIR)
@@ -351,7 +359,5 @@ clean-linux:
 clean-sunos:
 	-rm -rf $(OUTDIR)
 
-
 debug: CPPFLAGS = -Wall -O -static-libgcc -ggdb
 debug: all
-
