@@ -64,9 +64,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <net/if_arp.h>
-#include <arpa/inet.h>
+
+#ifdef DARWIN
+#include <sys/sysctl.h>
+#include <net/if_types.h>
+#include <net/if_dl.h>
+#endif
 
 #define inaddrr(x) (*(struct in_addr *) &ifr->x[sizeof sa.sin_port])
 #define IFRSIZE   ((int)(size * sizeof (struct ifreq)))

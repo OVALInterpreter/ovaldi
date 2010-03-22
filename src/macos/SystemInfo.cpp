@@ -213,118 +213,132 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	//------------------------------------------------------------------------------------//
 
 	IfDataVector interfaces;
+	IfData *tmpIfData = NULL;
+	int socketfd, prev_length, length, addr_length, mib[6], mac_length;
+        char *ptr, *macbuf, *i, *macstr, *ip;
+	unsigned char *macptr = NULL;
+	struct ifconf ifc;
+        struct in_addr ip4addr;
+	struct ifreq *ifr = NULL;
+	struct sockaddr_in *sinptr = NULL;
+	struct if_msghdr *ifm = NULL;
+	struct sockaddr_dl *sdl = NULL;
+      
+	ptr = NULL;
+	macbuf = NULL;
+	i = NULL;
+	macstr = NULL;
+	prev_length = 0;
+	length = 10 * sizeof(struct ifreq);
 	
-	unsigned char      *u;
-	int                sockfd, size  = 1;
-	struct ifreq       *ifr;
-	struct ifconf      ifc;
-	struct sockaddr_in sa;
-
-	if (0 > (sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP))) {
-	  throw SystemInfoException("Error: Unable to open socket.");
-	}	
-
-	ifc.ifc_len = IFRSIZE;
-	ifc.ifc_req = NULL;
-
-	do {
-	++size;
-	/* realloc buffer size until no overflow occurs  */
-
-		if (NULL == (ifc.ifc_req = (ifreq*)realloc(ifc.ifc_req, IFRSIZE))) {
-		  throw SystemInfoException("Error: Unable to allocate mememory.");
-		}
-		ifc.ifc_len = IFRSIZE;
-		if (ioctl(sockfd, SIOCGIFCONF, &ifc)) {
-		  throw SystemInfoException("Error: ioctl SIOCFIFCONF.");
-		}
-	} while  (IFRSIZE <= ifc.ifc_len);
-
-	ifr = ifc.ifc_req;
-
-	for (;(char *) ifr < (char *) ifc.ifc_req + ifc.ifc_len; ++ifr) {
-
-		if (ifr->ifr_addr.sa_data == (ifr+1)->ifr_addr.sa_data) {
-		  continue;  // duplicate, skip it
-		}
-
-		if (ioctl(sockfd, SIOCGIFFLAGS, ifr)) {
-		  continue;  // failed to get flags, skip it
-		}
-
-		//printf("Interface:  %s\n", ifr->ifr_name);
-		//printf("IP Address: %s\n", inet_ntoa(inaddrr(ifr_addr.sa_data)));
-		IfData *tmpIfData = new IfData();
-		tmpIfData->ifName = ifr->ifr_name;
-		tmpIfData->ipAddress = inet_ntoa(inaddrr(ifr_addr.sa_data));
-
-		if (0 == ioctl(sockfd, SIOCGIFHWADDR, ifr)) {
-
-			/* Select which  hardware types to process.
-			*
-			*    See list in system include file included from
-			*    /usr/include/net/if_arp.h  (For example, on
-			*    Linux see file /usr/include/linux/if_arp.h to
-			*    get the list.)
-			*/
-		  /* No used 
-			switch (ifr->ifr_hwaddr.sa_family) {
-
-				default:
-					printf("\n");
-					continue;
-				case  ARPHRD_NETROM:  case  ARPHRD_ETHER:  case  ARPHRD_PPP:
-				case  ARPHRD_EETHER:  case  ARPHRD_IEEE802: break;
-			}
-		  */
-
-		  
-			u = (unsigned char *) &ifr->ifr_addr.sa_data;
-			char *macStr = (char*)malloc(sizeof(char)*128);
-			memset(macStr, 0, 128);
-			if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
-			  //printf("HW Address: %2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x\n", u[0], u[1], u[2], u[3], u[4], u[5]);
-			  sprintf(macStr, "%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", u[0], u[1], u[2], u[3], u[4], u[5]); 
-			  tmpIfData->macAddress = macStr;
-			}
-			free(macStr);
-
-			interfaces.push_back(tmpIfData);
-		}
-
-		/* netmask 
-		if (0 == ioctl(sockfd, SIOCGIFNETMASK, ifr) && strcmp("255.255.255.255", inet_ntoa(inaddrr(ifr_addr.sa_data)))) {
-
-			printf("Netmask:    %s\n", inet_ntoa(inaddrr(ifr_addr.sa_data)));
-		}
-		*/
-
-		/* broadcast
-		if (ifr->ifr_flags & IFF_BROADCAST) {
-
-			if (0 == ioctl(sockfd, SIOCGIFBRDADDR, ifr) && strcmp("0.0.0.0", inet_ntoa(inaddrr(ifr_addr.sa_data)))) {
-				printf("Broadcast:  %s\n", inet_ntoa(inaddrr(ifr_addr.sa_data)));
-			}
-		}
-		*/
-		
-		/* MTU
-		if (0 == ioctl(sockfd, SIOCGIFMTU, ifr)) {
-
-			printf("MTU:        %u\n",  ifr->ifr_mtu);
-		}
-		*/
-
-		/* Metric
-		if (0 == ioctl(sockfd, SIOCGIFMETRIC, ifr)) {
-			printf("Metric:     %u\n",  ifr->ifr_metric);
-		}
-		printf("\n");
-		*/
+	if ( (socketfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+	  throw SystemInfoException("Error: failed to open socket");
 	}
+     
+	while(true){
+	  ifc.ifc_buf= (char*)malloc(length);
+	  ifc.ifc_len = length;
+	  if ( ifc.ifc_buf != NULL ){
+	    if ( ioctl(socketfd, SIOCGIFCONF, &ifc) < 0 ){
+	      if ( ifc.ifc_buf != NULL ){
+		free(ifc.ifc_buf);
+		ifc.ifc_buf = NULL;
+	      }
+	      throw SystemInfoException("Error: SIOCGIFCONF ioctl error");
+	    }else{
+	      if ( ifc.ifc_len == prev_length){
+		ifc.ifc_len = length;
+		break;
+	      }else{
+		prev_length = ifc.ifc_len;
+		length = length + 10 * sizeof(struct ifreq);
+		free(ifc.ifc_buf);
+	      }
+	    }
+	  }else{
+	    throw SystemInfoException("Error: couldn't allocate memory");
+	  }	  
+	}
+	
+	if (ioctl(socketfd, SIOCGIFCONF, &ifc) < 0){
+          throw SystemInfoException("Error: SIOCGIFCONF ioctl error");
+	}
+	
+	for (ptr = ifc.ifc_buf; ptr <ifc.ifc_buf + ifc.ifc_len; ) {
+          ifr = (struct ifreq *) ptr;
+          addr_length = sizeof(struct sockaddr);
+	  
+          if (ifr->ifr_addr.sa_len > addr_length){
+            addr_length = ifr->ifr_addr.sa_len;
+          }
+	  
+          ptr += sizeof(ifr->ifr_name) + addr_length;
+	  
+	  if ( ifr->ifr_addr.sa_family == AF_INET ){
+	    
+	    if ( ioctl(socketfd,SIOCGIFFLAGS,ifr) ){
+	      continue;
+	    }
+	    
+	    if ( !(ifr->ifr_flags & IFF_LOOPBACK) ) {
+	      
+	      sinptr = (struct sockaddr_in *) &ifr->ifr_addr;
+	      mac_length = 0;
+	      
+	      mib[0] = CTL_NET;
+	      mib[1] = AF_ROUTE;
+	      mib[2] = 0;
+	      mib[3] = AF_LINK;
+	      mib[4] = NET_RT_IFLIST;
+	      mib[5] = if_nametoindex(ifr->ifr_name);
+	      
+	      if (mib[5] == 0){
+		throw SystemInfoException("Error: if_nametoindex error");
+	      }
+	      
+	      if (sysctl(mib, 6, NULL, (size_t*)&mac_length, NULL, 0) < 0){
+		throw SystemInfoException("Error: sysctl error - retrieving data length");
+	      }
+	      
+	      macbuf = (char*) malloc(mac_length);
+	      
+	      if ( macbuf == NULL ){
+		throw SystemInfoException("Error: couldn't allocate memory");
+	      }      
 
-	close(sockfd);
+	      if (sysctl(mib, 6, macbuf, (size_t*)&mac_length, NULL, 0) < 0){
+		throw SystemInfoException("Error: sysctl error - retrieving data");
+	      }
+	      
+	      ifm = (struct if_msghdr *)macbuf;
+	      sdl = (struct sockaddr_dl *)(ifm + 1);
+	      macptr = (unsigned char *)LLADDR(sdl);
+	      i = NULL;
+	      ip4addr = (struct in_addr)sinptr->sin_addr;
+	      tmpIfData = new IfData();
+	      
+	      macstr = (char*)malloc(sizeof(char)*128);
+	      
+	      if ( macstr == NULL ){
+		throw SystemInfoException("Error: couldn't allocate memory");
+	      }
 
+	      ip = (char*)malloc(sizeof(char)*64);
+	      i = (char*)inet_ntop(AF_INET,(void*)(&ip4addr),ip,64);
+	
+	      tmpIfData->ifName = ifr->ifr_name;
+	      tmpIfData->ipAddress = ip;
+	      memset(macstr, 0, 128);
+	      sprintf(macstr, "%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", macptr[0], macptr[1], macptr[2], macptr[3], macptr[4], macptr[5]);
+	      tmpIfData->macAddress = macstr;
+	      interfaces.push_back(tmpIfData);
+	      free(macbuf);
+	      free(macstr);
+	      free(ip);
+	    }
+	  }
+	}
+	free(ifc.ifc_buf);
 	return interfaces;
 }
 
