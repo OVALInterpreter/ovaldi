@@ -61,8 +61,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = TextFileContent54Probe::Instance();
 	} else if(objectName.compare("ldap_object") == 0) {
 		probe = LDAPProbe::Instance();
-
-// here are the objects defined in the unix schema
+	// here are the objects defined in the unix schema
 	} else if(objectName.compare("file_object") == 0) {
 		probe = FileProbe::Instance();	
 	} else if(objectName.compare("inetd_object") == 0) {
@@ -76,28 +75,32 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("process_object") == 0) {
 		probe = ProcessProbe::Instance();
 	} else if(objectName.compare("runlevel_object") == 0) {
-		probe = RunLevelProbe::Instance();
+	        //Mac OS has no notion of runlevels
+	        //probe = RunLevelProbe::Instance();
 	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
-		probe = ShadowProbe::Instance();
+	        // Not ported yet
+		//probe = ShadowProbe::Instance();
 	} else if(objectName.compare("uname_object") == 0) {
 		probe = UnameProbe::Instance();
-
-// here are the objects defined in the linux schema
-#ifdef PACKAGE_DPKG
-	} else if(objectName.compare("dpkginfo_object") == 0) {
-		probe = DPKGInfoProbe::Instance();
-#endif
-	} else if(objectName.compare("inetlisteningservers_object") == 0) {
-		probe = InetListeningServersProbe::Instance();
-#ifdef PACKAGE_RPM
-	} else if(objectName.compare("rpminfo_object") == 0) {
-		probe = RPMInfoProbe::Instance();
-#endif
-	} else {
-		Log::Info(objectName + " is not currently supported.");
 	}
+
+//Not applicable
+// here are the objects defined in the linux schema
+//#ifdef PACKAGE_DPKG
+//	} else if(objectName.compare("dpkginfo_object") == 0) {
+//		probe = DPKGInfoProbe::Instance();
+//#endif
+//	} else if(objectName.compare("inetlisteningservers_object") == 0) {
+//		probe = InetListeningServersProbe::Instance();
+//#ifdef PACKAGE_RPM
+//	} else if(objectName.compare("rpminfo_object") == 0) {
+//		probe = RPMInfoProbe::Instance();
+//#endif
+//	} else {
+//		Log::Info(objectName + " is not currently supported.");
+//	}
 
   _probes.insert( probe );
 

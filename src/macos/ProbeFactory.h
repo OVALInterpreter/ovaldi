@@ -45,16 +45,18 @@
 #include "FileHashProbe.h"
 #include "FamilyProbe.h"
 #include "UnameProbe.h"
-#ifdef PACKAGE_RPM
- #include "RPMInfoProbe.h"
-#endif
-#ifdef PACKAGE_DPKG
- #include "DPKGInfoProbe.h"
-#endif
-
-#include "InetListeningServersProbe.h"
+//Not applicable
+//#ifdef PACKAGE_RPM
+//#include "RPMInfoProbe.h"
+//#endif
+//#ifdef PACKAGE_DPKG
+//#include "DPKGInfoProbe.h"
+//#endif
+//Not ported yet
+//#include "InetListeningServersProbe.h"
 #include "ProcessProbe.h"
-#include "ShadowProbe.h"
+//Not ported yet
+//#include "ShadowProbe.h"
 #include "PasswordProbe.h"
 #include "InterfaceProbe.h"
 #include "PasswordProbe.h"
@@ -63,7 +65,8 @@
 #include "TextFileContentProbe.h"
 #include "TextFileContent54Probe.h"
 #include "VariableProbe.h"
-#include "RunLevelProbe.h"
+//Mac OS has no notion of runlevels
+//#include "RunLevelProbe.h"
 #include "XinetdProbe.h"
 #include "InetdProbe.h"
 #include "LDAPProbe.h"
