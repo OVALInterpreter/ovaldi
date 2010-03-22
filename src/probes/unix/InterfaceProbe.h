@@ -34,10 +34,21 @@
 #include "Item.h"
 #include "ItemEntity.h"
 #include "Common.h"
+#include "Log.h"
 
-// For the sa_family_t type.
 #include <sys/socket.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
 
+#ifdef DARWIN
+#include <sys/sysctl.h>
+#include <net/if_types.h>
+#include <net/if_dl.h>
+#else
+#include <net/if_arp.h>
+#endif
 
 /**
 	This class is responsible for collecting information about unix interface_objects.
@@ -86,8 +97,13 @@ class InterfaceProbe : public AbsProbe {
 	 * Gets the OVAL hardware type name for the given value, or ""
 	 * if one is not defined.
 	 */
-	std::string HardwareTypeToString(sa_family_t hwFamily);
 
+	#ifdef DARWIN
+	std::string GetHardwareTypesFromIft(unsigned char type);
+	#endif
+	
+	std::string HardwareTypeToString(sa_family_t hwFamily);
+	
 	/**
 	 * Creates ItemEntity objects for the given flags.
 	 */
