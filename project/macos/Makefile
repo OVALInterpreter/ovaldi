@@ -40,7 +40,7 @@ MACOSPROBEDIR = ${SRCDIR}/probes/macos
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
 CURRENTDIR = ../project/macos
 
-INCDIRS = -I/usr/local/include -I/usr/include -I$(MACOSDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/usr/include/pcre -I/opt/local/include -I/usr/local/include -I/usr/include
+INCDIRS = -I$(MACOSDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/usr/include -I/usr/local/include
 
 EXECUTABLE = $(OUTDIR)/ovaldi
 
@@ -53,7 +53,7 @@ endif
 # General options that should be used by g++.
 CPPFLAGS = -Wall -O
 
-LIBDIR = -L/usr/local/lib -L/usr/lib -L/opt/local/lib  
+LIBDIR = -L/usr/lib -L/usr/local/lib
 
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap -llber
@@ -320,8 +320,7 @@ set-platform:
 	if  [ ${PLATFORM} = LINUX ]; then \
 		make linux; \
 	fi; \
-        if  [ ${PLATFORM} = MACOS ]; then \                                                                                                                                                                                              
-		make macos; \
+        if  [ ${PLATFORM} = DARWIN ]; then \                                                                                                                                                                             make macos; \
         fi;
 
 linux: build
@@ -348,7 +347,7 @@ clean :
 	if  [ $(PLATFORM) = SUNOS ]; then \
 		make clean-sunos; \
 	fi; \
-        if  [ $(PLATFORM) = MACOS ]; then \
+        if  [ $(PLATFORM) = DARWIN ]; then \
         	make clean-macos; \
         fi; \
 
@@ -357,6 +356,9 @@ clean-linux:
 	-rm -rf $(OUTDIR)
 
 clean-sunos:
+	-rm -rf $(OUTDIR)
+
+clean-macos:
 	-rm -rf $(OUTDIR)
 
 debug: CPPFLAGS = -Wall -O -static-libgcc -ggdb
