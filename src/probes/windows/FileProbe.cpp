@@ -361,8 +361,12 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 				throw ProbeException(errorMessage);
 			}
 			
-			//	Set owner 
-			owner->SetValue(aname);
+			//	Set owner (use domain\username format)
+			string ownerStr;
+			ownerStr.append(dname);
+			ownerStr.append("\\");
+			ownerStr.append(aname);
+			owner->SetValue(ownerStr);
 			owner->SetStatus(OvalEnum::STATUS_EXISTS);
 			free(aname);
 			free(dname);
