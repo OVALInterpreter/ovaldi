@@ -98,7 +98,7 @@ install the supporting libraries.
 	
 	To compile and install the PCRE library simply run the following commands.
  
-            ./configure –prefix='install path'
+            ./configure -prefix='install path'
 	    make
             sudo make install
 
@@ -115,7 +115,7 @@ install the supporting libraries.
 	   
            export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_7_0'
            cd $XERCESCROOT/src/xercesc
-	   ./runConfigure –p macosx –n native –b 32 –c gcc –x g++ -P 'install path'
+	   ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
 	   make
            sudo make install
 
@@ -133,7 +133,7 @@ install the supporting libraries.
            export XALANCROOT='<path to xalan-c>/xml-xalan/c'
 	   export XERCESCROOT='<install path of xerces-c>'
            cd $XALANCROOT
-           ./runConfigure –p macosx –c gcc –x g++ –P 'install path'
+           ./runConfigure -p macosx -c gcc -x g++ -P 'install path'
            make
            sudo make install
 
