@@ -235,6 +235,9 @@ public:
 	*/
 	static string ToString(PSID pSid);
 
+	/** Return a string representation of the ULONGLONG */
+	static string ToString(ULONGLONG ul);
+
 	/** Return true if the current os is Vista or later. 
 		The return value is calculated once and the result is stored in a static private variable.
 

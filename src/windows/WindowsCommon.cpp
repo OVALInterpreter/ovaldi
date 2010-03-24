@@ -1616,8 +1616,8 @@ string WindowsCommon::LookUpLocalSystemName() {
 }
 
 string WindowsCommon::ToString(FILETIME fTime) {
-
-	return Common::ToString(fTime.dwLowDateTime) + Common::ToString(fTime.dwHighDateTime);
+	ULONGLONG fTimeResult = (((ULONGLONG)fTime.dwHighDateTime)<<32) + fTime.dwLowDateTime;
+	return WindowsCommon::ToString(fTimeResult);
 }
 
 string WindowsCommon::ToString(DWORD dw) {
@@ -1629,6 +1629,17 @@ string WindowsCommon::ToString(DWORD dw) {
 
 	string dwStr = dwordBuf;
 	return dwStr;
+}
+
+string WindowsCommon::ToString(ULONGLONG ul){
+	//ULONGLONG (unsigned long long) 0 to 18,446,744,073,709,551,615 => 20 characters + null byte => 21 characters
+	char ulonglongBuf[21];
+	ZeroMemory(ulonglongBuf,sizeof(ulonglongBuf));
+	_snprintf(ulonglongBuf,sizeof(ulonglongBuf)-1,"%llu",ul);
+	ulonglongBuf[sizeof(ulonglongBuf)-1] = '\0';
+	
+	string ulStr = ulonglongBuf;
+	return ulStr;
 }
 
 string WindowsCommon::ToString(PSID pSID) {
