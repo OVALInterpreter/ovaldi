@@ -626,12 +626,6 @@ string LDAPProbe::GetDataType ( string oid ) {
 		return "LDAPTYPE_DIRECTORY_STRING";
 	} else if ( oid.compare ( "1.3.6.1.4.1.1466.115.121.1.37" ) == 0 ) {
 		return "LDAPTYPE_OBJECT_CLASS_DESCRIP_STRING";
-		/* These are not valid datatypes for LDAP data and will be deprecated in OVAL V5.7
-		}else if ( oid.compare("") == 0 ){
-			return "LDAPTYPE_TIMESTAMP";
-		}else if ( oid.compare("") == 0 ){
-			return "LDAPTYPE_EMAIL";
-		*/
 	} else {
 		return "";
 	}
