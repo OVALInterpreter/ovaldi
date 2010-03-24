@@ -455,8 +455,16 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 	DWORD entriesread;
 	DWORD totalentries;
 	LOCALGROUP_MEMBERS_INFO_0* userInfo = NULL;
-
-	localGroupName = WindowsCommon::StringToWide(groupName);
+	string shortGroupName;
+	string groupDomain;
+	
+	// Split the group name into its domain and trustee name components and only use the name component in the group name.
+	// The remarks section for the documentation regarding the NetLocalGroupGetMembers() function states that the characters
+	// ", /, \, [, ], :, |, <, >, +, =, ;, ?, * cannot be present in the account name (i.e. domain\trustee_name) violates this.
+	// Also, by specifying NULL for the servername you are indicating that it should look for the particular group name on the local
+	// system where the domain component isn't needed.
+	WindowsCommon::SplitTrusteeName(groupName,&groupDomain,&shortGroupName);
+	localGroupName = WindowsCommon::StringToWide(shortGroupName);
 
 	try {
 
