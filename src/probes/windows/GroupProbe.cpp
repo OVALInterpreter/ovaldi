@@ -147,21 +147,44 @@ Item* GroupProbe::GetGroupMembers(string groupName) {
 	Item* item = NULL;
 
 	StringSet* members = new StringSet();
-	bool groupExists = WindowsCommon::ExpandGroup(groupName, members, false, false);
+	bool groupExists = WindowsCommon::ExpandGroup(groupName, members, true, false);
 
 	if(groupExists) {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-		StringSet::iterator iterator;
-		if(members->size() > 0) {
-			for(iterator = members->begin(); iterator != members->end(); iterator++) {
-				item->AppendElement(new ItemEntity("user", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		int usersCount = 0;
+		int subgroupsCount = 0;
+		ItemEntityVector *entityVector = new ItemEntityVector();
+
+		for(StringSet::iterator iterator = members->begin(); iterator != members->end(); iterator++) {
+			if ( WindowsCommon::IsGroup(*iterator) ){
+				// put subgroup entities at the back of the ItemEntityVector
+				entityVector->push_back(new ItemEntity("subgroup", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				++subgroupsCount;
+			}else{
+				// put user entities at the beginning of the ItemEntityVector
+				entityVector->insert(entityVector->begin(),new ItemEntity("user", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				++usersCount;
 			}
-		} else {
-			item->AppendElement(new ItemEntity("user", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
+
+		// if there are no user members add an user entity with a status of 'does not exist'
+		if ( usersCount == 0 ){
+			entityVector->insert(entityVector->begin(),new ItemEntity("user", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
+		// if there are no subgroup members add an subgroup entity with a status of 'does not exist'
+		if ( subgroupsCount == 0 ){
+			entityVector->push_back(new ItemEntity("subgroup", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
+		// add the group item entity to the beginning of the group_item
+		entityVector->insert(entityVector->begin(),new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+
+		item->SetElements(entityVector);
+		entityVector->clear();
+		delete entityVector;
 
 	} else {
 

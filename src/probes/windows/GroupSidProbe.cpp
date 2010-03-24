@@ -153,18 +153,41 @@ Item* GroupSidProbe::GetGroupSidInfo ( string groupSidStr ) {
     StringSet* userSids = new StringSet();
     Item* item = this->CreateItem();
 
-    if ( WindowsCommon::ExpandGroupBySID ( groupSidStr, userSids, false, false ) ) {
+    if ( WindowsCommon::ExpandGroupBySID ( groupSidStr, userSids, true, false ) ) {
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
 
-        if ( userSids->size() > 0 ) {
-            for ( StringSet::iterator iterator = userSids->begin() ; iterator != userSids->end() ; iterator++ ) {
-                item->AppendElement ( new ItemEntity ( "user_sid", *iterator, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-            }
-
-        } else {
-            item->AppendElement ( new ItemEntity ( "user_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+		int usersCount = 0;
+		int subgroupsCount = 0;
+		ItemEntityVector *entityVector = new ItemEntityVector();
+        
+		for ( StringSet::iterator iterator = userSids->begin() ; iterator != userSids->end() ; iterator++ ) {
+			if ( WindowsCommon::IsGroupSID(*iterator) ){
+				// put subgroup_sid entities at the back of the ItemEntityVector
+				entityVector->push_back(new ItemEntity("subgroup_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				++subgroupsCount;			
+			}else{
+				// put user_sid entities at the beginning of the ItemEntityVector
+				entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				++usersCount;
+			}
         }
+
+		// if there are no user members add an user entity with a status of 'does not exist'
+		if ( usersCount == 0 ){
+			entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
+		// if there are no subgroup members add an subgroup entity with a status of 'does not exist'
+		if ( subgroupsCount == 0 ){
+			entityVector->push_back(new ItemEntity("subgroup_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
+		// add the group_sid item entity to the beginning of the group_sid_item
+		entityVector->insert(entityVector->begin(), new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+
+		item->SetElements(entityVector);
+		entityVector->clear();
+		delete entityVector;
 
     } else {
         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
