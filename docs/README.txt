@@ -476,6 +476,10 @@ From the PCRE Web site:
    package, which is open source software, written by Philip Hazel,
    and copyright by the University of Cambridge, England."
 
+The PCRE library is under the BSD License and is re-distributed in
+ovaldi-x.x.x-setup.exe. As a result, a copy of the license
+(LICENCE.pcre) has been provided. 
+   
 For more information about PCRE visit:
     http://www.pcre.org
 
@@ -493,6 +497,10 @@ the Xerces Web site:
   "This product includes software developed by the Apache Software
   Foundation (http://www.apache.org/)."
 
+The Xerces library is under the Apache 2.0 License and is re-distributed
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result, 
+a copy of the license (LICENCE.xerces_xalan) has been provided.   
+  
 For more information about Xerces visit:
     http://xerces.apache.org/
 
@@ -508,6 +516,10 @@ the Xalan Web site:
   "This product includes software developed by the Apache Software
   Foundation (http://www.apache.org/)."
 
+The Xalan library is under the Apache 2.0 License and is re-distributed
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result,
+a copy of the license (LICENCE.xerces_xalan) has been provided.
+  
 For more information about Xalan visit:
     http://xalan.apache.org/
 
@@ -523,12 +535,18 @@ The OVAL Interpreter uses the open-source OpenSSL library.
   Open Source licenses. In case of any license issues related to OpenSSL,
   please contact openssl-core@openssl.org.
 
-Also, see the file LICENSE.openssl.
+A copy of the license (LICENSE.openssl) has been provided.
 
 For more information about OpenSSL visit:
     http://openssl.org/
 
 The source code is also available at the above Web site.
+
+"This product includes software developed by the OpenSSL Project for use in the
+OpenSSL Toolkit. (http://www.openssl.org/)"
+ 
+"This product includes cryptographic software written by Eric Young
+(eay@cryptsoft.com)" 
 
 -- VIII -- OPENLDAP --
   
