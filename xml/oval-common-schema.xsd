@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.6">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.7">
      <xsd:annotation>
           <xsd:documentation>The following is a description of the common types that are shared across the different schemas within Open Vulnerability and Assessment Language (OVAL). Each type is described in detail and should provide the information necessary to understand what each represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between these type is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Common</schema>
-               <version>5.6</version>
-               <date>9/9/2009 9:44:35 AM</date>
-                <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.7 RC 2</version>
+               <date>3/23/2010 6:49:52 AM</date>
+                <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
               <sch:ns prefix="oval" uri="http://oval.mitre.org/XMLSchema/oval-common-5"/>
+              <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
           </xsd:appinfo>
      </xsd:annotation>
      <!-- =============================================================================== -->
@@ -16,7 +17,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="deprecated_info" type="oval:DeprecatedInfoType">
           <xsd:annotation>
-                <xsd:documentation>The deprecated_info element is used in documenting deprecation infromation for items in the OVAL Language.  It is declared globally as it can be found in any of the OVAL schemas and is used as part of the appinfo documentation and therefore it is not an element that can be declared locally and based off a global type..</xsd:documentation>
+                <xsd:documentation>The deprecated_info element is used in documenting deprecation information for items in the OVAL Language.  It is declared globally as it can be found in any of the OVAL schemas and is used as part of the appinfo documentation and therefore it is not an element that can be declared locally and based off a global type..</xsd:documentation>
           </xsd:annotation>
      </xsd:element>
      <!-- =============================================================================== -->
@@ -39,7 +40,7 @@
                </xsd:element>
                <xsd:element name="comment" type="xsd:string" minOccurs="0" maxOccurs="1">
                     <xsd:annotation>
-                         <xsd:documentation>The optional comment child element is used to supply additional information regarding the element’s deprecated status.</xsd:documentation>
+                         <xsd:documentation>The optional comment child element is used to supply additional information regarding the element's deprecated status.</xsd:documentation>
                     </xsd:annotation>
                </xsd:element>
           </xsd:sequence>
@@ -150,12 +151,12 @@
           <xsd:restriction base="xsd:string">
                <xsd:enumeration value="all">
                     <xsd:annotation>
-                         <xsd:documentation>A value of 'all' means that a final result of true is given if all the individual results under concideration are true.</xsd:documentation>
+                         <xsd:documentation>A value of 'all' means that a final result of true is given if all the individual results under consideration are true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="at least one">
                     <xsd:annotation>
-                          <xsd:documentation>A value of 'at least one' means that a final result of true is given if at least one of the individual results under concideration is true.</xsd:documentation>
+                          <xsd:documentation>A value of 'at least one' means that a final result of true is given if at least one of the individual results under consideration is true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="none exist">
@@ -167,8 +168,8 @@
                                    <oval:reason>Replaced by the 'none satisfy' value. In version 5.3 of the OVAL Language, the checking of existence and state were separated into two distict checks CheckEnumeration (state) and ExistenceEnumeration (existence). Since CheckEnumeration is now used to specify how many objects should satisfy a given state for a test to return true, and no longer used for specifying how many objects must exist for a test to return true, a value of 'none exist' is no longer needed. See the 'none satisfy' value.</oval:reason>
                                    <oval:comment>This value has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
                               </oval:deprecated_info>
-                              <sch:pattern id="none_exist_value_dep">
-                                   <sch:rule context="/oval-def:oval_definitions/oval-def:tests/child::*">
+                              <sch:pattern id="oval_none_exist_value_dep">
+                                   <sch:rule context="oval-def:oval_definitions/oval-def:tests/child::*">
                                         <sch:report test="@check='none exist'">
                                              DEPRECATED ATTRIBUTE VALUE IN: <sch:value-of select="name()"/> ATTRIBUTE VALUE:
                                         </sch:report>
@@ -184,7 +185,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="only one">
                     <xsd:annotation>
-                          <xsd:documentation>A value of 'only one' means that a final result of true is given if one and only one of the individual results under concideration are true.</xsd:documentation>
+                          <xsd:documentation>A value of 'only one' means that a final result of true is given if one and only one of the individual results under consideration are true.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>
@@ -227,6 +228,11 @@
                <xsd:enumeration value="int">
                     <xsd:annotation>
                         <xsd:documentation>The int datatype describes standard integer data.  This datatype conforms to the W3C Recommendation for integer data which follows the standard mathematical concept of the integer numbers.  (no decimal point and infinite range)  Expected operations within OVAL for int values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', 'less than or equal', 'bitwise and', and 'bitwise or'.</xsd:documentation>
+                    </xsd:annotation>
+               </xsd:enumeration>
+               <xsd:enumeration value="record">
+                    <xsd:annotation>
+                         <xsd:documentation>The record datatype describes an entity with structured set of named fields and values as its content. The only allowed operation within OVAL for record values is 'equals'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="string">
@@ -449,7 +455,7 @@ at_least_one_exists  ||  0   |  0+  |  1+  |  0+  ||  Error
                </xsd:enumeration>
                <xsd:enumeration value="pattern match">
                     <xsd:annotation>
-                         <xsd:documentation>The 'pattern match' operation allows an item to be tested against a regular expression. When used by an entity in an OVAL Object, the regular expression represents the set of matching objects on the system.  OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html</xsd:documentation>
+                         <xsd:documentation>The 'pattern match' operation allows an item to be tested against a regular expression. When used by an entity in an OVAL Object, the regular expression represents the unique set of matching items on the system.  OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
           </xsd:restriction>

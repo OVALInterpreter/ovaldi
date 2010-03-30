@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:sp-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" elementFormDefault="qualified" version="5.6">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:sp-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" elementFormDefault="qualified" version="5.7">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the SharePoint specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
@@ -7,9 +7,9 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint Definition</schema>
-                  <version>5.6</version>
-                  <date>9/9/2009 9:44:37 AM</date>
-                  <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.7 RC 2</version>
+                  <date>3/23/2010 6:49:54 AM</date>
+                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sp-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -22,12 +22,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spwebapplication test is used to check the properties or permission settings of a SharePoint web application. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spwebapptst">
+                        <sch:pattern id="sp-def_webapptst">
                               <sch:rule context="sp-def:spwebapplication_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spwebapplication_object/@id"><sch:value-of select="../@id"/> - the object child element of a spwebapplication_test must reference an spwebapplication_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spwebapplication_object/@id"><sch:value-of select="../@id"/> - the object child element of a spwebapplication_test must reference an spwebapplication_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spwebapplication_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spwebapplication_state/@id"><sch:value-of select="../@id"/> - the state child element of a spwebapplication_test must reference an spwebapplication_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spwebapplication_state/@id"><sch:value-of select="../@id"/> - the state child element of a spwebapplication_test must reference an spwebapplication_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -59,7 +59,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The webapplicationurl element defines the SPWebApplication to evaluate specific security settings or permissions.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spwebappobjwebapplicationurl">
+                                                                  <sch:pattern id="sp-def_webappobjwebapplicationurl">
                                                                         <sch:rule context="sp-def:spwebapplication_object/sp-def:webapplicationurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webapplicationurl entity of a spwebapplication_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -86,7 +86,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The webapplicationurl element identifies a Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstewebapplicationurl">
+                                                      <sch:pattern id="sp-def_webappstewebapplicationurl">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:webapplicationurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webapplicationurl entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -98,7 +98,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the allowparttopartcommunication is enabled it allows users to create connections between Web parts.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteallowparttopartcommunication">
+                                                      <sch:pattern id="sp-def_webappsteallowparttopartcommunication">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:allowparttopartcommunication">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the allowparttopartcommunication entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -110,7 +110,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the allowaccesstowebpartcatalog is enabled it allows users access to the online Web part gallery.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteallowaccesstowebpartcatalog">
+                                                      <sch:pattern id="sp-def_webappsteallowaccesstowebpartcatalog">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:allowaccesstowebpartcatalog">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the allowaccesstowebpartcatalog entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -122,7 +122,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The blockedfileextention element identifies one or more file extensions that should be blocked from the deployment.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteblockedfileextention">
+                                                      <sch:pattern id="sp-def_webappsteblockedfileextention">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:blockedfileextention">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the blockedfileextention entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -134,7 +134,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The defaultquotatemplate element identifies the default quota template set for the web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstedefaultquotatemplate">
+                                                      <sch:pattern id="sp-def_webappstedefaultquotatemplate">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:defaultquotatemplate">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the defaultquotatemplate entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -146,7 +146,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the externalworkflowparticipantsenabled is enabled then users are allowed to participate in workflows.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteexternalworkflowparticipantsenabled">
+                                                      <sch:pattern id="sp-def_webappsteexternalworkflowparticipantsenabled">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:externalworkflowparticipantsenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the externalworkflowparticipantsenabled entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -158,7 +158,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the recyclebinenabled is enabled it will be easy to restore deleted files.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsterecyclebinenabled">
+                                                      <sch:pattern id="sp-def_webappsterecyclebinenabled">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:recyclebinenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the recyclebinenabled entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -170,7 +170,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the automaticallydeleteunusedsitecollections is disabled, sites will not be automatically deleted.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteautomaticallydeleteunusedsitecollections">
+                                                      <sch:pattern id="sp-def_webappsteautomaticallydeleteunusedsitecollections">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:automaticallydeleteunusedsitecollections">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the automaticallydeleteunusedsitecollections entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -182,7 +182,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the selfservicesitecreationenabled is enabled users will be allowed to create and manager their own top-level Web sites .</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteselfservicesitecreationenabled">
+                                                      <sch:pattern id="sp-def_webappsteselfservicesitecreationenabled">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:selfservicesitecreationenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the selfservicesitecreationenabled entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -194,7 +194,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The secondstagerecyclebinquota is the quota for the second stage recyle bin</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstesecondstagerecyclebinquota">
+                                                      <sch:pattern id="sp-def_webappstesecondstagerecyclebinquota">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:secondstagerecyclebinquota">
                                                                   <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the secondstagerecyclebinquota entity of a spwebapplication_state should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -206,7 +206,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The recyclebinretentionperiod is the retention period for the recyle bin</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsterecyclebinretentionperiod">
+                                                      <sch:pattern id="sp-def_webappsterecyclebinretentionperiod">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:recyclebinretentionperiod">
                                                                   <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the recyclebinretentionperiod entity of a spwebapplication_state should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -218,7 +218,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The outboundmailserverinstance element identifies the name of the SMPT server.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteoutboundmailserverinstance">
+                                                      <sch:pattern id="sp-def_webappsteoutboundmailserverinstance">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:outboundmailserverinstance">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the outboundmailserverinstance entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -230,7 +230,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The outboundmailsenderaddress element identifies the address that the mail is being send from.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteoutboundmailsenderaddress">
+                                                      <sch:pattern id="sp-def_webappsteoutboundmailsenderaddress">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:outboundmailsenderaddress">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for theoutboundmailsenderaddress entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -242,7 +242,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The outboundmailreplytoaddress element identifies the address that the mail should be replied to.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteoutboundmailreplytoaddress">
+                                                      <sch:pattern id="sp-def_webappsteoutboundmailreplytoaddress">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:outboundmailreplytoaddress">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the outboundmailreplytoaddress entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -254,7 +254,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the secvalexpires is enabled then the form will expire after the security validation time (timeout) .</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstesecvalexpires">
+                                                      <sch:pattern id="sp-def_webappstesecvalexpires">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:secvalexpires">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the secvalexpires entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -268,7 +268,7 @@
                                                 <xsd:appinfo>
                                                       <valid_datatypes>integer</valid_datatypes>
                                                       <valid_operators>equals, not equal, greater than, less than, greater than or equal, less than or equal</valid_operators>
-                                                      <sch:pattern id="spwebappstetimeout">
+                                                      <sch:pattern id="sp-def_webappstetimeout">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:timout">
                                                                   <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the timeout entity of a spwebapplication_state should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -280,7 +280,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If this is true, the web application to which this test refers is the Central Administration web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebsteisadministrationwebapplication">
+                                                      <sch:pattern id="sp-def_websteisadministrationwebapplication">
                                                             <sch:rule context="sp-def:spwebapplication_item/sp-def:isadministrationwebapplication">
                                                                   <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the isadministrationwebapplication entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -292,7 +292,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The applicationpoolname element identifies the web applications application pool name.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteapplicationpoolname">
+                                                      <sch:pattern id="sp-def_webappsteapplicationpoolname">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:applicationpoolname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the applicationpoolname entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -304,7 +304,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The applicationpoolusername element identifies the web applications application pool username.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteapplicationpoolusername">
+                                                      <sch:pattern id="sp-def_webappsteapplicationpoolusername">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:applicationpoolusername">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the applicationpoolusername entity of a spwebapplication_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -316,7 +316,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the openitems is enabled the permission to view the source of documents with server-side file handlers is available to use for this web application..</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteopenitems">
+                                                      <sch:pattern id="sp-def_webappsteopenitems">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:openitems">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the openitems entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -328,7 +328,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the addlistitems is enabled the permission to add items to lists, add documents to document libraries, and add Web discussion comments is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteaddlistitems">
+                                                      <sch:pattern id="sp-def_webappsteaddlistitems">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:addlistitems">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the addlistitems entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -340,7 +340,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If approveitems is enabled the permission to approve a minor version of a list item or document is available to use for this the Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteapproveitems">
+                                                      <sch:pattern id="sp-def_webappsteapproveitems">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:approveitems">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the approveitems entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -352,7 +352,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the deletelistitems is enabled the permission to delete items from a list, documents from a document library, and Web discussion comments in documents is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstedeletelistitems">
+                                                      <sch:pattern id="sp-def_webappstedeletelistitems">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:deletelistitems">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the deletelistitems entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -364,7 +364,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the deleteversions is enabled the permission to delete past versions of a list item or document is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstedeleteversions">
+                                                      <sch:pattern id="sp-def_webappstedeleteversions">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:deleteversions">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the deleteversions entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -376,7 +376,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the editlistitems is enabled the permission to edit items in lists, edit documents in document libraries, edit Web discussion comments in documents, and customize Web Part Pages in document libraries is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteeditlistitems">
+                                                      <sch:pattern id="sp-def_webappsteeditlistitems">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:editlistitems">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the editlistitems entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -388,7 +388,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the managelists is enabled the permission to create and delete lists, add or remove columns in a list, and add or remove public views of a list is available to use for this the Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstemanagelists">
+                                                      <sch:pattern id="sp-def_webappstemanagelists">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:managelists">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the managelists entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -400,7 +400,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the viewversions is enabled the permission to view past versions of a list item or document is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteviewversions">
+                                                      <sch:pattern id="sp-def_webappsteviewversions">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:viewversions">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the viewversions entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -412,7 +412,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the viewlistitems is enabled the permission to view items in lists, documents in document libraries, and view Web discussion commentsis available is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteviewlistitems">
+                                                      <sch:pattern id="sp-def_webappsteviewlistitems">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:viewlistitems">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the viewlistitems entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -424,7 +424,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the cancelcheckout is enabled the permission to discard or check in a document which is checked out to another user is available to use for this the Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstecancelcheckout">
+                                                      <sch:pattern id="sp-def_webappstecancelcheckout">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:cancelcheckout">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the cancelcheckout entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -436,7 +436,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the createalerts is enabled the permission to Create e-mail alerts is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstecreatealerts">
+                                                      <sch:pattern id="sp-def_webappstecreatealerts">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:createalerts">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the createalerts entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -448,7 +448,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the viewformpages is enabled the permission to view forms, views, and application pages, and enumerate lists is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteviewformpagess">
+                                                      <sch:pattern id="sp-def_webappsteviewformpagess">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:viewformpages">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the viewformpages entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -460,7 +460,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the viewpages is enabled the permission to view pages in a Web site is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteviewpages">
+                                                      <sch:pattern id="sp-def_webappsteviewpages">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:viewpages">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the viewpages entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -472,7 +472,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If addandcustomizepages is enabled the permission to add, change, or delete HTML pages or Web Part Pages, and edit the Web site using a Windows SharePoint Services–compatible editor is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteaddandcustomizepages">
+                                                      <sch:pattern id="sp-def_webappsteaddandcustomizepages">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:addandcustomizepages">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the addandcustomizepages entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -484,7 +484,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the applystylesheets is enabled the permission to Apply a style sheet (.css file) to the Web site is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteapplystylesheets">
+                                                      <sch:pattern id="sp-def_webappsteapplystylesheets">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:applystylesheets">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the applystylesheets entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -496,7 +496,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the applythemeanborder is enabled the permission to apply a theme or borders to the entire Web site is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteapplythemeandborder">
+                                                      <sch:pattern id="sp-def_webappsteapplythemeandborder">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:applythemeandborder">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the applythemeandborder entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -506,9 +506,9 @@
                                     </xsd:element>
                                     <xsd:element name="browsedirectories" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>If the browsedirectories is enabled the permission to enumerate files and folders in a Web site using Microsoft Office SharePoint Designer 2007 and WebDAV interfaces is available to use for this Web application.</xsd:documentation>
+                                                <xsd:documentation>If the browsedirectories is enabled the permission to enumerate files and folders in a Web site using Microsoft Office SharePoint Designer and WebDAV interfaces is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstebrowsedirectories">
+                                                      <sch:pattern id="sp-def_webappstebrowsedirectories">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:browsedirectories">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the browsedirectories entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -520,7 +520,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the browseuserinfo is enabled the permission to view information about users of the Web site is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstebrowseuserinfo">
+                                                      <sch:pattern id="sp-def_webappstebrowseuserinfo">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:browseuserinfo">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the browseuserinfo entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -532,7 +532,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the creategroups is enabled the permission to create a group of users that can be used anywhere within the site collection is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstecreategroups">
+                                                      <sch:pattern id="sp-def_webappstecreategroups">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:creategroups">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the creategroups entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -544,7 +544,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the createsscsite is enabled the permission to create a Web site using Self-Service Site Creation is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstecreatesscsite">
+                                                      <sch:pattern id="sp-def_webappstecreatesscsite">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:createsscsite">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the createsscsite entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -556,7 +556,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the editmyuserinfo is enabled the permission to allows a user to change his or her user information, such as adding a picture is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteeditmyuserinfo">
+                                                      <sch:pattern id="sp-def_webappsteeditmyuserinfo">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:editmyuserinfo">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the editmyuserinfo entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -568,7 +568,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If enumeratepermissions is enabled the permission to enumerate permissions on the Web site, list, folder, document, or list itemis is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteenumeratepermissions">
+                                                      <sch:pattern id="sp-def_webappsteenumeratepermissions">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:enumeratepermissions">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the enumeratepermissions entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -580,7 +580,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the managealerts is enabled the permission to manage alerts for all users of the Web site is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstemanagealerts">
+                                                      <sch:pattern id="sp-def_webappstemanagealerts">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:managealerts">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the managealerts entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -592,7 +592,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the managepermissions is enabled the permission to create and change permission levels on the Web site and assign permissions to users and groups is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstemanagepermissions">
+                                                      <sch:pattern id="sp-def_webappstemanagepermissions">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:managepermissions">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the managepermissions entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -604,7 +604,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the managesubwebs is enabled the permission to create subsites such as team sites, Meeting Workspace sites, and Document Workspace sites is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstemanagesubwebs">
+                                                      <sch:pattern id="sp-def_webappstemanagesubwebs">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:managesubwebs">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the managesubwebs entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -616,7 +616,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the manageweb is enabled the permission to perform all administration tasks for the Web site as well as manage content is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstemanageweb">
+                                                      <sch:pattern id="sp-def_webappstemanageweb">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:manageweb">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the manageweb entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -628,7 +628,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If open is enabled the permission to allow users to open a Web site, list, or folder to access items inside that containeris available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteopens">
+                                                      <sch:pattern id="sp-def_webappsteopens">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:open">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the open entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -640,7 +640,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the useclientintegration is enabled the permission to use features that launch client applications; otherwise, users must work on documents locally and upload changesis is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteuseclientintegration">
+                                                      <sch:pattern id="sp-def_webappsteuseclientintegration">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:useclientintegration">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the useclientintegration entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -650,9 +650,9 @@
                                     </xsd:element>
                                     <xsd:element name="useremoteapis" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="unbounded">
                                           <xsd:annotation>
-                                                <xsd:documentation>If the useremoteapis is enabled the permission to use SOAP, WebDAV, or Microsoft Office SharePoint Designer 2007 interfaces to access the Web siteis available to use for this Web application.</xsd:documentation>
+                                                <xsd:documentation>If the useremoteapis is enabled the permission to use SOAP, WebDAV, or Microsoft Office SharePoint Designer interfaces to access the Web siteis available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteuseremoteapis">
+                                                      <sch:pattern id="sp-def_webappsteuseremoteapis">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:useremoteapis">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the useremoteapis entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -664,7 +664,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the viewusagedata is enabled the permission to view reports on Web site usage in documents is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteviewusagedata">
+                                                      <sch:pattern id="sp-def_webappsteviewusagedata">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:viewusagedata">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the viewusagedata entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -676,7 +676,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the managepersonalviews is enabled the permission to Create, change, and delete personal views of lists is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappstemanagepersonalviews">
+                                                      <sch:pattern id="sp-def_webappstemanagepersonalviews">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:managepersonalviews">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the managepersonalviews entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -688,7 +688,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the adddelprivatewebparts is enabled the permission to add or remove personal Web Parts on a Web Part Page is available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteadddelprivatewebparts">
+                                                      <sch:pattern id="sp-def_webappsteadddelprivatewebparts">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:adddelprivatewebparts">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the adddelprivatewebparts entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -700,7 +700,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the updatepersonalwebparts is enabled the permission to update Web Parts to display personalized informationis available to use for this Web application.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebappsteupdatepersonalwebparts">
+                                                      <sch:pattern id="sp-def_webappsteupdatepersonalwebparts">
                                                             <sch:rule context="sp-def:spwebapplication_state/sp-def:updatepersonalwebparts">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the updatepersonalwebparts entity of a spwebapplication_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -720,12 +720,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spgroup test is used to check the group properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spgrptst">
+                        <sch:pattern id="sp-def_grptst">
                               <sch:rule context="sp-def:spgroup_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spgroup_object/@id"><sch:value-of select="../@id"/> - the object child element of a spgroup_test must reference a spgroup_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spgroup_object/@id"><sch:value-of select="../@id"/> - the object child element of a spgroup_test must reference a spgroup_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spgroup_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spgroup_state/@id"><sch:value-of select="../@id"/> - the state child element of a spgroup_test must reference a spgroup_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spgroup_state/@id"><sch:value-of select="../@id"/> - the state child element of a spgroup_test must reference a spgroup_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -757,7 +757,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The sitecollectionurl element defines the Site Colection to evaluate specific group settings.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spgrpobjsitecollectionurl">
+                                                                  <sch:pattern id="sp-def_grpobjsitecollectionurl">
                                                                         <sch:rule context="sp-def:spgroup_object/sp-def:sitecollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spgroup_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -784,7 +784,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The sitecollectionurl element identifies a Site Collection.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spgrpstesitecollectionurl">
+                                                      <sch:pattern id="sp-def_grpstesitecollectionurl">
                                                             <sch:rule context="sp-def:spgroup_state/sp-def:sitecollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spgroup_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -796,7 +796,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name element identifies a Group name.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spgrpstegname">
+                                                      <sch:pattern id="sp-def_grpstegname">
                                                             <sch:rule context="sp-def:spgroup_state/sp-def:gname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the gname entity of a spgroup_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -808,7 +808,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the autoacceptrequesttojoinleave is enabled it allows users to automatically join groups.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spgrpsteautoacceptrequesttojoinleave">
+                                                      <sch:pattern id="sp-def_grpsteautoacceptrequesttojoinleave">
                                                             <sch:rule context="sp-def:spgroup_state/sp-def:autoacceptrequesttojoinleave">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the autoacceptrequesttojoinleave entity of a spgroup_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -820,7 +820,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the allowmemberseditmembership is enabled than all group memebers will be allowed to edit the membership of a group..</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spgrpsteallowmemberseditmembership">
+                                                      <sch:pattern id="sp-def_grpsteallowmemberseditmembership">
                                                             <sch:rule context="sp-def:spgroup_state/sp-def:allowmemberseditmembership">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the autoacceptrequesttojoinleave entity of a spgroup_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -832,7 +832,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the onlyallowmembersviewmembership is enabled it allows users to automatically join groups.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spgrpsteonlyallowmembersviewmembership">
+                                                      <sch:pattern id="sp-def_grpsteonlyallowmembersviewmembership">
                                                             <sch:rule context="sp-def:spgroup_state/sp-def:onlyallowmembersviewmembership">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the onlyallowmembersviewmembership entity of a spgroup_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -852,12 +852,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spweb test is used to check the properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spwebtst">
+                        <sch:pattern id="sp-def_webtst">
                               <sch:rule context="sp-def:spweb_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spweb_object/@id"><sch:value-of select="../@id"/> - the object child element of a spweb_test must reference an spweb_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spweb_object/@id"><sch:value-of select="../@id"/> - the object child element of a spweb_test must reference an spweb_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spweb_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spweb_state/@id"><sch:value-of select="../@id"/> - the state child element of a spweb_test must reference an spweb_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spweb_state/@id"><sch:value-of select="../@id"/> - the state child element of a spweb_test must reference an spweb_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -889,7 +889,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The webcollurl element defines the web application to evaluate specific web settings.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spwebobjwebcollectionurl">
+                                                                  <sch:pattern id="sp-def_webobjwebcollectionurl">
                                                                         <sch:rule context="sp-def:spweb_object/sp-def:webcollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webcollectionurl entity of a spweb_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -901,7 +901,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The sitecollectionurl element defines the site collection to evaluate specific web settings.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spwebobjsitecollectionurl">
+                                                                  <sch:pattern id="sp-def_webobjsitecollectionurl">
                                                                         <sch:rule context="sp-def:spweb_object/sp-def:sitecollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spweb_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -928,7 +928,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The webcollurl element identifies a Site Collection.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebstewebcollectionurl">
+                                                      <sch:pattern id="sp-def_webstewebcollectionurl">
                                                             <sch:rule context="sp-def:spweb_state/sp-def:webcollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webcollectionurl entity of a spweb_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -940,7 +940,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name element identifies a site collection url.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebstesitecollectionurl">
+                                                      <sch:pattern id="sp-def_webstesitecollectionurl">
                                                             <sch:rule context="sp-def:spweb_state/sp-def:sitecollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spweb_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -952,7 +952,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The secondarysitecolladmin element identifies a secondary site collection admin.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebstesecondarysitecolladmin">
+                                                      <sch:pattern id="sp-def_webstesecondarysitecolladmin">
                                                             <sch:rule context="sp-def:spweb_state/sp-def:secondarysitecolladmin">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the secondarysitecolladmin entity of a spweb_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -964,7 +964,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>A boolean that represents if the secondarysitecolladmin is enabled.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebstesecondsitecolladminenabled">
+                                                      <sch:pattern id="sp-def_webstesecondsitecolladminenabled">
                                                             <sch:rule context="sp-def:spweb_state/sp-def:secondsitecolladminenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the secondsitecolladminenabled entity of a spweb_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -976,7 +976,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the allowanonymousaccess is enabled users will be allowed to create and manager their own top-level Web sites .</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spwebsteallowanonymousaccess">
+                                                      <sch:pattern id="sp-def_websteallowanonymousaccess">
                                                             <sch:rule context="sp-def:spweb_state/sp-def:allowanonymousaccess">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the allowanonymousaccess entity of a spweb_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -996,12 +996,12 @@
             <xsd:annotation>
                   <xsd:documentation>The splist test is used to check the properties of lists associated with a SharePoint site or site collection. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an splist_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="splisttst">
+                        <sch:pattern id="sp-def_listtst">
                               <sch:rule context="sp-def:splist_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:splist_object/@id"><sch:value-of select="../@id"/> - the object child element of a splist_test must reference an splist_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:splist_object/@id"><sch:value-of select="../@id"/> - the object child element of a splist_test must reference an splist_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:splist_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:splist_state/@id"><sch:value-of select="../@id"/> - the state child element of a splist_test must reference an splist_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:splist_state/@id"><sch:value-of select="../@id"/> - the state child element of a splist_test must reference an splist_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1033,7 +1033,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The spsiteurl element defines the Sharepoint website being specified ...</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="splistobjspsiteurl">
+                                                                  <sch:pattern id="sp-def_listobjspsiteurl">
                                                                         <sch:rule context="sp-def:splist_object/sp-def:spsiteurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spwebsiteurl entity of a splist_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1060,7 +1060,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The spsiteurl element identifies an Sharepoint site to test for.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spliststesiteurl">
+                                                      <sch:pattern id="sp-def_liststesiteurl">
                                                             <sch:rule context="sp-def:splist_object/sp-def:spsiteurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spsiteurl entity of a splist_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1072,7 +1072,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the irmenabled option is enabled, documents are protected whenever they leave the control of the Sharepoint system.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spliststeirmenabled">
+                                                      <sch:pattern id="sp-def_liststeirmenabled">
                                                             <sch:rule context="sp-def:splist_state/sp-def:irmenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the irmenabled entity of a splist_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1084,7 +1084,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the enableversioning option is enabled, backup copies of documents are kept and managed by the Sharepoint system.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spliststeenableversioning">
+                                                      <sch:pattern id="sp-def_liststeenableversioning">
                                                             <sch:rule context="sp-def:splist_state/sp-def:enableversioning">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the enableversioning entity of a splist_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1096,7 +1096,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>If the nocrawl option is enabled, the site is excluded from crawls that Sharepoint does when it indexes sites.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spliststenocrawl">
+                                                      <sch:pattern id="sp-def_liststenocrawl">
                                                             <sch:rule context="sp-def:splist_state/sp-def:nocrawl">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the nocrawl entity of a splist_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1116,12 +1116,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spantivirussettings test is used to check the settings for antivirus software associated with a SharePoint deployment.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spavstst">
+                        <sch:pattern id="sp-def_avstst">
                               <sch:rule context="sp-def:spantivirussettings_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spantivirussettings_object/@id"><sch:value-of select="../@id"/> - the object child element of a spantivirussettings_test must reference an spantivirussettings_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spantivirussettings_object/@id"><sch:value-of select="../@id"/> - the object child element of a spantivirussettings_test must reference an spantivirussettings_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spantivirussettings_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spantivirussettings_state/@id"><sch:value-of select="../@id"/> - the state child element of a spantivirussettings_test must reference an spantivirussettings_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spantivirussettings_state/@id"><sch:value-of select="../@id"/> - the state child element of a spantivirussettings_test must reference an spantivirussettings_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1153,7 +1153,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The spwebservicename element denotes the web service for which antivirus settings will be checked.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spavsobjwebservicename">
+                                                                  <sch:pattern id="sp-def_avsobjwebservicename">
                                                                         <sch:rule context="sp-def:spantivirussettings_object/sp-def:spwebservicename">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spwebservicename entity of a spantivirussettings_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1165,7 +1165,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The spfarmname element denotes the farm on which a web service to be queried resides.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spavsobjfarmname">
+                                                                  <sch:pattern id="sp-def_avsobjfarmname">
                                                                         <sch:rule context="sp-def:spantivirussettings_object/sp-def:spfarmname">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spfarmname entity of a spantivirussettings_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1192,7 +1192,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The spwebservicename denotes the name of a SharePoint web service to be tested or * (the default) to test all web services.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstewebservicename">
+                                                      <sch:pattern id="sp-def_avsstewebservicename">
                                                             <sch:rule context="sp-def:spantivirussettings_object/sp-def:spwebservicename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spwebservicename entity of a spantivirusservice_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1204,7 +1204,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The spfarmname denotes the name of the farm on which the Sharepoint webservice resides or the local farm (default).</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstespfarmname">
+                                                      <sch:pattern id="sp-def_avsstespfarmname">
                                                             <sch:rule context="sp-def:spantivirussettings_object/sp-def:spfarmname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spfarmname entity of a spantivirusservice_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1216,7 +1216,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether infected documents can be downloaded on the SharePoint system.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavssteallowdownload">
+                                                      <sch:pattern id="sp-def_avssteallowdownload">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:allowdownload">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the allowdownload entity of a spantivirussettings_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1228,7 +1228,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the virus scanner should attempt to cure files that are infected.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstecleaningenabled">
+                                                      <sch:pattern id="sp-def_avsstecleaningenabled">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:cleaningenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the cleaningenabled entity of a spantivirussettings_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1240,7 +1240,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whetehr files are scanned for viruses when they are downloaded.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstedownloadscanenabled">
+                                                      <sch:pattern id="sp-def_avsstedownloadscanenabled">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:downloadscanenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the downloadscanenabled entity of a spantivirussettings_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1252,7 +1252,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The number of threads that the antivirus scanner can use to scan documents for viruses.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstenumberofthreads">
+                                                      <sch:pattern id="sp-def_avsstenumberofthreads">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:numberofthreads">
                                                                   <sch:assert test="@datatype='integer'"><sch:value-of select="../@id"/> - datatype attribute for the numberofthreads entity of a spantivirussettings_state should be 'integer'</sch:assert>
                                                             </sch:rule>
@@ -1264,7 +1264,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether to skip scanning for viruses during a search crawl.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavssteskipsearchcrawl">
+                                                      <sch:pattern id="sp-def_avssteskipsearchcrawl">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:skipsearchcrawl">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the skipsearchcrawl entity of a spantivirussettings_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1276,7 +1276,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Denotes the amount of time before the virus scanner times out.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstetimeout">
+                                                      <sch:pattern id="sp-def_avsstetimeout">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:timeout">
                                                                   <sch:assert test="@datatype='integer'"><sch:value-of select="../@id"/> - datatype attribute for the timeout entity of a spantivirussettings_state should be 'integer'</sch:assert>
                                                             </sch:rule>
@@ -1288,7 +1288,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether files are scanned when they are uploaded.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavssteuploadscanenabled">
+                                                      <sch:pattern id="sp-def_avssteuploadscanenabled">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:uploadscanenabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the uploadscanenabled entity of a spantivirussettings_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1300,7 +1300,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Denotes the current increment of the number of times the vendor has been updated.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spavsstevendorupdatecount">
+                                                      <sch:pattern id="sp-def_avsstevendorupdatecount">
                                                             <sch:rule context="sp-def:spantivirussettings_state/sp-def:vendorupdatecount">
                                                                   <sch:assert test="@datatype='integer'"><sch:value-of select="../@id"/> - datatype attribute for the vendorupdatecount entity of a spantivirussettings_state should be 'integer'</sch:assert>
                                                             </sch:rule>
@@ -1320,12 +1320,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spsiteadministration test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spsiteadmintst">
+                        <sch:pattern id="sp-def_siteadmintst">
                               <sch:rule context="sp-def:spsiteadministration_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spsiteadministration_object/@id"><sch:value-of select="../@id"/> - the object child element of a spsiteadministration_test must reference an spsiteadministration_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spsiteadministration_object/@id"><sch:value-of select="../@id"/> - the object child element of a spsiteadministration_test must reference an spsiteadministration_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spsiteadministration_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spsiteadministration_state/@id"><sch:value-of select="../@id"/> - the state child element of a spsiteadministration_test must reference an spsiteadministration_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spsiteadministration_state/@id"><sch:value-of select="../@id"/> - the state child element of a spsiteadministration_test must reference an spsiteadministration_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1357,7 +1357,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The sitecollectionurl element defines the site to evaluate.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spsiteadminobjsitecollectionurl">
+                                                                  <sch:pattern id="sp-def_siteadminobjsitecollectionurl">
                                                                         <sch:rule context="sp-def:spsiteadministration_object/sp-def:sitecollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spsiteadministration_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1384,7 +1384,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The sitecollectionurl element identifies a site.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spsiteadminstesitecollectionurl">
+                                                      <sch:pattern id="sp-def_siteadminstesitecollectionurl">
                                                             <sch:rule context="sp-def:spsiteadministration_state/sp-def:sitecollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spsiteadministration_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1398,7 +1398,7 @@
                                                 <xsd:appinfo>
                                                       <valid_datatypes>integer</valid_datatypes>
                                                       <valid_operators>equals, not equal, greater than, less than, greater than or equal, less than or equal</valid_operators>
-                                                      <sch:pattern id="spsiteadminstestoragemaxlevel">
+                                                      <sch:pattern id="sp-def_siteadminstestoragemaxlevel">
                                                             <sch:rule context="sp-def:spsiteadministration_state/sp-def:storagemaxlevel">
                                                                   <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for thestoragemaxlevel entity of a spsiteadministration_state should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -1412,7 +1412,7 @@
                                                 <xsd:appinfo>
                                                       <valid_datatypes>integer</valid_datatypes>
                                                       <valid_operators>equals, not equal, greater than, less than, greater than or equal, less than or equal</valid_operators>
-                                                      <sch:pattern id="spsiteadminstestoragewarninglevel">
+                                                      <sch:pattern id="sp-def_siteadminstestoragewarninglevel">
                                                             <sch:rule context="sp-def:spsiteadministration_state/sp-def:storagewarninglevel">
                                                                   <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the storagewarninglevel entity of a spsiteadministration_state should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -1432,12 +1432,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spsite test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spsitetst">
+                        <sch:pattern id="sp-def_sitetst">
                               <sch:rule context="sp-def:spsite_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spsite_object/@id"><sch:value-of select="../@id"/> - the object child element of a spsite_test must reference an spsite_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spsite_object/@id"><sch:value-of select="../@id"/> - the object child element of a spsite_test must reference an spsite_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spsite_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spsite_state/@id"><sch:value-of select="../@id"/> - the state child element of a spsite_test must reference an spsite_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spsite_state/@id"><sch:value-of select="../@id"/> - the state child element of a spsite_test must reference an spsite_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1469,7 +1469,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The sitecollectionurl element defines the site to evaluate.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spsiteobjsitecollectionurl">
+                                                                  <sch:pattern id="sp-def_siteobjsitecollectionurl">
                                                                         <sch:rule context="sp-def:spsite_object/sp-def:sitecollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spsite_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1496,7 +1496,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The sitecollectionurl element identifies a site.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spsitestesitecollectionurl">
+                                                      <sch:pattern id="sp-def_sitestesitecollectionurl">
                                                             <sch:rule context="sp-def:spsite_state/sp-def:sitecollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a spsite_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1508,7 +1508,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The quota name is the name of quota template for a site collection.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spsitestequotaname">
+                                                      <sch:pattern id="sp-def_sitestequotaname">
                                                             <sch:rule context="sp-def:spsite_state/sp-def:quotaname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the quotaname entity of a spsite_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1520,7 +1520,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URL is the full URL to the root Web site of the site collection, including host name, port number, and path.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spsitesteurl">
+                                                      <sch:pattern id="sp-def_sitesteurl">
                                                             <sch:rule context="sp-def:spsite_state/sp-def:url">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the url entity of a spsite_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1540,12 +1540,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spcrawlrule test is used to check the configuration or rules associated with the SharePoint system's built-in indexer and the sites or documents that will be indexed.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spcrtst">
+                        <sch:pattern id="sp-def_crtst">
                               <sch:rule context="sp-def:spcrawlrule_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spcrawlrule_object/@id"><sch:value-of select="../@id"/> - the object child element of a spcrawlrule_test must reference an spcrawlrule_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spcrawlrule_object/@id"><sch:value-of select="../@id"/> - the object child element of a spcrawlrule_test must reference an spcrawlrule_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spcrawlrule_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spcrawlrule_state/@id"><sch:value-of select="../@id"/> - the state child element of a spcrawlrule_test must reference an spcrawlrule_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spcrawlrule_state/@id"><sch:value-of select="../@id"/> - the state child element of a spcrawlrule_test must reference an spcrawlrule_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1577,7 +1577,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The spsiteurl element denotes the resource on the SharePoint server (eg. a site or document) for which indexing settings will be checked.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spcrobjsiteurl">
+                                                                  <sch:pattern id="sp-def_crobjsiteurl">
                                                                         <sch:rule context="sp-def:spcrawlrule_object/sp-def:spsiteurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spsiteurl entity of a spcrawlrule_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1604,7 +1604,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The spsiteurl denotes the URL of a website or resource whose indexing properties should be tested.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrstespsiteurl">
+                                                      <sch:pattern id="sp-def_crstespsiteurl">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:spsiteurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the spsiteurl entity of a spcrawlrule_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1616,7 +1616,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the crawler should crawl content from a hierarchical content source, such as HTTP content.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrstecrawlashttp">
+                                                      <sch:pattern id="sp-def_crstecrawlashttp">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:crawlashttp">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the crawlashttp entity of a spcrawlrule_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1628,7 +1628,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether a particular crawl rule is enabled.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrsteenabled">
+                                                      <sch:pattern id="sp-def_crsteenabled">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:enabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the enabled entity of a spcrawlrule_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1640,7 +1640,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the indexer should crawl websites that contain the question mark (?) character.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrstefollowcomplexurls">
+                                                      <sch:pattern id="sp-def_crstefollowcomplexurls">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:followcomplexurls">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the followcomplexurls entity of a spcrawlrule_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1652,7 +1652,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The path to which a particular crawl rule applies.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrstepath">
+                                                      <sch:pattern id="sp-def_crstepath">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:path">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the path entity of a spcrawlrule_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1664,7 +1664,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The priority setting for a particular crawl rule.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrstepriority">
+                                                      <sch:pattern id="sp-def_crstepriority">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:priority">
                                                                   <sch:assert test="@datatype='integer'"><sch:value-of select="../@id"/> - datatype attribute for the priority entity of a spcrawlrule_state should be 'integer'</sch:assert>
                                                             </sch:rule>
@@ -1676,7 +1676,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the crawler should exclude the content of items that this rule applies to from the content index.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrstesuppressindexing">
+                                                      <sch:pattern id="sp-def_crstesuppressindexing">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:suppressindexing">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the suppressindexing entity of a spcrawlrule_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1688,7 +1688,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>A string containing the account name for the crawl rule.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spcrsteaccountname">
+                                                      <sch:pattern id="sp-def_crsteaccountname">
                                                             <sch:rule context="sp-def:spcrawlrule_state/sp-def:accountname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the accountname entity of a spcrawlrule_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1708,12 +1708,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spjobdefinition test is used to check the status of the various properties associated with scheduled jobs in the SharePoint system.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spjobdeftst">
+                        <sch:pattern id="sp-def_jobdeftst">
                               <sch:rule context="sp-def:spjobdefinition_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spjobdefinition_object/@id"><sch:value-of select="../@id"/> - the object child element of a spjobdefinition_test must reference an spjobdefinition_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spjobdefinition_object/@id"><sch:value-of select="../@id"/> - the object child element of a spjobdefinition_test must reference an spjobdefinition_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spjobdefinition_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spjobdefinition_state/@id"><sch:value-of select="../@id"/> - the state child element of a spjobdefinition_test must reference an spjobdefinition_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spjobdefinition_state/@id"><sch:value-of select="../@id"/> - the state child element of a spjobdefinition_test must reference an spjobdefinition_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1745,7 +1745,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The URI that represents the web application for which jobs should be checked.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="spjobdefobjwebappuri">
+                                                                  <sch:pattern id="sp-def_jobdefobjwebappuri">
                                                                         <sch:rule context="sp-def:spjobdefinition_object/sp-def:webappuri">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webappuri entity of a spjobdefinition_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1772,7 +1772,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URI that represents the web application for which jobs should be checked.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spjobdefstewebappuri">
+                                                      <sch:pattern id="sp-def_jobdefstewebappuri">
                                                             <sch:rule context="sp-def:spjobdefinition_state/sp-def:webappuri">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webappuri entity of a spjobdefinition_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1784,7 +1784,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the job as displayed in the SharePoint Central Administration site.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spjobdefstedisplayname">
+                                                      <sch:pattern id="sp-def_jobdefstedisplayname">
                                                             <sch:rule context="sp-def:spjobdefinition_state/sp-def:displayname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the displayname entity of a spjobdefinition_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1796,7 +1796,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Determines whether or not the job definition is enabled.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spjobdefsteisdisabled">
+                                                      <sch:pattern id="sp-def_jobdefsteisdisabled">
                                                             <sch:rule context="sp-def:spjobdefinition_state/sp-def:isdisabled">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the isdisabled entity of a spjobdefinition_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1808,7 +1808,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Determines whether the job definition should be retried if it ends abnormally.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spjobdefsteretry">
+                                                      <sch:pattern id="sp-def_jobdefsteretry">
                                                             <sch:rule context="sp-def:spjobdefinition_state/sp-def:retry">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the retry entity of a spjobdefinition_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -1820,7 +1820,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The title of a job as displayed in the SharePoint Central Administration site.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spjobdefstetitle">
+                                                      <sch:pattern id="sp-def_jobdefstetitle">
                                                             <sch:rule context="sp-def:spjobdefinition_state/sp-def:title">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the title entity of a spjobdefinition_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1840,12 +1840,12 @@
             <xsd:annotation>
                   <xsd:documentation>The bestbet test is used to get all the best bets associated with a site.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="bbtst">
+                        <sch:pattern id="sp-def_bbtst">
                               <sch:rule context="sp-def:bestbet_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:bestbet_object/@id"><sch:value-of select="../@id"/> - the object child element of a bestbet_test must reference an bestbet_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:bestbet_object/@id"><sch:value-of select="../@id"/> - the object child element of a bestbet_test must reference an bestbet_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:bestbet_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:bestbet_state/@id"><sch:value-of select="../@id"/> - the state child element of a bestbet_test must reference an bestbet_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:bestbet_state/@id"><sch:value-of select="../@id"/> - the state child element of a bestbet_test must reference an bestbet_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1877,7 +1877,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The URL that represents the site collection.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="bbobjsitecollectionurl">
+                                                                  <sch:pattern id="sp-def_bbobjsitecollectionurl">
                                                                         <sch:rule context="sp-def:bestbet_object/sp-def:sitecollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a bestbet_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1889,7 +1889,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The URL that represents the best bet.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="bbobjbestbeturl">
+                                                                  <sch:pattern id="sp-def_bbobjbestbeturl">
                                                                         <sch:rule context="sp-def:bestbet_object/sp-def:bestbeturl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the bestbeturl entity of a bestbet_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -1916,7 +1916,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URL that represents the site collection.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="bbstesitecollectionurl">
+                                                      <sch:pattern id="sp-def_bbstesitecollectionurl">
                                                             <sch:rule context="sp-def:bestbet_state/sp-def:sitecollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a bestbet_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1928,7 +1928,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the job as displayed in the SharePoint Central Administration site.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="bbstebestbeturl">
+                                                      <sch:pattern id="sp-def_bbstebestbeturl">
                                                             <sch:rule context="sp-def:bestbet_state/sp-def:bestbeturl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the bestbeturl entity of a bestbet_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1940,7 +1940,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The title of a best bet.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="bbstetitle">
+                                                      <sch:pattern id="sp-def_bbstetitle">
                                                             <sch:rule context="sp-def:bestbet_state/sp-def:title">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the title entity of a bestbet_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1952,7 +1952,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Thedescription of a best bet..</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="bbstedescription">
+                                                      <sch:pattern id="sp-def_bbstedescription">
                                                             <sch:rule context="sp-def:bestbet_state/sp-def:description">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the description entity of a bestbet_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -1972,12 +1972,12 @@
             <xsd:annotation>
                   <xsd:documentation>The policycoll test is used to get all the Information Policies associated with a site.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="infopolicycolltst">
+                        <sch:pattern id="sp-def_infopolicycolltst">
                               <sch:rule context="sp-def:policycoll_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:policycoll_object/@id"><sch:value-of select="../@id"/> - the object child element of a policycoll_test must reference an policycoll_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:policycoll_object/@id"><sch:value-of select="../@id"/> - the object child element of a policycoll_test must reference an policycoll_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:policycoll_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:policycoll_state/@id"><sch:value-of select="../@id"/> - the state child element of a policycoll_test must reference an policycoll_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:policycoll_state/@id"><sch:value-of select="../@id"/> - the state child element of a policycoll_test must reference an policycoll_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -2009,7 +2009,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The URL that represents the site collection.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="infopolicycollobjsitecollectionurl">
+                                                                  <sch:pattern id="sp-def_infopolicycollobjsitecollectionurl">
                                                                         <sch:rule context="sp-def:infopolicycoll_object/sp-def:sitecollectionurl">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -2021,7 +2021,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The id that represents the Information Policy.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="infopolicycollobjid">
+                                                                  <sch:pattern id="sp-def_infopolicycollobjid">
                                                                         <sch:rule context="sp-def:infopolicycoll_object/sp-def:id">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the id entity of a infopolicycoll_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -2048,7 +2048,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URL that represents the site collection.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="infopolicycollstesitecollectionurl">
+                                                      <sch:pattern id="sp-def_infopolicycollstesitecollectionurl">
                                                             <sch:rule context="sp-def:infopolicycoll_state/sp-def:sitecollectionurl">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the sitecollectionurl entity of a infopolicycoll_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -2060,7 +2060,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The id of the Information Policy.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="infopolicycollsteid">
+                                                      <sch:pattern id="sp-def_infopolicycollsteid">
                                                             <sch:rule context="sp-def:infopolicycoll_state/sp-def:id">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the id entity of a infopolicycoll_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -2072,7 +2072,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the Information Policy.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="infopolicycollstename">
+                                                      <sch:pattern id="sp-def_infopolicycollstename">
                                                             <sch:rule context="sp-def:infopolicycoll_state/sp-def:name">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a infopolicycoll_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -2084,7 +2084,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The description of an Information Policy..</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="infopolicycollstedescription">
+                                                      <sch:pattern id="sp-def_infopolicycollstedescription">
                                                             <sch:rule context="sp-def:infopolicycoll_state/sp-def:description">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the description entity of a infopolicycoll_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -2096,7 +2096,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The long description of an Information Policy..</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="infopolicycollstelongdescription">
+                                                      <sch:pattern id="sp-def_infopolicycollstelongdescription">
                                                             <sch:rule context="sp-def:infopolicycoll_state/sp-def:longdescription">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the longdescription entity of a infopolicycoll_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -2116,12 +2116,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spdiagnosticsservice test is used to check the diagnostic properties associated with a Sharepoint system.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="spdiagnosticsservicetest">
+                        <sch:pattern id="sp-def_diagnosticsservicetest">
                               <sch:rule context="sp-def:spdiagnosticsservice_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticsservice_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_object</sch:assert> 
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticsservice_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_object</sch:assert> 
                               </sch:rule>
                               <sch:rule context="sp-def:spdiagnosticsservice_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticsservice_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_state</sch:assert> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticsservice_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_state</sch:assert> 
                               </sch:rule>
                         </sch:pattern>     
                   </xsd:appinfo>
@@ -2152,7 +2152,7 @@
                                                 <xsd:annotation>
                                                       <xsd:documentation>The farm whose diagnostic capabilities should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
                                                       <xsd:appinfo>
-                                                            <sch:pattern id="spdsobjfarmname">
+                                                            <sch:pattern id="sp-def_dsobjfarmname">
                                                                   <sch:rule context="sp-def:spdiagnosticsservice_object/sp-def:farmname">
                                                                         <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the farmname entity of an spdiagnosticsservice_object should be 'string'</sch:assert> 
                                                                   </sch:rule>
@@ -2178,7 +2178,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The farm whose diagnostic capabilities should be checked.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdsstefarmname">
+                                                      <sch:pattern id="sp-def_dsstefarmname">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:farmname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the farmname entity of an spdiagnosticsservice_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2190,7 +2190,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the diagnostic service as shown in the Sharepoint Central Administration site.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdsstedisplayname">
+                                                      <sch:pattern id="sp-def_dsstedisplayname">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:displayname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the displayname entity of an spdiagnosticsservice_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2202,7 +2202,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The number of minutes to capture events to a single log file. This value lies in the range 0 to 1440. The default value is 30.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdsstelogcutinterval">
+                                                      <sch:pattern id="sp-def_dsstelogcutinterval">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:logcutinterval">
                                                                   <sch:assert test="@datatype='integer'"><sch:value-of select="../@id"/> - datatype attribute for the logcutinterval entity of an spdiagnosticsservice_state should be 'integer'</sch:assert>
                                                             </sch:rule>
@@ -2214,7 +2214,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The path to the file system directory where log files are created and stored.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdssteloglocation">
+                                                      <sch:pattern id="sp-def_dssteloglocation">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:loglocation">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the loglocation entity of an spdiagnosticsservice_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2226,7 +2226,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The value that indicates the number of log files to create. This lies in the range 0 to 1024 with a default of 96.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdsstelogstokeep">
+                                                      <sch:pattern id="sp-def_dsstelogstokeep">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:logstokeep">
                                                                   <sch:assert test="@datatype='integer'"><sch:value-of select="../@id"/> - datatype attribute for the logstokeep entity of an spdiagnosticsservice_state should be 'integer'</sch:assert> 
                                                             </sch:rule>
@@ -2238,7 +2238,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The required property specifies whether an instance of the spdiagnosticsservice must be running on the farm.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdssterequired">
+                                                      <sch:pattern id="sp-def_dssterequired">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:required">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the required entity of an spdiagnosticsservice_state should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -2250,7 +2250,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The friendly name for the service as displayed in the Central Administration and in logs. This should be "Windows Sharepoint Diagnostics Service" by default.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdsstetypename">
+                                                      <sch:pattern id="sp-def_dsstetypename">
                                                             <sch:rule context="sp-def:spdiagnosticsservice_state/sp-def:typename">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the typename entity of an spdiagnosticsservice_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2270,12 +2270,12 @@
             <xsd:annotation>
                   <xsd:documentation>The spdiagnosticslevel_test is used to check the status of the logging features associated with a Sharepoint deployment.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern>
+                        <sch:pattern id="sp-def_diagnostics_level_test">
                               <sch:rule context="sp-def:spdiagnosticslevel_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_object</sch:assert>  
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_object</sch:assert>  
                               </sch:rule>
                               <sch:rule context="sp-def:spdiagnosticslevel_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_state</sch:assert> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_state</sch:assert> 
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -2306,7 +2306,7 @@
                                                 <xsd:annotation>
                                                       <xsd:documentation>The farm whose diagnostics levels should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
                                                       <xsd:appinfo>
-                                                            <sch:pattern id="spdlobjfarmname">
+                                                            <sch:pattern id="sp-def_dlobjfarmname">
                                                                   <sch:rule context="sp-def:spdiagnosticslevel_object/sp-def:farmname">
                                                                         <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the farmname entity of an spdiagnosticslevel_object should be 'string'</sch:assert>  
                                                                   </sch:rule>
@@ -2332,7 +2332,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the farm for which diagnostics level properties should be checked.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdlstefarmname">
+                                                      <sch:pattern id="sp-def_dlstefarmname">
                                                             <sch:rule context="sp-def:spdiagnosticslevel_state/sp-def:farmname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the farmname entity of an spdiagnosticslevel_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2344,7 +2344,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The event severity setting for a particular diagnostic level category.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdlsteeventseverity">
+                                                      <sch:pattern id="sp-def_dlsteeventseverity">
                                                             <sch:rule context="spdiagnosticslevel_state/sp-def:eventseverity">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the eventseverity entity of an spdiagnosticslevel_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2356,7 +2356,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the trace log category is hidden in the Windows Sharepoint Services Central Administration interface.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdlstehidden">
+                                                      <sch:pattern id="sp-def_dlstehidden">
                                                             <sch:rule context="sp-def:spdiagnosticslevel_state/sp-def:hidden">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the hidden entity of an spdiagnosticslevel_state should be 'boolean'</sch:assert> 
                                                             </sch:rule>
@@ -2368,7 +2368,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>A string that represents the ID of the trace log category. This is its English language name.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdlstelevelid">
+                                                      <sch:pattern id="sp-def_dlstelevelid">
                                                             <sch:rule context="sp-def:spdiagnosticslevel_state/sp-def:levelid">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the levelid entity of an spdiagnosticslevel_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2380,7 +2380,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the trace log category. This represents the localized name for the category.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdlstelevelname">
+                                                      <sch:pattern id="sp-def_dlstelevelname">
                                                             <sch:rule context="sp-def:spdiagnosticslevel_state/sp-def:levelname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the levelname entity of an spdiagnosticslevel_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2392,7 +2392,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The trace severity setting for a particular diagnostic level category.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="spdlstetraceseverity">
+                                                      <sch:pattern id="sp-def_dlstetraceseverity">
                                                             <sch:rule context="sp-def:spdiagnosticslevel_state/sp-def:traceseverity">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the traceseverity entity of an spdiagnosticslevel_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2412,12 +2412,12 @@
             <xsd:annotation>
                   <xsd:documentation>The sppolicyfeature test enables one to check the attributes associated with policies and policy features on the Sharepoint deployment.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern>
+                        <sch:pattern id="sp-def_policyfeature_test">
                               <sch:rule context="sp-def:sppolicyfeature_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:sppolicyfeature_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicyfeature_test must reference an sppolicyfeature_object</sch:assert> 
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicyfeature_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicyfeature_test must reference an sppolicyfeature_object</sch:assert> 
                               </sch:rule>
                               <sch:rule context="sp-def:sppolicyfeature_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:sppolicyfeature_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicyfeature_test must reference an sppolicyfeature_state</sch:assert> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:sppolicyfeature_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicyfeature_test must reference an sppolicyfeature_state</sch:assert> 
                               </sch:rule> 
                         </sch:pattern>
                   </xsd:appinfo>
@@ -2448,7 +2448,7 @@
                                                 <xsd:annotation>
                                                       <xsd:documentation>The farm whose policy features should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
                                                       <xsd:appinfo>
-                                                            <sch:pattern id="sppfobjfarmname">
+                                                            <sch:pattern id="sp-def_pfobjfarmname">
                                                                   <sch:rule context="sp-def:sppolicyfeature_object/sp-def:farmname">
                                                                         <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the farmname entity of an sppolicyfeature_object should be 'string'</sch:assert> 
                                                                   </sch:rule>
@@ -2474,7 +2474,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The farm whose policy features should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstefarmname">
+                                                      <sch:pattern id="sp-def_pfstefarmname">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:farmname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the farmname entity of an sppolicyfeature_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2486,7 +2486,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URL to a web control used to edit policy instance-level settings.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfsteconfigpage">
+                                                      <sch:pattern id="sp-def_pfsteconfigpage">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:configpage">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the configpage entity of an sppolicyfeature_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2498,7 +2498,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The default values for any policy instance-level settings for a policy feature.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstedefaultcustomdata">
+                                                      <sch:pattern id="sp-def_pfstedefaultcustomdata">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:defaultcustomdata">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the defaultcustomdata entity of an sppolicyfeature_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2510,7 +2510,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The short description of the policy feature and of the service it provides.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstedescription">
+                                                      <sch:pattern id="sp-def_pfstedescription">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:description">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the description entity of an sppolicyfeature_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2522,7 +2522,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URL to a web control used to edit server farm-level settings for this policy feature.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfsteglobalconfigpage">
+                                                      <sch:pattern id="sp-def_pfsteglobalconfigpage">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:globalconfigpage">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the globalconfigpage entity of an sppolicyfeature_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2534,7 +2534,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The default settings for any server farm-level settings for this policy feature.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfsteglobalcustomdata">
+                                                      <sch:pattern id="sp-def_pfsteglobalcustomdata">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:globalcustomdata">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the globalconfigpage entity of an sppolicyfeature_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2546,7 +2546,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The policy feature group to which a policy feature belongs.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstegroup">
+                                                      <sch:pattern id="sp-def_pfstegroup">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:group">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the group entity of an sppolicyfeature_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2558,7 +2558,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name to display in the Microsoft Office Sharepoint Server 2007 interface for an information policy feature.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstename">
+                                                      <sch:pattern id="sp-def_pfstename">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:name">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of an sppolicyfeature_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2570,7 +2570,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the creator of the policy feature as it is displayed in the Microsoft Office Sharepoint Server 2007 user interface.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstepublisher">
+                                                      <sch:pattern id="sp-def_pfstepublisher">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:publisher">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the publisher entity of an sppolicyfeature_state should be 'string'</sch:assert>  
                                                             </sch:rule>
@@ -2582,7 +2582,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the policy feature is hidden or visible.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppfstestate">
+                                                      <sch:pattern id="sp-def_pfstestate">
                                                             <sch:rule context="sp-def:sppolicyfeature_state/sp-def:state">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the state entity of an sppolicyfeature_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2602,12 +2602,12 @@
             <xsd:annotation>
                   <xsd:documentation>The sppolicy test enables one to check the attributes of the policies associated with a particular URL Zone in a Sharepoint system.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern>
+                        <sch:pattern id="sp-def_policy_test">
                               <sch:rule context="sp-def:sppolicy_test/sp-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/sp-def:sppolicy_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicy_test must reference an sppolicy_object</sch:assert> 
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicy_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicy_test must reference an sppolicy_object</sch:assert> 
                               </sch:rule>
                               <sch:rule context="sp-def:sppolicy_test/sp-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/sp-def:sppolicy_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicy_test must reference an sppolicy_state</sch:assert> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:sppolicy_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicy_test must reference an sppolicy_state</sch:assert> 
                               </sch:rule>  
                         </sch:pattern>
                   </xsd:appinfo>
@@ -2638,7 +2638,7 @@
                                                 <xsd:annotation>
                                                       <xsd:documentation>The URI that represents the web application for which policies should be checked.</xsd:documentation>
                                                       <xsd:appinfo>
-                                                            <sch:pattern id="sppolicyobjwebappuri">
+                                                            <sch:pattern id="sp-def_policyobjwebappuri">
                                                                   <sch:rule context="sp-def:sppolicy_object/sp-def:webappuri">
                                                                         <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webappuri entity of an sppolicy_object should be 'string'</sch:assert> 
                                                                   </sch:rule>
@@ -2651,7 +2651,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The zone for which policies should be checked.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicyobjurlzone">
+                                                      <sch:pattern id="sp-def_policyobjurlzone">
                                                             <sch:rule context="sp-def:sppolicy_object/sp-def:urlzone">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the urlzone entity of an sppolicy_object should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2676,7 +2676,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The URI that represents the web application for which policies should be checked.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicystewebappuri">
+                                                      <sch:pattern id="sp-def_policystewebappuri">
                                                             <sch:rule context="sp-def:sppolicy_state/sp-def:webappuri">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the webappuri entity of an sppolicy_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2688,7 +2688,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The zone for which policies should be checked.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicysteurlzone">
+                                                      <sch:pattern id="sp-def_policysteurlzone">
                                                             <sch:rule context="sp-def:sppolicy_state/sp-def:urlzone">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the urlzone entity of an sppolicy_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2700,7 +2700,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The user or group display name for a policy. This defaults to the user name if the display name cannot be resolved through Active Directory.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicystedisplayname">
+                                                      <sch:pattern id="sp-def_policystedisplayname">
                                                             <sch:rule context="sp-def:sppolicy_state/sp-def:displayname">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the displayname entity of an sppolicy_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2712,7 +2712,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Specifies whether the user identified by a particular policy is visible only as a System account within the Windows Sharepoint Services user interface.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicysteissystemuser">
+                                                      <sch:pattern id="sp-def_policysteissystemuser">
                                                             <sch:rule context="sp-def:sppolicy_state/sp-def:issystemuser">
                                                                   <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the issystemuser entity of an sppolicy_state should be 'boolean'</sch:assert> 
                                                             </sch:rule>
@@ -2724,7 +2724,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The user name of the user or group that is associated with policy.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicysteusername">
+                                                      <sch:pattern id="sp-def_policysteusername">
                                                             <sch:rule context="sp-def:sppolicy_state/sp-def:username">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the username entity of an sppolicy_state should be 'string'</sch:assert> 
                                                             </sch:rule>
@@ -2736,7 +2736,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The policy role type to apply globally in a Sharepoint web application to a user or group.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="sppolicystepolicyroletype">
+                                                      <sch:pattern id="sp-def_policystepolicyroletype">
                                                             <sch:rule context="sp-def:sppolicyrole_state/sp-def:policyroletype">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the policyroletype entity of an sppolicyrole_state should be 'string'</sch:assert> 
                                                             </sch:rule>

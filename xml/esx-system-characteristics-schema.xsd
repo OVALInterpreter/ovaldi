@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:esx-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx" elementFormDefault="qualified" version="5.6">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:esx-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx" elementFormDefault="qualified" version="5.7">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
       <xsd:annotation>
@@ -7,9 +7,9 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>VMware ESX server System Characteristics</schema>
-                  <version>5.6</version>
-                  <date>9/9/2009 9:44:32 AM</date>
-                  <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.7 RC 2</version>
+                  <date>3/23/2010 6:49:50 AM</date>
+                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                   <sch:ns prefix="esx-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx"/>
                 <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -35,7 +35,7 @@
                                                             <oval:reason>The deprecated patch_test has a bug where the patch name entity is defined as a string in the object yet is defined as an int in the state.  Additional state entities have also been added to the new patch56_test.</oval:reason>
                                                             <oval:comment>This item has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
                                                       </oval:deprecated_info>
-                                                      <sch:pattern id="esxpatchitempatch_number">
+                                                      <sch:pattern id="esx-sc_patchitempatch_number">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:patch_number">
                                                                   <sch:report test="true()">DEPRECATED ELEMENT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                                                                   <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the patch_number entity of a patch_item should be 'int'</sch:assert>
@@ -48,7 +48,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The patch_name entity indetifies the name of the patch.  For example: ESX-200603 or ESX350-200904401-BG.  The value of this entity should correspond to the values returned under the "name" column of the "esxupdate query" command.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="esxpatchitempatch_name">
+                                                      <sch:pattern id="esx-sc_patchitempatch_name">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:patch_name">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the patch_name entity of a patch_item should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -60,7 +60,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The knowledge_base_id entity specifies the knowledge base article identifier number associated with a given patch from ESX versions 3.0.2 and earlier.  It is comprised of the numerical string at the end of the patch name. For example, the patch ESX-200603 would have a knowledge base identifier of 200603.  For patches from ESX version 3.0.3 and later, the patch name uses a different format and does not include the knowledge base id.  This entity should be marked with a status of 'does not exist' in those cases.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="esxpatchitemkb_id">
+                                                      <sch:pattern id="esx-sc_patchitemkb_id">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:knowledge_base_id">
                                                                   <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the knowledge_base_id entity of a patch_item should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -72,7 +72,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The bundle_id entity specifies the unique ID for the patch.  Note that for version 3.0.3 and version 3.5 this is comprised of the year and month the bundle was released and a 3-digit unique ID. It is in the format YYYYMM###. For example, the first patch released in January 2008 might have a BundleID of 200801001.  For patches from ESX version 3.0.2 and earlier, this entity should be marked with a status of 'does not exist' since patch name has a different format and doesn't include a bundle id.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="esxpatchitembundle_id">
+                                                      <sch:pattern id="esx-sc_patchitembundle_id">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:bundle_id">
                                                                   <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the bundle_id entity of a patch_item should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -84,7 +84,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The classification entity specifies the type of patch.  It can be one of: B - bug, U - update, S - security, or R - roll-up.  For patches from ESX version 3.0.2 and earlier, this entity should be marked with a status of 'does not exist' since patch name has a different format and doesn't include a classification.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="esxpatchitemclassification">
+                                                      <sch:pattern id="esx-sc_patchitemclassification">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:classification">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the classification entity of a patch_item should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -96,7 +96,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The support_level entity specifies the support level of the patch.  If can be one of: G - GA patch, H - hot patch, D - debugging patch, or C - custom patch.  For patches from ESX version 3.0.2 and earlier, this entity should be marked with a status of 'does not exist' since patch name has a different format and doesn't include a support level.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="esxpatchitemsupport_level">
+                                                      <sch:pattern id="esx-sc_patchitemsupport_level">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:support_level">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the support_level entity of a patch_item should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -108,7 +108,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the installtaion status of the specific patch.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="esxpatchitemstatus">
+                                                      <sch:pattern id="esx-sc_patchitemstatus">
                                                             <sch:rule context="esx-sc:patch_item/esx-sc:status">
                                                                   <sch:assert test="@datatype='boolean'">item <sch:value-of select="../@id"/> - datatype attribute for the status entity of a patch_item should be 'boolean'</sch:assert>
                                                             </sch:rule>
@@ -136,7 +136,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the release of current VMware ESX server.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="versionitemrelease">
+                                                      <sch:pattern id="esx-sc_versionitemrelease">
                                                             <sch:rule context="esx-sc:version_item/esx-sc:release">
                                                                   <sch:assert test="@datatype='version'">item <sch:value-of select="../@id"/> - datatype attribute for the release entity of a version_item should be 'version'</sch:assert>
                                                             </sch:rule>
@@ -148,7 +148,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the build version of current VMware ESX server.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="versionitembuild">
+                                                      <sch:pattern id="esx-sc_versionitembuild">
                                                             <sch:rule context="esx-sc:version_item/esx-sc:build">
                                                                   <sch:assert test="@datatype='int'">item <sch:value-of select="../@id"/> - datatype attribute for the build entity of a version_item should be 'int'</sch:assert>
                                                             </sch:rule>
@@ -206,7 +206,7 @@
                   <xsd:restriction base="oval-sc:EntityItemStringType">
                         <xsd:enumeration value="C">
                               <xsd:annotation>
-                                    <xsd:documentation>Custom patches are special fixes provided to a customer. They are usually specific to customer’s environment, and are most likely not required by  customers not reporting the issue. Custom patches have been tested in the customer’s environment.</xsd:documentation>
+                                    <xsd:documentation>Custom patches are special fixes provided to a customer. They are usually specific to customer's environment, and are most likely not required by  customers not reporting the issue. Custom patches have been tested in the customer's environment.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
                         <xsd:enumeration value="D">
