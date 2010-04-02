@@ -35,7 +35,7 @@ AbsStateMap Filter::processedFiltersMap;
 //****************************************************************************************//
 //									Filter Class										  //	
 //****************************************************************************************//
-Filter::Filter(string id) : AbsState() {
+Filter::Filter(string id) : AbsState(), excluding(true) {
 
 	// get the specified state element
 	DOMElement* statesElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(), "states");
@@ -43,11 +43,11 @@ Filter::Filter(string id) : AbsState() {
 	this->Parse(stateElm);
 }
 
-Filter::Filter(OvalEnum::Operator myOperator, int version) : AbsState(myOperator, version)  {
+Filter::Filter(OvalEnum::Operator myOperator, bool excluding, int version) : AbsState(myOperator, version), excluding(excluding)  {
 
 }
 
-Filter::Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator, int version) : AbsState(id, name, xmlns, myOperator, version) {
+Filter::Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator, bool excluding, int version) : AbsState(id, name, xmlns, myOperator, version), excluding(excluding) {
 
 }
 

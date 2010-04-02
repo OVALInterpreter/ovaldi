@@ -139,12 +139,18 @@ ItemVector* AbsObjectCollector::ApplyFilters(ItemVector* items, AbsStateVector* 
 		Filter* filter = (Filter*)(*filterIterator);
 		ItemVector* results = new ItemVector();
 
-		// Now loop through all the Items. Add Matching Items to result Vector
+		// Now loop through all the Items.
 		ItemVector::iterator itemIterator;
 		for(itemIterator = tmpItems->begin(); itemIterator != tmpItems->end(); itemIterator++) {
 			Item* item = (*itemIterator);
-			if(!filter->Analyze(item)) {
-				results->push_back(item);
+			bool itemMatchesFilter = filter->Analyze(item);
+
+			// if filter action is "exclude", we filter out those items which
+			// match the filter.  If the action is "include", we filter out
+			// those which don't match.
+			if ((filter->IsExcluding() && !itemMatchesFilter) ||
+				(!filter->IsExcluding() && itemMatchesFilter)) {
+					results->push_back(item);
 			}
 		}
 		// reset the tmpItems vector

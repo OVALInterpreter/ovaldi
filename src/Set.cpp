@@ -267,9 +267,15 @@ void Set::Parse(DOMElement* setObjectElm) {
 			} else if(childName.compare("filter") == 0) {
 				this->SetIsSimpleSet(true);
 				string stateId = XmlCommon::GetDataNodeValue(setChild);
+				string actionStr = XmlCommon::GetAttributeByName(setChild, "action");
 
+				bool excluding = false;
+				if (actionStr.empty() || actionStr == "exclude")
+					excluding = true;
 
 				Filter* tmpFilter = Filter::GetFilter(stateId);
+				tmpFilter->SetExcluding(excluding);
+
 				//Filter* tmpFilter = Filter::SearchCache();
 				//if(tmpFilter == NULL) {
 				//	tmpFilter = new Filter(stateId);

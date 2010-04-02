@@ -54,6 +54,19 @@ public:
 	*/
 	static Filter* GetFilter(string statieId);
 
+	/**
+	 * Returns the selected action for this filter.
+	 * \return true if the selected action for this filter is "excluding",
+	 * or false otherwise.
+	 */
+	bool IsExcluding(){return excluding;}
+
+	/**
+	 * Sets the action for this filter.  See IsExcluding().
+	 */
+	void SetExcluding(bool excluding)
+	{ this->excluding = excluding; }
+
 	/** Analyze the specified Item return the boolean result for the Item. */
 	bool Analyze(Item* item);	
 
@@ -66,7 +79,7 @@ public:
 private:
 
 	/** Create a Filter object setting only the operator and version properties. */
-	Filter(OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
+	Filter(OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, bool excluding = true, int version = 1);
 
 	/**
 		Parse the state element with the specified id into a Filter object.
@@ -75,7 +88,13 @@ private:
 	Filter(string id);
 
 	/** Create a complete Filter object setting all properties. */
-	Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
+	Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, bool excluding = true, int version = 1);
+
+	/**
+	 * A filter may have one of two values for its "action" attribute: "include" or
+	 * "exclude".  This field represents the selected action for this filter.
+	 */
+	bool excluding;
 
 	/** Cache the specified filter. */
 	static void Cache(Filter* filter);
