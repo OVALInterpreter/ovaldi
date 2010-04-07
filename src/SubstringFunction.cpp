@@ -89,15 +89,23 @@ ComponentValue* SubstringFunction::ComputeValue() {
 			int start = 0;
 
 			// Initialize substring_length to the length of the string.  This case applies if substring_length is less than 0 or greater than or equal to the length of the string.
-			int end = currentValue.length();
+			// It is important that this is a signed type, because the start
+			// index may be negative, which will compare wrong with an unsigned type.
+			// (and we hope these strings aren't so gigantic a signed int can't hold
+			//  its length!)
+			int len = currentValue.length();
 			
-			// If substring_start is greater than 1 use the specified value.
-			if ( this->GetStart() > 1 ) start = this->GetStart() - 1;
+			// If start is larger than the length of the string, throw exception
+			if ( this->GetStart() > len)
+				throw Exception("Substring start index too large ("+Common::ToString(this->GetStart())+") for string value:\n"+currentValue, OvalEnum::LEVEL_ERROR);
+			// otherwise, if substring_start is greater than 1 use the specified value.
+			else if ( this->GetStart() > 1 )
+				start = this->GetStart() - 1;
 
 			// If substring_length is greater than -1 and less than the the length of the string use the specified value.
-			if ( ( this->GetLength() > -1 ) && ( this->GetLength() < end ) ) end = this->GetLength(); 
+			if ( ( this->GetLength() > -1 ) && ( this->GetLength() < len ) ) len = this->GetLength(); 
 
-			newValue = currentValue.substr(start,end);		
+			newValue = currentValue.substr(start,len);		
 			values->push_back(newValue);
 		}
 		result->SetValues(values);
