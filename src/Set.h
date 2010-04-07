@@ -46,7 +46,6 @@ XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
 // Forward declarations to allow compilation.
-class Filter;
 class AbsState;
 typedef vector < AbsState*, allocator<AbsState*> > AbsStateVector;
 class Set;
@@ -76,9 +75,9 @@ public:
 	VariableValueVector* GetVariableValues();
 	
 	/** Return the filters field's value. */
-	AbsStateVector* GetFilters();
+	FilterVector* GetFilters();
 	/** Set the filters field's value. */
-	void SetFilters(AbsStateVector* filters);
+	void SetFilters(FilterVector* filters);
 
 	/** Get the isSimpleSet field's value. */
 	bool GetIsSimpleSet();
@@ -114,7 +113,7 @@ public:
 	void AppendFilter(Filter* filter);
     
 private:
-	AbsStateVector filters;
+	FilterVector filters;
 	AbsObject* referenceOne;
 	AbsObject* referenceTwo;
 	Set* setOne;

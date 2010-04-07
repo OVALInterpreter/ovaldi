@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "State.h"
+#include "StateEntity.h"
 
 AbsStateMap State::processedStatesMap;
 

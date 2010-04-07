@@ -128,30 +128,23 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 // ***************************************************************************************	//
 //								Private members												//
 // ***************************************************************************************	//
-ItemVector* AbsObjectCollector::ApplyFilters(ItemVector* items, AbsStateVector* filters) {
+ItemVector* AbsObjectCollector::ApplyFilters(ItemVector* items, FilterVector* filters) {
 
 	ItemVector* tmpItems = new ItemVector();
 	this->CopyItems(tmpItems, items);
 
 	// loop through all filters
-	AbsStateVector::iterator filterIterator;
+	FilterVector::iterator filterIterator;
 	for(filterIterator = filters->begin(); filterIterator != filters->end(); filterIterator++) {
-		Filter* filter = (Filter*)(*filterIterator);
+		Filter* filter = *filterIterator;
 		ItemVector* results = new ItemVector();
 
-		// Now loop through all the Items.
+		// Now loop through all the Items and see if they pass the filter.
 		ItemVector::iterator itemIterator;
 		for(itemIterator = tmpItems->begin(); itemIterator != tmpItems->end(); itemIterator++) {
 			Item* item = (*itemIterator);
-			bool itemMatchesFilter = filter->Analyze(item);
-
-			// if filter action is "exclude", we filter out those items which
-			// match the filter.  If the action is "include", we filter out
-			// those which don't match.
-			if ((filter->IsExcluding() && !itemMatchesFilter) ||
-				(!filter->IsExcluding() && itemMatchesFilter)) {
-					results->push_back(item);
-			}
+			if (filter->DoFilter(item))
+				results->push_back(item);
 		}
 		// reset the tmpItems vector
 		delete tmpItems;

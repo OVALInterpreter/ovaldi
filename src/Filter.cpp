@@ -30,187 +30,35 @@
 
 #include "Filter.h"
 
-AbsStateMap Filter::processedFiltersMap;
+XERCES_CPP_NAMESPACE_USE
+using namespace std;
 
 //****************************************************************************************//
 //									Filter Class										  //	
 //****************************************************************************************//
-Filter::Filter(string id) : AbsState(), excluding(true) {
 
-	// get the specified state element
-	DOMElement* statesElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(), "states");
-	DOMElement* stateElm = XmlCommon::FindElementByAttribute(statesElm, "id", id);
-	this->Parse(stateElm);
-}
-
-Filter::Filter(OvalEnum::Operator myOperator, bool excluding, int version) : AbsState(myOperator, version), excluding(excluding)  {
-
-}
-
-Filter::Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator, bool excluding, int version) : AbsState(id, name, xmlns, myOperator, version), excluding(excluding) {
-
-}
-
-Filter::~Filter() {
-
-}
-
-// ***************************************************************************************	//
-//								 Public static members										//
-// ***************************************************************************************	//
-Filter* Filter::GetFilter(string stateId) {
-	
-	Filter* tmpFilter = Filter::SearchCache(stateId);
-	if(tmpFilter == NULL) {
-		tmpFilter = new Filter(stateId);
-		Filter::Cache(tmpFilter);
-	}
-	return tmpFilter;
+Filter::Filter(DOMElement *filterElm) {
+	this->Parse(filterElm);
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-bool Filter::Analyze(Item* item) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Analyze the specified Item return the Result value for the Item.
-	//
-	//	1 - create a vector of Item elements that match each element in the state.
-	//	2 - pass the vector to the AbsEntity analyze method
-	//	3 - build a vector of results for each element in the state.
-	//	4 - combine the results to a single value based on the states operator
-    // -----------------------------------------------------------------------
+bool Filter::DoFilter(Item* item) {
 
-	OvalEnum::ResultEnumeration overallResult = OvalEnum::RESULT_ERROR;
-
-	// Check the status of the Item
-	if(item->GetStatus() == OvalEnum::STATUS_ERROR) {
-		overallResult = OvalEnum::RESULT_ERROR;
-	} else if(item->GetStatus() == OvalEnum::STATUS_NOT_COLLECTED) {
-		overallResult = OvalEnum::RESULT_ERROR;
-	} else if(item->GetStatus() == OvalEnum::STATUS_DOES_NOT_EXIST) {
-		overallResult = OvalEnum::RESULT_FALSE;
-	} else {
-
-		// check data before analysis
-		if(this->GetElements()->size() == 0) {
-			overallResult = OvalEnum::RESULT_TRUE;
-		} else {
-
-			// vector of result values before the state operator is applied
-			IntVector filterResults;
-
-			// Loop through all elements in the state
-			AbsEntityVector::iterator iterator;
-			for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
-				FilterEntity* filterElm = (FilterEntity*)(*iterator);
-
-				// locate matching elements in the item
-				string filterElmName = filterElm->GetName(); 
-				ItemEntityVector* scElements = item->GetElementsByName(filterElmName);
-
-				// Analyze each matching element
-				ItemEntityVector::iterator scIterator;
-				IntVector filterElmResults;
-				for(scIterator = scElements->begin(); scIterator != scElements->end(); scIterator++) {
-					ItemEntity* scElm = (ItemEntity*)(*scIterator);
-					// call FilterEntity->analyze method
-					filterElmResults.push_back(filterElm->Analyze(scElm));
-				}
-				scElements->clear();
-				delete scElements;
-
-				// compute the overall filter result
-				OvalEnum::ResultEnumeration filterResult = OvalEnum::RESULT_UNKNOWN; // default to unknown;
-				if(filterElmResults.size() > 0) {
-					filterResult = OvalEnum::CombineResultsByCheck(&filterElmResults, filterElm->GetEntityCheck());
-				}
-				// store the result for the current state element
-				filterResults.push_back(filterResult);
-
-				overallResult = OvalEnum::CombineResultsByOperator(&filterResults, this->GetOperator());
-			}
-		}
-	}
+	OvalEnum::ResultEnumeration result = this->state->Analyze(item);
 
 	// for a filter really want to convert the result to a boolean
-	bool isMatch = false;
-	if(overallResult == OvalEnum::RESULT_TRUE) {
-		isMatch = true;
-	} else if(overallResult == OvalEnum::RESULT_FALSE) {
-		isMatch = false;	
-	} else {
-		throw AbsStateException("Filter::ApplyFilter method unable to convert result value to a boolean. Found result: " + OvalEnum::ResultToString(overallResult));
-	}
-	return isMatch;
+	if (result != OvalEnum::RESULT_TRUE && result != OvalEnum::RESULT_FALSE)
+		throw AbsStateException("Filter::ApplyFilter method unable to convert result value to a boolean. Found result: " + OvalEnum::ResultToString(result));
+
+	return (result == OvalEnum::RESULT_TRUE && !this->IsExcluding()) ||
+		(result == OvalEnum::RESULT_FALSE && this->IsExcluding());
 }
 
-void Filter::Parse(DOMElement* stateElm) {
-
-	this->SetName(XmlCommon::GetElementName(stateElm));
-	this->SetId(XmlCommon::GetAttributeByName(stateElm, "id"));
-	this->SetXmlns(XmlCommon::GetNamespace(stateElm));
-	string versionStr = XmlCommon::GetAttributeByName(stateElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
-		version = 1;
-	} else {
-		version = atoi(versionStr.c_str());
-	}
-	this->SetVersion(version);
-
-	// loop over all elements
-	DOMNodeList *stateChildren = stateElm->getChildNodes();
-	unsigned int index = 0;
-	while(index < stateChildren->getLength()) {
-		DOMNode *tmpNode = stateChildren->item(index++);
-
-		//	only concerned with ELEMENT_NODEs
-		if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
-			DOMElement *stateChild = (DOMElement*)tmpNode;
-
-			//	get the name of the child
-			string childName = XmlCommon::GetElementName(stateChild);
-			if(childName.compare("notes") == 0) {
-				continue;
-			} else {
-                FilterEntity* filterEntity = new FilterEntity();
-				filterEntity->Parse(stateChild);
-				this->AppendElement(filterEntity);
-			}
-		}
-	}
-}
-
-Filter* Filter::SearchCache(string id) {
-
-	AbsState* cachedFilter = NULL;
-
-	AbsStateMap::iterator iterator;
-	iterator = Filter::processedFiltersMap.find(id);
-	if(iterator != Filter::processedFiltersMap.end()) {
-		cachedFilter = iterator->second;
-	} 
-
-	return (Filter*)cachedFilter;
-}
-
-void Filter::ClearCache() {
-
-	AbsStateMap::iterator iterator;
-	for(iterator = Filter::processedFiltersMap.begin(); iterator != Filter::processedFiltersMap.end(); iterator++) {
-		AbsState* state = iterator->second;
-		delete state;
-	}
-	
-	Filter::processedFiltersMap.clear();
-}
-
-void Filter::Cache(Filter* filter) {
-
-	//	TODO - do i need to add protection to this cache
-
-	Filter::processedFiltersMap.insert(AbsStatePair(filter->GetId(), filter));
+void Filter::Parse(DOMElement* filterElm) {
+	string stateId = XmlCommon::GetDataNodeValue(filterElm);
+	string actionStr = XmlCommon::GetAttributeByName(filterElm, "action");
+	this->SetExcluding(actionStr.empty() || actionStr == "exclude");
+	this->state = State::GetStateById(stateId);
 }

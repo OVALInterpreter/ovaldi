@@ -54,9 +54,8 @@ Set::Set() {
 
 Set::~Set() {
 
-	Filter* filter = NULL;
-	while(filters.size() != 0) {
-	  	filter = (Filter*)filters[filters.size()-1];
+	while(!filters.empty()) {
+	  	delete filters.back();
 	  	filters.pop_back();
 	}
 
@@ -78,11 +77,11 @@ Set::~Set() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-AbsStateVector* Set::GetFilters() {
+FilterVector* Set::GetFilters() {
 	return &this->filters;
 }
 
-void Set::SetFilters(AbsStateVector* filters) {
+void Set::SetFilters(FilterVector* filters) {
 	this->filters = (*filters);
 }
 
@@ -146,13 +145,13 @@ VariableValueVector* Set::GetVariableValues() {
     
 	if(this->GetIsSimpleSet()) {
 		// get the variable values used in each filter 
-		AbsStateVector::iterator iterator;
-		for(iterator = this->GetFilters()->end(); iterator != this->GetFilters()->end(); iterator++) {
-			Filter* filter = (Filter*)(*iterator);
+		FilterVector::iterator iterator;
+		for(iterator = this->GetFilters()->begin(); iterator != this->GetFilters()->end(); iterator++) {
+			Filter* filter = *iterator;
 			VariableValueVector* filterVarValues = filter->GetVariableValues();
 			// copy the state's var values to the set's vector of var values
 			VariableValueVector::iterator vit;
-			for(vit = filterVarValues->end(); vit != filterVarValues->end(); vit++) {
+			for(vit = filterVarValues->begin(); vit != filterVarValues->end(); vit++) {
 				varValue = (*vit);
 				varValues->push_back(varValue);
 			}
@@ -266,21 +265,7 @@ void Set::Parse(DOMElement* setObjectElm) {
 				}
 			} else if(childName.compare("filter") == 0) {
 				this->SetIsSimpleSet(true);
-				string stateId = XmlCommon::GetDataNodeValue(setChild);
-				string actionStr = XmlCommon::GetAttributeByName(setChild, "action");
-
-				bool excluding = false;
-				if (actionStr.empty() || actionStr == "exclude")
-					excluding = true;
-
-				Filter* tmpFilter = Filter::GetFilter(stateId);
-				tmpFilter->SetExcluding(excluding);
-
-				//Filter* tmpFilter = Filter::SearchCache();
-				//if(tmpFilter == NULL) {
-				//	tmpFilter = new Filter(stateId);
-				//	Filter::Cache(tmpFilter);
-				//}
+				Filter *tmpFilter = new Filter(setChild);
 				this->AppendFilter(tmpFilter);
 			}
 		}

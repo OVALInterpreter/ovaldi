@@ -37,6 +37,7 @@
 #include "VariableValue.h"
 #include "Log.h"
 #include "State.h"
+#include "Object.h"
 
 
 XERCES_CPP_NAMESPACE_USE

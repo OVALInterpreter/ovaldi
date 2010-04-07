@@ -31,32 +31,25 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include "AbsState.h"
-#include "FilterEntity.h"
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
+#include "Item.h"
+#include "State.h"
+#include "VariableValue.h"
 
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
-
-class FilterEntity;
-class Item;
 /**
 	This class represents a filter in a set object of the oval definition schema.
-	A Filter is a state that is used by a set object to filter out items from a set
-	when creating a set of objects to analyze.
+	A Filter refers to a state that is used by a set object to filter out items from a set
+	when creating a set of items to analyze.
 */
-class Filter : public AbsState {
+class Filter {
 
 public:
-	~Filter();
-
-	/** Get a Filter object for the specified state id.
-		Manages the cache of filters.
-	*/
-	static Filter* GetFilter(string statieId);
+	Filter(xercesc::DOMElement *filterElm);
 
 	/**
 	 * Returns the selected action for this filter.
-	 * \return true if the selected action for this filter is "excluding",
+	 * \return true if the selected action for this filter is "exclude",
 	 * or false otherwise.
 	 */
 	bool IsExcluding(){return excluding;}
@@ -67,28 +60,25 @@ public:
 	void SetExcluding(bool excluding)
 	{ this->excluding = excluding; }
 
-	/** Analyze the specified Item return the boolean result for the Item. */
-	bool Analyze(Item* item);	
+	/**
+	 * Test the specified Item and return a boolean result.
+	 * The return value reflects whether the item "passed" the filter.  E.g.
+	 * if the item satisfied the state and the filter action is "include", then
+	 * true is returned.  Or if the item did not satisfy the state and the filter
+	 * action is "exclude", then true is returned.  Otherwise false is returned.
+	 */
+	bool DoFilter(Item* item);	
 
-	/** Parse the provided state from a definition file into an Filter object. */
-	void Parse(DOMElement* stateElm);
-
-	/** Delete all items in the cache. */
-	static void ClearCache();
+	/**
+	 * Get variable values used in the referenced state.
+	 */
+	VariableValueVector *GetVariableValues()
+	{ return state->GetVariableValues(); }
 
 private:
 
-	/** Create a Filter object setting only the operator and version properties. */
-	Filter(OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, bool excluding = true, int version = 1);
-
-	/**
-		Parse the state element with the specified id into a Filter object.
-		@param id a string that hold the id of a state in an oval definition file to be parsed.
-	*/
-	Filter(string id);
-
-	/** Create a complete Filter object setting all properties. */
-	Filter(string id, string name, string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, bool excluding = true, int version = 1);
+	/** Parse the provided filter from a definition file into a Filter object. */
+	void Parse(xercesc::DOMElement* filterElm);
 
 	/**
 	 * A filter may have one of two values for its "action" attribute: "include" or
@@ -96,15 +86,12 @@ private:
 	 */
 	bool excluding;
 
-	/** Cache the specified filter. */
-	static void Cache(Filter* filter);
-
-	/** Search the cache of Filters for the specified filter. 
-		@return Returns a filter object with the specified id or NULL if not found
-	*/
-	static Filter* SearchCache(string id);
-
-	static AbsStateMap processedFiltersMap;
+	/**
+	 * This filter's associated state.
+	 */
+	State *state;
 };
+
+typedef std::vector<Filter*> FilterVector;
 
 #endif

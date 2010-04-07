@@ -32,14 +32,11 @@
 #define STATE_H
 
 #include "AbsState.h"
-#include "StateEntity.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
-class StateEntity;
 class Item;
-class State;
 
 /**
 	This class represents a state in the oval definition schema.
