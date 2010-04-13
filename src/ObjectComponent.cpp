@@ -71,19 +71,20 @@ ComponentValue* ObjectComponent::ComputeValue() {
 		collectedObjFlag = collectedObject->GetFlag();
 		items = collectedObject->GetReferences();
 		if(collectedObject->GetMessages()->size() > 0) {
-			errorMsg = collectedObject->GetMessages()->at(1)->GetValue();
+			errorMsg = collectedObject->GetMessages()->at(1)->GetValue(); // TODO - this seems like a bug. Why are we only getting the message at index 1 in the vector of messages?
 		}
 
 	} else {
 		collectedObjFlag = ObjectReader::GetCollectedObjectFlag(this->GetObjectId());
 		items = ObjectReader::GetItemsForObject(this->GetObjectId());
+        // TODO - this might also be a bug. WHy are we not getting messages when using hte object reader? i think we can still have messages here too.
 	}
 
 	ComponentValue* result = new ComponentValue();
 	// set the flag to the flag value of the collected object.
 	result->SetFlag(collectedObjFlag);
 
-	// only process the items if the flag on the colelcted obj is COMPLETE or INCOMPLETE
+	// only process the items if the flag on the collected obj is COMPLETE or INCOMPLETE
 	if(collectedObjFlag == OvalEnum::FLAG_COMPLETE || collectedObjFlag == OvalEnum::FLAG_INCOMPLETE) {
 
 		if(items->size() > 0) {
