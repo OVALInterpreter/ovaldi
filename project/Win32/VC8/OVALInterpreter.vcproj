@@ -283,10 +283,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\FilterEntity.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Item.cpp"
 				>
 			</File>
@@ -957,10 +953,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Filter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\FilterEntity.h"
 				>
 			</File>
 			<File
