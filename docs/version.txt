@@ -35,6 +35,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---        Version 5.7 build 1      ---
 ---------------------------------------
 
+* Implemented the "action" attribute in filters.
+
 ---------------------------------------
 ---        Version 5.6 build 4      ---
 ---------------------------------------
