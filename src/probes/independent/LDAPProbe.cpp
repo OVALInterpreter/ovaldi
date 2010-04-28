@@ -206,7 +206,7 @@ StringSet* LDAPProbe::GetSuffixes ( ObjectEntity* suffixEntity ) {
 
 StringSet* LDAPProbe::GetAllSuffixes ( ) {
 	StringSet* suffixes = new StringSet();
-	StringVector* allSuffixes = LDAPProbe::GetCharacterValues ( "", "", LDAPProbe::NAMING_CONTEXTS_ATTRIBUTE );
+	StringVector* allSuffixes = LDAPProbe::GetValues ( "", "", LDAPProbe::NAMING_CONTEXTS_ATTRIBUTE );
 	for ( StringVector::iterator it = allSuffixes->begin() ; it != allSuffixes->end() ; it++ ) {
 		StringSet* dn = LDAPProbe::GetAllDistinguishedNames ( *it, "", LDAP_SCOPE_BASE );
 		for ( StringSet::iterator it1 = dn->begin() ; it1 != dn->end() ; it1++ ) {
@@ -392,7 +392,7 @@ string LDAPProbe::RemoveDnBase ( string suffixStr, string distinguishedNameStr )
 
 string LDAPProbe::GetObjectClass ( string suffixStr, string relativeDnStr ) {
 	string objectClassStr = "";
-	StringVector* objectClassVector = LDAPProbe::GetCharacterValues ( suffixStr, relativeDnStr, LDAPProbe::OBJECT_CLASS_ATTRIBUTE );
+	StringVector* objectClassVector = LDAPProbe::GetValues ( suffixStr, relativeDnStr, LDAPProbe::OBJECT_CLASS_ATTRIBUTE );
 	for ( StringVector::iterator it = objectClassVector->begin(); it != objectClassVector->end() ; it++ ) {
 		objectClassStr.append ( *it );
 		objectClassStr.append ( ";" );
@@ -529,7 +529,7 @@ bool LDAPProbe::ObjectExists ( string suffixStr, string relativeDnStr ) {
 
 void LDAPProbe::GetLdapItem ( string suffixStr, string relativeDnStr, string attributeStr, Item* item ) {
 	string type = "";
-	StringVector* schemas = LDAPProbe::GetCharacterValues ( suffixStr, relativeDnStr, LDAPProbe::SUBSCHEMA_SUBENTRY_ATTRIBUTE );
+	StringVector* schemas = LDAPProbe::GetValues ( suffixStr, relativeDnStr, LDAPProbe::SUBSCHEMA_SUBENTRY_ATTRIBUTE );
 	for ( StringVector::iterator schema = schemas->begin() ; schema != schemas->end() ; schema++ ) {
 		TypeMapMap::iterator itmm;
 		if ( ( itmm = types->find ( *schema ) ) != types->end() ) {
@@ -542,13 +542,14 @@ void LDAPProbe::GetLdapItem ( string suffixStr, string relativeDnStr, string att
 	}
 	delete schemas;
 	if ( type.compare ( "" ) != 0 ) {
+		bool isBinary = (type.compare("LDAPTYPE_BINARY")==0)?true:false;
 		item->AppendElement ( new ItemEntity ( "ldaptype", type, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-		StringVector* values = LDAPProbe::GetCharacterValues ( suffixStr, relativeDnStr, attributeStr );
+		StringVector* values = LDAPProbe::GetValues ( suffixStr, relativeDnStr, attributeStr, isBinary);
 		if ( values->empty() ) {
 			item->AppendElement ( new ItemEntity ( "value", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 		} else {
 			for ( StringVector::iterator value = values->begin(); value != values->end(); value++ ) {
-				item->AppendElement ( new ItemEntity ( "value", *value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
+				item->AppendElement ( new ItemEntity ( "value", *value, (isBinary)?OvalEnum::DATATYPE_BINARY:OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
 			}
 		}
 		delete values;
@@ -565,12 +566,12 @@ TypeMapMap* LDAPProbe::GetAttributeValueTypes() {
 	string name = "NAME";
 	string syntax = "SYNTAX";
 	TypeMapMap* types = new TypeMapMap();
-	StringVector* schemas = LDAPProbe::GetCharacterValues ( "", "", LDAPProbe::SUBSCHEMA_SUBENTRY_ATTRIBUTE );
+	StringVector* schemas = LDAPProbe::GetValues ( "", "", LDAPProbe::SUBSCHEMA_SUBENTRY_ATTRIBUTE );
 	StringVector* nameValues = new StringVector();
 
 	for ( StringVector::iterator it1 = schemas->begin() ; it1 != schemas->end() ; it1++ ) {
 		TypeMap* tmap = new TypeMap();
-		StringVector* attributeTypes = LDAPProbe::GetCharacterValues ( *it1, "", LDAPProbe::ATTRIBUTE_TYPES_ATTRIBUTE );
+		StringVector* attributeTypes = LDAPProbe::GetValues ( *it1, "", LDAPProbe::ATTRIBUTE_TYPES_ATTRIBUTE );
 		for ( StringVector::iterator it2 = attributeTypes->begin() ; it2 != attributeTypes->end() ; it2++ ) {
 			string attributeTypeStr = *it2;
 			vector<StringVector> substrings;
@@ -626,12 +627,14 @@ string LDAPProbe::GetDataType ( string oid ) {
 		return "LDAPTYPE_DIRECTORY_STRING";
 	} else if ( oid.compare ( "1.3.6.1.4.1.1466.115.121.1.37" ) == 0 ) {
 		return "LDAPTYPE_OBJECT_CLASS_DESCRIP_STRING";
-	} else {
+	} else if ( oid.compare( "1.3.6.1.4.1.1466.115.121.1.5" ) == 0 ) {
+		return "LDAPTYPE_BINARY";
+	}else {
 		return "";
 	}
 }
 
-StringVector* LDAPProbe::GetCharacterValues ( string suffixStr, string relativeDnStr, string attributeStr ) {
+StringVector* LDAPProbe::GetValues ( string suffixStr, string relativeDnStr, string attributeStr, bool type ) {
 	StringVector* valuesVector = new StringVector();
 	LDAPMessage* entry = NULL;
 	BerElement* attrPtr = NULL;
@@ -654,11 +657,10 @@ StringVector* LDAPProbe::GetCharacterValues ( string suffixStr, string relativeD
 					if ( ( ( values = ldap_get_values_len ( ldap, entry, attribute ) ) != NULL ) && ( ( *values ) != NULL ) && ( count = ldap_count_values_len ( values ) ) > 0 ) {
 						string value = "";
 						for ( unsigned int i = 0; i < count; i++ ) {
-							int length = ( values[i] )->bv_len;
-							for ( int j = 0 ; j < length; j++ ) {
-								if ( (  ( * ( ( values[i] )->bv_val ) + j ) ) != '\0' ) {
-									value.push_back ( ( char ) ( * ( ( ( values[i] )->bv_val ) +j ) ) );
-								}
+							if ( type ){
+								value = this->ConvertToBinary(values[i]->bv_val,values[i]->bv_len);
+							}else{
+								value = values[i]->bv_val;
 							}
 							valuesVector->push_back ( value );
 							value.clear();
@@ -679,6 +681,24 @@ StringVector* LDAPProbe::GetCharacterValues ( string suffixStr, string relativeD
 		}
 	}
 	return valuesVector;
+}
+
+string LDAPProbe::ConvertToBinary(char* data, unsigned long length){
+	string value = "";
+	for (unsigned long i = 0 ; i < length ; i++ ) {
+			// The buffer must be three bytes long, two bytes for each hex character in the
+			// binary data, and one byte for the terminating NULL character.
+			char binaryBuf[3];
+			memset(binaryBuf,0,sizeof(binaryBuf));
+			sprintf(binaryBuf, "%x", data[i]);
+			binaryBuf[sizeof(binaryBuf)-1] = '\0';
+			if (strlen(binaryBuf) == 1){ 
+				value.append("0");
+			}
+			value.append(binaryBuf);
+	}
+
+	return value;
 }
 
 string LDAPProbe::RemoveQuotes ( string str ) {

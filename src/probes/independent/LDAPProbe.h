@@ -207,13 +207,20 @@ class LDAPProbe : public AbsProbe {
 		 */
 		string GetDataType ( string oid );
 
-		/** Retrieve all of the values for the specified suffix, relative distinguished name, and attribute.  This method only retrieves values of attributes that are represented by ASCII characters.
+		/** Retrieve all of the values for the specified suffix, relative distinguished name, and attribute.
 		 *  @param suffixStr A string that contains the suffix of the LDAP item.
 		 *  @param relativeDnStr A string that contains the relative distinguished name of the LDAP item.
 		 *  @param attributeStr A string that contains the attribute of the LDAP item.
 		 * @return A StringVector containg all of the values for the specified suffix, relative distinguished name, and attribute.
 		 */
-		StringVector* GetCharacterValues ( string suffixStr, string relativeDnStr, string attributeStr );
+		StringVector* GetValues ( string suffixStr, string relativeDnStr, string attributeStr, bool type = 0 );
+
+		/** Converts a sequence of characters that represents binary data into a string of hex-encoded data.  Please see the binary datatype in DatatypeEnumeration in the oval-common-schema for more information.
+		 *	@param data The binary data represented as a sequence of characters.
+		 *	@param length The length of the data.
+		 *	@return The string value of the data in binary form as described in the documentation for the binary datatype in DatatypeEnumeration in the oval-common-schema. 
+		 */
+		string ConvertToBinary(char* data, unsigned long length);
 
 		/** Remove quotes from the specified string.
 		 * @param str A string value that you want to remove the quotes from.
