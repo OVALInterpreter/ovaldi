@@ -535,7 +535,10 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 
 				// add the reference to the collected obj element
 				string refElementName = "reference";
-				DOMElement *newReferenceElm = scFile->createElement(XMLString::transcode(refElementName.c_str()));
+				XMLCh* name = XMLString::transcode(refElementName.c_str());
+				DOMElement *newReferenceElm = scFile->createElement(name);
+				//Free memory allocated by XMLString::transcode(char*)
+				XMLString::release(&name);
 				newCollectedObjectElem->appendChild(newReferenceElm);
 				string idStr = Common::ToString(reference->GetId());
 				XmlCommon::AddAttribute(newReferenceElm, "item_ref", idStr);

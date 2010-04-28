@@ -35,9 +35,12 @@
 //****************************************************************************************//
 void XmlCommon::AddAttribute(DOMElement *node, string attName, string attValue) {
 
-	const XMLCh *name = XMLString::transcode(attName.c_str());
-	const XMLCh *value = XMLString::transcode(attValue.c_str());
+	XMLCh *name = XMLString::transcode(attName.c_str());
+	XMLCh *value = XMLString::transcode(attValue.c_str());
 	node->setAttribute(name, value);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
+	XMLString::release(&value);
 
 }
 
@@ -123,10 +126,15 @@ DOMElement* XmlCommon::CreateElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 	DOMText *tmpTextNode = NULL;
 	DOMElement *newElem = NULL;
 
-
-	newElem = doc->createElement(XMLString::transcode(nodeName.c_str()));
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	newElem = doc->createElement(name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 	if(nodeValue.compare("") != 0) {
-		tmpTextNode = doc->createTextNode(XMLString::transcode(nodeValue.c_str()));
+		XMLCh* value = XMLString::transcode(nodeValue.c_str());
+		tmpTextNode = doc->createTextNode(value);
+		//Free memory allocated by XMLString::transcode(char*)
+		XMLString::release(&value);
 		newElem->appendChild(tmpTextNode);
 	}
 
@@ -140,10 +148,13 @@ ElementVector* XmlCommon::FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocu
 	DOMNodeList *nodeList	= NULL;
 	int listLen				= 0;
 	int index				= 0;
-
-	nodeList = doc->getElementsByTagName(XMLString::transcode(nodeName.c_str()));
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	nodeList = doc->getElementsByTagName(name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 
 	listLen = nodeList->getLength();
+	XMLCh* attName = XMLString::transcode(attribute.c_str());
 	while(index < listLen)
 	{
 		tmpNode = (DOMElement*)nodeList->item(index++);	
@@ -154,7 +165,7 @@ ElementVector* XmlCommon::FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocu
 			{
 				nodes->push_back(tmpNode);
 				continue;
-			}else if(tmpNode->hasAttribute(XMLString::transcode(attribute.c_str())))
+			}else if(tmpNode->hasAttribute(attName))
 			{
 				//	Check for attribute value if desired
 				if(attValue.compare("") == 0)
@@ -169,6 +180,8 @@ ElementVector* XmlCommon::FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocu
 			}
 		}
 	}
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
 
 	return nodes;
 }
@@ -183,8 +196,12 @@ DOMElement* XmlCommon::FindElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *d
 
 
 	//	Get a list of all the nodes in the document with the nodeName and loop through them
-	nodeList = doc->getElementsByTagName(XMLString::transcode(nodeName.c_str()));
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	nodeList = doc->getElementsByTagName(name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 	listLen = nodeList->getLength();
+	XMLCh* attName = XMLString::transcode(attribute.c_str());
 	while(index < listLen)
 	{
 		tmpNode = (DOMElement*)nodeList->item(index++);	
@@ -195,7 +212,7 @@ DOMElement* XmlCommon::FindElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *d
 			{
 				result = tmpNode;
 				break;
-			}else if(tmpNode->hasAttribute(XMLString::transcode(attribute.c_str())))
+			}else if(tmpNode->hasAttribute(attName))
 			{
 				//	Check for attribute value if desired
 				if(attValue.compare("") == 0)
@@ -210,7 +227,9 @@ DOMElement* XmlCommon::FindElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *d
 			}
 		}
 	}
-
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
+	
 	return result;
 }
 
@@ -221,9 +240,12 @@ DOMElement* XmlCommon::FindElement(DOMElement *element, string nodeName, string 
 	DOMNodeList *nodeList	= NULL;
 	int listLen				= 0;
 	int index				= 0;
-
-	nodeList = element->getElementsByTagName(XMLString::transcode(nodeName.c_str()));
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	nodeList = element->getElementsByTagName(name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 	listLen = nodeList->getLength();
+	XMLCh* attName = XMLString::transcode(attribute.c_str());
 	while(index < listLen)
 	{
 		tmpNode = (DOMElement*)nodeList->item(index++);
@@ -234,7 +256,7 @@ DOMElement* XmlCommon::FindElement(DOMElement *element, string nodeName, string 
 			{
 				result = tmpNode;
 				break;
-			}else if(tmpNode->hasAttribute(XMLString::transcode(attribute.c_str())))
+			}else if(tmpNode->hasAttribute(attName))
 			{
 				//	Check for attribute value if desired
 				if(attValue.compare("") == 0)
@@ -250,6 +272,8 @@ DOMElement* XmlCommon::FindElement(DOMElement *element, string nodeName, string 
 			}
 		}
 	}
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
 
 	return result;
 }
@@ -264,8 +288,14 @@ DOMElement* XmlCommon::FindElementNS(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 
 
 	//	Get a list of all the nodes in the document with the nodeName and loop through them
-	nodeList = doc->getElementsByTagNameNS(XMLString::transcode(xmlns.c_str()), XMLString::transcode(nodeName.c_str()));
+	XMLCh* xmlnsValue = XMLString::transcode(xmlns.c_str());
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	nodeList = doc->getElementsByTagNameNS(xmlnsValue, name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&xmlnsValue);
+	XMLString::release(&name);
 	listLen = nodeList->getLength();
+	XMLCh* attName = XMLString::transcode(attribute.c_str());
 	while(index < listLen)
 	{
 		tmpNode = (DOMElement*)nodeList->item(index++);	
@@ -276,7 +306,7 @@ DOMElement* XmlCommon::FindElementNS(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 			{
 				result = tmpNode;
 				break;
-			}else if(tmpNode->hasAttribute(XMLString::transcode(attribute.c_str())))
+			}else if(tmpNode->hasAttribute(attName))
 			{
 				//	Check for attribute value if desired
 				if(attValue.compare("") == 0)
@@ -291,7 +321,8 @@ DOMElement* XmlCommon::FindElementNS(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 			}
 		}
 	}
-
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
 	return result;
 }
 
@@ -303,10 +334,14 @@ DOMElement* XmlCommon::FindElementNS(DOMElement *element, string nodeName, strin
 	int listLen				= 0;
 	int index				= 0;
 
-
-	nodeList = element->getElementsByTagNameNS(XMLString::transcode(xmlns.c_str()), XMLString::transcode(nodeName.c_str()));
-
+	XMLCh* xmlnsValue = XMLString::transcode(xmlns.c_str());
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	nodeList = element->getElementsByTagNameNS(xmlnsValue,name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&xmlnsValue);
+	XMLString::release(&name);
 	listLen = nodeList->getLength();
+	XMLCh* attName = XMLString::transcode(attribute.c_str());
 	while(index < listLen)
 	{
 		tmpNode = (DOMElement*)nodeList->item(index++);	
@@ -317,7 +352,7 @@ DOMElement* XmlCommon::FindElementNS(DOMElement *element, string nodeName, strin
 			{
 				result = tmpNode;
 				break;
-			}else if(tmpNode->hasAttribute(XMLString::transcode(attribute.c_str())))
+			}else if(tmpNode->hasAttribute(attName))
 			{
 				//	Check for attribute value if desired
 				if(attValue.compare("") == 0)
@@ -332,7 +367,8 @@ DOMElement* XmlCommon::FindElementNS(DOMElement *element, string nodeName, strin
 			}
 		}
 	}
-
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
 	return result;
 }
 
@@ -414,9 +450,10 @@ string XmlCommon::GetAttributeByName(DOMElement *node, string name) {
 		throw XmlCommonException("Error: Unable to get attribute value. NULL attribute name supplied\n");
 
 
-	const XMLCh *attName = XMLString::transcode(name.c_str());
+	XMLCh *attName = XMLString::transcode(name.c_str());
 	value = ToString(((DOMElement*)node)->getAttribute(attName));
-
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
 	//////////   DEBUG ////////////////////
 	//	cout << "***** debug *****" <<endl;
 	//	cout << "GetAttributeByName()" << endl;
@@ -429,8 +466,10 @@ string XmlCommon::GetAttributeByName(DOMElement *node, string name) {
 
 void XmlCommon::RemovetAttributeByName(DOMElement *node, string name) {
 
-	const XMLCh *attName = XMLString::transcode(name.c_str());
+	XMLCh *attName = XMLString::transcode(name.c_str());
 	node->removeAttribute(attName);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&attName);
 }
 
 string XmlCommon::GetDataNodeValue(DOMElement *node) {

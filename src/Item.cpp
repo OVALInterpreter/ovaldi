@@ -332,7 +332,10 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 		XmlCommon::AddSchemaLocation(DocumentManager::GetSystemCharacterisitcsDocument(), this->GetSchemaLocation());
 
 		// Create a new item element	
-		DOMElement *newItemElem = scFile->createElement(XMLString::transcode(this->GetName().c_str()));
+		XMLCh* name = XMLString::transcode(this->GetName().c_str());
+		DOMElement *newItemElem = scFile->createElement(name);
+		//Free memory allocated by XMLString::transcode(char*)
+		XMLString::release(&name);
 		itemsElm->appendChild(newItemElem);
 
 		// Add the attributes

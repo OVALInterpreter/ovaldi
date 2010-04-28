@@ -124,7 +124,10 @@ bool ItemEntity::Equals(ItemEntity* entity) {
 void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm) {
 
 	// Create new item element
-	DOMElement* newItemEntityElem = scFile->createElement(XMLString::transcode(this->GetName().c_str()));
+	XMLCh* name = XMLString::transcode(this->GetName().c_str());
+	DOMElement* newItemEntityElem = scFile->createElement(name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 	itemElm->appendChild(newItemEntityElem);
 
 	// Add the attributes
@@ -139,7 +142,10 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 
 	// Add the value
 	if(this->GetValue().compare("") != 0) {
-		DOMText* newItemEntityElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
+		XMLCh* value = XMLString::transcode(this->GetValue().c_str());
+		DOMText* newItemEntityElemValue = scFile->createTextNode(value);
+		//Free memory allocated by XMLString::transcode(char*)
+		XMLString::release(&value);
 		newItemEntityElem->appendChild(newItemEntityElemValue);
 	}
 }
