@@ -37,6 +37,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 
 * Implemented the "action" attribute in filters.
 * Fixed a memory leak that was causing the interpreter to crash while running oval.xml from the repository.
+* Added support for the LDAPTYPE_BINARY datatype in the ind-def:ldap_test.
 
 ---------------------------------------
 ---        Version 5.6 build 4      ---
