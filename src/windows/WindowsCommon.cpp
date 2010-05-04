@@ -31,6 +31,7 @@
 #include "WindowsCommon.h"
 
 StringSet* WindowsCommon::allLocalUserSIDs = NULL;
+StringSet* WindowsCommon::allLocalGroupSIDs = NULL;
 StringSet* WindowsCommon::allTrusteeNames = NULL;
 StringSet* WindowsCommon::allTrusteeSIDs = NULL;
 StringSet* WindowsCommon::wellKnownTrusteeNames = NULL;
@@ -465,7 +466,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 	// system where the domain component isn't needed.
 	WindowsCommon::SplitTrusteeName(groupName,&groupDomain,&shortGroupName);
 	localGroupName = WindowsCommon::StringToWide(shortGroupName);
-
+	
 	try {
 
 		res = NetLocalGroupGetMembers(NULL,						// server name NULL == localhost
@@ -565,7 +566,7 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 	bool groupExists = false;
 	LPWSTR wDomainName = NULL;
 	LPWSTR globalgroupname = NULL;
-	LPBYTE domainControllerName = NULL;
+	LPCWSTR domainControllerName = NULL;
 	GROUP_USERS_INFO_0* userInfo = NULL; 
 
 	WindowsCommon::SplitTrusteeName(groupName, &domainName, &shortGroupName);
@@ -574,8 +575,7 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 
 	try {
 
-		if(NetGetAnyDCName(NULL, wDomainName, &domainControllerName) == NERR_Success) {
-
+			domainControllerName = WindowsCommon::GetDomainControllerName(domainName);
 			globalgroupname = WindowsCommon::StringToWide(shortGroupName);
 
 			LPCWSTR p = (LPCWSTR)domainControllerName;
@@ -651,11 +651,10 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 					throw Exception("Unable to expand global group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
 				}
 			}
-		}
 
 	} catch(...) {
 		if(domainControllerName != NULL) {
-			NetApiBufferFree(domainControllerName);
+			NetApiBufferFree((LPVOID)domainControllerName);
 		}
 
 		if(userInfo != NULL) {
@@ -670,7 +669,7 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 	}
 
 	if(domainControllerName != NULL) {
-		NetApiBufferFree(domainControllerName);
+		NetApiBufferFree((LPVOID)domainControllerName);
 	}
 
 	if(userInfo != NULL) {
@@ -906,6 +905,21 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 	nts = LsaClose(polHandle);
 
 	return allGroups;
+}
+
+StringSet* WindowsCommon::GetAllLocalGroupSids() {
+
+	if(WindowsCommon::allLocalGroupSIDs == NULL) {
+		WindowsCommon::allLocalGroupSIDs = new StringSet();
+
+		StringSet *pGroups = WindowsCommon::GetAllLocalGroups();
+
+		WindowsCommon::ConvertTrusteeNamesToSidStrings(pGroups, WindowsCommon::allLocalGroupSIDs);
+
+		delete pGroups;
+	}
+
+	return WindowsCommon::allLocalGroupSIDs;
 }
 
 StringSet* WindowsCommon::GetAllGlobalGroups() {
@@ -1781,39 +1795,32 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 
 	bool userExists = false;
 
-	// need to split username from server name and domain.
-	size_t dash = userNameIn.find("\\");
-	string userName = "";
-	if(dash != string::npos ) {
-		userName = userNameIn.substr(dash+1, userNameIn.length());
-	} else {
-		userName = userNameIn;
-	}
+	// Split username into domain and account name components
+	string domain;
+	string userName;
+	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&userName);
+	
+	LPCWSTR userNameApi = WindowsCommon::StringToWide(userNameIn);
+	LPCWSTR serverName = WindowsCommon::GetDomainControllerName(domain);	
+	DWORD dwEntriesRead;
+	DWORD dwTotalEntries;
+	DWORD dwLevel=0;
+	DWORD dwPrefMaxLen=MAX_PREFERRED_LENGTH;
+	LPGROUP_USERS_INFO_0 pBuf = NULL;
+	string shortGroupName;
+	bool groupExists = false;
 
-	LPCWSTR userNameApi;
-	// convert userName for api use
-	wchar_t* wUserName = NULL;
-	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
-	wUserName = new wchar_t[size];
-	mbstowcs(wUserName, userName.c_str(), userName.size() + 1 );
-	userNameApi = wUserName;
-
-	// get the global groups
-	LPGROUP_USERS_INFO_0 pBuf = NULL; 
-	DWORD dwLevel = 0;
-	DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
-	DWORD dwEntriesRead = 0;
-	DWORD dwTotalEntries = 0;
-	NET_API_STATUS nStatus;
+	GROUP_USERS_INFO_0* userInfo = NULL; 
 	
 	// Call the NetUserGetGroups function, specifying level 0.
-	nStatus = NetUserGetGroups(NULL,
+	NET_API_STATUS nStatus = NetUserGetGroups(serverName,
 								userNameApi,
 								dwLevel,
 								(LPBYTE*)&pBuf,
 								dwPrefMaxLen,
 								&dwEntriesRead,
 								&dwTotalEntries);
+
 	// If the call succeeds,
 	if (nStatus == NERR_Success) {
 		userExists = true;
@@ -1837,11 +1844,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 						pBuf = NULL;
 					}
 
-					if(wUserName != NULL) {
-						delete wUserName;
-						wUserName = NULL;
-					}
-
 					throw Exception("An access violation has occurred while getting groups for user: " + userName);
 				}
 
@@ -1857,15 +1859,17 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 
 		// report an error if all groups are not listed.
 		if (dwEntriesRead < dwTotalEntries) {
+			
+			// Free the allocated buffer.
+			if (serverName != NULL) {
+				NetApiBufferFree((LPVOID)serverName);
+				serverName = NULL;
+			}
+			
 			// Free the allocated buffer.
 			if (pBuf != NULL) {
 				NetApiBufferFree(pBuf);
 				pBuf = NULL;
-			}
-
-			if(wUserName != NULL) {
-				delete wUserName;
-				wUserName = NULL;
 			}
 
 			throw Exception("Unable to get all global groups for user: " + userName);
@@ -1875,14 +1879,15 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		// do nothing
 	} else {
 
+		// Free the allocated buffer.
+		if (serverName != NULL) {
+			NetApiBufferFree((LPVOID)serverName);
+			serverName = NULL;
+		}
+
 		if (pBuf != NULL) {
 			NetApiBufferFree(pBuf);
 			pBuf = NULL;
-		}
-
-		if(wUserName != NULL) {
-			delete wUserName;
-			wUserName = NULL;
 		}
 
 		string errMsg = "Unable to get all global groups for user: " + userName + ". Windows Api NetUserGetGroups failed with error: ";
@@ -1911,7 +1916,9 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		} else if(nStatus == NERR_InternalError) {
 			errMsg = errMsg + "An internal error occurred.";
 
-		} else {
+		} else if (nStatus == ERROR_NO_SUCH_DOMAIN) {
+			errMsg = errMsg + "The domain '"+domain+"' does not exist or could not be contacted.";
+		}else {
 			errMsg = errMsg + "Unknown error.";
 		} 
 
@@ -1923,7 +1930,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		NetApiBufferFree(pBuf);
 		pBuf = NULL;
 	}
-
 
 	//
 	// get the local groups for the user
@@ -1949,6 +1955,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 									dwPrefMaxLen,
 									&dwEntriesRead,
 									&dwTotalEntries);
+
 	// If the call succeeds
 	if (nStatus == NERR_Success) {
 		userExists = true;
@@ -1964,17 +1971,19 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 			//  print the names of the local groups 
 			//  to which the user belongs. 
 			for (i = 0; i < dwEntriesRead; i++) {
-
+				
 				if (pLocalTmpBuf == NULL) {
+					
+					// Free the allocated buffer.
+					if (serverName != NULL) {
+						NetApiBufferFree((LPVOID)serverName);
+						serverName = NULL;
+					}
+
 					// Free the allocated memory.
 					if (pBuf != NULL) {
 						NetApiBufferFree(pBuf);
 						pBuf = NULL;
-					}
-
-					if(wUserName != NULL) {
-						delete wUserName;
-						wUserName = NULL;
 					}
 
 					throw Exception("An access violation has occurred while getting local groups for user: " + userName);
@@ -1989,18 +1998,20 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 				dwTotalCount++;
 			}
 		}
-
+		
 		// report an error if all groups are not listed
 		if (dwEntriesRead < dwTotalEntries) {
+
+			// Free the allocated buffer.
+			if (serverName != NULL) {
+				NetApiBufferFree((LPVOID)serverName);
+				serverName = NULL;
+			}
+
 			// Free the allocated memory.
 			if (pBuf != NULL) {
 				NetApiBufferFree(pBuf);
 				pBuf = NULL;
-			}
-
-			if(wUserName != NULL) {
-				delete wUserName;
-				wUserName = NULL;
 			}
 
 			throw Exception("Unable to get all local groups for user: " + userName);
@@ -2010,14 +2021,15 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		// do nothing
 	} else {
 
+		// Free the allocated buffer.
+		if (serverName != NULL) {
+			NetApiBufferFree((LPVOID)serverName);
+			serverName = NULL;
+		}
+
 		if (pBuf != NULL) {
 			NetApiBufferFree(pBuf);
 			pBuf = NULL;
-		}
-
-		if(wUserName != NULL) {
-			delete wUserName;
-			wUserName = NULL;
 		}
 
 		string errMsg = "Unable to get all local groups for user: " + userName + ". Windows Api NetUserGetLocalGroups failed with error: ";
@@ -2049,11 +2061,19 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		} else if(nStatus == RPC_S_SERVER_UNAVAILABLE) {
 			errMsg = errMsg + "The RPC server is unavailable. This error is returned if the servername parameter could not be found.";
 
-		} else {
+		} else if (nStatus == ERROR_NO_SUCH_DOMAIN) {
+			errMsg = errMsg + "The domain '"+domain+"' does not exist or could not be contacted.";
+		}else {
 			errMsg = errMsg + "Unknown error.";
 		} 
 
 		throw Exception(errMsg);
+	}
+
+	// Free the allocated buffer.
+	if (serverName != NULL) {
+		NetApiBufferFree((LPVOID)serverName);
+		serverName = NULL;
 	}
 
 	// Free the allocated memory.
@@ -2062,39 +2082,18 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		pBuf = NULL;
 	}
 
-	if(wUserName != NULL) {
-		delete wUserName;
-		wUserName = NULL;
-	}
-
 	return userExists;
 }
 
 bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
-
-	bool enabled = true;
-
-	// need to split username from server name and domain.
-	size_t dash = userNameIn.rfind("\\");
-	string userName = "";
-	if(dash != string::npos ) {
-		userName = userNameIn.substr(dash+1, userNameIn.length());
-	} else {
-		userName = userNameIn;
-	}
-		
-	// convert userName for api use
-	wchar_t* wUserName = NULL;
-	LPCWSTR userNameApi = NULL;
-	size_t size = mbstowcs(NULL, userName.c_str(), userName.length()) + 1;
-	wUserName = new wchar_t[size];
-	mbstowcs(wUserName, userName.c_str(), userName.size() + 1 );
-	userNameApi = wUserName;
-	
-
-	DWORD dwLevel = 23; // need USER_INFO_23  to get enabled flag
-	LPUSER_INFO_23 pBuf = NULL;
-	NET_API_STATUS nStatus;
+	string domain;                                                    // Used to hold the domain portion of the username
+	string accountName;                                               // Used to hold the account name portion of the username
+	bool enabled = true;											  // Initialize user enabled to true
+	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&accountName); // Split into domain and account name components
+	LPCWSTR serverName = WindowsCommon::GetDomainControllerName(domain);  // Retrieve the server name for the specified domain
+	LPCWSTR userNameApi = WindowsCommon::StringToWide(accountName);   // Convert account name into wide string for use in the api
+	DWORD dwLevel = 23;                                               // Need USER_INFO_23  to get enabled flag
+	LPUSER_INFO_23 pBuf = NULL;                                       // Will be used to hold the user info 
 
 	// Call the NetUserGetInfo function
 	//
@@ -2102,12 +2101,16 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	// host only. This will prevent the interpreter from trying to get user
 	// information for users that are not defined on the local host.
 	//
-	nStatus = NetUserGetInfo(NULL,
+	NET_API_STATUS nStatus = NetUserGetInfo(serverName,
 							userNameApi,
 							dwLevel,
 							(LPBYTE *)&pBuf);
 
-	delete wUserName;
+	// Free the allocated buffer.
+	if (serverName != NULL) {
+		NetApiBufferFree((LPVOID)serverName);
+		serverName = NULL;
+	}
 
 	// If the call succeeds, print the user information.
 	if (nStatus == NERR_Success) {
@@ -2544,4 +2547,15 @@ string WindowsCommon::GetObjectType ( SE_OBJECT_TYPE objectType ) {
         default:
             return "";
     }
+}
+
+LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
+
+	LPBYTE domainControllerName = NULL;
+	
+	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, WindowsCommon::StringToWide(domainName), &domainControllerName) != NERR_Success) {
+		domainControllerName = NULL;
+	}
+	
+	return (LPCWSTR)domainControllerName;
 }

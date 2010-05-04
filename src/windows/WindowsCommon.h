@@ -202,6 +202,12 @@ public:
 	/** Returns true if the trustee name corresponds to a group. */
 	static bool IsGroup(string trusteeName);
 
+	/** Return a StringSet* of all local groups. */
+	static StringSet* GetAllLocalGroups();
+
+	/** Retrieves list of sids for all local groups */
+	static StringSet* GetAllLocalGroupSids();
+
 	/** Return the set of all local and global groups on the local system. */
 	static StringSet* GetAllGroups();
 
@@ -305,9 +311,6 @@ private:
 	/** Split Trustee name between domain and account portion */
 	static void SplitTrusteeName(string trusteeName, string *domainName, string *accountName);
 
-	/** Return a StringSet* of all local groups. */
-	static StringSet* GetAllLocalGroups();
-
 	/** Return a StringSet* of all global groups. */
 	static StringSet* GetAllGlobalGroups();
 
@@ -341,10 +344,17 @@ private:
 	/** Look up the local system name. */
 	static string LookUpLocalSystemName();
 
+	/** Retrieve the domain controller name for the specified domain name.
+	  @param domainName A string that represents the domain name.
+	  @return A LPCWSTR representing the domain controller name or NULL if the domain name is the empty string or if the domain controller name lookup failed.
+	*/
+	static LPCWSTR GetDomainControllerName(string domainName);
+
 	static StringSet* allTrusteeNames;
 	static StringSet* allTrusteeSIDs;
 	static StringSet* wellKnownTrusteeNames;
 	static StringSet* allLocalUserSIDs;
+	static StringSet* allLocalGroupSIDs;
 
 	static inline bool IsAccountGroup(SID_NAME_USE sidType, string accountName);	
 };
