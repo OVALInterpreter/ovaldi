@@ -39,6 +39,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a memory leak that was causing the interpreter to crash while running oval.xml from the repository.
 * Added support for the LDAPTYPE_BINARY datatype in the ind-def:ldap_test.
 * Added support for the win-def:dnscache_test.
+* Updated the user_test, user_sid_test, user_sid55_test, group_test, and group_sid_test to align with their clarified documentation regarding search scope and lookups.
 
 ---------------------------------------
 ---        Version 5.6 build 4      ---
