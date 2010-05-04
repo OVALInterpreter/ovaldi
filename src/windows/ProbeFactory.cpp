@@ -117,8 +117,9 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = UserSidProbe::Instance();
 	} else if(objectName.compare("user_sid55_object") == 0) {
 		probe = UserSid55Probe::Instance();
-
-// independent schema objects
+	} else if(objectName.compare("dnscache_object") == 0){
+		probe = DNSCacheProbe::Instance();
+	// independent schema objects
 	} else if(objectName.compare("family_object") == 0) {
 		probe = FamilyProbe::Instance();
 	} else if(objectName.compare("environmentvariable_object") == 0) {

@@ -44,6 +44,7 @@
 #include "FileProbe.h"
 #include "FileMd5Probe.h"
 #include "FileHashProbe.h"
+#include "DNSCacheProbe.h"
 #include "FamilyProbe.h"
 #include "RegistryProbe.h"
 #include "EnvironmentVariableProbe.h"
