@@ -59,70 +59,28 @@ AbsProbe* UserSid55Probe::Instance() {
 ItemVector* UserSid55Probe::CollectItems(Object *object) {
 
 	ObjectEntity* userSid = object->GetElementByName("user_sid");
-
-	// check datatypes - only allow string
-	if(userSid->GetDatatype() != OvalEnum::DATATYPE_STRING) {
-		throw ProbeException("Error: invalid data type specified on user_sid. Found: " + OvalEnum::DatatypeToString(userSid->GetDatatype()));
-	}	
-
-	// check operation - only allow  equals, not equals and pattern match
-	if(userSid->GetOperation() != OvalEnum::OPERATION_EQUALS && userSid->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && userSid->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
-		throw ProbeException("Error: invalid operation specified on user_sid. Found: " + OvalEnum::OperationToString(userSid->GetOperation()));
-	}
-
-	// behaviors are not allowed on user_sids
-	if(object->GetBehaviors()->size() != 0) {
-		throw ProbeException("Error user_sid55_objects do not support behaviors.");		
-	}
-
 	ItemVector *collectedItems = new ItemVector();
 
-	// get the user data
-	if(userSid->GetVarRef() == NULL) {
-		if(userSid->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// simply get user sid if it exists
-			Item* item=  this->GetUserSidInfo(userSid->GetValue());
-			if(item != NULL) {
-				collectedItems->push_back(item);
-			} 
-		} else {
+	if ( userSid->GetOperation() == OvalEnum::OPERATION_EQUALS ){
+		StringVector userSids;
+		//Since we are performing a lookup -- do not restrict the search scope (i.e. allow domain user lookups)
+		//We are ignoring the flag for now
+		/*OvalEnum::Flag flag =*/ userSid->GetEntityValues(userSids);
+		for(StringVector::iterator it = userSids.begin(); it != userSids.end(); it++){
+			collectedItems->push_back(this->GetUserSidInfo(*it));
+		}
+	}else{
+		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
+		StringSet* userSids = WindowsCommon::GetAllLocalUserSids();
+		ItemEntity* userSidItemEntity = new ItemEntity("user_sid","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
 
-			bool isRegex = false;
-			if(userSid->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH)
-				isRegex = true;
-
-			// Get all users SIDs on the system...
-			StringSet* allUserSids = WindowsCommon::GetAllLocalUserSids();
-			
-			// Get the set of users that match the ItemEntity.
-			StringSet::iterator iterator;
-			for(iterator = allUserSids->begin(); iterator != allUserSids->end(); iterator++) {
-				string curr = (*iterator);
-				if(this->IsMatch(userSid->GetValue(), (*iterator), isRegex)) {
-					Item* item =  this->GetUserSidInfo(*iterator);
-					if(item != NULL) {
-						collectedItems->push_back(item);
-					}
-				}
+		for(StringSet::iterator it = userSids->begin(); it != userSids->end(); it++){
+			userSidItemEntity->SetValue(*it);
+			if ( userSid->Analyze(userSidItemEntity) == OvalEnum::RESULT_TRUE ){
+				collectedItems->push_back(this->GetUserSidInfo(*it));
 			}
 		}
-	} else {
-		// Get all users on the system...
-		StringSet* allLocalUserSids = WindowsCommon::GetAllLocalUserSids();
-
-		// loop through all users on the system
-		// only keep those that match operation and value and var check
-		StringSet::iterator it;
-		ItemEntity* tmp = this->CreateItemEntity(userSid);
-		for(it = allLocalUserSids->begin(); it != allLocalUserSids->end(); it++) {
-			tmp->SetValue((*it));
-			if(userSid->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				Item* item = this->GetUserSidInfo((*it));
-				if(item != NULL) {
-					collectedItems->push_back(item);
-				}
-			}
-		}
+		delete userSidItemEntity;
 	}
 
 	return collectedItems;
@@ -138,7 +96,7 @@ Item* UserSid55Probe::CreateItem() {
 						"win-sc", 
 						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows windows-system-characteristics-schema.xsd", 
 						OvalEnum::STATUS_ERROR, 
-						"user_sid55_item");
+						"user_sid_item");
 
 	return item;
 }

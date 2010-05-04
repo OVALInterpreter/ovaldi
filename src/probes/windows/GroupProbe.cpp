@@ -58,71 +58,28 @@ ItemVector* GroupProbe::CollectItems(Object *object) {
 
 	// get the trustee_name from the provided object
 	ObjectEntity* group = object->GetElementByName("group");
-
-	// check datatypes - only allow string
-	if(group->GetDatatype() != OvalEnum::DATATYPE_STRING) {
-		throw ProbeException("Error: invalid data type specified on group. Found: " + OvalEnum::DatatypeToString(group->GetDatatype()));
-	}	
-
-	// check operation - only allow  equals, not equals and pattern match
-	if(group->GetOperation() != OvalEnum::OPERATION_EQUALS && group->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && group->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
-		throw ProbeException("Error: invalid operation specified on group. Found: " + OvalEnum::OperationToString(group->GetOperation()));
-	}
-
-	// behaviors are not allowed on groups
-	if(object->GetBehaviors()->size() != 0) {
-		throw ProbeException("Error group_objects do not support behaviors.");		
-	}
-
 	ItemVector *collectedItems = new ItemVector();
 
-	// get the group data
-	if(group->GetVarRef() == NULL) {
-		if(group->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// simply get the members of the group if it exists
-			Item* item =  this->GetGroupMembers(group->GetValue());
-			if(item != NULL) {
-				collectedItems->push_back(item);
-			}
-		} else {
-
-			bool isRegex = false;
-			if(group->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH)
-				isRegex = true;
-
-			// Get all groups on the system...
-			StringSet* allGroups = WindowsCommon::GetAllGroups();
-			
-			// Get the set of groups that match the ItemEntity.
-			StringSet::iterator iterator;
-			for(iterator = allGroups->begin(); iterator != allGroups->end(); iterator++) {
-				string curr = (*iterator);
-				if(this->IsMatch(group->GetValue(), (*iterator), isRegex)) {
-					Item* item =  this->GetGroupMembers((*iterator));
-					if(item != NULL) {
-						collectedItems->push_back(item);
-					}
-				}
+	if ( group->GetOperation() == OvalEnum::OPERATION_EQUALS ){
+		StringVector groups;
+		//Since we are performing a lookup -- do not restrict the search scope (i.e. allow domain group lookups)
+		//We are ignoring the flag for now
+		/*OvalEnum::Flag flag =*/ group->GetEntityValues(groups);
+		for(StringVector::iterator it = groups.begin(); it != groups.end(); it++){
+			collectedItems->push_back(this->GetGroupMembers(*it));
+		}
+	}else{
+		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
+		StringSet* groups = WindowsCommon::GetAllLocalGroups();
+		ItemEntity* groupItemEntity = new ItemEntity("group","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		for(StringSet::iterator it = groups->begin(); it != groups->end(); it++){
+			groupItemEntity->SetValue(*it);
+			if ( group->Analyze(groupItemEntity) == OvalEnum::RESULT_TRUE ){
+				collectedItems->push_back(this->GetGroupMembers(*it));
 			}
 		}
-
-	} else {
-		// Get all groups on the system...
-		StringSet* allGroups = WindowsCommon::GetAllGroups();
-
-		// loop through all groups on the system
-		// only keep those that match operation and value and var check
-		StringSet::iterator it;
-		ItemEntity* tmp = this->CreateItemEntity(group);
-		for(it = allGroups->begin(); it != allGroups->end(); it++) {
-			tmp->SetValue((*it));
-			if(group->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				Item* item = this->GetGroupMembers((*it));
-				if(item != NULL) {
-					collectedItems->push_back(item);
-				}
-			}
-		}
+		delete groups;
+		delete groupItemEntity;
 	}
 
 	return collectedItems;
@@ -188,8 +145,7 @@ Item* GroupProbe::GetGroupMembers(string groupName) {
 
 	} else {
 
-		// create an item to report that a group was looked up 
-		// and it did not exist
+		// create an item to report that a group was looked up and it did not exist
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
