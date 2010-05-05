@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint Definition</schema>
-                  <version>5.7 RC 2</version>
-                  <date>3/23/2010 6:49:54 AM</date>
+                  <version>5.7</version>
+                  <date>5/3/2010 8:41:20 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sp-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"/>
@@ -1188,7 +1188,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="spwebservicename" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1" default="*">
+                                    <xsd:element name="spwebservicename" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The spwebservicename denotes the name of a SharePoint web service to be tested or * (the default) to test all web services.</xsd:documentation>
                                                 <xsd:appinfo>
@@ -1200,7 +1200,7 @@
                                                 </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="spfarmname" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1" default="SPFarm.Local">
+                                    <xsd:element name="spfarmname" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The spfarmname denotes the name of the farm on which the Sharepoint webservice resides or the local farm (default).</xsd:documentation>
                                                 <xsd:appinfo>

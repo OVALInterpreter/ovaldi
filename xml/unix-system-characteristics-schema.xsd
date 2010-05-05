@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Unix System Characteristics</schema>
-               <version>5.7 RC 2</version>
-               <date>3/23/2010 6:49:55 AM</date>
+               <version>5.7</version>
+               <date>5/3/2010 8:41:21 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="unix-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"/>
@@ -51,7 +51,7 @@
                               </xsd:element>
                               <xsd:element name="ip_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name.</xsd:documentation>
+                                        <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unix-sc_dnscacheitemipaddress">
                                                   <sch:rule context="unix-sc:dnscache_item/unix-sc:ip_address">
@@ -508,7 +508,7 @@
                               </xsd:element>
                               <xsd:element name="inet_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The inet_addr entity is the IP address of the specific interface.</xsd:documentation>
+                                        <xsd:documentation>The inet_addr entity is the IP address of the specific interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unix-sc_interfaceiteminet_addr">
                                                   <sch:rule context="unix-sc:interface_item/unix-sc:inet_addr">
@@ -520,7 +520,7 @@
                               </xsd:element>
                               <xsd:element name="broadcast_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The broadcast_addr entity is the broadcast IP address for this interface's network. For example 192.168.255.255.</xsd:documentation>
+                                        <xsd:documentation>The broadcast_addr entity is the broadcast IP address for this interface's network. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unix-sc_interfaceitembroadcast_addr">
                                                   <sch:rule context="unix-sc:interface_item/unix-sc:broadcast_addr">
@@ -532,7 +532,7 @@
                               </xsd:element>
                               <xsd:element name="netmask" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the bitmask used to calculate the inteface's IP network. The network number is calculated by bitwise-ANDing this with the IP address. The host number on that network is calculated by bitwise-XORing this with the IP address.</xsd:documentation>
+                                        <xsd:documentation>This is the bitmask used to calculate the inteface's IP network. The network number is calculated by bitwise-ANDing this with the IP address. The host number on that network is calculated by bitwise-XORing this with the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="unix-sc_interfaceitemnetmask">
                                                   <sch:rule context="unix-sc:interface_item/unix-sc:netmask">

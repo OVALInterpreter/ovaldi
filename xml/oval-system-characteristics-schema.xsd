@@ -7,8 +7,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core System Characteristics</schema>
-            <version>5.7 RC 2</version>
-            <date>3/23/2010 6:49:53 AM</date>
+            <version>5.7</version>
+            <date>5/3/2010 8:41:19 PM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -142,7 +142,7 @@
             </xsd:element>
             <xsd:element name="ip_address" type="xsd:string" minOccurs="1" maxOccurs="1">
                 <xsd:annotation>
-                    <xsd:documentation>The reqired ip_address element holds the ip address for the interface.</xsd:documentation>
+                    <xsd:documentation>The reqired ip_address element holds the IP address for the interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="mac_address" type="xsd:string" minOccurs="1" maxOccurs="1">
@@ -438,12 +438,12 @@
             <xsd:documentation>The EntityItemRecordType defines an entity that consists of a number of named fields. This structure is used for representing a record from a database query and other similar structures where multiple related fields must be collected at once. Note that for all entities of this type, the only allowed datatype is 'record'.</xsd:documentation>
             <xsd:documentation>Note the dataype attribute must be set to 'record'.</xsd:documentation>
             <xsd:appinfo>
-                <sch:pattern id="oval-sc_fields">
+                <sch:pattern id="oval-sc_item_record_fields">
                     <sch:rule context="oval-sc:system_data/*/*/*">
                             <sch:assert test="not(@datatype='record')">
                                 <sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> field of an <sch:value-of select="name(../..)"/> should not be 'record'
                             </sch:assert>
-                    </sch:rule>                    
+                    </sch:rule>
                 </sch:pattern>
             </xsd:appinfo>
         </xsd:annotation>
@@ -457,7 +457,7 @@
     </xsd:complexType>    
     <xsd:complexType name="EntityItemFieldType">
         <xsd:annotation>
-            <xsd:documentation>The EntityItemFieldType defines an element with simple content that represents a named field in a record that may contain any number of named fields. The EntityItemFieldType is much like all other entities with one significant difference, the EntityItemFieldType has a name attribute</xsd:documentation>
+            <xsd:documentation>The EntityItemFieldType defines an element with simple content that represents a named field in a record that may contain any number of named fields. The EntityItemFieldType is much like all other entities with one significant difference, the EntityItemFieldType has a name attribute.</xsd:documentation>
             <xsd:documentation>The required name attribute specifies a name for the field. Field names are lowercase and may occur more than once to allow for a field to have multiple values.</xsd:documentation>
             <xsd:documentation>The optional datatype attribute determines the type of data expected (the default datatype is 'string'). Note that the datatype attribute simply defines the type of data as found on the system, it is not used during evaluation. An OVAL Definition defines how the data should be interpreted during analysis. If the definition states a datatype that is different than what the system characteristics presents, then a type cast must be made.</xsd:documentation> 
             <xsd:documentation>The optional mask attribute is used to identify values that have been hidden for sensitivity concerns. This is used by the result file which uses the system characteristic schema to format the information found on a specific system. If the original definition set the mask attribute of an entity to 'true', then the value obtained from the system should not be presented in the results file. A system characteristics file that is not held within a results file should not use the mask attribute.</xsd:documentation>
@@ -467,7 +467,7 @@
             <xsd:extension base="xsd:anySimpleType">
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
-                        <xsd:documentation>A string restricted to allow only lower case characters.</xsd:documentation>
+                        <xsd:documentation>A string restricted to disallow upper case characters.</xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:string">

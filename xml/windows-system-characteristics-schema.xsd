@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.7 RC 2</version>
-               <date>3/23/2010 6:49:56 AM</date>
+               <version>5.7</version>
+               <date>5/3/2010 8:41:22 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -1594,7 +1594,7 @@
                               </xsd:element>
                               <xsd:element name="ip_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name.</xsd:documentation>
+                                        <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_dnscacheitemipaddress">
                                                   <sch:rule context="win-sc:dnscache_item/win-sc:ip_address">
@@ -2629,7 +2629,7 @@
                               </xsd:element>
                               <xsd:element name="inet_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the IP address.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_wininterfaceiteminet_addr">
                                                   <sch:rule context="win-sc:interface_item/win-sc:inet_addr">
@@ -2641,7 +2641,7 @@
                               </xsd:element>
                               <xsd:element name="broadcast_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the broadcast address. A broadcast address is typically the IP address with the host portion set to either all zeros or all ones.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the broadcast address. A broadcast address is typically the IP address with the host portion set to either all zeros or all ones. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_wininterfaceitembroadcast_addr">
                                                   <sch:rule context="win-sc:interface_item/win-sc:broadcast_addr">
@@ -2653,7 +2653,7 @@
                               </xsd:element>
                               <xsd:element name="netmask" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the subnet mask for the IP address.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the subnet mask for the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_wininterfaceitemnetmask">
                                                   <sch:rule context="win-sc:interface_item/win-sc:netmask">
@@ -2933,7 +2933,7 @@
                          <xsd:sequence>
                               <xsd:element name="local_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the local IP address the listening port is bound to.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the local IP address the listening port is bound to. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_winportitemlocal_address">
                                                   <sch:rule context="win-sc:port_item/win-sc:local_address">

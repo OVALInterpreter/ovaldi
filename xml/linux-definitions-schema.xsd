@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux Definition</schema>
-               <version>5.7 RC 2</version>
-               <date>3/23/2010 6:49:52 AM</date>
+               <version>5.7</version>
+               <date>5/3/2010 8:41:18 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                <sch:ns prefix="linux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"/>
@@ -163,7 +163,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="inetlisteningservers_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The inet listening servers test is used to check what applications are listening on the network. It is generally using the parsed output of running the command netstat -tuwlnpe with root privilege. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetlisteningservers_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The inet listening servers test is used to check what applications are listening on the network.  This is limited to applications that are listening for connections that use the TCP or UDP protocols and have addresses represented as IPv4 or IPv6 addresses (AF_INET or AF_INET6). It is generally using the parsed output of running the command netstat -tuwlnpe with root privilege. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetlisteningservers_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                <xsd:appinfo>
                     <sch:pattern id="linux-def_inetlisteningservers_test">
                          <sch:rule context="linux-def:inetlisteningservers_test/linux-def:object">
@@ -189,7 +189,7 @@
      <xsd:element name="inetlisteningservers_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
                <xsd:documentation>The inetlisteningservers_object element is used by an inet listening servers test to define the specific protocol-address-port to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-               <xsd:documentation>An inet listening servers object consists of three entities. The first identifies a specific ip address. The second entity represents a certain port number. While the third identifies the protocol.</xsd:documentation>
+               <xsd:documentation>An inet listening servers object consists of three entities. The first identifies a specific IP address. The second entity represents a certain port number. While the third identifies the protocol.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -212,7 +212,7 @@
                                         </xsd:element>
                                         <xsd:element name="local_address" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
                                              <xsd:annotation>
-                                                  <xsd:documentation>This is the IP address of the network interface on which an application listens.</xsd:documentation>
+                                                  <xsd:documentation>This is the IP address of the network interface on which an application listens. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                   <xsd:appinfo>
                                                        <sch:pattern id="linux-def_ilsobjlocal_address">
                                                             <sch:rule context="linux-def:inetlisteningservers_object/linux-def:local_address">
@@ -263,7 +263,7 @@
                               </xsd:element>
                               <xsd:element name="local_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address of the network interface on which the program listens.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address of the network interface on which the program listens. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-def_ilsstelocal_address">
                                                   <sch:rule context="linux-def:inetlisteningservers_state/linux-def:local_address">
@@ -287,7 +287,7 @@
                               </xsd:element>
                               <xsd:element name="local_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address and network port number associated with the inet listening server, equivalent to local_address:local_port.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address and network port number associated with the inet listening server, equivalent to local_address:local_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-def_ilsstelocal_full_address">
                                                   <sch:rule context="linux-def:inetlisteningservers_state/linux-def:local_full_address">
@@ -311,7 +311,7 @@
                               </xsd:element>
                               <xsd:element name="foreign_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-def_ilssteforeign_address">
                                                   <sch:rule context="linux-def:inetlisteningservers_state/linux-def:foreign_address">
@@ -335,7 +335,7 @@
                               </xsd:element>
                               <xsd:element name="foreign_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-def_ilssteforeign_full_address">
                                                   <sch:rule context="linux-def:inetlisteningservers_state/linux-def:foreign_full_address">

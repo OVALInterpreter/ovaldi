@@ -8,8 +8,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core Definition</schema>
-            <version>5.7 RC 2</version>
-            <date>3/23/2010 6:49:53 AM</date>
+            <version>5.7</version>
+            <date>5/3/2010 8:41:19 PM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
             <sch:ns prefix="ind-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"/>
@@ -482,6 +482,14 @@
         <xsd:annotation>
             <xsd:documentation>The VariableType complex type defines attributes associated with each OVAL Variable. The required id attribute uniquely identifies each variable, and must conform to the format specified by the VariableIDPattern simple type. The required version attribute holds the current version of the variable. Versions are integers, starting at 1 and incrementing every time a variable is modified.  The required comment attribute provides a short description of the variable. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
             <xsd:documentation>The required datatype attribute specifies the type of value being defined.  The set of values identified by a variable must comply with the specified datatype, otherwise an error should be reported.  Please see the DatatypeEnumeration for details about each valid datatype.  For example, if the datatype of the variable is specified as boolean then the value(s) returned by the component / function should be "true", "false", "1", or "0".</xsd:documentation>
+            <xsd:documentation>Note that the 'record' datatype is not permitted on variables.</xsd:documentation>
+            <xsd:appinfo>
+                <sch:pattern id="oval-def_allowed-variable-datatypes">
+                    <sch:rule context="oval-def:variables/child::*">
+                        <sch:assert test="not(@datatype='record')"><sch:value-of select="@id"/> - The 'record' datatype is prohibited on variables.</sch:assert>
+                    </sch:rule>
+                </sch:pattern>
+            </xsd:appinfo>
         </xsd:annotation>
         <xsd:sequence>
             <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
@@ -590,6 +598,9 @@
             <xsd:documentation>The LiteralComponentType complex type defines a literal value to be used as a component.  The optional datatype attribute defines the type of data expected.  The default datatype is 'string'.</xsd:documentation>
             <xsd:appinfo>
                 <sch:pattern id="oval-def_literal_component">
+                    <sch:rule context="oval-def:literal_component">
+                        <sch:assert test="not(@datatype='record')"><sch:value-of select="ancestor::*/@id"/> - The 'record' datatype is prohibited on variables.</sch:assert>
+                    </sch:rule>
                     <!--
                         <sch:rule context="oval-def:literal_component/*/*[not(@datatype)]">
                         </sch:rule>
@@ -628,17 +639,14 @@
     </xsd:complexType>
     <xsd:complexType name="ObjectComponentType">
         <xsd:annotation>
-            <xsd:documentation>The ObjectComponentType complex type defines a specific value on the local system to obtain. The required object_ref attribute provides a reference to an existing OVAL Object declaration. This reference defines the object to examine and eventually pull the value from. The required item_field defines which piece of data to retrieve from the object referenced by the object_ref. For example, if the object_ref references a file_object, the item_field may define the version entity as the piece of information to use as the value of the variable. The types of data to retrieve can be found in the OVAL System Characteristics file under the item associated with the object referenced by object_ref.</xsd:documentation>
-            <xsd:appinfo>
-                <sch:pattern id="oval-def_item_field">
-                    <sch:rule context="oval-def:object_component">
-                        <sch:assert test="@item_field!=''">The item_field attribute of an object_component of variable <sch:value-of select="../../@id"/> cannot be empty.</sch:assert>
-                    </sch:rule>
-                </sch:pattern>
-            </xsd:appinfo>
+            <xsd:documentation>The ObjectComponentType complex type defines a specific value or set of values on the local system to obtain.</xsd:documentation>
+            <xsd:documentation>The required object_ref attribute provides a reference to an existing OVAL Object declaration. The referenced OVAL Object specifies a set of OVAL Items to collect. Note that an OVAL Object might identify 0, 1, or many OVAL Items on a system. If no items are found on the system then an error should be reported when determining the value of an ObjectComponentType. If 1 or more OVAL Items are found then each OVAL Item will be considered and the ObjectComponentType may have one or more values.</xsd:documentation>
+            <xsd:documentation>The required item_field attribute specifies the name of the entity whose value will be retrieved from each OVAL Item collected by the referenced OVAL Object. For example, if the object_ref references a win-def:file_object, the item_field may specify the 'version' entity as the field to use as the value of the ObjectComponentType. Note that an OVAL Item may have 0, 1, or many entities whose name matches the specified item_field value. If an entity is not found with a name that matches the value of the item_field an error should be reported when determining the value of an ObjectComponentType. If 1 or more matching entities are found in a single OVAL Item the value of the ObjectComponentType is the list of the values from each of the matching entities.</xsd:documentation>
+            <xsd:documentation>The optional record_field attribute specifies the name of a field in a record entity in an OVAL Item. The record_field attribute allows the value of a specific field to be retrieved from an entity with a datatype of 'record'. If a field with a matching name attribute value is not found in the referenced OVAL Item entity an error should be reported when determining the value of the ObjectComponentType.</xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="object_ref" type="oval:ObjectIDPattern" use="required"/>
-        <xsd:attribute name="item_field" type="xsd:string" use="required"/>
+        <xsd:attribute name="item_field" type="oval:NonEmptyStringType" use="required"/>
+        <xsd:attribute name="record_field" type="oval:NonEmptyStringType" use="optional"/>
     </xsd:complexType>
     <xsd:complexType name="VariableComponentType">
         <xsd:annotation>
@@ -1094,6 +1102,11 @@
                         <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - The use of '<sch:value-of select="@operation"/>' for the operation attribute of the <sch:value-of select="name()"/> entity is not valid given a datatype of record.</sch:assert>
                     </sch:rule>
                 </sch:pattern>
+                <sch:pattern id="oval-def_no_var_ref_with_records">
+                    <sch:rule context="oval-def:objects/*/*[@datatype='record']|oval-def:states/*/*[@datatype='record']">
+                        <sch:assert test="not(@var_ref)"><sch:value-of select="../@id"/> - The use of var_ref is prohibited when the datatype is 'record'.</sch:assert>
+                    </sch:rule>
+                </sch:pattern>
                 <sch:pattern id="oval-def_definition_entity_type_check_rules">
                     <sch:rule context="oval-def:objects/*/*[not(@xsi:nil='true') and not(@var_ref) and @datatype='int']|oval-def:states/*/*[not(@xsi:nil='true') and not(@var_ref) and @datatype='int']">
                         <sch:assert test="(not(contains(.,'.'))) and (number(.) = floor(.))"><sch:value-of select="../@id"/> - The datatype for the <sch:value-of select="name()"/> entity is 'int' but the value is not an integer.</sch:assert>
@@ -1117,12 +1130,12 @@
             <xsd:documentation>If the entity uses a var_ref and the associated variable defines more than one value, the optional var_check attribute defines how the data collection should proceed. For example, if an object entity 'filename' with an operation of 'does not equal' references a variable that returns five different values, and the var_check attribute has a value of 'all', then an actual file on the system matches only if the actual filename does not equal any of the variable values. If a variable does not return any value, then an error should be reported during OVAL analysis.</xsd:documentation>
             <xsd:appinfo>
                 <sch:pattern id="oval-def_entityobjectbaserules">
-                    <sch:rule context="oval-def:objects/*/*[@var_ref]">
+                    <sch:rule context="oval-def:objects/*/*[@var_ref]|oval-def:objects/*/*/*[@var_ref]">
                         <sch:report test="not(@var_check)"><sch:value-of select="../@id"/> - a var_ref has been supplied for the <sch:value-of select="name()"/> entity so a var_check should also be provided</sch:report>
                     </sch:rule>
-                      <sch:rule context="oval-def:objects/*/*[@var_check]">
+                    <sch:rule context="oval-def:objects/*/*[@var_check]|oval-def:objects/*/*/*[@var_check]">
                             <sch:assert test="@var_ref"><sch:value-of select="../@id"/> - a var_check has been supplied for the <sch:value-of select="name()"/> entity so a var_ref should also be provided</sch:assert>
-                      </sch:rule>
+                    </sch:rule>
                 </sch:pattern>
             </xsd:appinfo>
         </xsd:annotation>
@@ -1212,12 +1225,12 @@
             <xsd:documentation>The entity_check and var_check attributes are considered together when evaluating a single state entity. When a variable identifies more than one value and multiple item entities with the same name exist for a single state entity, a many-to-many comparison must be conducted.  In this situation, there are many values for the state entity that must be compared to many item entities.  Each item entity is compared to the state entity. For each item entity, an interim result is calculated by using the var_check attribute to combine the result of comparing each variable value with a single system value. Then these interim results are combined for each system value using the entity_check attribute.</xsd:documentation>
             <xsd:appinfo>
                 <sch:pattern id="oval-def_entitystatebaserules">
-                    <sch:rule context="oval-def:states/*/*[@var_ref]">
+                    <sch:rule context="oval-def:states/*/*[@var_ref]|oval-def:states/*/*/*[@var_ref]">
                         <sch:report test="not(@var_check)"><sch:value-of select="../@id"/> - a var_ref has been supplied for the <sch:value-of select="name()"/> entity so a var_check should also be provided</sch:report>
                     </sch:rule>
-                      <sch:rule context="oval-def:states/*/*[@var_check]">
-                            <sch:assert test="@var_ref"><sch:value-of select="../@id"/> - a var_check has been supplied for the <sch:value-of select="name()"/> entity so a var_ref should also be provided</sch:assert>
-                      </sch:rule>
+                    <sch:rule context="oval-def:states/*/*[@var_check]|oval-def:states/*/*/*[@var_check]">
+                        <sch:assert test="@var_ref"><sch:value-of select="../@id"/> - a var_check has been supplied for the <sch:value-of select="name()"/> entity so a var_ref should also be provided</sch:assert>
+                    </sch:rule>
                 </sch:pattern>
             </xsd:appinfo>
         </xsd:annotation>
@@ -1305,13 +1318,14 @@
             <xsd:documentation>The EntityStateRecordType defines an entity that consists of a number of uniquely named fields. This structure is used for representing a record from a database query and other similar structures where multiple related fields must be collected at once. Note that for all entities of this type, the only allowed datatype is 'record' and the only allowed operation is 'equals'. During analysis of a system characteristics item the each field is analyzed and then the overall result for elements of this type is computed by logically anding the results for each field and then applying the entity_check attribute.</xsd:documentation>
             <xsd:documentation>Note the datatype attribute must be set to 'record'.</xsd:documentation>
             <xsd:documentation>Note the operation attribute must be set to 'equals'.</xsd:documentation>
+            <xsd:documentation>Note the var_ref attribute is not permitted.</xsd:documentation>
             <xsd:appinfo>
-                <sch:pattern id="oval-def_fields">
+                <sch:pattern id="oval-def_state_record_fields">
                     <sch:rule context="oval-def:states/*/*/*">
                         <sch:assert test="not(@datatype='record')">
-                            <sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> field of an <sch:value-of select="name(../..)"/> should not be 'record'
+                            <sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> field of an <sch:value-of select="name(../..)"/> should not be 'record'.
                         </sch:assert>
-                    </sch:rule>                    
+                    </sch:rule>
                 </sch:pattern>
             </xsd:appinfo>
         </xsd:annotation>
@@ -1321,7 +1335,7 @@
                     <xsd:element name="field" type="oval-def:EntityStateFieldType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:restriction>
-        </xsd:complexContent>     
+        </xsd:complexContent>
     </xsd:complexType> 
     <xsd:complexType name="EntityStateFieldType">
         <xsd:annotation>
@@ -1338,7 +1352,7 @@
             <xsd:extension base="xsd:anySimpleType">
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
-                        <xsd:documentation>A string restricted to allow only lower case characters.</xsd:documentation>
+                        <xsd:documentation>A string restricted to disallow upper case characters.</xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:string">

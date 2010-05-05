@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.7 RC 2</version>
-                  <date>3/23/2010 6:49:55 AM</date>
+                  <version>5.7</version>
+                  <date>5/3/2010 8:41:21 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -1909,7 +1909,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="dnscache_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The dnscache_test is used to check the time to live and IP addresses associated with a domain name.  The time to live and IP addresses for a particular domain name are retrieved from the DNS cache on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a dnscache_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The dnscache_test is used to check the time to live and IP addresses associated with a domain name.  The time to live and IP addresses for a particular domain name are retrieved from the DNS cache on the local system. The entries in the DNS cache can be collected using Microsoft's DnsGetCacheDataTable() and DnsQuery() API calls. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a dnscache_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
                         <sch:pattern id="win-def_dnscachetst">
                               <sch:rule context="win-def:dnscache_test/win-def:object">
@@ -1996,7 +1996,7 @@
                                     </xsd:element>
                                     <xsd:element name="ip_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name that was collected from the DNS cache on the local system.</xsd:documentation>
+                                                <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name that was collected from the DNS cache on the local system. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_dnscachesteipaddress">
                                                             <sch:rule context="win-def:dnscache_state/win-def:ip_address">
@@ -4550,7 +4550,7 @@
                                     </xsd:element>
                                     <xsd:element name="inet_addr" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The inet_addr element specifies the IP address.</xsd:documentation>
+                                                <xsd:documentation>The inet_addr element specifies the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_wininterfacesteinet_addr">
                                                             <sch:rule context="win-def:interface_state/win-def:inet_addr">
@@ -4562,7 +4562,7 @@
                                     </xsd:element>
                                     <xsd:element name="broadcast_addr" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The broadcast_addr element specifies the broadcast address. A broadcast address is typically the IP address with the host portion set to either all zeros or all ones.</xsd:documentation>
+                                                <xsd:documentation>The broadcast_addr element specifies the broadcast address. A broadcast address is typically the IP address with the host portion set to either all zeros or all ones. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_wininterfacestebroadcast_addr">
                                                             <sch:rule context="win-def:interface_state/win-def:broadcast_addr">
@@ -4574,7 +4574,7 @@
                                     </xsd:element>
                                     <xsd:element name="netmask" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The netmask element specifies the subnet mask for the IP address.</xsd:documentation>
+                                                <xsd:documentation>The netmask element specifies the subnet mask for the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_wininterfacestenetmask">
                                                             <sch:rule context="win-def:interface_state/win-def:netmask">
@@ -5022,7 +5022,7 @@
                                           <xsd:sequence minOccurs="0">
                                                 <xsd:element name="local_address" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>This element specifies the local IP address the listening port is bound to.</xsd:documentation>
+                                                            <xsd:documentation>This element specifies the local IP address the listening port is bound to. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_winportobjlocal_address">
                                                                         <sch:rule context="win-def:port_object/win-def:local_address">
@@ -5073,7 +5073,7 @@
                               <xsd:sequence>
                                     <xsd:element name="local_address" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>This element specifies the local IP address the listening port is bound to.</xsd:documentation>
+                                                <xsd:documentation>This element specifies the local IP address the listening port is bound to. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_winportstelocal_address">
                                                             <sch:rule context="win-def:port_state/win-def:local_address">

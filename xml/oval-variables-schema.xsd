@@ -8,8 +8,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Variable</schema>
-               <version>5.7 RC 2</version>
-               <date>3/23/2010 6:49:53 AM</date>
+               <version>5.7</version>
+               <date>5/3/2010 8:41:19 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
               <sch:ns prefix="oval-var" uri="http://oval.mitre.org/XMLSchema/oval-system-variables-5"/>
           </xsd:appinfo>
@@ -62,7 +62,18 @@
                <xsd:element name="value" type="xsd:anySimpleType" minOccurs="1" maxOccurs="unbounded"/>
           </xsd:sequence>
           <xsd:attribute name="id" type="oval:VariableIDPattern" use="required"/>
-          <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required"/>
+          <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required">
+               <xsd:annotation>
+                    <xsd:documentation>Note that the 'record' datatype is not permitted on variables.</xsd:documentation>
+                    <xsd:appinfo>
+                         <sch:pattern id="oval-var_allowed_datatypes">
+                              <sch:rule context="oval-var:variables/oval-var:variable">
+                                   <sch:assert test="not(@datatype='record')"><sch:value-of select="@id"/> - The 'record' datatype is prohibited on variables.</sch:assert>
+                              </sch:rule>
+                         </sch:pattern>
+                    </xsd:appinfo>
+               </xsd:annotation>
+          </xsd:attribute>
           <xsd:attribute name="comment" type="xsd:string" use="required"/>
      </xsd:complexType>
      <!-- =============================================================================== -->

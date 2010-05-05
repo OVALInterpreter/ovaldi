@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux System Characteristics</schema>
-               <version>5.7 RC 2</version>
-               <date>3/23/2010 6:49:52 AM</date>
+               <version>5.7</version>
+               <date>5/3/2010 8:41:18 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="linux-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux"/>
@@ -127,7 +127,7 @@
                               </xsd:element>
                               <xsd:element name="local_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address associated with the inet listening server.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address associated with the inet listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-sc_ilsitemlocal_address">
                                                   <sch:rule context="linux-sc:inetlisteningserver_item/linux-sc:local_address">
@@ -151,7 +151,7 @@
                               </xsd:element>
                               <xsd:element name="local_full_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address and network port on which the program listens, equivalent to local_address:local_port.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address and network port on which the program listens, equivalent to local_address:local_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-sc_ilsitemlocal_full_address">
                                                   <sch:rule context="linux-sc:inetlisteningserver_item/linux-sc:local_full_address">
@@ -175,7 +175,7 @@
                               </xsd:element>
                               <xsd:element name="foreign_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-sc_ilsitemforeign_address">
                                                   <sch:rule context="linux-sc:inetlisteningserver_item/linux-sc:foreign_address">
@@ -199,7 +199,7 @@
                               </xsd:element>
                               <xsd:element name="foreign_full_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port.</xsd:documentation>
+                                        <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="linux-sc_ilsitemforeign_full_address">
                                                   <sch:rule context="linux-sc:inetlisteningserver_item/linux-sc:foreign_full_address">

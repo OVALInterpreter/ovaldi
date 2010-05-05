@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>MacOS Definition</schema>
-                  <version>5.7 RC 2</version>
-                  <date>3/23/2010 6:49:52 AM</date>
+                  <version>5.7</version>
+                  <date>5/3/2010 8:41:18 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="macos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos"/>
@@ -176,7 +176,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="inetlisteningservers_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>This test's purpose is generally used to check if a program is listening on the network, either for a new connections or as part of an ongoing connection. It is generally speaking the parsed output of running the command netstat -tuwlnpe with root privilege.</xsd:documentation>
+                  <xsd:documentation>This test's purpose is generally used to check if an application is listening on the network, either for a new connection or as part of an ongoing connection. This is limited to applications that are listening for connections that use the TCP or UDP protocols and have addresses represented as IPv4 or IPv6 addresses (AF_INET or AF_INET6). It is generally speaking the parsed output of running the command netstat -tuwlnpe with root privilege.</xsd:documentation>
                   <xsd:appinfo>
                         <sch:pattern id="macos-def_inetlisteningservers_test">
                               <sch:rule context="macos-def:inetlisteningservers_test/macos-def:object">
@@ -251,7 +251,7 @@
                                     </xsd:element>
                                     <xsd:element name="local_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>This is the IP address of the network interface on which the program listens.</xsd:documentation>
+                                                <xsd:documentation>This is the IP address of the network interface on which the program listens. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="macos-def_ilsstelocal_address">
                                                             <sch:rule context="macos-def:inetlisteningservers_state/macos-def:local_address">
@@ -263,7 +263,7 @@
                                     </xsd:element>
                                     <xsd:element name="local_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>This is the IP address and network port on which the program listens, equivalent to local_address:local_port.</xsd:documentation>
+                                                <xsd:documentation>This is the IP address and network port on which the program listens, equivalent to local_address:local_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="macos-def_ilsstelocal_full_address">
                                                             <sch:rule context="macos-def:inetlisteningservers_state/macos-def:local_full_address">
@@ -287,7 +287,7 @@
                                     </xsd:element>
                                     <xsd:element name="foreign_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server.</xsd:documentation>
+                                                <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="macos-def_ilssteforeign_address">
                                                             <sch:rule context="macos-def:inetlisteningservers_state/macos-def:foreign_address">
@@ -299,7 +299,7 @@
                                     </xsd:element>
                                     <xsd:element name="foreign_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port.</xsd:documentation>
+                                                <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="macos-def_ilssteforeign_full_address">
                                                             <sch:rule context="macos-def:inetlisteningservers_state/macos-def:foreign_full_address">
