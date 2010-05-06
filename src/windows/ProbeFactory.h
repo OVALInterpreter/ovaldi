@@ -52,6 +52,7 @@
 #include "XmlFileContentProbe.h"
 #include "VariableProbe.h"
 #include "WMIProbe.h"
+#include "WMI57Probe.h"
 #include "PasswordPolicyProbe.h"
 #include "LockoutPolicyProbe.h"
 #include "AuditEventPolicyProbe.h"

@@ -50,6 +50,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = ActiveDirectoryProbe::Instance();
 	} else if(objectName.compare("wmi_object") == 0) {
 		probe = WMIProbe::Instance();
+	} else if(objectName.compare("wmi57_object") == 0) {
+		probe = WMI57Probe::Instance();
 	} else if(objectName.compare("passwordpolicy_object") == 0) {
 		probe = PasswordPolicyProbe::Instance();
 	} else if(objectName.compare("lockoutpolicy_object") == 0) {
