@@ -77,12 +77,10 @@ void AbsEntity::SetName(string name) {
 
 string AbsEntity::GetValue() {
     switch ( this->value.size() ){
-        case 0:
-            return "";
         case 1:
 			return this->value.front()->GetValue();
         default:
-            break;
+            return "";
     }
 }
 
@@ -230,7 +228,7 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 				result = EntityComparator::CompareVersion(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
-				result = EntityComparator::CompareRecord(this->GetOperation(), &this->GetValues(), &scElement->GetValues());
+				result = EntityComparator::CompareRecord(this->GetOperation(), this->GetValues(), scElement->GetValues());
 			}
 
 		} else {

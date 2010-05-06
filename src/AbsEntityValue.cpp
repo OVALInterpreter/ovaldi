@@ -37,6 +37,10 @@
 AbsEntityValue::AbsEntityValue(){
 }
 
+AbsEntityValue::~AbsEntityValue(){
+
+}
+
 AbsEntityValue::AbsEntityValue(string value){
 	
 	this->value = value;

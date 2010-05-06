@@ -160,13 +160,13 @@ bool ItemEntity::Equals(ItemEntity* entity) {
 				// Now if you check the other way, you will see that they are in fact not equal as 4 does not exist in FieldVector 1.
 					
 				for(AbsEntityValueVector::iterator it1 = this->GetValues().begin() ; it1 != this->GetValues().end() ; it1++){
-					if(!this->ValueExistsInItemEntity(&entity->GetValues(), (*it1))) {
+					if(!this->ValueExistsInItemEntity(entity->GetValues(), (*it1))) {
 						return false; // Short-circuit out. There is no need to do anything else because they are not equal.
 					}	
 				}
 
 				for(AbsEntityValueVector::iterator it2 = entity->GetValues().begin() ; it2 != entity->GetValues().end() ; it2++){
-					if(!this->ValueExistsInItemEntity(&this->GetValues(), (*it2))) {
+					if(!this->ValueExistsInItemEntity(this->GetValues(), (*it2))) {
 						return false; // Short-circuit out. There is no need to do anything else because they are not equal.
 					}	
 				}
@@ -178,11 +178,11 @@ bool ItemEntity::Equals(ItemEntity* entity) {
 	return isEqual;
 }
 
-bool ItemEntity::ValueExistsInItemEntity(AbsEntityValueVector* entityValueVector, AbsEntityValue* entityValue) {
+bool ItemEntity::ValueExistsInItemEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue) {
 
 	bool exists = false;
 	
-	for(AbsEntityValueVector::iterator iterator = entityValueVector->begin(); iterator != entityValueVector->end(); iterator++) {
+	for(AbsEntityValueVector::iterator iterator = entityValueVector.begin(); iterator != entityValueVector.end(); iterator++) {
 		if(entityValue->Equals(*iterator)) {
 			exists = true;
 			break;

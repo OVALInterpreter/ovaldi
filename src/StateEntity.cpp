@@ -113,7 +113,7 @@ bool StateEntity::Equals(AbsEntity* entity) {
 							// because the vectors must be unique so there will not be the possibility for
 							// duplicates that may cause false positives that they are equal.
 							for(AbsEntityValueVector::iterator it = this->GetValues().begin() ; it != this->GetValues().end() ; it++){
-								if ( !this->ValueExistsInStateEntity(&stateEntity->GetValues(),*it) ){
+								if ( !this->ValueExistsInStateEntity(stateEntity->GetValues(),*it) ){
 									isEqual = false; // Short-circuit out. There is no need to do anything else because they are not equal.
 								}
 							}
@@ -129,11 +129,11 @@ bool StateEntity::Equals(AbsEntity* entity) {
 	return isEqual;
 }
 
-bool StateEntity::ValueExistsInStateEntity(AbsEntityValueVector* entityValueVector, AbsEntityValue* entityValue) {
+bool StateEntity::ValueExistsInStateEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue) {
 
 	bool exists = false;
 	
-	for(AbsEntityValueVector::iterator iterator = entityValueVector->begin(); iterator != entityValueVector->end(); iterator++) {
+	for(AbsEntityValueVector::iterator iterator = entityValueVector.begin(); iterator != entityValueVector.end(); iterator++) {
 		if(entityValue->Equals(*iterator)) {
 			exists = true;
 			break;

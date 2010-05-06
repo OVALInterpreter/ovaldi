@@ -45,6 +45,9 @@ public:
 	/** AbsEntityValue constructor. */
 	AbsEntityValue(string value);
 
+	/** AbsEntityValue virtual destructor. */
+	virtual ~AbsEntityValue();
+
 	/** Get the value of the entity value. */
 	string GetValue();
 

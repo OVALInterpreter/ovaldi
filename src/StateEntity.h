@@ -55,7 +55,7 @@ public:
 
 	bool Equals(AbsEntity* entity);
 
-	bool ValueExistsInStateEntity(AbsEntityValueVector* entityValueVector, AbsEntityValue* entityValue);
+	bool ValueExistsInStateEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue);
 
 	/** Parse the XML representation of a StateEntity. */
 	void Parse(DOMElement* entitiyElm);

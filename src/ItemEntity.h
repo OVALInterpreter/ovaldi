@@ -70,7 +70,7 @@ public:
 		@param entityValueVector the entity value vector for which you want to see if the specified entity value exists.
 		@param entityValue the entity value whose existence you would like to check in the specified entity value vector.
 	*/
-	bool ValueExistsInItemEntity(AbsEntityValueVector* entityValueVector, AbsEntityValue* entityValue);
+	bool ValueExistsInItemEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue);
 
 	/** Write this ItemEntity to the sc file.
 	    Inserts this ItemEntity as the last child of the specified

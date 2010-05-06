@@ -454,17 +454,17 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 	return result;
 }
 
-OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation op, AbsEntityValueVector* defValue, AbsEntityValueVector* scValue) {
+OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation op, AbsEntityValueVector defValue, AbsEntityValueVector scValue) {
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 	// Equals is the only operation allowed on a entity of type record.
 	if ( op == OvalEnum::OPERATION_EQUALS ){
 		IntVector recordResults;
 		IntVector fieldEntityResults;
-		for(AbsEntityValueVector::iterator defIt = defValue->begin(); defIt != defValue->end(); defIt++){
+		for(AbsEntityValueVector::iterator defIt = defValue.begin(); defIt != defValue.end(); defIt++){
 			StateFieldEntityValue* sfev = (StateFieldEntityValue*)(*defIt);
 			IntVector fieldResults;
 			
-			for(AbsEntityValueVector::iterator scIt = scValue->begin(); scIt != scValue->end(); scIt++){
+			for(AbsEntityValueVector::iterator scIt = scValue.begin(); scIt != scValue.end(); scIt++){
 				ItemFieldEntityValue* ifev = (ItemFieldEntityValue*)(*scIt);
 				if ( sfev->GetName().compare(ifev->GetName()) == 0 ){
 					fieldResults.push_back(sfev->Analyze(ifev));

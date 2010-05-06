@@ -48,7 +48,7 @@ public:
 	StringEntityValue(string value);
 	
     /** Destructor for a StringEntityValue.*/
-	~StringEntityValue();
+	virtual ~StringEntityValue();
 
 	/** Determine if the StringEntityValue is equal to the specified StringEntityValue. This is determined by comparing the value of each entity value.  
 	 *  @param entityValue A pointer to a AbsEntityValue that specifies the string entity value that should be comapred to this string entity value.

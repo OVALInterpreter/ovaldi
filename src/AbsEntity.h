@@ -41,7 +41,7 @@
 #include "AbsVariable.h"
 #include "ItemEntity.h"
 #include "EntityComparator.h"
-
+#include "AbsEntityValue.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
