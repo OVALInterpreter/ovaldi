@@ -112,7 +112,6 @@ OBJS = \
 	ExternalVariable.obj \
 	FileFinder.obj \
 	Filter.obj \
-	FilterEntity.obj \
 	InterfaceProbe.obj \
 	Item.obj \
 	ItemEntity.obj \
@@ -214,7 +213,6 @@ REL_OBJS = \
 	$(BUILDDIR)/ExternalVariable.obj \
 	$(BUILDDIR)/FileFinder.obj \
 	$(BUILDDIR)/Filter.obj \
-	$(BUILDDIR)/FilterEntity.obj \
 	$(BUILDDIR)/InterfaceProbe.obj \
 	$(BUILDDIR)/Item.obj \
 	$(BUILDDIR)/ItemEntity.obj \
