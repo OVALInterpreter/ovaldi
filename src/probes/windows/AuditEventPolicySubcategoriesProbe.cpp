@@ -149,18 +149,22 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object *object) {
 					for(ULONG subcategoryIndex = 0; subcategoryIndex < subCategoryCount; subcategoryIndex++) {
 						AUDIT_POLICY_INFORMATION currentPolicy = pAuditPolicies[subcategoryIndex];
 						
-						string itemEntityName = GetItemEntityNameFromGuid(currentPolicy.AuditSubCategoryGuid);
+						StringSet* itemEntityNames = GetItemEntityNameFromGuid(currentPolicy.AuditSubCategoryGuid);
+						if ( itemEntityNames->size() > 0 ){
+							for(StringSet::iterator it = itemEntityNames->begin(); it != itemEntityNames->end(); it++){
+								string itemEntityName = *it;
+								if(itemEntityName.compare("") != 0) {
+									Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - itemEntityName=" + itemEntityName);
+									ItemEntity *pItemEntity = new ItemEntity(itemEntityName,  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+									item->AppendElement(pItemEntity);
 
-						if(itemEntityName != "") {
-							Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - itemEntityName=" + itemEntityName);
-							ItemEntity *pItemEntity = new ItemEntity(itemEntityName,  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
-							item->AppendElement(pItemEntity);
-
-							ReadAuditOptions(item, pItemEntity, currentPolicy.AuditingInformation);
-						} else {
-							
+									ReadAuditOptions(item, pItemEntity, currentPolicy.AuditingInformation);
+								}
+							}
+						}else {
 							Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - GUID not found.  Skipping.");
 						}
+						delete itemEntityNames;
 					}
 
 					policyAuditEventType++;
@@ -291,7 +295,7 @@ void AuditEventPolicySubcategoriesProbe::Init() {
 
 	InsertIntoGuidItemEntityNameMapping(Audit_System_SecurityStateChange, "security_state_change");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_CredentialValidation, "credential_validation");
-	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Kerberos, "kerberos_ticket_events"); //?
+	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Kerberos, "kerberos_ticket_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Others, "other_account_logon_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_ApplicationGroup, "application_group_management");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_ComputerAccount, "computer_account_management");
@@ -339,6 +343,13 @@ void AuditEventPolicySubcategoriesProbe::Init() {
 	InsertIntoGuidItemEntityNameMapping(Audit_System_Integrity, "system_integrity");
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_WfpIPSecPolicy, "filtering_platform_policy_change"); 
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_IPSecUserMode, "ipsec_extended_mode");
+
+	//Complete listing of audit event setting GUIDs - http://msdn.microsoft.com/en-us/library/dd973928(PROT.10).aspx (GUID listed in NTSecApi.h)
+	//These are new for Windows 7.
+	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Kerberos, "kerberos_service_ticket_operations");              //GUID = {0CCE9240-69AE-11D9-BED3-505054503030}
+	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_KerbCredentialValidation, "kerberos_authentication_service"); //GUID = {0CCE9242-69AE-11D9-BED3-505054503030}
+	InsertIntoGuidItemEntityNameMapping(Audit_Logon_NPS, "network_policy_server");                                       //GUID = {0CCE9243-69AE-11D9-BED3-505054503030}
+	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_DetailedFileShare, "detailed_file_share");                    //GUID = {0CCE9244-69AE-11D9-BED3-505054503030}
 }
 
 void AuditEventPolicySubcategoriesProbe::InsertIntoGuidItemEntityNameMapping(GUID guid, string itemEntityName) {
@@ -348,12 +359,13 @@ void AuditEventPolicySubcategoriesProbe::InsertIntoGuidItemEntityNameMapping(GUI
 }
 
 
-string AuditEventPolicySubcategoriesProbe::GetItemEntityNameFromGuid(GUID guid) {
+StringSet* AuditEventPolicySubcategoriesProbe::GetItemEntityNameFromGuid(GUID guid) {
+	StringSet* names = new StringSet();
 	for(vector<GuidString>::iterator it = _guidItemElementNameVector.begin(); it != _guidItemElementNameVector.end(); ++it) {
 		if(it->first == guid) {
-			return it->second;
+			names->insert(it->second);
 		}		
 	}
 
-	return "";
+	return names;
 }
