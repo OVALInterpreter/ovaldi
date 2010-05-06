@@ -37,7 +37,9 @@
 
 #include "Common.h"
 #include "OvalEnum.h"
-
+#include "AbsEntityValue.h"
+#include "StringEntityValue.h"
+#include "ItemFieldEntityValue.h"
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
@@ -49,7 +51,10 @@ public:
 
 	/** Create a complete ItemEntity object. */
 	ItemEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
-	
+
+	/** Create a complete ItemEntity object. */
+	ItemEntity(string name, ItemFieldEntityValueVector* fields, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
 
@@ -60,6 +65,12 @@ public:
 		Note: Status is not compared.
 	*/
 	bool Equals(ItemEntity* entity);
+
+	/** Return true if the specified entity value exists in the entity value vector.
+		@param entityValueVector the entity value vector for which you want to see if the specified entity value exists.
+		@param entityValue the entity value whose existence you would like to check in the specified entity value vector.
+	*/
+	bool ValueExistsInItemEntity(AbsEntityValueVector* entityValueVector, AbsEntityValue* entityValue);
 
 	/** Write this ItemEntity to the sc file.
 	    Inserts this ItemEntity as the last child of the specified
@@ -97,6 +108,12 @@ public:
 	/** Set the value field's value. */
 	void SetValue(string value);
 
+	/** Return the value field's value. */
+	AbsEntityValueVector GetValues();
+
+	/** Set the value field's value. */
+	void SetValues(AbsEntityValueVector values);
+
 	/** Get the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
 
@@ -112,7 +129,7 @@ public:
 private:
 	OvalEnum::SCStatus scStatus;
 	string name;
-	string value;
+	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
 };

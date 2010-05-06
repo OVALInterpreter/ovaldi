@@ -28,38 +28,40 @@
 //
 //****************************************************************************************//
 
-#ifndef OBJECTREADER_H
-#define OBJECTREADER_H
+#include "StringEntityValue.h"
 
-#include "Common.h"
-#include "DocumentManager.h"
-#include "Item.h"
-#include "VariableValue.h"
+//****************************************************************************************//
+//								StringEntityValue Class										  //	
+//****************************************************************************************//
 
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
+StringEntityValue::StringEntityValue(){
 
-/**
-	This class reads collected objects in a system characteristics files.
-	Two static methods are provided that will fetch the set of items for a collected
-	object or the set of variable values used when collecting an object in a oval
-	system characterisitcs file.
-*/
-class ObjectReader {
-public:
-	
-	/** Return the flag associated with the collected object. 
-		Locate teh collected object in the System characteristics document and
-		return the flag attribute's value.
-	*/
-	static OvalEnum::Flag GetCollectedObjectFlag(string objectId);
+}
 
-	/** Return the set of items for the specified id. */
-	static ItemVector* GetItemsForObject(string objectId);
+StringEntityValue::StringEntityValue(string value) : AbsEntityValue(value) {
 
-	/** Return the set of variable values used to collect the specified object. */
-	static VariableValueVector* GetVariableValuesForObject(string objectId);
-	static StringVector* GetMessagesForObject(string objectId);
-};
+}
 
-#endif
+StringEntityValue::~StringEntityValue(){
+
+}
+
+bool StringEntityValue::Equals(AbsEntityValue *entityValue){
+	StringEntityValue* stringEntityValue = (StringEntityValue*)entityValue;
+	bool isEqual = false;
+
+	if(this->GetValue().compare(stringEntityValue->GetValue()) == 0) {
+		isEqual = true;
+	}
+
+	return isEqual;
+}
+
+void StringEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm){
+	DOMText* newItemEntityElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
+	entityElm->appendChild(newItemEntityElemValue);
+}
+
+void StringEntityValue::Parse(DOMElement* stringEntityElm) {
+	this->SetValue(XmlCommon::GetDataNodeValue(stringEntityElm));
+}

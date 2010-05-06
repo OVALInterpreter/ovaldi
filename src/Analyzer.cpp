@@ -133,7 +133,7 @@ void Analyzer::Run() {
 			if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
 				DOMElement *definitionElm = (DOMElement*)tmpNode;
 				
-				// get the dedfinition id and check the cache
+				// get the definition id and check the cache
 				string definitionId = XmlCommon::GetAttributeByName(definitionElm, "id");
 				if(Definition::SearchCache(definitionId) == NULL) {
 

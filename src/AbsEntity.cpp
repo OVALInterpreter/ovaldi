@@ -45,6 +45,18 @@ AbsEntity::AbsEntity(string name, string value, OvalEnum::Datatype datatype, boo
 	this->SetNil(nil);
 }
 
+AbsEntity::AbsEntity(string name, AbsEntityValueVector values, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check varCheck, bool nil) {
+
+	this->SetName(name);
+	this->SetValues(values);
+	this->SetDatatype(datatype);
+	this->SetIsObjectEntity(isObjectEntity);
+	this->SetOperation(operation);
+	this->SetVarCheck(varCheck);
+	this->SetVarRef(NULL);
+	this->SetNil(nil);
+}
+
 AbsEntity::~AbsEntity() {
 
 }
@@ -64,13 +76,35 @@ void AbsEntity::SetName(string name) {
 }
 
 string AbsEntity::GetValue() {
-
-	return this->value;
+    switch ( this->value.size() ){
+        case 0:
+            return "";
+        case 1:
+			return this->value.front()->GetValue();
+        default:
+            break;
+    }
 }
 
 void AbsEntity::SetValue(string value) {
+    switch ( this->value.size() ){
+        case 0:
+			this->value.push_back(new StringEntityValue(value));
+			break;
+        case 1:
+			this->value.front()->SetValue(value);
+			break;
+        default:
+            break;
+    }
+}
 
+void AbsEntity::SetValues(AbsEntityValueVector value){
 	this->value = value;
+}
+
+AbsEntityValueVector AbsEntity::GetValues(){
+	return this->value;
 }
 
 OvalEnum::Datatype AbsEntity::GetDatatype() {
@@ -92,7 +126,6 @@ void AbsEntity::SetIsObjectEntity(bool isObjectEntity) {
 
 	this->isObjectEntity = isObjectEntity;
 }
-
 
 OvalEnum::Check AbsEntity::GetVarCheck() {
 
@@ -148,7 +181,7 @@ VariableValueVector* AbsEntity::GetVariableValues() {
 			varValues->push_back((*varValueIt));
 		}
 
-		// get any variable values that were used for determinihng the value of this variable
+		// get any variable values that were used for determining the value of this variable
 		values = varRef->GetVariableValues();
 		for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
 			varValues->push_back((*varValueIt));
@@ -196,6 +229,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 				result = EntityComparator::CompareString(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 				result = EntityComparator::CompareVersion(this->GetOperation(), this->GetValue(), scElement->GetValue());
+			} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
+				result = EntityComparator::CompareRecord(this->GetOperation(), &this->GetValues(), &scElement->GetValues());
 			}
 
 		} else {
@@ -223,6 +258,10 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 						tmp = EntityComparator::CompareString(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 						tmp = EntityComparator::CompareVersion(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+					} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
+						//result = EntityComparator::CompareRecord(this->GetOperation(), (*iterator)->GetValues(), scElement->GetValues());
+						Log::Message("Warning: For a state of type 'record' the var_ref attribute is ignored. Returning a result of not evaluated.");
+						tmp = OvalEnum::RESULT_NOT_EVALUATED;
 					}
 
 					results.push_back(tmp);

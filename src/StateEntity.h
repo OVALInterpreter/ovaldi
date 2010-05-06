@@ -33,6 +33,7 @@
 
 #include "AbsEntity.h" 
 #include "VariableFactory.h"
+#include "StateFieldEntityValue.h"
 
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
@@ -53,6 +54,8 @@ public:
 	~StateEntity();
 
 	bool Equals(AbsEntity* entity);
+
+	bool ValueExistsInStateEntity(AbsEntityValueVector* entityValueVector, AbsEntityValue* entityValue);
 
 	/** Parse the XML representation of a StateEntity. */
 	void Parse(DOMElement* entitiyElm);

@@ -29,6 +29,9 @@
 //****************************************************************************************//
 
 #include "EntityComparator.h"
+#include "StateFieldEntityValue.h"
+#include "ItemFieldEntityValue.h"
+
 //****************************************************************************************//
 //								EntityComparator Class									  //	
 //****************************************************************************************//
@@ -446,6 +449,38 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 		} 
 	}catch (string errorMessage){
 		cout << errorMessage;	
+	}
+
+	return result;
+}
+
+OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation op, AbsEntityValueVector* defValue, AbsEntityValueVector* scValue) {
+	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+	// Equals is the only operation allowed on a entity of type record.
+	if ( op == OvalEnum::OPERATION_EQUALS ){
+		IntVector recordResults;
+		IntVector fieldEntityResults;
+		for(AbsEntityValueVector::iterator defIt = defValue->begin(); defIt != defValue->end(); defIt++){
+			StateFieldEntityValue* sfev = (StateFieldEntityValue*)(*defIt);
+			IntVector fieldResults;
+			
+			for(AbsEntityValueVector::iterator scIt = scValue->begin(); scIt != scValue->end(); scIt++){
+				ItemFieldEntityValue* ifev = (ItemFieldEntityValue*)(*scIt);
+				if ( sfev->GetName().compare(ifev->GetName()) == 0 ){
+					fieldResults.push_back(sfev->Analyze(ifev));
+				}
+			}
+			// If a field in the StateEntity is not present in the ItemEntity report an error for the field
+			if ( fieldResults.size() == 0 ) {
+				fieldResults.push_back(OvalEnum::RESULT_ERROR);
+			}
+			OvalEnum::ResultEnumeration fieldFinalResult = OvalEnum::CombineResultsByCheck(&fieldResults, sfev->GetEntityCheck());
+			recordResults.push_back(fieldFinalResult);
+		}
+		// Results of a record is the result of ANDing all of the fields together
+		result = OvalEnum::CombineResultsByCheck(&recordResults,OvalEnum::CHECK_ALL);
+	}else{
+		throw Exception("Error: Invalid operation. Operation: "+OvalEnum::OperationToString(op)+". Only 'equals' is allowed for the 'record' datatype.");
 	}
 
 	return result;

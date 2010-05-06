@@ -28,38 +28,25 @@
 //
 //****************************************************************************************//
 
-#ifndef OBJECTREADER_H
-#define OBJECTREADER_H
+#include "AbsEntityValue.h"
 
-#include "Common.h"
-#include "DocumentManager.h"
-#include "Item.h"
-#include "VariableValue.h"
+//****************************************************************************************//
+//								AbsEntityValue Class										  //	
+//****************************************************************************************//
 
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
+AbsEntityValue::AbsEntityValue(){
+}
 
-/**
-	This class reads collected objects in a system characteristics files.
-	Two static methods are provided that will fetch the set of items for a collected
-	object or the set of variable values used when collecting an object in a oval
-	system characterisitcs file.
-*/
-class ObjectReader {
-public:
+AbsEntityValue::AbsEntityValue(string value){
 	
-	/** Return the flag associated with the collected object. 
-		Locate teh collected object in the System characteristics document and
-		return the flag attribute's value.
-	*/
-	static OvalEnum::Flag GetCollectedObjectFlag(string objectId);
+	this->value = value;
+}
 
-	/** Return the set of items for the specified id. */
-	static ItemVector* GetItemsForObject(string objectId);
+string AbsEntityValue::GetValue(){
+	return this->value;
+}
 
-	/** Return the set of variable values used to collect the specified object. */
-	static VariableValueVector* GetVariableValuesForObject(string objectId);
-	static StringVector* GetMessagesForObject(string objectId);
-};
+void AbsEntityValue::SetValue(string value){
+	this->value = value;
+}
 
-#endif

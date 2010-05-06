@@ -46,7 +46,9 @@ class ObjectComponent : public AbsComponent {
 public:
 
     /** Create a complete ObjectComponent object/ */
-	ObjectComponent(string objectId = "", string itemField = "");
+	ObjectComponent(string objectId = "", string itemField = "", string recordField = "");
+	
+	/** ObjectComponent destructor */
 	~ObjectComponent();
 
     /** Parse the ObjectComponent element and populate the current ObjectComponent. */
@@ -76,9 +78,16 @@ public:
     /** Set the itemField field's value. */
 	void SetItemField(string itemField);
 
+	/** Return the recordField field's value. */
+	string GetRecordField();
+
+    /** Set the recordField field's value. */
+	void SetRecordField(string recordField);
+
 private:
 	string objectId;
 	string itemField;
+	string recordField;
 };
 
 #endif

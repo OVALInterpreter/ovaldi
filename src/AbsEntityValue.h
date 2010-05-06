@@ -28,38 +28,40 @@
 //
 //****************************************************************************************//
 
-#ifndef OBJECTREADER_H
-#define OBJECTREADER_H
+#ifndef ABSENTITYVALUE_H
+#define ABSENTITYVALUE_H
 
-#include "Common.h"
-#include "DocumentManager.h"
-#include "Item.h"
-#include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include "OvalEnum.h"
 using namespace std;
-
+XERCES_CPP_NAMESPACE_USE
 /**
-	This class reads collected objects in a system characteristics files.
-	Two static methods are provided that will fetch the set of items for a collected
-	object or the set of variable values used when collecting an object in a oval
-	system characterisitcs file.
+	This class represents an entity value in an entity as defined in the oval system characteristics schema.
 */
-class ObjectReader {
+class AbsEntityValue{
 public:
-	
-	/** Return the flag associated with the collected object. 
-		Locate teh collected object in the System characteristics document and
-		return the flag attribute's value.
-	*/
-	static OvalEnum::Flag GetCollectedObjectFlag(string objectId);
+	/** AbsEntityValue constructor. */
+	AbsEntityValue();
 
-	/** Return the set of items for the specified id. */
-	static ItemVector* GetItemsForObject(string objectId);
+	/** AbsEntityValue constructor. */
+	AbsEntityValue(string value);
 
-	/** Return the set of variable values used to collect the specified object. */
-	static VariableValueVector* GetVariableValuesForObject(string objectId);
-	static StringVector* GetMessagesForObject(string objectId);
+	/** Get the value of the entity value. */
+	string GetValue();
+
+	/** Set the value of the entity value. */
+	void SetValue(string value);
+
+	/** Determine if this entity value is equal to the specified entity value. */
+	virtual bool Equals(AbsEntityValue *entityValue)=0;
+
+protected:
+	string value;
 };
+
+/**	
+	A vector for storing AbsEntityValue objects. 
+	Stores only pointers to the objects. 
+*/
+typedef vector < AbsEntityValue*, allocator<AbsEntityValue*> > AbsEntityValueVector;
 
 #endif

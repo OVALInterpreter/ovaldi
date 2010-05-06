@@ -39,8 +39,8 @@
 #include "OvalEnum.h"
 #include "VariableValue.h"
 #include "AbsVariable.h"
-#include "EntityComparator.h"
 #include "ItemEntity.h"
+#include "EntityComparator.h"
 
 
 XERCES_CPP_NAMESPACE_USE
@@ -65,6 +65,22 @@ public:
 	*/
 	AbsEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
 		AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
+
+	/**
+		This constructor has default values specified for all parameters. Default values are based on 
+		the default values found in the oval schemas or reasonable defaults for this application.
+		@param name a string representing the name of the entity.
+		@param value a string representing the value of the entity.
+		@param datatype an OvalEnum::Datatype representing the datatype attribute for the entity. 
+		@param isObjectEntity a bool used to indicate whether or not the entity is part of an object specifier.
+		@param operation an OvalEnum::Operation representing the operation attribute for the entity.
+		@param varRef an AbsVariable* that represents the var_ref attribute for the entity. 
+		@param varCheck an OvalEnum::Check that represents the var_check attribute for the entity.
+		@param nil a bool that represents the xsi:nil attribute for the entity.
+	*/
+	AbsEntity(string name, AbsEntityValueVector values, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
+		AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
+
 
 	/**
 		This destructor takes no special action. All dynamically allocated memory is freed by other classes.
@@ -120,10 +136,17 @@ public:
 	/** Set the name field's value. */
 	void SetName(string name);
 
-	/** Return the value field's value. */
+	/** Return the string that is the value of the entity. Use this when the entity is a string-based value. */
 	string GetValue();
-	/** Set the value field's value. */
+
+	/** Set the string value of the entity. Use this when the entity is string-based value. */
 	void SetValue(string value);
+
+	/** Return the values of the entity. Use this when the entity is not a string-based value. */
+	AbsEntityValueVector GetValues();
+
+	/** Set the values of the entity. Use this when the entity is not a string-based value. */
+	void SetValues(AbsEntityValueVector value);
 
 	/** Return the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
@@ -157,14 +180,13 @@ public:
 
 private:
 	string name;
-	string value;
+	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
 	OvalEnum::Check varCheck;
 	OvalEnum::Operation operation;
 	AbsVariable* varRef;
 	bool nil;
-
 };
 
 /**	
