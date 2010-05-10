@@ -48,13 +48,21 @@ public:
 	/** AbsEntityValue virtual destructor. */
 	virtual ~AbsEntityValue();
 
-	/** Get the value of the entity value. */
+	/** Return the value of the entity.
+	 *  @return A string representing the value of the entity.
+	 */
 	string GetValue();
 
-	/** Set the value of the entity value. */
+	/** Set the value of the entity.
+	 *  @param value A string representation of the value of the entity.
+	 *  @return Void.
+	 */
 	void SetValue(string value);
 
-	/** Determine if this entity value is equal to the specified entity value. */
+	/** Determine if this entity value is equal to the specified entity value. 
+	 *  @param entityValue The AbsEntityValue that you would like to compare to this entity value.
+	 *  @return A boolean value indicating whether or not the specified value is equal to this entity value.
+	 */
 	virtual bool Equals(AbsEntityValue *entityValue)=0;
 
 protected:

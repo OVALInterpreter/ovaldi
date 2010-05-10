@@ -58,16 +58,26 @@ public:
     /** ItemFieldEntityValue destructor. */
     ~ItemFieldEntityValue();
 
-	/** Return the name field's value. */
+	/** Return the name value of the field.
+	 *  @return A string representing the name value of the field.
+	 */
 	string GetName();
 
-	/** Set the name field's value. */
+	/** Set the name field's value.
+	 *  @param name A string value representing the field's name.
+	 *  @return Void.
+	 */
 	void SetName(string name);
 
-	/** Get the datatype field's value. */
+	/** Return the datatype of the field.
+ 	 *  @return A value from the OvalEnum::Datatype enumeration representing the datatype of the field.
+	 */
 	OvalEnum::Datatype GetDatatype();
 
-	/** Set the datatype field's value. */
+	/** Set the datatype of the field.
+	 *  @param datatype A OvalEnum::Datatype enumeration value representing the datatype of the field.
+	 *  @return Void.
+	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
 	/** Return the status of the ItemFieldEntityValue.
@@ -81,7 +91,7 @@ public:
 	 */
 	void SetStatus(OvalEnum::SCStatus status);
 	
-	/** Determine if the specified ItemFieldEntityValue is equal to this ItemFieldEntityValue.
+	/** Determine if the specified AbsEntityValue is equal to this ItemFieldEntityValue.
 		@param entityValue the AbsEntityValue that you would like to see if the current ItemFieldEntityValue is equal to.
 		@return a boolean value indicating whether or not the two ItemFieldEntityValues are equal.
 	*/

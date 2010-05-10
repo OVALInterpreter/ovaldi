@@ -50,12 +50,24 @@ public:
 		@param orig a ObjectEntity* to be copied
 	*/
 	ObjectEntity(ObjectEntity* orig);
+
+	/** Create a complete ObjectEntity object. */
 	ObjectEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
+	
+	/** ObjectEntity destructor. */
 	~ObjectEntity();
 
+	/**
+	 *  Return true if the specified entity is equal to the current entity. Otherwise return false.
+	 *	@param entity an AbsEntity* to compare against.
+	 *	@return The result of the comparison.
+	 */
 	bool Equals(AbsEntity* entity);
 
-	/** Parses the xml representation of a ObjectEntity. */
+	/** Parse the XML representation of a ObjectEntity.
+	 *	@param entitiyElm a DOMElement* that represents the xml version of an entity.
+	 *	@return Void.
+	 */
 	void Parse(DOMElement* entitiyElm);
 };
 

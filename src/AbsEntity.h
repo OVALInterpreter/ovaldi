@@ -67,22 +67,6 @@ public:
 		AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
 
 	/**
-		This constructor has default values specified for all parameters. Default values are based on 
-		the default values found in the oval schemas or reasonable defaults for this application.
-		@param name a string representing the name of the entity.
-		@param value a string representing the value of the entity.
-		@param datatype an OvalEnum::Datatype representing the datatype attribute for the entity. 
-		@param isObjectEntity a bool used to indicate whether or not the entity is part of an object specifier.
-		@param operation an OvalEnum::Operation representing the operation attribute for the entity.
-		@param varRef an AbsVariable* that represents the var_ref attribute for the entity. 
-		@param varCheck an OvalEnum::Check that represents the var_check attribute for the entity.
-		@param nil a bool that represents the xsi:nil attribute for the entity.
-	*/
-	AbsEntity(string name, AbsEntityValueVector values, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
-		AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
-
-
-	/**
 		This destructor takes no special action. All dynamically allocated memory is freed by other classes.
 	*/
 	virtual ~AbsEntity();
@@ -127,55 +111,108 @@ public:
     OvalEnum::Flag GetEntityValues(StringVector &values);
 
 	/** 
-		Return a vector of variable values that were used for this entity.
-	*/
+	 *	Return a vector of variable values that were used for this entity.
+	 *	@return A VariableValueVector* that represents the variable values specified by the entity.
+	 */
 	VariableValueVector* GetVariableValues(); 
 
-	/** Return the name field's value. */
+	/** Return the name field's value. 
+	 *  @return A string representing the name of the entity.
+	 */
 	string GetName();
-	/** Set the name field's value. */
+
+	/** Set the name field's value.
+	 *  @param name A string representing the name of the entity.
+	 *  @return Void.
+	 */
 	void SetName(string name);
 
-	/** Return the string that is the value of the entity. Use this when the entity is a string-based value. */
+	/** Return the string that is the value of the entity. Use this when the entity is a string-based value. 
+	 *  @return A string representing the value of the entity.
+	 */
 	string GetValue();
 
-	/** Set the string value of the entity. Use this when the entity is string-based value. */
+	/** Set the string value of the entity. Use this when the entity is string-based value.
+	 *  @param value A string representing the value of the entity.
+	 *  @return Void.
+	 */
 	void SetValue(string value);
 
-	/** Return the values of the entity. Use this when the entity is not a string-based value. */
+	/** Return the values of the entity. Use this when the entity is not a string-based value.
+	 *  @return A AbsEntityValueVector containing the values of the entity.
+	 */
 	AbsEntityValueVector GetValues();
 
-	/** Set the values of the entity. Use this when the entity is not a string-based value. */
+	/** Set the values of the entity. Use this when the entity is not a string-based value.
+	 *  @param value A AbsEntityValueVector representing the values of the entity.
+	 *  @return Void.
+	 */
 	void SetValues(AbsEntityValueVector value);
 
-	/** Return the datatype field's value. */
+	/** Return the datatype field's value.
+	 *  @return A OvalEnum::Datatype value representing the datatype of the entity.
+	 */
 	OvalEnum::Datatype GetDatatype();
-	/** Set the datatype field's value. */
+
+	/** Set the datatype field's value.
+	 *  @param datatype An OvalEnum::Datatype enumeration value representing the value of the entity.
+	 *  @return Void.
+	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
-	/** Get the isObjectEntity field's value. */
+	/** Get the isObjectEntity field's value.
+	 *  @return A boolean value indicating whether or not the entity is an ObjectEntity.	
+	 */
 	bool GetIsObjectEntity();
-	/** Set the isObjectEntity field's value. */
+
+	/** Set the isObjectEntity field's value.
+	 *  @param isObjectAbsEntity A boolean value indicating whether or not the entity is an ObjectEntity.
+	 *  @return Void.
+	 */
 	void SetIsObjectEntity(bool isObjectAbsEntity);
 
-	/** Return true if the xsi:nil is set to true. */
+	/** Return true if the xsi:nil is set to true.
+	 *  @return A boolean value indicating whether or not the entity has a nil value.
+	 */
 	bool GetNil();
-	/** Set the nil field's value. */
+
+	/** Set the nil field's value.
+	 *  @param nil The boolean value indicating whether or not the entity has a nil value.
+	 *  @return Void.
+	 */
 	void SetNil(bool nil);
 
-	/** Return the operation field's value. */
+	/** Return the operation field's value.
+	 *  @return A OvalEnum::Operation value representing the operation of the entity.
+	 */
 	OvalEnum::Operation GetOperation();
-	/** Set the operation field's value. */
+
+	/** Set the operation field's value.
+	 *  @param operation An OvalEnum::Operation enumeration value indicating the operation of the entity.
+	 *  @return Void.
+	 */
 	void SetOperation(OvalEnum::Operation operation);
 
-	/** Return the varCheck field's value */
+	/** Return the varCheck field's value.
+	 *  @return An OvalEnum::Check enumeration value representing the var check value of the entity.
+	 */
 	OvalEnum::Check GetVarCheck();
-	/** Set the varCheck field's value. */
+	
+	/** Set the var check value.
+	 *  @param check A OvalEnum::Check value representing the var check value of the entity.
+	 *  @return Void.
+	 */
 	void SetVarCheck(OvalEnum::Check check);
 
-	/** Return the varRef field's value */
+	/** Return the referenced variable.
+ 	 *  @return An AbsVariable* which is the variable referenced by the entity's var ref attribute.
+	 */
 	AbsVariable* GetVarRef();
-	/** Set the varRef field's value. */
+
+	/** Set the referenced variable of the entity.
+	 *  @param varRef A AbsVariable value representing the variable referenced by the entity's var ref attribute.
+	 *  @return Void.
+	 */
 	void SetVarRef(AbsVariable* varRef);
 
 private:

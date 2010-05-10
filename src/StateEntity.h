@@ -50,17 +50,42 @@ public:
 		@param orig a StateEntity* to be copied
 	*/
 	StateEntity(StateEntity* orig);
+	
+	/** Create a complete StateEntity object. */
 	StateEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check entityCheck = OvalEnum::CHECK_ALL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
+	
+	/** StateEntity destructor. */
 	~StateEntity();
 
+	/**
+	 *  Return true if the specified entity is equal to the current entity. Otherwise return false.
+ 	 *  @param entity an AbsEntity* to compare against.
+	 *  @return The result of the comparison.
+	 */
 	bool Equals(AbsEntity* entity);
 
+	/** Return true if the specified entity value exists in the entity value vector.
+	 *  @param entityValueVector the entity value vector for which you want to see if the specified entity value exists.
+	 *	@param entityValue the entity value whose existence you would like to check in the specified entity value vector.
+	 * 	@return A boolean value indicating whether or not the specified entity value exists in the specified entity values vector.
+	 */
 	bool ValueExistsInStateEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue);
 
-	/** Parse the XML representation of a StateEntity. */
+	/** Parse the XML representation of a StateEntity.
+	 *	@param entitiyElm a DOMElement* that represents the xml version of an entity.
+	 *	@return Void.
+	 */
 	void Parse(DOMElement* entitiyElm);
 
+	/** Return the entity check value.
+ 	 *  @return A value from the OvalEnum::Check enumeration representing the entity check value of the state entity.
+	 */
 	OvalEnum::Check GetEntityCheck();
+
+	/** Set the entity check value.
+	 *  @param check A OvalEnum::Check value representing the entity check value of the state entity.
+	 *  @return Void.
+	 */
 	void SetEntityCheck(OvalEnum::Check check);
 
 private:

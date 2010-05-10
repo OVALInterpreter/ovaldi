@@ -41,11 +41,9 @@ ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, b
 	this->scStatus = status;
 }
 
-ItemEntity::ItemEntity(string name, ItemFieldEntityValueVector* value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
+ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
 	this->name = name;
-	for(ItemFieldEntityValueVector::iterator it = value->begin();it != value->end(); it++){
-		this->value.push_back(*it);
-	}
+	this->value = value;
 	this->datatype = datatype;
 	this->isObjectEntity = isObjectEntity;
 	this->scStatus = status;
@@ -76,26 +74,19 @@ void ItemEntity::SetName(string name) {
 }
 
 string ItemEntity::GetValue() {
-    
-	switch ( this->value.size() ){
-        case 1:
-			return this->value.front()->GetValue();
-        default:
-			return "";
-    }
+	if ( this->value.empty() ){
+		return "";
+	}else{
+		return this->value.front()->GetValue();
+	}
 }
 
 void ItemEntity::SetValue(string value) {
-    switch ( this->value.size() ){
-        case 0:
-			this->value.push_back(new StringEntityValue(value));
-			break;
-        case 1:
-			this->value.front()->SetValue(value);
-			break;
-        default:
-            break;
-    }
+	if ( this->value.empty() ){
+		this->value.push_back(new StringEntityValue(value));
+	}else{
+		this->value.front()->SetValue(value);
+	}
 }
 
 void ItemEntity::SetValues(AbsEntityValueVector value){

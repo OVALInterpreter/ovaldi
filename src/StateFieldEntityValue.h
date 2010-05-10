@@ -52,16 +52,26 @@ public:
     /** StateFieldEntityValue destructor. */
     ~StateFieldEntityValue();
 
-	/** Return the name field's value. */
+	/** Return the name value of the field.
+	 *  @return A string representing the name value of the field.
+	 */
 	string GetName();
 
-	/** Set the name field's value. */
+	/** Set the name field's value.
+	 *  @param name A string value representing the field's name.
+	 *  @return Void.
+	 */
 	void SetName(string name);
 
-	/** Get the datatype field's value. */
+	/** Return the datatype of the field.
+ 	 *  @return A value from the OvalEnum::Datatype enumeration representing the datatype of the field.
+	 */
 	OvalEnum::Datatype GetDatatype();
 
-	/** Set the datatype field's value. */
+	/** Set the datatype of the field.
+	 *  @param datatype A OvalEnum::Datatype enumeration value representing the datatype of the field.
+	 *  @return Void.
+	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
 	/** Determine if the specified ItemFieldEntityValue is equal to this ItemFieldEntityValue.
@@ -70,34 +80,48 @@ public:
 	*/
 	virtual bool Equals(AbsEntityValue* entityValue);
 
-	/** Return the value of the operation attribute. */
+	/** Return the operation of the field.
+ 	 *  @return A value from the OvalEnum::Operation enumeration representing the operation of the field.
+	 */
 	OvalEnum::Operation GetOperation();
 
-	/** Set the value of the operation attribute. */
+	/** Set the operation of the field.
+	 *  @param operation A OvalEnum::Operation value representing the operation of the field.
+	 *  @return Void.
+	 */
 	void SetOperation(OvalEnum::Operation operation);
 
-	/** Return the status field's value. */
-	OvalEnum::SCStatus GetStatus();
-
-	/** Set the scStatus field's value. */
-	void SetStatus(OvalEnum::SCStatus status);
-
-	/** Return the varCheck field's value */
+	/** Return the entity check value.
+ 	 *  @return A value from the OvalEnum::Check enumeration representing the entity check value of the field.
+	 */
 	OvalEnum::Check GetEntityCheck();
 
-	/** Set the varCheck field's value. */
+	/** Set the entity check value of the field.
+	 *  @param check A OvalEnum::Check value representing the entity check value of the field.
+	 *  @return Void.
+	 */
 	void SetEntityCheck(OvalEnum::Check check);
 	
-	/** Return the varCheck field's value */
+	/** Return the var check value.
+ 	 *  @return A value from the OvalEnum::Check enumeration representing the var check value of the field.
+	 */
 	OvalEnum::Check GetVarCheck();
 
-	/** Set the varCheck field's value. */
+	/** Set the var check value of the field.
+	 *  @param check A OvalEnum::Check value representing the var check value of the field.
+	 *  @return Void.
+	 */
 	void SetVarCheck(OvalEnum::Check check);
 
-	/** Return the varRef field's value */
+	/** Return the referenced variable.
+ 	 *  @return An AbsVariable* which is the variable referenced by the field's var ref attribute.
+	 */
 	AbsVariable* GetVarRef();
 	
-	/** Set the varRef field's value. */
+	/** Set the referenced variable of the field.
+	 *  @param varRef A AbsVariable value representing the variable referenced by the field's var ref attribute.
+	 *  @return Void.
+	 */
 	void SetVarRef(AbsVariable* varRef);
 
 	/** Parse the specified entity to retrieve its field entity value.

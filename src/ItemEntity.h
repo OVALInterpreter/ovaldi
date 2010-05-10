@@ -53,7 +53,7 @@ public:
 	ItemEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(string name, ItemFieldEntityValueVector* fields, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+	ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
 
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
@@ -61,14 +61,16 @@ public:
     /** ItemEntity destructor. */
     ~ItemEntity();
 
-	/** Return true if this ItemEntity is equal to the provided ItemEntity
-		Note: Status is not compared.
+	/** Return true if this ItemEntity is equal to the provided ItemEntity. Note: Status is not compared.
+		@param entity An ItemEntity* that you would like to compare to this ItemEntity.
+		@return A boolean value indicating whether or not the two ItemEntities are equal.
 	*/
 	bool Equals(ItemEntity* entity);
 
 	/** Return true if the specified entity value exists in the entity value vector.
 		@param entityValueVector the entity value vector for which you want to see if the specified entity value exists.
 		@param entityValue the entity value whose existence you would like to check in the specified entity value vector.
+		@return A boolean value indicating whether or not the specified entity value exists in the specified entity values vector.
 	*/
 	bool ValueExistsInItemEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue);
 
@@ -93,37 +95,65 @@ public:
 	/** Return the status field's value. */
 	OvalEnum::SCStatus GetStatus();
 
-	/** Set the scStatus field's value. */
+	/** Set the status of the ItemEntity.
+	 *  @param status A string value representing the status of the ItemEntity.
+	 *  @return Void.
+	 */
 	void SetStatus(OvalEnum::SCStatus status);
 
-	/** Return the name field's value. */
+	/** Return the name value of the ItemEntity.
+	 *  @return A string representing the name value of the ItemEntity.
+	 */
 	string GetName();
 
-	/** Set the name field's value. */
+	/** Set the name of the ItemEntity.
+	 *  @param name A string value representing the name of the ItemEntity.
+	 *  @return Void.
+	 */
 	void SetName(string name);
 
-	/** Return the value field's value. */
+	/** Return the value of the ItemEntity.
+	 *  @return A string representing the value of the ItemEntity.
+	 */
 	string GetValue();
 
-	/** Set the value field's value. */
+	/** Set the value of the ItemEntity.
+	 *  @param value A string representation of the value of the ItemEntity.
+	 *  @return Void.
+	 */
 	void SetValue(string value);
 
-	/** Return the value field's value. */
+	/** Return the values of the ItemEntity.
+  	 *  @return A AbsEntityValueVector containing the values of the ItemEntity.
+	 */
 	AbsEntityValueVector GetValues();
 
-	/** Set the value field's value. */
+	/** Set the values of the ItemEntity.
+	 *  @param values A AbsEntityValueVector that contains the values for the ItemEntity.
+	 *  @return Void.
+	 */
 	void SetValues(AbsEntityValueVector values);
 
-	/** Get the datatype field's value. */
+	/** Return the datatype of the ItemEntity.
+ 	 *  @return A value from the OvalEnum::Datatype enumeration representing the datatype of the ItemEntity.
+	 */
 	OvalEnum::Datatype GetDatatype();
 
-	/** Set the datatype field's value. */
+	/** Set the datatype of the ItemEntity.
+	 *  @param datatype A value from the OvalEnum::Datatype enumeration representing the datatype of the ItemEntity.
+	 *  @return Void.
+	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
-	/** Get the isObjectEntity field's value. */
+	/** Return whether or not the ItemEntity is an object entity.
+	 *  @return A boolean value indicating whether or not the ItemEntity is an object entity.
+	 */
 	bool GetIsObjectEntity();
 
-	/** Set the isObjectEntity field's value. */
+	/** Set the boolean value indicating whether or not the ItemEntity is an object entity.
+	 *  @param isObjectEntity A boolean value indicating whether or not the ItemEntity is an object entity.
+	 *  @return Void.
+	 */
 	void SetIsObjectEntity(bool isObjectEntity);
 
 private:
