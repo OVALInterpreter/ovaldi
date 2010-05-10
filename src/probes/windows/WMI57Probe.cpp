@@ -245,7 +245,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendMessage(new OvalMessage("blahlbah"));
+	
 		// iterate through each instance returned and create a result entity for it.
 		do {
 			// We have finished looping through the enumeration.  If no results
@@ -281,18 +281,15 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					// Get the name of the property.  We need to parse the SELECT
 					// statment to determine the name.
 					StringVector* fieldNames = this->GetWqlFields(wmi_wql->GetValue(),WMI57Probe::SELECT);
-					
-
-					ItemFieldEntityValueVector* fieldEntityValues = new ItemFieldEntityValueVector();
+					AbsEntityValueVector fieldEntityValues;
 					
 					for(StringVector::iterator it = fieldNames->begin(); it != fieldNames->end(); it++){
 						// Once the name has been retrieved, use it to get the value
 						// associated with it.
 						string fieldName = *it;
-						// get the data associated with the name
-						//hres = pclsObj[0]->Get(bstr_t(fieldName.c_str()), 0, &vtProp, pvtType, 0);
 						hres = pclsObj[0]->Get(bstr_t(fieldName.c_str()), 0, &vtProp, 0, 0);
 						string errorMsg = "";
+
 						if(hres == WBEM_E_NOT_FOUND) {
 							errorMsg = "WBEM_E_NOT_FOUND for wql: " + wmi_wql->GetValue();
                         } else if(hres == WBEM_E_OUT_OF_MEMORY) {
@@ -316,16 +313,16 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									szChar[size] = NULL;
 									wcstombs(szChar, vtProp.bstrVal, size);
 									strFieldValue = szChar;
-									fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));                                 
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));                                 
 									delete szChar;
 								} else {
-									fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 								}
 
 							} else if ((V_VT(&vtProp) == VT_UINT)) {
 								int value = V_INT(&vtProp);
 								strFieldValue = Common::ToString(value);
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_BOOL)) {
 								bool value;								
 								if ( V_BOOL(&vtProp) == VARIANT_TRUE ){
@@ -334,7 +331,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									value = false;
 								}
 								strFieldValue = Common::ToString(value);
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_DATE)) {
 								errorMsg = "Unsupported datatype VT_DATE found.";
 							} else if ((V_VT(&vtProp) == VT_DECIMAL)) {
@@ -344,23 +341,23 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 							} else if ((V_VT(&vtProp) == VT_INT)) {
 								int value = V_INT(&vtProp);
 								strFieldValue = Common::ToString(value);                                  
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I1)) {
 								char value = V_I1(&vtProp);
 								strFieldValue += value;
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I2)) {
 								int value = V_I2(&vtProp);
 								strFieldValue = Common::ToString(value);
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I4)) {
 								long value = V_I4(&vtProp);
 								strFieldValue = Common::ToString(value);
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I8)) {
 								errorMsg = "Unsupported datatype VT_I8 found.";
 							} else if ((V_VT(&vtProp) == VT_NULL)) {
-								fieldEntityValues->push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else {
 								errorMsg = "Unsupported datatype found.";
 							}
@@ -438,7 +435,14 @@ StringVector* WMI57Probe::GetWqlFields(string wqlIn, WQLFieldType wqlFieldType) 
 				case WMI57Probe::SELECT:{
 					for(unsigned long i = 0; i < wqlAnalysis->m_uSelectListSize; i++){
 						for(unsigned long j = 0; j < wqlAnalysis->m_ppSelectList[i]->m_uNameListSize; j++){
-							fieldNames->push_back(WindowsCommon::UnicodeToAsciiString((wchar_t*)wqlAnalysis->m_ppSelectList[i]->m_ppszNameList[j]));
+							string field = WindowsCommon::UnicodeToAsciiString((wchar_t*)wqlAnalysis->m_ppSelectList[i]->m_ppszNameList[j]);
+							if ( field.compare("*") != 0 ){
+								fieldNames->push_back(field);
+							}else{
+								fieldNames->clear();
+								delete fieldNames;
+								throw ProbeException("Found a field name of '*'.  WQL queries that use '*' are not permitted as defined in the windows-definitions-schema.");
+							}
 						}
 					}
 					break;
