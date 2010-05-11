@@ -32,7 +32,6 @@
 
 #include "AbsProbe.h"
 #include "WindowsCommon.h"
-#include <TChar.h>
 
 using namespace std;
 
@@ -60,38 +59,23 @@ class VolumeProbe : public AbsProbe {
         /** Retrieve all of the Windows volumes on the local system.
          *  @return Void.
          */
-        void GetAllVolumes();
+        void GetAllVolumes(StringSet &volumes);
 
         /** Collect all of the information associated with a particular Windows volume and use it to populate a Item object.
-         *  @param rootPathStr A pointer to a TCHAR string that represents the rootpath of the Windows volume whose infomation you would like to enumerate.
+         *  @param rootPathStr A string that represents the rootpath of the Windows volume whose infomation you would like to enumerate.
          *  @return A Item object that contains all of the specified volume's associated information.
          */
-        Item* BuildVolumeObject ( LPTSTR rootPathStr );
-
-        /** Retrieve a particular Item from the instance of the ItemVector using the volume's rootpath as the key.
-         *  @param rootPathStr A string that contains the rootpath of a Windows volume.
-         *  @return The Item object whose roothpath matches the specified value.
-         */
-        Item* GetVolume ( string rootPathStr );
+        Item* BuildVolumeObject ( string rootPathStr );
 
         /** Retrieve the pathname of a particular volume using the specified volume name.
-         *  @param volumeNameStr Pointer to a TCHAR string that represents the name of the volume whose path you would like to enumerate.
+         *  @param volumeNameStr A string that represents the name of the volume whose path you would like to enumerate.
          *  @return A string representing the path name of the specified volume.
          */
-        string GetPathName ( LPTSTR volumeNameStr );
-
-        /** Delete all of the Items in the volumes ItemVector.
-         *  @return Void.
-         */
-        void DeleteVolumes();
+        string GetPathName ( string volumeNameStr );
 
         /** The static instance of the VolumeProbe.
         All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes. */
         static VolumeProbe *instance;
-
-        /** The ItemVector that holds the information about all of the Windows volumes on the local system. */
-        ItemVector* volumes;
-
 };
 
 #endif

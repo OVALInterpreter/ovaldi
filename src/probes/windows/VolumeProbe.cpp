@@ -36,12 +36,11 @@
 VolumeProbe *VolumeProbe::instance = NULL;
 
 VolumeProbe::VolumeProbe() {
-    volumes = NULL;
+
 }
 
 VolumeProbe::~VolumeProbe() {
     instance = NULL;
-    VolumeProbe::DeleteVolumes();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -60,81 +59,27 @@ AbsProbe* VolumeProbe::Instance() {
 ItemVector* VolumeProbe::CollectItems ( Object *object ) {
     // Get the rootpath from the provided object
     ObjectEntity* rootpath = object->GetElementByName ( "rootpath" );
-
-    // Check datatypes - only allow the string datatype
-    if ( rootpath->GetDatatype() != OvalEnum::DATATYPE_STRING ) {
-        throw ProbeException ( "Error: invalid data type specified on rootpath. Found: " + OvalEnum::DatatypeToString ( rootpath->GetDatatype() ) );
-    }
-
-    // Check operation - only allow equals, not equals, and pattern match
-    if ( rootpath->GetOperation() != OvalEnum::OPERATION_EQUALS && rootpath->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && rootpath->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
-        throw ProbeException ( "Error: invalid operation specified on rootpath. Found: " + OvalEnum::OperationToString ( rootpath->GetOperation() ) );
-    }
-
-    // Use lazy initialization to gather all the shared resources on the system
-    if ( volumes == NULL ) {
-        VolumeProbe::GetAllVolumes();
-    }
-
     ItemVector *collectedItems = new ItemVector();
 
-    if ( rootpath->GetVarRef() == NULL ) {
-        if ( rootpath->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
-            Item* aVolume = VolumeProbe::GetVolume ( rootpath->GetValue() );
-
-            if ( aVolume != NULL ) {
-                Item* temp = new Item ( *aVolume );
-                collectedItems->push_back ( temp );
-
-            } else {
-                aVolume = this->CreateItem();
-                aVolume->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                aVolume->AppendElement ( new ItemEntity ( "rootpath" , rootpath->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
-                collectedItems->push_back ( aVolume );
-            }
-
-        } else {
-            ItemVector::iterator iterator1;
-            ItemEntityVector::iterator iterator2;
-
-            // Loop through all volumes if they are a regex match on netname create item an return it
-            for ( iterator1 = VolumeProbe::volumes->begin() ; iterator1 != VolumeProbe::volumes->end() ; iterator1++ ) {
-                ItemEntityVector* ivec = ( *iterator1 )->GetElementsByName ( "rootpath" );
-
-                for ( iterator2 = ivec->begin() ; iterator2 != ivec->end() ; iterator2++ ) {
-                    if ( rootpath->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                        if ( rootpath->GetValue().compare ( ( *iterator2 )->GetValue() ) != 0 ) {
-                            Item* temp = new Item ( **iterator1 );
-                            collectedItems->push_back ( temp );
-                        }
-
-                    } else {
-                        if ( this->myMatcher->IsMatch ( rootpath->GetValue().c_str() , ( *iterator2 )->GetValue().c_str() ) ) {
-                            Item* temp = new Item ( **iterator1 );
-                            collectedItems->push_back ( temp );
-                        }
-                    }
-                }
-            }
-        }
-
-    } else {
-        // Loop through all of the volumes on the system
-        // Only keep the volumes that match operation, value, and var check
-        ItemVector::iterator it1;
-        ItemEntityVector::iterator it2;
-
-        for ( it1 = VolumeProbe::volumes->begin() ; it1 != VolumeProbe::volumes->end() ; it1++ ) {
-            ItemEntityVector* ivec = ( *it1 )->GetElementsByName ( "rootpath" );
-
-            for ( it2 = ivec->begin() ; it2 != ivec->end() ; it2++ ) {
-                if ( rootpath->Analyze ( *it2 ) == OvalEnum::RESULT_TRUE ) {
-                    Item* temp = new Item ( **it1 );
-                    collectedItems->push_back ( temp );
-                }
-            }
-        }
-    }
+	if ( rootpath->GetOperation() == OvalEnum::OPERATION_EQUALS ){
+		StringVector volumes;
+		//We are ignoring the flag for now
+		/*OvalEnum::Flag flag =*/ rootpath->GetEntityValues(volumes);
+		for(StringVector::iterator it = volumes.begin(); it != volumes.end(); it++){
+			collectedItems->push_back(this->BuildVolumeObject((*it).c_str()));
+		}
+	}else{
+		StringSet volumes;
+		this->GetAllVolumes(volumes);
+		ItemEntity* volumeItemEntity = new ItemEntity("rootpath","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		for(StringSet::iterator it = volumes.begin(); it != volumes.end(); it++){
+			volumeItemEntity->SetValue(*it);
+			if ( rootpath->Analyze(volumeItemEntity) == OvalEnum::RESULT_TRUE ){
+				collectedItems->push_back(this->BuildVolumeObject(*it));
+			}
+		}
+		delete volumeItemEntity;
+	}
 
     return collectedItems;
 }
@@ -153,33 +98,16 @@ Item* VolumeProbe::CreateItem() {
     return item;
 }
 
-Item* VolumeProbe::GetVolume ( string rootPathStr ) {
-    ItemVector::iterator iterator1;
-    ItemEntityVector::iterator iterator2;
-
-    for ( iterator1 = VolumeProbe::volumes->begin() ; iterator1 != VolumeProbe::volumes->end() ; iterator1++ ) {
-        ItemEntityVector* ivec = ( *iterator1 )->GetElementsByName ( "rootpath" );
-
-        for ( iterator2 = ivec->begin() ; iterator2 != ivec->end() ; iterator2++ ) {
-            if ( ( *iterator2 )->GetValue().compare ( rootPathStr ) == 0 ) {
-                return ( *iterator1 );
-            }
-        }
-    }
-
-    return NULL;
-}
-
-Item* VolumeProbe::BuildVolumeObject ( LPTSTR rootPathStr ) {
+Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
     DWORD volumeSerialNumber;
     DWORD maximumComponentLength;
     DWORD fileSystemFlags;
     DWORD bufferSize = MAX_PATH + 1;
-    LPTSTR volumeNameBuffer = ( LPTSTR ) malloc ( sizeof ( _TCHAR ) * ( bufferSize ) );
-    LPTSTR fileSystemNameBuffer = ( LPTSTR ) malloc ( sizeof ( _TCHAR ) * ( bufferSize ) );
+    char* volumeNameBuffer = ( char* ) malloc ( sizeof ( char* ) * ( bufferSize ) );
+    char* fileSystemNameBuffer = ( char* ) malloc ( sizeof ( char* ) * ( bufferSize ) );
 
     if ( volumeNameBuffer != NULL && fileSystemNameBuffer != NULL ) {
-        if ( ( GetVolumeInformation ( rootPathStr ,
+		if ( ( GetVolumeInformationA ( rootPathStr.c_str() ,
                                       volumeNameBuffer ,
                                       bufferSize ,
                                       &volumeSerialNumber ,
@@ -197,10 +125,21 @@ Item* VolumeProbe::BuildVolumeObject ( LPTSTR rootPathStr ) {
                 fileSystemNameBuffer = NULL;
             }
 
-            VolumeProbe::DeleteVolumes();
-            throw ProbeException ( "Error: GetVolumeInformation() was unable to retrieve all of the requested information about a particular volume. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+			DWORD error = GetLastError();
+			Item* item = this->CreateItem();
+			
+			if ( error == ERROR_PATH_NOT_FOUND ){
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST));				
+			}else{
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ));
+				item->AppendMessage(new OvalMessage("Error: GetVolumeInformation() was unable to retrieve all of the requested information regarding this volume. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) ));
+			}
+			
+			return item;
 
-        } else {
+		} else {
             Item* item = this->CreateItem();
             bool fileCaseSensistiveSearch = false;
             bool fileCasePreservedNames = false;
@@ -274,7 +213,7 @@ Item* VolumeProbe::BuildVolumeObject ( LPTSTR rootPathStr ) {
             }
 
             item->SetStatus ( OvalEnum::STATUS_EXISTS );
-            ( rootPathStr == NULL ) ? item->AppendElement ( new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "rootpath" , VolumeProbe::GetPathName ( rootPathStr ) , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS )  );
+			( rootPathStr.compare("") == 0 ) ? item->AppendElement ( new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "rootpath" , rootPathStr, OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS )  );
             ( fileSystemNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "file_system" , "" , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "file_system" , fileSystemNameBuffer , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS )  );
             ( volumeNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "name" , "" , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "name" , volumeNameBuffer , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS )  );
             item->AppendElement ( new ItemEntity ( "volume_max_component_length" , Common::ToString ( maximumComponentLength ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
@@ -322,13 +261,13 @@ Item* VolumeProbe::BuildVolumeObject ( LPTSTR rootPathStr ) {
     }
 }
 
-string VolumeProbe::GetPathName ( LPTSTR volumeNameStr ) {
+string VolumeProbe::GetPathName ( string volumeNameStr ) {
     DWORD  CharCount = MAX_PATH + 1;
-    LPTSTR path = ( LPTSTR ) malloc ( sizeof ( _TCHAR ) * ( CharCount ) );
+    char* path = ( char* ) malloc ( sizeof ( char* ) * ( CharCount ) );
     string pathStr = "";
 
     if ( path ) {
-        GetVolumePathNamesForVolumeName ( volumeNameStr , path , CharCount , &CharCount );
+		GetVolumePathNamesForVolumeNameA ( volumeNameStr.c_str() , path , CharCount , &CharCount );
 
         if (  GetLastError() == ERROR_INVALID_NAME ) {
             return pathStr;
@@ -346,37 +285,32 @@ string VolumeProbe::GetPathName ( LPTSTR volumeNameStr ) {
 }
 
 
-void VolumeProbe::GetAllVolumes() {
-    Item * aVolume;
+void VolumeProbe::GetAllVolumes(StringSet &volumes) {
     bool isTrue;
     HANDLE handle;
     DWORD length = MAX_PATH + 1;
-    LPTSTR volumeName = ( LPTSTR ) malloc ( sizeof ( _TCHAR ) * ( length ) );
+    char* volumeName = ( char* ) malloc ( sizeof ( char* ) * ( length ) );
 
     if ( volumeName != NULL ) {
-        if ( ( handle = FindFirstVolume ( volumeName , length ) ) == INVALID_HANDLE_VALUE ) {
+        if ( ( handle = FindFirstVolumeA ( volumeName , length ) ) == INVALID_HANDLE_VALUE ) {
             throw ProbeException ( "Error: There were no volumes found on the system while using FindFirstVolume(). Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
         }
 
-        VolumeProbe::volumes = new ItemVector();
-
-        if ( ( aVolume = VolumeProbe::BuildVolumeObject ( volumeName ) ) != NULL ) {
-            VolumeProbe::volumes->push_back ( aVolume );
-        }
-
+		volumes.insert(this->GetPathName(volumeName));
         isTrue = true;
 
         while ( isTrue ) {
-            if ( FindNextVolume ( handle , volumeName , length ) == 0 ) {
-                FindVolumeClose ( handle );
-
+            if ( FindNextVolumeA ( handle , volumeName , length ) == 0 ) {
                 if ( GetLastError() != ERROR_NO_MORE_FILES ) {
-                    VolumeProbe::DeleteVolumes();
-
-                    if ( volumeName != NULL ) {
+              
+	                if ( volumeName != NULL ) {
                         free ( volumeName );
                         volumeName = NULL;
                     }
+					
+					if ( FindVolumeClose ( handle ) == 0 ) {
+						throw ProbeException ( "Error: FindVolumeClose() was unable to close the search handle opened by FindFirstVolume(). Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+					}
 
                     throw ProbeException ( "Error: There was an error retrieving the next volume while using FindNextVolume(). Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 
@@ -385,9 +319,7 @@ void VolumeProbe::GetAllVolumes() {
                 }
 
             } else {
-                if ( ( aVolume = VolumeProbe::BuildVolumeObject ( volumeName ) ) != NULL ) {
-                    VolumeProbe::volumes->push_back ( aVolume );
-                }
+				volumes.insert(this->GetPathName(volumeName));
             }
         }
 
@@ -396,27 +328,8 @@ void VolumeProbe::GetAllVolumes() {
             volumeName = NULL;
         }
 
-        if ( FindVolumeClose ( handle ) == 0 ) {
-            VolumeProbe::DeleteVolumes();
-            throw ProbeException ( "Error: FindVolumeClose() was unable to close the search handle opened by FindFirstVolume(). Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
+		if ( FindVolumeClose ( handle ) == 0 ) {
+			throw ProbeException ( "Error: FindVolumeClose() was unable to close the search handle opened by FindFirstVolume(). Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		}
     }
-}
-
-void VolumeProbe::DeleteVolumes() {
-    if ( VolumeProbe::volumes != NULL ) {
-        ItemVector::iterator it;
-
-        for ( it = VolumeProbe::volumes->begin() ; it != VolumeProbe::volumes->end() ; it++ ) {
-            if ( ( *it ) != NULL ) {
-                delete ( *it );
-                ( *it ) = NULL;
-            }
-        }
-
-        delete VolumeProbe::volumes;
-        VolumeProbe::volumes = NULL;
-    }
-
-    return;
 }
