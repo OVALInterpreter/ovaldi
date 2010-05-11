@@ -123,20 +123,8 @@ install the supporting libraries.
 
           http://archive.apache.org/dist/xml/xerces-c/binaries/
 
-       Unzip the binaries and add the location of the xerces-c.dll onto your 
-       path environment variable.
-
-       Add the following directory to the include files search path:
-       
-          <installed path>\include
-
-       Add the following directory to the library files search path:
-
-          <installed path>\lib
-
-       In Visual C++ 7 the UI for setting up directories can be found by clicking the
-       "Tools" menu then selecting "Options..." next selecting the "Project" folder
-       and then choosing the "VC++ Directories" item. 
+       Please refer to 'build.xerces.xalan.win32.txt' for instructions on how to build the
+	   xerces-c library on Windows. 
 
   C. Xalan Library
       
@@ -146,20 +134,8 @@ install the supporting libraries.
 
           http://archive.apache.org/dist/xml/xalan-c/binaries/
 
-       Unzip the binaries and add the locations of the Xalan-C_1_10.dll and 
-       XalanMessages_1_10.dll to your path environment variable.
-
-       Add the following directory to the include files search path:
-       
-          <installed path>\include
-
-       Add the following directory to the library files search path:
-
-          <installed path>\lib
-
-       In Visual C++ 7 the UI for setting up directories can be found by clicking the
-       "Tools" menu then selecting "Options..." next selecting the "Project" folder
-       and then choosing the "VC++ Directories" item. 
+       Please refer to 'build.xerces.xalan.win32.txt' for instructions on how to build the
+	   xalan-c library on Windows.
 
   D. OpenSSL Library
 
