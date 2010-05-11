@@ -44,6 +44,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the TCPMUX and TCPMUXPLUS datatypes in the unix-def:xinetd_test.
 * Added support for the record type (n-tuples).
 * Added support for the wmi57_test.
+* Fixed the volume probe such that it properly handles errors encountered while collecting volumes.
 
 ---------------------------------------
 ---        Version 5.6 build 4      ---
