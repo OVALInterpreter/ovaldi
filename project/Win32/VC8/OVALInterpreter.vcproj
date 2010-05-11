@@ -231,6 +231,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\AbsEntityValue.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\AbsObject.cpp"
 				>
 			</File>
@@ -288,6 +292,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\ItemEntity.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\ItemFieldEntityValue.cpp"
 				>
 			</File>
 			<File
@@ -364,6 +372,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\StateFieldEntityValue.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\StringEntityValue.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\Test.cpp"
 				>
 			</File>
@@ -425,6 +441,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\DNSCacheProbe.cpp"
 					>
 				</File>
 				<File
@@ -569,6 +589,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\VolumeProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\WMI57Probe.cpp"
 					>
 				</File>
 				<File
@@ -904,6 +928,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\AbsEntityValue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\AbsObject.h"
 				>
 			</File>
@@ -964,6 +992,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\ItemFieldEntityValue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\Main.h"
 				>
 			</File>
@@ -1005,6 +1037,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\StateEntity.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\StateFieldEntityValue.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\StringEntityValue.h"
 				>
 			</File>
 			<File
@@ -1068,6 +1108,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\DNSCacheProbe.h"
 					>
 				</File>
 				<File
@@ -1212,6 +1256,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\VolumeProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\WMI57Probe.h"
 					>
 				</File>
 				<File
