@@ -77,7 +77,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib libeay32MTd.lib"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib libeay32MTd.lib Dnsapi.lib"
 				OutputFile="Debug/ovaldiD.exe"
 				Version="2.0"
 				LinkIncremental="2"
