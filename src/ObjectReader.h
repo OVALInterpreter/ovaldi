@@ -58,6 +58,7 @@ public:
 
 	/** Return the set of variable values used to collect the specified object. */
 	static VariableValueVector* GetVariableValuesForObject(std::string objectId);
+	static StringVector* GetMessagesForObject(std::string objectId);
 };
 
 #endif

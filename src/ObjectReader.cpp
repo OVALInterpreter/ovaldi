@@ -153,3 +153,41 @@ VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
 	return values;
 }
 
+StringVector* ObjectReader::GetMessagesForObject(string objectId){
+	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
+	
+	StringVector* messages = new StringVector();
+	if(collectedObjectsElm != NULL) {
+        DOMElement* objectElm = XmlCommon::FindElement(collectedObjectsElm, "object", "id", objectId);
+		if(objectElm != NULL) {
+
+			// loop through all references and get the corresponding messages
+			DOMNodeList *objectChildren = objectElm->getChildNodes();
+			unsigned int index = 0;
+			while(index < objectChildren->getLength()) {
+				DOMNode* tmpNode = objectChildren->item(index);
+
+				//	only concerned with ELEMENT_NODEs
+				if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+					DOMElement* objectChild = (DOMElement*)tmpNode;
+
+					//	get the name of the child
+					string childName = XmlCommon::GetElementName(objectChild);
+					if(childName.compare("message") == 0) {
+						messages->push_back(XmlCommon::GetDataNodeValue(objectChild));								
+					}
+				}
+				index ++;
+			}
+
+		} else {
+			delete messages;
+			throw Exception("Error: The specified object was not found in the provided System Characteristics file.");
+		}
+	} else {
+		delete messages;
+		throw Exception("Error: Unable to locate collected_object element in provided System Characteristics file.");
+	}
+	return messages;	
+
+}

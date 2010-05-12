@@ -72,7 +72,7 @@ private:
 
 	void InsertIntoGuidItemEntityNameMapping(GUID guid, string itemEntityName);
 
-	string GetItemEntityNameFromGuid(GUID guid);
+	StringSet* GetItemEntityNameFromGuid(GUID guid);
 };
 
 #endif

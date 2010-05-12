@@ -361,8 +361,12 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 				throw ProbeException(errorMessage);
 			}
 			
-			//	Set owner 
-			owner->SetValue(aname);
+			//	Set owner (use domain\username format)
+			string ownerStr;
+			ownerStr.append(dname);
+			ownerStr.append("\\");
+			ownerStr.append(aname);
+			owner->SetValue(ownerStr);
 			owner->SetStatus(OvalEnum::STATUS_EXISTS);
 			free(aname);
 			free(dname);
@@ -420,9 +424,9 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		FILETIME writeTime;
 
 		BOOL timeRes = GetFileTime(	hFile,
-									&creationTime,
-									&lastAccessTime,
-									&writeTime);
+									&creationTime,   //c_time
+									&lastAccessTime, //a_time
+									&writeTime);     //m_time
 
 		if(!timeRes) {
 
@@ -433,17 +437,17 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
 
 		} else {
-
+			
 			//////////////////////////////////////////////////////
 			/////////////////////  Accessed  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(aTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Created  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(cTime);
 
 			//////////////////////////////////////////////////////

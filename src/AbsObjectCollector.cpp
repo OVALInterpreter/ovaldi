@@ -130,24 +130,23 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 // ***************************************************************************************	//
 //								Private members												//
 // ***************************************************************************************	//
-ItemVector* AbsObjectCollector::ApplyFilters(ItemVector* items, AbsStateVector* filters) {
+ItemVector* AbsObjectCollector::ApplyFilters(ItemVector* items, FilterVector* filters) {
 
 	ItemVector* tmpItems = new ItemVector();
 	this->CopyItems(tmpItems, items);
 
 	// loop through all filters
-	AbsStateVector::iterator filterIterator;
+	FilterVector::iterator filterIterator;
 	for(filterIterator = filters->begin(); filterIterator != filters->end(); filterIterator++) {
-		Filter* filter = (Filter*)(*filterIterator);
+		Filter* filter = *filterIterator;
 		ItemVector* results = new ItemVector();
 
-		// Now loop through all the Items. Add Matching Items to result Vector
+		// Now loop through all the Items and see if they pass the filter.
 		ItemVector::iterator itemIterator;
 		for(itemIterator = tmpItems->begin(); itemIterator != tmpItems->end(); itemIterator++) {
 			Item* item = (*itemIterator);
-			if(!filter->Analyze(item)) {
+			if (filter->DoFilter(item))
 				results->push_back(item);
-			}
 		}
 		// reset the tmpItems vector
 		delete tmpItems;

@@ -334,7 +334,10 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 		XmlCommon::AddSchemaLocation(DocumentManager::GetSystemCharacterisitcsDocument(), this->GetSchemaLocation());
 
 		// Create a new item element	
-		DOMElement *newItemElem = scFile->createElement(XMLString::transcode(this->GetName().c_str()));
+		XMLCh* name = XMLString::transcode(this->GetName().c_str());
+		DOMElement *newItemElem = scFile->createElement(name);
+		//Free memory allocated by XMLString::transcode(char*)
+		XMLString::release(&name);
 		itemsElm->appendChild(newItemElem);
 
 		// Add the attributes
@@ -350,11 +353,23 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 		// Add any messges
 		if(this->GetMessages()->size() > 0) {
 			string msgStr = "";
-			OvalMessageVector::iterator messageIterator;
+            OvalMessageVector::iterator messageIterator;
+			for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
+				OvalMessage* message = (*messageIterator);
+                msgStr.append(message->GetValue());
+                if((messageIterator+1) != this->GetMessages()->end())
+                    msgStr.append(" - ");
+			}
+
+            // TODO - clean this up and allow many messages on an item.
+            OvalMessage message(msgStr, this->GetMessages()->at(0)->GetLevel());
+			message.Write(scFile, newItemElem, "oval-sc");
+
+			/*OvalMessageVector::iterator messageIterator;
 			for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
 				OvalMessage* message = (*messageIterator);
 				message->Write(scFile, newItemElem, "oval-sc");
-			}
+			}*/
 		}
 
 		// Call the write method for each element

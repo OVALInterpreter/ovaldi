@@ -39,10 +39,10 @@ using namespace std;
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
-#define VERSION "5.6"
-#define BUILD 4
+#define VERSION "5.7"
+#define BUILD 1
 
-#define SCHEMA_VERSION "5.6"
+#define SCHEMA_VERSION "5.7"
 
 string Version::GetMinumumCompatibleVersion() {
 

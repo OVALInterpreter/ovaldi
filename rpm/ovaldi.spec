@@ -1,5 +1,5 @@
 %define name	ovaldi
-%define version	5.6.4
+%define version	5.7.1
 %define release	1
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
@@ -73,16 +73,8 @@ make
 /bin/cp xml/oval-definitions-schematron.xsl $RPM_BUILD_ROOT/usr/share/ovaldi
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
-if grep "release 3" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL3/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL3/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL3/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-elif grep "release 4" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL4/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL4/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL4/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-elif grep "release 5" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+if grep "release 5" /etc/redhat-release &> /dev/null ; then
+  /bin/cp project/linux/EL5/libxerces-c.so.28.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
   /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
   /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
 else
@@ -105,8 +97,8 @@ fi
 %preun libs
 if [ $1 = 0 ]; then
     #// Do stuff specific to uninstalls
-    if [ -e %{_libdir}/ovaldi/libxerces-c.so.27 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.27
+    if [ -e %{_libdir}/ovaldi/libxerces-c.so.28 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.28
     fi
     if [ -e %{_libdir}/ovaldi/libxerces-c.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxerces-c.so
@@ -154,11 +146,15 @@ fi
 /usr/share/ovaldi/*.xsd
 
 %files libs
-%{_libdir}/ovaldi/libxerces-c.so.27.0
+%{_libdir}/ovaldi/libxerces-c.so.28.0
 %{_libdir}/ovaldi/libxalan-c.so.110.0
 %{_libdir}/ovaldi/libxalanMsg.so.110.0
 
 %changelog
+
+* Wed May 12 2010 Bryan Worrell <bworrell@mitre.org> 5.5.4-1.0
+* Updated for libxerces-c.so.28 
+
 * Fri Oct 10 2008 Bryan Worrell <bworrell@mitre.org> 5.5.4-1.0
 * Updated spec file as per instructions from Steve 'Ashcrow' Milner <me@stevemilner.org>
 

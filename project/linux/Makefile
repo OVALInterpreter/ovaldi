@@ -83,6 +83,7 @@ OBJS = \
 	AbsCriteria.obj \
 	AbsDataCollector.obj \
 	AbsEntity.obj \
+	AbsEntityValue.obj \
 	AbsFunctionComponent.obj \
 	AbsObject.obj \
 	AbsObjectCollector.obj \
@@ -112,10 +113,10 @@ OBJS = \
 	ExternalVariable.obj \
 	FileFinder.obj \
 	Filter.obj \
-	FilterEntity.obj \
 	InterfaceProbe.obj \
 	Item.obj \
 	ItemEntity.obj \
+	ItemFieldEntityValue.obj \
 	LiteralComponent.obj \
 	LocalVariable.obj \
 	Log.obj \
@@ -136,6 +137,8 @@ OBJS = \
 	SplitFunction.obj \
 	State.obj \
 	StateEntity.obj \
+	StateFieldEntityValue.obj \
+	StringEntityValue.obj \
 	SubstringFunction.obj \
 	Test.obj \
 	TestedItem.obj \
@@ -184,6 +187,7 @@ REL_OBJS = \
 	$(BUILDDIR)/AbsCriteria.obj \
 	$(BUILDDIR)/AbsDataCollector.obj \
 	$(BUILDDIR)/AbsEntity.obj \
+	$(BUILDDIR)/AbsEntityValue.obj \
 	$(BUILDDIR)/AbsFileFinder.obj \
 	$(BUILDDIR)/AbsFunctionComponent.obj \
 	$(BUILDDIR)/AbsObject.obj \
@@ -214,10 +218,10 @@ REL_OBJS = \
 	$(BUILDDIR)/ExternalVariable.obj \
 	$(BUILDDIR)/FileFinder.obj \
 	$(BUILDDIR)/Filter.obj \
-	$(BUILDDIR)/FilterEntity.obj \
 	$(BUILDDIR)/InterfaceProbe.obj \
 	$(BUILDDIR)/Item.obj \
 	$(BUILDDIR)/ItemEntity.obj \
+	$(BUILDDIR)/ItemFieldEntityValue.obj \
 	$(BUILDDIR)/LiteralComponent.obj \
 	$(BUILDDIR)/LocalVariable.obj \
 	$(BUILDDIR)/Log.obj \
@@ -237,6 +241,8 @@ REL_OBJS = \
 	$(BUILDDIR)/SetObject.obj \
 	$(BUILDDIR)/State.obj \
 	$(BUILDDIR)/StateEntity.obj \
+	$(BUILDDIR)/StateFieldEntityValue.obj \
+	$(BUILDDIR)/StringEntityValue.obj \
 	$(BUILDDIR)/SubstringFunction.obj \
 	$(BUILDDIR)/Test.obj \
 	$(BUILDDIR)/TestedItem.obj \

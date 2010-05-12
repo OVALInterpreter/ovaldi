@@ -76,8 +76,8 @@ XinetdProbe::XinetdProbe() {
 	allowedTypes.insert("RPC");
 	allowedTypes.insert("INTERNAL");
 	allowedTypes.insert("UNLISTED");
-	//	allowedTypes.insert("TCPMUX");
-	//	allowedTypes.insert("TCPMUXPLUS");
+	allowedTypes.insert("TCPMUX");
+	allowedTypes.insert("TCPMUXPLUS");
 
 	allowedSocketTypes.insert("stream");
 	allowedSocketTypes.insert("dgram");

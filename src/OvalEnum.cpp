@@ -251,6 +251,9 @@ string OvalEnum::DatatypeToString(OvalEnum::Datatype datatype){
 		case (DATATYPE_VERSION):
 			datatypeStr = "version";
 			break;
+		case (DATATYPE_RECORD):
+			datatypeStr = "record";
+			break;
 		default:	
 			throw Exception("OvalEnum::DatatypeToString - Error unsupported datatype.");
 			break;
@@ -285,6 +288,8 @@ OvalEnum::Datatype OvalEnum::ToDatatype(string datatypeStr){
 		datatype = DATATYPE_FLOAT;
 	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_VERSION)) == 0) {
 		datatype = DATATYPE_VERSION;
+	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_RECORD)) == 0) {
+		datatype = DATATYPE_RECORD;
 	} else {
 		throw Exception("OvalEnum::ToDatatype - Error unsupported datatype value: " + datatypeStr);
 	}

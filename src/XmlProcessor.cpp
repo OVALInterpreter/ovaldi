@@ -58,8 +58,11 @@ DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const publicId, con
 	string systemIDFilename = XmlCommon::ToString(systemId);
 	last = systemIDFilename.find_last_of("/\\");
 	path = schemapath + systemIDFilename.substr(last+1);
-
-	return new Wrapper4InputSource (new LocalFileInputSource (XMLString::transcode (path.c_str())));	
+	XMLCh* pathValue = XMLString::transcode(path.c_str());
+	LocalFileInputSource* lfis = new LocalFileInputSource(pathValue);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&pathValue);
+	return new Wrapper4InputSource (lfis);	
 }
 
 //****************************************************************************************//
@@ -181,22 +184,27 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string fileP
 
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocument(string root) {
 
-	const XMLCh *xmlRoot = XMLString::transcode(root.c_str());
-
-	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(XMLString::transcode ("Core"));
+	XMLCh *xmlRoot = XMLString::transcode(root.c_str());
+	XMLCh* core = XMLString::transcode ("Core");
+	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(core);
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc = impl->createDocument(0, xmlRoot, 0);
-
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&xmlRoot);
+	XMLString::release(&core);
 	return(doc);
 }
 
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocumentNS(string namespaceURI, string qualifiedName) {
 
-	const XMLCh *uri = XMLString::transcode(namespaceURI.c_str());
-	const XMLCh *name = XMLString::transcode(qualifiedName.c_str());
-
-	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(XMLString::transcode ("Core"));
+	XMLCh *uri = XMLString::transcode(namespaceURI.c_str());
+	XMLCh *name = XMLString::transcode(qualifiedName.c_str());
+	XMLCh *core = XMLString::transcode ("Core");
+	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(core);
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc = impl->createDocument(uri, name, NULL);
-
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&uri);
+	XMLString::release(&name);
+	XMLString::release(&core);
 	return(doc);
 }
 

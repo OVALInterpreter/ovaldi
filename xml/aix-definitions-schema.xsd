@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:aix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" elementFormDefault="qualified" version="5.6">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:aix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix" elementFormDefault="qualified" version="5.7">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the AIX specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>AIX Definition</schema>
-                  <version>5.6</version>
-                  <date>9/9/2009 9:44:30 AM</date>
-                  <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.7</version>
+                  <date>5/3/2010 8:41:08 PM</date>
+                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="aix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -21,12 +21,12 @@
             <xsd:annotation>
                   <xsd:documentation>The intirm fix test is used to check information associated with different interim or emergency fixes installed on the system. The information being tested is based off the emgr -l -u VUID command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an interim_fix_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="interimfixtst">
+                        <sch:pattern id="aix-def_interimfixtst">
                               <sch:rule context="aix-def:interim_fix_test/aix-def:object">
-                                    <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:interim_fix_object/@id"><sch:value-of select="../@id"/> - the object child element of a <sch:name path=".."/> must reference a interim_fix_object</sch:assert>
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/aix-def:interim_fix_object/@id"><sch:value-of select="../@id"/> - the object child element of a <sch:name path=".."/> must reference a interim_fix_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="aix-def:interim_fix_test/aix-def:state">
-                                    <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:interim_fix_state/@id"><sch:value-of select="../@id"/> - the state child element of a <sch:name path=".."/> must reference a interim_fix_state</sch:assert>
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/aix-def:interim_fix_state/@id"><sch:value-of select="../@id"/> - the state child element of a <sch:name path=".."/> must reference a interim_fix_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -44,8 +44,8 @@
       </xsd:element>
       <xsd:element name="interim_fix_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The interim_fix_object element is used by a intirm fix test to define the specific fix to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An interim fix object consists of a single vuid entity that identifies the fix to be used.</xsd:documentation>
+                  <xsd:documentation>The interim_fix_object element is used by a interim_fix_test to define the specific fix to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An interim_fix_object consists of a single vuid entity that identifies the fix to be used.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -58,7 +58,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>Virtually Unique ID. A combination of time and cpuid, this ID can be used to differentiate fixes that are otherwise identical.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="interimfixobjvuid">
+                                                                  <sch:pattern id="aix-def_interimfixobjvuid">
                                                                         <sch:rule context="aix-def:interim_fix_object/aix-def:vuid">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -85,7 +85,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Virtually Unique ID. A combination of time and cpuid, this ID can be used to differentiate fixes that are otherwise identical.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="interimfixstevuid">
+                                                      <sch:pattern id="aix-def_interimfixstevuid">
                                                             <sch:rule context="aix-def:interim_fix_state/aix-def:vuid">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -97,7 +97,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Each efix that is installed on a given system has a unique efix label.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="interimfixstelabel">
+                                                      <sch:pattern id="aix-def_interimfixstelabel">
                                                             <sch:rule context="aix-def:interim_fix_state/aix-def:label">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -109,7 +109,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Describes the efix package.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="interimfixsteabstract">
+                                                      <sch:pattern id="aix-def_interimfixsteabstract">
                                                             <sch:rule context="aix-def:interim_fix_state/aix-def:abstract">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -121,7 +121,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The the emergency fix state.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="interimfixstestate">
+                                                      <sch:pattern id="aix-def_interimfixstestate">
                                                             <sch:rule context="aix-def:interim_fix_state/aix-def:state">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -139,14 +139,14 @@
       <!-- =============================================================================== -->
       <xsd:element name="fileset_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The fileset test is used to check information associated with different filesets installed on the system. The information used by this test is modeled after the /usr/bin/lslpp -l command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The fileset_test is used to check information associated with different filesets installed on the system. The information used by this test is modeled after the /usr/bin/lslpp -l command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                 <xsd:appinfo>
-                    <sch:pattern id="filesettst">
+                    <sch:pattern id="aix-def_filesettst">
                         <sch:rule context="aix-def:fileset_test/aix-def:object">
-                            <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:fileset_object/@id"><sch:value-of select="../@id"/> - the object child element of a fileset_test must reference a fileset_object</sch:assert>
+                            <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/aix-def:fileset_object/@id"><sch:value-of select="../@id"/> - the object child element of a fileset_test must reference a fileset_object</sch:assert>
                         </sch:rule>
                         <sch:rule context="aix-def:fileset_test/aix-def:state">
-                            <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:fileset_state/@id"><sch:value-of select="../@id"/> - the state child element of a fileset_test must reference a fileset_state</sch:assert>
+                            <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/aix-def:fileset_state/@id"><sch:value-of select="../@id"/> - the state child element of a fileset_test must reference a fileset_state</sch:assert>
                         </sch:rule>
                     </sch:pattern>
                 </xsd:appinfo>
@@ -164,8 +164,8 @@
       </xsd:element>
       <xsd:element name="fileset_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The fileset_object element is used by a fileset test to define the fileset to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>A fileset object consists of a single flstinst entity that identifies the fileset to be used.</xsd:documentation>
+                  <xsd:documentation>The fileset_object element is used by a fileset_test to define the fileset to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>A fileset_object consists of a single flstinst entity that identifies the fileset to be used.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -178,7 +178,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>The flstinst entity represents the fileset name we want to check. For example, if we want to check the status of the fileset 'bos.rte', we can use fileset test and the flstinst entity will be 'bos.rte' or 'bot.*' or etc.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="filesetobjflstinst">
+                                                                  <sch:pattern id="aix-def_filesetobjflstinst">
                                                                         <sch:rule context="aix-def:fileset_object/aix-def:flstinst">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the flstinst entity of a fileset_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -205,7 +205,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Represents the name of a fileset.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="filesetsteflstinst">
+                                                      <sch:pattern id="aix-def_filesetsteflstinst">
                                                             <sch:rule context="aix-def:fileset_state/aix-def:flstinst">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the flstinst entity of a fileset_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -217,7 +217,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Maintenance level (also known as version in Solaris or Linux) of a fileset. For example, "5.3.0.10" is the level for 'bos.txt.tfs' fileset in one AIX machine.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="filesetstelevel">
+                                                      <sch:pattern id="aix-def_filesetstelevel">
                                                             <sch:rule context="aix-def:fileset_state/aix-def:level">
                                                                   <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the level entity of a fileset_state should be 'version'</sch:assert>
                                                             </sch:rule>
@@ -229,7 +229,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>This gives the state of a fileset. The state can be 'APPLIED', 'APPLYING','BROKEN', 'COMMITTED', 'EFIX LOCKED', 'OBSOLETE', 'COMMITTING','REJECTING'. See the manpage of the 'lslpp' command more information.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="filesetstestate">
+                                                      <sch:pattern id="aix-def_filesetstestate">
                                                             <sch:rule context="aix-def:fileset_state/aix-def:state">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the state entity of a fileset_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -241,7 +241,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Short description of a fileset.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="filesetstedescription">
+                                                      <sch:pattern id="aix-def_filesetstedescription">
                                                             <sch:rule context="aix-def:fileset_state/aix-def:description">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the description entity of a fileset_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -261,12 +261,12 @@
             <xsd:annotation>
                   <xsd:documentation>The fix test is used to check information associated with different fixes installed on the system. The information being tested is based off the /usr/sbin/instfix -iavk command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an fix_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                 <xsd:appinfo>
-                    <sch:pattern id="fixtst">
+                    <sch:pattern id="aix-def_fixtst">
                         <sch:rule context="aix-def:fix_test/aix-def:object">
-                            <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:fix_object/@id"><sch:value-of select="../@id"/> - the object child element of a fix_test must reference a fix_object</sch:assert>
+                            <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/aix-def:fix_object/@id"><sch:value-of select="../@id"/> - the object child element of a fix_test must reference a fix_object</sch:assert>
                         </sch:rule>
                         <sch:rule context="aix-def:fix_test/aix-def:state">
-                            <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:fix_state/@id"><sch:value-of select="../@id"/> - the state child element of a fix_test must reference a fix_state</sch:assert>
+                            <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/aix-def:fix_state/@id"><sch:value-of select="../@id"/> - the state child element of a fix_test must reference a fix_state</sch:assert>
                         </sch:rule>
                     </sch:pattern>
                 </xsd:appinfo>
@@ -298,7 +298,7 @@
                                                       <xsd:annotation>
                                                             <xsd:documentation>APAR is the short for 'Authorized Program Analysis Report'. APAR identifies and describes a software product defect. An APAR number can obtain a PTF (Program Temporary Fix) for the defect, if a PTF is available. An example of an apar_number is 'IY78751', it includes two alphabetic characters and a 5-digit integer.</xsd:documentation>
                                                             <xsd:appinfo>
-                                                                  <sch:pattern id="fixobjapar_number">
+                                                                  <sch:pattern id="aix-def_fixobjapar_number">
                                                                         <sch:rule context="aix-def:fix_object/aix-def:apar_number">
                                                                               <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the apar_number entity of a fix_object should be 'string'</sch:assert>
                                                                         </sch:rule>
@@ -325,7 +325,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>APAR is the short for 'Authorized Program Analysis Report'. APAR identifies and describes a software product defect. An APAR number can obtain a PTF (Program Temporary Fix) for the defect, if a PTF is available. An example of an apar_number is 'IY78751', it includes two alphabetic characters and a 5-digit integer.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="fixsteapar_number">
+                                                      <sch:pattern id="aix-def_fixsteapar_number">
                                                             <sch:rule context="aix-def:fix_state/aix-def:apar_number">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the apar_number entity of a fix_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -337,7 +337,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The abstract of an APAR. For instance, 'LL syas rXct are available even when not susea' is the abstract of APAR 'IY78751'.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="fixsteabstract">
+                                                      <sch:pattern id="aix-def_fixsteabstract">
                                                             <sch:rule context="aix-def:fix_state/aix-def:abstract">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the abstract entity of a fix_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -349,7 +349,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The symptom text related to an APAR. For example, the symptom text for 'IY75211' is 'Daylight savings change for year 2007 and beyond'.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="fixstesymptom">
+                                                      <sch:pattern id="aix-def_fixstesymptom">
                                                             <sch:rule context="aix-def:fix_state/aix-def:symptom">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the symptom entity of a fix_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -361,7 +361,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The installation status of files associated with the APAR. This cannot be got from the output of the instfix command directly. The last line of the output is 'All filesets for XXXXXXX were found', or 'Not all filesets for XXXXXXX were found' or 'No filesets which have fixes for XXXXXXX are currently installed.'. These can be translated to the correct value as defined by the EntityStateFixInstallationStatusType.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="fixsteinstallation_status">
+                                                      <sch:pattern id="aix-def_fixsteinstallation_status">
                                                             <sch:rule context="aix-def:fix_state/aix-def:installation_status">
                                                                   <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the installation_status entity of a fix_state should be 'string'</sch:assert>
                                                             </sch:rule>
@@ -381,12 +381,12 @@
             <xsd:annotation>
                   <xsd:documentation>The oslevel test reveals information about the release and maintenance level of AIX operating system. This information can be retrieved by the /usr/bin/oslevel -r command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an oslevel_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                 <xsd:appinfo>
-                    <sch:pattern id="osleveltst">
+                    <sch:pattern id="aix-def_osleveltst">
                         <sch:rule context="aix-def:oslevel_test/aix-def:object">
-                            <sch:assert test="@object_ref=/oval-def:oval_definitions/oval-def:objects/aix-def:oslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of a oslevel_test must reference a oslevel_object</sch:assert>
+                            <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/aix-def:oslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of a oslevel_test must reference a oslevel_object</sch:assert>
                         </sch:rule>
                         <sch:rule context="aix-def:oslevel_test/aix-def:state">
-                            <sch:assert test="@state_ref=/oval-def:oval_definitions/oval-def:states/aix-def:oslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of a oslevel_test must reference a oslevel_state</sch:assert>
+                            <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/aix-def:oslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of a oslevel_test must reference a oslevel_state</sch:assert>
                         </sch:rule>
                     </sch:pattern>
                 </xsd:appinfo>
@@ -424,7 +424,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the maintenance level (system version) of current AIX operating system.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="oslevelstemaintenance_level">
+                                                      <sch:pattern id="aix-def_oslevelstemaintenance_level">
                                                             <sch:rule context="aix-def:oslevel_state/aix-def:maintenance_level">
                                                                   <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the maintenance_level entity of an oslevel_state should be 'version'</sch:assert>
                                                             </sch:rule>

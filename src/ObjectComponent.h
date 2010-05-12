@@ -45,7 +45,9 @@ class ObjectComponent : public AbsComponent {
 public:
 
     /** Create a complete ObjectComponent object/ */
-	ObjectComponent(std::string objectId = "", std::string itemField = "");
+	ObjectComponent(std::string objectId = "", std::string itemField = "", std::string recordField = "");
+	
+	/** ObjectComponent destructor */
 	~ObjectComponent();
 
     /** Parse the ObjectComponent element and populate the current ObjectComponent. */
@@ -75,9 +77,16 @@ public:
     /** Set the itemField field's value. */
 	void SetItemField(std::string itemField);
 
+	/** Return the recordField field's value. */
+	std::string GetRecordField();
+
+    /** Set the recordField field's value. */
+	void SetRecordField(std::string recordField);
+
 private:
 	std::string objectId;
 	std::string itemField;
+	std::string recordField;
 };
 
 #endif

@@ -59,71 +59,28 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 
 	// get the trustee_name from the provided object
 	ObjectEntity* user = object->GetElementByName("user");
-
-	// check datatypes - only allow string
-	if(user->GetDatatype() != OvalEnum::DATATYPE_STRING) {
-		throw ProbeException("Error: invalid data type specified on user. Found: " + OvalEnum::DatatypeToString(user->GetDatatype()));
-	}	
-
-	// check operation - only allow  equals, not equals and pattern match
-	if(user->GetOperation() != OvalEnum::OPERATION_EQUALS && user->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && user->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
-		throw ProbeException("Error: invalid operation specified on user. Found: " + OvalEnum::OperationToString(user->GetOperation()));
-	}
-
-	// behaviors are not allowed on users
-	if(object->GetBehaviors()->size() != 0) {
-		throw ProbeException("Error user_objects do not support behaviors.");		
-	}
-
 	ItemVector *collectedItems = new ItemVector();
 
-	// get the user data
-	if(user->GetVarRef() == NULL) {
-		if(user->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// simply get user if it exists
-			Item* item=  this->GetUserInfo(user->GetValue());
-			if(item != NULL) {
-				collectedItems->push_back(item);
-			} 
-		} else {
-
-			bool isRegex = false;
-			if(user->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH)
-				isRegex = true;
-
-			// Get all users on the system...
-			StringSet* allUsers = this->GetAllUsers();
-			
-			// Get the set of users that match the ItemEntity.
-			StringSet::iterator iterator;
-			for(iterator = allUsers->begin(); iterator != allUsers->end(); iterator++) {
-				string curr = (*iterator);
-				if(this->IsMatch(user->GetValue(), (*iterator), isRegex)) {
-					Item* item =  this->GetUserInfo((*iterator));
-					if(item != NULL) {
-						collectedItems->push_back(item);
-					}
-				}
+	if ( user->GetOperation() == OvalEnum::OPERATION_EQUALS ){
+		StringVector users;
+		//Since we are performing a lookup -- do not restrict the search scope (i.e. allow domain user lookups)
+		//We are ignoring the flag for now
+		/*OvalEnum::Flag flag =*/ user->GetEntityValues(users);
+		for(StringVector::iterator it = users.begin(); it != users.end(); it++){
+			collectedItems->push_back(this->GetUserInfo(*it));
+		}
+	}else{
+		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
+		StringSet users;
+		WindowsCommon::GetAllLocalUsers(&users);
+		ItemEntity* userItemEntity = new ItemEntity("user","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		for(StringSet::iterator it = users.begin(); it != users.end(); it++){
+			userItemEntity->SetValue(*it);
+			if ( user->Analyze(userItemEntity) == OvalEnum::RESULT_TRUE ){
+				collectedItems->push_back(this->GetUserInfo(*it));
 			}
 		}
-
-	} else {
-		// Get all users on the system...
-		StringSet* allUsers = this->GetAllUsers();
-
-		// loop through all users on the system
-		// only keep those that match operation and value and var check
-		StringSet::iterator it;
-		ItemEntity* tmp = this->CreateItemEntity(user);
-		for(it = allUsers->begin(); it != allUsers->end(); it++) {
-			tmp->SetValue((*it));
-			if(user->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				Item* item = this->GetUserInfo((*it));
-				if(item != NULL) {
-					collectedItems->push_back(item);
-				}
-			}
-		}
+		delete userItemEntity;
 	}
 
 	return collectedItems;

@@ -36,20 +36,27 @@ using namespace std;
 //								ItemEntity Class										  //	
 //****************************************************************************************//
 ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
+	this->name = name;
+	this->value.push_back(new StringEntityValue(value));
+	this->datatype = datatype;
+	this->isObjectEntity = isObjectEntity;
+	this->scStatus = status;
+}
 
-	this->SetName(name);
-	this->SetValue(value);
-	this->SetDatatype(datatype);
-	this->SetIsObjectEntity(isObjectEntity);
-	this->SetStatus(status);
+ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
+	this->name = name;
+	this->value = value;
+	this->datatype = datatype;
+	this->isObjectEntity = isObjectEntity;
+	this->scStatus = status;
 }
 
 ItemEntity::ItemEntity(const ItemEntity& itemEntity){
-    this->SetName(itemEntity.name);
-    this->SetValue(itemEntity.value);
-    this->SetDatatype(itemEntity.datatype);
-    this->SetIsObjectEntity(itemEntity.isObjectEntity);
-    this->SetStatus(itemEntity.scStatus);
+    this->name = itemEntity.name;
+    this->value = itemEntity.value;
+    this->datatype = itemEntity.datatype;
+    this->isObjectEntity = itemEntity.isObjectEntity;
+	this->scStatus = itemEntity.scStatus;
 }
 
 ItemEntity::~ItemEntity() {
@@ -69,13 +76,27 @@ void ItemEntity::SetName(string name) {
 }
 
 string ItemEntity::GetValue() {
-
-	return this->value;
+	if ( this->value.empty() ){
+		return "";
+	}else{
+		return this->value.front()->GetValue();
+	}
 }
 
 void ItemEntity::SetValue(string value) {
+	if ( this->value.empty() ){
+		this->value.push_back(new StringEntityValue(value));
+	}else{
+		this->value.front()->SetValue(value);
+	}
+}
 
+void ItemEntity::SetValues(AbsEntityValueVector value){
 	this->value = value;
+}
+
+AbsEntityValueVector ItemEntity::GetValues(){
+	return this->value;
 }
 
 OvalEnum::Datatype ItemEntity::GetDatatype() {
@@ -114,13 +135,54 @@ bool ItemEntity::Equals(ItemEntity* entity) {
 
 	if(this->GetDatatype() == entity->GetDatatype()) {
 		if(this->GetName().compare(entity->GetName()) == 0) {
-			if(this->GetValue().compare(entity->GetValue()) == 0) {
-				isEqual = true;	
+			if ( this->GetValues().size() == entity->GetValues().size() ){	
+				// Need to check both vectors against each other as item entities may have fields that are not unique.
+				// As a result, it is possible to have duplicate fields and this way we can make sure that the duplicate
+				// values are not causing false positives.
+				// Example (if you were to check just one side):
+				// FieldVector 1                                  FieldVector 2
+				// <field name="numbers" datatype="int">1</field> <field name="numbers" datatype="int">1</field>
+				// <field name="numbers" datatype="int">2</field> <field name="numbers" datatype="int">2</field>
+				// <field name="numbers" datatype="int">3</field> <field name="numbers" datatype="int">3</field>
+				// <field name="numbers" datatype="int">3</field> <field name="numbers" datatype="int">4</field>
+				// for each field in FieldVector 1
+				//   if field does not exist in FieldVector 2
+				// 		return false
+				// return true
+				// This will return true because 1,2,3, and 3 all exist in FieldVector 2.
+				// Now if you check the other way, you will see that they are in fact not equal as 4 does not exist in FieldVector 1.
+					
+				for(AbsEntityValueVector::iterator it1 = this->GetValues().begin() ; it1 != this->GetValues().end() ; it1++){
+					if(!this->ValueExistsInItemEntity(entity->GetValues(), (*it1))) {
+						return false; // Short-circuit out. There is no need to do anything else because they are not equal.
+					}	
+				}
+
+				for(AbsEntityValueVector::iterator it2 = entity->GetValues().begin() ; it2 != entity->GetValues().end() ; it2++){
+					if(!this->ValueExistsInItemEntity(this->GetValues(), (*it2))) {
+						return false; // Short-circuit out. There is no need to do anything else because they are not equal.
+					}	
+				}
+
+				isEqual = true;
 			}
 		}
 	}
-
 	return isEqual;
+}
+
+bool ItemEntity::ValueExistsInItemEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue) {
+
+	bool exists = false;
+	
+	for(AbsEntityValueVector::iterator iterator = entityValueVector.begin(); iterator != entityValueVector.end(); iterator++) {
+		if(entityValue->Equals(*iterator)) {
+			exists = true;
+			break;
+		}
+	}	
+
+	return exists;
 }
 
 void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm) {
@@ -139,21 +201,67 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 	if(strStatus.compare("exists") != 0)
         XmlCommon::AddAttribute(newItemEntityElem, "status", strStatus);
 
-	// Add the value
-	if(this->GetValue().compare("") != 0) {
-		DOMText* newItemEntityElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
-		newItemEntityElem->appendChild(newItemEntityElemValue);
+	// Add the value(s)
+	AbsEntityValueVector v = this->GetValues();
+	for(AbsEntityValueVector::iterator it = v.begin(); it != v.end();it++){
+		if( ((*it)->GetValue()).compare("") != 0) {
+			if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
+				((StringEntityValue*)*it)->Write(scFile,newItemEntityElem);
+			}else{
+				((ItemFieldEntityValue*)*it)->Write(scFile,newItemEntityElem);
+			}
+		}
 	}
 }
 
 string ItemEntity::UniqueString() {
-	return this->GetName() + this->GetValue();
+	string valueStr = "";
+	AbsEntityValueVector allValues = this->GetValues();
+	for(AbsEntityValueVector::iterator it = allValues.begin(); it != allValues.end(); it++){
+		// If a record append the name of each field before its value
+		if ( this->GetDatatype() == OvalEnum::DATATYPE_RECORD ){
+			valueStr.append(((ItemFieldEntityValue*)(*it))->GetName());
+		}
+		valueStr.append((*it)->GetValue());
+	}
+	return this->GetName() + valueStr;
 }
 
 void ItemEntity::Parse(DOMElement* itemEntityElm) {
 	
 	this->SetName(XmlCommon::GetElementName(itemEntityElm));
-	this->SetValue(XmlCommon::GetDataNodeValue(itemEntityElm));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(itemEntityElm, "datatype")));
 	this->SetStatus(OvalEnum::ToSCStatus(XmlCommon::GetAttributeByName(itemEntityElm, "status")));
+	
+	// The datatype is not 'record' so we can just grab the string value in the element.
+	if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
+		this->SetValue(XmlCommon::GetDataNodeValue(itemEntityElm));
+	}else{
+		// The datatype is 'record' so we need to loop over all of the elements (which are the fields).
+		DOMNodeList *itemChildren = itemEntityElm->getChildNodes();
+		unsigned int index = 0;
+		AbsEntityValueVector aevv;
+		while(index < itemChildren->getLength()) {
+			DOMNode* tmpNode = itemChildren->item(index);
+
+			//	Only concerned with ELEMENT_NODEs
+			if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+				DOMElement* itemChild = (DOMElement*)tmpNode;
+
+				//	Get the name of the child
+				string childName = XmlCommon::GetElementName(itemChild);
+				if ( childName.compare("field") == 0 || childName.compare("oval-sc:field") == 0 ){
+					ItemFieldEntityValue* fev = new ItemFieldEntityValue();
+					fev->Parse(itemChild);
+					aevv.push_back(fev);
+				}else{
+					StringEntityValue* sev = new StringEntityValue();
+					sev->Parse(itemChild);
+					aevv.push_back(sev);
+				}
+			}
+			index ++;
+		}	
+		this->SetValues(aevv);
+	}
 }

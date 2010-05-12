@@ -78,7 +78,8 @@ public:
 					DATATYPE_BOOLEAN,
 					DATATYPE_EVR_STRING,
 					DATATYPE_FLOAT,
-					DATATYPE_VERSION};
+					DATATYPE_VERSION,
+					DATATYPE_RECORD};
 	static std::string DatatypeToString(OvalEnum::Datatype datatype);
 	static OvalEnum::Datatype ToDatatype(std::string datatypeStr);
 

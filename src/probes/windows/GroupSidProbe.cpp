@@ -56,83 +56,29 @@ AbsProbe* GroupSidProbe::Instance() {
 
 ItemVector* GroupSidProbe::CollectItems ( Object *object ) {
     ObjectEntity* groupSid = object->GetElementByName ( "group_sid" );
-
-    if ( groupSid->GetDatatype() != OvalEnum::DATATYPE_STRING ) {
-        throw ProbeException ( "Error: invalid data type specified on group_sid. Found: " + OvalEnum::DatatypeToString ( groupSid->GetDatatype() ) );
-    }
-
-    if ( groupSid->GetOperation() != OvalEnum::OPERATION_EQUALS && groupSid->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && groupSid->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
-        throw ProbeException ( "Error: invalid operation specified on group_sid. Found: " + OvalEnum::OperationToString ( groupSid->GetOperation() ) );
-    }
-
     ItemVector *collectedItems = new ItemVector();
 
-    if ( groupSid->GetVarRef() == NULL ) {
-        if ( groupSid->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
-            Item* item =  this->GetGroupSidInfo ( groupSid->GetValue() );
-
-            if ( item != NULL ) {
-                collectedItems->push_back ( item );
-            }
-
-        } else {
-            bool isRegex = false;
-
-            if ( groupSid->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
-                isRegex = true;
-            }
-
-            StringSet* allLocalGroupSids = new StringSet();
-            StringSet* allLocalGroups = WindowsCommon::GetAllGroups();
-            WindowsCommon::ConvertTrusteeNamesToSidStrings ( allLocalGroups, allLocalGroupSids );
-            allLocalGroups->clear();
-            delete allLocalGroups;
-            allLocalGroups = NULL;
-
-            for ( StringSet::iterator iterator = allLocalGroupSids->begin(); iterator != allLocalGroupSids->end(); iterator++ ) {
-                if ( this->IsMatch ( groupSid->GetValue(), ( *iterator ), isRegex ) ) {
-                    Item* item =  this->GetGroupSidInfo ( *iterator );
-
-                    if ( item != NULL ) {
-                        collectedItems->push_back ( item );
-                    }
-                }
-            }
-
-            allLocalGroupSids->clear();
-            delete allLocalGroupSids;
-            allLocalGroupSids = NULL;
-        }
-
-    } else {
-        StringSet* allLocalGroupSids = new StringSet();
-        StringSet* allLocalGroups = WindowsCommon::GetAllGroups();
-        WindowsCommon::ConvertTrusteeNamesToSidStrings ( allLocalGroups, allLocalGroupSids );
-        allLocalGroups->clear();
-        delete allLocalGroups;
-        allLocalGroups = NULL;
-        ItemEntity* tmp = this->CreateItemEntity ( groupSid );
-
-        for ( StringSet::iterator iterator = allLocalGroupSids->begin(); iterator != allLocalGroupSids->end(); iterator++ ) {
-            tmp->SetValue ( ( *iterator ) );
-
-            if ( groupSid->Analyze ( tmp ) == OvalEnum::RESULT_TRUE ) {
-                Item* item = this->GetGroupSidInfo ( ( *iterator ) );
-
-                if ( item != NULL ) {
-                    collectedItems->push_back ( item );
-                }
-            }
-        }
-
-        allLocalGroupSids->clear();
-        delete allLocalGroupSids;
-        allLocalGroupSids = NULL;
-        delete tmp;
-        tmp = NULL;
-    }
-
-    return collectedItems;
+	if ( groupSid->GetOperation() == OvalEnum::OPERATION_EQUALS ){
+		StringVector groupSids;
+		//Since we are performing a lookup -- do not restrict the search scope (i.e. allow domain group lookups)
+		//We are ignoring the flag for now
+		/*OvalEnum::Flag flag =*/ groupSid->GetEntityValues(groupSids);
+		for(StringVector::iterator it = groupSids.begin(); it != groupSids.end(); it++){
+			collectedItems->push_back(this->GetGroupSidInfo(*it));
+		}
+	}else{
+		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
+		StringSet* groupSids = WindowsCommon::GetAllLocalGroupSids();
+		ItemEntity* groupItemEntity = new ItemEntity("group","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		for(StringSet::iterator it = groupSids->begin(); it != groupSids->end(); it++){
+			groupItemEntity->SetValue(*it);
+			if ( groupSid->Analyze(groupItemEntity) == OvalEnum::RESULT_TRUE ){
+				collectedItems->push_back(this->GetGroupSidInfo(*it));
+			}
+		}
+	}
+	
+	return collectedItems;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -153,18 +99,41 @@ Item* GroupSidProbe::GetGroupSidInfo ( string groupSidStr ) {
     StringSet* userSids = new StringSet();
     Item* item = this->CreateItem();
 
-    if ( WindowsCommon::ExpandGroupBySID ( groupSidStr, userSids, false, false ) ) {
+    if ( WindowsCommon::ExpandGroupBySID ( groupSidStr, userSids, true, false ) ) {
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
 
-        if ( userSids->size() > 0 ) {
-            for ( StringSet::iterator iterator = userSids->begin() ; iterator != userSids->end() ; iterator++ ) {
-                item->AppendElement ( new ItemEntity ( "user_sid", *iterator, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-            }
-
-        } else {
-            item->AppendElement ( new ItemEntity ( "user_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+		int usersCount = 0;
+		int subgroupsCount = 0;
+		ItemEntityVector *entityVector = new ItemEntityVector();
+        
+		for ( StringSet::iterator iterator = userSids->begin() ; iterator != userSids->end() ; iterator++ ) {
+			if ( WindowsCommon::IsGroupSID(*iterator) ){
+				// put subgroup_sid entities at the back of the ItemEntityVector
+				entityVector->push_back(new ItemEntity("subgroup_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				++subgroupsCount;			
+			}else{
+				// put user_sid entities at the beginning of the ItemEntityVector
+				entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				++usersCount;
+			}
         }
+
+		// if there are no user members add an user entity with a status of 'does not exist'
+		if ( usersCount == 0 ){
+			entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
+		// if there are no subgroup members add an subgroup entity with a status of 'does not exist'
+		if ( subgroupsCount == 0 ){
+			entityVector->push_back(new ItemEntity("subgroup_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
+		// add the group_sid item entity to the beginning of the group_sid_item
+		entityVector->insert(entityVector->begin(), new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+
+		item->SetElements(entityVector);
+		entityVector->clear();
+		delete entityVector;
 
     } else {
         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );

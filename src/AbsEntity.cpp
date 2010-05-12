@@ -66,13 +66,27 @@ void AbsEntity::SetName(string name) {
 }
 
 string AbsEntity::GetValue() {
-
-	return this->value;
+	if ( this->value.empty() ){
+		return "";
+	}else{
+		return this->value.front()->GetValue();
+	}
 }
 
 void AbsEntity::SetValue(string value) {
+	if ( this->value.empty() ){
+		this->value.push_back(new StringEntityValue(value));
+	}else{
+		this->value.front()->SetValue(value);
+	}
+}
 
+void AbsEntity::SetValues(AbsEntityValueVector value){
 	this->value = value;
+}
+
+AbsEntityValueVector AbsEntity::GetValues(){
+	return this->value;
 }
 
 OvalEnum::Datatype AbsEntity::GetDatatype() {
@@ -94,7 +108,6 @@ void AbsEntity::SetIsObjectEntity(bool isObjectEntity) {
 
 	this->isObjectEntity = isObjectEntity;
 }
-
 
 OvalEnum::Check AbsEntity::GetVarCheck() {
 
@@ -150,7 +163,7 @@ VariableValueVector* AbsEntity::GetVariableValues() {
 			varValues->push_back((*varValueIt));
 		}
 
-		// get any variable values that were used for determinihng the value of this variable
+		// get any variable values that were used for determining the value of this variable
 		values = varRef->GetVariableValues();
 		for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
 			varValues->push_back((*varValueIt));
@@ -198,6 +211,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 				result = EntityComparator::CompareString(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 				result = EntityComparator::CompareVersion(this->GetOperation(), this->GetValue(), scElement->GetValue());
+			} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
+				result = EntityComparator::CompareRecord(this->GetOperation(), this->GetValues(), scElement->GetValues());
 			}
 
 		} else {
@@ -225,6 +240,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 						tmp = EntityComparator::CompareString(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 						tmp = EntityComparator::CompareVersion(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+					} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
+						throw Exception("Error: A var_ref attribute is not allowed on an entity with a datatype of 'record'.");
 					}
 
 					results.push_back(tmp);

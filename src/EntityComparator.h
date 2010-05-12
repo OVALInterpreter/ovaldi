@@ -31,10 +31,9 @@
 #ifndef ENTITYCOMPARATOR_H
 #define ENTITYCOMPARATOR_H
 
-#include "Common.h"
 #include "OvalEnum.h"
 #include "REGEX.h"
-
+#include "AbsEntityValue.h"
 /**
 	This class is a container for all comparison methods between definition entities and item entities.
 */
@@ -75,6 +74,9 @@ public:
 
 	/** Compare two float values based on the specified operation. */
 	static OvalEnum::ResultEnumeration CompareIosVersion(OvalEnum::Operation op, std::string defValue, std::string scValue);
+
+	/** Compare two record values based on the specified operation. */
+	static OvalEnum::ResultEnumeration CompareRecord(OvalEnum::Operation op, AbsEntityValueVector defValue, AbsEntityValueVector scValue);
 
 	/** Compare two string values based on the specified operation. */
 	static OvalEnum::ResultEnumeration CompareString(OvalEnum::Operation op, std::string defValue, std::string scValue);

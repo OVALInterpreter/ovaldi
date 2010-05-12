@@ -76,7 +76,7 @@ typedef std::vector < Item* > ItemVector;
 	This class represents an object in a oval sytem characteristics schema.
 	The oval system characteristics schema defiens a collected objects element which
 	contains any number of object elements. These object elements reflects the 
-	objects that an OVAL deifnition specfieid for data collection. Each object that is
+	objects that an OVAL definition specfied for data collection. Each object that is
 	collected for an OVAL definition has a corresponding object in the oval system charaeristitcs file.
 */
 class CollectedObject {

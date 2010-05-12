@@ -82,9 +82,9 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 
 The following instructions describe how to build the OVAL Interpreter 
 on a Windows system.  The OVAL Interpreter has been built on Windows 
-and tested on Windows 2000 and Windows XP Pro using VC8. The source 
-distribution includes a project file that can be used to build the
-OVAL Interpreter.  Before the OVAL Interpreter can be built, the supporting
+and tested on Windows XP Pro using VC8 and the Windows 7 SDK. The source
+distribution includes a project file that can be used to build the OVAL
+Interpreter. Before the OVAL Interpreter can be built, the supporting
 libraries must be installed. Follow the instruction below to setup and
 install the supporting libraries.
 
@@ -123,20 +123,8 @@ install the supporting libraries.
 
           http://archive.apache.org/dist/xml/xerces-c/binaries/
 
-       Unzip the binaries and add the location of the xerces-c.dll onto your 
-       path environment variable.
-
-       Add the following directory to the include files search path:
-       
-          <installed path>\include
-
-       Add the following directory to the library files search path:
-
-          <installed path>\lib
-
-       In Visual C++ 7 the UI for setting up directories can be found by clicking the
-       "Tools" menu then selecting "Options..." next selecting the "Project" folder
-       and then choosing the "VC++ Directories" item. 
+       Please refer to 'build.xerces.xalan.win32.txt' for instructions on how to build the
+	   xerces-c library on Windows. 
 
   C. Xalan Library
       
@@ -146,20 +134,8 @@ install the supporting libraries.
 
           http://archive.apache.org/dist/xml/xalan-c/binaries/
 
-       Unzip the binaries and add the locations of the Xalan-C_1_10.dll and 
-       XalanMessages_1_10.dll to your path environment variable.
-
-       Add the following directory to the include files search path:
-       
-          <installed path>\include
-
-       Add the following directory to the library files search path:
-
-          <installed path>\lib
-
-       In Visual C++ 7 the UI for setting up directories can be found by clicking the
-       "Tools" menu then selecting "Options..." next selecting the "Project" folder
-       and then choosing the "VC++ Directories" item. 
+       Please refer to 'build.xerces.xalan.win32.txt' for instructions on how to build the
+	   xalan-c library on Windows.
 
   D. OpenSSL Library
 
@@ -183,6 +159,12 @@ install the supporting libraries.
        "Tools" menu then selecting "Options..." next selecting the "Project" folder
        and then choosing the "VC++ Directories" item. 
 
+       "This product includes software developed by the OpenSSL Project for use in the
+       OpenSSL Toolkit. (http://www.openssl.org/)"
+ 
+       "This product includes cryptographic software written by Eric Young
+       (eay@cryptsoft.com)" 
+	   
   E. Building the OVAL Interpreter
 
       After setting up the PCRE, Xerces, and Xalan libraries open the provided project
@@ -197,12 +179,16 @@ install the supporting libraries.
 -- III -- PCRE --
 
 The OVAL Interpreter uses the open source PCRE library.  The OVAL Interpreter
-currently uses version 6.3 of the PCRE library.  From the PCRE Web site:
+currently uses version 8.x of the PCRE library.  From the PCRE Web site:
 
   "Regular expression support is provided by the PCRE library 
    package, which is open source software, written by Philip Hazel,
    and copyright by the University of Cambridge, England."
 
+The PCRE library is under the BSD License and is re-distributed in
+ovaldi-x.x.x-setup.exe. As a result, a copy of the license
+(LICENCE.pcre) has been provided.    
+   
 For more information about PCRE visit:
 
     http://www.pcre.org
@@ -222,6 +208,10 @@ the Xerces Web site:
   "This product includes software developed by the Apache Software
   Foundation (http://www.apache.org/)."
 
+The Xerces library is under the Apache 2.0 License and is re-distributed
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result, 
+a copy of the license (LICENCE.xerces_xalan) has been provided.    
+  
 For more information about Xerces visit:
 
     http://xml.apache.org
@@ -237,6 +227,10 @@ the Xalan Web site:
   "This product includes software developed by the Apache Software
   Foundation (http://www.apache.org/)."
 
+The Xalan library is under the Apache 2.0 License and is re-distributed
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result,
+a copy of the license (LICENCE.xerces_xalan) has been provided.  
+  
 For more information about Xalan visit:
 
     http://xml.apache.org
@@ -253,12 +247,18 @@ The OVAL Interpreter uses the open-source OpenSSL library.
   Open Source licenses. In case of any license issues related to OpenSSL,
   please contact openssl-core@openssl.org.
 
-Also, see the file LICENSE.openssl.
+  A copy of the license (LICENSE.openssl) has been provided.
 
 For more information about OpenSSL visit:
     http://openssl.org/
 
 The source code is also available at the above Web site.
+
+"This product includes software developed by the OpenSSL Project for use in the
+OpenSSL Toolkit. (http://www.openssl.org/)"
+ 
+"This product includes cryptographic software written by Eric Young
+(eay@cryptsoft.com)" 
 
 -- VII -- REPORTING PROBLEMS --
 

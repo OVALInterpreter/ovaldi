@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:aix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix" elementFormDefault="qualified" version="5.6">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:aix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix" elementFormDefault="qualified" version="5.7">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the AIX specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
           <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>AIX System Characteristics</schema>
-               <version>5.6</version>
-               <date>9/9/2009 9:44:31 AM</date>
-                <terms_of_use>Copyright (c) 2002-2009, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.7</version>
+               <date>5/3/2010 8:41:16 PM</date>
+                <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="aix-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix"/>
               <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -29,7 +29,7 @@
                                    <xsd:annotation>
                                         <xsd:documentation>Virtually Unique ID. A combination of time and cpuid, this ID can be used to differentiate fixes that are otherwise identical.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="interimfixitemvuid">
+                                             <sch:pattern id="aix-sc_interimfixitemvuid">
                                                   <sch:rule context="aix-sc:interim_fix_item/aix-sc:vuid">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -41,7 +41,7 @@
                                    <xsd:annotation>
                                         <xsd:documentation>Each efix that is installed on a given system has a unique efix label.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="interimfixitemlabel">
+                                             <sch:pattern id="aix-sc_interimfixitemlabel">
                                                   <sch:rule context="aix-sc:interim_fix_item/aix-sc:label">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -53,7 +53,7 @@
                                    <xsd:annotation>
                                         <xsd:documentation>Describes the efix package.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="interimfixitemabstract">
+                                             <sch:pattern id="aix-sc_interimfixitemabstract">
                                                   <sch:rule context="aix-sc:interim_fix_item/aix-sc:abstract">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -65,7 +65,7 @@
                                    <xsd:annotation>
                                         <xsd:documentation>The the emergency fix state.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="interimfixitemstate">
+                                             <sch:pattern id="aix-sc_interimfixitemstate">
                                                   <sch:rule context="aix-sc:interim_fix_item/aix-sc:state">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the <sch:name/> entity of a <sch:name path=".."/> should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -93,7 +93,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>Represents the name of the fileset being checked.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="filesetitemflstinst">
+                                             <sch:pattern id="aix-sc_filesetitemflstinst">
                                                   <sch:rule context="aix-sc:fileset_item/aix-sc:flstinst">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the flstinst entity of a fileset_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -105,7 +105,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>Maintenance level (also known as version in Solaris or Linux) of the fileset. For example, "5.3.0.10" is the level for 'bos.txt.tfs' fileset in one AIX machine.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="filesetitemlevel">
+                                             <sch:pattern id="aix-sc_filesetitemlevel">
                                                   <sch:rule context="aix-sc:fileset_item/aix-sc:level">
                                                        <sch:assert test="@datatype='version'">item <sch:value-of select="../@id"/> - datatype attribute for the level entity of a fileset_item should be 'version'</sch:assert>
                                                   </sch:rule>
@@ -117,7 +117,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>This gives the state of the fileset being checked. The state can be 'APPLIED', 'APPLYING','BROKEN', 'COMMITTED', 'EFIX LOCKED', 'OBSOLETE', 'COMMITTING','REJECTING'.  See the manpage of the 'lslpp' command more information.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="filesetitemstate">
+                                             <sch:pattern id="aix-sc_filesetitemstate">
                                                   <sch:rule context="aix-sc:fileset_item/aix-sc:state">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the state entity of a fileset_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -129,7 +129,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>Short description of the fileset being checked.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="filesetitemdescription">
+                                             <sch:pattern id="aix-sc_filesetitemdescription">
                                                   <sch:rule context="aix-sc:fileset_item/aix-sc:description">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the description entity of a fileset_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -157,7 +157,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>APAR is the short for 'Authorized Program Analysis Report'.  APAR identifies and describes a software product defect. An APAR number can obtain a PTF (Program Temporary Fix) for the defect, if a PTF is available.  An example of an apar_number is 'IY78751', it includes two alphabetic characters and a 5-digit integer.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="fixitemapar_number">
+                                             <sch:pattern id="aix-sc_fixitemapar_number">
                                                   <sch:rule context="aix-sc:fix_item/aix-sc:apar_number">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the apar_number entity of a fix_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -169,7 +169,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>The abstract of the APAR being checked. For instance, 'LL syas rXct are available even when not susea' is the abstract of APAR 'IY78751'.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="fixitemabstract">
+                                             <sch:pattern id="aix-sc_fixitemabstract">
                                                   <sch:rule context="aix-sc:fix_item/aix-sc:abstract">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the abstract entity of a fix_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -181,7 +181,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>The symptom text related to the APAR being checked. For example, the symptom text for 'IY75211' is 'Daylight savings change for year 2007 and beyond'.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="fixitemsymptom">
+                                             <sch:pattern id="aix-sc_fixitemsymptom">
                                                   <sch:rule context="aix-sc:fix_item/aix-sc:symptom">
                                                        <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the symptom entity of a fix_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -193,7 +193,7 @@
                                    <xsd:annotation>
                                          <xsd:documentation>The installation status of files associated with the APAR.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="fixiteminstallation_status">
+                                             <sch:pattern id="aix-sc_fixiteminstallation_status">
                                                   <sch:rule context="aix-sc:fix_item/aix-sc:installation_status">
                                                         <sch:assert test="not(@datatype) or @datatype='string'">item <sch:value-of select="../@id"/> - datatype attribute for the installation_status entity of a fix_item should be 'string'</sch:assert>
                                                   </sch:rule>
@@ -221,7 +221,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the maintenance level (system version) of current AIX operating system.</xsd:documentation>
                                                 <xsd:appinfo>
-                                                      <sch:pattern id="oslevelitemmaintenance_level">
+                                                      <sch:pattern id="aix-sc_oslevelitemmaintenance_level">
                                                             <sch:rule context="aix-sc:oslevel_item/aix-sc:maintenance_level">
                                                                   <sch:assert test="@datatype='version'">item <sch:value-of select="../@id"/> - datatype attribute for the maintenance_level entity of an oslevel_item should be 'version'</sch:assert>
                                                             </sch:rule>

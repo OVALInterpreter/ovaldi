@@ -111,7 +111,10 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 	// Create new item element
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
 	string elementName = "variable_value";
-	DOMElement* newVariableValueElem = scFile->createElement(XMLString::transcode(elementName.c_str()));
+	XMLCh* name = XMLString::transcode(elementName.c_str());
+	DOMElement* newVariableValueElem = scFile->createElement(name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 	collectedObjectElm->appendChild(newVariableValueElem);
 
 	// Add the attributes
@@ -120,7 +123,10 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 
 	// Add the value
 	if(this->GetValue().compare("") != 0) {
-		DOMText* newVariableValueElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
+		XMLCh* value = XMLString::transcode(this->GetValue().c_str());
+		DOMText* newVariableValueElemValue = scFile->createTextNode(value);
+		//Free memory allocated by XMLString::transcode(char*)
+		XMLString::release(&value);
 		newVariableValueElem->appendChild(newVariableValueElemValue);
 	}
 }

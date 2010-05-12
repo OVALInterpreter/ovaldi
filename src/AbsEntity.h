@@ -39,9 +39,9 @@
 #include "OvalEnum.h"
 #include "VariableValue.h"
 #include "AbsVariable.h"
-#include "EntityComparator.h"
 #include "ItemEntity.h"
-
+#include "EntityComparator.h"
+#include "AbsEntityValue.h"
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -110,60 +110,120 @@ public:
     OvalEnum::Flag GetEntityValues(StringVector &values);
 
 	/** 
-		Return a vector of variable values that were used for this entity.
-	*/
+	 *	Return a vector of variable values that were used for this entity.
+	 *	@return A VariableValueVector* that represents the variable values specified by the entity.
+	 */
 	VariableValueVector* GetVariableValues(); 
 
-	/** Return the name field's value. */
+	/** Return the name field's value. 
+	 *  @return A string representing the name of the entity.
+	 */
 	std::string GetName();
-	/** Set the name field's value. */
+
+	/** Set the name field's value.
+	 *  @param name A string representing the name of the entity.
+	 *  @return Void.
+	 */
 	void SetName(std::string name);
 
-	/** Return the value field's value. */
+	/** Return the string that is the value of the entity. Use this when the entity is a string-based value. 
+	 *  @return A string representing the value of the entity.
+	 */
 	std::string GetValue();
-	/** Set the value field's value. */
+
+	/** Set the string value of the entity. Use this when the entity is string-based value.
+	 *  @param value A string representing the value of the entity.
+	 *  @return Void.
+	 */
 	void SetValue(std::string value);
 
-	/** Return the datatype field's value. */
+	/** Return the values of the entity. Use this when the entity is not a string-based value.
+	 *  @return A AbsEntityValueVector containing the values of the entity.
+	 */
+	AbsEntityValueVector GetValues();
+
+	/** Set the values of the entity. Use this when the entity is not a string-based value.
+	 *  @param value A AbsEntityValueVector representing the values of the entity.
+	 *  @return Void.
+	 */
+	void SetValues(AbsEntityValueVector value);
+
+	/** Return the datatype field's value.
+	 *  @return A OvalEnum::Datatype value representing the datatype of the entity.
+	 */
 	OvalEnum::Datatype GetDatatype();
-	/** Set the datatype field's value. */
+
+	/** Set the datatype field's value.
+	 *  @param datatype An OvalEnum::Datatype enumeration value representing the value of the entity.
+	 *  @return Void.
+	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
-	/** Get the isObjectEntity field's value. */
+	/** Get the isObjectEntity field's value.
+	 *  @return A boolean value indicating whether or not the entity is an ObjectEntity.	
+	 */
 	bool GetIsObjectEntity();
-	/** Set the isObjectEntity field's value. */
+
+	/** Set the isObjectEntity field's value.
+	 *  @param isObjectAbsEntity A boolean value indicating whether or not the entity is an ObjectEntity.
+	 *  @return Void.
+	 */
 	void SetIsObjectEntity(bool isObjectAbsEntity);
 
-	/** Return true if the xsi:nil is set to true. */
+	/** Return true if the xsi:nil is set to true.
+	 *  @return A boolean value indicating whether or not the entity has a nil value.
+	 */
 	bool GetNil();
-	/** Set the nil field's value. */
+
+	/** Set the nil field's value.
+	 *  @param nil The boolean value indicating whether or not the entity has a nil value.
+	 *  @return Void.
+	 */
 	void SetNil(bool nil);
 
-	/** Return the operation field's value. */
+	/** Return the operation field's value.
+	 *  @return A OvalEnum::Operation value representing the operation of the entity.
+	 */
 	OvalEnum::Operation GetOperation();
-	/** Set the operation field's value. */
+
+	/** Set the operation field's value.
+	 *  @param operation An OvalEnum::Operation enumeration value indicating the operation of the entity.
+	 *  @return Void.
+	 */
 	void SetOperation(OvalEnum::Operation operation);
 
-	/** Return the varCheck field's value */
+	/** Return the varCheck field's value.
+	 *  @return An OvalEnum::Check enumeration value representing the var check value of the entity.
+	 */
 	OvalEnum::Check GetVarCheck();
-	/** Set the varCheck field's value. */
+	
+	/** Set the var check value.
+	 *  @param check A OvalEnum::Check value representing the var check value of the entity.
+	 *  @return Void.
+	 */
 	void SetVarCheck(OvalEnum::Check check);
 
-	/** Return the varRef field's value */
+	/** Return the referenced variable.
+ 	 *  @return An AbsVariable* which is the variable referenced by the entity's var ref attribute.
+	 */
 	AbsVariable* GetVarRef();
-	/** Set the varRef field's value. */
+
+	/** Set the referenced variable of the entity.
+	 *  @param varRef A AbsVariable value representing the variable referenced by the entity's var ref attribute.
+	 *  @return Void.
+	 */
 	void SetVarRef(AbsVariable* varRef);
 
 private:
 	std::string name;
-	std::string value;
+	AbsEntityValueVector value;
+
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
 	OvalEnum::Check varCheck;
 	OvalEnum::Operation operation;
 	AbsVariable* varRef;
 	bool nil;
-
 };
 
 /**	

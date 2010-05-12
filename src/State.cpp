@@ -30,6 +30,7 @@
 
 
 #include "State.h"
+#include "StateEntity.h"
 
 using namespace std;
 

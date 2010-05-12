@@ -185,7 +185,7 @@ void AbsDataCollector::Run() {
 		CollectedObject::WriteCollectedObjects();
 
 		// clean up after the run completes
-		Filter::ClearCache();
+		State::ClearCache();
 		AbsVariable::ClearCache();
 		AbsProbe::ClearGlobalCache();
 		VariableValue::ClearCache();
