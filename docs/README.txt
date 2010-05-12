@@ -123,7 +123,8 @@ http://oval.mitre.org/oval/about/bsd_license.html
   C. Microsoft Windows Installation
      
        The OVAL Interpreter can be installed and run on
-       Microsoft Windows NT/2000/XP/Server 2003/Vista/Server 2008/Windows 7.
+       Microsoft Windows XP, Windows Server 2003, Windows Vista,
+	   Windows Server 2008, and Windows 7.
 
        Install the OVAL Interpreter by running the installer
        executable -      ovaldi-X.X.X-setup.exe
