@@ -777,8 +777,6 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
 #endif
 
 int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string *errMsg) {
-	FILE *cmdlineFile = NULL;
-
 	// Build the absolute path to the command line file
 	string cmdlinePath = "/proc/";
 	cmdlinePath.append(process);
