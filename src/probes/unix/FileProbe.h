@@ -47,8 +47,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 /**
 	This class is responsible for collecting file information for red hat file_objects.
 */
@@ -73,7 +71,7 @@ private:
 	static FileProbe* instance;
 
 	/** Get all attributes for the file specified in fileIn. Return them in an Item. */
-	Item* GetFileAttributes(string path, string fileName);
+	Item* GetFileAttributes(std::string path, std::string fileName);
 };
 
 #endif

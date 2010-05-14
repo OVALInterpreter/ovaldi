@@ -35,14 +35,13 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a LiteralComponent in a local_variable in the oval definition schema
 */
 class LiteralComponent : public AbsComponent {
 public:
-	LiteralComponent(string value = "");
+	LiteralComponent(std::string value = "");
 	~LiteralComponent();
 
 	void Parse(DOMElement* componentElm); 
@@ -50,11 +49,11 @@ public:
 
 	VariableValueVector* GetVariableValues();
 
-	string GetValue();
-	void SetValue(string value);
+	std::string GetValue();
+	void SetValue(std::string value);
 
 private:
-	string value;
+	std::string value;
 };
 
 #endif

@@ -36,7 +36,6 @@
 #include "REGEX.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a RegexCaptureFunction component in a local_variable in the oval definition schema.
@@ -50,7 +49,7 @@ class RegexCaptureFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete RegexCaptureFunction object. */
-	RegexCaptureFunction(string pattern = "");
+	RegexCaptureFunction(std::string pattern = "");
 	~RegexCaptureFunction();
 
 	/** Parse the substring element and its child component element. */
@@ -63,12 +62,12 @@ public:
 	VariableValueVector* GetVariableValues();
 
 	/** Get the pattern field's value. */
-	string GetPattern();
+	std::string GetPattern();
 	/** Set the pattern field's value. */
-	void SetPattern(string pattern);
+	void SetPattern(std::string pattern);
 
 private:
-	string pattern;
+	std::string pattern;
     REGEX reUtil;
 };
 

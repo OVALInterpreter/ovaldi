@@ -43,17 +43,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifndef INIT_DIR
-#define INIT_DIR  "/etc/rc.d/init.d"
-#endif  /* INIT_DIR */
-
 #ifndef RC_DIR
-#define RC_DIR    "/etc/rc.d"
+#  ifdef LINUX
+#    define RC_DIR "/etc/rc.d"
+#  elif defined SUNOS
+#    define RC_DIR "/etc"
+#  endif
 #endif  /* RC_DIR */
 
 #define BUFLEN    1024
 
-using namespace std;
 
 /**
   A service that is started or killed at a particular runlevel. This would most likely be stored
@@ -64,13 +63,13 @@ class runlevel_item
 {
   public:
     runlevel_item() : is_start( false ) {}
-    runlevel_item( const string &name, const bool is_start ) : service_name(name), is_start(is_start) {}
+    runlevel_item( const std::string &name, const bool is_start ) : service_name(name), is_start(is_start) {}
     ~runlevel_item(){}
 
     runlevel_item( const runlevel_item &r1 ) { this->copy_item( r1 ); }
     runlevel_item & operator= ( const runlevel_item &rhs ) { this->copy_item( rhs ); return *this; }
 
-    string  service_name;
+    std::string  service_name;
     bool    is_start;
   
 
@@ -121,10 +120,10 @@ struct ltrunlevel_item_comparator
 
 
 
-typedef set<char, ltchr_comparator> CharSet;
-typedef set<const char *, ltstr_comparator> CharPtrSet;
-typedef set<runlevel_item, ltrunlevel_item_comparator> RunLevelItemSet;
-typedef map<const char, RunLevelItemSet, ltchr_comparator> SetMap;
+typedef std::set<char, ltchr_comparator> CharSet;
+typedef std::set<const char *, ltstr_comparator> CharPtrSet;
+typedef std::set<runlevel_item, ltrunlevel_item_comparator> RunLevelItemSet;
+typedef std::map<const char, RunLevelItemSet, ltchr_comparator> SetMap;
 
 
 /**
@@ -252,7 +251,7 @@ class RunLevelProbe : public AbsProbe {
       @param insertUnequalNonRegex true if the runlevel runlevel_object entity has a "not equal" operation
       @return a set of runlevels being used in the runlevel_test
     */ 
-    CharSet     * _getMatchingRunlevels( string pattern, bool isRegex, bool insertUnequalNonRegex = false );
+    CharSet     * _getMatchingRunlevels( std::string pattern, bool isRegex, bool insertUnequalNonRegex = false );
 
     /**
       Generates a set of service names dictated by the service_name runlevel_object enitty 
@@ -262,7 +261,7 @@ class RunLevelProbe : public AbsProbe {
       @insertUnequalNonRegex true if the service_name runlevel_object entity has a "not equal" operation
       @return a set of services being used in the given runlevels 
     */
-    RunLevelItemSet  * _getMatchingServiceNames ( string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex = false );
+    RunLevelItemSet  * _getMatchingServiceNames ( std::string pattern, CharSet * working_runlevels, bool isRegex, bool insertUnequalNonRegex = false );
 
     /**
       Calls  ItemEntity::Analyze() method to validate the data collected for the given entity (service_name)
@@ -318,7 +317,7 @@ class RunLevelProbe : public AbsProbe {
       @insertUnequalNonRegex true if the value should be inserted though pattern and value do not match and isRegex is false
       @return true if the value warrants an insertion
     */
-    bool          _isInsertable( string pattern, string value, bool isRegex, bool insertUnequalNonRegex );
+    bool          _isInsertable( std::string pattern, std::string value, bool isRegex, bool insertUnequalNonRegex );
   
   private:  // Private Member Variables 
 	  static RunLevelProbe *  _instance;

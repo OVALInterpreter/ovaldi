@@ -35,6 +35,8 @@
 #include "OvalEnum.h"
 #include <errno.h>
 
+using namespace std;
+
 namespace {
 	/**
 	 * Used to manage locking/unlocking of password/shadow files in a

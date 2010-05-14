@@ -67,7 +67,6 @@
 
 // end xalan and xerces includes
 
-using namespace std;
 XERCES_CPP_NAMESPACE_USE
 
 /**
@@ -106,7 +105,7 @@ private:
 	static XmlFileContentProbe* instance;
 
 	/** Return an Item for the specified xpath if is succeeds otherwise return NULL. */
-	Item* EvaluateXpath(string path, string fileName, string xpath);
+	Item* EvaluateXpath(std::string path, std::string fileName, std::string xpath);
 };
 
 /**

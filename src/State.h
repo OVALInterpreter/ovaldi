@@ -34,7 +34,6 @@
 #include "AbsState.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class Item;
 
@@ -64,7 +63,7 @@ public:
 	/** Sarch the cache of States for the specified State. 
 		Return NULL if not found
 	*/
-	static State* SearchCache(string id);
+	static State* SearchCache(std::string id);
 
 	/** Delete all items in the cache. */
 	static void ClearCache();
@@ -80,7 +79,7 @@ public:
 
 		If the state is not found an exception is thrown. 
 	*/
-	static State* GetStateById(string stateId);
+	static State* GetStateById(std::string stateId);
 
 private:
 

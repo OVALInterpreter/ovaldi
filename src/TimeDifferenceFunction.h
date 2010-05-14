@@ -37,7 +37,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents a TimeDifferenceFunction component in a local_variable in the oval definition schema.
@@ -102,22 +101,22 @@ private:
 	void SetFormat2(OvalEnum::DateTimeFormat format2);
 	
 	/** Convert a DateTime_YEAR_MONTH_DAY format date-time value to seconds **/
-	time_t YearMonthDayValueToSeconds(string dateTimeValue);
+	time_t YearMonthDayValueToSeconds(std::string dateTimeValue);
 	/** Convert a DateTime_MONTH_DAY_YEAR format date-time value to seconds **/
-	time_t MonthDayYearValueToSeconds(string dateTimeValue);
+	time_t MonthDayYearValueToSeconds(std::string dateTimeValue);
 	/** Convert a DateTime_DAY_MONTH_YEAR format date-time value to seconds **/
-	time_t DayMonthYearValueToSeconds(string dateTimeValue);
+	time_t DayMonthYearValueToSeconds(std::string dateTimeValue);
 	/** Convert a DateTime_WIN_FILETIME format date-time value to seconds **/
-	time_t WinFiletimeValueToSeconds(string dateTimeValue);
+	time_t WinFiletimeValueToSeconds(std::string dateTimeValue);
 	/** Convert a DateTime_SECONDS_SINCE_EPOCH format date-time value to seconds **/
-	time_t SecondsSinceEpochValueToSeconds(string dateTimeValue);
+	time_t SecondsSinceEpochValueToSeconds(std::string dateTimeValue);
 
 	/** Build a time structure (struct tm) and convert it to the time in seconds since the epoch **/
 	time_t buildTimeStructure(int,int,int,int=0,int=0,int=0);
 	/** Convert a string representation of a month into its corresponding numerical value **/
-	int MonthStrToInt(string monthValueStr);
+	int MonthStrToInt(std::string monthValueStr);
 	/** Convert a hexadecimal value to its equivalent decimal value **/
-	long long HexToDecimal(string hexTimeDateStr);
+	long long HexToDecimal(std::string hexTimeDateStr);
 };
 
 #endif

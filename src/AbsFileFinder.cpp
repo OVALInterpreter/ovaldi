@@ -30,6 +30,8 @@
 
 #include "AbsFileFinder.h"
 
+using namespace std;
+
 AbsFileFinder::AbsFileFinder() {
 
 	fileMatcher = new REGEX();

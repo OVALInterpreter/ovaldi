@@ -39,10 +39,9 @@
 #include "Set.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class Set;
-typedef vector < Set*, allocator<Set*> > SetVector;
+typedef std::vector < Set* > SetVector;
 
 
 /**
@@ -51,7 +50,7 @@ typedef vector < Set*, allocator<Set*> > SetVector;
 class SetObject : public AbsObject {
 
 public:
-	SetObject(string id = "", string comment = "", string name = "", int version = 1, string xmlns = "");
+	SetObject(std::string id = "", std::string comment = "", std::string name = "", int version = 1, std::string xmlns = "");
 	~SetObject();
 
 	void Parse(DOMElement* setObjectElm);

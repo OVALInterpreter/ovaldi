@@ -47,7 +47,6 @@
 #include "OvalEnum.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 
 class CollectedObject;
@@ -56,22 +55,22 @@ class CollectedObject;
 	A vector for storing CollectedObject objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < CollectedObject*, allocator<CollectedObject*> > CollectedObjectVector;
+typedef std::vector < CollectedObject* > CollectedObjectVector;
 
 /**	
 	A pair for storing object ids and CollectedObjects together. 
 	Stores only pointers to the CollectedObjects. 
 */
-typedef pair <string, CollectedObject* > CollectedObjectPair;
+typedef std::pair <std::string, CollectedObject* > CollectedObjectPair;
 
 /**	
 	A map for storing CollectedObjectPairs. 
 	Stores only pointers to the objects. 
 */
-typedef map <string, CollectedObject* > CollectedObjectMap;
+typedef std::map <std::string, CollectedObject* > CollectedObjectMap;
 
 class Item;
-typedef vector < Item*, allocator<Item*> > ItemVector;
+typedef std::vector < Item* > ItemVector;
 
 /**
 	This class represents an object in a oval sytem characteristics schema.
@@ -86,10 +85,10 @@ public:
 
 	static CollectedObject* CreateNotApplicable(AbsObject* absObject);
 	static CollectedObject* CreateNotSupported(AbsObject* absObject);
-	static CollectedObject* CreateError(string objectId);
+	static CollectedObject* CreateError(std::string objectId);
 	static CollectedObject* Create(AbsObject* absObject);
 
-	static CollectedObject* GetCollectedObject(string objectId);
+	static CollectedObject* GetCollectedObject(std::string objectId);
 
     /** Write all collected objects in the map of collected objects.
 		After writing delete the object to free memory.
@@ -101,11 +100,11 @@ public:
 	OvalEnum::Flag GetFlag();
 	void SetFlag(OvalEnum::Flag flag);
 	
-	string GetId();
-	void SetId(string id);
+	std::string GetId();
+	void SetId(std::string id);
 
-	string GetComment();
-	void SetComment(string comment);
+	std::string GetComment();
+	void SetComment(std::string comment);
 
 	OvalMessageVector* GetMessages();
 	void SetMessages(OvalMessageVector* messages);
@@ -136,17 +135,17 @@ private:
 	/** Creates references to the set of input items. */
 	void AppendReferences(ItemVector* references);
 
-	CollectedObject(string id = "", string comment = "", int version = 1, int variableInstance = 0, OvalEnum::Flag flag = OvalEnum::FLAG_ERROR);
+	CollectedObject(std::string id = "", std::string comment = "", int version = 1, int variableInstance = 0, OvalEnum::Flag flag = OvalEnum::FLAG_ERROR);
 	/** Ensure that a given variable value for a variable id is only written once. */
-	bool IsWritten(StringPairVector* varIdValuePairs, string varId, string value);
+	bool IsWritten(StringPairVector* varIdValuePairs, std::string varId, std::string value);
 	/** Ensure that references are only written once. */
 	bool IsWritten(IntVector* itemIds, int itemId);
 	
 	static void Cache(CollectedObject* collectedObject);
 
 	OvalEnum::Flag flag;
-	string id;
-	string comment;
+	std::string id;
+	std::string comment;
 	OvalMessageVector messages;
 	ItemVector references;
 	VariableValueVector variableValues;
@@ -166,7 +165,7 @@ class CollectedObjectException : public Exception {
 			done with the explicit call to the Exception class constructor that 
 	 		takes a single string param.
 		*/
-		CollectedObjectException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		CollectedObjectException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~CollectedObjectException();
 };
 

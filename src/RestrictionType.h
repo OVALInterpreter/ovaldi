@@ -35,7 +35,6 @@
 #include "OvalEnum.h"
 #include "EntityComparator.h"
 
-using namespace std;
 
 /**
 	This class represents the RestrictionType related to external variables in the oval definition schema.
@@ -43,7 +42,7 @@ using namespace std;
 class RestrictionType {
 public:
 
-	RestrictionType(OvalEnum::Datatype datatype, string value);
+	RestrictionType(OvalEnum::Datatype datatype, std::string value);
 	RestrictionType();
 	~RestrictionType();
 
@@ -51,20 +50,20 @@ public:
 	void Parse(DOMElement* restrictionTypeElm);
 
 	/** Ensure that the specified value matches the criteria specified by this restriction. */
-	bool ValidateValue(OvalEnum::Datatype datatype, string externalValue);
+	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
-	void SetValue(string value);
-	string GetValue();
+	void SetValue(std::string value);
+	std::string GetValue();
 
 	void SetOperation(OvalEnum::Operation operation);
 	OvalEnum::Operation GetOperation();
 
 private:
 
-	string value;
+	std::string value;
 	OvalEnum::Datatype datatype;		
 	OvalEnum::Operation operation;		
 };
 
-typedef vector < RestrictionType*, allocator<RestrictionType*> > RestrictionTypeVector;
+typedef std::vector < RestrictionType* > RestrictionTypeVector;
 #endif

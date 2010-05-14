@@ -30,6 +30,8 @@
 
 #include "Definition.h"
 
+using namespace std;
+
 DefinitionMap Definition::processedDefinitionsMap;
 
 //****************************************************************************************//

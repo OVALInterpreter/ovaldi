@@ -34,7 +34,6 @@
 #include "Common.h"
 #include "OvalEnum.h"
 
-using namespace std;
 
 
 /**
@@ -52,14 +51,14 @@ public:
 
 	StringVector* GetValues();
 	void SetValues(StringVector* values);
-	void AppendValue(string value);
+	void AppendValue(std::string value);
 
 	OvalEnum::Flag GetFlag();
 	void SetFlag(OvalEnum::Flag flag);
 
 	StringVector* GetMessages();
 	void SetMessages(StringVector* msgs);
-	void AppendMessage(string msg);
+	void AppendMessage(std::string msg);
 	void AppendMessages(StringVector* newMsgs);
 
 
@@ -70,6 +69,6 @@ private:
 
 };
 
-typedef vector < ComponentValue*, allocator<ComponentValue*> > ComponentValueVector;
+typedef std::vector < ComponentValue* > ComponentValueVector;
 
 #endif

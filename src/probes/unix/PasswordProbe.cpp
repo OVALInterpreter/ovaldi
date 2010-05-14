@@ -34,6 +34,7 @@
 #include "OvalEnum.h"
 #include <errno.h>
 
+using namespace std;
 
 PasswordProbe* PasswordProbe::instance = NULL;
 

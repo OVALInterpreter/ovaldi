@@ -33,6 +33,7 @@
 
 #include "AbsProbe.h"
 
+#include <cerrno>
 #include <strings.h>
 #include <dirent.h>
 #include <pwd.h>
@@ -41,14 +42,22 @@
 #include <sys/stat.h>
 
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <string>
+
+#ifdef SUNOS
+#include <fstream>
+#include <procfs.h>
+#include <ftw.h>
+#include <algorithm>
+#include <cctype>
+#endif
 
 // Define some buffer lengths
 #define CMDLINE_LEN 1024
 #define SCHED_CLASS_LEN 128
 #define TTY_LEN PATH_MAX
-
-using namespace std;
 
 /**
 	Data collector for process test.
@@ -77,7 +86,7 @@ private:
 		@param command an ObjectEntity* that represents the objects to collect on the ssytem
 		@return The matching commands
 	*/
-	StringVector* GetCommands(ObjectEntity* command);
+	StringPairVector* GetCommands(ObjectEntity* command);
 	
 	/**
 		Get all commands on the system that match the specified pattern.
@@ -85,31 +94,33 @@ private:
 		@param isRegex a bool that is indicates how system commands should be compared against the specified pattern
 		@return The set of matching commands.
 	*/
-	StringVector* GetMatchingCommands(string pattern, bool isRegex);
+	StringPairVector* GetMatchingCommands(std::string pattern, bool isRegex);
 
 	/**
 		Return true if the specifeid command exists on the system.
 		@param command a string that hold the name of the rpm to check for.
 		@result The result of checking for the specified rpm on the system.
 	*/
-	bool CommandExists(string command);
+	bool CommandExists(std::string command, std::string &pid);
 
 	/**
 		Get all the information for the command.
 		@param command a string representing the command to collect information about.
 		@param items a vector of items that matched the command.
 	*/
-	void GetPSInfo(string command, ItemVector* items);
+	void GetPSInfo(std::string command, std::string pidStr, ItemVector* items);
 
 	/**
 		Read /proc/<pid>/cmdline to gather the application name and startup arguments
 	*/
-	int RetrieveCommandLine(char *process, char *cmdline, string *errMsg);
+	int RetrieveCommandLine(const char *process, char *cmdline, std::string *errMsg);
+
+#ifdef LINUX
 
 	/**
 		Read the stat file for a specific process
 	*/
-	int RetrieveStatFile(char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg);
+	int RetrieveStatFile(const char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
 
 	/**
 		 Since there appears to be no simple way to convert the 'tty' value contained in
@@ -118,23 +129,56 @@ private:
 		 if this probe is not run as root, many of these reads will fail.  In that case, we
 		 return '?' as the tty value.		
 	*/
-	void RetrieveTTY(char *process, char *ttyName);
+	void RetrieveTTY(const char *process, char *ttyName);
 
 	/**
 		Read the value contained in '/proc/uptime/' so that we can calculate
 		the start time and exec time of the running processes.
 	*/
-	int RetrieveUptime(unsigned long *uptime, string *errMsg);
+	int RetrieveUptime(unsigned long *uptime, std::string *errMsg);
+
+#endif
+
+#ifdef SUNOS
+
+	/**
+	 * Solaris-specific: gets a device path for the given device.  This will
+	 * take advantage of /etc/ttysrch, if the file exists.
+	 */
+	std::string GetDevicePath(dev_t tty);
+
+	/**
+	 * Solaris-specific: Gets the directories listed in /etc/ttysrch.  An empty
+	 * vector is returned if the file wasn't found or couldn't be read.
+	 */
+	StringVector GetDeviceSearchDirs();
+
+	/**
+	 * Solaris-specific: Reads info from the specified file into \p info.
+	 * \param[in] psinfoFileName the full path to the file to read
+	 * \param[out] info Receives info about the process
+	 * \param[out] errMsg Will receive any error message.  If the file was not found,
+	 *             it will remain unmodified.  Other errors produce a message.
+	 * \return false if the file was not found or an error occurred, true otherwise.
+	 */
+	bool ReadPSInfoFromFile(const std::string psinfoFileName, psinfo_t &info, std::string &errMsg);
+
+#endif
 
 	/**
 		Convert the input seconds and conveert to a string format for exec time.
     */
-	string FormatExecTime(unsigned long execTime);
+	std::string FormatExecTime(time_t execTime);
 
 	/**
 		Convert the input seconds and convert to a string format for start time.
     */
-	string FormatStartTime(unsigned long startTime);
+	std::string FormatStartTime(time_t startTime);
+
+	/**
+	 * A convenience method to delete the commands vector.
+	 */
+	void DeleteCommands(StringPairVector *commands);
 
 	static ProcessProbe *instance;
 };

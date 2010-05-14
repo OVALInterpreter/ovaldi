@@ -35,10 +35,9 @@
 #include "OvalEnum.h"
 #include "EntityComparator.h"
 
-using namespace std;
 class PossibleValueType;
 
-typedef vector < PossibleValueType*, allocator<PossibleValueType*> > PossibleValueTypeVector;
+typedef std::vector < PossibleValueType* > PossibleValueTypeVector;
 
 /**
 	This class represents an the PossibleValueType related to external variables in the oval definitions schema.
@@ -54,17 +53,17 @@ public:
 	void Parse(DOMElement* possibleElm);
 
 	/** Ensure that the specified value matches the criteria specified by this possible_value element. */
-	bool ValidateValue(OvalEnum::Datatype datatype, string externalValue);
+	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
-	void SetHint(string hint);
-	string GetHint();
+	void SetHint(std::string hint);
+	std::string GetHint();
 
-	void SetValue(string value);
-	string GetValue();
+	void SetValue(std::string value);
+	std::string GetValue();
 
 private:
-	string hint;
-	string value;
+	std::string hint;
+	std::string value;
 };
 
 #endif

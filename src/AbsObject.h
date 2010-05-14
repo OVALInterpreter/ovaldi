@@ -42,7 +42,6 @@
 #include "VariableValue.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents an AbsObject in an oval definition file.
@@ -55,34 +54,34 @@ public:
 	virtual void Parse(DOMElement*) = 0;
 	virtual VariableValueVector* GetVariableValues() = 0;
 	
-	string GetId();
-	void SetId(string id);
+	std::string GetId();
+	void SetId(std::string id);
 
-	string GetComment();
-	void SetComment(string comment);
+	std::string GetComment();
+	void SetComment(std::string comment);
 
-	string GetName();
-	void SetName(string name);
+	std::string GetName();
+	void SetName(std::string name);
 
-	string GetXmlns();
-	void SetXmlns(string xmlns);
+	std::string GetXmlns();
+	void SetXmlns(std::string xmlns);
 
 	int GetVersion();
 	void SetVersion(int version);
 
-	string GetType();
+	std::string GetType();
 
 protected:
-	AbsObject(string id = "", string comment = "", string xmlns = "", string name = "", int version = 1);
-	string type;
+	AbsObject(std::string id = "", std::string comment = "", std::string xmlns = "", std::string name = "", int version = 1);
+	std::string type;
 
 private:
 
-	string id;
-	string comment;
-	string name;
+	std::string id;
+	std::string comment;
+	std::string name;
 	int version;
-	string xmlns;
+	std::string xmlns;
 
 };
 
@@ -90,14 +89,14 @@ private:
 	A vector for storing AbsObject objects.
 	All objects are stored by reference.
 */
-typedef vector < AbsObject*, allocator<AbsObject*> > AbsObjectVector;
+typedef std::vector < AbsObject* > AbsObjectVector;
 
 /** 
 	This class represents an Exception that occured while processing an AbsObject.
 */
 class AbsObjectException : public Exception {
 	public:
-		AbsObjectException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		AbsObjectException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~AbsObjectException();
 };
 

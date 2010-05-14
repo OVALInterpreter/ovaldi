@@ -47,7 +47,6 @@
 #include "VariableValue.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents an State in an oval definition file.
@@ -57,7 +56,7 @@ class AbsState {
 
 public:
 	AbsState(OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
-	AbsState(string id, string name, string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
+	AbsState(std::string id, std::string name, std::string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
 	virtual ~AbsState();
 
 	virtual void Parse(DOMElement* stateElm) = 0;
@@ -67,17 +66,17 @@ public:
 	AbsEntityVector* GetElements();
 	void SetElements(AbsEntityVector* elements);
 
-	string GetId();
-	void SetId(string id);
+	std::string GetId();
+	void SetId(std::string id);
 
-	string GetName();
-	void SetName(string name);
+	std::string GetName();
+	void SetName(std::string name);
 
 	OvalEnum::Operator GetOperator();
 	void SetOperator(OvalEnum::Operator ovalOperator);
 
-	string GetXmlns();
-	void SetXmlns(string xmlns);
+	std::string GetXmlns();
+	void SetXmlns(std::string xmlns);
 
 	int GetVersion();
 	void SetVersion(int version);
@@ -86,31 +85,31 @@ public:
     
 private:
 	AbsEntityVector elements;
-	string id;
-	string name;
+	std::string id;
+	std::string name;
 	OvalEnum::Operator myOperator;
 	int version;
-	string xmlns;
+	std::string xmlns;
 };
 
 /**	
 	A pair for storing  state ids and AbsState objects together. 
 	Stores only pointers to the objects. 
 */
-typedef pair <string, AbsState* > AbsStatePair;
+typedef std::pair <std::string, AbsState* > AbsStatePair;
 
 /**	
 	A map for storing AbsState. 
 	Stores only pointers to the objects. 
 */
-typedef map <string, AbsState* > AbsStateMap;
+typedef std::map <std::string, AbsState* > AbsStateMap;
 
 /** 
 	This class represents an Exception that occured while processing an AbsState.
 */
 class AbsStateException : public Exception {
 	public:
-		AbsStateException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		AbsStateException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~AbsStateException();
 };
 

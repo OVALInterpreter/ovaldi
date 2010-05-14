@@ -36,15 +36,13 @@
 #include "PossibleRestrictionType.h"
 #include "DocumentManager.h"
 
-using namespace std;
-
 /**
 	This class represents an external_variable in the oval definition schema.
 */
 class ExternalVariable : public AbsVariable {
 public:
 
-	ExternalVariable(string id = "", string name = "external_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
+	ExternalVariable(std::string id = "", std::string name = "external_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 	~ExternalVariable();
 
 	/** Parse the provided ExternalVariable element into a ExternalVariable. */
@@ -57,7 +55,7 @@ public:
 	void ComputeValue();
 
 	/** Validate that a given external variable value matches the possible values and possible restrictions for this ExternalVariable. */
-	bool ValidateValue(OvalEnum::Datatype datatype, string externalValue);
+	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
 	/** Get the set of PossibleValueType objects for this ExternalVariable. */
 	PossibleValueTypeVector* GetPossibleValueTypes();

@@ -47,7 +47,6 @@
 
 //	namespaces
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class AbsObjectCollector; // forward declaration needed to allow successful compilation
 
@@ -70,11 +69,11 @@ public:
 	/** Add the specified schmema location to the document root. 
 		Ensure that the specified schema location is not already added.
 	*/
-	void AddSchemaLocation(string newSchemaLocation);
+	void AddSchemaLocation(std::string newSchemaLocation);
 	/**	Add the specified xmlns to the document root. 
 		Ensure that the specified xmlns is not already added.	
 	*/
-	void AddXmlns(string newXmlnsAlias, string newXmlnsUri);
+	void AddXmlns(std::string newXmlnsAlias, std::string newXmlnsUri);
 	/** Loop through all objects in the provided oval definitions document.
 		Get the object reference from the test and call the object collector.
 	*/
@@ -123,7 +122,7 @@ protected:
 */
 class AbsDataCollectorException : public Exception {
 public:
-	AbsDataCollectorException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+	AbsDataCollectorException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 	~AbsDataCollectorException();
 };
 

@@ -41,7 +41,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class Test;
 
@@ -49,13 +48,13 @@ class Test;
 	A pair for storing test ids and Test objects together. 
 	Stores only pointers to the objects. 
 */
-typedef pair <string, Test* > TestPair;
+typedef std::pair <std::string, Test* > TestPair;
 
 /**	
 	A map for storing TestPairs. 
 	Stores only pointers to the objects. 
 */
-typedef map <string, Test* > TestMap;
+typedef std::map <std::string, Test* > TestMap;
 
 /**
 	This class represents a test in OVAL.
@@ -119,14 +118,14 @@ public:
 	void SetResult(OvalEnum::ResultEnumeration result);
     
 	/** Return the id field's value. */
-	string GetId();
+	std::string GetId();
 	/** Set the id field's value. */
-	void SetId(string id);
+	void SetId(std::string id);
 
 	/** Return the objectId field's value. */
-	string GetObjectId();
+	std::string GetObjectId();
 	/** Set the objectId field's value. */
-	void SetObjectId(string objectId);
+	void SetObjectId(std::string objectId);
 
     /** Return the object that is referenced by this test. */
     Object* GetReferencedObject();
@@ -136,14 +135,14 @@ public:
 	/** Set the stateIds field's value. */
 	void SetStateIds(StringSet stateIds);
     /** Add the stateId to the list of state ids. */
-	void AppendStateId(string stateId);
+	void AppendStateId(std::string stateId);
     /** return true if the test has a state reference. */
     bool HasStateReference();
 
 	/** Return the name field's value. */
-	string GetName();
+	std::string GetName();
 	/** Set the name field's value. */
-	void SetName(string name);
+	void SetName(std::string name);
 
 	/** Return the written field's value. */
 	bool GetWritten();
@@ -201,7 +200,7 @@ public:
 
 		If the test is not found an exception is thrown. 
 	*/
-	static Test* GetTestById(string testId);
+	static Test* GetTestById(std::string testId);
 
 private:
 
@@ -216,12 +215,12 @@ private:
 	/** Search the cache of Tests for the specified Test. 
 	    Return NULL if not found 
 	*/
-	static Test* SearchCache(string id);
+	static Test* SearchCache(std::string id);
 
 	int version;
 	int variableInstance;
 	OvalEnum::ResultEnumeration result;
-	string id;
+	std::string id;
 	bool written;
 	bool analyzed;
 	OvalEnum::Check check;
@@ -230,9 +229,9 @@ private:
     OvalEnum::Operator stateOperator;
 	TestedItemVector testedItems;
 	VariableValueVector testedVariables;
-	string objectId;
+	std::string objectId;
 	StringSet stateIds;
-	string name;
+	std::string name;
 
 	static TestMap processedTestsMap;
 };

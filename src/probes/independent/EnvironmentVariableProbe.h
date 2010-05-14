@@ -34,7 +34,6 @@
 
 #include <stdlib.h>
 
-using namespace std;
 
 extern char ** _environ; 
 

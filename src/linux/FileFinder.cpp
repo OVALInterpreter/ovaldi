@@ -30,6 +30,8 @@
 
 #include "FileFinder.h"
 
+using namespace std;
+
 FileFinder::FileFinder() {
 
 }

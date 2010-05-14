@@ -37,11 +37,11 @@ FamilyProbe *FamilyProbe::instance = NULL;
 
 FamilyProbe::FamilyProbe() {
 
-	#if WIN32
+	#ifdef WIN32
 		myFamily = "windows";
-	#elif LINUX
+	#elif defined LINUX
 		myFamily = "unix";
-	#elif SUNOS
+	#elif defined SUNOS
 		myFamily = "unix";
 	#else
 		myFamily = "error";

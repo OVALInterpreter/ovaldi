@@ -38,7 +38,6 @@
 #include "Behavior.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class ObjectEntity;
 class Object;
@@ -47,13 +46,13 @@ class Object;
 	A pair for storing object ids and Object pointers together. 
 	Stores only pointers to the objects. 
 */
-typedef pair <string, Object* > ObjectPair;
+typedef std::pair <std::string, Object* > ObjectPair;
 
 /**	
 	A map for storing ObjectPairs. 
 	Stores only pointers to the objects. 
 */
-typedef map <string, Object* > ObjectMap;
+typedef std::map <std::string, Object* > ObjectMap;
 
 /**
 	This class represents an Object in an oval definition file.	
@@ -61,7 +60,7 @@ typedef map <string, Object* > ObjectMap;
 class Object : public AbsObject {
 public:
     /** Create a complete object */
-	Object(string id = "", string comment = "", string xmlns = "", string name = "", int version = 1);
+	Object(std::string id = "", std::string comment = "", std::string xmlns = "", std::string name = "", int version = 1);
 	~Object();
 
     /** Parse the provided object element into an object. */
@@ -83,7 +82,7 @@ public:
 	void SetElements(AbsEntityVector* elements);
 
     /** Return the element with the specified name. */
-	ObjectEntity* GetElementByName(string elementName);
+	ObjectEntity* GetElementByName(std::string elementName);
 
     /** Add an element to the end of the elements vector. */
 	void AppendElement(ObjectEntity* objectEntity);
@@ -101,7 +100,7 @@ public:
 		
 		NOTE: This method is not intended to be used during data collection.
 	*/
-	static Object* GetObjectById(string objectId);
+	static Object* GetObjectById(std::string objectId);
     
     /** Delete all Objects in the cache. */
 	static void ClearCache();
@@ -114,7 +113,7 @@ private:
 	/** Search the cache of Objects for the specified Object. 
 		@return Returns the object with the specified id or NULL if not found.
 	*/
-	static Object* SearchCache(string id);
+	static Object* SearchCache(std::string id);
 
 	AbsEntityVector elements;
 	BehaviorVector behaviors;

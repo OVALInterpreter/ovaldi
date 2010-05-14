@@ -30,6 +30,8 @@
 
 #include "Item.h"
 
+using namespace std;
+
 int Item::idCounter = 1;
 ItemMap Item::processedItemsMap;
 

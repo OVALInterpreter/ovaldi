@@ -45,7 +45,6 @@
 #include "VariableValue.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class AbsVariable;
 
@@ -53,13 +52,13 @@ class AbsVariable;
 	A pair for storing variable ids and AbsVariable together. 
 	Stores only pointers to the AbsVariable. 
 */
-typedef pair <string, AbsVariable* > AbsVariablePair;
+typedef std::pair <std::string, AbsVariable* > AbsVariablePair;
 
 /**	
 	A map for storing AbsVariable. 
 	Stores only pointers to the objects. 
 */
-typedef map <string, AbsVariable* > AbsVariableMap;
+typedef std::map <std::string, AbsVariable* > AbsVariableMap;
 
 /**
 	This class represents an AbsVariable in an oval definition schema.
@@ -74,9 +73,9 @@ public:
 	virtual VariableValueVector* GetVariableValues() = 0;
 	
 	/** Return the id field's value. */
-	string GetId();
+	std::string GetId();
 	/** Set the id field's value. */
-	void SetId(string id);
+	void SetId(std::string id);
 	
 	/** Return the datatype field's value. */
 	OvalEnum::Datatype GetDatatype();
@@ -89,9 +88,9 @@ public:
 	void SetFlag(OvalEnum::Flag flag);
 
 	/** Return the name field's value. */
-	string GetName();
+	std::string GetName();
 	/** Set the name field's value. */
-	void SetName(string name);
+	void SetName(std::string name);
 
 	/** Return the values field's value. */
 	VariableValueVector* GetValues();
@@ -110,16 +109,16 @@ public:
 	/** Set the msgs field's value. */
 	void SetMessages(StringVector* msgs);
 	/** Add a msg to the end of the msgs vector. */
-	void AppendMessage(string msg);
+	void AppendMessage(std::string msg);
 	/** Add a newMsgs to the end of the msgs vector. */
 	void AppendMessages(StringVector* newMsgs);
 	/** Create a string listing of all messages. */
-	string ListMessages();
+	std::string ListMessages();
 
 	/** Search the cache of variables for the specified variable. 
 		return NULL if not found.
 	*/
-	static AbsVariable* SearchCache(string id);
+	static AbsVariable* SearchCache(std::string id);
 	/** delete all items in the cache. */
 	static void ClearCache();
 	/** cache the specified var
@@ -128,13 +127,13 @@ public:
 	static void Cache(AbsVariable* var);
 
 protected:
-	AbsVariable(string id = "", string name = "", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
+	AbsVariable(std::string id = "", std::string name = "", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 
 private:
 
-	string id;
+	std::string id;
 	OvalEnum::Flag flag;
-	string name;
+	std::string name;
 	int version;
 	OvalEnum::Datatype datatype;
 	VariableValueVector values; 

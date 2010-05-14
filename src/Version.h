@@ -34,8 +34,6 @@
 #include <iostream>
 #include <sstream>
 
-using namespace std;
-
 /**
 	Maintians the version of the OVAL Interpreter
 */
@@ -43,22 +41,22 @@ class Version {
 
 	public:
 		/** Return the build of this interpreter as a string. */
-		static string GetBuild();
+		static std::string GetBuild();
 
 		/** Return the build date of this interpreter as a string. */
-		static string GetBuildDate();
+		static std::string GetBuildDate();
 
 		/** Return the vendor of this interpreter as a string. */
-		static string GetVendor();
+		static std::string GetVendor();
 
 		/** Return the version of this interpreter as a string. */
-		static string GetVersion();
+		static std::string GetVersion();
 
 		/** Return the minimum compatible version of this interpreter as a string. */
-		static string GetMinumumCompatibleVersion();
+		static std::string GetMinumumCompatibleVersion();
 
 		/** Return the schema version this interpreter writes documents against. */
-		static string GetSchemaVersion();
+		static std::string GetSchemaVersion();
 };
 
 #endif

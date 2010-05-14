@@ -37,7 +37,6 @@
 #include "VariableValue.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class reads collected objects in a system characteristics files.
@@ -52,14 +51,14 @@ public:
 		Locate teh collected object in the System characteristics document and
 		return the flag attribute's value.
 	*/
-	static OvalEnum::Flag GetCollectedObjectFlag(string objectId);
+	static OvalEnum::Flag GetCollectedObjectFlag(std::string objectId);
 
 	/** Return the set of items for the specified id. */
-	static ItemVector* GetItemsForObject(string objectId);
+	static ItemVector* GetItemsForObject(std::string objectId);
 
 	/** Return the set of variable values used to collect the specified object. */
-	static VariableValueVector* GetVariableValuesForObject(string objectId);
-	static StringVector* GetMessagesForObject(string objectId);
+	static VariableValueVector* GetVariableValuesForObject(std::string objectId);
+	static StringVector* GetMessagesForObject(std::string objectId);
 };
 
 #endif

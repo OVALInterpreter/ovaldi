@@ -41,7 +41,6 @@
 #include "StringEntityValue.h"
 #include "ItemFieldEntityValue.h"
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class represents an entity in an Item as defined in the oval system characteristics schema.
@@ -50,10 +49,10 @@ class ItemEntity {
 public:
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(string name = "", string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
 
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
@@ -87,7 +86,7 @@ public:
             <li>getting the ItemEntity value</li>
         </ul>
     */
-    string UniqueString();
+    std::string UniqueString();
 
 	/** Parse the provided entity element */
 	void Parse(DOMElement* entityElm);
@@ -104,24 +103,24 @@ public:
 	/** Return the name value of the ItemEntity.
 	 *  @return A string representing the name value of the ItemEntity.
 	 */
-	string GetName();
+	std::string GetName();
 
 	/** Set the name of the ItemEntity.
 	 *  @param name A string value representing the name of the ItemEntity.
 	 *  @return Void.
 	 */
-	void SetName(string name);
+	void SetName(std::string name);
 
 	/** Return the value of the ItemEntity.
 	 *  @return A string representing the value of the ItemEntity.
 	 */
-	string GetValue();
+	std::string GetValue();
 
 	/** Set the value of the ItemEntity.
 	 *  @param value A string representation of the value of the ItemEntity.
 	 *  @return Void.
 	 */
-	void SetValue(string value);
+	void SetValue(std::string value);
 
 	/** Return the values of the ItemEntity.
   	 *  @return A AbsEntityValueVector containing the values of the ItemEntity.
@@ -158,7 +157,7 @@ public:
 
 private:
 	OvalEnum::SCStatus scStatus;
-	string name;
+	std::string name;
 	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
@@ -168,6 +167,6 @@ private:
 	A vector for storing ItemEntity objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < ItemEntity*, allocator<ItemEntity*> > ItemEntityVector;
+typedef std::vector < ItemEntity* > ItemEntityVector;
 
 #endif

@@ -41,8 +41,6 @@
 #include <dirent.h>
 #include <limits.h>
 
-using namespace std;
-
 /**
 	This class is the linux file searching implmentation used by this application
 */
@@ -59,15 +57,15 @@ private:
 	*/
 	StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
-	bool PathExists(string path);
-	bool FileNameExists(string path, string fileName);
-	void FindPaths(string regex, StringVector* paths, bool isRegex = true);
-	void GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
-	void GetPathsForPattern(string dirIn, string pattern, StringVector* pathVector, bool isRegex = true);	
+	bool PathExists(std::string path);
+	bool FileNameExists(std::string path, std::string fileName);
+	void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
+	void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
+	void GetPathsForPattern(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/
-	StringVector* GetChildDirectories(string path);
+	StringVector* GetChildDirectories(std::string path);
 };
 
 #endif

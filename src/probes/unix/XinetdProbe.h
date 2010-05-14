@@ -92,7 +92,7 @@ class XinetdProbe : public AbsProbe {
 	 * The defaults section is stored separately, in the given
 	 * 'defaults' param.
 	 */
-	void ProcessConfigFile(const string& confFileName, 
+	void ProcessConfigFile(const std::string& confFileName, 
 						   StringVector& includeStack, 
 						   std::vector<ServiceEntryMap>& services, 
 						   ServiceEntryMap& defaults,
@@ -107,7 +107,7 @@ class XinetdProbe : public AbsProbe {
 	 * processed.  If there is more than one default section found,
 	 * all defaults are collected together into one big group.
 	 */
-	void ProcessIncludeDir(const string& includeDir,
+	void ProcessIncludeDir(const std::string& includeDir,
 						   StringVector& includeStack,
 						   std::vector<ServiceEntryMap>& services,
 						   ServiceEntryMap& defaults,

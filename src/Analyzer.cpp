@@ -30,6 +30,8 @@
 
 #include "Analyzer.h"
 
+using namespace std;
+
 DOMElement* Analyzer::definitionsElm = NULL;
 DOMElement* Analyzer::testsElm = NULL;
 DOMElement* Analyzer::resultsSystemElm = NULL;

@@ -77,7 +77,6 @@
 #include <vector>
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class stores interface information as strings.
@@ -87,18 +86,18 @@ class IfData {
 public:
 	IfData(){};
 	~IfData(){};
-	IfData(string ifn, string ipAddr, string macAddr) : ifName(ifn), ipAddress(ipAddr), macAddress(macAddr) {}
+	IfData(std::string ifn, std::string ipAddr, std::string macAddr) : ifName(ifn), ipAddress(ipAddr), macAddress(macAddr) {}
 
-	string ifName;
-	string ipAddress;
-	string macAddress;
+	std::string ifName;
+	std::string ipAddress;
+	std::string macAddress;
 };
 
 /**	
 	A vector for storing interface data dobjects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < IfData*, allocator<IfData*> > IfDataVector;
+typedef std::vector < IfData* > IfDataVector;
 
 /**
 	This class stores system info as defined in the oval system characteristics schema.
@@ -112,10 +111,10 @@ public:
 	~SystemInfo();
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc);
 		
-	string os_name;
-	string os_version;
-	string architecture;
-	string primary_host_name;
+	std::string os_name;
+	std::string os_version;
+	std::string architecture;
+	std::string primary_host_name;
 	IfDataVector interfaces;
 };
 
@@ -136,7 +135,7 @@ class SystemInfoCollector {
 */
 class SystemInfoException : public Exception {
 	public:
-		SystemInfoException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
+	SystemInfoException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
 		~SystemInfoException();
 };
 

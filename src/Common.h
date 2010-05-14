@@ -66,37 +66,35 @@
 #include "XmlCommon.h"
 #include "DocumentManager.h"
 
-using namespace std;
-
 /**
 	A vector for storing strings.
 */
-typedef vector < string, allocator<string> > StringVector;
+typedef std::vector < std::string > StringVector;
 
 /**
     A set for storing unique strings.
 */
-typedef set < string > StringSet;
+typedef std::set < std::string > StringSet;
 
 /**
 	A vector for storing integers.
 */
-typedef vector < int, allocator<int> > IntVector;
+typedef std::vector < int > IntVector;
 
 /**
 	A vector for storing long long integers.
 */
-typedef vector < long long, allocator<long long> > LongLongVector;
+typedef std::vector < long long > LongLongVector;
 
 /**	
 	A pair for storing two related strings.
 */
-typedef pair < string, string > StringPair;
+typedef std::pair < std::string, std::string > StringPair;
 
 /**	
 	A vector for storing pairs of strings.
 */
-typedef vector < StringPair*, allocator<StringPair*> > StringPairVector;
+typedef std::vector < StringPair* > StringPairVector;
 
 /**
 	This class provides a set of common fuctions used through out the application.
@@ -104,88 +102,88 @@ typedef vector < StringPair*, allocator<StringPair*> > StringPairVector;
 */
 class Common {
 	public:
-		static string	GetDatafile();
+		static std::string	GetDatafile();
 		static bool		GetGenerateMD5();
-		static string	GetXMLfile();
-		static string	GetSchemaPath();
-		static string	GetXMLfileMD5();
-		static string	GetOutputFilename();
+		static std::string	GetXMLfile();
+		static std::string	GetSchemaPath();
+		static std::string	GetXMLfileMD5();
+		static std::string	GetOutputFilename();
 		static bool		GetUseProvidedData();
 		static bool		GetUseVariableFile();
-		static string	GetExternalVariableFile();
+		static std::string	GetExternalVariableFile();
 		static bool		GetVerifyXMLfile();
-		static string	GetXSLFilename();
-		static string	GetXSLOutputFilename();
-		static string   GetLogFileLocation();
+		static std::string	GetXSLFilename();
+		static std::string	GetXSLOutputFilename();
+		static std::string   GetLogFileLocation();
 		static bool     GetNoXsl();
-		static string   GetDefinitionIdsString();
+		static std::string   GetDefinitionIdsString();
 		static bool     GetLimitEvaluationToDefinitionIds();
 		static bool     GetDoDefinitionSchematron();
-		static string   GetDefinitionSchematronPath();
-		static string   GetDefinitionIdsFile();
+		static std::string   GetDefinitionSchematronPath();
+		static std::string   GetDefinitionIdsFile();
 
-		static void		SetDataFile(string);
+		static void		SetDataFile(std::string);
 		static void		SetGenerateMD5(bool);
-		static void		SetXMLfile(string);
-		static void		SetSchemaPath(string);
-		static void		SetXMLfileMD5(string);
-		static void		SetOutputFilename(string);
+		static void		SetXMLfile(std::string);
+		static void		SetSchemaPath(std::string);
+		static void		SetXMLfileMD5(std::string);
+		static void		SetOutputFilename(std::string);
 		static void		SetUseProvidedData(bool);
 		static void		SetUseVariableFile(bool);
-		static void		SetExternalVariableFile(string);
+		static void		SetExternalVariableFile(std::string);
 		static void		SetVerifyXMLfile(bool);
-		static void 	SetXSLFilename(string);
-		static void		SetXSLOutputFilename(string);
-		static void		SetLogFileLocation(string);
+		static void 	SetXSLFilename(std::string);
+		static void		SetXSLOutputFilename(std::string);
+		static void		SetLogFileLocation(std::string);
 		static void     SetNoXsl(bool);
-		static void     SetDefinitionIdsString(string definitionIdsString);
+		static void     SetDefinitionIdsString(std::string definitionIdsString);
 		static void     SetLimitEvaluationToDefinitionIds(bool set);
 		static void     SetDoDefinitionSchematron(bool set);
-		static void     SetDefinitionSchematronPath(string definitionSchematronPath);
-		static void     SetDefinitionIdsFile(string definitionIdsFile);
+		static void     SetDefinitionSchematronPath(std::string definitionSchematronPath);
+		static void     SetDefinitionIdsFile(std::string definitionIdsFile);
 
 		static StringVector* ParseDefinitionIdsFile();
 		static StringVector* ParseDefinitionIdsString();
 		/** Pad the provided string with spaces so that it is the desired length. */
-		static string	PadString(string, unsigned int);
+		static std::string	PadString(std::string, unsigned int);
 		/** Pad the provided string with the specified char so that it is the desired length. */
-		static string	PadStringWithChar(string, char, unsigned int);
+		static std::string	PadStringWithChar(std::string, char, unsigned int);
 		/**
 		 *  This function takes a string and searches for all oldChrs.  If one is found,
 	     *  it is replaced with a newChr.  It is only intended to work with a single char 
 	     *  at a time. No multiple char strings allowed
 	     */
-		static string	SwitchChar(string stringIn, string oldChr, string newChr);
+		static std::string	SwitchChar(std::string stringIn, std::string oldChr, std::string newChr);
 		/** Return true if the specified file exists. */
 		static bool     FileExists(const char* filename);
 		/** Return the int as a string. */
-		static string	ToString(int);
+		static std::string	ToString(int);
 		/** Return the unsigned int as a string. */
-		static string	ToString(unsigned int);
+		static std::string	ToString(unsigned int);
 		/** Return the long as a string. */
-		static string	ToString(long);
+		static std::string	ToString(long);
 		/** Return the long long as a string. */
-		static string   ToString(long long);
+		static std::string   ToString(long long);
 		/** Return the unsigned long as a string. */
-		static string	ToString(unsigned long);
+		static std::string	ToString(unsigned long);
 		/** Return a the bool as a string. */
-		static string	ToString(bool);
+		static std::string	ToString(bool);
 		/** Return a the char as a string. */
-		static string	ToString(char);
+		static std::string	ToString(char);
 		/** Return a double as a string. */
-		static string	ToString(double);
+		static std::string	ToString(double);
 
 		/** Converts a string into a string of all uppercase characters.
 		 *	@param s The string that you would like to convert into all uppercase characters.
 		 *	@return A string of uppercase characters.
 		 */
-		static string ToUpper(string s);
+		static std::string ToUpper(std::string s);
 
 		/** Converts a string into a string of all lowercase characters.
 		 *	@param s The string that you would like to convert into all lowercase characters.
 		 *	@return A string of lowercase characters.
 		 */
-		static string ToLower(string s);
+		static std::string ToLower(std::string s);
 		
 		/** Converts a string into a long long integer. At some point, we might want to consider placing the error checking code in a separate method to allow more flexibility with the StringToLongLong() method. 
 		 *	@param numstr Pointer to the character string that you would like to convert into a long long integer.
@@ -199,7 +197,7 @@ class Common {
 		 *	Retrieve the date/time.  The final output will be in the format:
 		 *	yyyy-mm-ddThh:mm:ss	2006-08-16T14:21:38
 		 */
-		static string	GetTimeStamp();
+		static std::string	GetTimeStamp();
 
         /**
 		 *	Build a valid filepath out of the input path and filename. 
@@ -207,14 +205,14 @@ class Common {
 		 *	@param path non NULL string representing the path portion of the filepath
 		 *	@param filename string representing the filename
         */
-        static string BuildFilePath(const string path, const string filename);
+        static std::string BuildFilePath(const std::string path, const std::string filename);
 
 		/**
 		 *	Split a valid filepath into its path and filename components. 
 		 *	@param filepath a non-NULL, non-empty, string representing the filepath that you would like split.
 		 *	@return a pointer to a StringPair that contains the path and filename components of the specified filepath.
          */
-		static StringPair* SplitFilePath(const string filepath);
+		static StringPair* SplitFilePath(const std::string filepath);
 
 		/** Removes whitespace at the start of the given string. */
 		static void TrimStart(std::string& str);
@@ -228,39 +226,39 @@ class Common {
 		static bool IsRegexChar(char c);
 
 		static char fileSeperator;
-		static string fileSeperatorStr;
+		static std::string fileSeperatorStr;
 
 		/** All chars which are not interpreted literally in a regex. */
-		static const string REGEX_CHARS;
+		static const std::string REGEX_CHARS;
 
 		
 
 	private:
-		static string dataFile;
-		static string outputFilename;
-		static string startTime;
-		static string externalVariablesFile;
-		static string xmlfile;
-		static string schemapath;
+		static std::string dataFile;
+		static std::string outputFilename;
+		static std::string startTime;
+		static std::string externalVariablesFile;
+		static std::string xmlfile;
+		static std::string schemapath;
 		static bool noXsl;
-		static string xslFile;
-		static string xslOutputFile;
-		static string logFileLocation;
-		static string xmlfileMD5;
+		static std::string xslFile;
+		static std::string xslOutputFile;
+		static std::string logFileLocation;
+		static std::string xmlfileMD5;
 		static bool	generateMD5;
 		static bool useProvidedData;
 		static bool verifyXMLfile;
 		static bool limitEvaluationToDefinitionIds;
-		static string definitionIds;
+		static std::string definitionIds;
 		static bool doDefinitionSchematron;
-		static string definitionSchematronPath;
-		static string definitionIdsFile;
+		static std::string definitionSchematronPath;
+		static std::string definitionIdsFile;
 
 		/** format of a definition id. */
-		static const string DEFINITION_ID;
+		static const std::string DEFINITION_ID;
 
 		/** format required for a list of definitions ids */
-		static const string DEFINITION_ID_LIST;
+		static const std::string DEFINITION_ID_LIST;
 
 };
 
@@ -274,7 +272,7 @@ class CommonException : public Exception {
             done with the explicit call to the Exception class constructor that
             takes a single string param.
         */
-		CommonException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
+		CommonException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
 		~CommonException();
 };
 

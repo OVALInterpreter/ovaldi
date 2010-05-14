@@ -30,6 +30,8 @@
 
 #include "REGEX.h"
 
+using namespace std;
+
 REGEX::REGEX() {
 	this->matchCount = 0;
 }
@@ -400,7 +402,7 @@ void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& search
 	int matchOffset = 0;
 	StringVector match;
 	do {
-		memset(ovector, 0, ovecSize);
+		memset(ovector, 0, ovecSize*sizeof(int));
 
 		matchCount = pcre_exec(
 			re,

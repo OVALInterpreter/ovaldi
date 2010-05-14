@@ -35,7 +35,6 @@
 #include "Item.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class representsa tested_item int eh oval results schema.
@@ -73,6 +72,6 @@ private:
 	A vector for storing TestedItem objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < TestedItem*, allocator<TestedItem*> > TestedItemVector;
+typedef std::vector < TestedItem* > TestedItemVector;
 
 #endif

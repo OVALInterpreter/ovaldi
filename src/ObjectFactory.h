@@ -44,7 +44,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class is a Factory class for getting parsed objects.
@@ -54,7 +53,7 @@ using namespace std;
 class ObjectFactory {
 
 public:
-	static AbsObject* GetObjectById(string objectId);
+	static AbsObject* GetObjectById(std::string objectId);
 
 };
 

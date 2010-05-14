@@ -37,10 +37,6 @@
 #include <stdio.h>
 #include <iostream>
 
-
-
-using namespace std;
-
 /** 
 	This class provides logging for the application.
 
@@ -63,7 +59,7 @@ public:
 		@param toScreen when true the log messages will be written to std out.
 		@throws Exception Thrown when the existing log file can not be cleared.
 	*/
-	static void Init(int level = DEBUG, string logFile = "", bool toScreen = false);
+	static void Init(int level = DEBUG, std::string logFile = "", bool toScreen = false);
 
 	/** Shutdown the logger. Simply has to close the log file. */
 	static void Shutdown();
@@ -74,31 +70,31 @@ public:
 		@param fileOnly When true log to the file only, not to std out.
 		@throws Exception Thrown when the logger has not been initialized.
 	*/
-	static void Debug(string msg, bool fileOnly = false);
+	static void Debug(std::string msg, bool fileOnly = false);
 
 	/** Write the specified message at Log::INFO level.
 
 		@param msg The message to write
 		@throws Exception Thrown when the logger has not been initialized.
 	*/
-	static void Info(string msg);
+	static void Info(std::string msg);
 	
 	/** Write the specified message at Log::MESSAGE level.
 
 		@param msg The message to write
 		@throws Exception Thrown when the logger has not been initialized.
 	*/
-	static void Message(string msg);
+	static void Message(std::string msg);
 	
 	/** Write the specified message at Log::FATAL level.
 
 		@param msg The message to write
 		@throws Exception Thrown when the logger has not been initialized.
 	*/
-	static void Fatal(string msg);
+	static void Fatal(std::string msg);
 
 	static int  GetLevel();		
-	static void SetLevel(string strLevel);
+	static void SetLevel(std::string strLevel);
 	static void SetLevel(int level);
 	static void SetToScreen(bool screen);
 	static bool GetToScreen();
@@ -121,7 +117,7 @@ public:
 
 		@param msg The message to be written.
 	*/
-	static void UnalteredMessage(string msg);
+	static void UnalteredMessage(std::string msg);
 
 	static const int DEBUG = 1;
 	static const int INFO = 2;
@@ -141,16 +137,16 @@ private:
 		@param logMessageIn The message to be logged.
 		@param fileOnly If true write the log message only to file, not to screen.
 	*/
-	static void WriteLog(string logMessageIn, bool fileOnly = false);
+	static void WriteLog(std::string logMessageIn, bool fileOnly = false);
 
 	/** Convert the level to a string. */
-	static string LevelToString(int level);
+	static std::string LevelToString(int level);
 
-	static string logFilename;
+	static std::string logFilename;
 	static int level;
 	static bool toScreen;
 	static bool initialized;
-    static ofstream logFile;
+    static std::ofstream logFile;
 
 };
 

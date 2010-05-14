@@ -28,13 +28,9 @@
 //
 //****************************************************************************************//
 
-//SOLARIS PORT NOTICE:
-
-//This code is copied from the linux version of this file. This code currently provides stubs for
-// inserting the probes that might be needed by a solaris port of the interpreter. When a port to solaris
-//is provide this code needs to be both completed and tested.
-
 #include "ProbeFactory.h"
+
+using namespace std;
 
 AbsProbeSet ProbeFactory::_probes;
 
@@ -49,62 +45,58 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	//	If a Probe is not found return null
 	// -----------------------------------------------------------------------
 
-// SOLARIS PORT NOTICE: Add other probes here to support collection of solaris specific objects.
-
 	AbsProbe* probe = NULL;
 
 // here are the objects defined in the independent schema
 	if(objectName.compare("family_object") == 0) {
 		probe = FamilyProbe::Instance();
 	} else if(objectName.compare("filemd5_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = FileMd5Probe::Instance();
 	} else if(objectName.compare("filehash_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = FileHashProbe::Instance();
 	} else if(objectName.compare("environmentvariable_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = EnvironmentVariableProbe::Instance();
 	} else if(objectName.compare("variable_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = VariableProbe::Instance();
 	} else if(objectName.compare("textfilecontent_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = TextFileContentProbe::Instance();
+	} else if(objectName.compare("textfilecontent54_object") == 0) {
+		probe = TextFileContent54Probe::Instance();
 	} else if(objectName.compare("xmlfilecontent_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux and windows systems and needs to be tested on solaris systems
 		probe = XmlFileContentProbe::Instance();
+		//	} else if(objectName.compare("ldap_object") == 0) {
+		// Not currently implemented for solaris systems
 
 // here are the objects defined in the unix schema
 	} else if(objectName.compare("file_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = FileProbe::Instance();	
 	} else if(objectName.compare("inetd_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = InetdProbe::Instance();
 	} else if(objectName.compare("interface_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = InterfaceProbe::Instance();
 	} else if(objectName.compare("password_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = PasswordProbe::Instance();
 	} else if(objectName.compare("process_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = ProcessProbe::Instance();
 	} else if(objectName.compare("runlevel_object") == 0) {
-		// Not currently implemented for any unix systems
-	} else if(objectName.compare("sccs_object") == 0) {
+		probe = RunLevelProbe::Instance();
+		//	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
-		// Not currently implemented for any unix systems
+		probe = ShadowProbe::Instance();
 	} else if(objectName.compare("uname_object") == 0) {
-		// SOLARIS PORT NOTICE: This probe was written for linux systems and needs to be tested on solaris systems
 		probe = UnameProbe::Instance();
+	} else if(objectName.compare("xinetd_object") == 0) {
+		probe = XinetdProbe::Instance();
 
 // here are the solaris specific objects
-	} else if(objectName.compare("isainfo_object") == 0) {
+/*	} else if(objectName.compare("isainfo_object") == 0) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
 	} else if(objectName.compare("package_object") == 0) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
 	} else if(objectName.compare("patch_object") == 0) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
+		*/
 	} else {
 		Log::Info(objectName + " is not currently supported.");
 	}

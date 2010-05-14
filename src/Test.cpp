@@ -30,6 +30,8 @@
 
 #include "Test.h"
 
+using namespace std;
+
 TestMap Test::processedTestsMap;
 //****************************************************************************************//
 //								Test Class												  //	

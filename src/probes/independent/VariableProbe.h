@@ -32,7 +32,6 @@
 
 #include "AbsProbe.h"
 
-using namespace std;
 
 /**
 	This class is responsible for collecting variable information for variable_objects.
@@ -51,7 +50,7 @@ public:
 private:
 
 	/** Return an Item for the specified variable id. */
-	Item* GetItemForVarId(string varId);
+	Item* GetItemForVarId(std::string varId);
 
 	/** Return all the variable ids in the definitions file being processed. */
 	StringVector* GetVariableIds();

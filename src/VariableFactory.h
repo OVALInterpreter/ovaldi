@@ -42,7 +42,6 @@
 #include "ExternalVariable.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class provides a single interface to all variable classes.
@@ -50,7 +49,7 @@ using namespace std;
 */
 class VariableFactory {
 public:
-	static AbsVariable* GetVariable(string varId);
+	static AbsVariable* GetVariable(std::string varId);
 
 private:
 	static DOMElement* variablesElm;
@@ -61,7 +60,7 @@ private:
 */
 class VariableFactoryException : public Exception {
 	public:
-		VariableFactoryException(AbsVariable* var = NULL, string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		VariableFactoryException(AbsVariable* var = NULL, std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 		~VariableFactoryException();
 
 		void SetVariable(AbsVariable* var);

@@ -39,6 +39,8 @@
 
 #ifdef LINUX
 	#define STRNICMP strnicmp
+#elif defined SUNOS
+#  define STRNICMP strncasecmp
 #endif
 
 
@@ -65,8 +67,6 @@
 #include "EntityComparator.h"
 #include "OvalEnum.h"
 
-
-using namespace std;
 
 #define BUFFER_SIZE 4096
 

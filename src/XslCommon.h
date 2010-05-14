@@ -44,9 +44,6 @@
 //	other includes
 #include "Log.h"
 
-//	namespaces
-using namespace std;
-
 /**
 	This class encapsulates a set of static methods for applying an xsl to an xml file
 */
@@ -56,12 +53,12 @@ public:
 		Apply the specified xsl to the specified xml and output to the 
 		specified file.
 	*/
-	static void ApplyXSL(string xmlFilePath, string xslFilePath, string outputFilePath);
+	static void ApplyXSL(std::string xmlFilePath, std::string xslFilePath, std::string outputFilePath);
 
 	/** 
 		Apply the specified xsl to the specified xml and output the reuslt as a string.
 	*/
-	static string ApplyXSL(string xmlFilePath, string xslFilePath);
+	static std::string ApplyXSL(std::string xmlFilePath, std::string xslFilePath);
 };
 
 

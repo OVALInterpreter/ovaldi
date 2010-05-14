@@ -37,8 +37,6 @@
 
 #include "Common.h"
 
-using namespace std;
-
 /**
 	This class stores all the enumerations that are common to more than one oval schema.
 	Along with each enumeration are the methods need for translating that enumeration tothe oval 
@@ -50,8 +48,8 @@ public:
 	/** An enum to define the acceptable arithmetic operations. */
 	enum ArithmeticOperation	{ARITHMETIC_ADD,
 				                ARITHMETIC_MULTIPLY};
-	static string ArithmeticOperationToString(OvalEnum::ArithmeticOperation arithOp);
-	static OvalEnum::ArithmeticOperation ToArithmeticOperation(string arithStr);
+	static std::string ArithmeticOperationToString(OvalEnum::ArithmeticOperation arithOp);
+	static OvalEnum::ArithmeticOperation ToArithmeticOperation(std::string arithStr);
 
     /** An enum to define the acceptable check values. */
 	enum Check	{CHECK_ALL,
@@ -59,8 +57,8 @@ public:
 				CHECK_NONE_EXIST, // DEPRECATED in version 5.3
 				CHECK_NONE_SATISFY,
 				CHECK_ONLY_ONE};
-	static string CheckToString(OvalEnum::Check check);
-	static OvalEnum::Check ToCheck(string checkStr);
+	static std::string CheckToString(OvalEnum::Check check);
+	static OvalEnum::Check ToCheck(std::string checkStr);
 
 	/** An enum to define the acceptable check_existence values. */
 	enum Existence	{EXISTENCE_ALL_EXIST,
@@ -68,9 +66,9 @@ public:
 				EXISTENCE_AT_LEAST_ONE_EXISTS,
 				EXISTENCE_NONE_EXIST,
 				EXISTENCE_ONLY_ONE_EXISTS};
-	static string ExistenceToString(OvalEnum::Existence existence);
+	static std::string ExistenceToString(OvalEnum::Existence existence);
 	/** Convert the string to an Existence. */
-	static OvalEnum::Existence ToExistence(string existenceStr);
+	static OvalEnum::Existence ToExistence(std::string existenceStr);
 
 	/** An enum to define the acceptable data types. */
 	enum Datatype	{DATATYPE_STRING,
@@ -82,8 +80,8 @@ public:
 					DATATYPE_FLOAT,
 					DATATYPE_VERSION,
 					DATATYPE_RECORD};
-	static string DatatypeToString(OvalEnum::Datatype datatype);
-	static OvalEnum::Datatype ToDatatype(string datatypeStr);
+	static std::string DatatypeToString(OvalEnum::Datatype datatype);
+	static OvalEnum::Datatype ToDatatype(std::string datatypeStr);
 
     /** An enum to define the acceptable date time formats. */
 	enum DateTimeFormat	{DATETIME_YEAR_MONTH_DAY,
@@ -91,8 +89,8 @@ public:
 					DATETIME_DAY_MONTH_YEAR,
 					DATETIME_WIN_FILETIME,
 					DATETIME_SECONDS_SINCE_EPOCH};
-	static string DateTimeFormatToString(OvalEnum::DateTimeFormat dateTimeFormat);
-	static OvalEnum::DateTimeFormat ToDateTimeFormat(string dateTimeFormatStr);
+	static std::string DateTimeFormatToString(OvalEnum::DateTimeFormat dateTimeFormat);
+	static OvalEnum::DateTimeFormat ToDateTimeFormat(std::string dateTimeFormatStr);
 
 	/** enumeration of possible CollectedObject Flag values. */
 	enum Flag	{FLAG_ERROR,
@@ -101,8 +99,8 @@ public:
 				FLAG_DOES_NOT_EXIST,
 				FLAG_NOT_COLLECTED,
 				FLAG_NOT_APPLICABLE};
-	static string FlagToString(OvalEnum::Flag flag);
-	static OvalEnum::Flag ToFlag(string flagStr);
+	static std::string FlagToString(OvalEnum::Flag flag);
+	static OvalEnum::Flag ToFlag(std::string flagStr);
 	static OvalEnum::Flag CombineFlags(IntVector* flags);
 
 	/** An enum to define the acceptable levels. */
@@ -111,8 +109,8 @@ public:
 				LEVEL_FATAL,
 				LEVEL_INFO,
 				LEVEL_WARNING};
-	static string LevelToString(OvalEnum::Level level);
-	static OvalEnum::Level ToLevel(string levelStr);
+	static std::string LevelToString(OvalEnum::Level level);
+	static OvalEnum::Level ToLevel(std::string levelStr);
 
 	/** enumeration of Operations and supporting methods. */
 	enum Operation	{OPERATION_EQUALS, 
@@ -126,16 +124,16 @@ public:
 					OPERATION_PATTERN_MATCH,
 					OPERATION_CASE_INSENSITIVE_EQUALS,
 					OPERATION_CASE_INSENSITIVE_NOT_EQUAL };
-	static string OperationToString(OvalEnum::Operation operation);
-	static OvalEnum::Operation ToOperation(string operationStr);
+	static std::string OperationToString(OvalEnum::Operation operation);
+	static OvalEnum::Operation ToOperation(std::string operationStr);
 
 	/** enumeration of Operators and supporting methods. */
 	enum Operator	{OPERATOR_AND,
 					OPERATOR_ONE,
 					OPERATOR_OR,
 					OPERATOR_XOR};
-	static OvalEnum::Operator ToOperator(string operatorStr);
-	static string OperatorToString(OvalEnum::Operator op);
+	static OvalEnum::Operator ToOperator(std::string operatorStr);
+	static std::string OperatorToString(OvalEnum::Operator op);
 
 	/** enumeration of Result Values and supporting methods. */
 	enum ResultEnumeration	{RESULT_TRUE,
@@ -144,8 +142,8 @@ public:
 							RESULT_ERROR,
 							RESULT_NOT_EVALUATED,
 							RESULT_NOT_APPLICABLE};
-	static OvalEnum::ResultEnumeration ToResult(string resultStr);
-	static string ResultToString(OvalEnum::ResultEnumeration result);
+	static OvalEnum::ResultEnumeration ToResult(std::string resultStr);
+	static std::string ResultToString(OvalEnum::ResultEnumeration result);
 
 	static OvalEnum::ResultEnumeration CombineResultsByOperator(IntVector* results, OvalEnum::Operator op);    
 	static OvalEnum::ResultEnumeration CombineResultsByCheck(IntVector* results, OvalEnum::Check check);
@@ -156,15 +154,15 @@ public:
 					STATUS_EXISTS,
 					STATUS_DOES_NOT_EXIST,
 					STATUS_NOT_COLLECTED};
-	static string SCStatusToString(OvalEnum::SCStatus status);
-	static OvalEnum::SCStatus ToSCStatus(string statusStr);
+	static std::string SCStatusToString(OvalEnum::SCStatus status);
+	static OvalEnum::SCStatus ToSCStatus(std::string statusStr);
 
 	/** An eumeration of possible SetOperator values in the definition schema. */
 	enum SetOperator	{SET_OPERATOR_COMPLEMENT, 
 						SET_OPERATOR_INTERSECTION,
 						SET_OPERATOR_UNION};
-	static string SetOperatorToString(OvalEnum::SetOperator operation);
-	static OvalEnum::SetOperator ToSetOperator(string operationStr);
+	static std::string SetOperatorToString(OvalEnum::SetOperator operation);
+	static OvalEnum::SetOperator ToSetOperator(std::string operationStr);
 };
 
 #endif

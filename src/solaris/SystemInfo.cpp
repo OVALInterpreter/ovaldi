@@ -30,14 +30,7 @@
 
 #include "SystemInfo.h"
 
-//SOLARIS PORT NOTICE:
-
-//This code is copied from the linux version of this file. I assume that in this case there
-//are is no need to change this code to run on solaris os. When a port to solaris is provided 
-//this code needs to be tested.
-
-
-
+using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~		Class SystemInfo		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -144,7 +137,6 @@ SystemInfo* SystemInfoCollector::CollectSystemInfo() {
 	//  Run the system info collector. Return a SystemInfo object. 
 	//
 	//------------------------------------------------------------------------------------//
-
 	SystemInfo *sysInfo = new SystemInfo();
 	SystemInfoCollector::GetOSInfo(sysInfo);
 	sysInfo->interfaces = SystemInfoCollector::GetInterfaces();
@@ -219,72 +211,37 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	//------------------------------------------------------------------------------------//
 
 	IfDataVector interfaces;
-	/*
-	struct ifconf conf;
-	struct sockaddr_in *s_in;
-	struct  sockaddr_in *hwAddr;
-	int sock, count;
-
-	// Open dummy socket
-	if((sock = socket(PF_INET, SOCK_DGRAM, 0)) == -1) {
-	  throw SystemInfoException("Error: Unable to open socket.");
-	}
-
-	// Get the list of devices - only gets 20
-	memset(&conf, 0, sizeof(conf));
-	conf.ifc_len = sizeof(struct ifreq) * 20;
-	conf.ifc_buf = (char*)malloc(conf.ifc_len);
-
-	if(ioctl(sock, SIOCGIFCONF, &conf) == -1) {
-	  free(conf.ifc_buf);
-	  throw SystemInfoException("Error: Unable to get a device list.");
-	}
-
-	count = conf.ifc_len/sizeof(struct ifreq);
-	for(int i = 0; i < count; i++) {
-	  IfData *tmpIfData = new IfData();
-	  s_in = (struct sockaddr_in*)&conf.ifc_req[i].ifr_addr;
-	  tmpIfData->ifName = conf.ifc_req[i].ifr_name;
-	  tmpIfData->ipAddress = inet_ntoa(s_in->sin_addr);
-
-	  hwAddr = (struct sockaddr_in*)&conf.ifc_req[i].ifr_hwaddr;
-	  tmpIfData->macAddress = inet_ntoa(hwAddr->sin_addr);
-
-	  tmpIfData->macAddress = " UNKNOWN ";
-	  
-	  interfaces.push_back(tmpIfData);
-	}
-
-	free(conf.ifc_buf);	  
-*/
 
 	/* here is the test sample code i found on the net
-	*/
+	 */
 
 	unsigned char      *u;
 	int                sockfd, size  = 1;
 	struct ifreq       *ifr;
 	struct ifconf      ifc;
 	struct sockaddr_in sa;
+	struct arpreq arp;
+	char macStr[128];
+	
 
 	if (0 > (sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP))) {
-	  throw SystemInfoException("Error: Unable to open socket.");
+		throw SystemInfoException("Error: Unable to open socket.");
 	}	
 
 	ifc.ifc_len = IFRSIZE;
 	ifc.ifc_req = NULL;
 
 	do {
-	++size;
-	/* realloc buffer size until no overflow occurs  */
+		++size;
+		/* realloc buffer size until no overflow occurs  */
 
 		if (NULL == (ifc.ifc_req = (ifreq*)realloc(ifc.ifc_req, IFRSIZE))) {
-		  throw SystemInfoException("Error: Unable to allocate mememory.");
+			throw SystemInfoException("Error: Unable to allocate mememory.");
 		}
 		ifc.ifc_len = IFRSIZE;
 		if (ioctl(sockfd, SIOCGIFCONF, &ifc)) {
-		  free(ifc.ifc_req);
-		  throw SystemInfoException("Error: ioctl SIOCFIFCONF.");
+			free(ifc.ifc_req);
+			throw SystemInfoException("Error: ioctl SIOCFIFCONF.");
 		}
 	} while  (IFRSIZE <= ifc.ifc_len);
 
@@ -293,11 +250,7 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	for (;(char *) ifr < (char *) ifc.ifc_req + ifc.ifc_len; ++ifr) {
 
 		if (ifr->ifr_addr.sa_data == (ifr+1)->ifr_addr.sa_data) {
-		  continue;  // duplicate, skip it
-		}
-
-		if (ioctl(sockfd, SIOCGIFFLAGS, ifr)) {
-		  continue;  // failed to get flags, skip it
+			continue;  // duplicate, skip it
 		}
 
 		//printf("Interface:  %s\n", ifr->ifr_name);
@@ -306,75 +259,27 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 		tmpIfData->ifName = ifr->ifr_name;
 		tmpIfData->ipAddress = inet_ntoa(inaddrr(ifr_addr.sa_data));
 
-		if (0 == ioctl(sockfd, SIOCGIFHWADDR, ifr)) {
+		if (ioctl(sockfd, SIOCGIFADDR, ifr))
+			continue;
 
-			/* Select which  hardware types to process.
-			*
-			*    See list in system include file included from
-			*    /usr/include/net/if_arp.h  (For example, on
-			*    Linux see file /usr/include/linux/if_arp.h to
-			*    get the list.)
-			*/
-		  /* No used 
-			switch (ifr->ifr_hwaddr.sa_family) {
+		arp.arp_pa = ifr->ifr_addr;
+		if (ioctl(sockfd, SIOCGARP, &arp))
+			continue;
 
-				default:
-					printf("\n");
-					continue;
-				case  ARPHRD_NETROM:  case  ARPHRD_ETHER:  case  ARPHRD_PPP:
-				case  ARPHRD_EETHER:  case  ARPHRD_IEEE802: break;
-			}
-		  */
-
-		  
-			u = (unsigned char *) &ifr->ifr_addr.sa_data;
-			char *macStr = (char*)malloc(sizeof(char)*128);
-			memset(macStr, 0, 128);
-			if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
-			  //printf("HW Address: %2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x\n", u[0], u[1], u[2], u[3], u[4], u[5]);
-			  sprintf(macStr, "%2.2x.%2.2x.%2.2x.%2.2x.%2.2x.%2.2x", u[0], u[1], u[2], u[3], u[4], u[5]); 
-			  tmpIfData->macAddress = macStr;
-			}
-			free(macStr);
-
-			interfaces.push_back(tmpIfData);
+		u = (unsigned char *) arp.arp_ha.sa_data;
+		memset(macStr, 0, sizeof(macStr));
+		if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
+			sprintf(macStr, "%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", u[0], u[1], u[2], u[3], u[4], u[5]); 
+			tmpIfData->macAddress = macStr;
 		}
 
-		/* netmask 
-		if (0 == ioctl(sockfd, SIOCGIFNETMASK, ifr) && strcmp("255.255.255.255", inet_ntoa(inaddrr(ifr_addr.sa_data)))) {
-
-			printf("Netmask:    %s\n", inet_ntoa(inaddrr(ifr_addr.sa_data)));
-		}
-		*/
-
-		/* broadcast
-		if (ifr->ifr_flags & IFF_BROADCAST) {
-
-			if (0 == ioctl(sockfd, SIOCGIFBRDADDR, ifr) && strcmp("0.0.0.0", inet_ntoa(inaddrr(ifr_addr.sa_data)))) {
-				printf("Broadcast:  %s\n", inet_ntoa(inaddrr(ifr_addr.sa_data)));
-			}
-		}
-		*/
-		
-		/* MTU
-		if (0 == ioctl(sockfd, SIOCGIFMTU, ifr)) {
-
-			printf("MTU:        %u\n",  ifr->ifr_mtu);
-		}
-		*/
-
-		/* Metric
-		if (0 == ioctl(sockfd, SIOCGIFMETRIC, ifr)) {
-			printf("Metric:     %u\n",  ifr->ifr_metric);
-		}
-		printf("\n");
-		*/
+		interfaces.push_back(tmpIfData);
 	}
 
 	close(sockfd);
 
 	/* end sample code from the net
-	*/
+	 */
 
 	return interfaces;
 }

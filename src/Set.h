@@ -43,13 +43,12 @@
 #include "VariableValue.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 // Forward declarations to allow compilation.
 class AbsState;
-typedef vector < AbsState*, allocator<AbsState*> > AbsStateVector;
+typedef std::vector < AbsState* > AbsStateVector;
 class Set;
-typedef vector < Set*, allocator<Set*> > SetVector;
+typedef std::vector < Set* > SetVector;
 // end forward declarations
 
 /**
@@ -131,7 +130,7 @@ class SetException : public Exception {
 			done with the explicit call to the Exception class constructor that 
 			takes a single string param.
 		*/
-		SetException(string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
+		SetException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
 
 		~SetException();
 };

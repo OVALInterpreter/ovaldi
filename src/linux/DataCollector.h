@@ -36,7 +36,6 @@
 #include "SystemInfo.h"
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	The linux specific data collector

@@ -45,7 +45,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class Item;
 
@@ -53,36 +52,36 @@ class Item;
 	A vector for storing Item objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < Item*, allocator<Item*> > ItemVector;
+typedef std::vector < Item* > ItemVector;
 
 /**	
 	A pair for storing item ids and Item objects together. 
 	Stores only pointers to the objects. 
 */
-typedef pair < int, Item* > ItemPair;
+typedef std::pair < int, Item* > ItemPair;
 
 /**	
 	A map for storing ItemPairs. 
 	Stores only pointers to the Item objects. 
 */
-typedef map < int, Item* > ItemMap;
+typedef std::map < int, Item* > ItemMap;
 
 /**	
 	A pair for storing item strings and Item objects together. 
 	Stores only pointers to the objects. 
 */
-typedef pair < string, Item* > StringItemPair;
+typedef std::pair < std::string, Item* > StringItemPair;
 
 /**	
 	A map for storing Items keyed off of each Item's string value.
 	Stores only pointers to the objects. 
 */
-typedef map < string, Item* > StringKeyedItemMap;
+typedef std::map < std::string, Item* > StringKeyedItemMap;
 
 /**	
 	A pair of an StringKeyedItemMap::iterator and a bool.
 */
-typedef pair < StringKeyedItemMap::iterator, bool > ItemCacheResult;
+typedef std::pair < StringKeyedItemMap::iterator, bool > ItemCacheResult;
 
 
 /**
@@ -100,7 +99,7 @@ typedef pair < StringKeyedItemMap::iterator, bool > ItemCacheResult;
 class Item {
 public:
 	/** Create a complete Item object. */
-	Item(int id = 0, string xmlns = "", string xmlnsAlias = "", string schemaLocation = "", OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, string name = "");
+	Item(int id = 0, std::string xmlns = "", std::string xmlnsAlias = "", std::string schemaLocation = "", OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, std::string name = "");
 	
     /** Item copy constructor */
     Item(const Item& item);
@@ -124,13 +123,13 @@ public:
 	/** Return all elements with the specified name.
 		@return Returns a vector of elements with a matching name. If no mathes are found the vector is empty. The caller should delete the returned vector but not its contents.
 	*/
-	ItemEntityVector* GetElementsByName(string elementName);
+	ItemEntityVector* GetElementsByName(std::string elementName);
 
     /** Return the ItemEntity with the specified name. If the Item contains multiple ItemEntities with the specified name, this method will indicate that an error has occurred. Note that this method should only be used with ItemEntities that can occur at most once in an Item.
         @param itemEntityNameStr A string representing the name of the ItemEntity that you would like to retrieve.
         @return Returns an ItemEntity with the specified name. If no matches are found an empty ItemEntity object is returned. If multiple ItemEntities are found an exception is thrown.  
     */
-    ItemEntity* GetElementByName(string itemEntityNameStr);
+    ItemEntity* GetElementByName(std::string itemEntityNameStr);
 
 	/** Parse the provided item element from an sc file into an Item object. */
 	void Parse(DOMElement* scItemElm);
@@ -148,7 +147,7 @@ public:
             <li>converting each object entity to a string</li>
         </ul>
     */
-    string UniqueString();
+    std::string UniqueString();
 
     /** Get the elements field's value. */
 	ItemEntityVector* GetElements();
@@ -171,24 +170,24 @@ public:
 	void SetMessages(OvalMessageVector* messages);
 
     /** Get the name field's value. */
-	string GetName();
+	std::string GetName();
     /** Set the name field's value. */
-	void SetName(string name);
+	void SetName(std::string name);
 
     /** Get the schemaLocation field's value. */
-	string GetSchemaLocation();
+	std::string GetSchemaLocation();
     /** Set the schemaLocation field's value. */
-	void SetSchemaLocation(string schemaLocation);
+	void SetSchemaLocation(std::string schemaLocation);
 
     /** Get the xmlns field's value. */
-	string GetXmlns();
+	std::string GetXmlns();
     /** Set the xmlns field's value. */
-	void SetXmlns(string xmlns);
+	void SetXmlns(std::string xmlns);
 
     /** Get the xmlnsAlias field's value. */
-	string GetXmlnsAlias();
+	std::string GetXmlnsAlias();
     /** Set the xmlnsAlias field's value. */
-	void SetXmlnsAlias(string xmlnsAlias);
+	void SetXmlnsAlias(std::string xmlnsAlias);
 
     /** Get the status field's value. */
 	OvalEnum::SCStatus GetStatus();
@@ -218,7 +217,7 @@ public:
 		
 		NOTE: This method is not intended to be used during data collection.
 	*/
-	static Item* GetItemById(string itemId);
+	static Item* GetItemById(std::string itemId);
 
 private:
 
@@ -237,11 +236,11 @@ private:
 	ItemEntityVector elements;
 	int id;
 	OvalMessageVector messages;
-	string name;
+	std::string name;
 	OvalEnum::SCStatus status;
-	string xmlns;
-	string xmlnsAlias;
-	string schemaLocation;
+	std::string xmlns;
+	std::string xmlnsAlias;
+	std::string schemaLocation;
 	bool isWritten;
 
     /** A static counter used to assign unique ids to each item. */

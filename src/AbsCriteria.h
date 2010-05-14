@@ -40,7 +40,6 @@
 
 
 XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 class AbsCriteria;
 
@@ -95,6 +94,6 @@ private:
 	A vector for storing AbsCriteria objects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < AbsCriteria*, allocator<AbsCriteria*> > AbsCriteriaVector;
+typedef std::vector < AbsCriteria* > AbsCriteriaVector;
 
 #endif

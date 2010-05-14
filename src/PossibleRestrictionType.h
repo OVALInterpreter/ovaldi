@@ -33,10 +33,9 @@
 
 #include "RestrictionType.h"
 
-using namespace std;
 class PossibleRestrictionType;
 
-typedef vector < PossibleRestrictionType*, allocator<PossibleRestrictionType*> > PossibleRestrictionTypeVector;
+typedef std::vector < PossibleRestrictionType* > PossibleRestrictionTypeVector;
 
 /**
 	This class represents an the PossibleRestrictionType related to external variables in the oval definition schema.
@@ -48,21 +47,21 @@ public:
 	PossibleRestrictionType();
 	~PossibleRestrictionType();
 
-	void SetHint(string hint);
-	string GetHint();
+	void SetHint(std::string hint);
+	std::string GetHint();
 
 	/** Parses a valid PossibleRestrictionType element as defined int eh oval definitions schema. */
 	void Parse(DOMElement* possibleRestrictionElm);
 
 	/** Ensure that the specified value matches the criteria specified by this possible_restriction element. */
-	bool ValidateValue(OvalEnum::Datatype datatype, string externalValue);
+	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
 	RestrictionTypeVector* GetRestrictionTypes();
 	void AppendRestrictionType(RestrictionType* rt);
 
 private:
 
-	string hint;
+	std::string hint;
 	RestrictionTypeVector restrictionTypes;
 };
 

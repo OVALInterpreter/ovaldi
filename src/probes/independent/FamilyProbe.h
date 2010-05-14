@@ -32,8 +32,6 @@
 
 #include "AbsProbe.h"
 
-using namespace std;
-
 /**
 	This class is resposible for determing family information for the windows platform.
 */
@@ -56,7 +54,7 @@ private:
 
 	static FamilyProbe *instance;
 
-	string myFamily;
+	std::string myFamily;
 };
 
 #endif
