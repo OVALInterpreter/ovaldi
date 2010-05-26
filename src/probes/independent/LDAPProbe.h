@@ -40,7 +40,7 @@
 #include "Lm.h"
 #endif
 
-#if defined LINUX || defined SUNOS
+#if defined LINUX || defined SUNOS || defined DARWIN
 #include "ldap.h"
 typedef int ULONG;
 #endif

@@ -28,61 +28,81 @@
 //
 //****************************************************************************************//
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef PROBEFACTORY_H
+#define PROBEFACTORY_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-	#include "WindowsCommon.h"
-	#include <windows.h>
-#endif
-
-#ifdef LINUX
-#  define STRNICMP strnicmp
-#elif defined SUNOS
-#  define STRNICMP strncasecmp
-#elif defined DARWIN
-#  define STRNICMP strnicmp
-#endif
-
-
-#define EXIT_SUCCESS	0
-#define	EXIT_FAILURE	1
-
-
-//	other includes
-#include <time.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <stdlib.h>
 
-
-#include "XmlProcessor.h"
 #include "AbsDataCollector.h"
-#include "Version.h"
-#include "Analyzer.h"
-#include "DocumentManager.h"
-#include "DataCollector.h"
-#include "XslCommon.h"
-#include "EntityComparator.h"
-#include "OvalEnum.h"
 
 
-#define BUFFER_SIZE 4096
+//	include the probe classes
+#include "FileProbe.h"
+#include "FileMd5Probe.h"
+#include "FileHashProbe.h"
+#include "FamilyProbe.h"
+#include "UnameProbe.h"
+//Not applicable
+//#ifdef PACKAGE_RPM
+//#include "RPMInfoProbe.h"
+//#endif
+//#ifdef PACKAGE_DPKG
+//#include "DPKGInfoProbe.h"
+//#endif
+//Not ported yet
+//#include "InetListeningServersProbe.h"
+#include "ProcessProbe.h"
+//Not ported yet
+//#include "ShadowProbe.h"
+#include "PasswordProbe.h"
+#include "InterfaceProbe.h"
+#include "PasswordProbe.h"
+#include "EnvironmentVariableProbe.h"
+#include "XmlFileContentProbe.h"
+#include "TextFileContentProbe.h"
+#include "TextFileContent54Probe.h"
+#include "VariableProbe.h"
+//Mac OS has no notion of runlevels
+//#include "RunLevelProbe.h"
+#include "XinetdProbe.h"
+#include "InetdProbe.h"
+#include "LDAPProbe.h"
 
-/** The starting point for the application. */
-int main(int argc, char* argv[]);
 
-/** 
- *  Processes the commandline arguments and enforces required arguments. 
- *  There must be at least two arguments.  The program name and the xmlfile hash. (or
- *  the -m flag signifing no hash is required)
- */
-void ProcessCommandLine(int argc, char* argv[]);
 
-/** Prints out a list of option flags that can be used with this exe. */
-void Usage();
+class AbsProbe;
+
+/**
+	This class is a Factory class for getting probes for an object in an oval definitions file. 
+	Each object defined in the oval definition schema has a corresponding probe for data collection. 
+	This class provides uniform access to all probes in the application, and is responsible for determining
+	which probe to associate with a given object.
+
+	Each supported platform should implement its own ProbeFactory that manages the probes for that platform.
+
+	All Probes are singlestons.
+*/
+class ProbeFactory {
+
+public:
+	/**
+		Factory method. Based on the specified object name return the appropriate probe.
+		@param objectName a string taht corresponds to the name of an object in the oval definition schema.
+		@return The probe for the specified object or NULL.
+	*/
+	static AbsProbe* GetProbe(std::string objectName);
+
+	/** 
+		Shutdown the ProbeFactory.
+	*/
+	static void Shutdown();
+
+private:
+  static AbsProbeSet _probes;
+
+};
 
 #endif

@@ -34,9 +34,12 @@
 
 #include <stdlib.h>
 
-
+#ifdef DARWIN
+#include <crt_externs.h>
+#define _environ (*_NSGetEnviron())
+#else
 extern char ** _environ; 
-
+#endif
 /**
 	This class is responsible for collecting enviroment variable data.
 	This class should be platform independent.

@@ -47,6 +47,7 @@ class Filter {
 public:
 	Filter(xercesc::DOMElement *filterElm);
 
+
 	/**
 	 * Returns the selected action for this filter.
 	 * \return true if the selected action for this filter is "exclude",
@@ -65,7 +66,7 @@ public:
 	 * The return value reflects whether the item "passed" the filter.  E.g.
 	 * if the item satisfied the state and the filter action is "include", then
 	 * true is returned.  Or if the item did not satisfy the state and the filter
-	 * action is "exclude", then true is returned.  Otherwise false is returned.
+	 * Action is "exclude", then true is returned.  Otherwise false is returned.
 	 */
 	bool DoFilter(Item* item);	
 

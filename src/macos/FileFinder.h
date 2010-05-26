@@ -28,61 +28,44 @@
 //
 //****************************************************************************************//
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef FILEFINDER_H
+#define FILEFINDER_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-	#include "WindowsCommon.h"
-	#include <windows.h>
-#endif
+#include "AbsFileFinder.h"
 
-#ifdef LINUX
-#  define STRNICMP strnicmp
-#elif defined SUNOS
-#  define STRNICMP strncasecmp
-#elif defined DARWIN
-#  define STRNICMP strnicmp
-#endif
-
-
-#define EXIT_SUCCESS	0
-#define	EXIT_FAILURE	1
-
-
-//	other includes
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <time.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
 
+#include <dirent.h>
+#include <limits.h>
 
-#include "XmlProcessor.h"
-#include "AbsDataCollector.h"
-#include "Version.h"
-#include "Analyzer.h"
-#include "DocumentManager.h"
-#include "DataCollector.h"
-#include "XslCommon.h"
-#include "EntityComparator.h"
-#include "OvalEnum.h"
+/**
+	This class is the linux file searching implmentation used by this application
+*/
+class FileFinder : public AbsFileFinder {
+public:
+	FileFinder();
+	~FileFinder();
 
+private:
+	/** Return the set of matching paths after applying behaviors.
+	    The only defined behaviors for unix files are:
+		recurse_direction, max_depth, recurse, and recurse_file_system
+		Currently only recurse_direction and max_depth are implemented.
+	*/
+	StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
-#define BUFFER_SIZE 4096
-
-/** The starting point for the application. */
-int main(int argc, char* argv[]);
-
-/** 
- *  Processes the commandline arguments and enforces required arguments. 
- *  There must be at least two arguments.  The program name and the xmlfile hash. (or
- *  the -m flag signifing no hash is required)
- */
-void ProcessCommandLine(int argc, char* argv[]);
-
-/** Prints out a list of option flags that can be used with this exe. */
-void Usage();
+	bool PathExists(std::string path);
+	bool FileNameExists(std::string path, std::string fileName);
+	void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
+	void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
+	void GetPathsForPattern(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
+	/** Get the full path of all child directories as a StringVector. 
+	    The caller is responsible for deleting the StringVector* of child paths.
+	*/
+	StringVector* GetChildDirectories(std::string path);
+};
 
 #endif

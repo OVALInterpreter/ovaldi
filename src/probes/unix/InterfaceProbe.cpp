@@ -30,13 +30,7 @@
 
 #include "InterfaceProbe.h"
 
-#include "Log.h"
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <net/if_arp.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
+using namespace std;
 
 using namespace std;
 
@@ -74,7 +68,7 @@ ItemVector* InterfaceProbe::CollectItems(Object* object) {
 	}
 
 	ItemVector *collectedItems = new ItemVector();
-
+	
 	if ( name->GetVarRef() == NULL ) {
 		if ( name->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
 			Item* aInterface = this->GetInterface ( name->GetValue() );
@@ -190,6 +184,203 @@ Item* InterfaceProbe::GetInterface(const string &name) {
 	return NULL;
 }
 
+#ifdef DARWIN
+void InterfaceProbe::GetAllInterfaces(){
+
+  int socketfd, prev_length, length, addr_length, mib[6], mac_length;
+  char *ptr, *macbuf, *i, *mac;
+  unsigned char *macptr = NULL;
+  struct ifconf ifc;
+  struct ifreq *ifr = NULL;
+  struct sockaddr_in *sinptr = NULL;
+  struct if_msghdr *ifm = NULL;
+  struct sockaddr_dl *sdl = NULL;
+  Item *item = NULL;
+  string typeStr = "";
+  string macStr = "";
+  string ipStr = "";
+  string broadStr = "";
+  string netStr = "";
+  ItemEntityVector allFlags;
+
+  ptr = NULL;
+  macbuf = NULL;
+  i = NULL;
+  mac = NULL;
+  prev_length = 0;
+  length = 10 * sizeof(struct ifreq);
+
+  if ( (socketfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+    throw ProbeException("Error: failed to open socket");
+  }
+  while(true){
+    ifc.ifc_buf= (char*)malloc(length);
+    ifc.ifc_len = length;
+    if ( ifc.ifc_buf != NULL ){
+      if ( ioctl(socketfd, SIOCGIFCONF, &ifc) < 0 ){
+	if ( ifc.ifc_buf != NULL ){
+	  free(ifc.ifc_buf);
+	  ifc.ifc_buf = NULL;
+	}
+	throw ProbeException("Error: SIOCGIFCONF ioctl error");
+      }else{
+	if ( ifc.ifc_len == prev_length){
+	  ifc.ifc_len = length;
+	  break;
+	}else{
+	  prev_length = ifc.ifc_len;
+	  length = length + 10 * sizeof(struct ifreq);
+	  free(ifc.ifc_buf);
+	}
+      }
+    }else{
+      throw ProbeException("Error: couldn't allocate memory");
+    }
+  }
+
+  if (ioctl(socketfd, SIOCGIFCONF, &ifc) < 0){
+    throw ProbeException("Error: SIOCGIFCONF ioctl error");
+  }
+
+  for (ptr = ifc.ifc_buf; ptr <ifc.ifc_buf + ifc.ifc_len; ) {
+    ifr = (struct ifreq *) ptr;
+    addr_length = sizeof(struct sockaddr);
+
+    if (ifr->ifr_addr.sa_len > addr_length){
+      addr_length = ifr->ifr_addr.sa_len;
+    }
+
+    item = this->CreateItem();
+    item->SetStatus(OvalEnum::STATUS_EXISTS);
+    string errorMsgPrefix = string("Error querying network interface ")+ifr->ifr_name+": ";
+    item->AppendElement(new ItemEntity("name", ifr->ifr_name, OvalEnum::DATATYPE_STRING, true));
+
+    ptr += sizeof(ifr->ifr_name) + addr_length;
+   
+    if ( ifr->ifr_addr.sa_family == AF_INET ){
+      if ( ioctl(socketfd,SIOCGIFFLAGS,ifr) < 0 ){
+	allFlags.push_back(new ItemEntity("flags", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+      }else{
+	allFlags = this->ProcessFlags(ifr->ifr_flags);	
+      }
+
+      mac_length = 0;
+      
+      mib[0] = CTL_NET;
+      mib[1] = AF_ROUTE;
+      mib[2] = 0;
+      mib[3] = AF_LINK;
+      mib[4] = NET_RT_IFLIST;
+      mib[5] = if_nametoindex(ifr->ifr_name);
+      
+      if (mib[5] == 0){
+	throw ProbeException("Error: if_nametoindex error");
+      }
+      
+      if (sysctl(mib, 6, NULL, (size_t*)&mac_length, NULL, 0) < 0){
+	throw ProbeException("Error: sysctl error - retrieving data length");
+      }
+      
+      macbuf = (char*) malloc(mac_length);
+      
+      if ( macbuf == NULL ){
+	throw ProbeException("Error: couldn't allocate memory");
+      }
+      
+      if (sysctl(mib, 6, macbuf, (size_t*)&mac_length, NULL, 0) < 0){
+	throw ProbeException("Error: sysctl error - retrieving data");
+      }
+      
+      ifm = (struct if_msghdr *)macbuf;
+      sdl = (struct sockaddr_dl *)(ifm + 1);
+      
+      typeStr = this->GetHardwareTypesFromIft(sdl->sdl_type);
+      item->AppendElement(new ItemEntity("type",typeStr,OvalEnum::DATATYPE_STRING,false,(typeStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+     
+      macptr = (unsigned char *)LLADDR(sdl);
+      mac = (char*)malloc(sizeof(char)*128);
+      
+      if ( mac == NULL ){
+	throw ProbeException("Error: couldn't allocate memory");
+      }
+      
+      memset(mac, 0, 128);
+      sprintf(mac,"%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", macptr[0], macptr[1], macptr[2], macptr[3], macptr[4], macptr[5]);
+      
+      macStr = mac;
+      item->AppendElement(new ItemEntity("hardware_addr",macStr,OvalEnum::DATATYPE_STRING,false,(macStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+           
+      sinptr = (struct sockaddr_in *) &ifr->ifr_addr;
+      ipStr = inet_ntoa(sinptr->sin_addr);
+      item->AppendElement(new ItemEntity("inet_addr",ipStr,OvalEnum::DATATYPE_STRING,false,(ipStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+
+      if ( ioctl(socketfd, SIOCGIFBRDADDR, ifr) < 0) {
+	item->AppendElement(new ItemEntity("broadcast_addr", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+        item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFBRDADDR: " + strerror(errno),OvalEnum::LEVEL_ERROR));
+        item->SetStatus(OvalEnum::STATUS_ERROR);
+      } else {
+	sinptr = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+        broadStr = inet_ntoa(sinptr->sin_addr);
+        item->AppendElement(new ItemEntity("broadcast_addr", broadStr, OvalEnum::DATATYPE_STRING, false, (broadStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+      }
+      
+      if ( ioctl(socketfd, SIOCGIFNETMASK, ifr) < 0) {
+        item->AppendElement(new ItemEntity("netmask_addr", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+        item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFNETMASK: " + strerror(errno),OvalEnum::LEVEL_ERROR));
+        item->SetStatus(OvalEnum::STATUS_ERROR);
+      } else {
+        sinptr = (struct sockaddr_in *) &ifr->ifr_addr;
+	netStr = inet_ntoa(sinptr->sin_addr);
+        item->AppendElement(new ItemEntity("netmask_addr", netStr, OvalEnum::DATATYPE_STRING, false, (netStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+      }
+      
+      for(ItemEntityVector::iterator it = allFlags.begin(); it != allFlags.end(); it++){
+	item->AppendElement(*it);
+      }
+
+      this->interfaces.push_back(item);
+      
+      free(macbuf);
+      free(mac);
+    }
+  }
+  free(ifc.ifc_buf);
+}
+
+string InterfaceProbe::GetHardwareTypesFromIft(unsigned char type){
+
+string hwTypeStr ="";
+
+switch (type) {
+  case IFT_ETHER:
+    hwTypeStr = "ARPHDR_ETHER";
+    break;
+  case IFT_FDDI:
+    hwTypeStr = "ARPHDR_FDDI";
+    break;
+  case IFT_PPP:
+    hwTypeStr = "ARPHDR_PPP";
+    break;
+  case IFT_SLIP:
+    hwTypeStr = "ARPHDR_SLIP";
+    break;
+  case IFT_LOOP:
+    hwTypeStr = "ARPHDR_LOOPBACK";
+    break;
+  case IFT_P10:
+  case IFT_P80:
+    hwTypeStr = "ARPHDR_PRONET";
+    break;
+  case IFT_OTHER:
+    hwTypeStr = "ARPHDR_VOID";
+    break;
+  default:
+    break;
+  }
+ return hwTypeStr;
+}
+
+#else
 void InterfaceProbe::GetAllInterfaces() {
 	StringVector interfaceNames = GetInterfaceNames();
 
@@ -457,9 +648,13 @@ StringVector InterfaceProbe::GetInterfaceNames() {
 
 	return names;
 }
+#endif
 
 void InterfaceProbe::SetupHardwareTypes() {
-	this->hardwareTypeNameMap[ARPHRD_ETHER] = "ARPHRD_ETHER";
+
+#ifdef ARPHRD_ETHER
+  this->hardwareTypeNameMap[ARPHRD_ETHER] = "ARPHRD_ETHER";
+#endif
 
 #ifdef ARPHRD_FDDI
 	this->hardwareTypeNameMap[ARPHRD_FDDI] = "ARPHRD_FDDI";

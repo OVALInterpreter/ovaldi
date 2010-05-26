@@ -54,6 +54,10 @@
 #include <cctype>
 #endif
 
+#ifdef DARWIN
+#include <sys/sysctl.h>
+#endif
+
 // Define some buffer lengths
 #define CMDLINE_LEN 1024
 #define SCHED_CLASS_LEN 128
@@ -167,12 +171,12 @@ private:
 
 	/**
 		Convert the input seconds and conveert to a string format for exec time.
-    */
+	*/
 	std::string FormatExecTime(time_t execTime);
 
 	/**
 		Convert the input seconds and convert to a string format for start time.
-    */
+	*/
 	std::string FormatStartTime(time_t startTime);
 
 	/**

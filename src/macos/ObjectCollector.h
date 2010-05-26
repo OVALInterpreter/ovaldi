@@ -28,61 +28,29 @@
 //
 //****************************************************************************************//
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef OBJECTCOLLECTOR_H
+#define OBJECTCOLLECTOR_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-	#include "WindowsCommon.h"
-	#include <windows.h>
-#endif
+//	include the parent class.
+#include "AbsObjectCollector.h"
+#include "ProbeFactory.h"
 
-#ifdef LINUX
-#  define STRNICMP strnicmp
-#elif defined SUNOS
-#  define STRNICMP strncasecmp
-#elif defined DARWIN
-#  define STRNICMP strnicmp
-#endif
+//	namespaces
+XERCES_CPP_NAMESPACE_USE
 
+/**
+	The object collector for linux definitions.
+*/
+class ObjectCollector : public AbsObjectCollector {
+public:
 
-#define EXIT_SUCCESS	0
-#define	EXIT_FAILURE	1
+	ObjectCollector();
+	~ObjectCollector();
 
-
-//	other includes
-#include <time.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-
-#include "XmlProcessor.h"
-#include "AbsDataCollector.h"
-#include "Version.h"
-#include "Analyzer.h"
-#include "DocumentManager.h"
-#include "DataCollector.h"
-#include "XslCommon.h"
-#include "EntityComparator.h"
-#include "OvalEnum.h"
-
-
-#define BUFFER_SIZE 4096
-
-/** The starting point for the application. */
-int main(int argc, char* argv[]);
-
-/** 
- *  Processes the commandline arguments and enforces required arguments. 
- *  There must be at least two arguments.  The program name and the xmlfile hash. (or
- *  the -m flag signifing no hash is required)
- */
-void ProcessCommandLine(int argc, char* argv[]);
-
-/** Prints out a list of option flags that can be used with this exe. */
-void Usage();
+protected:
+	bool IsApplicable(AbsObject* object);
+	bool IsSupported(AbsObject* object);
+	AbsProbe* GetProbe(Object* object);
+};
 
 #endif

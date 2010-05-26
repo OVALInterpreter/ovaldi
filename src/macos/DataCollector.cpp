@@ -28,66 +28,61 @@
 //
 //****************************************************************************************//
 
-#include "FamilyProbe.h"
+#include "DataCollector.h"
 
 //****************************************************************************************//
-//								FamilyProbe Class										  //	
+//								DataCollector Class										  //	
 //****************************************************************************************//
-FamilyProbe *FamilyProbe::instance = NULL;
-
-FamilyProbe::FamilyProbe() {
-
-	#ifdef WIN32
-		myFamily = "windows";
-	#elif defined LINUX
-		myFamily = "unix";
-	#elif defined SUNOS
-		myFamily = "unix";
-	#elif defined DARWIN
-                myFamily = "macos";
-        #else
-		myFamily = "error";
-	#endif
+DataCollector::DataCollector() : AbsDataCollector() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//
+	// -----------------------------------------------------------------------
 }
 
-FamilyProbe::~FamilyProbe() {
-  instance = NULL;
+DataCollector::~DataCollector() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Nothing for now
+	// -----------------------------------------------------------------------
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-AbsProbe* FamilyProbe::Instance() {
+// ***************************************************************************************	//
+//								Static Public members										//
+// ***************************************************************************************	//
+void DataCollector::Init() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Create a new instance of the data collector
+	//	Set the oval and sc document references
+	//	Add the System info for this platform
+	//
+	// -----------------------------------------------------------------------
 
-	// Use lazy initialization
-	if(instance == NULL) 
-		instance = new FamilyProbe();
-
-	return instance;	
+	AbsDataCollector* odc = new DataCollector();
+	odc->InitBase(new ObjectCollector());
+	
+	AbsDataCollector::instance = odc;
 }
 
-ItemVector* FamilyProbe::CollectItems(Object *object) {
-	ItemVector *collectedItems = new ItemVector();
 
-	Item* item = this->CreateItem();
-	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("family", this->myFamily, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	collectedItems->push_back(item);
+void DataCollector::WriteSystemInfo() {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Create a new instance of the data collector
+	//	Set the oval and sc document references
+	//	Add the System info for this platform
+	//
+	// -----------------------------------------------------------------------
 
-	return collectedItems;
+	SystemInfo* systemInfo = SystemInfoCollector::CollectSystemInfo();
+	systemInfo->Write(DocumentManager::GetSystemCharacterisitcsDocument());
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-Item* FamilyProbe::CreateItem() {
 
-	Item* item = new Item(0, 
-						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent", 
-						"ind-sc", 
-						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent independent-system-characteristics-schema.xsd", 
-						OvalEnum::STATUS_ERROR, 
-						"family_item");
 
-	return item;
-}
+

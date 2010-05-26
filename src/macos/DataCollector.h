@@ -28,61 +28,27 @@
 //
 //****************************************************************************************//
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef DATACOLLECTOR_H
+#define DATACOLLECTOR_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-	#include "WindowsCommon.h"
-	#include <windows.h>
-#endif
-
-#ifdef LINUX
-#  define STRNICMP strnicmp
-#elif defined SUNOS
-#  define STRNICMP strncasecmp
-#elif defined DARWIN
-#  define STRNICMP strnicmp
-#endif
-
-
-#define EXIT_SUCCESS	0
-#define	EXIT_FAILURE	1
-
-
-//	other includes
-#include <time.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-
-#include "XmlProcessor.h"
 #include "AbsDataCollector.h"
-#include "Version.h"
-#include "Analyzer.h"
-#include "DocumentManager.h"
-#include "DataCollector.h"
-#include "XslCommon.h"
-#include "EntityComparator.h"
-#include "OvalEnum.h"
+#include "ObjectCollector.h"
+#include "SystemInfo.h"
 
+XERCES_CPP_NAMESPACE_USE
 
-#define BUFFER_SIZE 4096
+/**
+	The linux specific data collector
+*/
+class DataCollector : public AbsDataCollector {
+public:
+	~DataCollector();
 
-/** The starting point for the application. */
-int main(int argc, char* argv[]);
+	static void Init();
 
-/** 
- *  Processes the commandline arguments and enforces required arguments. 
- *  There must be at least two arguments.  The program name and the xmlfile hash. (or
- *  the -m flag signifing no hash is required)
- */
-void ProcessCommandLine(int argc, char* argv[]);
-
-/** Prints out a list of option flags that can be used with this exe. */
-void Usage();
+protected:
+	DataCollector();
+	void WriteSystemInfo();
+};
 
 #endif

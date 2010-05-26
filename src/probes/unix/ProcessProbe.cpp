@@ -33,7 +33,7 @@
 using namespace std;
 
 //****************************************************************************************//
-//								                  ProcessProbe Class										                ?/
+//				 ProcessProbe Class	                                  //
 //****************************************************************************************//
 
 ProcessProbe *ProcessProbe::instance = NULL;
@@ -570,9 +570,112 @@ bool ProcessProbe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &inf
 	return true;
 }
 
+#elif defined DARWIN
+
+void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
+  int i, mib[4];
+  size_t length, count;
+  char* data = NULL;
+  struct kinfo_proc *procdata = NULL;
+  Item *item = NULL;
+  char* tty = NULL;
+  string ttyStr = "";
+  string formattedExecTime = "";
+  string formattedStartTime = "";
+  
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_PROC;
+  mib[2] = KERN_PROC_PID;                                                                                                                                                     
+  mib[3] = atoi(pidStr.c_str());
+
+  if ( sysctl(mib, 4, data, &length, NULL, 0) == -1 ){
+    throw ProbeException("Error: sysctl error while trying to determine data length");
+  }
+
+  data = (char*) malloc (length);
+
+  if ( data == NULL ){
+    throw ProbeException("Error: couldn't allocate memory");
+  }
+
+  if ( sysctl(mib, 4, data, &length, NULL, 0) == -1 ){
+    free(data);
+    throw ProbeException("Error: sysctl error while trying to retrieve data");
+  }
+
+  procdata = (struct kinfo_proc*) data;
+  count = length/sizeof(kinfo_proc);
+  
+  for(i = 0 ; i < (int)count ; i++){
+    
+    if( (tty = devname(procdata[i].kp_eproc.e_tdev,S_IFCHR) ) != NULL ){
+      ttyStr = tty;
+    }
+    formattedStartTime = this->FormatStartTime(procdata[i].kp_proc.p_starttime.tv_sec);
+    
+    item = this->CreateItem();
+    item->SetStatus(OvalEnum::STATUS_EXISTS);
+    item->AppendMessage(new OvalMessage("The unix-def:process_probe for OSX currently only collects the command of the process and not the command line arguments.  Note that this may cause the number of processes collected to be inaccurate"));
+    item->AppendElement(new ItemEntity("command", procdata[i].kp_proc.p_comm, OvalEnum::DATATYPE_STRING, true));
+    item->AppendElement(new ItemEntity("exec_time", formattedExecTime));
+    item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER));
+    item->AppendElement(new ItemEntity("ppid", Common::ToString(procdata[i].kp_eproc.e_ppid), OvalEnum::DATATYPE_INTEGER));
+    item->AppendElement(new ItemEntity("priority", Common::ToString(procdata[i].kp_proc.p_priority)));
+    item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+    item->AppendElement(new ItemEntity("start_time", formattedStartTime));
+    item->AppendElement(new ItemEntity("tty", ttyStr, OvalEnum::DATATYPE_STRING, false, (ttyStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+    item->AppendElement(new ItemEntity("user_id", Common::ToString(procdata[i].kp_eproc.e_ucred.cr_uid)));
+    
+    items->push_back(item);
+  }
+  free(data);
+  return;
+}
+
 #endif
 
+#ifdef DARWIN
 bool ProcessProbe::CommandExists(string command, string &pid) {
+  int i, mib[4];
+  size_t length, count;
+  bool exists = false;
+  char* data = NULL;
+  struct kinfo_proc *procdata = NULL;
+
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_PROC;
+  mib[2] = KERN_PROC_ALL;
+
+  if ( sysctl(mib, 3, data, &length, NULL, 0) == -1 ){
+    throw ProbeException("Error: sysctl error while trying to determine data length");
+  }
+
+  data = (char*) malloc (length);
+
+  if ( data == NULL ){
+    throw ProbeException("Error: couldn't allocate memory");
+  }
+
+  if ( sysctl(mib, 3, data, &length, NULL, 0) == -1 ){
+    free(data);
+    throw ProbeException("Error: sysctl error while trying to retrieve data");
+  }
+
+  procdata = (struct kinfo_proc*) data;
+  count = length/sizeof(kinfo_proc);
+
+  for(i = 0 ; i < (int)count ; i++){
+    if( command.compare(procdata[i].kp_proc.p_comm) == 0 ) {
+      exists = true;
+      pid = Common::ToString(procdata[i].kp_proc.p_pid);
+    }
+  }
+  free(data);
+  return exists;
+}
+#else
+bool ProcessProbe::CommandExists(string command, string &pid) {
+
 	bool exists = false;
 	string errMsg = "";
 
@@ -615,7 +718,48 @@ bool ProcessProbe::CommandExists(string command, string &pid) {
   }
   return exists;
 }
+#endif 
 
+#ifdef DARWIN
+StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex){
+  int i, mib[4];
+  size_t length, count;
+  char* data = NULL;
+  struct kinfo_proc *procdata = NULL;
+  StringPairVector *commands = NULL;
+  
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_PROC;
+  mib[2] = KERN_PROC_ALL;
+
+  if ( sysctl(mib, 3, data, &length, NULL, 0) == -1 ){
+    throw ProbeException("Error: sysctl error while trying to determine data length");
+  }
+
+  data = (char*) malloc (length);
+
+  if ( data == NULL ){
+    throw ProbeException("Error: couldn't allocate memory");
+  }
+
+  if ( sysctl(mib, 3, data, &length, NULL, 0) == -1 ){
+    free(data);
+    throw ProbeException("Error: sysctl error while trying to retrieve data");
+  }
+
+  procdata = (struct kinfo_proc*) data;
+  count = length/sizeof(kinfo_proc);
+  commands = new StringPairVector();
+
+  for(i = 0 ; i < (int)count ; i++){
+      if( this->IsMatch(pattern, procdata[i].kp_proc.p_comm, isRegex)) {
+	commands->push_back(new pair<string,string>(procdata[i].kp_proc.p_comm, Common::ToString(procdata[i].kp_proc.p_pid)));
+      }
+  }
+  free(data);
+  return commands;
+}
+#else
 StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
 	StringPairVector* commands = new StringPairVector();
 	string errMsg = "";
@@ -660,6 +804,7 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
 
   return commands;
 }
+#endif
 
 int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string *errMsg) {
 	// Build the absolute path to the command line file
@@ -670,6 +815,7 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 	FILE *cmdlineFile = NULL;
 	int i = 0;
 	int bytes = 0;
+
 	cmdlinePath.append("/cmdline");
 
 	// Open the file for reading
