@@ -56,7 +56,7 @@ CPPFLAGS = -Wall -O
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
