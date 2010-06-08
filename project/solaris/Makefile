@@ -55,7 +55,7 @@ CPPFLAGS = -Wall -O -DBSD_COMP
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lsocket -lnsl
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lsocket -lnsl
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
