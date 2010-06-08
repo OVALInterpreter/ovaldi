@@ -33,7 +33,11 @@
 #include "Exception.h"
 #include <string>
 #include <iostream>
-#include <openssl/evp.h>
+
+#if defined WIN32
+#  include <windows.h> // <wincrypt.h> won't compile unless <windows.h> is included first...
+#  include <wincrypt.h>
+#endif
 
 /**
  * Encapsulates an openssl message digest context.  Instances of this
@@ -62,9 +66,43 @@ public:
 	std::string digest(const std::string& fileName, DigestType digestType);
 
 private:
-	const EVP_MD* getDigest(DigestType digestType);
 
-	EVP_MD_CTX context;
+#if defined WIN32
+	/** platform-specific type used for expressing digest algorithms */
+	typedef ALG_ID AlgType;
+
+	/** Windows' handle to a cryptographic service provider. */
+	HCRYPTPROV hProv;
+
+#else
+	/** platform-specific type used for expressing digest algorithms */
+	typedef int AlgType;
+
+	/**
+	 * libgcrypt requires a one-time initialization.
+	 */
+	static bool IsInitialized;
+	/**
+	 * Method to do libgcrypt's 1-time initialization.
+	 */
+	static void Initialize();
+
+#endif
+
+	// These methods are designed to have a platform-independent interface,
+	// with platform-specific implementations.  The platform differences
+	// are encapsulated in the opaque "context" values.
+
+	void initDigest(void **context, DigestType digestType);
+	void updateDigest(void *context, void *buf, size_t bufSize);
+	std::string getDigestResults(void *context);
+	void freeDigest(void *context);
+	AlgType getDigest(DigestType digestType);
+
+	/**
+	 * Construct a hex string from the given bytes to represent a hash value.
+	 */
+	std::string hashBytesToString(unsigned char *bytes, size_t numBytes);
 };
 
 class DigestException : public Exception {
