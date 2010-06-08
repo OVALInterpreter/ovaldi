@@ -89,7 +89,6 @@ namespace {
 
 
 ShadowProbe* ShadowProbe::instance = NULL;
-map<string, string> ShadowProbe::dollarEncryptMethodTypes;
 
 ShadowProbe::ShadowProbe() {
 }
@@ -162,6 +161,7 @@ Item *ShadowProbe::CreateItemFromPasswd(const struct spwd *pwInfo) {
 	ItemEntity *accountInactiveEntity = new ItemEntity("exp_inact", Common::ToString(pwInfo->sp_inact));
 	ItemEntity *expirationDateEntity = new ItemEntity("exp_date", Common::ToString(pwInfo->sp_expire));
 	ItemEntity *flagsEntity = new ItemEntity("flag", Common::ToString(pwInfo->sp_flag));
+	
 
 	item->AppendElement(nameEntity);
 	item->AppendElement(passwordEntity);
@@ -173,41 +173,7 @@ Item *ShadowProbe::CreateItemFromPasswd(const struct spwd *pwInfo) {
 	item->AppendElement(expirationDateEntity);
 	item->AppendElement(flagsEntity);
 
-	string method = this->FindPasswordEncryptMethod(pwInfo->sp_pwdp);
-	ItemEntity *encryptMethodEntity;
-	if (method.empty()) {
-		item->AppendMessage(new OvalMessage("Couldn't determine password encryption method"));
-		encryptMethodEntity = new ItemEntity("encrypt_method", "", OvalEnum::DATATYPE_STRING,
-											 false, OvalEnum::STATUS_ERROR);
-	} else
-		encryptMethodEntity = new ItemEntity("encrypt_method", method);
-
-	item->AppendElement(encryptMethodEntity);
-
 	return item;
-}
-
-string ShadowProbe::FindPasswordEncryptMethod(const string &password) {
-	REGEX re;
-	StringVector matches;
-
-	// BSDi identified by leading _
-	if (!password.empty() && password[0]=='_')
-		return "BSDi";
-
-	// check for the $...$ prefix
-	if (re.GetMatchingSubstrings("^\\$([^$]+)\\$", password.c_str(), &matches)) {
-		map<string,string>::iterator iter = 
-			ShadowProbe::dollarEncryptMethodTypes.find(matches[0]);
-
-		if (iter != ShadowProbe::dollarEncryptMethodTypes.end())
-			return iter->second;
-
-		return "";
-	}
-
-	// default to DES
-	return "DES";
 }
 
 Item *ShadowProbe::GetSingleItem(const string& username) {
@@ -274,17 +240,6 @@ AbsProbe* ShadowProbe::Instance() {
 	if (ShadowProbe::instance == NULL)
 		ShadowProbe::instance = new ShadowProbe();
 
-	if (ShadowProbe::dollarEncryptMethodTypes.empty())
-		PopulateDollarEncryptMethodTypes();
-
 	return ShadowProbe::instance;
 }
 
-void ShadowProbe::PopulateDollarEncryptMethodTypes() {
-	dollarEncryptMethodTypes["1"] = "MD5";
-	dollarEncryptMethodTypes["2"] = "Blowfish";
-	dollarEncryptMethodTypes["2a"] = "Blowfish";
-	dollarEncryptMethodTypes["md5"] = "Sun MD5";
-	dollarEncryptMethodTypes["5"] = "SHA-256";
-	dollarEncryptMethodTypes["6"] = "SHA-512";
-}

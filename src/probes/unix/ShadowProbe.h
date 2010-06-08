@@ -35,7 +35,6 @@
 #include "Object.h"
 #include <shadow.h>
 #include <string>
-#include <map>
 
 
 /**
@@ -63,13 +62,6 @@ class ShadowProbe : public AbsProbe {
 	/** Creates an item from a spwd struct */
 	Item *CreateItemFromPasswd(const struct spwd *pwInfo);
 
-	/**
-	 * Attempts to determine the encryption method used on the given
-	 * encrypted password.  An empty string is returned if the method
-	 * could not be determined.
-	 */
-	std::string FindPasswordEncryptMethod(const std::string &password);
-
 	/** Finds a single item by name. */
 	Item *GetSingleItem(const std::string& username);
 
@@ -78,16 +70,6 @@ class ShadowProbe : public AbsProbe {
 
 	/** Singleton instance */
 	static ShadowProbe* instance;
-
-	/**
-	 * A lookup table for names of encryption methods which are specified
-	 * via an encrypted password that starts with "$...$".  The value in
-	 * between the dollar signs is the key lookup into this map.
-	 */
-	static std::map<std::string, std::string> dollarEncryptMethodTypes;
-
-	/** Populates the #dollarEncryptMethodTypes mapping */
-	static void PopulateDollarEncryptMethodTypes();
 };
 
 #endif
