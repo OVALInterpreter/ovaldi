@@ -124,8 +124,16 @@ private:
 	/**
 		Read the stat file for a specific process
 	*/
-	int RetrieveStatFile(const char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
+	int RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
 
+	/**
+	 * Reads uid's from the /proc/pid/status file.  This file supposedly contains
+	 * a more human readable form of what's in /proc/pid/stat.  But it seems like
+	 * it contains more than that: as far as I've been able to figure out, process
+	 * uid's are only available here.
+	 */
+	int RetrieveStatusFile(const char *process, int *ruid, int *euid, std::string *errMsg);
+	
 	/**
 		 Since there appears to be no simple way to convert the 'tty' value contained in
 		 '/proc/<pid>/stat' into a device name, we instead use '/proc/<pid>/fd/0', which is

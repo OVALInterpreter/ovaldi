@@ -237,7 +237,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	char cmdline[CMDLINE_LEN + 1];
 	char schedulingClass[SCHED_CLASS_LEN + 1];
 
-	int uid, pid, ppid;
+	int ruid, euid, pid, ppid;
 	long priority = 0;
 	unsigned long starttime = 0;
 
@@ -258,77 +258,74 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	if (stat(procDir.c_str(), &st) != 0)
 		return; // oops, this process went away when we weren't looking
 
-				// Clear the ps values
-				memset(cmdline, 0, CMDLINE_LEN + 1);
-				memset(schedulingClass, 0, SCHED_CLASS_LEN + 1);
-				memset(ttyName, 0, TTY_LEN + 1);
-				uid = pid = ppid = priority = starttime = 0;
-				adjustedStartTime = execTime = 0;
-				errMsg = "";
+	// Clear the ps values
+	memset(cmdline, 0, CMDLINE_LEN + 1);
+	memset(schedulingClass, 0, SCHED_CLASS_LEN + 1);
+	memset(ttyName, 0, TTY_LEN + 1);
+	euid = ruid = pid = ppid = priority = starttime = 0;
+	adjustedStartTime = execTime = 0;
+	errMsg = "";
 
-				// Retrieve the command line with arguments
-				status = RetrieveCommandLine(pidStr.c_str(), cmdline, &errMsg);
-				if(status < 0) { 
-					//				    closedir(proc);
-					throw ProbeException(errMsg);
+	// Retrieve the command line with arguments
+	status = RetrieveCommandLine(pidStr.c_str(), cmdline, &errMsg);
+	if(status < 0) { 
+		//				    closedir(proc);
+		throw ProbeException(errMsg);
 
-				// If the command line matches the input command line get the remaining 
-				// data and add a new data object to the items
-				} else if(status == 0 && command.compare(cmdline) == 0) {
+		// If the command line matches the input command line get the remaining 
+		// data and add a new data object to the items
+	} else if(status == 0 && command.compare(cmdline) == 0) {
 
-					Item* item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		Item* item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-					// Read the 'stat' file for the remaining process parameters
-					status = RetrieveStatFile(pidStr.c_str(), &uid, &pid, &ppid, &priority, &starttime, &errMsg);
-					if(status < 0) {
-						item->AppendMessage(new OvalMessage(errMsg));
-					} else {
+		// Read the 'stat' and 'status' files for the remaining process parameters
+		status = RetrieveStatFile(pidStr.c_str(), &pid, &ppid, &priority, &starttime, &errMsg);
+		if (status==0) status = RetrieveStatusFile(pidStr.c_str(), &ruid, &euid, &errMsg);
+		if(status < 0) {
+			item->AppendMessage(new OvalMessage(errMsg));
+		} else {
 
-						// We can retrieve a value for the tty from the 'stat' file, but it's unclear
-						// how you convert that to a device name.  Therefore, we ignore that value
-						// and grab the device stdout(fd/0) is attached to.
-						RetrieveTTY(pidStr.c_str(), ttyName);
+			// We can retrieve a value for the tty from the 'stat' file, but it's unclear
+			// how you convert that to a device name.  Therefore, we ignore that value
+			// and grab the device stdout(fd/0) is attached to.
+			RetrieveTTY(pidStr.c_str(), ttyName);
 
-						// The Linux start time is represented as the number of jiffies (1/100 sec)
-						// that the application was started after the last system reboot.  To get an
-						// actual timestamp, we have to do some gymnastics.  We then use the calculated
-						// start time to determine the exec time.
-						//
-						if(uptime > 0) {
-							adjustedStartTime = currentTime - (uptime - (starttime/100));
-							execTime = currentTime - adjustedStartTime;
-						}
-						string execTimeStr = this->FormatExecTime(execTime);
-						string adjustedStartTimeStr = this->FormatStartTime(adjustedStartTime);
+			// The Linux start time is represented as the number of jiffies (1/100 sec)
+			// that the application was started after the last system reboot.  To get an
+			// actual timestamp, we have to do some gymnastics.  We then use the calculated
+			// start time to determine the exec time.
+			//
+			if(uptime > 0) {
+				adjustedStartTime = currentTime - (uptime - (starttime/100));
+				execTime = currentTime - adjustedStartTime;
+			}
+			string execTimeStr = this->FormatExecTime(execTime);
+			string adjustedStartTimeStr = this->FormatStartTime(adjustedStartTime);
 
-						// Add the data to a new data object and add th resultVector
-						item->SetStatus(OvalEnum::STATUS_EXISTS);
-						if(errMsg.compare("") != 0) {
-							item->AppendMessage(new OvalMessage(errMsg));
-						}
+			// Add the data to a new data object and add th resultVector
+			item->SetStatus(OvalEnum::STATUS_EXISTS);
+			if(errMsg.compare("") != 0) {
+				item->AppendMessage(new OvalMessage(errMsg));
+			}
 
-						item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("scheduling_class",  "-", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("user_id", Common::ToString(uid), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-					}
+			item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid)));
+			item->AppendElement(new ItemEntity("scheduling_class",  "-", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		}
 
-					items->push_back(item); 
-				}
-				/*			}
-		} // else
-    closedir(proc);
-  }
-				*/
+		items->push_back(item); 
+	}
 }
 
-int ProcessProbe::RetrieveStatFile(const char *process, int *uid, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
+int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
 
   // Stat File parameters.  While we're really only concerned with gathering the parameters
   // that are passed in, these variables are good placeholders in case we decide to collect
@@ -349,19 +346,6 @@ int ProcessProbe::RetrieveStatFile(const char *process, int *uid, int *pid, int 
   statPath.append(process);
   statPath.append("/stat");
 
-  // While we're here, stat() the 'stat' file to get the uid for the process.  If
-  // we want to convert this to a user name, feed the uid to getpwuid().
-  //
-  struct stat statBuf;
-
-  if((stat(statPath.c_str(), &statBuf)) < 0) {
-    errMsg->append("ProcessProbe: Unable to obtain uid information for pid:  ");
-    errMsg->append(process);
-    return(-1);
-  } else {
-    *uid = statBuf.st_uid;
-  }
-    
   // Open the 'stat' file and read the contents
   if((statFile = fopen(statPath.c_str(), "r")) == NULL) {
     errMsg->append("ProcessProbe: Unable to obtain process information for pid: ");
@@ -377,6 +361,51 @@ int ProcessProbe::RetrieveStatFile(const char *process, int *uid, int *pid, int 
   fclose(statFile);
 
   return(0);
+}
+
+int ProcessProbe::RetrieveStatusFile(const char *process, int *ruid, int *euid, string *errMsg) {
+	string statusFileName = string("/proc/")+process+"/status";
+	errno = 0;
+	ifstream statusFile(statusFileName.c_str());
+
+	if (!statusFile) {
+		// Processes come and go; if it went away, that's ok.
+		// No need to report.  If there was some other
+		// error, throw an exception.
+		if (errno == ENOENT)
+			return -1;
+
+		*errMsg = "ProcessProbe: Error opening "+statusFileName+": "+strerror(errno);
+		return -1;
+	}
+
+	string line, label;
+	while (statusFile) {
+		getline(statusFile, line);
+		istringstream iss(line);
+		iss >> label;
+		if (label == "Uid:") {
+			*ruid = *euid = -1;
+			errno = 0;
+			iss >> *ruid >> *euid;
+			if (iss)
+				return 1;
+
+			if ((*ruid == -1 || *euid == -1) && iss.eof())
+				// we didn't get values for both... eol was premature
+				*errMsg = "Premature end-of-line while reading ruid and euid from "+
+					statusFileName;
+			else if (errno != 0)
+				*errMsg = "Error encountered while reading "+statusFileName+": "+
+					strerror(errno);
+			//else... we dunno what happened...
+
+			return -1;
+		}
+	}
+
+	*errMsg += "'Uid:' line not found in "+statusFileName;
+	return -1;
 }
 
 void ProcessProbe::RetrieveTTY(const char *process, char *ttyName) {
