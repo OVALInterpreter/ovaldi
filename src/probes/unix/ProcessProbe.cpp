@@ -454,7 +454,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	timestruc_t startTime, execTime;
 	int priority;
 	string schedClass;
-	uid_t userId;
+	uid_t rUserId, eUserId;
 	string formattedStartTime, formattedExecTime;
 	string devicePath;
 	Item *item;
@@ -483,7 +483,8 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	schedClass = info.pr_lwp.pr_clname;
 	
 	tty = info.pr_ttydev;
-	userId = info.pr_uid;
+	rUserId = info.pr_uid;
+	eUserId = info.pr_euid;
 	
 	formattedExecTime = this->FormatExecTime(execTime.tv_sec);
 	formattedStartTime = this->FormatStartTime(startTime.tv_sec);
@@ -497,6 +498,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("priority", Common::ToString(priority)));
+	item->AppendElement(new ItemEntity("ruid", Common::ToString(rUserId)));
 	item->AppendElement(new ItemEntity("scheduling_class", schedClass));
 	item->AppendElement(new ItemEntity("start_time", formattedStartTime));
 	if (devicePath.empty())
@@ -504,7 +506,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 										   false, OvalEnum::STATUS_DOES_NOT_EXIST));
 	else
 		item->AppendElement(new ItemEntity("tty", devicePath));
-	item->AppendElement(new ItemEntity("user_id", Common::ToString(userId)));
+	item->AppendElement(new ItemEntity("user_id", Common::ToString(eUserId)));
 
 	items->push_back(item);
 }
