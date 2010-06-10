@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:esx-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx" elementFormDefault="qualified" version="5.7">
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:esx-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx" elementFormDefault="qualified" version="5.8">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,8 +7,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>VMware ESX server Definition</schema>
-                  <version>5.7</version>
-                  <date>5/3/2010 8:41:17 PM</date>
+                  <version>5.8 Draft 2</version>
+                  <date>5/26/2010 2:55:43 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="esx-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx"/>
@@ -60,13 +60,6 @@
                                                 <xsd:element name="patch_name" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The patch name entity indetifies a specific patch or set of patches to be checked on the system.  For example: ESX-200603 or ESX350-200904401-BG.  The value of this entity should correspond to the values returned under the "name" column of the "esxupdate query" command.</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="esx-def_patch56objpatch_name">
-                                                                        <sch:rule context="esx-def:patch56_object/esx-def:patch_name">
-                                                                              <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the patch_name entity of a patch56_object should be 'string'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                           </xsd:sequence>
@@ -87,73 +80,31 @@
                                     <xsd:element name="patch_name" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The patch_name entity indetifies the name of a patch to test for.  For example: ESX-200603 or ESX350-200904401-BG.  The value of this entity should correspond to the values returned under the "name" column of the "esxupdate query" command.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patch56stepatch_name">
-                                                            <sch:rule context="esx-def:patch56_state/esx-def:patch_name">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the patch_name entity of a patch56_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="knowledge_base_id" type="oval-def:EntityStateIntType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The knowledge_base_id entity specifies a given knowledge base article identifier number.  This entity is valid for ESX versions 3.0.2 and earlier.  It is comprised of the numerical string at the end of the patch name. For example, the patch ESX-200603 would have a knowledge base identifier of 200603.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patch56stekbid">
-                                                            <sch:rule context="esx-def:patch56_state/esx-def:knowledge_base_id">
-                                                                  <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the knowledge_base_id entity of a patch56_state should be 'int'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="bundle_id" type="oval-def:EntityStateIntType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The bundle_id entity specifies a unique ID for the patch.  This entity is valid for ESX version 3.0.3 and version 3.5 and is comprised of the year and month the bundle was released and a 3-digit unique ID. It is in the format YYYYMM###. For example, the first patch released in January 2008 might have a BundleID of 200801001.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patch56stebundleid">
-                                                            <sch:rule context="esx-def:patch56_state/esx-def:bundle_id">
-                                                                  <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the bundle_id entity of a patch56_state should be 'int'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="classification" type="esx-def:EntityStateClassificationType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The classification entity specifies the type of patch.  It can be one of: B - bug, U - update, S - security, or R - roll-up.  This entity is valid for ESX version 3.0.3 and later.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patch56steclassification">
-                                                            <sch:rule context="esx-def:patch56_state/esx-def:classification">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the classification entity of a patch56_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="support_level" type="esx-def:EntityStateSupportLevelType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The support_level entity specifies a support level to test for.  If can be one of: G - GA patch, H - hot patch, D - debugging patch, or C - custom patch.  This entity is valid for ESX version 3.0.3 and later.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patch56stesupport_level">
-                                                            <sch:rule context="esx-def:patch56_state/esx-def:support_level">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the support_level entity of a patch56_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="status" type="oval-def:EntityStateBoolType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The status entity specifies an installation status of a patch to test for.  A value of 'true' is used to signify that a given patch is intalled.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patch56stestatus">
-                                                            <sch:rule context="esx-def:patch56_state/esx-def:status">
-                                                                  <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the status entity of a patch56_state should be 'boolean'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -207,7 +158,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -235,20 +186,13 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:ObjectType">
                               <xsd:sequence>
-                                    <xsd:choice minOccurs="1" maxOccurs="1">
+                                    <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
                                                 <xsd:element name="behaviors" type="esx-def:PatchBehaviors" minOccurs="0" maxOccurs="1"/>
-                                                <xsd:element name="patch_number" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                                <xsd:element name="patch_number" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The patch_number entity identifies the patch to be checked. Many of the security bulletins for VMWARE ESX Server contain non-numerical characters in the patche number, therefore this entity has a datatype of string.</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="esx-def_patchobjpatch_number">
-                                                                        <sch:rule context="esx-def:patch_object/esx-def:patch_number">
-                                                                              <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the patch_number entity of a patch_object should be 'string'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                           </xsd:sequence>
@@ -281,25 +225,11 @@
                                     <xsd:element name="patch_number" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the patch number of a specific patch which will be checked in current VMware ESX server. Many of the security bulletins for VMWARE ESX Server contain non-numerical characters in the patch nubmer, therefore this entity has a datatype of string.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patchstepatch_number">
-                                                            <sch:rule context="esx-def:patch_state/esx-def:patch_number">
-                                                                  <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the patch_number entity of a patch_state should be 'int'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="status" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the installation status of a specific patch in current VMware ESX server.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_patchstestatus">
-                                                            <sch:rule context="esx-def:patch_state/esx-def:status">
-                                                                  <sch:assert test="@datatype='boolean'"><sch:value-of select="../@id"/> - datatype attribute for the status entity of a patch_state should be 'boolean'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -348,7 +278,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -376,25 +306,11 @@
                                     <xsd:element name="release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the release version of current VMware ESX server.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_versionsterelease">
-                                                            <sch:rule context="esx-def:version_state/esx-def:release">
-                                                                  <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the release entity of an version_state should be 'version'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="build" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the build version of current VMware ESX server.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="esx-def_versionstebuild">
-                                                            <sch:rule context="esx-def:version_state/esx-def:build">
-                                                                  <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the build entity of an version_state should be 'int'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -407,7 +323,7 @@
       <!-- =============================================================================== -->
       <xsd:complexType name="EntityStateClassificationType">
             <xsd:annotation>
-                  <xsd:documentation>The EntityStateClassificationType complex type restricts a string value to a specific set of values that describe the classification of a given ESX Server patch. The empty string is also allowed to support empty emlement associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+                  <xsd:documentation>The EntityStateClassificationType complex type restricts a string value to a specific set of values that describe the classification of a given ESX Server patch. The empty string is also allowed to support an empty element associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleContent>
                   <xsd:restriction base="oval-def:EntityStateStringType">
@@ -433,7 +349,7 @@
                         </xsd:enumeration>
                         <xsd:enumeration value="">
                               <xsd:annotation>
-                                    <xsd:documentation>The empty string is also allowed to support empty emlement associated with variable references.</xsd:documentation>
+                                    <xsd:documentation>The empty string is also allowed to support an empty element associated with variable references.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
                   </xsd:restriction>
@@ -441,7 +357,7 @@
       </xsd:complexType>
       <xsd:complexType name="EntityStateSupportLevelType">
             <xsd:annotation>
-                  <xsd:documentation>The EntityStateSupportLevelType complex type restricts a string value to a specific set of values that describe the support level of a given ESX Server patch. The empty string is also allowed to support empty emlement associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+                  <xsd:documentation>The EntityStateSupportLevelType complex type restricts a string value to a specific set of values that describe the support level of a given ESX Server patch. The empty string is also allowed to support an empty element associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleContent>
                   <xsd:restriction base="oval-def:EntityStateStringType">
@@ -467,7 +383,7 @@
                         </xsd:enumeration>
                         <xsd:enumeration value="">
                               <xsd:annotation>
-                                    <xsd:documentation>The empty string is also allowed to support empty emlement associated with variable references.</xsd:documentation>
+                                    <xsd:documentation>The empty string is also allowed to support an empty element associated with variable references.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
                   </xsd:restriction>

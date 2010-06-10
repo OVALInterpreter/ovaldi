@@ -1,12 +1,12 @@
-<?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.7">
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.8">
      <xsd:annotation>
           <xsd:documentation>The following is a description of the common types that are shared across the different schemas within Open Vulnerability and Assessment Language (OVAL). Each type is described in detail and should provide the information necessary to understand what each represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between these type is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Common</schema>
-               <version>5.7</version>
-               <date>5/3/2010 8:41:19 PM</date>
+               <version>5.8 Draft 2</version>
+               <date>5/26/2010 2:55:45 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
               <sch:ns prefix="oval" uri="http://oval.mitre.org/XMLSchema/oval-common-5"/>
               <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
@@ -28,12 +28,12 @@
                 <xsd:documentation>The DeprecatedInfoType complex type defines a structure that will be used to flag schema-defined constructs as deprecated.  It holds information related to the version of OVAL when the contruct was deprecated along with a reason and comment.</xsd:documentation>
           </xsd:annotation>
           <xsd:sequence>
-               <xsd:element name="version" type="xsd:decimal" minOccurs="1" maxOccurs="1">
+               <xsd:element name="version" type="xsd:decimal">
                     <xsd:annotation>
                          <xsd:documentation>The required version child element details the version of OVAL in which the construct became deprecated.</xsd:documentation>
                     </xsd:annotation>
                </xsd:element>
-               <xsd:element name="reason" type="xsd:string" minOccurs="1" maxOccurs="1">
+               <xsd:element name="reason" type="xsd:string">
                     <xsd:annotation>
                          <xsd:documentation>The required reason child element is used to provide an explanation as to why an item was deprecated and to direct a reader to possible alternative structures within OVAL.</xsd:documentation>
                     </xsd:annotation>
@@ -61,12 +61,12 @@
                          <xsd:documentation>The optional product_version specifies the version of the application used to generate the file.</xsd:documentation>
                     </xsd:annotation>
                </xsd:element>
-               <xsd:element name="schema_version" type="xsd:decimal" minOccurs="1" maxOccurs="1">
+               <xsd:element name="schema_version" type="xsd:decimal">
                     <xsd:annotation>
                          <xsd:documentation>The required schema_version specifies the version of the OVAL Schema that the document has been written in and that should be used for validation.</xsd:documentation>
                     </xsd:annotation>
                </xsd:element>
-               <xsd:element name="timestamp" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
+               <xsd:element name="timestamp" type="xsd:dateTime">
                     <xsd:annotation>
                          <xsd:documentation>The required timestamp specifies when the particular OVAL document was compiled. The format for the timestamp is yyyy-mm-ddThh:mm:ss. Note that the timestamp element does not specify when a definition (or set of definitions) was created or modified but rather when the actual XML document that contains the definition was created. For example, the document might have pulled a bunch of existing OVAL Definitions together, each of the definitions having been created at some point in the past. The timestamp in this case would be when the combined document was created.</xsd:documentation>
                     </xsd:annotation>

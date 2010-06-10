@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:catos-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos" elementFormDefault="qualified" version="5.7">
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:catos-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos" elementFormDefault="qualified" version="5.8">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,8 +7,8 @@
           <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Eric Grey at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>CatOS Definition</schema>
-                  <version>5.7</version>
-                  <date>5/3/2010 8:41:16 PM</date>
+                  <version>5.8 Draft 2</version>
+                  <date>5/26/2010 2:55:43 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="catos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos"/>
@@ -36,7 +36,7 @@
             <xsd:complexContent>
                 <xsd:extension base="oval-def:TestType">
                     <xsd:sequence>
-                        <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="object" type="oval-def:ObjectRefType" />
                         <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:sequence>
                 </xsd:extension>
@@ -45,26 +45,19 @@
     </xsd:element>
     <xsd:element name="line_object" substitutionGroup="oval-def:object">
         <xsd:annotation>
-            <xsd:documentation>The line_object element is used by a line_test to define the object to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+            <xsd:documentation>The line_object element is used by a line_test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
             <xsd:documentation>A line_object consists of a show_subcommand entity that is the name of a SHOW sub-command to be tested.</xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="oval-def:ObjectType">
                     <xsd:sequence>
-                        <xsd:choice minOccurs="1" maxOccurs="1">
+                        <xsd:choice>
                             <xsd:element ref="oval-def:set"/>
                             <xsd:sequence>
-                                <xsd:element name="show_subcommand" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                <xsd:element name="show_subcommand" type="oval-def:EntityObjectStringType">
                                     <xsd:annotation>
                                         <xsd:documentation>The name of a SHOW sub-command.</xsd:documentation>
-                                        <xsd:appinfo>
-                                            <sch:pattern id="catos-def_lineobjshow_subcommand">
-                                                <sch:rule context="catos-def:line_object/catos-def:show_subcommand">
-                                                    <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the show_subcommand entity of a line_object should be 'string'</sch:assert>
-                                                </sch:rule>
-                                            </sch:pattern>
-                                        </xsd:appinfo>
                                     </xsd:annotation>
                                 </xsd:element>
                             </xsd:sequence>
@@ -85,25 +78,11 @@
                         <xsd:element name="show_subcommand" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The name of the SHOW sub-command.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="catos-def_linesteshow_subcommand">
-                                        <sch:rule context="catos-def:line_state/catos-def:show_subcommand">
-                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the show_subcommand entity of a line_state should be 'string'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
                             </xsd:annotation>
                         </xsd:element>
                         <xsd:element name="config_line" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The value returned from by the specified SHOW sub-command.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="catos-def_linesteconfig_line">
-                                        <sch:rule context="catos-def:line_state/catos-def:config_line">
-                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the config_line entity of a line_state should be 'string'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
                             </xsd:annotation>
                         </xsd:element>
                     </xsd:sequence>
@@ -133,7 +112,7 @@
                 <xsd:complexContent>
                       <xsd:extension base="oval-def:TestType">
                             <xsd:sequence>
-                                  <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                  <xsd:element name="object" type="oval-def:ObjectRefType" />
                                   <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                             </xsd:sequence>
                       </xsd:extension>
@@ -149,19 +128,12 @@
               <xsd:complexContent>
                     <xsd:extension base="oval-def:ObjectType">
                           <xsd:sequence>
-                                <xsd:choice minOccurs="1" maxOccurs="1">
+                                <xsd:choice>
                                       <xsd:element ref="oval-def:set"/>
                                       <xsd:sequence>
                                             <xsd:element name="module_number" type="oval-def:EntityObjectIntType" minOccurs="0" maxOccurs="1">
                                                   <xsd:annotation>
                                                         <xsd:documentation>A number that identifies the a specific module.</xsd:documentation>
-                                                        <xsd:appinfo>
-                                                              <sch:pattern id="catos-def_moduleobjmodule_number">
-                                                                    <sch:rule context="catos-def:module_object/catos-def:module_number">
-                                                                          <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the module_number entity of a module_object should be 'int'</sch:assert>
-                                                                    </sch:rule>
-                                                              </sch:pattern>
-                                                        </xsd:appinfo>
                                                   </xsd:annotation>
                                             </xsd:element>
                                       </xsd:sequence>
@@ -182,121 +154,51 @@
                                   <xsd:element name="module_number" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>A number that identifies the a specific module.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestemodule_number">
-                                                          <sch:rule context="catos-def:module_state/catos-def:module_number">
-                                                                <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the module_number entity of a module_state should be 'int'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="type" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The type of module.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestetype">
-                                                          <sch:rule context="catos-def:module_state/catos-def:type">
-                                                                <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the type entity of a module_state should be 'string'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="model" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The model of a module.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestemodel">
-                                                          <sch:rule context="catos-def:module_state/catos-def:model">
-                                                                <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the model entity of a module_state should be 'string'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
-                                  <xsd:element name="software_major_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                  <xsd:element name="software_major_release" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The major relase of the software of a module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestesoftware_major_release">
-                                                          <sch:rule context="catos-def:module_state/catos-def:software_major_release">
-                                                                <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the software_major_release entity of a module_state should be 'version'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                             </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="software_individual_release" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The individual release of the software of the module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestesoftware_individual_release">
-                                                          <sch:rule context="catos-def:module_state/catos-def:software_individual_release">
-                                                                <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the software_individual_release entity of a module_state should be 'int'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="software_version_id" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                       <xsd:annotation>
                                               <xsd:documentation>The vesion id of the software of a module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestesoftware_version_id">
-                                                          <sch:rule context="catos-def:module_state/catos-def:software_version_id">
-                                                                <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the software_version_id entity of a module_state should be 'string'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                               </xsd:appinfo>
                                        </xsd:annotation>
                                   </xsd:element>
-                                  <xsd:element name="hardware_major_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                  <xsd:element name="hardware_major_release" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The hardware major release of a module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestehardware_major_release">
-                                                          <sch:rule context="catos-def:module_state/catos-def:hardware_major_release">
-                                                                <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the hardware_major_release entity of a module_state should be 'version'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="hardware_individual_release" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The hardware individual release of a module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestehardware_individual_release">
-                                                          <sch:rule context="catos-def:module_state/catos-def:hardware_individual_release">
-                                                                <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the hardware_individual_release entity of a module_state should be 'int'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                        </xsd:annotation>
                                   </xsd:element>
-                                  <xsd:element name="firmware_major_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                  <xsd:element name="firmware_major_release" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The major release of the firmware of a module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestefirmware_major_release">
-                                                          <sch:rule context="catos-def:module_state/catos-def:firmware_major_release">
-                                                                <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the firmware_major_release entity of a module_state should be 'version'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="firmware_individual_release" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The individual release of the firmware of a module to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_modulestefirmware_individual_release">
-                                                          <sch:rule context="catos-def:module_state/catos-def:firmware_individual_release">
-                                                                <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the firmware_individual_release entity of a module_state should be 'int'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                             </xsd:sequence>
@@ -326,7 +228,7 @@
             <xsd:complexContent>
                 <xsd:extension base="oval-def:TestType">
                     <xsd:sequence>
-                        <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="object" type="oval-def:ObjectRefType" />
                         <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:sequence>
                 </xsd:extension>
@@ -354,37 +256,16 @@
                         <xsd:element name="swtich_series" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The switch_series entity defines a target Catalyst switch series to check for.  Each version of CatOS traditionally has target a specific Catalyst series of switches.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="catos-def_ver55stedevice_series">
-                                        <sch:rule context="catos-def:version55_state/catos-def:swtich_series">
-                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the swtich_series entity of a version55_state should be 'string'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
                             </xsd:annotation>
                         </xsd:element>
                         <xsd:element name="image_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The image_name entity defines a name of a CatOS image to check for.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="catos-def_ver55steimage_name">
-                                        <sch:rule context="catos-def:version55_state/catos-def:image_name">
-                                            <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the image_name entity of a version55_state should be 'string'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:element name="catos_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                        <xsd:element name="catos_release" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The catos_release entity defines a release version of CatOS to check for.</xsd:documentation>
-                                <xsd:appinfo>
-                                    <sch:pattern id="catos-def_ver55stecatos_release">
-                                        <sch:rule context="catos-def:version55_state/catos-def:catos_release">
-                                            <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the catos_release entity of a version55_state should be 'version'</sch:assert>
-                                        </sch:rule>
-                                    </sch:pattern>
-                                </xsd:appinfo>
                             </xsd:annotation>
                         </xsd:element>
                     </xsd:sequence>
@@ -428,7 +309,7 @@
                 <xsd:complexContent>
                       <xsd:extension base="oval-def:TestType">
                             <xsd:sequence>
-                                  <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                  <xsd:element name="object" type="oval-def:ObjectRefType" />
                                   <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                             </xsd:sequence>
                       </xsd:extension>
@@ -484,61 +365,26 @@
                                   <xsd:element name="swtich_series" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>A Catalyst switch series to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_verstedevice_series">
-                                                          <sch:rule context="catos-def:version_state/catos-def:swtich_series">
-                                                                <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the swtich_series entity of a version_state should be 'string'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="image_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The name of a CatOS image to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_versteimage_name">
-                                                          <sch:rule context="catos-def:version_state/catos-def:image_name">
-                                                                <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the image_name entity of a version_state should be 'string'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="catos_major_release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The major release of CatOS to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_verstecatos_major_release">
-                                                          <sch:rule context="catos-def:version_state/catos-def:catos_major_release">
-                                                                <sch:assert test="@datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the catos_major_release entity of a version_state should be 'version'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="catos_individual_release" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The individual release of CatOS to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_verstecatos_individual_release">
-                                                          <sch:rule context="catos-def:version_state/catos-def:catos_individual_release">
-                                                                <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the catos_individual_release entity of a version_state should be 'int'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                                   <xsd:element name="catos_version_id" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>The version id of Cat OS to check for.</xsd:documentation>
-                                              <xsd:appinfo>
-                                                    <sch:pattern id="catos-def_verstecatos_version_id">
-                                                          <sch:rule context="catos-def:version_state/catos-def:catos_version_id">
-                                                                <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the catos_version_id entity of a version_state should be 'string'</sch:assert>
-                                                          </sch:rule>
-                                                    </sch:pattern>
-                                              </xsd:appinfo>
                                         </xsd:annotation>
                                   </xsd:element>
                             </xsd:sequence>

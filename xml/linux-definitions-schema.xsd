@@ -1,13 +1,13 @@
-<?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" elementFormDefault="qualified" version="5.7">
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" elementFormDefault="qualified" version="5.8">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Linux specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux Definition</schema>
-               <version>5.7</version>
-               <date>5/3/2010 8:41:18 PM</date>
+               <version>5.8 Draft 2</version>
+               <date>5/26/2010 2:55:44 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                <sch:ns prefix="linux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"/>
@@ -35,7 +35,7 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-def:TestType">
                          <xsd:sequence>
-                              <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
                               <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                          </xsd:sequence>
                     </xsd:extension>
@@ -44,26 +44,19 @@
      </xsd:element>
      <xsd:element name="dpkginfo_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
-               <xsd:documentation>The dpkginfo_object element is used by a dpkginfo test to define the object to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:documentation>The dpkginfo_object element is used by a dpkginfo test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>A dpkginfo object consists of a single name entity that identifies the package being checked.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
                     <xsd:extension base="oval-def:ObjectType">
                          <xsd:sequence>
-                              <xsd:choice minOccurs="1" maxOccurs="1">
+                              <xsd:choice>
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
-                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the package name to check.</xsd:documentation>
-                                                  <xsd:appinfo>
-                                                       <sch:pattern id="linux-def_dpkgobjname">
-                                                            <sch:rule context="linux-def:dpkginfo_object/linux-def:name">
-                                                                 <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a dpkginfo_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                       </sch:pattern>
-                                                  </xsd:appinfo>
                                              </xsd:annotation>
                                         </xsd:element>
                                    </xsd:sequence>
@@ -84,73 +77,31 @@
                               <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the DPKG package name to check.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_dpkgstename">
-                                                  <sch:rule context="linux-def:dpkginfo_state/linux-def:name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a dpkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="arch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the architecture for which the package was built, like : i386, ppc, sparc, noarch.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_dpkgstearch">
-                                                  <sch:rule context="linux-def:dpkginfo_state/linux-def:arch">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the arch entity of a dpkginfo_state should be 'string'</sch:assert>                                                  
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="epoch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the epoch number of the package, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_dpkgsteepoch">
-                                                  <sch:rule context="linux-def:dpkginfo_state/linux-def:epoch">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the epoch entity of a dpkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_dpkgsterelease">
-                                                  <sch:rule context="linux-def:dpkginfo_state/linux-def:release">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the release entity of a dpkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="version" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the version number of the build.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_dpkgsteversion">
-                                                  <sch:rule context="linux-def:dpkginfo_state/linux-def:version">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of a dpkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="evr" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="evr" type="oval-def:EntityStateEVRStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This represents the epoch, version, and release fields as a single version string. It has the form "EPOCH:VERSION-RELEASE".</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_dpkgsteevr">
-                                                  <sch:rule context="linux-def:dpkginfo_state/linux-def:evr">
-                                                       <sch:assert test="not(@datatype) or @datatype='evr_string'"><sch:value-of select="../@id"/> - datatype attribute for the evr entity of a dpkginfo_state should be 'evr_string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -179,7 +130,7 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-def:TestType">
                          <xsd:sequence>
-                              <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
                               <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                          </xsd:sequence>
                     </xsd:extension>
@@ -188,50 +139,29 @@
      </xsd:element>
      <xsd:element name="inetlisteningservers_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
-               <xsd:documentation>The inetlisteningservers_object element is used by an inet listening servers test to define the specific protocol-address-port to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:documentation>The inetlisteningservers_object element is used by an inet listening servers test to define the specific protocol-address-port to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>An inet listening servers object consists of three entities. The first identifies a specific IP address. The second entity represents a certain port number. While the third identifies the protocol.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
                     <xsd:extension base="oval-def:ObjectType">
                          <xsd:sequence>
-                              <xsd:choice minOccurs="1" maxOccurs="1">
+                              <xsd:choice>
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
-                                        <xsd:element name="protocol" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                        <xsd:element name="protocol" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>The protocol entity defines a certain transport-layer protocol, in lowercase: tcp or udp.</xsd:documentation>
-                                                  <xsd:appinfo>
-                                                       <sch:pattern id="linux-def_ilsobjprotocol">
-                                                            <sch:rule context="linux-def:inetlisteningservers_object/linux-def:protocol">
-                                                                 <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the protocol entity of an inetlisteningservers_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                       </sch:pattern>
-                                                  </xsd:appinfo>
                                              </xsd:annotation>
                                         </xsd:element>
-                                        <xsd:element name="local_address" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                        <xsd:element name="local_address" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the IP address of the network interface on which an application listens. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
-                                                  <xsd:appinfo>
-                                                       <sch:pattern id="linux-def_ilsobjlocal_address">
-                                                            <sch:rule context="linux-def:inetlisteningservers_object/linux-def:local_address">
-                                                                 <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the local_address entity of an inetlisteningservers_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                       </sch:pattern>
-                                                  </xsd:appinfo>
                                              </xsd:annotation>
                                         </xsd:element>
-                                        <xsd:element name="local_port" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                        <xsd:element name="local_port" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the TCP or UDP port on which an application would listen. Note that this is not a list -- if a program listens on multiple ports, or on a combination of TCP and UDP, each will be represented by its own object.</xsd:documentation>
-                                                  <xsd:appinfo>
-                                                       <sch:pattern id="linux-def_ilsobjlocal_port">
-                                                            <sch:rule context="linux-def:inetlisteningservers_object/linux-def:local_port">
-                                                                 <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the local_port entity of an inetlisteningservers_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                       </sch:pattern>
-                                                  </xsd:appinfo>
                                              </xsd:annotation>
                                         </xsd:element>
                                    </xsd:sequence>
@@ -252,121 +182,51 @@
                               <xsd:element name="protocol" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The protocol entity defines the specific transport-layer protocol, in lowercase: tcp or udp, associated with the inet listening server.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilssteprotocol">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:protocol">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the protocol entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="local_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the IP address of the network interface on which the program listens. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilsstelocal_address">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:local_address">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the local_address entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="local_port" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the TCP or UDP port number associated with the inet listening server.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilsstelocal_port">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:local_port">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the local_port entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="local_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the IP address and network port number associated with the inet listening server, equivalent to local_address:local_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilsstelocal_full_address">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:local_full_address">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the local_full_address entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="program_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the name of the communicating program.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilssteprogram_name">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:program_name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the program_name entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="foreign_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilssteforeign_address">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:foreign_address">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the foreign_address entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="foreign_port" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the TCP or UDP port to which the program communicates. In the case of a listening program accepting new connections, this is usually a *.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilssteforeign_port">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:foreign_port">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the foreign_port entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="foreign_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the IP address and network port to which the program is communicating or will accept communications from, equivalent to foreign_address:foreign_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilssteforeign_full_address">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:foreign_full_address">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the foreign_full_address entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="pid" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The pid is the process ID of a specific process.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilsstepid">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:pid">
-                                                       <sch:assert test="not(@datatype) or @datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the pid entity of an inetlisteningservers_state should be 'int'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="user_id" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd. It represents the owner, and thus privilege level, of the specified program.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_ilssteuser_id">
-                                                  <sch:rule context="linux-def:inetlisteningservers_state/linux-def:user_id">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the user_id entity of an inetlisteningservers_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -395,7 +255,7 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-def:TestType">
                          <xsd:sequence>
-                              <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
                               <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                          </xsd:sequence>
                     </xsd:extension>
@@ -404,26 +264,19 @@
      </xsd:element>
      <xsd:element name="rpminfo_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
-               <xsd:documentation>The rpminfo_object element is used by a rpm info test to define the object to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:documentation>The rpminfo_object element is used by a rpm info test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>A rpm info object consists of a single name entity that identifies the package being checked.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
                     <xsd:extension base="oval-def:ObjectType">
                          <xsd:sequence>
-                              <xsd:choice minOccurs="1" maxOccurs="1">
+                              <xsd:choice>
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
-                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the package name to check.</xsd:documentation>
-                                                  <xsd:appinfo>
-                                                       <sch:pattern id="linux-def_rpmobjname">
-                                                            <sch:rule context="linux-def:rpminfo_object/linux-def:name">
-                                                                 <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a rpminfo_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                       </sch:pattern>
-                                                  </xsd:appinfo>
                                              </xsd:annotation>
                                         </xsd:element>
                                    </xsd:sequence>
@@ -444,85 +297,411 @@
                               <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the package name to check.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmstename">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a rpminfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="arch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmstearch">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:arch">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the arch entity of a rpminfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="epoch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) is equivalent to '0'. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmsteepoch">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:epoch">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the epoch entity of a rpminfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="release" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmsterelease">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:release">
-                                                       <sch:assert test="not(@datatype) or @datatype='string' or @datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the release entity of a rpminfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="version" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmsteversion">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:version">
-                                                       <sch:assert test="not(@datatype) or @datatype='string' or @datatype='version'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of a rpminfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="evr" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="evr" type="oval-def:EntityStateEVRStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This represents the epoch, version, and release fields as a single version string. It has the form "EPOCH:VERSION-RELEASE". Note that a null epoch (or '(none)' as returned by rpm) is equivalent to '0' and would hence have the form 0:VERSION-RELEASE. Comparisons involving this datatype should follow the algorithm of librpm's rpmvercmp() function.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmsteevr">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:evr">
-                                                       <sch:assert test="not(@datatype) or @datatype='evr_string'"><sch:value-of select="../@id"/> - datatype attribute for the evr entity of a rpminfo_state should be 'evr_string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="signature_keyid" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This field contains the 64-bit PGP key ID that the RPM issuer (generally the original operating system vendor) uses to sign the key. Note that the value should NOT contain a hyphen to seperat the higher 32-bits from the lower 32-bits. It should simply be a 16 character hex string. PGP is used to verify the authenticity and integrity of the RPM being considered. Software packages and patches are signed cryptographically to allow administrators to allay concerns that the distribution mechanism has been compromised, whether that mechanism is web site, FTP server, or even a mirror controlled by a hostile party. OVAL uses this field most of all to confirm that the package installed on the system is that shipped by the vendor, since comparing package version numbers against patch announcements is only programmatically valid if the installed package is known to contain the patched code.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_rpmstesignaturekeyid">
-                                                  <sch:rule context="linux-def:rpminfo_state/linux-def:signature_keyid">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the signature_keyid entity of a rpminfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
+     <!-- ==============================  RPM VERIFY TEST  ============================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="rpmverify_test" substitutionGroup="oval-def:test">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverify_test is used to verify the integrity of installed RPMs. This test aligns with the rpm -V command for verifying RPMs. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpmverify_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpmverify_test">
+                         <sch:rule context="linux-def:rpmverify_test/linux-def:object">
+                              <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/linux-def:rpmverify_object/@id"><sch:value-of select="../@id"/> - the object child element of an rpmverify_test must reference an rpmverify_object</sch:assert>
+                         </sch:rule>
+                         <sch:rule context="linux-def:rpmverify_test/linux-def:state">
+                              <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/linux-def:rpmverify_state/@id"><sch:value-of select="../@id"/> - the state child element of an rpmverify_test must reference an rpmverify_state</sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:TestType">
+                         <xsd:sequence>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
+                              <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="rpmverify_object" substitutionGroup="oval-def:object">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverify_object element is used by a rpmverity_test to define a set of files within a set of RPMs to verify. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:ObjectType">
+                         <xsd:sequence>
+                              <xsd:choice>
+                                   <xsd:element ref="oval-def:set"/>
+                                   <xsd:sequence>
+                                        <xsd:element name="behaviors" type="linux-def:RpmVerifyBehaviors" minOccurs="0" maxOccurs="1"/>
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the package name to check.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                        <xsd:element name="filepath" type="oval-def:EntityObjectStringType">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>The filepath element specifies the absolute path for a file in the specified package. A directory cannot be specified as a filepath.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                   </xsd:sequence>
+                              </xsd:choice>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="rpmverify_state" substitutionGroup="oval-def:state">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverify_state element defines the different information that can be used to evaluate the specified rpm. This includes the architecture, epoch number, and version numbers. Most of this information can be obtained through the rpm function. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:StateType">
+                         <xsd:sequence>
+                              <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the package name to check.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The filepath element specifies the absolute path for a file in the specified package. A directory cannot be specified as a filepath.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_differs entity aligns with the first character ('S' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="mode_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The mode_differs entity aligns with the second character ('M' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="md5_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The md5_differs entity aligns with the third character ('5' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="device_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The device_differs entity aligns with the fourth character ('D' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="link_mismatch" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The link_mismatch entity aligns with the fifth character ('L' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="ownership_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The ownership_differs entity aligns with the sixth character ('U' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="group_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The group_differs entity aligns with the seventh character ('U' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="mtime_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The mtime_differs entity aligns with the eighth character ('T' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="capabilities_differ" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_differs entity aligns with the ninth character ('P' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="configuration_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The configuration_file entity represents the configuration file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="documentation_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The documentation_file entity represents the documenation file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="ghost_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The ghost_file entity represents the ghost file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="license_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The license_file entity represents the license file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="readme_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The readme_file entity represents the readme file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>                              
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:complexType name="RpmVerifyBehaviors">
+          <xsd:annotation>
+               <xsd:documentation>The RpmVerifyBehaviors complex type defines a set of behaviors that for controlling how installed rpms are verified. These behaviors align with the verify-options of the rpm command with the addition of two behaviors that will indicate that a file with a given attribute marker should not be collected.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:attribute name="nodeps" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nodeps' when true this behavior means, don't verify dependencies of packages.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nodigest" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nodigest' when true this behavior means, don't verify package or header digests when reading.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nofiles" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nofiles' when true this behavior means, don't verify any attributes of package files.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="noscripts" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'noscripts' when true this behavior means, don't execute the %verifyscript scriptlet (if any).</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nosignature" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nosignature' when true this behavior means, don't verify package or header signatures when reading.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nolinkto" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nolinkto' when true this behavior means, don't verify symbolic links attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nomd5" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nomd5' when true this behavior means, don't verify the file md5 attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nosize" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nosize' when true this behavior means, don't verify the file size attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nouser" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nouser' when true this behavior means, don't verify the file owner attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nogroup" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nogroup' when true this behavior means, don't verify the file group owner attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nomtime" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nomtime' when true this behavior means, don't verify the file mtime attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nomode" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nomode' when true this behavior means, don't verify the file mode attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nordev" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nordev' when true this behavior means, don't verify the file rdev attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="noconfigfiles" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'noconfigfiles' when true this behavior means, skip files that are marked with the %config attribute marker.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="noghostfiles" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'noghostfiles' when true this behavior means, skip files that are maked with %ghost attribute marker.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+     </xsd:complexType>
+     <!-- =============================================================================== -->
+     <!-- ===========================  SELINUX BOOLEAN TEST  =========+================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="selinux_boolean_test" substitutionGroup="oval-def:test">
+          <xsd:annotation>
+               <xsd:documentation>The selinux_boolean_test is used to check the current and pending status of a SELinux boolean. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a selinux_boolean_object and the optional state element references a selinux_boolean_state that specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_selinuxbooleantst">
+                         <sch:rule context="linux-def:selinux_boolean_test/linux-def:object">
+                              <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/linux-def:selinux_boolean_object/@id"><sch:value-of select="../@id"/> - the object child element of an selinux_boolean_test must reference an selinux_boolean_object</sch:assert>
+                         </sch:rule>
+                         <sch:rule context="linux-def:selinux_boolean_test/linux-def:state">
+                              <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/linux-def:selinux_boolean_state/@id"><sch:value-of select="../@id"/> - the state child element of an selinux_boolean_test must reference an selinux_boolean_state</sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:TestType">
+                         <xsd:sequence>
+                              <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                              <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="selinux_boolean_object" substitutionGroup="oval-def:object">
+          <xsd:annotation>
+               <xsd:documentation>The selinux_boolean_object element is used by an selinux_boolean_test to define the items to evaluate based on a specified state.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:ObjectType">
+                         <xsd:sequence>
+                              <xsd:choice>
+                                   <xsd:element ref="oval-def:set"/>
+                                   <xsd:sequence>
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>The name of the SELinux boolean.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                   </xsd:sequence>
+                              </xsd:choice>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="selinux_boolean_state" substitutionGroup="oval-def:state">
+          <xsd:annotation>
+               <xsd:documentation>The selinux_boolean_state element defines the different information that can be used to evaluate the specified SELinux boolean. This includes SELinux boolean's current and pending status. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:StateType">
+                         <xsd:sequence>
+                              <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The name of the SELinux boolean.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="current_status" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The current_status entity represents the current state of the specified SELinux boolean.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="pending_status" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The pending_status entity represents the pending state of the specified SELinux boolean.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
+     <!-- ===============================  SESTATUS TEST  =============================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="sestatus_test" substitutionGroup="oval-def:test">
+          <xsd:annotation>
+               <xsd:documentation>The sestatus_test is used to check the status of SELinux running on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sestatus_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_sestatustst">
+                         <sch:rule context="linux-def:sestatus_test/linux-def:object">
+                              <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/linux-def:sestatus_object/@id"><sch:value-of select="../@id"/> - the object child element of an sestatus_test must reference an sestatus_object</sch:assert>
+                         </sch:rule>
+                         <sch:rule context="linux-def:sestatus_test/linux-def:state">
+                              <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/linux-def:sestatus_state/@id"><sch:value-of select="../@id"/> - the state child element of an sestatus_test must reference an sestatus_state</sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:TestType">
+                         <xsd:sequence>
+                              <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                              <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="sestatus_object" substitutionGroup="oval-def:object">
+          <xsd:annotation>
+               <xsd:documentation>The sestatus_object element is used by an sestatus_test to define the items to evaluate based on a specified state. There is actually only one object relating to the status of SELinux running on the local system. Therefore, there are no child entities defined. Any OVAL Test written to check the status of SELinux on the local system will reference the same sestatus_object.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:ObjectType"/>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="sestatus_state" substitutionGroup="oval-def:state">
+          <xsd:annotation>
+               <xsd:documentation>The sestatus_state element defines the different information that can be used to evaluate the status of SELinux running on the local system. This includes SELinux's current status, mode, and policy version. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:StateType">
+                         <xsd:sequence>
+                              <xsd:element name="status" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The status entity indicates whether SELinux is currently enabled or disabled on the system.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="mode" type="linux-def:EntityStateSeLinuxModeType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The mode entity indicates the current state of SELinux. Possible values are 'enforcing', 'permissive', and 'disabled'.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="policy_version" type="oval-def:EntityStateIntType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The version number of the SELinux policy.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -551,7 +730,7 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-def:TestType">
                          <xsd:sequence>
-                              <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
                               <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                          </xsd:sequence>
                     </xsd:extension>
@@ -560,26 +739,19 @@
      </xsd:element>
      <xsd:element name="slackwarepkginfo_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
-               <xsd:documentation>The slackwarepkginfo_object element is used by a slackware package info test to define the object to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:documentation>The slackwarepkginfo_object element is used by a slackware package info test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>A slackware package info object consists of a single name entity that identifies the package being checked.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
                     <xsd:extension base="oval-def:ObjectType">
                          <xsd:sequence>
-                              <xsd:choice minOccurs="1" maxOccurs="1">
+                              <xsd:choice>
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
-                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the package name to check.</xsd:documentation>
-                                                  <xsd:appinfo>
-                                                       <sch:pattern id="linux-def_spkginfoobjname">
-                                                            <sch:rule context="linux-def:slackwarepkginfo_object/linux-def:name">
-                                                                 <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a slackwarepkginfo_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                       </sch:pattern>
-                                                  </xsd:appinfo>
                                              </xsd:annotation>
                                         </xsd:element>
                                    </xsd:sequence>
@@ -600,49 +772,21 @@
                               <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the package name to check.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_spkginfostename">
-                                                  <sch:rule context="linux-def:slackwarepkginfo_state/linux-def:name">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a slackwarepkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="version" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the version number of the package.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_spkginfosteversion">
-                                                  <sch:rule context="linux-def:slackwarepkginfo_state/linux-def:version">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of a slackwarepkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="architecture" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation/>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_spkginfostearch">
-                                                  <sch:rule context="linux-def:slackwarepkginfo_state/linux-def:architecture">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the architecture entity of a slackwarepkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="revision" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation/>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="linux-def_spkginfosterevision">
-                                                  <sch:rule context="linux-def:slackwarepkginfo_state/linux-def:revision">
-                                                       <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the revision entity of a slackwarepkginfo_state should be 'string'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -653,4 +797,62 @@
      <!-- =============================================================================== -->
      <!-- =============================================================================== -->
      <!-- =============================================================================== -->
+     <xsd:complexType name="EntityStateSeLinuxModeType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityStateSeLinuxModeType complex type restricts a string value to three values: 1)enforcing 2)permissive or 3)disabled. These values indicate the current mode of SELinux on a system. The empty string is also allowed to support the empty element associated with variable references.  Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-def:EntityStateStringType">
+                    <xsd:enumeration value="enforcing">
+                         <xsd:annotation>
+                              <xsd:documentation>A value of 'enforcing' indicates that the SELinux security policy is enforced and will deny access based on the security policy rules.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="permissive">
+                         <xsd:annotation>
+                              <xsd:documentation>A value of 'permissive' indicates that the SELinux security policy is not enforced and will not deny access, but, it will still log denial messages.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="disabled">
+                         <xsd:annotation>
+                              <xsd:documentation>A value of 'disabled' indicates that SELinux is disabled.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
+     <xsd:complexType name="EntityStateRpmVerifyResultType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityStateRpmVerifyResultType complex type restricts a string value to the set of possible outcomes of checking an attribute of a file included in an RPM against the actual value of that attribute in the RPM database. The empty string is also allowed to support the empty element associated with variable references.  Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-def:EntityStateStringType">
+                    <xsd:enumeration value="pass">
+                         <xsd:annotation>
+                              <xsd:documentation>'pass' indicates that the test passed and is equivalent to the '.' value reported by the rpm -V command.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="fail">
+                         <xsd:annotation>
+                              <xsd:documentation>'fail' indicates that the test failed and is equivalent to a bold charcter in the test result string reported by the rpm -V command.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="not performed">
+                         <xsd:annotation>
+                              <xsd:documentation>'not performed' indicates that the test could not be performed and is equivalent to the '?' value reported by the rpm -V command.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
 </xsd:schema>

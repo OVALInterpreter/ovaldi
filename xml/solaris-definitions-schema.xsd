@@ -1,13 +1,13 @@
-<?xml version="1.0"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sol-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" elementFormDefault="qualified" version="5.7">
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sol-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" elementFormDefault="qualified" version="5.8">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Solaris specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Solaris Definition</schema>
-                  <version>5.7</version>
-                  <date>5/3/2010 8:41:21 PM</date>
+                  <version>5.8 Draft 2</version>
+                  <date>5/26/2010 2:55:47 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sol-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"/>
@@ -38,7 +38,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -66,37 +66,16 @@
                                     <xsd:element name="bits" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the number of bits in the address space of the native instruction set (isainfo -b).</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_isastebits">
-                                                            <sch:rule context="sol-def:isainfo_state/sol-def:bits">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the bits entity of an isainfo_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="kernel_isa" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the name of the instruction set used by kernel components (isainfo -k).</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_isastekernel_isa">
-                                                            <sch:rule context="sol-def:isainfo_state/sol-def:kernel_isa">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the kernel_isa entity of an isainfo_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="application_isa" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the name of the instruction set used by portable applications (isainfo -n).</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_isasteapplication_isa">
-                                                            <sch:rule context="sol-def:isainfo_state/sol-def:application_isa">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the application_isa entity of an isainfo_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -127,7 +106,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -136,26 +115,19 @@
       </xsd:element>
       <xsd:element name="package_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The package_object element is used by a package test to define the packages to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The package_object element is used by a package test to define the packages to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A package object consists of a single pkginst entity that identifies the package to be used.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:ObjectType">
                               <xsd:sequence>
-                                    <xsd:choice minOccurs="1" maxOccurs="1">
+                                    <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
-                                                <xsd:element name="pkginst" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                                <xsd:element name="pkginst" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The pkginst entity is a string that represents a package designation by its instance. An instance can be the package abbreviation or a specific instance (for example, inst.1 or inst.2).</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="sol-def_packageobjpkginst">
-                                                                        <sch:rule context="sol-def:package_object/sol-def:pkginst">
-                                                                              <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the pkginst entity of a package_object should be 'string'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                           </xsd:sequence>
@@ -176,73 +148,31 @@
                                     <xsd:element name="pkginst" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The pkginst entity is a string that represents a package designation by its instance. An instance can be the package abbreviation or a specific instance (for example, inst.1 or inst.2).</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_packagestepkginst">
-                                                            <sch:rule context="sol-def:package_state/sol-def:pkginst">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the pkginst entity of a package_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The name entity is a text string that specifies a full package name.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_packagestename">
-                                                            <sch:rule context="sol-def:package_state/sol-def:name">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the name entity of a package_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="category" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The category entity is a string in the form of a comma-separated list of categories under which a package may be displayed. Note that a package must at least belong to the system or application category. Categories are case-insensitive and may contain only alphanumerics. Each category is limited in length to 16 characters.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_packagestecategory">
-                                                            <sch:rule context="sol-def:package_state/sol-def:category">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the category entity of a package_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="version" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The version entity is a text string that specifies the current version associated with the software package. The maximum length is 256 ASCII characters and the first character cannot be a left parenthesis. Current Solaris software practice is to assign this parameter monotonically increasing Dewey decimal values of the form: major_revision.minor_revision[.micro_revision] where all the revision fields are integers. The versioning fields can be extended to an arbitrary string of numbers in Dewey-decimal format, if necessary.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_packagesteversion">
-                                                            <sch:rule context="sol-def:package_state/sol-def:version">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of a package_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="vendor" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The vendor entity is a string used to identify the vendor that holds the software copyright (maximum length of 256 ASCII characters).</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_packagestevendor">
-                                                            <sch:rule context="sol-def:package_state/sol-def:vendor">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the vendor entity of a package_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="description" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The description entity is a string that represents a more in-depth description of a package.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_packagestedescription">
-                                                            <sch:rule context="sol-def:package_state/sol-def:description">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the description entity of a package_state should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -273,7 +203,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -314,7 +244,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -323,39 +253,25 @@
       </xsd:element>
       <xsd:element name="patch54_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The patch54_object element is used by a patch test to define the specific patch to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The patch54_object element is used by a patch test to define the specific patch to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A patch object consists of a base entity that identifies the patch to be used, and a version entity that represent the patch revision number.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:ObjectType">
                               <xsd:sequence>
-                                    <xsd:choice minOccurs="1" maxOccurs="1">
+                                    <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
                                                 <xsd:element name="behaviors" type="sol-def:PatchBehaviors" minOccurs="0" maxOccurs="1"/>
-                                                <xsd:element name="base" type="oval-def:EntityObjectIntType" minOccurs="1" maxOccurs="1">
+                                                <xsd:element name="base" type="oval-def:EntityObjectIntType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="sol-def_patch54objbase">
-                                                                        <sch:rule context="sol-def:patch54_object/sol-def:base">
-                                                                              <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the base entity of a patch54_object should be 'int'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
-                                                <xsd:element name="version" type="oval-def:EntityObjectIntType" minOccurs="1" maxOccurs="1">
+                                                <xsd:element name="version" type="oval-def:EntityObjectIntType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="sol-def_patch54objversion">
-                                                                        <sch:rule context="sol-def:patch54_object/sol-def:version">
-                                                                              <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of a patch54_object should be 'int'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                           </xsd:sequence>
@@ -367,7 +283,7 @@
       </xsd:element>
       <xsd:element name="patch_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The patch_object element is used by a patch test to define the specific patch to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The patch_object element is used by a patch test to define the specific patch to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A patch object consists of a single base entity that identifies the patch to be used.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:deprecated_info>
@@ -388,19 +304,12 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:ObjectType">
                               <xsd:sequence>
-                                    <xsd:choice minOccurs="1" maxOccurs="1">
+                                    <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
-                                                <xsd:element name="base" type="oval-def:EntityObjectIntType" minOccurs="1" maxOccurs="1">
+                                                <xsd:element name="base" type="oval-def:EntityObjectIntType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="sol-def_patchobjbase">
-                                                                        <sch:rule context="sol-def:patch_object/sol-def:base">
-                                                                              <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the base entity of a patch_object should be 'int'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                           </xsd:sequence>
@@ -421,25 +330,11 @@
                                     <xsd:element name="base" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The base entity reresents a patch base code found before the hyphen.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_patchstebase">
-                                                            <sch:rule context="sol-def:patch_state/sol-def:base">
-                                                                  <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the base entity of a patch_state should be 'int'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="version" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The version entity represents a patch version number found after the hyphen</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_patchsteversion">
-                                                            <sch:rule context="sol-def:patch_state/sol-def:version">
-                                                                  <sch:assert test="@datatype='int'"><sch:value-of select="../@id"/> - datatype attribute for the version entity of a patch_state should be 'int'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -483,7 +378,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -492,26 +387,19 @@
       </xsd:element>
       <xsd:element name="smf_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The smf_object element is used by a smf_test to define the specific service instance to be evaluated. Each object extends the standard ObjectType as definied in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The smf_object element is used by a smf_test to define the specific service instance to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A smf_object consists of a service_name entity that identifies the service and a fmri entity that represents the fault management resource identifier.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:ObjectType">
                               <xsd:sequence>
-                                    <xsd:choice minOccurs="1" maxOccurs="1">
+                                    <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
-                                                <xsd:element name="fmri" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
+                                                <xsd:element name="fmri" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The FMRI (Fault Managed Resource Identifier) entity is used to identify system objects for which advanced fault and resource management capabilities are provided. Services managed by SMF are assigned FMRI URIs prefixed with the scheme name "svc". FMRIs used by SMF can be expressed in three ways: first as an absolute path including a location path such as "localhost" (eg svc://localhost/system/system-log:default), second as a path relative to the local machine (eg svc:/system/system-log:default), and third as simply the service identifier with the string prefixes implied (eg system/system-log:default). For OVAL, the absolute path version (first choice) should be used.</xsd:documentation>
-                                                            <xsd:appinfo>
-                                                                  <sch:pattern id="sol-def_fmriobjbase">
-                                                                        <sch:rule context="sol-def:smf_object/sol-def:fmri">
-                                                                              <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the fmri entity of a smf_object should be 'string'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                           </xsd:sequence>
@@ -532,85 +420,36 @@
                                     <xsd:element name="fmri" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The FMRI (Fault Managed Resource Identifier) entity describes a possible identifier associated with a service. Services managed by SMF are assigned FMRI URIs prefixed with the scheme name "svc". FMRIs used by SMF can be expressed in three ways: first as an absolute path including a location path such as "localhost" (eg svc://localhost/system/system-log:default), second as a path relative to the local machine (eg svc:/system/system-log:default), and third as simply the service identifier with the string prefixes implied (eg system/system-log:default). For OVAL, the absolute path version (first choice) should be used.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_fmristebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:fmri">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the fmri entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="service_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The service_name entity is usually an abbreviated form of the FMRI. In the example svc://localhost/system/system-log:default, the name would be system-log.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_srvnamestebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:service_name">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the service_name entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="service_state" type="sol-def:EntityStateSmfServiceStateType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The service_state entity describes a possible state that the service may be in. Each service instance is always in a well-defined state based on its dependencies, the results of the execution of its methods, and its potential receipt of events from the contracts filesystem. The service_state values are UNINITIALIZED, OFFLINE, ONLINE, DEGRADED, MAINTENANCE, DISABLED, and LEGACY-RUN.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_srvstatestebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:service_state">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the service_state entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="protocol" type="sol-def:EntityStateSmfProtocolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The protocol entity describes a possible protocol supported by the service. Possible values are tcp, tcp6, tcp6only, udp, udp6, and udp6only</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_protocolstebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:protocol">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the protocol entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="server_executable" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The entity server_executable is a string representing the listening daemon on the server side. An example being 'svcprop ftp' which might show 'inetd/start/exec astring /usr/sbin/in.ftpd\ -a'</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_srvexestebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:server_executable">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the server_executable entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="server_arguements" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The server_arguments entity describes possible parameters that are passed to the service.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_srvargsstebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:server_arguements">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the server_arguements entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="exec_as_user" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The exec_as_user entity is a string pulled from svcprop in the following format: inetd_start/user astring root</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="sol-def_execasuserstebase">
-                                                            <sch:rule context="sol-def:smf_state/sol-def:exec_as_user">
-                                                                  <sch:assert test="not(@datatype) or @datatype='string'"><sch:value-of select="../@id"/> - datatype attribute for the exec_as_user entity of a smf_object should be 'string'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
