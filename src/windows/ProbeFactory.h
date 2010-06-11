@@ -72,6 +72,7 @@
 #include "InterfaceProbe.h"
 #include "PortProbe.h"
 #include "ProcessProbe.h"
+#include "Process58Probe.h"
 #include "PrinterEffectiveRightsProbe.h"
 #include "ServiceEffectiveRightsProbe.h"
 #include "RegKeyEffectiveRightsProbe.h"
