@@ -524,6 +524,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\windows\Process58Probe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\windows\ProcessProbe.cpp"
 					>
 				</File>
@@ -1188,6 +1192,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\Process58Probe.h"
 					>
 				</File>
 				<File
