@@ -320,7 +320,7 @@ int main(int argc, char* argv[]) {
 		if(!Common::GetUseProvidedData()) {
 
 			//	Create a new data document
-			logMessage = " ** creating a new OVAL System Charateristics file.\n";
+			logMessage = " ** creating a new OVAL System Characteristics file.\n";
 			cout << logMessage;
 			Log::UnalteredMessage(logMessage);
 
