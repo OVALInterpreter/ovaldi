@@ -54,6 +54,7 @@
 
 #include "InetListeningServersProbe.h"
 #include "ProcessProbe.h"
+#include "Process58Probe.h"
 #include "ShadowProbe.h"
 #include "PasswordProbe.h"
 #include "InterfaceProbe.h"
