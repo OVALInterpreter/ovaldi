@@ -157,6 +157,7 @@ OBJS = \
 	FileProbe.obj \
 	InetListeningServersProbe.obj \
 	ProcessProbe.obj \
+	Process58Probe.obj \
 	UnameProbe.obj \
 	TextFileContentProbe.obj \
 	XmlFileContentProbe.obj \
@@ -261,6 +262,7 @@ REL_OBJS = \
 	$(BUILDDIR)/FileProbe.obj \
 	$(BUILDDIR)/InetListeningServersProbe.obj \
 	$(BUILDDIR)/ProcessProbe.obj \
+	$(BUILDDIR)/Process58Probe.obj \
 	$(BUILDDIR)/UnameProbe.obj \
 	$(BUILDDIR)/TextFileContentProbe.obj \
 	$(BUILDDIR)/TimeDifferenceFunction.obj \
