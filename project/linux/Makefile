@@ -54,18 +54,17 @@ LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap
 # Determine what package management system is being used 
 PACKAGE_RPM  = $(shell /usr/bin/env rpm  --version 2>/dev/null)
 PACKAGE_DPKG = $(shell /usr/bin/env dpkg --version 2>/dev/null)
-PACKAGE_MANAGERS = 
 
 SRC_DIRS = $(SRCDIR) $(LINUXDIR) $(UNIXPROBEDIR) $(LINUXPROBEDIR) $(INDEPENDENTPROBEDIR)
 CPP_FILES := $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
 ifneq (${PACKAGE_RPM}, )
 	LIBS += -lrpm -lrpmdb -lrpmio
-	PACKAGE_MANAGERS += -DPACKAGE_RPM
+	CPPFLAGS += -DPACKAGE_RPM
 	CPP_FILES := $(filter-out %DPKGInfoProbe.cpp, $(CPP_FILES))
 else ifneq (${PACKAGE_DPKG}, )
 	LIBS += -lapt-pkg
-	PACKAGE_MANAGERS += -DPACKAGE_DPKG
+	CPPFLAGS += -DPACKAGE_DPKG
 	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
 else
 	CPP_FILES := $(filter-out %DPKGInfoProbe.cpp, $(CPP_FILES))
@@ -78,13 +77,13 @@ OBJ_FILES = $(CPP_FILES:.cpp=.o)
 #                            Rules
 # *******************************************************************
 
-all: create-dir update build
+all: create-dir update $(EXECUTABLE)
 
 create-dir:
-	@install -d ${BUILDDIR}
+	@install -d $(OUTDIR)
 
-build: $(OBJ_FILES)
-	$(CXX) $(OBJ_FILES) $(LIBDIR) $(LIBS) -o $(EXECUTABLE)
+$(EXECUTABLE): $(OBJ_FILES)
+	$(CXX) $^ $(LIBDIR) $(LIBS) -o $@
 
 update:
 #	-rm $(BUILDDIR)/Version.o
