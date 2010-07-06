@@ -49,7 +49,7 @@ CPPFLAGS = -Wall -O -DBSD_COMP -DSUNOS $(INCDIRS)
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lsocket -lnsl
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -lsocket -lnsl
 
 SRC_DIRS = $(SRCDIR) $(SOLARISDIR) $(UNIXPROBEDIR) $(SOLARISPROBEDIR) $(INDEPENDENTPROBEDIR)
 CPP_FILES = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
@@ -60,13 +60,13 @@ OBJ_FILES = $(CPP_FILES:.cpp=.o)
 #                            Rules
 # *******************************************************************
 
-all: create-dir update build
+all: create-dir update $(EXECUTABLE)
 
 create-dir:
-	@install -d ${BUILDDIR}
+	@install -d $(OUTDIR)
 
-build: $(OBJ_FILES)
-	$(CXX) $(OBJ_FILES) $(LIBDIR) $(LIBS) -o $(EXECUTABLE)
+$(EXECUTABLE): $(OBJ_FILES)
+	$(CXX) $^ $(LIBDIR) $(LIBS) -o $@
 
 update:
 #	-rm $(BUILDDIR)/Version.o
