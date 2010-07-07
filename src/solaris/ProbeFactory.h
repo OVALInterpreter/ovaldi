@@ -51,6 +51,7 @@
 #include "FamilyProbe.h"
 #include "UnameProbe.h"
 #include "ProcessProbe.h"
+#include "Process58Probe.h"
 #include "EnvironmentVariableProbe.h"
 #include "TextFileContentProbe.h"
 #include "XmlFileContentProbe.h"
