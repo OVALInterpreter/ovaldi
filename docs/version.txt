@@ -32,6 +32,10 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.7 build 2      ---
+---------------------------------------
+
+---------------------------------------
 ---        Version 5.7 build 1      ---
 ---------------------------------------
 
