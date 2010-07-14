@@ -224,6 +224,9 @@ class Common {
 		static void TrimString(std::string& str);
 
 		static bool IsRegexChar(char c);
+		
+		/** Resolves the canonical path for a given path */
+		static std::string GetFullPath(std::string path);
 
 		static char fileSeperator;
 		static std::string fileSeperatorStr;
@@ -244,6 +247,7 @@ class Common {
 		static std::string xslFile;
 		static std::string xslOutputFile;
 		static std::string logFileLocation;
+		static std::string logFileName;
 		static std::string xmlfileMD5;
 		static bool	generateMD5;
 		static bool useProvidedData;

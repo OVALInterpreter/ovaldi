@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
 		//////////////////////////////////////////////////////
 		///////  Check the version of the xml schema	//////
 		//////////////////////////////////////////////////////
-		// The interpreter is implemented to support a set majnor and minor version of the OVAL
+		// The interpreter is implemented to support a set major and minor version of the OVAL
 		// Language and previous minor versions of that major version.
 		// Make sure that the schema version of the xml file provided is less than or equal to the 
 		// current major and minor version that the interpreter is built for.
@@ -484,7 +484,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 	// the -m flag signifing no hash is required)
 	//
 	// Loop through each argument passed into this application.  With each one we need to
-	// check to see if it is a valid option.  After checking the argument, depricate the
+	// check to see if it is a valid option.  After checking the argument, decrement the
 	// argc variable.  Therefore, with each loop, argc should get smaller and smaller until
 	// it is eventually less than or equal to 1.  (NOTE: We have already checked argv[0]
 	// which is why we stop when argc is less than or equal to 1)  This signifies that we
@@ -768,6 +768,46 @@ void ProcessCommandLine(int argc, char* argv[]) {
 		cerr << "command to skip the MD5 check." << endl;
 		Usage();
 		exit( EXIT_FAILURE );
+	}
+
+	////////////////////////////////////////////////////////////
+	// Prevent user from overwriting input files with output files.
+	////////////////////////////////////////////////////////////
+
+	StringVector inputs(0);
+	StringVector outputs(0);
+	
+	inputs.push_back(Common::GetFullPath(Common::GetXMLfile()));
+	inputs.push_back(Common::GetFullPath(Common::GetExternalVariableFile()));
+	inputs.push_back(Common::GetFullPath(Common::GetXSLFilename()));
+
+	outputs.push_back(Common::GetFullPath(Common::GetOutputFilename()));
+	outputs.push_back(Common::GetFullPath(Common::GetXSLOutputFilename()));
+	outputs.push_back(Common::GetFullPath(Common::GetLogFileLocation()));
+
+	if (Common::GetDoDefinitionSchematron()) {
+		inputs.push_back(Common::GetFullPath(Common::GetDefinitionSchematronPath()));
+	}
+
+	if (Common::GetLimitEvaluationToDefinitionIds()) {
+		inputs.push_back(Common::GetFullPath(Common::GetDefinitionIdsFile()));
+	}
+
+	// This variable can be either an input or an output depending on the command line flags used
+	if (Common::GetUseProvidedData()) {
+		inputs.push_back(Common::GetFullPath(Common::GetDatafile()));
+	} else {
+		outputs.push_back(Common::GetFullPath(Common::GetDatafile()));
+	}
+
+	for (unsigned int i = 0; i < inputs.size(); i++) {
+		for (unsigned int j = 0; j < outputs.size(); j++) {
+			if (inputs.at(i).compare(outputs.at(j)) == 0) {
+				cerr << endl << "Output will overwrite input file " << inputs.at(i) << endl;
+				Usage();
+				exit( EXIT_FAILURE );
+			}
+		}
 	}
 }
 

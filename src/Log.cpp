@@ -36,7 +36,7 @@ using namespace std;
 int Log::level = Log::DEBUG;
 bool Log::toScreen = true;
 bool Log::initialized = false;
-string Log::logFilename = "ovaldi.log";
+string Log::logFilename = "";
 ofstream Log::logFile;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -58,13 +58,7 @@ void Log::Init(int level, string logFile, bool toScreen) {
 		Log::SetLevel(level);
 
 		// init the log file
-		if ( logFile.compare("") != 0 ){
-			// if the path does not end with a file separator then add it
-			if ( logFile.at(logFile.length() - 1) != Common::fileSeperator ){
-				logFile.push_back(Common::fileSeperator);
-			}
-			Log::logFilename.insert(0,logFile);
-		}
+		Log::logFilename = logFile;
 
 		// init the to screen flag
 		Log::toScreen = toScreen;

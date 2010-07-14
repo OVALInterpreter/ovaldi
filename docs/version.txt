@@ -35,6 +35,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---        Version 5.7 build 2      ---
 ---------------------------------------
 
+* Added input filtering so that input files cannot be overwritten by output files.
+
 ---------------------------------------
 ---        Version 5.7 build 1      ---
 ---------------------------------------
