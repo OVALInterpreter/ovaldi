@@ -34,13 +34,8 @@
 #include <string>
 #include <iostream>
 
-#if defined WIN32
-#  include <windows.h> // <wincrypt.h> won't compile unless <windows.h> is included first...
-#  include <wincrypt.h>
-#endif
-
 /**
- * Encapsulates an openssl message digest context.  Instances of this
+ * Encapsulates a message digest context.  Instances of this
  * class compute digests on any sort of data.
  */
 class Digest
@@ -67,17 +62,6 @@ public:
 
 private:
 
-#if defined WIN32
-	/** platform-specific type used for expressing digest algorithms */
-	typedef ALG_ID AlgType;
-
-	/** Windows' handle to a cryptographic service provider. */
-	HCRYPTPROV hProv;
-
-#else
-	/** platform-specific type used for expressing digest algorithms */
-	typedef int AlgType;
-
 	/**
 	 * libgcrypt requires a one-time initialization.
 	 */
@@ -87,8 +71,6 @@ private:
 	 */
 	static void Initialize();
 
-#endif
-
 	// These methods are designed to have a platform-independent interface,
 	// with platform-specific implementations.  The platform differences
 	// are encapsulated in the opaque "context" values.
@@ -97,7 +79,7 @@ private:
 	void updateDigest(void *context, void *buf, size_t bufSize);
 	std::string getDigestResults(void *context);
 	void freeDigest(void *context);
-	AlgType getDigest(DigestType digestType);
+	int getDigest(DigestType digestType);
 
 	/**
 	 * Construct a hex string from the given bytes to represent a hash value.
