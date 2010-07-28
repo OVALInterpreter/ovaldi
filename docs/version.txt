@@ -40,6 +40,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the linux/solaris/osx versions of the interpreter where it would quit with a fatal error if it was unable to perform a DNS lookup for the FQDN of the local host.
 * Fixed a bug that caused an error when attempting to read from an empty cd drive that has been mounted as a directory in Windows.
 * Interpreter will now look for the XML schema in /usr/share/ovaldi by default for *nix operating systems.
+* The OpenSSL library was replaced by the Libgcrypt library.
 
 ---------------------------------------
 ---        Version 5.7 build 1      ---
