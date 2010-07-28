@@ -180,25 +180,28 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	// First make a call to gethostname()
 	string strHostName = "";
 	char *chHostName = (char*)malloc(sizeof(char)*(MAXHOSTNAMELENGTH + 1));
-	int res = 0;
-	res = gethostname(chHostName, MAXHOSTNAMELENGTH);
+	int res = gethostname(chHostName, MAXHOSTNAMELENGTH);
 
 	if(res != 0) {
 		free(chHostName);	
-		throw SystemInfoException("Error: Unable to determine the host name.");
+		sysInfo->primary_host_name = "unknown";
+		Log::Debug("Unable to get short hostname from system");
+		return;
 	}
 
 	strHostName = chHostName;
 	// Next get the fqdn with a call to gethostbyname
 	struct hostent *hostData = NULL;
 	hostData = gethostbyname((const char*)chHostName); 
-	if(hostData == NULL) {
-      free(chHostName);	
-	  throw SystemInfoException("Error: Unable to get the fully qualified domain name.");
+	if(hostData != NULL) {
+		// Process the hostData structure
+		strHostName = hostData->h_name;
+	} else {
+		Log::Debug("Unable to resolve system FQDN.  Using short hostname instead.");
 	}
-	
-	// Process the hostData structure
-	sysInfo->primary_host_name = hostData->h_name;
+
+	sysInfo->primary_host_name = strHostName;
+	free(chHostName);
 }
 
 IfDataVector SystemInfoCollector::GetInterfaces() {

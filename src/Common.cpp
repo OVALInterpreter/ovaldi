@@ -47,7 +47,11 @@ const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-
 // Initialize static variables.
 string	Common::dataFile			  = "system-characteristics.xml";
 string	Common::xmlfile				  = "definitions.xml";
+#ifdef WIN32
 string	Common::schemapath			  = "xml";
+#else
+string	Common::schemapath			  = "/usr/share/ovaldi";
+#endif
 string	Common::outputFilename	      = "results.xml";
 string	Common::externalVariablesFile = "external-variables.xml";
 string	Common::xmlfileMD5			  = "";

@@ -461,7 +461,15 @@ bool FileFinder::PathExists(string path) {
 			} else if(errorNum == ERROR_PATH_NOT_FOUND) {
 
 				// skip this the path does not exist
-
+			} else if (errorNum == ERROR_NOT_READY) {
+				// This path may be a removable drive with the media removed.
+				// Test if the given path is the mount point itself or a subdirectory
+				// under the mount point.
+				
+				DWORD attrs = GetFileAttributes(path.c_str());
+				if (attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT) {
+					exists = true;
+				}
 			} else {
 				char errorCodeBuffer[33];
 				_ltoa(errorNum, errorCodeBuffer, 10);
@@ -528,6 +536,8 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 
 				// skip this since if the path is not found the file can't exist
 
+			} else if (errorNum == ERROR_NOT_READY) {
+				// skip this the device is not ready.  This path may be a removable drive with the media removed.
 			} else {
 				char errorCodeBuffer[33];
 				_ltoa(errorNum, errorCodeBuffer, 10);

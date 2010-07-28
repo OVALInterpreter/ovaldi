@@ -440,7 +440,7 @@ int main(int argc, char* argv[]) {
 			Log::UnalteredMessage(logMessage);
 			XslCommon::ApplyXSL(Common::GetOutputFilename(), Common::GetXSLFilename(), Common::GetXSLOutputFilename());
 		} else {
-			logMessage = " ** skippinging OVAL Results xsl\n";
+			logMessage = " ** skipping OVAL Results xsl\n";
 			cout << logMessage;
 			Log::UnalteredMessage(logMessage);
 		}
@@ -448,6 +448,9 @@ int main(int argc, char* argv[]) {
 	} catch(Exception ex) {
 		cout << ex.GetErrorMessage() << endl;
 		Log::Fatal(ex.GetErrorMessage());
+		if (ex.GetSeverity() == ERROR_FATAL) {
+			exit( EXIT_FAILURE );
+		}
 	}
 
 	//////////////////////////////////////////////////////
@@ -813,6 +816,12 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 void Usage() {
 
+	#ifdef WIN32
+	string defaultSchemaPath = "xml";
+	#else
+	string defaultSchemaPath = "/usr/share/ovaldi";
+	#endif
+
 	cout << endl;
 	cout << "Command Line: ovaldi [options] MD5Hash" << endl;
 	cout << endl;
@@ -830,11 +839,11 @@ void Usage() {
 	cout << "Input Validation Options:" << endl;
 	cout << "   -m           = do not verify the oval-definitions file with an MD5 hash." << endl;
 	cout << "   -n           = perform Schematron validation of the oval-definitions file." << endl;
-    cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"xml" << Common::fileSeperatorStr << "oval-definitions-schematron.xsl\"" << endl;
+    cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << "oval-definitions-schematron.xsl\"" << endl;
 	cout << "\n";
 
 	cout << "Data Collection Options:" << endl;
-	cout << "   -a <string>  = path to the directory that contains the OVAL schema. DEFAULT=\"xml\"" << endl;
+	cout << "   -a <string>  = path to the directory that contains the OVAL schema. DEFAULT=\"" << defaultSchemaPath << "\"" << endl;
 	cout << "   -i <string>  = path to input System Characteristics file. Evaluation will be based on the contents of the file." << endl;
 	cout << "\n";
 
@@ -842,7 +851,7 @@ void Usage() {
 	cout << "   -d <string>  = save data to the specified XML file. DEFAULT=\"system-characteristics.xml\"" << endl;	
 	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"results.xml\"" << endl;
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
-	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"xml" << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;
+	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
 	cout << "\n";
 	

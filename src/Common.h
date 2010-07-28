@@ -61,6 +61,7 @@
 #include <utility>
 #include <functional>
 #include <cctype>
+#include <sys/stat.h>
 
 
 #include "XmlCommon.h"
