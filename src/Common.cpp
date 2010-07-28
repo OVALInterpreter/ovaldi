@@ -870,7 +870,7 @@ string Common::GetFullPath(string path) {
 	// The realpath function only works for files that actually exist.
 	// Null will be returned for files that do not exist, resulting in
 	// this function returning the input path.
-	if (buffer = realpath(path.c_str(), NULL)) {
+	if ((buffer = realpath(path.c_str(), NULL))) {
 		fullpath = buffer;
 	}
 	#endif
