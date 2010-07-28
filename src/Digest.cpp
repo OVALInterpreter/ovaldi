@@ -117,7 +117,7 @@ void Digest::initDigest(void **context, DigestType digestType) {
 	hd = gcry_md_open(algId, 0);
 #else
 	gcry_error_t err;
-	if (err = gcry_md_open(&hd, algId, 0))
+	if ((err = gcry_md_open(&hd, algId, 0)))
 		throw DigestException(string("Error opening message digest: ")+gcry_strerror(err));
 #endif
 
