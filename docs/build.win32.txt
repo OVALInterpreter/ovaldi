@@ -36,12 +36,12 @@ WITH THE OVAL INTERPRETER, OR http://oval.mitre.org/oval/about/bsd_license.html.
         A. PCRE Library
         B. Xerces Library
         C. Xalan Library
-        D. OpenSSL Library
+        D. Libgcrypt Library
         E. Building the OVAL Interpreter
   III  PCRE
   IV   XERCES
   V    XALAN
-  VI   OPENSSL
+  VI   LIBGCRYPT
   VII  REPORTING PROBLEMS
   VIII USEFUL LINKS
 
@@ -137,12 +137,11 @@ install the supporting libraries.
        Please refer to 'build.xerces.xalan.win32.txt' for instructions on how to build the
 	   xalan-c library on Windows.
 
-  D. OpenSSL Library
+  D. Libgcrypt Library
 
-       You can get source from http://openssl.org/source/ and build it yourself,
-       or you can get a binary installer from
-       http://www.slproweb.com/products/Win32OpenSSL.html.  The instructions
-       below assume you used the binary installer.
+       You can get source from http://www.gnupg.org/download/#libgcrypt and build it yourself,
+       or you can get a binary installer from ftp://ftp.gnupg.org/gcrypt/binary/gpg-w32-dev-20100713.zip.
+	   The instructions below assume you used the binary installer.
 
        Add the following directory to the include files search path:
        
@@ -152,18 +151,9 @@ install the supporting libraries.
 
           <installed path>\lib\VC
 
-       Add the appropriate library, e.g. "libeay32MT.lib" to the list of
-       dependency libraries.
-
        In Visual C++ 7 the UI for setting up directories can be found by clicking the
        "Tools" menu then selecting "Options..." next selecting the "Project" folder
        and then choosing the "VC++ Directories" item. 
-
-       "This product includes software developed by the OpenSSL Project for use in the
-       OpenSSL Toolkit. (http://www.openssl.org/)"
- 
-       "This product includes cryptographic software written by Eric Young
-       (eay@cryptsoft.com)" 
 	   
   E. Building the OVAL Interpreter
 
@@ -237,28 +227,22 @@ For more information about Xalan visit:
 
 The source code is also available at the above Web site.
 
--- VI -- OPENSSL --
+-- VI -- LIBGCRYPT --
 
-The OVAL Interpreter uses the open-source OpenSSL library.
+The OVAL Interpreter uses the open-source Libgcrypt library.  The binary
+was compiled with version 1.4.6 of the Libgcrypt library.  From the
+Libgcrypt Web site:
 
-  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
-  the OpenSSL License and the original SSLeay license apply to the toolkit.
-  See below for the actual license texts. Actually, both licenses are BSD-style
-  Open Source licenses. In case of any license issues related to OpenSSL,
-  please contact openssl-core@openssl.org.
-
-  A copy of the license (LICENSE.openssl) has been provided.
-
-For more information about OpenSSL visit:
-    http://openssl.org/
+	"Libgcrypt is a general purpose cryptographic library based on the
+	code from GnuPG. It provides functions for all cryptographic building
+	blocks: symmetric ciphers, hash algorithms, MACs, public key
+	algorithms, large integer functions, random numbers and a lot of
+	supporting functions."
+  
+For more information about Libgcrypt visit:
+    http://www.gnupg.org/related_software/libraries.en.html#lib-libgcrypt
 
 The source code is also available at the above Web site.
-
-"This product includes software developed by the OpenSSL Project for use in the
-OpenSSL Toolkit. (http://www.openssl.org/)"
- 
-"This product includes cryptographic software written by Eric Young
-(eay@cryptsoft.com)" 
 
 -- VII -- REPORTING PROBLEMS --
 
