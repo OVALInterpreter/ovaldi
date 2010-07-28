@@ -47,7 +47,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
   IV   PCRE
   V    XERCES
   VI   XALAN
-  VII  OPENSSL
+  VII  LIBGCRYPT
   VIII OPENLDAP
   IX   TROUBLESHOOTING
   X    REPORTING PROBLEMS
@@ -65,7 +65,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
   A. Red Hat Linux Installation
 
        The OVAL Interpreter can be installed and run on Red
-       Hat Enterprise Linux 3, 4, and 5.
+       Hat Enterprise Linux 5.
 
        Install the RPM simply by running the following command:
 
@@ -293,7 +293,8 @@ http://oval.mitre.org/oval/about/bsd_license.html
                      DEFAULT="oval-definitions-schematron.xsl"    
 
      Data Collection Options:
-      -a dir name  = path to the directory that contains the OVAL schema and other xml resources. DEFAULT="xml"
+      -a dir name  = path to the directory that contains the OVAL schema and other xml resources. On Windows
+	                 platforms, DEFAULT="xml".  On *nix platforms, DEFAULT="/usr/share/ovaldi".
       -i filename  = path to input System Characteristics file. Evaluation will
                      be based on the contents of the file.
 
@@ -368,7 +369,8 @@ http://oval.mitre.org/oval/about/bsd_license.html
            "oval-definitions-schematron.xsl" in the OVAL Interpreter installation directory.
 
      -a -- Specifies the pathname of the directory that contains the OVAL
-           Schema and other XML resources. DEFAULT="xml"
+           Schema and other XML resources. On Windows platforms, DEFAULT="xml".
+		   On *nix platforms, DEFAULT="/usr/share/ovaldi".
            
      -i -- Specifies the pathname of a OVAL System Characteristics document that
            is to be used as the basis of the analysis.  In this mode,
@@ -492,7 +494,7 @@ site:
 -- V -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.7 of the xerces-c library.  From
+binary was compiled with version 2.8 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
@@ -526,28 +528,22 @@ For more information about Xalan visit:
 
 The source code is also available at the above Web site.
 
--- VII -- OPENSSL --
+-- VII -- LIBGCRYPT --
 
-The OVAL Interpreter uses the open-source OpenSSL library.
+The OVAL Interpreter uses the open-source Libgcrypt library.  The binary
+was compiled with version 1.4.6 (1.1.0 on Solaris) of the Libgcrypt library.
+From the Libgcrypt Web site:
 
-  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
-  the OpenSSL License and the original SSLeay license apply to the toolkit.
-  See below for the actual license texts. Actually, both licenses are BSD-style
-  Open Source licenses. In case of any license issues related to OpenSSL,
-  please contact openssl-core@openssl.org.
-
-A copy of the license (LICENSE.openssl) has been provided.
-
-For more information about OpenSSL visit:
-    http://openssl.org/
+	"Libgcrypt is a general purpose cryptographic library based on the
+	code from GnuPG. It provides functions for all cryptographic building
+	blocks: symmetric ciphers, hash algorithms, MACs, public key
+	algorithms, large integer functions, random numbers and a lot of
+	supporting functions."
+  
+For more information about Libgcrypt visit:
+    http://www.gnupg.org/related_software/libraries.en.html#lib-libgcrypt
 
 The source code is also available at the above Web site.
-
-"This product includes software developed by the OpenSSL Project for use in the
-OpenSSL Toolkit. (http://www.openssl.org/)"
- 
-"This product includes cryptographic software written by Eric Young
-(eay@cryptsoft.com)" 
 
 -- VIII -- OPENLDAP --
   
