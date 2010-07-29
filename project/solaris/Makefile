@@ -155,7 +155,8 @@ OBJS = \
  TextFileContent54Probe.obj \
  InetdProbe.obj \
  XinetdProbe.obj \
- Digest.obj
+ Digest.obj \
+ Directive.obj
 
 REL_OBJS = \
 	$(BUILDDIR)/Main.obj \
@@ -251,8 +252,9 @@ REL_OBJS = \
 	$(BUILDDIR)/TextFileContent54Probe.obj \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
-	$(BUILDDIR)/Digest.obj
-
+	$(BUILDDIR)/Digest.obj \
+	$(BUILDDIR)/Directive.obj
+	
 # Search the output directory for object files
 vpath %.obj $(BUILDDIR)
 vpath %.cpp $(SRCDIR)
