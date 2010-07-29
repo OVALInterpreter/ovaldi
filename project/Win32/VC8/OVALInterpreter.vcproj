@@ -183,6 +183,7 @@
 				DelayLoadDLLs="Advapi32.dll;Authz.dll"
 				ProgramDatabaseFile=".\Release/ovaldi.pdb"
 				SubSystem="1"
+				OptimizeReferences="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				SupportUnloadOfDelayLoadedDLL="true"
