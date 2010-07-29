@@ -665,20 +665,20 @@ OvalEnum::ResultEnumeration OvalEnum::ToResult(string resultStr) {
 
 	OvalEnum::ResultEnumeration result;
 	
-	if(resultStr.compare(OvalEnum::ResultToString(RESULT_TRUE)) == 0) {
+	if(resultStr.compare(OvalEnum::ResultToString(RESULT_TRUE)) == 0 || resultStr.compare(OvalEnum::ResultToDirectiveString(RESULT_TRUE)) == 0) {
 		result = RESULT_TRUE;
-	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_FALSE)) == 0) {
+	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_FALSE)) == 0 || resultStr.compare(OvalEnum::ResultToDirectiveString(RESULT_FALSE)) == 0) {
 		result = RESULT_FALSE;
-	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_UNKNOWN)) == 0) {
+	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_UNKNOWN)) == 0 || resultStr.compare(OvalEnum::ResultToDirectiveString(RESULT_UNKNOWN)) == 0) {
 		result = RESULT_UNKNOWN;
-	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_ERROR)) == 0) {
+	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_ERROR)) == 0 || resultStr.compare(OvalEnum::ResultToDirectiveString(RESULT_ERROR)) == 0) {
 		result = RESULT_ERROR;
-	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_NOT_EVALUATED)) == 0) {
+	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_NOT_EVALUATED)) == 0 || resultStr.compare(OvalEnum::ResultToDirectiveString(RESULT_NOT_EVALUATED)) == 0) {
 		result = RESULT_NOT_EVALUATED;
-	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_NOT_APPLICABLE)) == 0) {
+	} else if(resultStr.compare(OvalEnum::ResultToString(RESULT_NOT_APPLICABLE)) == 0 || resultStr.compare(OvalEnum::ResultToDirectiveString(RESULT_NOT_APPLICABLE)) == 0) {
 		result = RESULT_NOT_APPLICABLE;
 	} else {
-		throw Exception("OvalEnum::ToOperator - Error unsupported result value: " + resultStr);
+		throw Exception("OvalEnum::ToResult - Error unsupported result value: " + resultStr);
 	}
 
 	return result;	
@@ -711,6 +711,42 @@ string OvalEnum::ResultToString(OvalEnum::ResultEnumeration result) {
 			break;
 		case (RESULT_NOT_APPLICABLE):
 			resultStr = "not applicable";
+			break;
+		default:
+			throw Exception("OvalEnum::ResultEnumeration - Error unsupported result value.");
+			break;
+	}
+	return resultStr;
+}
+
+string OvalEnum::ResultToDirectiveString(OvalEnum::ResultEnumeration result) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	convert the ResultEnumeration to a string the way it would appear in 
+	//  the <directives> section of the XML
+	//
+	// -----------------------------------------------------------------------
+	string resultStr = "";
+
+	switch(result) {
+		case (RESULT_TRUE):
+			resultStr = "definition_true";
+			break;
+		case (RESULT_FALSE):
+			resultStr = "definition_false";
+			break;
+		case (RESULT_UNKNOWN):
+			resultStr = "definition_unknown";
+			break;
+		case (RESULT_ERROR):
+			resultStr = "definition_error";
+			break;
+		case (RESULT_NOT_EVALUATED):
+			resultStr = "definition_not_evaluated";
+			break;
+		case (RESULT_NOT_APPLICABLE):
+			resultStr = "definition_not_applicable";
 			break;
 		default:
 			throw Exception("OvalEnum::ResultEnumeration - Error unsupported result value.");
@@ -948,6 +984,60 @@ OvalEnum::ResultEnumeration OvalEnum::NegateResult(OvalEnum::ResultEnumeration r
 		return result;
 	}
 
+}
+
+string OvalEnum::ResultContentToString(OvalEnum::ResultContent resultContent) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	convert the ResultContent to a string
+	//
+	// -----------------------------------------------------------------------
+	string resultStr = "";
+
+	switch(resultContent) {
+		case (RESULT_CONTENT_FULL):
+			resultStr = "full";
+			break;
+		case (RESULT_CONTENT_THIN):
+			resultStr = "thin";
+			break;
+		default:
+			throw Exception("OvalEnum::ResultContent - Error unsupported result content value.");
+			break;
+	}
+	return resultStr;
+}
+
+OvalEnum::ResultContent OvalEnum::ToResultContent(string resultContentStr) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the string to an Result
+	//
+	// -----------------------------------------------------------------------
+
+	OvalEnum::ResultContent result;
+	
+	if(resultContentStr.compare(OvalEnum::ResultContentToString(RESULT_CONTENT_FULL)) == 0) {
+		result = RESULT_CONTENT_FULL;
+	} else if(resultContentStr.compare(OvalEnum::ResultContentToString(RESULT_CONTENT_THIN)) == 0) {
+		result = RESULT_CONTENT_THIN;
+	} else {
+		throw Exception("OvalEnum::ToResultContent - Error unsupported result content value: " + resultContentStr);
+	}
+
+	return result;	
+}
+
+OvalEnum::ResultContent OvalEnum::CombineResultContent(OvalEnum::ResultContent rc1, OvalEnum::ResultContent rc2) {
+	if (rc1 == OvalEnum::RESULT_CONTENT_FULL || rc2 == OvalEnum::RESULT_CONTENT_FULL) {
+		return OvalEnum::RESULT_CONTENT_FULL;
+	} else if (rc1 == OvalEnum::RESULT_CONTENT_THIN || rc2 == OvalEnum::RESULT_CONTENT_THIN) {
+		return OvalEnum::RESULT_CONTENT_THIN;
+	} else {
+		throw new Exception("OvalEnum::CombineResultContent - No way to combine given values");
+	}
 }
 
 string OvalEnum::SCStatusToString(OvalEnum::SCStatus status){

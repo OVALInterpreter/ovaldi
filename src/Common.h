@@ -111,6 +111,7 @@ class Common {
 		static bool		GetUseProvidedData();
 		static bool		GetUseVariableFile();
 		static std::string	GetExternalVariableFile();
+		static std::string	GetDirectivesConfigFile();
 		static bool		GetVerifyXMLfile();
 		static std::string	GetXSLFilename();
 		static std::string	GetXSLOutputFilename();
@@ -131,6 +132,7 @@ class Common {
 		static void		SetUseProvidedData(bool);
 		static void		SetUseVariableFile(bool);
 		static void		SetExternalVariableFile(std::string);
+		static void		SetDirectivesConfigFile(std::string);
 		static void		SetVerifyXMLfile(bool);
 		static void 	SetXSLFilename(std::string);
 		static void		SetXSLOutputFilename(std::string);
@@ -241,6 +243,7 @@ class Common {
 		static std::string outputFilename;
 		static std::string startTime;
 		static std::string externalVariablesFile;
+		static std::string directivesConfigFile;
 		static std::string xmlfile;
 		static std::string schemapath;
 		static bool noXsl;

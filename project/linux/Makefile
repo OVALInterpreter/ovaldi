@@ -172,6 +172,7 @@ OBJS = \
 	InetdProbe.obj \
 	XinetdProbe.obj \
 	Digest.obj \
+	Directive.obj \
 	LDAPProbe.obj
 
 ifneq (${PACKAGE_RPM}, )
@@ -277,6 +278,7 @@ REL_OBJS = \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
 	$(BUILDDIR)/Digest.obj \
+	$(BUILDDIR)/Directive.obj \
 	$(BUILDDIR)/LDAPProbe.obj
 
 ifneq (${PACKAGE_RPM}, )

@@ -272,6 +272,8 @@ int main(int argc, char* argv[]) {
 			exit( EXIT_FAILURE );
 		}
 
+		Directive::LoadDirectives();
+
 
 		//////////////////////////////////////////////////////
 		// Schematron validation							//
@@ -395,12 +397,12 @@ int main(int argc, char* argv[]) {
 			string idFile = Common::GetDefinitionIdsFile();
 
 			StringVector* ids = NULL;
-
+			
 			if(idFile.compare("") != 0) {
 				ids = Common::ParseDefinitionIdsFile();	
 			} else {
 				ids = Common::ParseDefinitionIdsString();				
-			}				
+			}
 
             if(ids->size() == 0) {
                 delete ids;
@@ -420,6 +422,13 @@ int main(int argc, char* argv[]) {
 		#ifdef _DEBUG
 			analysisEnd = GetTickCount();
 		#endif
+
+
+		// Apply Directives
+		logMessage = " ** applying directives to OVAL results.\n";
+		cout << logMessage;
+		Log::UnalteredMessage(logMessage);
+		Directive::ApplyAll(DocumentManager::GetResultDocument());
 
 		// print the results 
 		analyzer->PrintResults();
@@ -724,6 +733,20 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 
+				// **********  location of directives config file  ********** //
+				case 'g':
+
+					if ((argc < 3) || (argv[2][0] == '-')) {
+						Usage();
+						exit( EXIT_FAILURE );
+					} else {
+						Common::SetDirectivesConfigFile(argv[2]);
+						++argv;
+						--argc;
+					}
+
+					break;
+
                 // **********  path to directory containing OVAL schema  ********** //
 			    case 'a':
 
@@ -783,6 +806,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 	inputs.push_back(Common::GetFullPath(Common::GetXMLfile()));
 	inputs.push_back(Common::GetFullPath(Common::GetExternalVariableFile()));
 	inputs.push_back(Common::GetFullPath(Common::GetXSLFilename()));
+	inputs.push_back(Common::GetFullPath(Common::GetDirectivesConfigFile()));
 
 	outputs.push_back(Common::GetFullPath(Common::GetOutputFilename()));
 	outputs.push_back(Common::GetFullPath(Common::GetXSLOutputFilename()));
@@ -848,7 +872,8 @@ void Usage() {
 	cout << "\n";
 
 	cout << "Result Output Options:" << endl;	
-	cout << "   -d <string>  = save data to the specified XML file. DEFAULT=\"system-characteristics.xml\"" << endl;	
+	cout << "   -d <string>  = save data to the specified XML file. DEFAULT=\"system-characteristics.xml\"" << endl;
+	cout << "   -g <string>  = path to the oval directives configuration file. DEFAULT=\"directives.xml\"" << endl;
 	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"results.xml\"" << endl;
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
 	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;

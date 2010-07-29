@@ -54,6 +54,7 @@ string	Common::schemapath			  = "/usr/share/ovaldi";
 #endif
 string	Common::outputFilename	      = "results.xml";
 string	Common::externalVariablesFile = "external-variables.xml";
+string	Common::directivesConfigFile  = "directives.xml";
 string	Common::xmlfileMD5			  = "";
 string	Common::startTime			  = "";
 
@@ -119,6 +120,11 @@ bool Common::GetUseProvidedData()
 string Common::GetExternalVariableFile()
 {
 	return externalVariablesFile;	
+}
+
+string Common::GetDirectivesConfigFile()
+{
+	return directivesConfigFile;	
 }
 
 bool Common::GetVerifyXMLfile()
@@ -221,6 +227,15 @@ void Common::SetExternalVariableFile(string varFilenameIn) {
 		externalVariablesFile = varFilenameIn;
 	} else {
 		throw CommonException("The specified external variables file does not exist! " + varFilenameIn);
+	}
+}
+
+void Common::SetDirectivesConfigFile(string varFilenameIn) {
+
+	if(Common::FileExists(varFilenameIn.c_str())) {
+		directivesConfigFile = varFilenameIn;
+	} else {
+		throw CommonException("The specified directives file does not exist! " + varFilenameIn);
 	}
 }
 

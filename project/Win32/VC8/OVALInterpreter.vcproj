@@ -275,6 +275,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\Directive.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\EntityComparator.cpp"
 				>
 			</File>
@@ -969,6 +973,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Definition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\Directive.h"
 				>
 			</File>
 			<File
