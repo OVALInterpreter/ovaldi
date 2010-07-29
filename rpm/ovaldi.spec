@@ -1,5 +1,5 @@
 %define name	ovaldi
-%define version	5.7.1
+%define version	5.7.2
 %define release	1
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
