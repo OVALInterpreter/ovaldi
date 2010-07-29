@@ -301,6 +301,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
      Result Output Options:
       -d filename  = save system-characteristics data to the specified XML file.
                      DEFAULT="system-characteristics.xml"
+	  -g filename  = path to the oval directives configuration file. DEFAULT="directives.xml". 				 
       -r filename  = save oval-results to the specified XML file.
                      DEFAULT="oval-results.xml"
       -s           = do not apply a stylesheet to the results xml.
@@ -381,6 +382,11 @@ http://oval.mitre.org/oval/about/bsd_license.html
      -d -- Specifies the pathname of the file to which collected
            configuration data is to be saved. This data is stored in the
            format defined by the OVAL Systems Characteristics Schema. 
+		   
+	 -g -- Specifies the pathname of the file containing the directives
+		   which are used to control what information is included in
+		   the generated OVAL Results document. The file must comply with
+		   the OVAL Directives schema.
 
      -r -- Specifies the pathname of the file to which analysis results
            are to be saved.  This data is stored according to the format
@@ -531,7 +537,7 @@ The source code is also available at the above Web site.
 -- VII -- LIBGCRYPT --
 
 The OVAL Interpreter uses the open-source Libgcrypt library.  The binary
-was compiled with version 1.4.6 (1.1.0 on Solaris) of the Libgcrypt library.
+was compiled with version 1.4.6 (1.1.12 on Solaris) of the Libgcrypt library.
 From the Libgcrypt Web site:
 
 	"Libgcrypt is a general purpose cryptographic library based on the
