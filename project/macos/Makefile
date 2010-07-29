@@ -169,6 +169,7 @@ OBJS = \
 	InetdProbe.obj \
 	XinetdProbe.obj \
 	Digest.obj \
+	Directive.obj \
 	LDAPProbe.obj \
         #InetListeningServersProbe.obj \
 	#RunLevelProbe.obj \
@@ -274,6 +275,7 @@ REL_OBJS = \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
 	$(BUILDDIR)/Digest.obj \
+	$(BUILDDIR)/Directive.obj \
 	$(BUILDDIR)/LDAPProbe.obj
 	#$(BUILDDIR)InetListeningServersProbe.obj \  
         #$(BUILDDIR)RunLevelProbe.obj \
