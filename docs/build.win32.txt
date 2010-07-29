@@ -149,7 +149,7 @@ install the supporting libraries.
 
        Add the following directory to the library files search path:
 
-          <installed path>\lib\VC
+          <installed path>\lib
 
        In Visual C++ 7 the UI for setting up directories can be found by clicking the
        "Tools" menu then selecting "Options..." next selecting the "Project" folder
