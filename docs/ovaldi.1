@@ -1,4 +1,4 @@
-.TH ovaldi 1 "May 12, 2010" "Version 5.7.1" "USER COMMANDS"
+.TH ovaldi 1 "July 29, 2010" "Version 5.7.2" "USER COMMANDS"
 .SH NAME
 ovaldi \- a reference interpreter for the Open Vulnerability and Assessment Language
 .SH SYNOPSIS
@@ -57,7 +57,7 @@ default to "oval-definitions-schematron.xsl" in the OVAL Interpreter directory.
 .TP
 .B \-a dir name
 Specifies the pathname of the directory that contains the OVAL Language Schema
-and other XML resources. DEFAULT="xml"
+and other XML resources. DEFAULT="/usr/share/ovaldi"
 .TP
 .B \-i filename
 Specifies the pathname of a OVAL System Characteristics document that is to be
@@ -69,6 +69,11 @@ which may have been generated on another system.
 Specifies the pathname of the file to which collected configuration data is to
 be saved. This data is stored in the format defined by the OVAL Systems
 Characteristics Schema.
+.TP
+.B \-g filename
+Specifies the pathname of the file containing the directives which are used to
+control what information is included in the generated OVAL Results document. The
+file must comply with the OVAL Directives schema.
 .TP
 .B \-r filename
 Specifies the pathname of the file to which analysis results are to be saved.

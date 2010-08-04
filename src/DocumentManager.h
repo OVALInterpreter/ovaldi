@@ -59,6 +59,12 @@ public:
 	*/
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetEvaluationIdDocument();
 
+	/** Return the config document.
+		If the config doc has not been parsed parse it.
+		@return Returns a DOMDocument.
+	*/
+	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetDirectivesConfigDocument();
+
 	/** Set the definitionDoc document. */
 	static void SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 	/** Set the systemCharacterisitcsDoc document. */
@@ -67,6 +73,8 @@ public:
 	static void SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 	/** Set the externalVariableDoc document. */
 	static void SetExternalVariableDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	/** Set the configDoc document. */
+	static void SetDirectivesConfigDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 
 private:
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* systemCharacterisitcsDoc;
@@ -74,6 +82,7 @@ private:
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc;
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* externalVariableDoc;
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* evaluationIdDoc;
+	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* directivesConfigDoc;
 };
 
 #endif

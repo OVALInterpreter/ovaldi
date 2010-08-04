@@ -47,9 +47,14 @@ const string Common::DEFINITION_ID_LIST = "oval:[A-Za-z0-9_\\-\\.]+:def:[1-9][0-
 // Initialize static variables.
 string	Common::dataFile			  = "system-characteristics.xml";
 string	Common::xmlfile				  = "definitions.xml";
+#ifdef WIN32
 string	Common::schemapath			  = "xml";
+#else
+string	Common::schemapath			  = "/usr/share/ovaldi";
+#endif
 string	Common::outputFilename	      = "results.xml";
 string	Common::externalVariablesFile = "external-variables.xml";
+string	Common::directivesConfigFile  = "directives.xml";
 string	Common::xmlfileMD5			  = "";
 string	Common::startTime			  = "";
 
@@ -58,6 +63,7 @@ string  Common::xslFile			      = "results_to_html.xsl";
 string  Common::xslOutputFile		  = "results.html";
 
 string Common::logFileLocation	      = "";
+string Common::logFileName            = "ovaldi.log";
 
 bool    Common::doDefinitionSchematron   = false;
 string  Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
@@ -116,6 +122,11 @@ string Common::GetExternalVariableFile()
 	return externalVariablesFile;	
 }
 
+string Common::GetDirectivesConfigFile()
+{
+	return directivesConfigFile;	
+}
+
 bool Common::GetVerifyXMLfile()
 {
 	return verifyXMLfile;
@@ -137,7 +148,7 @@ string Common::GetXSLOutputFilename()
 }
 
 string Common::GetLogFileLocation(){
-	return Common::logFileLocation;
+	return Common::logFileLocation + Common::logFileName;
 }
 
 bool Common::GetNoXsl() {
@@ -219,6 +230,15 @@ void Common::SetExternalVariableFile(string varFilenameIn) {
 	}
 }
 
+void Common::SetDirectivesConfigFile(string varFilenameIn) {
+
+	if(Common::FileExists(varFilenameIn.c_str())) {
+		directivesConfigFile = varFilenameIn;
+	} else {
+		throw CommonException("The specified directives file does not exist! " + varFilenameIn);
+	}
+}
+
 void Common::SetVerifyXMLfile(bool verifyXMLfileIn)
 {
 	verifyXMLfile = verifyXMLfileIn;
@@ -241,6 +261,12 @@ void Common::SetNoXsl(bool noXsl) {
 }
 
 void Common::SetLogFileLocation(string in){
+	if ( in.compare("") != 0 ){
+		// if the path does not end with a file separator then add it
+		if ( in.at(in.length() - 1) != Common::fileSeperator ){
+			in.push_back(Common::fileSeperator);
+		}
+	}
 	Common::logFileLocation = in;
 }
 
@@ -831,6 +857,41 @@ void Common::TrimString(string &str) {
 
 bool Common::IsRegexChar(char c) {
 	return Common::REGEX_CHARS.find(c) != string::npos;
+}
+
+/**
+ * Return the full path for a given path or file name.
+ *
+ * Note: When this function is used in Linux, the file must exist.  If it does
+ * not exist, the input path will be returned instead.
+ *
+ * @param path path to a file.  Example: ../../../../../../etc/passwd
+ * @return Full path for the given file or relative path.  Example: /etc/passwd
+ */
+string Common::GetFullPath(string path) {
+	char* buffer;
+	string fullpath = path;
+
+	#ifdef WIN32
+	DWORD size = GetFullPathName(path.c_str(), 0, NULL, NULL);
+	buffer = (char*)malloc(size);
+
+	if (GetFullPathName(path.c_str(), size, buffer, NULL)) {
+		// Since windows paths are case-insensitive, make the path lower case
+		// so that string comparisons can be done easily.
+		fullpath = Common::ToLower(buffer);
+	}
+	#else
+	// The realpath function only works for files that actually exist.
+	// Null will be returned for files that do not exist, resulting in
+	// this function returning the input path.
+	if ((buffer = realpath(path.c_str(), NULL))) {
+		fullpath = buffer;
+	}
+	#endif
+
+	free(buffer);
+	return fullpath;
 }
 
 //****************************************************************************************//

@@ -144,10 +144,22 @@ public:
 							RESULT_NOT_APPLICABLE};
 	static OvalEnum::ResultEnumeration ToResult(std::string resultStr);
 	static std::string ResultToString(OvalEnum::ResultEnumeration result);
+	static std::string ResultToDirectiveString(OvalEnum::ResultEnumeration result);
 
 	static OvalEnum::ResultEnumeration CombineResultsByOperator(IntVector* results, OvalEnum::Operator op);    
 	static OvalEnum::ResultEnumeration CombineResultsByCheck(IntVector* results, OvalEnum::Check check);
 	static OvalEnum::ResultEnumeration NegateResult(OvalEnum::ResultEnumeration);
+
+	/** An enum to define result content.  Start at 1 and continue using powers of two so that
+	they can be combined using binary logic. */
+	enum ResultContent {RESULT_CONTENT_FULL=0x1,
+						RESULT_CONTENT_THIN=0x2};
+	static OvalEnum::ResultContent ToResultContent(std::string resultContentStr);
+	static std::string ResultContentToString(OvalEnum::ResultContent resultContent);
+
+	/** Combine the given result content levels.  The combined level is returned.  Currently 
+	this simply returns the highest level, but if additional levels are added in the future, this may change. */
+	static OvalEnum::ResultContent CombineResultContent(OvalEnum::ResultContent rc1, OvalEnum::ResultContent rc2);
 
 	/** An enum to define the acceptable status values. */
 	enum SCStatus	{STATUS_ERROR,

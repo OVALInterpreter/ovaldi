@@ -36,13 +36,13 @@ WITH THE OVAL INTERPRETER, OR http://oval.mitre.org/oval/about/bsd_license.html.
           A. PCRE Library
           B. Xerces Library
           C. Xalan Library
-          D. OpenSSL Library
+          D. Libgcrypt Library
           E. OpenLDAP Library
           F. Building the OVAL Interpreter
   III   PCRE
   IV    XERCES
   V     XALAN
-  VI    OPENSSL
+  VI    LIBGCRYPT
   VII	OPENLDAP
   VIII  REPORTING PROBLEMS
   IX    USEFUL LINKS
@@ -131,22 +131,22 @@ install the supporting libraries.
        To compile and install the Xalan-C library simply run the following commands.
 	   
            export XALANCROOT='<path to xalan-c>/xml-xalan/c'
-	   export XERCESCROOT='<install path of xerces-c>'
+	       export XERCESCROOT='<install path of xerces-c>'
            cd $XALANCROOT
            ./runConfigure -p macosx -c gcc -x g++ -P 'install path'
            make
            sudo make install
 
-  F. OpenSSL Library
+  F. Libgcrypt Library
 
-       The OVAL Interpreter uses the open source OpenSSL library.  The
-       binary was compiled with version 0.9.8l of the OpenSSL library.
+       The OVAL Interpreter uses the open source Libgcrypt library.  The
+       binary was compiled with version 1.4.6 of the Libgcrypt library.
 	   
-       The source code for the OpenSSL library can be downloaded from the following link.
+       The source code for the Libgcrypt library can be downloaded from the following link.
 	   
-           http://openssl.org/source/
+           http://www.gnupg.org/download/#libgcrypt
 	   
-       To compile and install the OpenSSL library simply run the following commands.
+       To compile and install the Libgcrypt library simply run the following commands.
   
            ./config --prefix='install path'
            make
@@ -162,7 +162,7 @@ install the supporting libraries.
 	   
           ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release
 	   
-      To compile and install the OpenSSL library simply run the following commands.
+      To compile and install the OpenLDAP library simply run the following commands.
   
           ./configure --prefix='install path'
           make
@@ -171,7 +171,7 @@ install the supporting libraries.
   	
   H. Building the OVAL Interpreter
 
-      After installing the PCRE, Xerces-C, and Xalan-C, OpenSSL, and OpenLDAP libraries,
+      After installing the PCRE, Xerces-C, and Xalan-C, Libgcrypt, and OpenLDAP libraries,
       change into the directory:
 
           <path to ovaldi directory>\project\macos
@@ -229,22 +229,23 @@ For more information about Xalan visit:
 
 The source code is also available at the above Web site.
 
--- VI -- OPENSSL --
+-- VI -- LIBGCRYPT --
 
-The OVAL Interpreter uses the open-source OpenSSL library.
+The OVAL Interpreter uses the open-source Libgcrypt library.  The binary
+was compiled with version 1.4.6 of the Libgcrypt library.  From the
+Libgcrypt Web site:
 
-  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
-  the OpenSSL License and the original SSLeay license apply to the toolkit.
-  See below for the actual license texts. Actually, both licenses are BSD-style
-  Open Source licenses. In case of any license issues related to OpenSSL,
-  please contact openssl-core@openssl.org.
+	"Libgcrypt is a general purpose cryptographic library based on the
+	code from GnuPG. It provides functions for all cryptographic building
+	blocks: symmetric ciphers, hash algorithms, MACs, public key
+	algorithms, large integer functions, random numbers and a lot of
+	supporting functions."
 
-Also, see the file LICENSE.openssl.
-
-For more information about OpenSSL visit:
-    http://openssl.org/
+For more information about Libgcrypt visit:
+    http://www.gnupg.org/related_software/libraries.en.html#lib-libgcrypt
 
 The source code is also available at the above Web site.
+
 
 -- VII -- OPENLDAP --
   

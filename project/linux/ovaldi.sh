@@ -39,15 +39,14 @@
 #
 if [ $# == 1 ]; then
   DEFS="$1"
-elif [ -f /usr/share/ovaldi/linux.definitions.xml ]; then
-  DEFS=/usr/share/ovaldi/linux.definitions.xml
+elif [ -f /usr/share/ovaldi/definitions.xml ]; then
+  DEFS=/usr/share/ovaldi/definitions.xml
 else
   echo "Error: no definitions file specified and default definitions"
-  echo "(/usr/share/ovaldi/linux.definitions.xml) do not exist."
+  echo "(/usr/share/ovaldi/definitions.xml) do not exist."
   echo "usage: $0 [definitions.xml]"
   exit 1
 fi
-  
 
 #
 # Get a date of the start of the run, so we can date-stamp the results

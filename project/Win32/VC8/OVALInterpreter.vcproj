@@ -476,6 +476,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\independent\FileHash58Probe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\independent\FileHashProbe.cpp"
 					>
 				</File>
@@ -1144,6 +1148,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\windows\FileFinder.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\independent\FileHash58Probe.h"
 					>
 				</File>
 				<File

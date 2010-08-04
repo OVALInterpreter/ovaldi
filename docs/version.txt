@@ -32,6 +32,18 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.7 build 2      ---
+---------------------------------------
+
+* Added input filtering so that input files cannot be overwritten by output files.
+* Fixed a bug so that interpreter now correctly exits with an EXIT_FAILURE exit code after experiencing a fatal error.
+* Fixed a bug in the linux/solaris/osx versions of the interpreter where it would quit with a fatal error if it was unable to perform a DNS lookup for the FQDN of the local host.
+* Fixed a bug that caused an error when attempting to read from an empty cd drive that has been mounted as a directory in Windows.
+* Interpreter will now look for the XML schema in /usr/share/ovaldi by default for *nix operating systems.
+* The OpenSSL library was replaced by the Libgcrypt library.
+* Added support for OVAL 5.7 directives.
+
+---------------------------------------
 ---        Version 5.7 build 1      ---
 ---------------------------------------
 

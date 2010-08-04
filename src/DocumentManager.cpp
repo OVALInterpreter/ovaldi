@@ -41,6 +41,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::systemCharacterisit
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::resultDoc = NULL;
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::externalVariableDoc = NULL;
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::evaluationIdDoc = NULL;
+XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::directivesConfigDoc = NULL;
 
 // ***************************************************************************************	//
 //								Public members												//
@@ -105,6 +106,34 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetEvaluationIdDocu
 	return DocumentManager::evaluationIdDoc;
 }
 
+XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDirectivesConfigDocument() {
+
+	if(DocumentManager::directivesConfigDoc == NULL) {
+		string varFile = Common::GetDirectivesConfigFile();
+		if(Common::FileExists(varFile.c_str())) {
+			try {
+				XmlProcessor *processor = XmlProcessor::Instance();
+				DocumentManager::directivesConfigDoc = processor->ParseFile(Common::GetDirectivesConfigFile());
+			} catch (Exception ex) {
+				string msg = "Error while parsing directives file: " + Common::GetDirectivesConfigFile() + " " + ex.GetErrorMessage();
+				cout << msg << endl;
+				Log::Message(msg);
+				throw ex;
+			} catch (...) {
+				string msg = "An unknown error occured while parsing directives file: " + Common::GetDirectivesConfigFile();
+				cout << msg << endl;
+				Log::Message(msg);
+				throw Exception(msg);
+			}
+		} else {
+			Log::Debug("The directives file does not exist! " + varFile);
+			throw Exception("The directives file does not exist! " + varFile);
+		}
+	}
+
+	return DocumentManager::directivesConfigDoc;
+}
+
 void DocumentManager::SetSystemCharacterisitcsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* sc) {
 	DocumentManager::systemCharacterisitcsDoc = sc;
 }
@@ -119,4 +148,8 @@ void DocumentManager::SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDo
 
 void DocumentManager::SetExternalVariableDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
 	DocumentManager::externalVariableDoc = d;
+}
+
+void DocumentManager::SetDirectivesConfigDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
+	DocumentManager::directivesConfigDoc = d;
 }

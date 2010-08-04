@@ -425,26 +425,25 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	const int size = 256;
 	host_name = (char*)malloc(sizeof(char)*size);
 	if(host_name == NULL) {
-		sysInfo->primary_host_name = "unknown";	
+		sysInfo->primary_host_name = "unknown";
+		free(host_name);
 		throw SystemInfoException("Error: Unable to allocate memeory while gathering Operating System information.");
 	}
 
-	int ret = gethostname(host_name, size);
-	if (ret != 0) {
-		ret =  WSAGetLastError();
-	
-		sysInfo->primary_host_name = "unknown";	
-		//throw SystemInfoException("Error: Unable to get hostname,");
-
+	int res = gethostname(host_name, size);
+	if (res != 0) {
+		res = WSAGetLastError();
+		sysInfo->primary_host_name = "unknown";
+		Log::Debug("Unable to get short hostname from system");
 	} else {
 		// next get the fully qualified host name
 		hostent *remoteHost;
 		remoteHost = gethostbyname(host_name);
-		if(remoteHost == NULL) {
-			sysInfo->primary_host_name = "unknown";	
-			//throw SystemInfoException("Error: Unable to get hostname,");
-		} else {
+		if(remoteHost != NULL) {
 			sysInfo->primary_host_name = remoteHost->h_name;	
+		} else {
+			sysInfo->primary_host_name = host_name;
+			Log::Debug("Unable to resolve system FQDN.  Using short hostname instead.");
 		}
 	}
 

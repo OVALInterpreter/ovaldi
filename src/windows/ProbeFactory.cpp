@@ -138,6 +138,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = XmlFileContentProbe::Instance();
 	} else if(objectName.compare("filehash_object") == 0) {
 		probe = FileHashProbe::Instance();
+	} else if(objectName.compare("filehash58_object") == 0) {
+		probe = FileHash58Probe::Instance();
 	} else if(objectName.compare("filemd5_object") == 0) {
 		probe = FileMd5Probe::Instance();
 	} else if(objectName.compare("ldap_object") == 0) {

@@ -27,6 +27,17 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+// this #define makes sure we're using an up-to-date API
+#define GCRYPT_NO_DEPRECATED
+
+// Important: libgcrypt uses winsock2, and unless we include winsock2 first, we
+// will indirectly include winsock1 via subsequent headers, before including
+// winsock2, causing a header clash.  (I guess winsock1 knows to not include if
+// winsock2 is already included, but not vice versa.)  Therefore, gcrypt.h MUST
+// be included before any ovaldi headers.
+#include <gcrypt.h>
+
 #include "Digest.h"
 
 #include<iomanip>
@@ -34,14 +45,6 @@
 #include<sstream>
 #include "Common.h"
 #include "Log.h"
-
-#if defined WIN32
-#  include "WindowsCommon.h"
-#else
-// this #define makes sure we're using an up-to-date API
-#  define GCRYPT_NO_DEPRECATED
-#  include <gcrypt.h>
-#endif
 
 #if defined SUNOS
 // for backward compatibility... I want to use a non-deprecated API
@@ -53,21 +56,17 @@
 #endif
 
 namespace {
-	/** implementation detail: a platform-specific digest context */
+	/**
+	 * a platform-specific digest context.
+	 * (Actually all supported platforms now use libgcrypt.)
+	 */
 	struct DigestContext {
-#if defined WIN32
-		HCRYPTHASH hHash;
-		DWORD digestLength;
-#else
 		gcry_md_hd_t hd;
 		size_t digestLength;
-#endif
 	};
 }
 
 using namespace std;
-
-#if !defined WIN32
 
 bool Digest::IsInitialized = false;
 
@@ -101,48 +100,15 @@ void Digest::Initialize() {
 	Digest::IsInitialized = true;
 }
 
-#endif
-
 Digest::Digest() {
-#if defined WIN32
-	if (!CryptAcquireContext(&this->hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_SILENT))
-		throw DigestException("Error acquiring crypto context: " + WindowsCommon::GetErrorMessage(GetLastError()));
-#else
 	if (!Digest::IsInitialized)
 		Digest::Initialize();
-#endif
 }
 
 Digest::~Digest(void) {
-#if defined WIN32
-	if (!CryptReleaseContext(this->hProv, 0))
-		// log, but don't throw... this seems unlikely...
-		Log::Info("Error releasing crypto context: " + WindowsCommon::GetErrorMessage(GetLastError()));
-#endif
 }
 
 void Digest::initDigest(void **context, DigestType digestType) {
-#if defined WIN32
-
-	ALG_ID algId = getDigest(digestType);
-	HCRYPTHASH hHash;
-	DWORD digestLength; // number of bytes in the resulting hash value
-	DWORD notneeded = sizeof(digestLength); // sigh
-
-	if (!CryptCreateHash(this->hProv, algId, 0, 0, &hHash))
-		throw DigestException("Error initializing hash: " + WindowsCommon::GetErrorMessage(GetLastError()));
-
-	if (!CryptGetHashParam(hHash, HP_HASHSIZE, (BYTE*)&digestLength, &notneeded, 0))
-		throw DigestException("Could not determine size of hash: " + WindowsCommon::GetErrorMessage(GetLastError()));
-
-	DigestContext *ctx = new DigestContext();
-	if (!ctx) throw DigestException("Couldn't allocate memory for digest context");
-	ctx->hHash = hHash;
-	ctx->digestLength = digestLength;
-	*context = ctx;
-
-#else
-
 	int algId = getDigest(digestType);
 	gcry_md_hd_t hd; // hd = message digest handle
 	unsigned int digestLength = gcry_md_get_algo_dlen(algId);
@@ -151,7 +117,7 @@ void Digest::initDigest(void **context, DigestType digestType) {
 	hd = gcry_md_open(algId, 0);
 #else
 	gcry_error_t err;
-	if (err = gcry_md_open(&hd, algId, 0))
+	if ((err = gcry_md_open(&hd, algId, 0)))
 		throw DigestException(string("Error opening message digest: ")+gcry_strerror(err));
 #endif
 
@@ -160,45 +126,22 @@ void Digest::initDigest(void **context, DigestType digestType) {
 	ctx->hd = hd;
 	ctx->digestLength = digestLength;
 	*context = ctx;
-
-#endif
 }
 
 void Digest::updateDigest(void *context, void *buf, size_t bufSize) {
 	DigestContext *ctx = (DigestContext*)context;
 
-#if defined WIN32
-	if (!CryptHashData(ctx->hHash, (BYTE*)buf, bufSize, 0))
-		throw DigestException("Error computing hash: " + WindowsCommon::GetErrorMessage(GetLastError()));
-#else
 	gcry_md_write(ctx->hd, buf, bufSize);
-#endif
 }
 
 string Digest::getDigestResults(void *context) {
 	DigestContext *ctx = (DigestContext*)context;
 	unsigned char *buf;
 
-#if defined WIN32
-	DWORD bufSize = ctx->digestLength;
-	buf = new unsigned char[bufSize];
-	if (!buf) throw DigestException("Couldn't allocate memory for digest results");
-
-	if (!CryptGetHashParam(ctx->hHash, HP_HASHVAL, buf, &bufSize, 0))
-	{
-		delete[] buf;
-		throw DigestException("Error computing hash: " + WindowsCommon::GetErrorMessage(GetLastError()));
-	}
-#else
 	size_t bufSize = ctx->digestLength;
 	buf = gcry_md_read(ctx->hd, 0);
-#endif
 
 	string digestStr = this->hashBytesToString(buf, bufSize);
-
-#if defined WIN32
-	delete[] buf;
-#endif
 
 	return digestStr;
 }
@@ -206,31 +149,27 @@ string Digest::getDigestResults(void *context) {
 void Digest::freeDigest(void *context) {
 	DigestContext *ctx = (DigestContext*)context;
 
-#if defined WIN32
-	if (!CryptDestroyHash(ctx->hHash))
-		Log::Info("Couldn't destroy hash object: " + WindowsCommon::GetErrorMessage(GetLastError()));
-#else
 	gcry_md_close(ctx->hd);
-#endif
 
 	delete ctx;
 }
 
-Digest::AlgType Digest::getDigest(DigestType digestType) {
+int Digest::getDigest(DigestType digestType) {
 	switch(digestType) {
-#if defined WIN32
-		case MD5:
-			return CALG_MD5;
-		case SHA1:
-			return CALG_SHA1;
-#else
 		case MD5:
 			return GCRY_MD_MD5;
 		case SHA1:
 			return GCRY_MD_SHA1;
-#endif
+		case SHA224:
+			return GCRY_MD_SHA224;
+		case SHA256:
+			return GCRY_MD_SHA256;
+		case SHA384:
+			return GCRY_MD_SHA384;
+		case SHA512:
+			return GCRY_MD_SHA512;
 		default:
-			throw DigestException(string("Unknown digest type (")+Common::ToString(digestType)+")");
+			throw DigestException(string("Unknown or unsupported digest type (")+Common::ToString(digestType)+")");
 	}
 }
 

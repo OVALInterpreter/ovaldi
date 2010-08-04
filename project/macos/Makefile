@@ -56,7 +56,7 @@ CPPFLAGS = -Wall -O
 LIBDIR = -L/usr/lib -L/usr/local/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lcrypto -lldap -llber
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -llber
 
 # Determine what platform the source is being build on
 PLATFORM = $(shell uname | tr '[a-z]' '[A-Z]')
@@ -169,6 +169,7 @@ OBJS = \
 	InetdProbe.obj \
 	XinetdProbe.obj \
 	Digest.obj \
+	Directive.obj \
 	LDAPProbe.obj \
         #InetListeningServersProbe.obj \
 	#RunLevelProbe.obj \
@@ -274,6 +275,7 @@ REL_OBJS = \
 	$(BUILDDIR)/InetdProbe.obj \
 	$(BUILDDIR)/XinetdProbe.obj \
 	$(BUILDDIR)/Digest.obj \
+	$(BUILDDIR)/Directive.obj \
 	$(BUILDDIR)/LDAPProbe.obj
 	#$(BUILDDIR)InetListeningServersProbe.obj \  
         #$(BUILDDIR)RunLevelProbe.obj \

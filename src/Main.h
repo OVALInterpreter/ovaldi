@@ -68,6 +68,7 @@
 #include "XslCommon.h"
 #include "EntityComparator.h"
 #include "OvalEnum.h"
+#include "Directive.h"
 
 
 #define BUFFER_SIZE 4096

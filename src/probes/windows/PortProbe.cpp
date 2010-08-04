@@ -238,13 +238,18 @@ Item* PortProbe::CreateItem() {
     return item;
 }
 
-Item* PortProbe::BuildPortItem ( string localAddressStr , unsigned long localPort , string protocolStr , unsigned long pid ) {
+Item* PortProbe::BuildPortItem ( string localAddressStr , unsigned long localPort , string remoteAddressStr , unsigned long remotePort , string protocolStr , unsigned long pid ) {
     Item* item = this->CreateItem();
     item->SetStatus ( OvalEnum::STATUS_EXISTS );
     item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
     item->AppendElement ( new ItemEntity ( "local_port" , Common::ToString ( localPort ) , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_EXISTS ) );
     item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
     item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( pid ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
+	if (!remoteAddressStr.empty()) {
+		// UDP and TCP server sockets don't have the remote address info
+		item->AppendElement ( new ItemEntity ( "foreign_address" , remoteAddressStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+		item->AppendElement ( new ItemEntity ( "foreign_port" , Common::ToString ( remotePort ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
+	}
     return item;
 }
 
@@ -303,11 +308,17 @@ void PortProbe::GetAllPorts() {
         int entries = tcpTable->dwNumEntries;
         struct in_addr ipAddr;
         char localAddrBuffer[16];
+		char remoteAddrBuffer[16] = { 0 }; // "" means not applicable
 
         for ( int i = 0 ; i < entries ; i++ ) {
             ipAddr.S_un.S_addr = ( u_long ) tcpTable->table[i].dwLocalAddr;
             strcpy_s ( localAddrBuffer , sizeof ( localAddrBuffer ) , inet_ntoa ( ipAddr ) );
-            PortProbe::ports->push_back ( PortProbe::BuildPortItem ( localAddrBuffer , ntohs ( ( unsigned short ) tcpTable->table[i].dwLocalPort ) , PROTOCOL_TCP , tcpTable->table[i].dwOwningPid ) );
+			if (tcpTable->table[i].dwState != MIB_TCP_STATE_LISTEN) {
+				ipAddr.S_un.S_addr = ( u_long ) tcpTable->table[i].dwRemoteAddr;
+				strcpy_s ( remoteAddrBuffer , sizeof ( remoteAddrBuffer ) , inet_ntoa ( ipAddr ) );
+			}
+
+            PortProbe::ports->push_back ( PortProbe::BuildPortItem ( localAddrBuffer , ntohs ( ( unsigned short ) tcpTable->table[i].dwLocalPort ) , remoteAddrBuffer, ntohs ( ( unsigned short ) tcpTable->table[i].dwRemotePort ), PROTOCOL_TCP , tcpTable->table[i].dwOwningPid ) );
         }
 
         if ( tcpTable != NULL ) {
@@ -369,7 +380,7 @@ void PortProbe::GetAllPorts() {
         for ( int i = 0 ; i < entries ; i++ ) {
             ipAddr.S_un.S_addr = ( u_long ) udpTable->table[i].dwLocalAddr;
             strcpy_s ( localAddrBuffer , sizeof ( localAddrBuffer ) , inet_ntoa ( ipAddr ) );
-            PortProbe::ports->push_back ( PortProbe::BuildPortItem ( localAddrBuffer , ntohs ( ( unsigned short ) udpTable->table[i].dwLocalPort ) , PROTOCOL_UDP , udpTable->table[i].dwOwningPid ) );
+            PortProbe::ports->push_back ( PortProbe::BuildPortItem ( localAddrBuffer , ntohs ( ( unsigned short ) udpTable->table[i].dwLocalPort ) , "", 0, PROTOCOL_UDP , udpTable->table[i].dwOwningPid ) );
         }
 
         if ( udpTable != NULL ) {
