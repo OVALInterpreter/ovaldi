@@ -228,7 +228,7 @@ bool Object::Analyze(Item* item) {
                     // an error if more than 1 match is found
                     iResults.push_back(OvalEnum::RESULT_ERROR);
                     string errMessage = "More than one match element was found for an object entity. Object Id: " + this->GetId();
-                    errMessage.append(" Item Id: " + item->GetId());
+					errMessage.append(" Item Id: " + Common::ToString(item->GetId()));
                     Log::Fatal(errMessage);
                 }
 
