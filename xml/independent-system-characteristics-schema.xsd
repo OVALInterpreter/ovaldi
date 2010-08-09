@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Independent System Characteristics</schema>
-               <version>5.8 Draft 2</version>
-               <date>5/26/2010 2:55:44 PM</date>
+               <version>5.8 Draft 6</version>
+               <date>8/6/2010 9:52:50 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="ind-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent"/>
@@ -44,8 +44,8 @@
                <xsd:appinfo>
                     <oval:deprecated_info>
                          <oval:version>5.8</oval:version>
-                         <oval:reason>Replaced by the filehash58_item. This item allows the hash algorithm to be specified. See the filehash58_item.</oval:reason>
-                         <oval:comment>This object has been deprecated and may be removed in a future version of the language.</oval:comment>
+                         <oval:reason>Replaced by the filehash58_item which allows the hash algorithm to be specified when collecting data. See the filehash58_item.</oval:reason>
+                         <oval:comment>This item has been deprecated and may be removed in a future version of the language.</oval:comment>
                     </oval:deprecated_info>
                     <sch:pattern id="ind-sc_filehash_item_dep">
                          <sch:rule context="ind-sc:filehash_item">
@@ -119,7 +119,7 @@
                                         <xsd:documentation>Identifier for the hash algorithm used to calculate the hash.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="hash" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="hash" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The result of applying the hash algorithm to the file.</xsd:documentation>
                                    </xsd:annotation>
@@ -160,13 +160,6 @@
                               <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The actual value of the specified environment variable.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_envitemvalue">
-                                                  <sch:rule context="ind-sc:environmentvariable_item/ind-sc:value">
-                                                       <sch:assert test="not(@datatype='record')"><sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> entity of an <sch:value-of select="name(..)"/> should not be 'record'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -198,13 +191,6 @@
                               <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The actual value of the specified environment variable.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_envitemvalue">
-                                                  <sch:rule context="ind-sc:environmentvariable_item/ind-sc:value">
-                                                       <sch:assert test="not(@datatype='record')"><sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> entity of an <sch:value-of select="name(..)"/> should not be 'record'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -270,13 +256,6 @@
                               <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The actual value of the specified LDAP attribute.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_ldapitemvalue">
-                                                  <sch:rule context="ind-sc:ldap_item/ind-sc:value">
-                                                       <sch:assert test="not(@datatype='record')"><sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> entity of an <sch:value-of select="name(..)"/> should not be 'record'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -383,13 +362,6 @@
                               <xsd:element name="result" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The result entity specifies the result(s) of the given SQL query against the database.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_sqlitemresult">
-                                                  <sch:rule context="ind-sc:sql_item/ind-sc:result">
-                                                       <sch:assert test="not(@datatype='record')"><sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> entity of an <sch:value-of select="name(..)"/> should not be 'record'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -491,7 +463,7 @@
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                               <xsd:element name="text" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="text" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="1">
                                      <xsd:annotation>
                                            <xsd:documentation>The text entity represents the block of text that matched the specified pattern.</xsd:documentation>
                                      </xsd:annotation>
@@ -499,13 +471,6 @@
                                <xsd:element name="subexpression" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The subexpression entity represents the value of a subexpression in the specified pattern.  If multiple subexpressions are specified in the pattern, then multiple entities are presented.  Note that the textfilecontent_state in the definition schema only allows a single subexpression entity.  This means that the test will check that all (or at least one, none, etc.) the subexpressions pass the same check.  This means that the order of multiple subexpression entities in the item does not matter.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_txtitemsubexpression">
-                                                  <sch:rule context="ind-sc:textfilecontent_item/ind-sc:subexpression">
-                                                       <sch:assert test="not(@datatype='record')"><sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> entity of an <sch:value-of select="name(..)"/> should not be 'record'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -529,7 +494,7 @@
                                         <xsd:documentation>The id of the variable.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="value" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                              <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The value of the variable. If a variable represents and array of values, then multiple value elements should exist.</xsd:documentation>
                                    </xsd:annotation>
@@ -570,7 +535,7 @@
                                         <xsd:documentation>Specifies an Xpath expression describing the text node(s) or attribute(s) to look at.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="value_of" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                              <xsd:element name="value_of" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The value_of element checks the value(s) of the text node(s) or attribute(s) found. How this is used is entirely controlled by operator attributes.</xsd:documentation>
                                    </xsd:annotation>
@@ -708,6 +673,11 @@
           </xsd:annotation>
           <xsd:simpleContent>
                <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:enumeration value="catos">
+                         <xsd:annotation>
+                              <xsd:documentation>The catos value describes the Cisco CatOS operating system.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="ios">
                          <xsd:annotation>
                               <xsd:documentation>The ios value describes the Cisco IOS operating system.</xsd:documentation>
@@ -718,14 +688,29 @@
                               <xsd:documentation>The macos value describes the Mac operating system.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="pixos">
+                         <xsd:annotation>
+                              <xsd:documentation>The pixos value describes the Cisco PIX operating system.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="undefined">
+                         <xsd:annotation>
+                              <xsd:documentation>The undefined value is to be used when the desired family is not available.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="unix">
                          <xsd:annotation>
                               <xsd:documentation>The unix value describes the UNIX operating system.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="vmware_infrastructure">
+                         <xsd:annotation>
+                              <xsd:documentation>The vmware_infrastructure value describes VMWare Infrastructure.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="windows">
                          <xsd:annotation>
-                              <xsd:documentation>The windows value describes the Windows operating system.</xsd:documentation>
+                              <xsd:documentation>The windows value describes the Microsoft Windows operating system.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="">

@@ -7,8 +7,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Eric Grey at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>PixOS Definition</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:46 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:52 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="pixos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#pixos"/>
@@ -21,6 +21,14 @@
       <xsd:element name="line_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The line_test is used to check the properties of specific output lines from a SHOW command, such as SHOW RUNNING-CONFIG. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a line_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>line_test</oval:test>
+                              <oval:object>line_object</oval:object>
+                              <oval:state>line_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#pixos">line_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="pixos-def_linetst">
                               <sch:rule context="pixos-def:line_test/pixos-def:object">
@@ -60,6 +68,7 @@
                                                             <xsd:documentation>The name of a SHOW sub-command.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -96,6 +105,14 @@
       <xsd:element name="version_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                 <xsd:documentation>The version test is used to check the version of the PIX operating system. It is based off of the SHOW VERSION command.  It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>version_test</oval:test>
+                              <oval:object>version_object</oval:object>
+                              <oval:state>version_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#pixos">version_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="pixos-def_vertst">
                               <sch:rule context="pixos-def:version_test/pixos-def:object">

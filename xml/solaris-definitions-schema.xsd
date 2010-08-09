@@ -6,8 +6,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Solaris Definition</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:47 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:53 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sol-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"/>
@@ -21,6 +21,14 @@
             <xsd:annotation>
                   <xsd:documentation>The isainfo test reveals information about the instruction set architectures. This information can be retrieved by the isainfo command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an isainfo_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:documentation>The isainfo_test was originally developed by Robert L. Hollis at ThreatGuard, Inc. Many thanks for their support of the OVAL project.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>isainfo_test</oval:test>
+                              <oval:object>isainfo_object</oval:object>
+                              <oval:state>isainfo_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris">isainfo_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="sol-def_isainfotst">
                               <sch:rule context="sol-def:isainfo_test/sol-def:object">
@@ -90,6 +98,14 @@
             <xsd:annotation>
                   <xsd:documentation>The package test is used to check information associated with different packages installed on the system. The information used by this test is modeled after the /usr/bin/pkginfo command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>package_test</oval:test>
+                              <oval:object>package_object</oval:object>
+                              <oval:state>package_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris">package_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sol-def_packagetst">
                               <sch:rule context="sol-def:package_test/sol-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sol-def:package_object/@id">
@@ -130,6 +146,7 @@
                                                             <xsd:documentation>The pkginst entity is a string that represents a package designation by its instance. An instance can be the package abbreviation or a specific instance (for example, inst.1 or inst.2).</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -187,6 +204,14 @@
             <xsd:annotation>
                   <xsd:documentation>The patch test is used to check information associated with different patches installed on the system. The information being tested is based off the /usr/bin/showrev -p command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>patch54_test</oval:test>
+                              <oval:object>patch54_object</oval:object>
+                              <oval:state>patch54_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris">patch54_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sol-def_patch54tst">
                               <sch:rule context="sol-def:patch54_test/sol-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sol-def:patch54_object/@id">
@@ -213,6 +238,14 @@
       <xsd:element name="patch_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The patch test is used to check information associated with different patches installed on the system. The information being tested is based off the /usr/bin/showrev -p command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>patch_test</oval:test>
+                              <oval:object>patch_object</oval:object>
+                              <oval:state>patch_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris">patch_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <oval:deprecated_info>
                               <oval:version>5.4</oval:version>
@@ -274,6 +307,7 @@
                                                             <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -306,13 +340,11 @@
                               <xsd:sequence>
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
-                                          <xsd:sequence>
-                                                <xsd:element name="base" type="oval-def:EntityObjectIntType">
-                                                      <xsd:annotation>
-                                                            <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
-                                                      </xsd:annotation>
-                                                </xsd:element>
-                                          </xsd:sequence>
+                                          <xsd:element name="base" type="oval-def:EntityObjectIntType">
+                                                <xsd:annotation>
+                                                      <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
+                                                </xsd:annotation>
+                                          </xsd:element>
                                     </xsd:choice>
                               </xsd:sequence>
                         </xsd:extension>
@@ -362,6 +394,14 @@
             <xsd:annotation>
                   <xsd:documentation>The smf_test is used to check service management facility controlled services including traditional unix rc level start/kill scrips and inetd daemon services. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a smf_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>smf_test</oval:test>
+                              <oval:object>smf_object</oval:object>
+                              <oval:state>smf_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris">smf_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sol-def_smftst">
                               <sch:rule context="sol-def:smf_test/sol-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sol-def:smf_object/@id">
@@ -402,6 +442,7 @@
                                                             <xsd:documentation>The FMRI (Fault Managed Resource Identifier) entity is used to identify system objects for which advanced fault and resource management capabilities are provided. Services managed by SMF are assigned FMRI URIs prefixed with the scheme name "svc". FMRIs used by SMF can be expressed in three ways: first as an absolute path including a location path such as "localhost" (eg svc://localhost/system/system-log:default), second as a path relative to the local machine (eg svc:/system/system-log:default), and third as simply the service identifier with the string prefixes implied (eg system/system-log:default). For OVAL, the absolute path version (first choice) should be used.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>

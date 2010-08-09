@@ -7,8 +7,8 @@
           <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Eric Grey at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>CatOS Definition</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:43 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:49 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="catos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos"/>
@@ -21,7 +21,15 @@
     <xsd:element name="line_test" substitutionGroup="oval-def:test">
         <xsd:annotation>
             <xsd:documentation>The line_test is used to check the properties of specific output lines from a SHOW command, such as show running-config. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a line_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
-            <xsd:appinfo>
+              <xsd:appinfo>
+                    <oval:element_mapping>
+                          <oval:test>line_test</oval:test>
+                          <oval:object>line_object</oval:object>
+                          <oval:state>line_state</oval:state>
+                          <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos">line_item</oval:item>
+                    </oval:element_mapping>
+              </xsd:appinfo>
+              <xsd:appinfo>
                 <sch:pattern id="catos-def_linetst">
                     <sch:rule context="catos-def:line_test/catos-def:object">
                         <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/catos-def:line_object/@id"><sch:value-of select="../@id"/> - the object child element of a line_test must reference a line_object</sch:assert>
@@ -60,6 +68,7 @@
                                         <xsd:documentation>The name of a SHOW sub-command.</xsd:documentation>
                                     </xsd:annotation>
                                 </xsd:element>
+                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                             </xsd:sequence>
                         </xsd:choice>
                     </xsd:sequence>
@@ -98,6 +107,14 @@
                 <xsd:documentation>The module test reveals module information in Cisco Catalyst switches. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a module_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                 <xsd:documentation>The module_test is based off the SHOW MODULE command. Having a separate module_test, as opposed to a general command_test, enables running an evaluation based on OVAL without having interactive command access to the device.</xsd:documentation>
                 <xsd:appinfo>
+                      <oval:element_mapping>
+                            <oval:test>module_test</oval:test>
+                            <oval:object>module_object</oval:object>
+                            <oval:state>module_state</oval:state>
+                            <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos">module_item</oval:item>
+                      </oval:element_mapping>
+                </xsd:appinfo>
+                <xsd:appinfo>
                       <sch:pattern id="catos-def_moduletst">
                             <sch:rule context="catos-def:module_test/catos-def:object">
                                   <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/catos-def:module_object/@id"><sch:value-of select="../@id"/> - the object child element of a module_test must reference a module_object</sch:assert>
@@ -131,11 +148,12 @@
                                 <xsd:choice>
                                       <xsd:element ref="oval-def:set"/>
                                       <xsd:sequence>
-                                            <xsd:element name="module_number" type="oval-def:EntityObjectIntType" minOccurs="0" maxOccurs="1">
+                                            <xsd:element name="module_number" type="oval-def:EntityObjectIntType">
                                                   <xsd:annotation>
                                                         <xsd:documentation>A number that identifies the a specific module.</xsd:documentation>
                                                   </xsd:annotation>
                                             </xsd:element>
+                                            <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                       </xsd:sequence>
                                 </xsd:choice>
                           </xsd:sequence>
@@ -213,7 +231,15 @@
         <xsd:annotation>
             <xsd:documentation>The version55_test is used to check the version of the Cisco CatOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
             <xsd:documentation>The required information of version55_test can be got via a SHOW VERSION command. The separated version55_test enables an evaluation based on OVAL without having interactive command access to the device.</xsd:documentation>
-            <xsd:appinfo>
+              <xsd:appinfo>
+                    <oval:element_mapping>
+                          <oval:test>version55_test</oval:test>
+                          <oval:object>version55_object</oval:object>
+                          <oval:state>version55_state</oval:state>
+                          <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos">version55_item</oval:item>
+                    </oval:element_mapping>
+              </xsd:appinfo>
+              <xsd:appinfo>
                   <sch:pattern id="catos-def_version55_test">
                         <sch:rule context="catos-def:version55_test/catos-def:object">
                               <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/catos-def:version55_object/@id"><sch:value-of select="../@id"/> - the object child element of a version55_test must reference a version55_object</sch:assert>
@@ -280,7 +306,15 @@
           <xsd:annotation>
               <xsd:documentation>The version test is used to check the version of the Cisco CatOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
               <xsd:documentation>The required information of version_test can be got via a SHOW VERSION command. The separated version_test enables an evaluation based on OVAL without having interactive command access to the device.</xsd:documentation>
-              <xsd:appinfo>
+                <xsd:appinfo>
+                      <oval:element_mapping>
+                            <oval:test>version_test</oval:test>
+                            <oval:object>version_object</oval:object>
+                            <oval:state>version_state</oval:state>
+                            <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos">version_item</oval:item>
+                      </oval:element_mapping>
+                </xsd:appinfo>
+                <xsd:appinfo>
                     <oval:deprecated_info>
                           <oval:version>5.5</oval:version>
                           <oval:reason>Replaced by the version55_test. Due to the fact it's not clear on how to separate the CatOS version, it was decided that the catos_major_release, catos_individual_release, and catos_version_id entities would be combined into a new single entity catos_release. A new test was created to reflect these changes. See the version55_test.</oval:reason>
@@ -292,7 +326,7 @@
                                       DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
                                 </sch:report>
                           </sch:rule>
-                    </sch:pattern>                        
+                    </sch:pattern>
               </xsd:appinfo>
               <xsd:appinfo>
                     <sch:pattern id="catos-def_version_test">

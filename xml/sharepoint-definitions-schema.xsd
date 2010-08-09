@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint Definition</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:46 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:52 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sp-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"/>
@@ -21,6 +21,14 @@
       <xsd:element name="spwebapplication_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The spwebapplication test is used to check the properties or permission settings of a SharePoint web application. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spwebapplication_test</oval:test>
+                              <oval:object>spwebapplication_object</oval:object>
+                              <oval:state>spwebapplication_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spwebapplication_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="sp-def_webapptst">
                               <sch:rule context="sp-def:spwebapplication_test/sp-def:object">
@@ -60,6 +68,7 @@
                                                             <xsd:documentation>The webapplicationurl element defines the SPWebApplication to evaluate specific security settings or permissions.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -347,6 +356,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spgroup test is used to check the group properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spgroup_test</oval:test>
+                              <oval:object>spgroup_object</oval:object>
+                              <oval:state>spgroup_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spgroup_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_grptst">
                               <sch:rule context="sp-def:spgroup_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spgroup_object/@id"><sch:value-of select="../@id"/> - the object child element of a spgroup_test must reference a spgroup_object</sch:assert>
@@ -385,6 +402,7 @@
                                                             <xsd:documentation>The sitecollectionurl element defines the Site Colection to evaluate specific group settings.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -437,6 +455,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spweb test is used to check the properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spweb_test</oval:test>
+                              <oval:object>spweb_object</oval:object>
+                              <oval:state>spweb_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spweb_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_webtst">
                               <sch:rule context="sp-def:spweb_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spweb_object/@id"><sch:value-of select="../@id"/> - the object child element of a spweb_test must reference an spweb_object</sch:assert>
@@ -480,6 +506,7 @@
                                                             <xsd:documentation>The sitecollectionurl element defines the site collection to evaluate specific web settings.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -532,6 +559,14 @@
             <xsd:annotation>
                   <xsd:documentation>The splist test is used to check the properties of lists associated with a SharePoint site or site collection. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an splist_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>splist_test</oval:test>
+                              <oval:object>splist_object</oval:object>
+                              <oval:state>splist_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">splist_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_listtst">
                               <sch:rule context="sp-def:splist_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:splist_object/@id"><sch:value-of select="../@id"/> - the object child element of a splist_test must reference an splist_object</sch:assert>
@@ -570,6 +605,7 @@
                                                             <xsd:documentation>The spsiteurl element defines the Sharepoint website being specified ...</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -617,6 +653,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spantivirussettings test is used to check the settings for antivirus software associated with a SharePoint deployment.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spantivirussettings_test</oval:test>
+                              <oval:object>spantivirussettings_object</oval:object>
+                              <oval:state>spantivirussettings_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spantivirussettings_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_avstst">
                               <sch:rule context="sp-def:spantivirussettings_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spantivirussettings_object/@id"><sch:value-of select="../@id"/> - the object child element of a spantivirussettings_test must reference an spantivirussettings_object</sch:assert>
@@ -660,6 +704,7 @@
                                                             <xsd:documentation>The spfarmname element denotes the farm on which a web service to be queried resides.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -737,6 +782,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spsiteadministration test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spsiteadministration_test</oval:test>
+                              <oval:object>spsiteadministration_object</oval:object>
+                              <oval:state>spsiteadministration_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spsiteadministration_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_siteadmintst">
                               <sch:rule context="sp-def:spsiteadministration_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spsiteadministration_object/@id"><sch:value-of select="../@id"/> - the object child element of a spsiteadministration_test must reference an spsiteadministration_object</sch:assert>
@@ -775,6 +828,7 @@
                                                             <xsd:documentation>The sitecollectionurl element defines the site to evaluate.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -817,6 +871,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spsite test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spsite_test</oval:test>
+                              <oval:object>spsite_object</oval:object>
+                              <oval:state>spsite_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spsite_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_sitetst">
                               <sch:rule context="sp-def:spsite_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spsite_object/@id"><sch:value-of select="../@id"/> - the object child element of a spsite_test must reference an spsite_object</sch:assert>
@@ -855,6 +917,7 @@
                                                             <xsd:documentation>The sitecollectionurl element defines the site to evaluate.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -897,6 +960,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spcrawlrule test is used to check the configuration or rules associated with the SharePoint system's built-in indexer and the sites or documents that will be indexed.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spcrawlrule_test</oval:test>
+                              <oval:object>spcrawlrule_object</oval:object>
+                              <oval:state>spcrawlrule_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spcrawlrule_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_crtst">
                               <sch:rule context="sp-def:spcrawlrule_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spcrawlrule_object/@id"><sch:value-of select="../@id"/> - the object child element of a spcrawlrule_test must reference an spcrawlrule_object</sch:assert>
@@ -935,6 +1006,7 @@
                                                             <xsd:documentation>The spsiteurl element denotes the resource on the SharePoint server (eg. a site or document) for which indexing settings will be checked.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -1002,6 +1074,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spjobdefinition test is used to check the status of the various properties associated with scheduled jobs in the SharePoint system.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spjobdefinition_test</oval:test>
+                              <oval:object>spjobdefinition_object</oval:object>
+                              <oval:state>spjobdefinition_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spjobdefinition_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_jobdeftst">
                               <sch:rule context="sp-def:spjobdefinition_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spjobdefinition_object/@id"><sch:value-of select="../@id"/> - the object child element of a spjobdefinition_test must reference an spjobdefinition_object</sch:assert>
@@ -1040,6 +1120,7 @@
                                                             <xsd:documentation>The URI that represents the web application for which jobs should be checked.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -1092,6 +1173,14 @@
             <xsd:annotation>
                   <xsd:documentation>The bestbet test is used to get all the best bets associated with a site.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>bestbet_test</oval:test>
+                              <oval:object>bestbet_object</oval:object>
+                              <oval:state>bestbet_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">bestbet_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_bbtst">
                               <sch:rule context="sp-def:bestbet_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:bestbet_object/@id"><sch:value-of select="../@id"/> - the object child element of a bestbet_test must reference an bestbet_object</sch:assert>
@@ -1135,6 +1224,7 @@
                                                             <xsd:documentation>The URL that represents the best bet.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -1182,6 +1272,14 @@
             <xsd:annotation>
                   <xsd:documentation>The policycoll test is used to get all the Information Policies associated with a site.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>infopolicycoll_test</oval:test>
+                              <oval:object>infopolicycoll_object</oval:object>
+                              <oval:state>infopolicycoll_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">infopolicycoll_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_infopolicycolltst">
                               <sch:rule context="sp-def:policycoll_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:policycoll_object/@id"><sch:value-of select="../@id"/> - the object child element of a policycoll_test must reference an policycoll_object</sch:assert>
@@ -1225,6 +1323,7 @@
                                                             <xsd:documentation>The id that represents the Information Policy.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -1277,6 +1376,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spdiagnosticsservice test is used to check the diagnostic properties associated with a Sharepoint system.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spdiagnosticsservice_test</oval:test>
+                              <oval:object>spdiagnosticsservice_object</oval:object>
+                              <oval:state>spdiagnosticsservice_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spdiagnosticsservice_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_diagnosticsservicetest">
                               <sch:rule context="sp-def:spdiagnosticsservice_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticsservice_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_object</sch:assert> 
@@ -1309,11 +1416,14 @@
                               <xsd:sequence>
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
-                                          <xsd:element name="farmname" type="oval-def:EntityObjectStringType">
-                                                <xsd:annotation>
-                                                      <xsd:documentation>The farm whose diagnostic capabilities should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
-                                                </xsd:annotation>
-                                          </xsd:element>
+                                          <xsd:sequence>
+                                                <xsd:element name="farmname" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The farm whose diagnostic capabilities should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1375,6 +1485,14 @@
             <xsd:annotation>
                   <xsd:documentation>The spdiagnosticslevel_test is used to check the status of the logging features associated with a Sharepoint deployment.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spdiagnosticslevel_test</oval:test>
+                              <oval:object>spdiagnosticslevel_object</oval:object>
+                              <oval:state>spdiagnosticslevel_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spdiagnosticslevel_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_diagnostics_level_test">
                               <sch:rule context="sp-def:spdiagnosticslevel_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_object</sch:assert>  
@@ -1407,11 +1525,14 @@
                               <xsd:sequence>
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
-                                          <xsd:element name="farmname" type="oval-def:EntityObjectStringType">
-                                                <xsd:annotation>
-                                                      <xsd:documentation>The farm whose diagnostics levels should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
-                                                </xsd:annotation>
-                                          </xsd:element>
+                                          <xsd:sequence>
+                                                <xsd:element name="farmname" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The farm whose diagnostics levels should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1468,6 +1589,14 @@
             <xsd:annotation>
                   <xsd:documentation>The sppolicyfeature test enables one to check the attributes associated with policies and policy features on the Sharepoint deployment.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>sppolicyfeature_test</oval:test>
+                              <oval:object>sppolicyfeature_object</oval:object>
+                              <oval:state>sppolicyfeature_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">sppolicyfeature_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_policyfeature_test">
                               <sch:rule context="sp-def:sppolicyfeature_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicyfeature_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicyfeature_test must reference an sppolicyfeature_object</sch:assert> 
@@ -1500,11 +1629,14 @@
                               <xsd:sequence>
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
-                                          <xsd:element name="farmname" type="oval-def:EntityObjectStringType">
-                                                <xsd:annotation>
-                                                      <xsd:documentation>The farm whose policy features should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
-                                                </xsd:annotation>
-                                          </xsd:element>
+                                          <xsd:sequence>
+                                                <xsd:element name="farmname" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The farm whose policy features should be checked. Use .* for all farms or SPFarm.Local for the local farm.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1581,6 +1713,14 @@
             <xsd:annotation>
                   <xsd:documentation>The sppolicy test enables one to check the attributes of the policies associated with a particular URL Zone in a Sharepoint system.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>sppolicy_test</oval:test>
+                              <oval:object>sppolicy_object</oval:object>
+                              <oval:state>sppolicy_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">sppolicy_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_policy_test">
                               <sch:rule context="sp-def:sppolicy_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicy_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicy_test must reference an sppolicy_object</sch:assert> 
@@ -1613,17 +1753,19 @@
                               <xsd:sequence>
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
-                                          <xsd:element name="webappuri" type="oval-def:EntityObjectStringType">
-                                                <xsd:annotation>
-                                                      <xsd:documentation>The URI that represents the web application for which policies should be checked.</xsd:documentation>
-                                                </xsd:annotation>
-                                          </xsd:element>
+                                          <xsd:sequence>
+                                                <xsd:element name="webappuri" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The URI that represents the web application for which policies should be checked.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="urlzone" type="sp-def:EntityObjectUrlZoneType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The zone for which policies should be checked.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                          </xsd:sequence>
                                     </xsd:choice>
-                                    <xsd:element name="urlzone" type="sp-def:EntityObjectUrlZoneType">
-                                          <xsd:annotation>
-                                                <xsd:documentation>The zone for which policies should be checked.</xsd:documentation>
-                                          </xsd:annotation>
-                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>

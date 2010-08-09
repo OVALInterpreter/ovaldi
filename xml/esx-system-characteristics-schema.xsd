@@ -7,8 +7,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>VMware ESX server System Characteristics</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:43 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:49 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                   <sch:ns prefix="esx-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx"/>
@@ -89,7 +89,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-sc:ItemType">
                               <xsd:sequence>
-                                    <xsd:element name="release" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="release" type="oval-sc:EntityItemVersionType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the release of current VMware ESX server.</xsd:documentation>
                                           </xsd:annotation>
@@ -97,6 +97,32 @@
                                     <xsd:element name="build" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the build version of current VMware ESX server.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
+      <!-- ========================  VI SDK MANAGED OBJECT ITEM  ========================= -->
+      <!-- =============================================================================== -->
+      <xsd:element name="visdkmanagedobject_item" substitutionGroup="oval-sc:item">
+            <xsd:annotation>
+                  <xsd:documentation>The visdkmanagedobject_item is used to represent information about Managed Objects in the VMware Infrastructure.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-sc:ItemType">
+                              <xsd:sequence>
+                                    <xsd:element name="property" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The property entity holds a string that represents the object path and name of a particular setting for the Managed Entity.  In the VMware Infrastructure SDK, property names are case-sensitive and thus case must be correct relative to the properties in the SDK.  For example, a Virtual Machine might have ethernet0.connectionType of 'bridged'.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The value entity holds a string that represents a value that's associated with the specified setting for the Managed Entity.  Some properties will return an array of values.  In such cases consider each value individually and then make final evaluation based on the entity_check attribute.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>

@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>HP-UX Definition</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:44 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:50 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="hpux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux"/>
@@ -21,6 +21,14 @@
       <xsd:element name="getconf_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>From /usr/bin/getconf. See getconf manpage for specific fields</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>getconf_test</oval:test>
+                              <oval:object>getconf_object</oval:object>
+                              <oval:state>getconf_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">getconf_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="hpux-def_getconf_test">
                               <sch:rule context="hpux-def:getconf_test/hpux-def:object">
@@ -56,7 +64,7 @@
                                           <xsd:sequence>
                                                 <xsd:element name="parameter_name" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>This is the parameter name to check</xsd:documentation>
+                                                            <xsd:documentation>This is the parameter name to check.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="pathname" type="oval-def:EntityObjectStringType">
@@ -64,6 +72,7 @@
                                                             <xsd:documentation>This is the pathname to check. Note that pathname is optional in the getconf call. An empty pathname in OVAL should be interpreted as if it was not supplied to the getconf call.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -89,7 +98,7 @@
                                                 <xsd:documentation>This is the pathname to check. Note that pathname is optional in the getconf call. An empty pathname in OVAL should be interpreted as if it was not supplied to the getconf call.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="output" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="output" type="oval-def:EntityStateAnySimpleType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The output produced by the getconf command.</xsd:documentation>
                                           </xsd:annotation>
@@ -105,6 +114,14 @@
       <xsd:element name="patch53_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>From /usr/sbin/swlist -l patch PHxx_yyyyy. See swlist manpage for specific fields</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>patch53_test</oval:test>
+                              <oval:object>patch53_object</oval:object>
+                              <oval:state>patch53_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">patch53_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="hpux-def_patch53_test">
                               <sch:rule context="hpux-def:patch53_test/hpux-def:object">
@@ -139,21 +156,22 @@
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
                                                 <xsd:element name="behaviors" type="hpux-def:Patch53Behaviors" minOccurs="0" maxOccurs="1"/>
-                                                <xsd:element name="swtype" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                                <xsd:element name="swtype" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>HP-UX patch names begin with 'PH'</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
-                                                <xsd:element name="area_patched" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                                <xsd:element name="area_patched" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The third and fourth characters in HP-UX patch names indicate the area of software being patched. CO - General HP-UX commands KL - Kernel patches NE - Network specific patches SS - All other subsystems (X11, starbase, etc.) </xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
-                                                <xsd:element name="patch_base" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                                <xsd:element name="patch_base" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The sixth through tenth characters in HP-UX patch names represent a unique numeric identifier for the patch</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -209,6 +227,14 @@
             <xsd:annotation>
                   <xsd:documentation>From /usr/sbin/swlist -l patch PHxx_yyyyy. See swlist manpage for specific fields</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>patch_test</oval:test>
+                              <oval:object>patch_object</oval:object>
+                              <oval:state>patch_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">patch_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <oval:deprecated_info>
                               <oval:version>5.3</oval:version>
                               <oval:reason>Replaced by the patch53_test. The patch_name entity was removed from the patch_object element, and replaced with the swtype, area_patched, and patch_base entities, because the patch_name element can be constructed from the swtype, area_patched, and patch_base entities. Likewise, the patch_name entity was removed from the patch_state element for the same reason. Also, a behaviors entity was added to the patch_object to allow the object to match both the original patch and any superseding patches. A new test was created to reflect these changes. See the patch53_test.</oval:reason>
@@ -220,7 +246,7 @@
                                           DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
                                     </sch:report>
                               </sch:rule>
-                        </sch:pattern>                        
+                        </sch:pattern>
                   </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="hpux-def_patch_test">
@@ -267,13 +293,11 @@
                               <xsd:sequence>
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
-                                          <xsd:sequence>
-                                                <xsd:element name="patch_name" type="oval-def:EntityObjectStringType">
-                                                      <xsd:annotation>
-                                                            <xsd:documentation>This is the patch name to check</xsd:documentation>
-                                                      </xsd:annotation>
-                                                </xsd:element>
-                                          </xsd:sequence>
+                                          <xsd:element name="patch_name" type="oval-def:EntityObjectStringType">
+                                                <xsd:annotation>
+                                                      <xsd:documentation>This is the patch name to check.</xsd:documentation>
+                                                </xsd:annotation>
+                                          </xsd:element>
                                     </xsd:choice>
                               </xsd:sequence>
                         </xsd:extension>
@@ -333,6 +357,14 @@
             <xsd:annotation>
                   <xsd:documentation>Output of /usr/sbin/swlist command. Note: A quick way to check for the installation of a specific fileset is to use the command 'swlist -a version -l fileset filesetname'. See manpage for swlist for explanation of additional command options.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>swlist_test</oval:test>
+                              <oval:object>swlist_object</oval:object>
+                              <oval:state>swlist_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">swlist_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="hpux-def_swlist_test">
                               <sch:rule context="hpux-def:swlist_test/hpux-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/hpux-def:swlist_object/@id"><sch:value-of select="../@id"/> - the object child element of an swlist_test must reference an swlist_object</sch:assert>
@@ -370,6 +402,7 @@
                                                             <xsd:documentation>This is the name of the bundle or fileset to check.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -400,7 +433,7 @@
                                                 <xsd:documentation/>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="version" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="version" type="oval-def:EntityStateFileSetRevisionType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation/>
                                           </xsd:annotation>
@@ -426,6 +459,14 @@
       <xsd:element name="trusted_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>This test allows for analysis of account settings in trusted HP-UX installations</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>trusted_test</oval:test>
+                              <oval:object>trusted_object</oval:object>
+                              <oval:state>trusted_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">trusted_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="hpux-def_trusted_test">
                               <sch:rule context="hpux-def:trusted_test/hpux-def:object">
@@ -461,9 +502,10 @@
                                           <xsd:sequence>
                                                 <xsd:element name="username" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>This is the name of the user being checked</xsd:documentation>
+                                                            <xsd:documentation>This is the name of the user being checked.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>

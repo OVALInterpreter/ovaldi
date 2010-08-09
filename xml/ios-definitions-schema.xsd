@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>IOS Definition</schema>
-                  <version>5.8 Draft 2</version>
-                  <date>5/26/2010 2:55:44 PM</date>
+                  <version>5.8 Draft 6</version>
+                  <date>8/6/2010 9:52:50 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                    <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ios-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios"/>
@@ -21,6 +21,14 @@
       <xsd:element name="global_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The global test is used to check for the existence of a particular line in the ios config file under the global context. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a global_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>global_test</oval:test>
+                              <oval:object>global_object</oval:object>
+                              <oval:state>global_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">global_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="ios-def_globaltst">
                               <sch:rule context="ios-def:global_test/ios-def:object">
@@ -59,6 +67,7 @@
                                                             <xsd:documentation>The global_command entity identifies a specific line in the ios config file under the global context.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -90,6 +99,14 @@
       <xsd:element name="interface_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation/>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>interface_test</oval:test>
+                              <oval:object>interface_object</oval:object>
+                              <oval:state>interface_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">interface_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="ios-def_interfacetst">
                               <sch:rule context="ios-def:interface_test/ios-def:object">
@@ -128,6 +145,7 @@
                                                             <xsd:documentation/>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -180,6 +198,14 @@
             <xsd:annotation>
                   <xsd:documentation>The line test is used to check the properties of specific output lines from a SHOW command, such as show running-config. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a line_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>line_test</oval:test>
+                              <oval:object>line_object</oval:object>
+                              <oval:state>line_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">line_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="ios-def_linetst">
                               <sch:rule context="ios-def:line_test/ios-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/ios-def:line_object/@id"><sch:value-of select="../@id"/> - the object child element of a line_test must reference a line_object</sch:assert>
@@ -218,6 +244,7 @@
                                                             <xsd:documentation>The name of a SHOW sub-command.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
                                     </xsd:choice>
                               </xsd:sequence>
@@ -254,6 +281,14 @@
       <xsd:element name="snmp_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>Tests if lines under the global context associated with snmp that have a specifiec access list or cmmunity name.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>snmp_test</oval:test>
+                              <oval:object>snmp_object</oval:object>
+                              <oval:state>snmp_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">snmp_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="ios-def_snmptst">
                               <sch:rule context="ios-def:snmp_test/ios-def:object">
@@ -316,6 +351,14 @@
             <xsd:annotation>
                   <xsd:documentation>The tclsh test is used to check tclsh information of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a tclsh_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>tclsh_test</oval:test>
+                              <oval:object>tclsh_object</oval:object>
+                              <oval:state>tclsh_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">tclsh_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="ios-def_tclshtst">
                               <sch:rule context="ios-def:tclsh_test/ios-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/ios-def:tclsh_object/@id"><sch:value-of select="../@id"/> - the object child element of a tclsh_test must reference a tclsh_object</sch:assert>
@@ -371,6 +414,14 @@
       <xsd:element name="version55_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The version55_test is used to check the version of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>version55_test</oval:test>
+                              <oval:object>version55_object</oval:object>
+                              <oval:state>version55_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">version55_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="ios-def_ver55tst">
                               <sch:rule context="ios-def:version55_test/ios-def:object">
@@ -462,6 +513,14 @@
     <xsd:element name="version_test" substitutionGroup="oval-def:test">
         <xsd:annotation>
             <xsd:documentation>The version test is used to check the version of the IOS operating system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+              <xsd:appinfo>
+                    <oval:element_mapping>
+                          <oval:test>version_test</oval:test>
+                          <oval:object>version_object</oval:object>
+                          <oval:state>version_state</oval:state>
+                          <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">version_item</oval:item>
+                    </oval:element_mapping>
+              </xsd:appinfo>
               <xsd:appinfo>
                     <oval:deprecated_info>
                           <oval:version>5.5</oval:version>

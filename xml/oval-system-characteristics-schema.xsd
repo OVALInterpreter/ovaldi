@@ -7,8 +7,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core System Characteristics</schema>
-            <version>5.8 Draft 2</version>
-            <date>5/26/2010 2:55:46 PM</date>
+            <version>5.8 Draft 6</version>
+            <date>8/6/2010 9:52:52 PM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -78,7 +78,7 @@
     <!-- =================================  GENERATOR  ================================= -->
     <!-- =============================================================================== -->
     <!--
-		The GeneratorType is defined by the oval shared schema.  Please refer to
+		The GeneratorType is defined by the oval-common-schema.  Please refer to
 		that documentation for a description of the complex type.
 	 -->
     <!-- =============================================================================== -->
@@ -142,7 +142,7 @@
             </xsd:element>
             <xsd:element name="ip_address" type="xsd:string">
                 <xsd:annotation>
-                    <xsd:documentation>The reqired ip_address element holds the IP address for the interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                    <xsd:documentation>The required ip_address element holds the IP address for the interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="mac_address" type="xsd:string">
@@ -279,7 +279,7 @@
             </xsd:enumeration>
             <xsd:enumeration value="incomplete">
                 <xsd:annotation>
-                    <xsd:documentation>A flag of 'incomplete' indicates that an instance matching item exists on the system, but only some of the matching items have been identified and are represented in the system characteristics file. It is unknown if additional matching items also exist. Note that with a flag of 'incomplete', each item that has been identified and matches the object declaration, but additional items might also exist on the system.</xsd:documentation>
+                    <xsd:documentation>A flag of 'incomplete' indicates that a matching item exists on the system, but only some of the matching items have been identified and are represented in the system characteristics file. It is unknown if additional matching items also exist. Note that with a flag of 'incomplete', each item that has been identified  matches the object declaration, but additional items might also exist on the system.</xsd:documentation>
                 </xsd:annotation>
             </xsd:enumeration>
             <xsd:enumeration value="does not exist">
@@ -316,7 +316,7 @@
             </xsd:enumeration>
             <xsd:enumeration value="does not exist">
                 <xsd:annotation>
-                    <xsd:documentation>A status of 'does not exist' says that the item or specific piece of information does not exist and therefore has not been collected. This status assumes that an attempt was made to collect the information, but the information just doesn't exist. This can happen when a certain entity is only pertinent to particular instances, or when xsi:nil is used to refer to a higher level object.</xsd:documentation>
+                    <xsd:documentation>A status of 'does not exist' says that the item or specific piece of information does not exist and therefore has not been collected. This status assumes that an attempt was made to collect the information, but the information just does't exist. This can happen when a certain entity is only pertinent to particular instances, or when xsi:nil is used to refer to a higher level object.</xsd:documentation>
                 </xsd:annotation>
             </xsd:enumeration>
             <xsd:enumeration value="not collected">
@@ -329,7 +329,7 @@
     <!-- =============================================================================== -->
     <!-- ===============================  ENTITY TYPES  ================================ -->
     <!-- =============================================================================== -->
-    <xsd:complexType name="EntityItemBaseType" abstract="true" mixed="true">
+    <xsd:complexType name="EntityItemBaseType" abstract="true">
         <xsd:annotation>
             <xsd:documentation>The EntityItemBaseType complex type is an abstract type that serves as the base type for all item entities.</xsd:documentation>
             <xsd:documentation>The optional datatype attribute determines the type of data expected (the default datatype is 'string'). Note that the datatype attribute simply defines the type of data as found on the system, it is not used during evaluation. An OVAL Definition defines how the data should be interpreted during analysis. If the definition states a datatype that is different than what the system characteristics presents, then a type cast must be made.</xsd:documentation> 
@@ -370,6 +370,7 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
@@ -382,7 +383,7 @@
                 <xsd:simpleType>
                     <xsd:union memberTypes="xsd:hexBinary oval:EmptyStringType"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="binary"/>                                                
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="binary"/>                                                
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
@@ -395,7 +396,7 @@
                 <xsd:simpleType>
                     <xsd:union memberTypes="xsd:boolean oval:EmptyStringType"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="boolean"/>                                                
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="boolean"/>                                                
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
@@ -408,7 +409,7 @@
                 <xsd:simpleType>
                     <xsd:union memberTypes="xsd:float oval:EmptyStringType"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="float"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="float"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
@@ -421,11 +422,10 @@
                 <xsd:simpleType>
                     <xsd:union memberTypes="xsd:integer oval:EmptyStringType"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="int"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="int"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
-
     <xsd:complexType name="EntityItemStringType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemStringType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type describes simple string data.</xsd:documentation>
@@ -435,35 +435,24 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="optional" fixed="string"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="optional" fixed="string"/>
             </xsd:restriction>
         </xsd:simpleContent>
-    </xsd:complexType>    
-
-    <xsd:complexType name="EntityItemRecordType" mixed="true">
+    </xsd:complexType>
+    <xsd:complexType name="EntityItemRecordType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemRecordType defines an entity that consists of a number of named fields. This structure is used for representing a record from a database query and other similar structures where multiple related fields must be collected at once. Note that for all entities of this type, the only allowed datatype is 'record'.</xsd:documentation>
-            <xsd:documentation>Note the dataype attribute must be set to 'record'.</xsd:documentation>
-            <xsd:appinfo>
-                <sch:pattern id="oval-sc_item_record_fields">
-                    <sch:rule context="oval-sc:system_data/*/*/*">
-                            <sch:assert test="not(@datatype='record')">
-                                <sch:value-of select="../@id"/> - datatype attribute for the <sch:value-of select="name()"/> field of an <sch:value-of select="name(../..)"/> should not be 'record'
-                            </sch:assert>
-                    </sch:rule>
-                </sch:pattern>
-            </xsd:appinfo>
+            <xsd:documentation>Note the datatype attribute must be set to 'record'.</xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:restriction base="oval-sc:EntityItemBaseType">
                 <xsd:sequence>
                     <xsd:element name="field" type="oval-sc:EntityItemFieldType" minOccurs="0" maxOccurs="unbounded"/>                    
                 </xsd:sequence>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="record"/>                
+                <xsd:attribute name="datatype" type="oval:ComplexDatatypeEnumeration" use="required" fixed="record"/>
             </xsd:restriction>
         </xsd:complexContent>     
     </xsd:complexType>    
-
     <xsd:complexType name="EntityItemFieldType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemFieldType defines an element with simple content that represents a named field in a record that may contain any number of named fields. The EntityItemFieldType is much like all other entities with one significant difference, the EntityItemFieldType has a name attribute.</xsd:documentation>
@@ -484,13 +473,12 @@
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="optional" default="string"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="optional" default="string"/>
                 <xsd:attribute name="mask" type="xsd:boolean" use="optional" default="false"/>
                 <xsd:attribute name="status" type="oval-sc:StatusEnumeration" use="optional" default="exists"/>
             </xsd:extension>
         </xsd:simpleContent>
     </xsd:complexType>
-
     <xsd:complexType name="EntityItemVersionType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemVersionType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type describes version data.</xsd:documentation>
@@ -500,11 +488,10 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="version"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="version"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>    
-
     <xsd:complexType name="EntityItemFilesetRevisionType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemFilesetRevisionType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type represents the version string related to filesets in HP-UX.</xsd:documentation>
@@ -514,11 +501,10 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="fileset_revision"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="fileset_revision"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>    
-
     <xsd:complexType name="EntityItemIOSVersionType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemIOSVersionType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type represents the version string for IOS.</xsd:documentation>
@@ -528,11 +514,10 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="ios_version"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="ios_version"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>    
-
     <xsd:complexType name="EntityItemEVRStringType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemEVRStringType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType.
@@ -544,9 +529,8 @@
                     <xsd:restriction base="xsd:string"/>
                     <!-- TODO: Should there be a pattern restriction here to enforce the pattern mentioned above? -->
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required" fixed="evr_string"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="evr_string"/>
             </xsd:restriction>
         </xsd:simpleContent>
-    </xsd:complexType>    
-    
+    </xsd:complexType>
 </xsd:schema>
