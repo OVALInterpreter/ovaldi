@@ -249,7 +249,18 @@ CollectedObject* AbsObjectCollector::Process(AbsObject* absObject) {
 	// Based on the type of object call the appropriate process method.
 	CollectedObject* collectedObject = NULL;
 	if(typeid(*absObject) == typeid(Object)) {
-		collectedObject = this->ProcessObject((Object*)absObject);
+		Object *object = (Object*)absObject;
+		collectedObject = this->ProcessObject(object);
+
+		// plain objects can have embedded filters.  We'll post-process
+		// the items using these filters.
+		FilterVector *embeddedFilters = object->GetFilters();
+		ItemVector *references = collectedObject->GetReferences();
+		ItemVector *filteredReferences = this->ApplyFilters(references, embeddedFilters);
+		collectedObject->SetReferences(filteredReferences);
+		// we need to delete the old reference ItemVector, but it should be CollectObject's
+		// job to manage its own memory, not ours.  It's not safe to rely on callers
+		// to do that (e.g. it's not exception-safe), so I won't do it here.
 	} else {
 		collectedObject = this->ProcessSetObject((SetObject*)absObject);
 	}

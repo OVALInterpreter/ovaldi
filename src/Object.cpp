@@ -58,6 +58,11 @@ Object::~Object() {
 	  	delete currentElement;
 	  	currentElement = NULL;
 	}
+
+	for (FilterVector::iterator filterIter = this->filters.begin();
+		 filterIter != this->filters.end();
+		 ++filterIter)
+		delete *filterIter;
 }
 
 // ***************************************************************************************	//
@@ -125,6 +130,10 @@ VariableValueVector* Object::GetVariableValues() {
 	return varValues;
 }
 
+FilterVector* Object::GetFilters() {
+	return &this->filters;
+}
+
 void Object::Parse(DOMElement* objectElm) {
 
 	this->SetName(XmlCommon::GetElementName(objectElm));
@@ -160,6 +169,8 @@ void Object::Parse(DOMElement* objectElm) {
 
 			if(childName.compare("behaviors") == 0) {
 				this->SetBehaviors(Behavior::Parse(objectChild));
+			} else if (childName == "filter") {
+				this->filters.push_back(new Filter(objectChild));
 			} else {
                 ObjectEntity* objectEntity = new ObjectEntity();
 				objectEntity->Parse(objectChild);
