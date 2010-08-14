@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
 #include "AbsObjectCollector.h"
 
 using namespace std;
@@ -130,40 +131,13 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 // ***************************************************************************************	//
 //								Private members												//
 // ***************************************************************************************	//
-ItemVector* AbsObjectCollector::ApplyFilters(ItemVector* items, FilterVector* filters) {
-
-	ItemVector* tmpItems = new ItemVector();
-	this->CopyItems(tmpItems, items);
-
-	// loop through all filters
-	FilterVector::iterator filterIterator;
-	for(filterIterator = filters->begin(); filterIterator != filters->end(); filterIterator++) {
-		Filter* filter = *filterIterator;
-		ItemVector* results = new ItemVector();
-
-		// Now loop through all the Items and see if they pass the filter.
-		ItemVector::iterator itemIterator;
-		for(itemIterator = tmpItems->begin(); itemIterator != tmpItems->end(); itemIterator++) {
-			Item* item = (*itemIterator);
-			if (filter->DoFilter(item))
-				results->push_back(item);
-		}
-		// reset the tmpItems vector
-		delete tmpItems;
-		tmpItems = NULL;
-		tmpItems = results;
-	}
-
-	return tmpItems;
+void AbsObjectCollector::ApplyFilters(ItemVector* items, FilterVector* filters) {
+	for(FilterVector::iterator filterIterator = filters->begin();
+		filterIterator != filters->end(); ++filterIterator)
+		items->erase(
+			remove_if(items->begin(), items->end(), FilterFunctor(*filterIterator)),
+			items->end());
 }
-
-void AbsObjectCollector::CopyItems(ItemVector* dest, ItemVector* src) {
-	
-	ItemVector::iterator iterator;
-	for(iterator = src->begin(); iterator != src->end(); iterator++) {
-		dest->push_back((*iterator));
-	}
-}	
 
 bool AbsObjectCollector::ExistsInSet(ItemVector* itemSet, Item* item) {
 
@@ -249,18 +223,7 @@ CollectedObject* AbsObjectCollector::Process(AbsObject* absObject) {
 	// Based on the type of object call the appropriate process method.
 	CollectedObject* collectedObject = NULL;
 	if(typeid(*absObject) == typeid(Object)) {
-		Object *object = (Object*)absObject;
-		collectedObject = this->ProcessObject(object);
-
-		// plain objects can have embedded filters.  We'll post-process
-		// the items using these filters.
-		FilterVector *embeddedFilters = object->GetFilters();
-		ItemVector *references = collectedObject->GetReferences();
-		ItemVector *filteredReferences = this->ApplyFilters(references, embeddedFilters);
-		collectedObject->SetReferences(filteredReferences);
-		// we need to delete the old reference ItemVector, but it should be CollectObject's
-		// job to manage its own memory, not ours.  It's not safe to rely on callers
-		// to do that (e.g. it's not exception-safe), so I won't do it here.
+		collectedObject = this->ProcessObject((Object*)absObject);
 	} else {
 		collectedObject = this->ProcessSetObject((SetObject*)absObject);
 	}
@@ -302,22 +265,24 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 			collectedSet1 = new CollectedSet();
 			CollectedObject* refOneCollectedObj = this->Run(set->GetReferenceOne()->GetId());
 			ItemVector* itemSet1 = refOneCollectedObj->GetReferences();
-			itemSet1 = this->ApplyFilters(itemSet1, set->GetFilters());
+			ItemVector filteredItems(*itemSet1);
+			this->ApplyFilters(&filteredItems, set->GetFilters());
 			VariableValueVector* set1Vars = refOneCollectedObj->GetVariableValues();
 			collectedSet1->AppendVariableValues(set1Vars);
 			collectedSet1->SetFlag(refOneCollectedObj->GetFlag());
-			collectedSet1->SetItems(itemSet1);
+			collectedSet1->SetItems(&filteredItems);
 		}
 
 		if(set->GetReferenceTwo() != NULL) {
 			collectedSet2 = new CollectedSet();
 			CollectedObject* refTwoCollectedObj = this->Run(set->GetReferenceTwo()->GetId());
 			ItemVector* itemSet2 = refTwoCollectedObj->GetReferences();
-			itemSet2 = this->ApplyFilters(itemSet2, set->GetFilters());
+			ItemVector filteredItems(*itemSet2);
+			this->ApplyFilters(&filteredItems, set->GetFilters());
 			VariableValueVector* set2Vars = refTwoCollectedObj->GetVariableValues();
 			collectedSet2->AppendVariableValues(set2Vars);
 			collectedSet2->SetFlag(refTwoCollectedObj->GetFlag());
-			collectedSet2->SetItems(itemSet2);
+			collectedSet2->SetItems(&filteredItems);
 		}
 	}
 

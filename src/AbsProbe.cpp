@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
 #include "AbsProbe.h"
 
 using namespace std;
@@ -55,9 +56,18 @@ ItemVector* AbsProbe::Run(Object* object) {
 	// create a vector of items that match the specified object
 	ItemVector* items = this->CollectItems(object);	
 	this->DeleteItemEntities();
+	this->ApplyFilters(items, object->GetFilters());
 	items = this->CacheAllItems(items);
 
 	return items;
+}
+
+void AbsProbe::ApplyFilters(ItemVector* items, FilterVector* filters) {
+	for(FilterVector::iterator filterIterator = filters->begin();
+		filterIterator != filters->end(); ++filterIterator)
+		items->erase(
+			remove_if(items->begin(), items->end(), FilterFunctor(*filterIterator)),
+			items->end());
 }
 
 ItemVector* AbsProbe::CacheAllItems(ItemVector* items) {

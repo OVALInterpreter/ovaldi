@@ -175,14 +175,10 @@ protected:
 	/** 
 	    Apply the input Filters to the vector of items.
 	    For Each Filter provided Loop through all the Items in the current set
-	    of items.  Only add items to the result set of items which 'pass' the
-		filter (which depends on its action attribute).
+	    of items.  Only keep items to the result set of items which 'pass' the
+		filter (which depends on its action attribute), and remove all others.
 	*/
-	ItemVector* ApplyFilters(ItemVector* items, FilterVector* filters);
-
-	
-	/** Copy all items in the src vector to the dest vector.	*/
-	void CopyItems(ItemVector* dest, ItemVector* src);
+	void ApplyFilters(ItemVector* items, FilterVector* filters);
 };
 
 /** 
