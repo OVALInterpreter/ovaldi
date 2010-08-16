@@ -125,19 +125,91 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
 }
 
 void PasswordPolicyProbe::ArePasswordComplexityReverseEncryptionSet(std::string &passwordComplexity, std::string &reversibleEncryption) {
-
 	vector<WMIItem> wmiItems = WMIUtil::GetPropertyValues("root\\rsop\\computer", "Select * from RSOP_SecuritySettingBoolean", "KeyName", "Setting");
 
 	// When passwordComplexity and reversibleEncryption haven't been explicitly set they default to (true, false)
 	passwordComplexity = "1";
 	reversibleEncryption = "0";
+	bool foundPasswordComplexity = false;
+	bool foundReversibleEncryption = false;
 
+	// Note: this WMI query only retreives the domain-level GPO values for these settings.  It will
+	// not factor in the local settings.
 	for(unsigned int i = 0; i < wmiItems.size(); i++) {
 		if(wmiItems[i].KeyName == "PasswordComplexity") {
 			passwordComplexity = wmiItems[i].PropertyValue;
+			foundPasswordComplexity = true;
 		} else if (wmiItems[i].KeyName == "ClearTextPassword") {
 			reversibleEncryption = wmiItems[i].PropertyValue;
+			foundReversibleEncryption = true;
 		}
+	}
+
+	// If the WMI query did not find the values, the secedit.exe tool must be used
+	// to get the local settings for PasswordComplexity and ClearTextPassword
+	if (!foundPasswordComplexity || !foundReversibleEncryption) {
+		// Execute secedit tool
+		int ret;
+		TCHAR tempdir[MAX_PATH];
+		ret = GetTempPath(MAX_PATH, tempdir);
+		if (ret == 0 || ret > MAX_PATH) {
+			throw Exception("Error: There was a problem finding an appropriate temporary directory");
+		}
+		string filename = string(tempdir) + "\\ovaldi_secedit_temp.txt";
+		if((ret = system(string("secedit.exe /export /quiet /areas SECURITYPOLICY /cfg " + filename).c_str())) != 0) {
+			throw Exception("Error: Unable to export local password policies: secedit.exe returned " + ret);
+		}
+		
+		// Open exported security policy text file
+		FILE * file;
+		file = fopen(filename.c_str(), "rb");
+		if (!file) {
+			throw Exception("Error: Unable to open exported password policy file: " + filename);
+		}
+
+		// The text file can be UTF-16.  This loop will remove null characters so
+		// that it can be used like a normal string.
+		REGEX regex;
+		char line[65];
+		int pos = 0;
+		int c;
+		do {
+			c = fgetc(file);
+			StringVector matches;
+
+			// If character is a line break, test regex
+			if (pos > 0 && (c == 0x0A || c == 0x0D)) {
+				line[pos] = 0; // Terminate the line with a null
+				pos = 0;
+				if (!foundPasswordComplexity && regex.GetMatchingSubstrings("PasswordComplexity\\s*=\\s*(\\d+)", line, &matches)) {
+					if (matches.size()) {
+						passwordComplexity = matches.at(0);
+						foundPasswordComplexity = true;
+					}
+				}
+
+				if (!foundReversibleEncryption && regex.GetMatchingSubstrings("ClearTextPassword\\s*=\\s*(\\d+)", line, &matches)) {
+					if (matches.size()) {
+						reversibleEncryption = matches.at(0);
+						foundReversibleEncryption = true;
+					}
+				}
+			}
+			
+			// Break out of the loop after everything is found
+			if (foundPasswordComplexity && foundReversibleEncryption) {
+				break;
+			}
+
+			// Skip null bytes, line breaks, and end of line
+			if (c != NULL && c != 0x0A && c != 0x0D && pos < 64 && c != EOF) {
+				line[pos] = c;
+				pos++;
+			}
+		} while (c != EOF);
+
+		fclose(file);
+		remove(filename.c_str());
 	}
 }
 
