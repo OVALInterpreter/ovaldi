@@ -189,9 +189,8 @@ std::string WMIUtil::GetStringFromVariant(VARIANT value) {
 			Log::Debug("WMIUtil::GetStringFromVariant() - Error converting value to string.");
 		}
 	} else if ((V_VT(&value) == VT_UINT)) {
-		char valBuf[20];
 		unsigned int intValue = V_INT(&value);
-		stringValue = _itoa_s(intValue, valBuf, 10);
+        stringValue = Common::ToString(intValue);
 	} else if ((V_VT(&value) == VT_BOOL)) {
 		BOOL boolValue = V_BOOL(&value);
 		if(boolValue == FALSE) {
@@ -206,16 +205,14 @@ std::string WMIUtil::GetStringFromVariant(VARIANT value) {
 	} else if ((V_VT(&value) == VT_FILETIME)) {
 		//TODO - need to format VT_FILETIME
 	} else if ((V_VT(&value) == VT_INT)) {
-		char valBuf[20];
 		int intValue = V_INT(&value);
-		stringValue = _itoa_s(intValue, valBuf, 10);
+		stringValue = Common::ToString(intValue);
 	} else if ((V_VT(&value) == VT_I1)) {
 		char charValue = V_I1(&value);
 		stringValue += charValue;
 	} else if ((V_VT(&value) == VT_I2)) {
-		char valBuf[20];
 		int intValue = V_I2(&value);
-		stringValue = _itoa_s(intValue, valBuf, 10);
+		stringValue = Common::ToString(intValue);
 	} else if ((V_VT(&value) == VT_I4)) {
 		char valBuf[20];
 		long longValue = V_I4(&value);

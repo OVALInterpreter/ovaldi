@@ -487,8 +487,6 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 			// with the specified interface index of this addr
 			// Declare and initialize variables.
 			PMIB_IFROW pMibIfRow;
-			DWORD dwSize = 0;
-			DWORD dwRetVal = 0;
 
 			// Allocate memory for our pointers.
 			pMibIfRow = (MIB_IFROW*) malloc(sizeof(MIB_IFROW));

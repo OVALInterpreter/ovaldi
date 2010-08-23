@@ -431,8 +431,11 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		if(!timeRes) {
 
 			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
-			ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			item->AppendElement(aTime);
+            ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+            item->AppendElement(cTime);
 			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+            item->AppendElement(mTime);
 			string lastError = WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
 

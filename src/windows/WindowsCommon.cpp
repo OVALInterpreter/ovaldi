@@ -320,7 +320,6 @@ bool WindowsCommon::IsGroupSID(string SID) {
 	PSID pSID;	
 	DWORD nameBufferSize = NAME_BUFFER_SIZE;	
 	DWORD domainNameBufferSize = NAME_BUFFER_SIZE;
-	DWORD sidSize = NAME_BUFFER_SIZE;
 	char nameBuffer[NAME_BUFFER_SIZE];
 	char domainNameBuffer[NAME_BUFFER_SIZE];
 	SID_NAME_USE sidType;
@@ -577,8 +576,6 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 
 			domainControllerName = WindowsCommon::GetDomainControllerName(domainName);
 			globalgroupname = WindowsCommon::StringToWide(shortGroupName);
-
-			LPCWSTR p = (LPCWSTR)domainControllerName;
 
 			res = NetGroupGetUsers((LPCWSTR)domainControllerName,		// server name NULL == localhost
 								   globalgroupname,						// group name
@@ -1262,7 +1259,6 @@ PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
 
 	Log::Debug("Starting GetSIDForTrusteeSID with: " + trusteeSID);
 
-	DWORD sidSize = 128;
 	BOOL retVal = FALSE;
 	PSID pSid;
 
@@ -1808,9 +1804,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	DWORD dwPrefMaxLen=MAX_PREFERRED_LENGTH;
 	LPGROUP_USERS_INFO_0 pBuf = NULL;
 	string shortGroupName;
-	bool groupExists = false;
 
-	GROUP_USERS_INFO_0* userInfo = NULL; 
 	
 	// Call the NetUserGetGroups function, specifying level 0.
 	NET_API_STATUS nStatus = NetUserGetGroups(serverName,
@@ -2415,7 +2409,6 @@ bool WindowsCommon::IsVistaOrLater() {
 
 	OSVERSIONINFOEX osvi;
 	DWORDLONG dwlConditionMask = 0;
-	int op=VER_GREATER_EQUAL;
 
 	// Initialize the OSVERSIONINFOEX structure.
 
@@ -2428,10 +2421,10 @@ bool WindowsCommon::IsVistaOrLater() {
 
 	// Initialize the condition mask.
 
-	VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, op );
-	VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, op );
-	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, op );
-	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL );
+	VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL );
 
 	// Perform the test.
     BOOL retVal = VerifyVersionInfo( &osvi, 
@@ -2456,7 +2449,6 @@ bool WindowsCommon::IsXPOrLater() {
 	
 	OSVERSIONINFOEX osvi;
 	DWORDLONG dwlConditionMask = 0;
-	int op=VER_GREATER_EQUAL;
 
 	// Initialize the OSVERSIONINFOEX structure.
 
@@ -2469,10 +2461,10 @@ bool WindowsCommon::IsXPOrLater() {
 
 	// Initialize the condition mask.
 
-	VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, op );
-	VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, op );
-	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, op );
-	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, op );
+	VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL );
+	VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL );
+	VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL );
 
 	// Perform the test.
 	BOOL retVal = VerifyVersionInfo( &osvi, 

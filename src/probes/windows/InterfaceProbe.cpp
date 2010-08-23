@@ -224,7 +224,6 @@ void InterfaceProbe::GetAllInterfaces() {
     }
 
     if ( ( ( errorIpAddrTable = GetIpAddrTable ( ipAddrTable , &addrSize , 0 ) ) == NO_ERROR ) && ( ( errorIfTable = GetIfTable ( ifTable , &ifSize , 0 ) ) == NO_ERROR ) ) {
-        DWORD addrTableLength = ipAddrTable->dwNumEntries;
         DWORD ifTableLength = ifTable->dwNumEntries;
         Item* item;
 

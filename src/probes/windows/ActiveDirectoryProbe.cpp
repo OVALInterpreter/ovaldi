@@ -789,7 +789,6 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                     hResult = adsiSearch->GetColumn ( hSearch , distinguishedNameAttributeStr , &adsiColumn );
 
                     if ( SUCCEEDED ( hResult ) ) {
-                        StringVector* values = new StringVector();
 
                         for ( unsigned int i = 0; i < adsiColumn.dwNumValues ; i++ ) {
                             if ( adsiColumn.dwADsType == ADSTYPE_DN_STRING ) {

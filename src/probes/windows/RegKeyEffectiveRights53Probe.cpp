@@ -138,7 +138,6 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
 
         for ( iterator = registryKeys->begin(); iterator != registryKeys->end(); iterator++ ) {
             RegKey* registryKey = ( *iterator );
-            Item* item = NULL;
 
             try {
                 string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );

@@ -238,7 +238,6 @@ Item* RegistryProbe::CreateItem() {
 Item* RegistryProbe::GetRegistryKey(string hive, string key, string name) {
 	
     HKEY hkey;
-	DWORD parse_depth = 0;
 	LONG res;
 	Item* item = NULL;
 

@@ -276,7 +276,6 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 
 					VARIANT vtProp;
 					VariantInit(&vtProp);
-					CIMTYPE* pvtType = NULL;
 
 					// Get the name of the property.  We need to parse the SELECT
 					// statment to determine the name.

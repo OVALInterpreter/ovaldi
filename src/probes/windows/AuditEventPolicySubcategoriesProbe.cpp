@@ -96,7 +96,6 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object *object) {
 		} 
 
 		ntsResult = ERROR_SUCCESS;
-		PWCHAR name = NULL;
 
 		Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - About to call LsaQueryInformationPolicy()");
 
@@ -114,8 +113,6 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object *object) {
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
 			collectedItems = new ItemVector();
 			collectedItems->push_back(item);
-
-			ULONG current = 0;			
 
 			// if auditing is turned on loop through the auditing options
 			if(pPAEInfo->AuditingMode) {

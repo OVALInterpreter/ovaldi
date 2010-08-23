@@ -144,9 +144,9 @@ VariableValueVector* AbsVariable::GetValues() {
 	return &this->values;
 }
 
-void AbsVariable::SetValues(VariableValueVector* value) {
+void AbsVariable::SetValues(VariableValueVector* values) {
 
-	this->values = values;
+	this->values = (*values);
 }
 
 void AbsVariable::AppendVariableValue(VariableValue* value) {

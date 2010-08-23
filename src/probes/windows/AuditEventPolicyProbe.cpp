@@ -104,7 +104,6 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
 
 	ntsResult = ERROR_SUCCESS;
 	PPOLICY_AUDIT_EVENTS_INFO pPAEInfo = NULL;
-	PWCHAR name = NULL;
 
 	ntsResult = LsaQueryInformationPolicy(
 				lsahPolicyHandle,                // Open handle to a Policy object.

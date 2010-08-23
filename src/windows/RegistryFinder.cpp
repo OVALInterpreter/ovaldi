@@ -708,7 +708,6 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
         keyStr.erase ( 0, 1 );
     }
 
-    StringVector* names = new StringVector();
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
     HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
     DWORD index = 0;
