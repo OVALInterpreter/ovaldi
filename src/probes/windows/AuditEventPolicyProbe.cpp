@@ -95,7 +95,7 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
 	// msdn link on getting audit event data:
 	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthn/security/lsaqueryinformationpolicy.asp
 	// The call below will retrieve a POLICY_AUDIT_EVENTS_INFO structure. 
-	// msdn link on the above strucutre:
+	// msdn link on the above structure:
 	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secmgmt/security/policy_audit_events_info.asp
 	// if auditing is turned on loop through the array of POLICY_AUDIT_EVENT_OPTIONS
 	// msdn link on the above structure
