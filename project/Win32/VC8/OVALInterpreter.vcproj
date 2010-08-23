@@ -58,7 +58,7 @@
 				AssemblerListingLocation=".\Debug\obj/"
 				ObjectFile=".\Debug\obj/"
 				ProgramDataBaseFileName=".\Debug\obj/"
-				WarningLevel="3"
+				WarningLevel="4"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
@@ -158,7 +158,7 @@
 				AssemblerListingLocation=".\Release\obj/"
 				ObjectFile=".\Release\obj/"
 				ProgramDataBaseFileName=".\Release\obj/"
-				WarningLevel="3"
+				WarningLevel="4"
 				SuppressStartupBanner="true"
 				CompileAs="0"
 			/>
