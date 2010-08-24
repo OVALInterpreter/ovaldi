@@ -39,6 +39,10 @@
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
+class Directive;
+
+typedef std::map<OvalEnum::ResultEnumeration, Directive *> DirectiveMap;
+
 /**
  * The Directive class is used to apply Directives to an OVAL results document.
  **/
@@ -50,27 +54,12 @@ public:
 	//
 
 	/**
-	 * Returns a map of the directives for each type of result
-	 *
-	 * @return std::map<OvalEnum::ResultEnumeration, Directive *>
-	 **/
-	static std::map<OvalEnum::ResultEnumeration, Directive *> GetDirectives();
-
-	/**
 	 * Returns a directive matching the specified type of result
 	 *
 	 * @param OvalEnum::ResultEnumeration
 	 * @return Directive
 	 **/
-	static Directive GetDirective(OvalEnum::ResultEnumeration);
-
-	/**
-	 * Use the provided map to look up directives
-	 *
-	 * @param std::map<OvalEnum::ResultEnumeration, Directive *>
-	 * @return void
-	 **/
-	static void SetDirectives(std::map<OvalEnum::ResultEnumeration, Directive *>);
+	static Directive GetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::ResultEnumeration);
 
 	/**
 	 * Use the given directive for the specified type of result
@@ -79,7 +68,7 @@ public:
 	 * @param Directive
 	 * @return void
 	 **/
-	static void SetDirective(OvalEnum::ResultEnumeration, Directive);
+	static void SetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::ResultEnumeration, Directive);
 
 	/**
 	 * Load directives from the ovaldi configuration file.
@@ -171,7 +160,12 @@ private:
 	/**
 	 * Static map of directives.
 	 **/
-	static std::map<OvalEnum::ResultEnumeration, Directive *> directives;
+	static map<OvalEnum::ClassEnumeration, DirectiveMap> directives;
+
+	/**
+	 * False if the user wants to exclude the source definitions from the results document
+	 **/
+	static bool includeSource;
 
 	/**
 	 * Build a list of references to other elements contained within the given DOMElement*.

@@ -175,6 +175,30 @@ public:
 						SET_OPERATOR_UNION};
 	static std::string SetOperatorToString(OvalEnum::SetOperator operation);
 	static OvalEnum::SetOperator ToSetOperator(std::string operationStr);
+
+	/** An enumeration of definition classes.  This is defined in the oval-common-schema. **/
+	enum ClassEnumeration	{CLASS_DEFAULT,
+							CLASS_COMPLIANCE,
+							CLASS_INVENTORY,
+							CLASS_MISCELLANEOUS,
+							CLASS_PATCH,
+							CLASS_VULNERABILITY};
+
+	/**
+	 * Convert a string into a ClassEnumeration
+	 *
+	 * @param std::string classStr
+	 * @return OvalEnum::ClassEnumeration
+	 **/
+	static OvalEnum::ClassEnumeration ToClass(std::string classStr);
+
+	/**
+	 * Convert a ClassEnumeration into a string
+	 *
+	 * @param OvalEnum::ClassEnumeration classEnum
+	 * @return std::string
+	 **/
+	static std::string ClassToString(OvalEnum::ClassEnumeration classEnum);
 };
 
 #endif

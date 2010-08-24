@@ -1108,7 +1108,7 @@ string OvalEnum::SetOperatorToString(OvalEnum::SetOperator setOperator){
 			setOperatorStr = "UNION";
 			break;
 		default:
-			throw Exception("Set::SetOperatorToString - Error unsupported setOperator value.");
+			throw Exception("OvalEnum::SetOperatorToString - Error unsupported setOperator value.");
 			break;
 	}
 	return setOperatorStr;
@@ -1134,4 +1134,43 @@ OvalEnum::SetOperator OvalEnum::ToSetOperator(string setOperatorStr){
 	}
 
 	return setOperator;
+}
+
+OvalEnum::ClassEnumeration OvalEnum::ToClass(std::string classStr) {
+	if (classStr.compare(OvalEnum::ClassToString(OvalEnum::CLASS_COMPLIANCE)) == 0) {
+		return OvalEnum::CLASS_COMPLIANCE;
+	} else if (classStr.compare(OvalEnum::ClassToString(OvalEnum::CLASS_INVENTORY)) == 0) {
+		return OvalEnum::CLASS_INVENTORY;
+	} else if (classStr.compare(OvalEnum::ClassToString(OvalEnum::CLASS_MISCELLANEOUS)) == 0) {
+		return OvalEnum::CLASS_MISCELLANEOUS;
+	} else if (classStr.compare(OvalEnum::ClassToString(OvalEnum::CLASS_PATCH)) == 0) {
+		return OvalEnum::CLASS_PATCH;
+	} else if (classStr.compare(OvalEnum::ClassToString(OvalEnum::CLASS_VULNERABILITY)) == 0) {
+		return OvalEnum::CLASS_VULNERABILITY;
+	} else {
+		throw Exception("OvalEnum::ToClass - Error unsupported class value.");
+	}
+}
+
+std::string OvalEnum::ClassToString(OvalEnum::ClassEnumeration classEnum) {
+	switch(classEnum) {
+		case (OvalEnum::CLASS_COMPLIANCE):
+			return "compliance";
+			break;
+		case (OvalEnum::CLASS_INVENTORY):
+			return "inventory";
+			break;
+		case (OvalEnum::CLASS_MISCELLANEOUS):
+			return "miscellaneous";
+			break;
+		case (OvalEnum::CLASS_PATCH):
+			return "patch";
+			break;
+		case (OvalEnum::CLASS_VULNERABILITY):
+			return "vulnerability";
+			break;
+		default:
+			throw Exception("OvalEnum::ClassToString - Error unsupported ClassToString value.");
+			break;
+	}
 }
