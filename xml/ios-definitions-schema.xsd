@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>IOS Definition</schema>
-                  <version>5.8 Draft 6</version>
-                  <date>8/6/2010 9:52:50 PM</date>
+                  <version>5.8 Release Candidate 1</version>
+                  <date>8/19/2010 10:28:48 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                    <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ios-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios"/>
@@ -419,7 +419,7 @@
                               <oval:test>version55_test</oval:test>
                               <oval:object>version55_object</oval:object>
                               <oval:state>version55_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">version55_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios">version_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -497,7 +497,7 @@
                                           <xsd:documentation>The mainline_rebuild entity is used to check the mainline rebuild piece of the version string.  The mainline rebuild is just a regular rebuild release against the mainline operating system release (e.g. the branch of development that would typically be called "the trunk" that isn't associated with a train). Since there is no train identifier to stick the rebuild release after, they stick a alphabetic character inside the parens holding the maintenance release number. For example, 12.4(5b) is the second rebuild of the 12.4(5) maintenance release.</xsd:documentation>
                                       </xsd:annotation>
                                   </xsd:element>
-                                  <xsd:element name="version_string" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                  <xsd:element name="version_string" type="oval-def:EntityStateIOSVersionType" minOccurs="0" maxOccurs="1">
                                       <xsd:annotation>
                                           <xsd:documentation>The version_string entity is used to check the raw string output of a 'show version' command.</xsd:documentation>
                                       </xsd:annotation>
@@ -618,7 +618,7 @@
                                 <xsd:documentation>The train identifier is the type of Train. For example the version string 12.2(3)T has a train identifier of T. Please see the EntityStateVersionTrainIdentifierType for more information about the different train identifiers.</xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:element name="version_string" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                        <xsd:element name="version_string" type="oval-def:EntityStateIOSVersionType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The version is the raw string output of a 'show version' command.</xsd:documentation>
                             </xsd:annotation>

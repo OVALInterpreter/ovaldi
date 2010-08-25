@@ -7,8 +7,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core Definition</schema>
-            <version>5.8 Draft 6</version>
-            <date>8/6/2010 9:52:51 PM</date>
+            <version>5.8 Release Candidate 1</version>
+            <date>8/19/2010 10:28:50 AM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -207,10 +207,25 @@
             <xsd:documentation>Additional metadata is also allowed although it is not part of the official OVAL Schema. Individual organizations can place metadata items that they feel are important and these will be skipped during the validation. All OVAL really cares about is that the stated metadata items are there.</xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
-            <xsd:element name="title" type="xsd:string" />
-            <xsd:element name="affected" type="oval-def:AffectedType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="title" type="xsd:string"/>
+            <xsd:element name="affected" type="oval-def:AffectedType" minOccurs="0" maxOccurs="unbounded">
+                <xsd:unique name="UniqueAffectedPlatform">
+                    <xsd:annotation>
+                        <xsd:documentation>Each affected platform element must have a unique value.</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:selector xpath="oval-def:platform"/>
+                    <xsd:field xpath="."/>
+                </xsd:unique>
+                <xsd:unique name="UniqueAffectedProduct">
+                    <xsd:annotation>
+                        <xsd:documentation>Each affected product element must have a unique value.</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:selector xpath="oval-def:product"/>
+                    <xsd:field xpath="."/>
+                </xsd:unique>
+            </xsd:element>
             <xsd:element name="reference" type="oval-def:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="description" type="xsd:string" />
+            <xsd:element name="description" type="xsd:string"/>
             <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
             <!-- For the next major release of OVAL, the xsd:any tag above will be modified to
 		         only allow elements from namespaces other than the default namespace.  This
@@ -1043,6 +1058,14 @@
                         <sch:assert test="not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal' or @operation='bitwise and' or @operation='bitwise or'"><sch:value-of select="../@id"/> - The use of '<sch:value-of select="@operation"/>' for the operation attribute of the <sch:value-of select="name()"/> entity is not valid given a datatype of int.</sch:assert>
                         <!--<sch:assert test="matches(., '^[+\-]?[0-9]+$')"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of int.</sch:assert>-->
                     </sch:rule>
+                    <sch:rule context="oval-def:objects/*/*[@datatype='ipv4_address']|oval-def:states/*/*[@datatype='ipv4_address']|oval-def:states/*/*/*[@datatype='ipv4_address']">
+                        <sch:assert test="not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal' or @operation='subsetof' or @operation='supersetof'"><sch:value-of select="../@id"/> - The use of '<sch:value-of select="@operation"/>' for the operation attribute of the <sch:value-of select="name()"/> entity is not valid given a datatype of ipv4_address.</sch:assert>
+                        <!-- TODO <sch:assert test="matches(we_need_regex_for_ipv4)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of ipv4_address.</sch:assert>-->
+                    </sch:rule>
+                    <sch:rule context="oval-def:objects/*/*[@datatype='ipv6_address']|oval-def:states/*/*[@datatype='ipv6_address']|oval-def:states/*/*/*[@datatype='ipv6_address']">
+                        <sch:assert test="not(@operation) or @operation='equals' or @operation='not equal' or @operation='greater than' or @operation='greater than or equal' or @operation='less than' or @operation='less than or equal' or @operation='subsetof' or @operation='supersetof'"><sch:value-of select="../@id"/> - The use of '<sch:value-of select="@operation"/>' for the operation attribute of the <sch:value-of select="name()"/> entity is not valid given a datatype of ipv6_address.</sch:assert>
+                        <!-- TODO <sch:assert test="matches(we_need_regex_for_ipv6)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of ipv6_address.</sch:assert>-->
+                    </sch:rule>
                     <sch:rule context="oval-def:objects/*/*[@datatype='string']|oval-def:states/*/*[@datatype='string']|oval-def:states/*/*/*[@datatype='string']">
                         <sch:assert test="not(@operation) or @operation='equals' or @operation='not equal' or @operation='case insensitive equals' or @operation='case insensitive not equal' or @operation='pattern match'"><sch:value-of select="../@id"/> - The use of '<sch:value-of select="@operation"/>' for the operation attribute of the <sch:value-of select="name()"/> entity is not valid given a datatype of string.</sch:assert>
                     </sch:rule>
@@ -1095,6 +1118,47 @@
                 <xsd:attribute name="var_check" type="oval:CheckEnumeration" use="optional" default="all"/>
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="EntityObjectIPAddressType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityObjectIPAddressType type is extended by the entities of an individual OVAL Object. This type provides uniformity to each object entity by including the attributes found in the EntityObjectBaseType. This specific type describes any IPv4/IPv6 address or address prefix.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-def:EntityObjectBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype">
+                    <xsd:simpleType>
+                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                            <xsd:enumeration value="ipv4_address"/>
+                            <xsd:enumeration value="ipv6_address"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="EntityObjectIPAddressStringType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityObjectIPAddressStringType type is extended by the entities of an individual OVAL Object. This type provides uniformity to each object entity by including the attributes found in the EntityObjectBaseType. This specific type describes any IPv4/IPv6 address, address prefix, or its string representation.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-def:EntityObjectBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype">
+                    <xsd:simpleType>
+                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                            <xsd:enumeration value="ipv4_address"/>
+                            <xsd:enumeration value="ipv6_address"/>
+                            <xsd:enumeration value="string"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:restriction>
+        </xsd:simpleContent>
     </xsd:complexType>
     <xsd:complexType name="EntityObjectAnySimpleType">
         <xsd:annotation>
@@ -1198,6 +1262,47 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    <xsd:complexType name="EntityStateIPAddressType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityStateIPAddressType type is extended by the entities of an individual OVAL State. This type provides uniformity to each object entity by including the attributes found in the EntityStateBaseType. This specific type describes any IPv4/IPv6 address or address prefix.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-def:EntityStateBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype">
+                    <xsd:simpleType>
+                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                            <xsd:enumeration value="ipv4_address"/>
+                            <xsd:enumeration value="ipv6_address"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="EntityStateIPAddressStringType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityStateIPAddressStringType type is extended by the entities of an individual OVAL State. This type provides uniformity to each object entity by including the attributes found in the EntityStateBaseType. This specific type describes any IPv4/IPv6 address, address prefix, or its string representation.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-def:EntityStateBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype">
+                    <xsd:simpleType>
+                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                            <xsd:enumeration value="ipv4_address"/>
+                            <xsd:enumeration value="ipv6_address"/>
+                            <xsd:enumeration value="string"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>                                
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
     <xsd:complexType name="EntityStateAnySimpleType">
         <xsd:annotation>
             <xsd:documentation>The EntityStateAnySimpleType type is extended by the entities of an individual OVAL State. This type provides uniformity to each state entity by including the attributes found in the EntityStateBaseType. This specific type describes any simple data.</xsd:documentation>
@@ -1266,8 +1371,7 @@
     </xsd:complexType>
     <xsd:complexType name="EntityStateEVRStringType">
         <xsd:annotation>
-            <xsd:documentation>The EntityStateEVRStringType type is extended by the entities of an individual OVAL State. This type provides uniformity to each state entity by including the attributes found in the EntityStateBaseType.
-            This type represents the epoch, version, and release fields as a single version string. It has the form "EPOCH:VERSION-RELEASE". Note that a null epoch (or '(none)' as returned by rpm) is equivalent to '0' and would hence have the form 0:VERSION-RELEASE. Comparisons involving this datatype should follow the algorithm of librpm's rpmvercmp() function.</xsd:documentation>
+            <xsd:documentation>The EntityStateEVRStringType type is extended by the entities of an individual OVAL State. This type provides uniformity to each state entity by including the attributes found in the EntityStateBaseType. This type represents the epoch, version, and release fields as a single version string. It has the form "EPOCH:VERSION-RELEASE". Note that a null epoch (or '(none)' as returned by rpm) is equivalent to '0' and would hence have the form 0:VERSION-RELEASE. Comparisons involving this datatype should follow the algorithm of librpm's rpmvercmp() function.</xsd:documentation>
         </xsd:annotation>
         <xsd:simpleContent>
             <xsd:restriction base="oval-def:EntityStateBaseType">
@@ -1302,6 +1406,19 @@
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
                 <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="fileset_revision"/>                
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="EntityStateIOSVersionType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityStateIOSVersionType type is extended by the entities of an individual OVAL State. This type provides uniformity to each state entity by including the attributes found in the EntityStateBaseType. This specific type represents the version string related to CISCO IOS.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-def:EntityStateBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="required" fixed="ios_version"/>                
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>

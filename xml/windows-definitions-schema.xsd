@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.8 Draft 6</version>
-                  <date>8/6/2010 9:52:53 PM</date>
+                  <version>5.8 Release Candidate 1</version>
+                  <date>8/19/2010 10:28:53 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -608,7 +608,7 @@
                                     </xsd:element>                                    
                                     <xsd:element name="value" type="oval-def:EntityStateRecordType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The value of the specified active directory attribute.</xsd:documentation>
+                                                <xsd:documentation>The actual value of the specified Active Directory attribute. Note that while an Active Directory attribute can contain structured data where it is necessary to collect multiple related fields that can be described by the 'record' datatype, it is not always the case.  It also is possible that an Active Directory attribute can contain only a single value or an array of values. In these cases, there is not a name to uniquely identify the corresponding field which is a requirement for fields in the 'record' datatype.  As a result, the name of the Active Directory attribute will be used to uniquely identify the field and satisfy this requirement.</xsd:documentation>
                                           </xsd:annotation>
                                           <xsd:unique name="UniqueAdValueFieldName">
                                                 <xsd:selector xpath="./oval-def:field"/>
@@ -1140,7 +1140,7 @@
                                                 <xsd:documentation>The ttl element contains an integer that represents the time to live in seconds of the DNS cache entry.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="ip_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="ip_address" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name that was collected from the DNS cache on the local system. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
@@ -1405,7 +1405,7 @@
                               <oval:test>fileauditedpermissions53_test</oval:test>
                               <oval:object>fileauditedpermissions53_object</oval:object>
                               <oval:state>fileauditedpermissions53_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">fileauditedpermissions53_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">fileauditedpermissions_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -1957,7 +1957,7 @@
                               <oval:test>fileeffectiverights53_test</oval:test>
                               <oval:object>fileeffectiverights53_object</oval:object>
                               <oval:state>fileeffectiverights53_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">fileeffectiverights53_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">fileeffectiverights_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -2767,17 +2767,17 @@
                                                 <xsd:documentation>The hardware_addr entity is the hardware or MAC address of the physical network card. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits.  Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="inet_addr" type="oval-def:EntityStateStringType" minOccurs="0">
+                                    <xsd:element name="inet_addr" type="oval-def:EntityStateIPAddressStringType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The inet_addr element specifies the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="broadcast_addr" type="oval-def:EntityStateStringType" minOccurs="0">
+                                    <xsd:element name="broadcast_addr" type="oval-def:EntityStateIPAddressStringType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The broadcast_addr element specifies the broadcast address. A broadcast address is typically the IP address with the host portion set to either all zeros or all ones. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="netmask" type="oval-def:EntityStateStringType" minOccurs="0">
+                                    <xsd:element name="netmask" type="oval-def:EntityStateIPAddressStringType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The netmask element specifies the subnet mask for the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
@@ -3118,7 +3118,7 @@
                                     <xsd:choice>
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:sequence>
-                                                <xsd:element name="local_address" type="oval-def:EntityObjectStringType">
+                                                <xsd:element name="local_address" type="oval-def:EntityObjectIPAddressStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>This element specifies the local IP address the listening port is bound to. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                                       </xsd:annotation>
@@ -3149,7 +3149,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="local_address" type="oval-def:EntityStateStringType" minOccurs="0">
+                                    <xsd:element name="local_address" type="oval-def:EntityStateIPAddressStringType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>This element specifies the local IP address the listening port is bound to. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
@@ -3169,7 +3169,7 @@
                                                 <xsd:documentation>The id given to the process that is associated with the specified listening port.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="foreign_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="foreign_address" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
@@ -3515,7 +3515,7 @@
                               <oval:test>process58_test</oval:test>
                               <oval:object>process58_object</oval:object>
                               <oval:state>process58_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">process58_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">process_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -3770,7 +3770,7 @@
                               <oval:test>regkeyauditedpermissions53_test</oval:test>
                               <oval:object>regkeyauditedpermissions53_object</oval:object>
                               <oval:state>regkeyauditedpermissions53_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">regkeyauditedpermissions53_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">regkeyauditedpermissions_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -4283,7 +4283,7 @@
                               <oval:test>regkeyeffectiverights53_test</oval:test>
                               <oval:object>regkeyeffectiverights53_object</oval:object>
                               <oval:state>regkeyeffectiverights53_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">regkeyeffectiverights53_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">regkeyeffectiverights_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -5638,7 +5638,7 @@
                           <oval:test>user_sid55_test</oval:test>
                           <oval:object>user_sid55_object</oval:object>
                           <oval:state>user_sid55_state</oval:state>
-                          <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">user_sid55_item</oval:item>
+                          <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">user_sid_item</oval:item>
                     </oval:element_mapping>
               </xsd:appinfo>
               <xsd:appinfo>

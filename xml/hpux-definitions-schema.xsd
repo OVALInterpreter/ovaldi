@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>HP-UX Definition</schema>
-                  <version>5.8 Draft 6</version>
-                  <date>8/6/2010 9:52:50 PM</date>
+                  <version>5.8 Release Candidate 1</version>
+                  <date>8/19/2010 10:28:48 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="hpux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#hpux"/>
@@ -109,6 +109,99 @@
             </xsd:complexType>
       </xsd:element>
       <!-- =============================================================================== -->
+      <!-- ===============================  NDD TEST  ==================================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="ndd_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>From /usr/bin/ndd. See ndd manpage for specific fields</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>ndd_test</oval:test>
+                              <oval:object>ndd_object</oval:object>
+                              <oval:state>ndd_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">ndd_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="hpux-def_ndd_test">
+                              <sch:rule context="hpux-def:ndd_test/hpux-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/hpux-def:ndd_object/@id"><sch:value-of select="../@id"/> - the object child element of an ndd_test must reference an ndd_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="hpux-def:ndd_test/hpux-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/hpux-def:ndd_state/@id"><sch:value-of select="../@id"/> - the state child element of an ndd_test must reference an ndd_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ndd_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation/>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="device" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The name of the device to examine.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="parameter" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The name of the parameter, For example, ip_forwarding.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ndd_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation/>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="device" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The name of the device to examine.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="parameter" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The name of the parameter, For example, ip_forwarding.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="value" type="oval-def:EntityStateAnySimpleType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The value of the named parameter.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
       <!-- ==============================  PATCH TEST (53) =============================== -->
       <!-- =============================================================================== -->
       <xsd:element name="patch53_test" substitutionGroup="oval-def:test">
@@ -119,7 +212,7 @@
                               <oval:test>patch53_test</oval:test>
                               <oval:object>patch53_object</oval:object>
                               <oval:state>patch53_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">patch53_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux">patch_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -433,10 +526,24 @@
                                                 <xsd:documentation/>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="version" type="oval-def:EntityStateFileSetRevisionType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="version" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation/>
                                           </xsd:annotation>
+                                          <xsd:complexType>
+                                                <xsd:simpleContent>
+                                                      <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                  <xsd:simpleType>
+                                                                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                              <xsd:enumeration value="string"/>
+                                                                              <xsd:enumeration value="fileset_revision"/>
+                                                                        </xsd:restriction>
+                                                                  </xsd:simpleType>
+                                                            </xsd:attribute>                                                  
+                                                      </xsd:restriction>
+                                                </xsd:simpleContent>                                        
+                                          </xsd:complexType>                                          
                                     </xsd:element>
                                     <xsd:element name="title" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
@@ -526,7 +633,7 @@
                                                 <xsd:documentation>This is the name of the user being checked</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="uid" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="uid" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The user's ID</xsd:documentation>
                                           </xsd:annotation>
@@ -536,7 +643,7 @@
                                                 <xsd:documentation>This is the encrypted version of the user's password</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="account_owner" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="account_owner" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The Account owner for pseudo-users</xsd:documentation>
                                           </xsd:annotation>
@@ -561,12 +668,12 @@
                                                 <xsd:documentation>Minimum time between password changes</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="pw_max_size" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="pw_max_size" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>Maximum password length in characters</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="pw_expiration" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="pw_expiration" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>Password expiration time in seconds</xsd:documentation>
                                           </xsd:annotation>
@@ -586,7 +693,7 @@
                                                 <xsd:documentation>Time of last unsuccessful password change</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="acct_expire" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="acct_expire" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>Absolute account lifetime in seconds</xsd:documentation>
                                           </xsd:annotation>
@@ -596,7 +703,7 @@
                                                 <xsd:documentation>Maximum time allowed between logins before the account is locked</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="exp_warning" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="exp_warning" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The time in seconds before expiration when a warning will appear</xsd:documentation>
                                           </xsd:annotation>
@@ -636,7 +743,7 @@
                                                 <xsd:documentation>Specifies the times when the user may login to this account</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="pw_changer" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="pw_changer" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The user ID of the user who last changed the password on the user's account, if it was not the account owner</xsd:documentation>
                                           </xsd:annotation>
@@ -656,22 +763,22 @@
                                                 <xsd:documentation>The terminal or remote host associated with the last successful login to the account</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="login_tty_u" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="login_tty_u" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The terminal or remote hosts associated with the last unsuccessful login to the account</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="num_u_logins" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="num_u_logins" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The number of unsuccessful login attempts since that last successful login</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="max_u_logins" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="max_u_logins" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The maximum number of unsuccessful login attempts before the account is locked</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="lock_flag" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="lock_flag" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>Indicates whether the administrative lock on the account is set</xsd:documentation>
                                           </xsd:annotation>

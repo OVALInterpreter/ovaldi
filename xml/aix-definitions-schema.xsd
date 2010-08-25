@@ -6,8 +6,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>AIX Definition</schema>
-                  <version>5.8 Draft 6</version>
-                  <date>8/6/2010 9:52:41 PM</date>
+                  <version>5.8 Release Candidate 1</version>
+                  <date>8/19/2010 10:28:38 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="aix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#aix"/>
@@ -297,18 +297,18 @@
             </xsd:complexType>
       </xsd:element>
       <!-- =============================================================================== -->
-      <!-- ===================================  NETOP TEST  ============================== -->
+      <!-- ===================================  NO TEST  ================================= -->
       <!-- =============================================================================== -->
-      <xsd:element name="netop_test" substitutionGroup="oval-def:test">
+      <xsd:element name="no_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The netop test is used to check information related to the /usr/sbin/no command and the parameters it manages. The no command sets or displays current or next boot values for network tuning parameters.  The information being tested is based off the /usr/sbin/no -o command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a netop_object and the optional state element specifies the value to check for. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The no test is used to check information related to the /usr/sbin/no command and the parameters it manages. The no command sets or displays current or next boot values for network tuning parameters.  The information being tested is based off the /usr/sbin/no -o command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a no_object and the optional state element specifies the value to check for. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
-                        <sch:pattern id="aix-def_netoptst">
-                              <sch:rule context="aix-def:netop_test/aix-def:object">
-                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/aix-def:netop_object/@id"><sch:value-of select="../@id"/> - the object child element of a <sch:name path=".."/> must reference a netop_object</sch:assert>
+                        <sch:pattern id="aix-def_notst">
+                              <sch:rule context="aix-def:no_test/aix-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/aix-def:no_object/@id"><sch:value-of select="../@id"/> - the object child element of a <sch:name path=".."/> must reference a no_object</sch:assert>
                               </sch:rule>
-                              <sch:rule context="aix-def:netop_test/aix-def:state">
-                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/aix-def:netop_state/@id"><sch:value-of select="../@id"/> - the state child element of a <sch:name path=".."/> must reference a netop_state</sch:assert>
+                              <sch:rule context="aix-def:no_test/aix-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/aix-def:no_state/@id"><sch:value-of select="../@id"/> - the state child element of a <sch:name path=".."/> must reference a no_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -324,10 +324,10 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-      <xsd:element name="netop_object" substitutionGroup="oval-def:object">
+      <xsd:element name="no_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The netop_object element is used by a netop_test to define the specific parameter to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>A netop_object consists of a single tunable entity that identifies the parameter to be looked at.</xsd:documentation>
+                  <xsd:documentation>The no_object element is used by a no_test to define the specific parameter to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>A no_object consists of a single tunable entity that identifies the parameter to be looked at.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -349,9 +349,9 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-      <xsd:element name="netop_state" substitutionGroup="oval-def:state">
+      <xsd:element name="no_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The netop_state element defines the different information associated with a specific call to /usr/sbin/no. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>The no_state element defines the different information associated with a specific call to /usr/sbin/no. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>

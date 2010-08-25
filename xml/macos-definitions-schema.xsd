@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>MacOS Definition</schema>
-                  <version>5.8 Draft 6</version>
-                  <date>8/6/2010 9:52:51 PM</date>
+                  <version>5.8 Release Candidate 1</version>
+                  <date>8/19/2010 10:28:49 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="macos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos"/>
@@ -125,6 +125,141 @@
             </xsd:complexType>
       </xsd:element>
       <!-- =============================================================================== -->
+      <!-- ===============================  DISK UTIL TEST  ============================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="diskutil_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>The diskutil_test is used to verify disks on a Mac OS system.  The information used by this test is modeled after the diskutil command. For more information, see diskutil(8). It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a diskutil_object and the optional diskutil_state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>diskutil_test</oval:test>
+                              <oval:object>diskutil_object</oval:object>
+                              <oval:state>diskutil_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos">diskutil_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="macos-def_diskutiltst">
+                              <sch:rule context="macos-def:diskutil_test/macos-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/macos-def:diskutil_object/@id">
+                                          <sch:value-of select="../@id"/> - the object child element of a diskutil_test must reference a diskutil_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="macos-def:diskutil_test/macos-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/macos-def:diskutil_state/@id">
+                                          <sch:value-of select="../@id"/> - the state child element of a diskutil_test must reference a diskutil_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="diskutil_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>The diskutil_object element is used by a diskutil_test to define the disks to be verified on a Mac OS system. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="device" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The device entity is a string that represents the disk on a Mac OS system to verify. Please see diskutil(8) for instructions on how to specify the device.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The filepath element specifies the absolute path for a file in the specified package. A directory cannot be specified as a filepath.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="diskutil_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation>The package_state element defines the different verification information associated with a disk on a Mac OS system. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="device" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The device entity is a string that represents the disk on a Mac OS system to verify. Please see diskutil(8) for instructions on how to specify the device.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The filepath element specifies the absolute path for a file on the specified device. A directory cannot be specified as a filepath.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="uread" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual user read permission changed from the expected user read permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="uwrite" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual user write permission changed from the expected user write permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="uexec" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual user exec permission changed from the expected user exec permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="gread" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual group read permission changed from the expected group read permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="gwrite" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual group write permission changed from the expected group write permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="gexec" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual group exec permission changed from the expected group exec permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="oread" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual others read permission changed from the expected others read permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="owrite" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual others read permission changed from the expected others read permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="oexec" type="macos-def:EntityStatePermissionCompareType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Has the actual others read permission changed from the expected others read permission?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
       <!-- ========================  INET LISTENING SERVERS TEST  ======================== -->
       <!-- =============================================================================== -->
       <xsd:element name="inetlisteningservers_test" substitutionGroup="oval-def:test">
@@ -135,7 +270,7 @@
                               <oval:test>inetlisteningservers_test</oval:test>
                               <oval:object>inetlisteningservers_object</oval:object>
                               <oval:state>inetlisteningservers_state</oval:state>
-                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos">inetlisteningservers_item</oval:item>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos">inetlisteningserver_item</oval:item>
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
@@ -197,7 +332,7 @@
                                                 <xsd:documentation>This is the name of the communicating program.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="local_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="local_address" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the IP address of the network interface on which the program listens. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
@@ -207,12 +342,12 @@
                                                 <xsd:documentation>This is the IP address and network port on which the program listens, equivalent to local_address:local_port. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="local_port" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="local_port" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the TCP or UDP port on which the program listens. Note that this is not a list -- if a program listens on multiple ports, or on a combination of TCP and UDP, each will have its own entry in the table data stored by this test.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="foreign_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="foreign_address" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                           </xsd:annotation>
@@ -597,6 +732,35 @@
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
       <!-- =============================================================================== -->
+      <xsd:complexType name="EntityStatePermissionCompareType">
+            <xsd:annotation>
+                  <xsd:documentation>The EntityStatePermissionCompareType complex type restricts a string value to more, less, or same which specifies if an actual permission is different than the expected permission (more or less restrictive) or if the permission is the same. The empty string is also allowed to support empty elements associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleContent>
+                  <xsd:restriction base="oval-def:EntityStateStringType">
+                        <xsd:enumeration value="more">
+                              <xsd:annotation>
+                                    <xsd:documentation>The actual permission is more restrictive than the expected permission.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="less">
+                              <xsd:annotation>
+                                    <xsd:documentation>The actual permission is less restrictive than the expected permission.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="same">
+                              <xsd:annotation>
+                                    <xsd:documentation>The actual permission is the same as the expected permission.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="">
+                              <xsd:annotation>
+                                    <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                  </xsd:restriction>
+            </xsd:simpleContent>
+      </xsd:complexType>
       <xsd:complexType name="EntityStatePlistTypeType">
             <xsd:annotation>
                   <xsd:documentation>The EntityStatePlistTypeType complex type restricts a string value to the seven values CFString, CFNumber, CFBoolean, CFDate, CFData, CFArray, and CFDictionary that specify the datatype of the value associated with a property list preference key. The empty string is also allowed to support empty elements associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>

@@ -7,8 +7,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core System Characteristics</schema>
-            <version>5.8 Draft 6</version>
-            <date>8/6/2010 9:52:52 PM</date>
+            <version>5.8 Release Candidate 1</version>
+            <date>8/19/2010 10:28:50 AM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -140,7 +140,7 @@
                     <xsd:documentation>The required interface_name element is the name of the interface</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="ip_address" type="xsd:string">
+            <xsd:element name="ip_address" type="oval-sc:EntityItemIPAddressStringType">
                 <xsd:annotation>
                     <xsd:documentation>The required ip_address element holds the IP address for the interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                 </xsd:annotation>
@@ -361,6 +361,47 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    <xsd:complexType name="EntityItemIPAddressType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityItemIPAddressType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type describes any IPv4/IPv6 address or address prefix.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-sc:EntityItemBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype">
+                    <xsd:simpleType>
+                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                            <xsd:enumeration value="ipv4_address"/>
+                            <xsd:enumeration value="ipv6_address"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="EntityItemIPAddressStringType">
+        <xsd:annotation>
+            <xsd:documentation>The EntityItemIPAddressStringType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type describes any IPv4/IPv6 address, address prefix, or its string representation.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:restriction base="oval-sc:EntityItemBaseType">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+                <xsd:attribute name="datatype">
+                    <xsd:simpleType>
+                        <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                            <xsd:enumeration value="ipv4_address"/>
+                            <xsd:enumeration value="ipv6_address"/>
+                            <xsd:enumeration value="string"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>    
     <xsd:complexType name="EntityItemAnySimpleType">
         <xsd:annotation>
             <xsd:documentation>The EntityItemAnySimpleType type is extended by the entities of an individual item. This type provides uniformity to each entity by including the attributes found in the EntityItemBaseType. This specific type describes any simple data.</xsd:documentation>

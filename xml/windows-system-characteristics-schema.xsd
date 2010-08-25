@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.8 Draft 6</version>
-               <date>8/6/2010 9:52:54 PM</date>
+               <version>5.8 Release Candidate 1</version>
+               <date>8/19/2010 10:28:53 AM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -370,8 +370,8 @@
                               </xsd:element>
                               <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The actual value of the specified active directory attribute.</xsd:documentation>
-                                   </xsd:annotation>                                   
+                                        <xsd:documentation>The actual value of the specified Active Directory attribute. Note that while an Active Directory attribute can contain structured data where it is necessary to collect multiple related fields that can be described by the 'record' datatype, it is not always the case.  It also is possible that an Active Directory attribute can contain only a single value or an array of values. In these cases, there is not a name to uniquely identify the corresponding field(s) which is a requirement for fields in the 'record' datatype.  As a result, the name of the Active Directory attribute will be used to uniquely identify the field(s) and satisfy this requirement. If the Active Directory attribute contains a single value, the 'record' will have a single field identified by the name of the Active Directory attribute. If the Active Directory attribute contains an array of values, the 'record' will have multiple fields all identified by the name of the Active Directory attribute</xsd:documentation>
+                                   </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
                     </xsd:extension>
@@ -384,6 +384,7 @@
      <xsd:element name="auditeventpolicy_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
                <xsd:documentation>The auditeventpolicy item enumerates the different types of events the system should audit. The defined values are found in window's POLICY_AUDIT_EVENT_TYPE enumeration and accessed through the LsaQueryInformationPolicy when the InformationClass parameters are set to PolicyAuditEventsInformation. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
+               <xsd:documentation>Note that when audinting is disabled each of the entities listed below should be set to 'AUDIT_NONE'.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -445,6 +446,7 @@
      <xsd:element name="auditeventpolicysubcategories_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
                <xsd:documentation>The auditeventpolicysubcategories_item is used to hold information about the audit event policy settings on a Windows system. These settings are used to specify which system and network events are monitored.  For example, if the credential_validation element has a value of AUDIT_FAILURE, it means that the system is configured to log all unsuccessful attempts to validate a user account on a system. It is important to note that these audit event policy settings are specific to certain versions of Windows. As a result, the documentation for that version of Windows should be consulted for more information on each setting. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
+               <xsd:documentation>Note that when audinting is disabled each of the entities listed below should be set to 'AUDIT_NONE'.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -755,7 +757,7 @@
                                         <xsd:documentation>The ttl element contains an integer that represents the time to live in seconds of the DNS cache entry.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="ip_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
+                              <xsd:element name="ip_address" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The ip_address element contains a string that represents an IP address associated with the specified domain name. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                    </xsd:annotation>
@@ -1262,17 +1264,17 @@
                                         <xsd:documentation>The hardware_addr entity is the hardware or MAC address of the physical network card. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits.  Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="inet_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="inet_addr" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This element specifies the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="broadcast_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="broadcast_addr" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This element specifies the broadcast address. A broadcast address is typically the IP address with the host portion set to either all zeros or all ones. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="netmask" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="netmask" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This element specifies the subnet mask for the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                    </xsd:annotation>
@@ -1426,7 +1428,7 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
-                              <xsd:element name="local_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="local_address" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This element specifies the local IP address the listening port is bound to. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                    </xsd:annotation>
@@ -1446,7 +1448,7 @@
                                         <xsd:documentation>The id given to the process that is associated with the specified listening port.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="foreign_address" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="foreign_address" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the IP address with which the program is communicating, or with which it will communicate, in the case of a listening server. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                                    </xsd:annotation>
