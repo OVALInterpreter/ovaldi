@@ -115,6 +115,8 @@ void Digest::initDigest(void **context, DigestType digestType) {
 
 #if defined SUNOS
 	hd = gcry_md_open(algId, 0);
+	if (!hd)
+		throw DigestException("Error opening message digest ("+Common::ToString(digestType)+")");
 #else
 	gcry_error_t err;
 	if ((err = gcry_md_open(&hd, algId, 0)))
@@ -160,8 +162,12 @@ int Digest::getDigest(DigestType digestType) {
 			return GCRY_MD_MD5;
 		case SHA1:
 			return GCRY_MD_SHA1;
+// libgcrypt which comes with solaris 10 doesn't define
+// a constant for sha-224.
+#if not defined SUNOS
 		case SHA224:
 			return GCRY_MD_SHA224;
+#endif
 		case SHA256:
 			return GCRY_MD_SHA256;
 		case SHA384:

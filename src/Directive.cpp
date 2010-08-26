@@ -29,6 +29,9 @@
 //****************************************************************************************//
 #include "Directive.h"
 
+using namespace std;
+XERCES_CPP_NAMESPACE_USE
+
 //
 // Static members
 //
