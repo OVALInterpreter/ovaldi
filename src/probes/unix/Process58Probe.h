@@ -28,8 +28,8 @@
 //
 //****************************************************************************************//
 
-#ifndef PROCESSPROBE_H
-#define PROCESSPROBE_H
+#ifndef PROCESS58PROBE_H
+#define PROCESS58PROBE_H
 
 #include "AbsProbe.h"
 
@@ -69,17 +69,17 @@
 	The following command produces process information sutable fro this probe.
     ps -eo class,etime,pid,uid,start_time,tty,priority,cmd
 */
-class ProcessProbe : public AbsProbe {
+class Process58Probe : public AbsProbe {
 public:
-	virtual ~ProcessProbe();
+	virtual ~Process58Probe();
     
 	virtual ItemVector* CollectItems(Object* object);
 
-	/** Ensure that the ProcessProbe is a singleton. */
+	/** Ensure that the Process58Probe is a singleton. */
 	static AbsProbe* Instance();
 	  
 private:
-	ProcessProbe();
+	Process58Probe();
 
 	/** Return a new Item created for storing process information. */
 	virtual Item* CreateItem();
@@ -90,7 +90,7 @@ private:
 		@param command an ObjectEntity* that represents the objects to collect on the ssytem
 		@return The matching commands
 	*/
-	StringPairVector* GetCommands(ObjectEntity* command);
+	StringPairVector* GetCommands(ObjectEntity *pid, ObjectEntity* command);
 	
 	/**
 		Get all commands on the system that match the specified pattern.
@@ -101,11 +101,23 @@ private:
 	StringPairVector* GetMatchingCommands(std::string pattern, bool isRegex);
 
 	/**
-		Return true if the specifeid command exists on the system.
-		@param command a string that hold the name of the rpm to check for.
-		@result The result of checking for the specified rpm on the system.
+		Return true if the specified command exists on the system, and gets its pid.
+		@deprecated This exists only until Dan fixes the MacOSX port to collect all
+		processes.  Once this method is no longer used, it will be deleted.
+		@param[in] command a string that hold the name of the command to check for.
+		@param[out] pid the pid for the first process found for the given command.
+		@return The result of checking for the specified command.  true=>found, false=>not found
 	*/
 	bool CommandExists(std::string command, std::string &pid);
+
+	/**
+		Return true if the specified command exists on the system, and gets its pids.
+		@param[in] command a string that hold the name of the command to check for.
+		@param[out] pids a vector which will be populated with the pids of all processes
+		found for the given command.
+		@return The result of checking for the specified command.  true=>found, false=>not found
+	*/
+	bool CommandExists(std::string command, StringVector &pids);
 
 	/**
 		Get all the information for the command.
@@ -192,7 +204,7 @@ private:
 	 */
 	void DeleteCommands(StringPairVector *commands);
 
-	static ProcessProbe *instance;
+	static Process58Probe *instance;
 };
 
 #endif

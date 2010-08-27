@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib  libgcrypt.dll.a libgpg-error.dll.a"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib libeay32MT.lib Dnsapi.lib"
 				OutputFile="Release/ovaldi.exe"
 				Version="5.0"
 				LinkIncremental="1"
@@ -183,7 +183,6 @@
 				DelayLoadDLLs="Advapi32.dll;Authz.dll"
 				ProgramDatabaseFile=".\Release/ovaldi.pdb"
 				SubSystem="1"
-				OptimizeReferences="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				SupportUnloadOfDelayLoadedDLL="true"
@@ -481,6 +480,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\independent\FileHash58Probe.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\independent\FileHashProbe.cpp"
 					>
 				</File>
@@ -526,6 +529,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\Process58Probe.cpp"
 					>
 				</File>
 				<File
@@ -1152,6 +1159,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\probes\independent\FileHash58Probe.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\probes\independent\FileHashProbe.h"
 					>
 				</File>
@@ -1197,6 +1208,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\Process58Probe.h"
 					>
 				</File>
 				<File

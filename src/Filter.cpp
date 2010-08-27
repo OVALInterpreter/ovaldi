@@ -62,3 +62,10 @@ void Filter::Parse(DOMElement* filterElm) {
 	this->SetExcluding(actionStr.empty() || actionStr == "exclude");
 	this->state = State::GetStateById(stateId);
 }
+
+bool FilterFunctor::operator()(Item *item) {
+	// the *_if (e.g. remove_if) algorithms need true
+	// returned to indicate the item should be removed,
+	// so we negate DoFilter's return value.
+	return !this->filter->DoFilter(item);
+}

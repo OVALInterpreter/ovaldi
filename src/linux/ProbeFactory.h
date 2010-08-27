@@ -43,6 +43,7 @@
 #include "FileProbe.h"
 #include "FileMd5Probe.h"
 #include "FileHashProbe.h"
+#include "FileHash58Probe.h"
 #include "FamilyProbe.h"
 #include "UnameProbe.h"
 #ifdef PACKAGE_RPM
@@ -54,6 +55,7 @@
 
 #include "InetListeningServersProbe.h"
 #include "ProcessProbe.h"
+#include "Process58Probe.h"
 #include "ShadowProbe.h"
 #include "PasswordProbe.h"
 #include "InterfaceProbe.h"

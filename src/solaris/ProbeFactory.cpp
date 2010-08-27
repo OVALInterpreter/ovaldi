@@ -54,6 +54,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileMd5Probe::Instance();
 	} else if(objectName.compare("filehash_object") == 0) {
 		probe = FileHashProbe::Instance();
+	} else if(objectName.compare("filehash58_object") == 0) {
+		probe = FileHash58Probe::Instance();
 	} else if(objectName.compare("environmentvariable_object") == 0) {
 		probe = EnvironmentVariableProbe::Instance();
 	} else if(objectName.compare("variable_object") == 0) {
@@ -78,6 +80,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = PasswordProbe::Instance();
 	} else if(objectName.compare("process_object") == 0) {
 		probe = ProcessProbe::Instance();
+	} else if(objectName.compare("process58_object") == 0) {
+		probe = Process58Probe::Instance();
 	} else if(objectName.compare("runlevel_object") == 0) {
 		probe = RunLevelProbe::Instance();
 		//	} else if(objectName.compare("sccs_object") == 0) {

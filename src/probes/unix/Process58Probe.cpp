@@ -28,15 +28,15 @@
 //
 //****************************************************************************************//
 
-#include "ProcessProbe.h"
+#include "Process58Probe.h"
 
 using namespace std;
 
 //****************************************************************************************//
-//				 ProcessProbe Class	                                  //
+//				 Process58Probe Class	                                  //
 //****************************************************************************************//
 
-ProcessProbe *ProcessProbe::instance = NULL;
+Process58Probe *Process58Probe::instance = NULL;
 
 #ifdef SUNOS
 
@@ -58,12 +58,12 @@ namespace {
 
 #endif
 
-ProcessProbe::ProcessProbe() {}
+Process58Probe::Process58Probe() {}
 
 
 
 
-ProcessProbe::~ProcessProbe() {
+Process58Probe::~Process58Probe() {
   instance = NULL;
 }
 
@@ -72,11 +72,11 @@ ProcessProbe::~ProcessProbe() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 
-AbsProbe* ProcessProbe::Instance() {
+AbsProbe* Process58Probe::Instance() {
 
 	// Use lazy initialization
 	if(instance == NULL) 
-		instance = new ProcessProbe();
+		instance = new Process58Probe();
 
 	return instance;	
 }
@@ -84,9 +84,10 @@ AbsProbe* ProcessProbe::Instance() {
 
 
 
-ItemVector* ProcessProbe::CollectItems(Object* object) {
+ItemVector* Process58Probe::CollectItems(Object* object) {
 
 	ObjectEntity* command = object->GetElementByName("command");
+	ObjectEntity* pid = object->GetElementByName("pid");
 
 	// check datatypes - only allow string
 	if(command->GetDatatype() != OvalEnum::DATATYPE_STRING) {
@@ -100,7 +101,7 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 
 	ItemVector *collectedItems = new ItemVector();
 
-	StringPairVector* commands = this->GetCommands(command);
+	StringPairVector* commands = this->GetCommands(pid, command);
 	if(commands->size() > 0) {
 		StringPairVector::iterator iterator;
 		for(iterator = commands->begin(); iterator != commands->end(); iterator++) {		
@@ -140,7 +141,7 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 
 
 
-Item* ProcessProbe::CreateItem() {
+Item* Process58Probe::CreateItem() {
 
 	Item* item = new Item(0, 
 						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix", 
@@ -159,12 +160,16 @@ Item* ProcessProbe::CreateItem() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 
-StringPairVector* ProcessProbe::GetCommands(ObjectEntity* command) {
+StringPairVector* Process58Probe::GetCommands(ObjectEntity *pid, ObjectEntity* command) {
 
 	StringPairVector* commands;
 	StringVector commandEntityValues;
 	StringVector::size_type numEntityValues;
-	string pid;
+#if defined DARWIN
+	string pidStr;
+#else
+	StringVector pids;
+#endif
 
 	command->GetEntityValues(commandEntityValues); // ignoring flag return value for now
 	numEntityValues = commandEntityValues.size();
@@ -176,11 +181,19 @@ StringPairVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 		for (StringVector::iterator iter = commandEntityValues.begin();
 			 iter != commandEntityValues.end();
 			 ++iter) {
-			if (this->CommandExists(*iter, pid))
-				commands->push_back(new pair<string,string>(*iter, pid));
+#if defined DARWIN
+			if (this->CommandExists(*iter, pidStr))
+				commands->push_back(new pair<string,string>(*iter, pidStr));
+#else
+			if (this->CommandExists(*iter, pids))
+				for (StringVector::iterator pidIter = pids.begin();
+					 pidIter != pids.end();
+					 ++pidIter)
+					commands->push_back(new pair<string,string>(*iter, *pidIter));
+#endif
 		}
 		break;
-		
+
 	case OvalEnum::OPERATION_NOT_EQUAL:
 		if (numEntityValues == 1)
 			commands = this->GetMatchingCommands(commandEntityValues[0], false);
@@ -200,21 +213,25 @@ StringPairVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 		break;
 	}
 
-	// If var_ref was specified, we need to make a second pass since
-	// in some cases above, we punted on actually satisfying the criteria
-	// (and just got everything).  And at the least, we should check that
-	// the var_check is satisfied.
-	if (command->GetVarRef() != NULL) {
-		ItemEntity* tmp = this->CreateItemEntity(command);
-		StringPairVector::iterator it;
-		for(it = commands->begin(); it != commands->end(); ) {
-			tmp->SetValue((*it)->first);
-			if(command->Analyze(tmp) == OvalEnum::RESULT_TRUE)
-				++it;
-			else {
-				delete *it;
-				it = commands->erase(it);
-			}
+	// The code above in some cases winnows down the process items
+	// retrieved to only include those which match the command object
+	// entity.  But not always.  We need to do a second, more cpu
+	// intensive pass to definitively filter out those which don't
+	// match the command or pid.  And in any case, we have to make
+	// sure var_checks are satisfied, in case a var_ref was used.
+
+	ItemEntity* tmpCmd = this->CreateItemEntity(command);
+	ItemEntity* tmpPid = this->CreateItemEntity(pid);
+	StringPairVector::iterator it;
+	for(it = commands->begin(); it != commands->end(); ) {
+		tmpCmd->SetValue((*it)->first);
+		tmpPid->SetValue((*it)->second);
+		if(command->Analyze(tmpCmd) == OvalEnum::RESULT_TRUE &&
+		   pid->Analyze(tmpPid) == OvalEnum::RESULT_TRUE)
+			++it;
+		else {
+			delete *it;
+			it = commands->erase(it);
 		}
 	}
 
@@ -222,7 +239,7 @@ StringPairVector* ProcessProbe::GetCommands(ObjectEntity* command) {
 }
 
 #ifdef LINUX
-void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
+void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	string errMsg = "";
 
@@ -311,7 +328,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 			}
 
 			item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid)));
@@ -325,7 +342,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	}
 }
 
-int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
+int Process58Probe::RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
 
   // Stat File parameters.  While we're really only concerned with gathering the parameters
   // that are passed in, these variables are good placeholders in case we decide to collect
@@ -348,7 +365,7 @@ int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, lon
 
   // Open the 'stat' file and read the contents
   if((statFile = fopen(statPath.c_str(), "r")) == NULL) {
-    errMsg->append("ProcessProbe: Unable to obtain process information for pid: ");
+    errMsg->append("Process58Probe: Unable to obtain process information for pid: ");
     errMsg->append(process);
     return(-1);
 
@@ -363,7 +380,7 @@ int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, lon
   return(0);
 }
 
-int ProcessProbe::RetrieveStatusFile(const char *process, int *ruid, int *euid, string *errMsg) {
+int Process58Probe::RetrieveStatusFile(const char *process, int *ruid, int *euid, string *errMsg) {
 	string statusFileName = string("/proc/")+process+"/status";
 	errno = 0;
 	ifstream statusFile(statusFileName.c_str());
@@ -375,7 +392,7 @@ int ProcessProbe::RetrieveStatusFile(const char *process, int *ruid, int *euid, 
 		if (errno == ENOENT)
 			return -1;
 
-		*errMsg = "ProcessProbe: Error opening "+statusFileName+": "+strerror(errno);
+		*errMsg = "Process58Probe: Error opening "+statusFileName+": "+strerror(errno);
 		return -1;
 	}
 
@@ -408,7 +425,7 @@ int ProcessProbe::RetrieveStatusFile(const char *process, int *ruid, int *euid, 
 	return -1;
 }
 
-void ProcessProbe::RetrieveTTY(const char *process, char *ttyName) {
+void Process58Probe::RetrieveTTY(const char *process, char *ttyName) {
   int bytes = 0;
 
   // Generate the absolute path name for the stdout(0) file in 'fd'
@@ -425,14 +442,14 @@ void ProcessProbe::RetrieveTTY(const char *process, char *ttyName) {
   }
 }
 
-int  ProcessProbe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
+int  Process58Probe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
   // The second value in this file represents idle time - we're not concerned with this.
   unsigned long idle = 0;
   FILE *uptimeHandle = NULL;
 
   // Open and parse the 'uptime' file
   if((uptimeHandle = fopen("/proc/uptime", "r")) == NULL) {
-    errMsg->append("ProcessProbe: Could not open /proc/uptime");
+    errMsg->append("Process58Probe: Could not open /proc/uptime");
     uptime = 0;
     return(-1);
   } else {
@@ -445,11 +462,11 @@ int  ProcessProbe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
 
 #elif defined SUNOS
 
-void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
+void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	string psinfoFileName = "/proc/"+pidStr+"/psinfo";
 	psinfo_t info;
-	pid_t pid, ppid;
+	pid_t ppid;
 	dev_t tty;
 	timestruc_t startTime, execTime;
 	int priority;
@@ -471,7 +488,6 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	
 	execTime = info.pr_time;
 	startTime = info.pr_start;
-	pid = info.pr_pid;
 	ppid = info.pr_ppid;
 
 	//note that this priority is for the "representative" lwp.  I guess
@@ -495,7 +511,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
 	item->AppendElement(new ItemEntity("command", command, OvalEnum::DATATYPE_STRING, true));
 	item->AppendElement(new ItemEntity("exec_time", formattedExecTime));
-	item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER));
+	item->AppendElement(new ItemEntity("pid", pidStr, OvalEnum::DATATYPE_INTEGER, true));
 	item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("priority", Common::ToString(priority)));
 	item->AppendElement(new ItemEntity("ruid", Common::ToString(rUserId)));
@@ -511,7 +527,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	items->push_back(item);
 }
 
-string ProcessProbe::GetDevicePath(dev_t tty) {
+string Process58Probe::GetDevicePath(dev_t tty) {
 	StringVector deviceDirs = this->GetDeviceSearchDirs();
 
 	// the last ditch fallback... search all of /dev
@@ -532,13 +548,13 @@ string ProcessProbe::GetDevicePath(dev_t tty) {
 			// leave off the entity, not halt the collection.  Don't show
 			// a message for ENOENT because /etc/ttysrch can list directories
 			// which don't exist, and we don't want to spam users...
-			Log::Message("ProcessProbe: Error occurred during search for device path under "+*iter+": "+strerror(errno));
+			Log::Message("Process58Probe: Error occurred during search for device path under "+*iter+": "+strerror(errno));
 	}
 
 	return "";
 }
 
-StringVector ProcessProbe::GetDeviceSearchDirs() {
+StringVector Process58Probe::GetDeviceSearchDirs() {
 	StringVector dirs;
 	string line;
 	ifstream file("/etc/ttysrch");
@@ -565,7 +581,7 @@ StringVector ProcessProbe::GetDeviceSearchDirs() {
 	return dirs;
 }
 
-bool ProcessProbe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &info, string &errMsg) {
+bool Process58Probe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &info, string &errMsg) {
 	errno = 0;
 	ifstream psinfoFile(psinfoFileName.c_str(), ios::in | ios::binary);
 
@@ -576,7 +592,7 @@ bool ProcessProbe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &inf
 		if (errno == ENOENT)
 			return false;
 
-		errMsg = "ProcessProbe: Error opening "+psinfoFileName+": "+strerror(errno);
+		errMsg = "Process58Probe: Error opening "+psinfoFileName+": "+strerror(errno);
 		return false;
 	}
 
@@ -584,7 +600,7 @@ bool ProcessProbe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &inf
 	psinfoFile.read((char*)&info, sizeof(psinfo_t));
 	
 	if (!psinfoFile) {
-		errMsg = "ProcessProbe: Error reading "+psinfoFileName;
+		errMsg = "Process58Probe: Error reading "+psinfoFileName;
 
 		// give errno a chance to tell us what happened.  If it's zero, we check
 		// how many bytes were read.  If too few, make up our own error message
@@ -603,7 +619,7 @@ bool ProcessProbe::ReadPSInfoFromFile(const string psinfoFileName, psinfo_t &inf
 
 #elif defined DARWIN
 
-void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
+void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items) {
   int i, mib[4];
   size_t length, count;
   char* data = NULL;
@@ -649,7 +665,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
     item->AppendMessage(new OvalMessage("The unix-def:process_probe for OSX currently only collects the command of the process and not the command line arguments.  Note that this may cause the number of processes collected to be inaccurate"));
     item->AppendElement(new ItemEntity("command", procdata[i].kp_proc.p_comm, OvalEnum::DATATYPE_STRING, true));
     item->AppendElement(new ItemEntity("exec_time", formattedExecTime));
-    item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER));
+    item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER, true));
     item->AppendElement(new ItemEntity("ppid", Common::ToString(procdata[i].kp_eproc.e_ppid), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("priority", Common::ToString(procdata[i].kp_proc.p_priority)));
     item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
@@ -666,7 +682,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 #endif
 
 #ifdef DARWIN
-bool ProcessProbe::CommandExists(string command, string &pid) {
+bool Process58Probe::CommandExists(string command, string &pid) {
   int i, mib[4];
   size_t length, count;
   bool exists = false;
@@ -705,7 +721,7 @@ bool ProcessProbe::CommandExists(string command, string &pid) {
   return exists;
 }
 #else
-bool ProcessProbe::CommandExists(string command, string &pid) {
+bool Process58Probe::CommandExists(string command, string &pid) {
 
 	bool exists = false;
 	string errMsg = "";
@@ -718,7 +734,7 @@ bool ProcessProbe::CommandExists(string command, string &pid) {
 
 	// Step into the /proc directory
 	if((proc = opendir("/proc")) == NULL) {
-		errMsg.append("ProcessProbe: Could not open /proc");
+		errMsg.append("Process58Probe: Could not open /proc");
 		throw ProbeException(errMsg);
 
 	} else {
@@ -744,15 +760,58 @@ bool ProcessProbe::CommandExists(string command, string &pid) {
 					break;
 				}
 			}
-		} // else
-    closedir(proc);
-  }
-  return exists;
+		}
+		closedir(proc);
+	} // else
+	return exists;
+}
+bool Process58Probe::CommandExists(string command, StringVector &pids) {
+
+	bool exists = false;
+	string errMsg = "";
+
+	// Process Parameters
+	char cmdline[CMDLINE_LEN + 1];
+
+	DIR *proc;
+	struct dirent *readProc;
+
+	// Step into the /proc directory
+	if((proc = opendir("/proc")) == NULL) {
+		errMsg.append("Process58Probe: Could not open /proc");
+		throw ProbeException(errMsg);
+
+	} else {
+
+		// Loop through all of the files - we're only concerned with those that
+		// start with a digit
+		while((readProc = readdir(proc)) != NULL) {
+			if(isdigit(readProc->d_name[0])) {
+				// Clear the ps values
+				memset(cmdline, 0, CMDLINE_LEN + 1);
+				errMsg = "";
+
+				// Retrieve the command line with arguments
+				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				if(status < 0) { 
+					closedir(proc);
+					throw ProbeException(errMsg);
+
+				// If the command line matches the input command line return true
+				} else if(status == 0 && command.compare(cmdline) == 0) {
+					exists = true;
+					pids.push_back(readProc->d_name);
+				}
+			}
+		}
+		closedir(proc);
+	} // else
+	return exists;
 }
 #endif 
 
 #ifdef DARWIN
-StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex){
+StringPairVector* Process58Probe::GetMatchingCommands(string pattern, bool isRegex){
   int i, mib[4];
   size_t length, count;
   char* data = NULL;
@@ -791,7 +850,7 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
   return commands;
 }
 #else
-StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex) {
+StringPairVector* Process58Probe::GetMatchingCommands(string pattern, bool isRegex) {
 	StringPairVector* commands = new StringPairVector();
 	string errMsg = "";
 
@@ -803,7 +862,7 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
 
 	// Step into the /proc directory
 	if((proc = opendir("/proc")) == NULL) {
-		errMsg.append("ProcessProbe: Could not open /proc");
+		errMsg.append("Process58Probe: Could not open /proc");
 		this->DeleteCommands(commands);
 		throw ProbeException(errMsg);
 
@@ -819,6 +878,7 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
 
 				// Retrieve the command line with arguments
 				int status = RetrieveCommandLine(readProc->d_name, cmdline, &errMsg);
+				
 				if(status < 0) { 
 					closedir(proc);
 					this->DeleteCommands(commands);
@@ -829,15 +889,15 @@ StringPairVector* ProcessProbe::GetMatchingCommands(string pattern, bool isRegex
 					commands->push_back(new pair<string,string>(cmdline, readProc->d_name));
 				}
 			}
-		} // else
-    closedir(proc);
-  }
+		}
+		closedir(proc);
+	} // else
 
-  return commands;
+	return commands;
 }
 #endif
 
-int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string *errMsg) {
+int Process58Probe::RetrieveCommandLine(const char *process, char *cmdline, string *errMsg) {
 	// Build the absolute path to the command line file
 	string cmdlinePath = "/proc/";
 	cmdlinePath.append(process);
@@ -851,7 +911,7 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 
 	// Open the file for reading
 	if((cmdlineFile = fopen(cmdlinePath.c_str(), "r")) == NULL) {
-		errMsg->append("ProcessProbe: Unable to obtain command line for pid: ");
+		errMsg->append("Process58Probe: Unable to obtain command line for pid: ");
 		errMsg->append(process);
 		return(-1);
 
@@ -887,7 +947,7 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 	return(0);
 }
 
-string ProcessProbe::FormatExecTime(time_t execTime) {
+string Process58Probe::FormatExecTime(time_t execTime) {
 
 	/**
 		This is the cumulative CPU time, formatted in [DD-]HH:MM:SS where DD is the number of days when execution time is 24 hours or more.
@@ -917,7 +977,7 @@ string ProcessProbe::FormatExecTime(time_t execTime) {
 	return sstr.str();
 }
 
-string ProcessProbe::FormatStartTime(time_t startTime) {
+string Process58Probe::FormatStartTime(time_t startTime) {
 
 	/** 
 		This is the time of day the process started formatted in HH:MM:SS if the 
@@ -957,7 +1017,7 @@ string ProcessProbe::FormatStartTime(time_t startTime) {
 	return startTimeStr;
 }
 
-void ProcessProbe::DeleteCommands(StringPairVector *commands) {
+void Process58Probe::DeleteCommands(StringPairVector *commands) {
 	if (commands == NULL) return;
 	
 	for(StringPairVector::iterator iter = commands->begin();

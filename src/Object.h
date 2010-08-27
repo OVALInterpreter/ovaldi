@@ -36,6 +36,7 @@
 #include "AbsObject.h"
 #include "ObjectEntity.h"
 #include "Behavior.h"
+#include "Filter.h"
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -90,6 +91,12 @@ public:
     /** Return TRUE if the input item matches the criteria specified by this object. */
     bool Analyze(Item* item);
 
+	/**
+	 * Returns the embedded filters.  The vector is owned by this object,
+	 * do not delete it.
+	 */
+	FilterVector* GetFilters();
+
     /** Return an object for the specified object id.
 		First the cache of Objects is checked. If the object is
 		not found in the cache the object is looked up in the
@@ -117,6 +124,7 @@ private:
 
 	AbsEntityVector elements;
 	BehaviorVector behaviors;
+	FilterVector filters;
 
     static ObjectMap objectCache;
 };

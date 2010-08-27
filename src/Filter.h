@@ -95,4 +95,17 @@ private:
 
 typedef std::vector<Filter*> FilterVector;
 
+/**
+ * A handy dandy functor to assist in the use of filters with
+ * STL algorithms.
+ */
+class FilterFunctor
+{
+public:
+	FilterFunctor(Filter *filter):filter(filter){}
+	bool operator()(Item *item);
+private:
+	Filter *filter;
+};
+
 #endif

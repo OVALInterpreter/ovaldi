@@ -63,7 +63,7 @@ class PortProbe : public AbsProbe {
          *  @param pid A unsigned long integer that contains the pid value of a Windows port.
          *  @return A Item representing a Windows port.
          */
-        Item* BuildPortItem ( string localAddressStr , unsigned long localPort , string protocolStr , unsigned long pid );
+        Item* BuildPortItem ( string localAddressStr , unsigned long localPort , string remoteAddressStr , unsigned long remotePort , string protocolStr , unsigned long pid );
 
         /** Retrieve a particular port from the instance of the ItemVector using the port's local address, port value, and protocol as the key.
          *  @param localAddressStr A string that contains the local address of a Windows port in dotted-quad notation.

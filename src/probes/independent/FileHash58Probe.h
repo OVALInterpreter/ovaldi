@@ -27,67 +27,55 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
-#ifndef SHADOWPROBE_H
-#define SHADOWPROBE_H
 
+#ifndef FILEHASH58PROBE_H
+#define FILEHASH58PROBE_H
+
+#include "FileFinder.h"
 #include "AbsProbe.h"
-#include "Item.h"
-#include "Object.h"
-#include <shadow.h>
-#include <string>
-#include <map>
-
+#include <Digest.h>
 
 /**
-	This class is responsible for collecting information about unix shadow_objects.
+	This class is responsible for collecting file hash data.
+	This class should be platform independant.
 */
-class ShadowProbe : public AbsProbe {
+class FileHash58Probe : public AbsProbe {
 
-	public:
-
-	virtual ~ShadowProbe();
-
-	/** Get all the files on the system that match the pattern and collect their attributes. */
+public:
+	virtual ~FileHash58Probe();
+	
+	/** Get all the files on the system that match the pattern and generate and md5 and sha1 */
 	virtual ItemVector* CollectItems(Object* object);
 
-	/** Return a new Item created for storing file information */
-	virtual Item* CreateItem();
-
-	/** Ensure that the ShadowProbe is a singleton. */
+	/** Ensure that the FileHashProbe is a singleton. */
 	static AbsProbe* Instance();
 
-	private:
+private:
+	FileHash58Probe();
 
-	ShadowProbe();
+	/** Return a new Item created for storing file hash information */
+	virtual Item* CreateItem();
 
-	/** Creates an item from a spwd struct */
-	Item *CreateItemFromPasswd(const struct spwd *pwInfo);
-
-	/**
-	 * Attempts to determine the encryption method used on the given
-	 * encrypted password.  An empty string is returned if the method
-	 * could not be determined.
-	 */
-	std::string FindPasswordEncryptMethod(const std::string &password);
-
-	/** Finds a single item by name. */
-	Item *GetSingleItem(const std::string& username);
-
-	/** Finds multiple items according to the given object entity. */
-	ItemVector *GetMultipleItems(Object *shadowObject);
-
-	/** Singleton instance */
-	static ShadowProbe* instance;
+	static FileHash58Probe* instance;
 
 	/**
-	 * A lookup table for names of encryption methods which are specified
-	 * via an encrypted password that starts with "$...$".  The value in
-	 * between the dollar signs is the key lookup into this map.
+	 * Computes the given digest for the given file and updates
+	 * the given item and item entity.
 	 */
-	static std::map<std::string, std::string> dollarEncryptMethodTypes;
+	void GetDigest(const std::string& filePath,
+					Item* item,
+					const std::string &digestName);
 
-	/** Populates the #dollarEncryptMethodTypes mapping */
-	static void PopulateDollarEncryptMethodTypes();
+	/**
+	 * Given a digest name as defined in the oval schema (e.g.
+	 * ind-def:EntityObjectHashTypeType), return the corresponding
+	 * enumerator from Digest::DigestType.
+	 */
+	Digest::DigestType digestTypeForName(const std::string &digestName);
+
+	Digest digest;
+
+	StringVector allDigestTypeNames;
 };
 
 #endif

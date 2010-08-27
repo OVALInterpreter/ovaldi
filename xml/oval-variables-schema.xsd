@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-var="http://oval.mitre.org/XMLSchema/oval-variables-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-variables-5" elementFormDefault="qualified" version="5.7">
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-var="http://oval.mitre.org/XMLSchema/oval-variables-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-variables-5" elementFormDefault="qualified" version="5.8">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation/>
-          <xsd:documentation>The following is a description of the elements, types, and attributes that compose the core schema for encoding Open Vulnerability and Assessment Language (OVAL) Variables. This schema provided to give structure to any external variables and their values that an OVAL definition is expecting.</xsd:documentation>
+          <xsd:documentation>The following is a description of the elements, types, and attributes that compose the core schema for encoding Open Vulnerability and Assessment Language (OVAL) Variables. This schema is provided to give structure to any external variables and their values that an OVAL Definition is expecting.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Variable</schema>
-               <version>5.7</version>
-               <date>5/3/2010 8:41:19 PM</date>
-                <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
-              <sch:ns prefix="oval-var" uri="http://oval.mitre.org/XMLSchema/oval-system-variables-5"/>
+               <version>5.8 Release Candidate 1</version>
+               <date>8/19/2010 10:28:50 AM</date>
+               <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+              <sch:ns prefix="oval-var" uri="http://oval.mitre.org/XMLSchema/oval-variables-5"/>
           </xsd:appinfo>
      </xsd:annotation>
      <!-- =============================================================================== -->
@@ -23,7 +23,7 @@
           </xsd:annotation>
           <xsd:complexType>
                <xsd:sequence>
-                    <xsd:element name="generator" type="oval:GeneratorType" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="generator" type="oval:GeneratorType" />
                     <xsd:element name="variables" type="oval-var:VariablesType" minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
                </xsd:sequence>
@@ -62,16 +62,9 @@
                <xsd:element name="value" type="xsd:anySimpleType" minOccurs="1" maxOccurs="unbounded"/>
           </xsd:sequence>
           <xsd:attribute name="id" type="oval:VariableIDPattern" use="required"/>
-          <xsd:attribute name="datatype" type="oval:DatatypeEnumeration" use="required">
+          <xsd:attribute name="datatype" use="required" type="oval:SimpleDatatypeEnumeration">
                <xsd:annotation>
                     <xsd:documentation>Note that the 'record' datatype is not permitted on variables.</xsd:documentation>
-                    <xsd:appinfo>
-                         <sch:pattern id="oval-var_allowed_datatypes">
-                              <sch:rule context="oval-var:variables/oval-var:variable">
-                                   <sch:assert test="not(@datatype='record')"><sch:value-of select="@id"/> - The 'record' datatype is prohibited on variables.</sch:assert>
-                              </sch:rule>
-                         </sch:pattern>
-                    </xsd:appinfo>
                </xsd:annotation>
           </xsd:attribute>
           <xsd:attribute name="comment" type="xsd:string" use="required"/>

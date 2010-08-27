@@ -29,25 +29,22 @@
 //****************************************************************************************//
 #include "Directive.h"
 
+using namespace std;
+XERCES_CPP_NAMESPACE_USE
+
 //
 // Static members
 //
-std::map<OvalEnum::ResultEnumeration, Directive *> Directive::directives;
+map<OvalEnum::ClassEnumeration, DirectiveMap> Directive::directives;
+bool Directive::includeSource = true;
 
-std::map<OvalEnum::ResultEnumeration, Directive *> Directive::GetDirectives() {
-	return directives;
+Directive Directive::GetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::ResultEnumeration key) {
+	return *directives[classEnum][key];
 }
 
-Directive Directive::GetDirective(OvalEnum::ResultEnumeration key) {
-	return *directives[key];
-}
 
-void Directive::SetDirectives(std::map<OvalEnum::ResultEnumeration, Directive *> value) {
-	directives = value;
-}
-
-void Directive::SetDirective(OvalEnum::ResultEnumeration key, Directive directive) {
-	directives[key] = &directive;
+void Directive::SetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::ResultEnumeration key, Directive directive) {
+	directives[classEnum][key] = &directive;
 }
 
 void Directive::LoadDirectives() {
@@ -59,35 +56,56 @@ void Directive::LoadDirectives() {
 		// If it fails to load the configuration document, load default directives
 		Log::Debug("Unable to load directives configuration file.  Using default directives.");
 		directives.clear();
-		directives[OvalEnum::RESULT_TRUE] = new Directive(OvalEnum::RESULT_TRUE);
-		directives[OvalEnum::RESULT_FALSE] = new Directive(OvalEnum::RESULT_FALSE);
-		directives[OvalEnum::RESULT_UNKNOWN] = new Directive(OvalEnum::RESULT_UNKNOWN);
-		directives[OvalEnum::RESULT_ERROR] = new Directive(OvalEnum::RESULT_ERROR);
-		directives[OvalEnum::RESULT_NOT_EVALUATED] = new Directive(OvalEnum::RESULT_NOT_EVALUATED);
-		directives[OvalEnum::RESULT_NOT_APPLICABLE] = new Directive(OvalEnum::RESULT_NOT_APPLICABLE);
+		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE] = new Directive(OvalEnum::RESULT_TRUE);
+		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_FALSE] = new Directive(OvalEnum::RESULT_FALSE);
+		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_UNKNOWN] = new Directive(OvalEnum::RESULT_UNKNOWN);
+		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_ERROR] = new Directive(OvalEnum::RESULT_ERROR);
+		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_NOT_EVALUATED] = new Directive(OvalEnum::RESULT_NOT_EVALUATED);
+		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_NOT_APPLICABLE] = new Directive(OvalEnum::RESULT_NOT_APPLICABLE);
 		return;
 	}
 
 	// Read the XML and create appropriate Directive objects.
-	DOMElement* directivesElem = XmlCommon::FindElement(config, "directives");
-	DOMNodeList* directiveNodes = directivesElem->getChildNodes();
-	for (unsigned int i = 0; i < directiveNodes->getLength(); i++) {
-		DOMNode* node = directiveNodes->item(i);
-		
-		if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
-			try {
-				string nodeName = XmlCommon::GetElementName((DOMElement*)node);
-				string strContent = XmlCommon::GetAttributeByName((DOMElement*)node, "content");
-				string strReported = XmlCommon::GetAttributeByName((DOMElement*)node, "reported");
-				OvalEnum::ResultEnumeration result = OvalEnum::ToResult(nodeName);
-				OvalEnum::ResultContent content = OvalEnum::ToResultContent(strContent);
-				bool reported = (strReported == "false") ? false : true;
-				directives[result] = new Directive(result, reported, content);
-			} catch (Exception e) {
-				string msg = "Error reading directive from configuration file: " + e.GetErrorMessage();
-				Log::Message(msg);
-				cout << msg << endl;
+	
+	DOMElement* directivesElem = XmlCommon::FindElement(config, "oval_directives");
+	DOMNodeList* directiveClassNodes = directivesElem->getChildNodes();
+	for (unsigned int j = 0; j < directiveClassNodes->getLength(); j++) {
+		DOMNode* classNode = directiveClassNodes->item(j);
+		if (classNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+			DOMElement* classElem = (DOMElement*)classNode;
+
+			// Find the type/class of the directive
+			string elemName = XmlCommon::GetElementName(classElem);
+			OvalEnum::ClassEnumeration defClass = OvalEnum::CLASS_DEFAULT;
+			if (elemName.compare("class_directives") == 0) {
+				defClass = OvalEnum::ToClass(XmlCommon::GetAttributeByName(classElem, "class"));
+			} else if (elemName.compare("directives") == 0) {
+				includeSource = (XmlCommon::GetAttributeByName(classElem, "include_source_definitions") != "false");
+			} else {
 				continue;
+			}
+
+			// Loop through the definition types for the current set of directives
+			DOMNodeList* directiveNodes = classElem->getChildNodes();
+			for (unsigned int i = 0; i < directiveNodes->getLength(); i++) {
+				DOMNode* node = directiveNodes->item(i);
+		
+				if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
+					try {
+						string nodeName = XmlCommon::GetElementName((DOMElement*)node);
+						string strContent = XmlCommon::GetAttributeByName((DOMElement*)node, "content");
+						string strReported = XmlCommon::GetAttributeByName((DOMElement*)node, "reported");
+						OvalEnum::ResultEnumeration result = OvalEnum::ToResult(nodeName);
+						OvalEnum::ResultContent content = OvalEnum::ToResultContent(strContent);
+						bool reported = (strReported == "false") ? false : true;
+						directives[defClass][result] = new Directive(result, reported, content);
+					} catch (Exception e) {
+						string msg = "Error reading directive from configuration file: " + e.GetErrorMessage();
+						Log::Message(msg);
+						cout << msg << endl;
+						continue;
+					}
+				}
 			}
 		}
 	}
@@ -97,9 +115,11 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 	//
 	// Update <directives> tag in results with correct settings
 	//
-	DOMElement* directivesElem = XmlCommon::FindElement(resultsDoc, "directives");
+	DOMElement* ovalResultsElem = XmlCommon::FindElement(resultsDoc, "oval_results");
+	DOMElement* directivesElem = XmlCommon::FindElement(ovalResultsElem, "directives");
+	DOMElement* ovalElem = XmlCommon::FindElement(ovalResultsElem, "oval_definitions");
 	DOMNodeList* directiveNodes = directivesElem->getChildNodes();
-	bool skip = true;
+	bool skip = includeSource;
 	for (unsigned int i = 0; i < directiveNodes->getLength(); i++) {
 		DOMNode* node = directiveNodes->item(i);
 
@@ -107,7 +127,7 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 			try {
 				string nodeName = XmlCommon::GetElementName((DOMElement*)node);
 				OvalEnum::ResultEnumeration result = OvalEnum::ToResult(nodeName);
-				Directive directive = Directive::GetDirective(result);
+				Directive directive = Directive::GetDirective(OvalEnum::CLASS_DEFAULT, result);
 				XmlCommon::AddAttribute((DOMElement*)node, "content", OvalEnum::ResultContentToString(directive.GetResultContent()));
 				XmlCommon::AddAttribute((DOMElement*)node, "reported", (directive.GetReported() ? "true" : "false"));
 
@@ -122,6 +142,28 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 		}
 	}
 
+	// Insert any class_directives elements that override the default directives
+	std::map<OvalEnum::ClassEnumeration, DirectiveMap>::iterator i;
+	for (i = directives.begin(); i != directives.end(); i++) {
+		OvalEnum::ClassEnumeration defClass = i->first;
+		if (defClass == OvalEnum::CLASS_DEFAULT) {
+			continue;
+		}
+		
+		skip = false;
+		DOMElement* classElem = XmlCommon::CreateElement(resultsDoc, "class_directives");
+		XmlCommon::AddAttribute(classElem, "class", OvalEnum::ClassToString(defClass));
+		ovalResultsElem->insertBefore(classElem, ovalElem);
+		for (DirectiveMap::iterator j = i->second.begin(); j != i->second.end(); j++) {
+			string defType = OvalEnum::ResultToDirectiveString(j->first);
+			DOMElement* defElem = XmlCommon::AddChildElement(resultsDoc, classElem, defType);
+			XmlCommon::AddAttribute(defElem, "content", OvalEnum::ResultContentToString(j->second->GetResultContent()));
+			XmlCommon::AddAttribute(defElem, "reported", j->second->GetReported() ? "true" : "false");
+		}
+	}
+
+	XmlCommon::AddAttribute(directivesElem, "include_source_definitions", includeSource ? "true" : "false");
+
 	// If all of the directives are set to their default settings, skip
 	// this process because it won't change anything.
 	if (skip) {
@@ -130,8 +172,7 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 
 	// Recurse into several elements checking for references
 	map<string,map<string, Directive::ElementType> > references;
-	DOMElement* ovalElem = XmlCommon::FindElement(resultsDoc, "oval_definitions");
-	DOMElement* resultsElem = XmlCommon::FindElement(resultsDoc, "results");
+	DOMElement* resultsElem = XmlCommon::FindElement(ovalResultsElem, "results");
 	DOMElement* systemElem = XmlCommon::FindElement(resultsElem, "system");
 	DOMElement* systemCharElem = XmlCommon::FindElement(systemElem, "oval_system_characteristics");
 	Directive::BuildReferences(XmlCommon::FindElement(ovalElem, "variables"), &references, Directive::ELEMENT_VARIABLE, "id");
@@ -143,6 +184,20 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 	Directive::BuildReferences(XmlCommon::FindElement(systemCharElem, "collected_objects"), &references, Directive::ELEMENT_OBJECT, "id");
 	//Directive::BuildReferences(XmlCommon::FindElement(systemCharElem, "system_data"), &references, Directive::ELEMENT_ITEM, "id");
 
+	// Build a map of each definition and its class
+	map<string, OvalEnum::ClassEnumeration> definitionClass;
+	DOMElement* ovalDefinitionsElem = XmlCommon::FindElement(ovalElem, "definitions");
+	DOMNodeList* ovalDefinitionNodes = ovalDefinitionsElem->getChildNodes();
+	for (unsigned int i = 0; i < ovalDefinitionNodes->getLength(); i++) {
+		DOMNode* node = ovalDefinitionNodes->item(i);
+
+		if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
+			string defId = XmlCommon::GetAttributeByName((DOMElement*)node, "id");
+			OvalEnum::ClassEnumeration defClass = OvalEnum::ToClass(XmlCommon::GetAttributeByName((DOMElement*)node, "class"));
+			definitionClass[defId] = defClass;
+		}
+	}
+
 	// Loop through all definitions and mark them (and any referenced definitions) with the
 	// appropriate ResultContent value.
 	map<string, OvalEnum::ResultContent> contentType;
@@ -153,12 +208,16 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 
 		if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
 			// Gather necessary information about this definition
+			string defId = XmlCommon::GetAttributeByName((DOMElement*)node, "definition_id");
 			string strResult = XmlCommon::GetAttributeByName((DOMElement*)node, "result");
 			OvalEnum::ResultEnumeration result = OvalEnum::ToResult(strResult);
-			Directive directive = Directive::GetDirective(result);
+
+			Directive directive = Directive::GetDirective(OvalEnum::CLASS_DEFAULT, result);
+			if (directives.find(definitionClass[defId]) != directives.end()) {
+				directive = Directive::GetDirective(definitionClass[defId], result);
+			}
 
 			if (directive.GetReported()) {
-				string defId = XmlCommon::GetAttributeByName((DOMElement*)node, "definition_id");
 				OvalEnum::ResultContent content = directive.GetResultContent();
 				contentType[defId] = OvalEnum::CombineResultContent(contentType[defId], content);
 
@@ -219,6 +278,12 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 			systemCharElem->removeChild(dataElem);
 			dataElem->release();
 		}
+	}
+
+	// Remove definitions if desired
+	if (!includeSource) {
+		ovalResultsElem->removeChild(ovalElem);
+		ovalElem->release();
 	}
 
 	if (!XmlCommon::HasChildElements(systemDefinitionsElem)) {

@@ -350,26 +350,16 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 
 		XmlCommon::AddAttribute(newItemElem, "xmlns", this->GetXmlns());	
 
-		// Add any messges
+		// Add any messges.  As of v5.8, no more than 50 are allowed per item.
 		if(this->GetMessages()->size() > 0) {
-			string msgStr = "";
-            OvalMessageVector::iterator messageIterator;
-			for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
-				OvalMessage* message = (*messageIterator);
-                msgStr.append(message->GetValue());
-                if((messageIterator+1) != this->GetMessages()->end())
-                    msgStr.append(" - ");
-			}
-
-            // TODO - clean this up and allow many messages on an item.
-            OvalMessage message(msgStr, this->GetMessages()->at(0)->GetLevel());
-			message.Write(scFile, newItemElem, "oval-sc");
-
-			/*OvalMessageVector::iterator messageIterator;
-			for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
+			OvalMessageVector::iterator messageIterator;
+			int messageCounter;
+			for(messageIterator = this->GetMessages()->begin(), messageCounter = 0;
+				messageIterator != this->GetMessages()->end() && messageCounter < 50;
+				messageIterator++, messageCounter++) {
 				OvalMessage* message = (*messageIterator);
 				message->Write(scFile, newItemElem, "oval-sc");
-			}*/
+			}
 		}
 
 		// Call the write method for each element

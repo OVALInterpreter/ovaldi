@@ -43,6 +43,7 @@
 #include "ItemEntity.h"
 #include "Object.h"
 #include "ObjectEntity.h"
+#include "Filter.h"
 
 
 class Object;
@@ -130,6 +131,8 @@ protected:
 	REGEX *myMatcher;
 	
 private:
+	void ApplyFilters(ItemVector* items, FilterVector* filters);
+
 	/** 
 		Cache all items in the vector of items.
 		Called by the AbsProbe::Run(Object* object) to ensure that all Items return by a probe
