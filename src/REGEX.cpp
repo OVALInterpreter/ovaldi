@@ -423,7 +423,12 @@ void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& search
 					match.push_back("");
 
 			matches.push_back(match);
-			matchOffset = ovector[1];
+
+			// Make sure we add at least one to the offset, so we don't
+			// loop infinitely matching in the same place.  This does not
+			// perfectly mimic Perl, but it's simple and prevents infinite
+			// loops...
+			matchOffset = ovector[1] == matchOffset ? ovector[1]+1 : ovector[1];
 
 		} else if (matchCount == 0) {
 			pcre_free(re);
@@ -442,7 +447,7 @@ void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& search
 			throw REGEXException(errMsg);
 		}
 
-	} while(matchCount > 0);
+	} while(matchCount > 0 && matchOffset < searchString.size());
 
 	pcre_free(re);
 	delete[] ovector;
