@@ -157,7 +157,7 @@ void PasswordPolicyProbe::ArePasswordComplexityReverseEncryptionSet(std::string 
 		}
 		string filename = string(tempdir) + "\\ovaldi_secedit_temp.txt";
 		if((ret = system(string("secedit.exe /export /quiet /areas SECURITYPOLICY /cfg " + filename).c_str())) != 0) {
-			throw Exception("Error: Unable to export local password policies: secedit.exe returned " + ret);
+            throw Exception("Error: Unable to export local password policies: secedit.exe returned " + Common::ToString(ret));
 		}
 		
 		// Open exported security policy text file
