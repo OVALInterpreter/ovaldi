@@ -447,7 +447,7 @@ void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& search
 			throw REGEXException(errMsg);
 		}
 
-	} while(matchCount > 0 && matchOffset < searchString.size());
+	} while(matchCount > 0 && matchOffset < (int)searchString.size());
 
 	pcre_free(re);
 	delete[] ovector;
