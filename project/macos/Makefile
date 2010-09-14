@@ -40,7 +40,7 @@ MACOSPROBEDIR = ${SRCDIR}/probes/macos
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
 CURRENTDIR = ../project/macos
 
-INCDIRS = -I$(MACOSDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/usr/include -I/usr/local/include
+INCDIRS = -I$(MACOSDIR) -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/usr/include -I/usr/local/include -I/opt/local/include
 
 EXECUTABLE = $(OUTDIR)/ovaldi
 
@@ -53,7 +53,7 @@ endif
 # General options that should be used by g++.
 CPPFLAGS = -Wall -O
 
-LIBDIR = -L/usr/lib -L/usr/local/lib
+LIBDIR = -L/opt/local/lib -L/usr/lib -L/usr/local/lib
 
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -llber
@@ -163,6 +163,7 @@ OBJS = \
 	FamilyProbe.obj \
 	FileMd5Probe.obj \
 	FileHashProbe.obj \
+	FileHash58Probe.obj \
 	VariableProbe.obj \
 	PasswordProbe.obj \
 	TextFileContent54Probe.obj \
@@ -269,6 +270,7 @@ REL_OBJS = \
 	$(BUILDDIR)/FamilyProbe.obj \
 	$(BUILDDIR)/FileMd5Probe.obj \
 	$(BUILDDIR)/FileHashProbe.obj \
+	$(BUILDDIR)/FileHash58Probe.obj \
 	$(BUILDDIR)/VariableProbe.obj \
 	$(BUILDDIR)/PasswordProbe.obj \
 	$(BUILDDIR)/TextFileContent54Probe.obj \
