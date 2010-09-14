@@ -73,6 +73,14 @@ class VolumeProbe : public AbsProbe {
          */
         string GetPathName ( string volumeNameStr );
 
+		/**
+		 * Convert a DriveTypeEnumeration into a string
+		 *
+		 * @param OvalEnum::DriveTypeEnumeration driveTypeEnum
+		 * @return std::string
+		 **/
+		static std::string DriveTypeToString(UINT driveType);
+
         /** The static instance of the VolumeProbe.
         All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes. */
         static VolumeProbe *instance;

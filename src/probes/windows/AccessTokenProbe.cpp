@@ -305,6 +305,8 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 			item->AppendElement(sedenyremoteInteractivelogonright);
 			ItemEntity* sedenyservicelogonright = new ItemEntity("sedenyservicelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedenyservicelogonright);
+			ItemEntity* setrustedcredmanaccessnameright = new ItemEntity("setrustedcredmanaccessnameright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			item->AppendElement(setrustedcredmanaccessnameright);
 
 			// Alter the access mask to show the correct rights.
 			char tmpPrivBuf[128];
@@ -390,6 +392,8 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 					sedenynetworklogonright->SetValue("1");
 				else if (_strnicmp(tmpPrivBuf, "SeDenyServiceLogonRight", 23) == 0)
 					sedenyservicelogonright->SetValue("1");
+				else if (_strnicmp(tmpPrivBuf, "SeTrustedCredManAccessPrivilege", 31) == 0)
+					setrustedcredmanaccessnameright->SetValue("1");
 				else if (_strnicmp(tmpPrivBuf, "SeDenyRemoteInteractiveLogonRight", 33) == 0)
 					sedenyremoteInteractivelogonright->SetValue("1");
 				else if (_strnicmp(tmpPrivBuf, "SeInteractiveLogonRight", 23) == 0)

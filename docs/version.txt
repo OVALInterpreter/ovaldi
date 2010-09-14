@@ -37,6 +37,10 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 
 * Added support for an unbounded filter element in all objects.
 * Added support for the OVAL 5.8 directives schema.
+* Added support for retrieving values for some items in the PasswordPolicyProbe from the local group policy.
+* Added support for SeTrustedCredManAccessPrivilege in accesstoken_state and accesstoken_item.
+* Added support for drive_type in volume_state and volume_item.
+* Fixed the TextFileContent54 probe so that the "multiline" behavior is correctly applied by default.
 
 ---------------------------------------
 ---        Version 5.7 build 2      ---

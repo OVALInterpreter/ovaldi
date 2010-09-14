@@ -155,6 +155,7 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
             bool fileSupportsEncryption = false;
             bool fileNamedStreams = false;
             bool fileReadOnlyVolume = false;
+			UINT driveType = 0;
 
             if ( ( fileSystemFlags & FILE_CASE_SENSITIVE_SEARCH ) == FILE_CASE_SENSITIVE_SEARCH ) {
                 fileCaseSensistiveSearch = true;
@@ -211,11 +212,14 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
             if ( ( fileSystemFlags & FILE_READ_ONLY_VOLUME ) == FILE_READ_ONLY_VOLUME ) {
                 fileReadOnlyVolume = true;
             }
+			
+			driveType = GetDriveType(rootPathStr.c_str());
 
             item->SetStatus ( OvalEnum::STATUS_EXISTS );
 			( rootPathStr.compare("") == 0 ) ? item->AppendElement ( new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "rootpath" , rootPathStr, OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS )  );
             ( fileSystemNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "file_system" , "" , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "file_system" , fileSystemNameBuffer , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS )  );
             ( volumeNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "name" , "" , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "name" , volumeNameBuffer , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS )  );
+			item->AppendElement ( new ItemEntity ( "drive_type" , this->DriveTypeToString ( driveType ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "volume_max_component_length" , Common::ToString ( maximumComponentLength ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "serial_number" , Common::ToString ( volumeSerialNumber ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "file_case_sensitive_search" , Common::ToString ( fileCaseSensistiveSearch ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
@@ -332,4 +336,33 @@ void VolumeProbe::GetAllVolumes(StringSet &volumes) {
 			throw ProbeException ( "Error: FindVolumeClose() was unable to close the search handle opened by FindFirstVolume(). Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 		}
     }
+}
+
+std::string VolumeProbe::DriveTypeToString(UINT driveType) {
+	switch(driveType) {
+		case (DRIVE_UNKNOWN):
+			return "DRIVE_UNKNOWN";
+			break;
+		case (DRIVE_NO_ROOT_DIR):
+			return "DRIVE_NO_ROOT_DIR";
+			break;
+		case (DRIVE_REMOVABLE):
+			return "DRIVE_REMOVABLE";
+			break;
+		case (DRIVE_FIXED):
+			return "DRIVE_FIXED";
+			break;
+		case (DRIVE_REMOTE):
+			return "DRIVE_REMOTE";
+			break;
+		case (DRIVE_CDROM):
+			return "DRIVE_CDROM";
+			break;
+		case (DRIVE_RAMDISK):
+			return "DRIVE_RAMDISK";
+			break;
+		default:
+			throw Exception("VolumeProbe::DriveTypeToString - Error unsupported driveType value.");
+			break;
+	}
 }

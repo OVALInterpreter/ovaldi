@@ -302,15 +302,15 @@ void TextFileContent54Probe::GetMatches(const string& path,
 }
 
 int TextFileContent54Probe::Behaviors2MatchOptions(BehaviorVector *behaviors) {
-	int opts = 0;
+	int opts = REGEX::MULTILINE;
 
 	for (BehaviorVector::iterator iter = behaviors->begin();
 		iter != behaviors->end();
 		++iter) {
 		if ((*iter)->GetName() == "ignore_case" && (*iter)->GetValue() == "true")
 			opts |= REGEX::IGNORE_CASE;
-		else if ((*iter)->GetName() == "multiline" && (*iter)->GetValue() == "true")
-			opts |= REGEX::MULTILINE;
+		else if ((*iter)->GetName() == "multiline" && (*iter)->GetValue() == "false")
+			opts &= !REGEX::MULTILINE;
 		else if ((*iter)->GetName() == "singleline" && (*iter)->GetValue() == "true")
 			opts |= REGEX::SINGLELINE;
 	}
