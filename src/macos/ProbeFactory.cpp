@@ -49,7 +49,9 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileMd5Probe::Instance();
 	} else if(objectName.compare("filehash_object") == 0) {
 		probe = FileHashProbe::Instance();
-	} else if(objectName.compare("environmentvariable_object") == 0) {
+	}else if(objectName.compare("filehash58_object") == 0) {
+	        probe = FileHash58Probe::Instance();
+        } else if(objectName.compare("environmentvariable_object") == 0) {
 		probe = EnvironmentVariableProbe::Instance();
 	} else if(objectName.compare("textfilecontent_object") == 0) {
 		probe = TextFileContentProbe::Instance();
