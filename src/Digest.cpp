@@ -164,7 +164,7 @@ int Digest::getDigest(DigestType digestType) {
 			return GCRY_MD_SHA1;
 // libgcrypt which comes with solaris 10 doesn't define
 // a constant for sha-224.
-#if not defined SUNOS
+#if !defined SUNOS
 
 		case SHA224:
 			return GCRY_MD_SHA224;
