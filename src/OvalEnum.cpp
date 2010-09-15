@@ -1174,3 +1174,5 @@ std::string OvalEnum::ClassToString(OvalEnum::ClassEnumeration classEnum) {
 			break;
 	}
 }
+
+
