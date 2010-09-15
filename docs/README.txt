@@ -22,11 +22,7 @@ computers as you wish.
 
 BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE TERMS AND 
 CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS, DO NOT USE THE OVAL 
-INTERPRETER.
-
-For more information, please refer to the terms.txt file or: 
-http://oval.mitre.org/oval/about/bsd_license.html 
-
+INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
 -- CONTENTS --
 
@@ -679,8 +675,6 @@ OVAL Interpreter SourceForge Site -- http://sourceforge.net/projects/ovaldi/
 OVAL Repository -- http://oval.mitre.org/repository/
 
 OVAL Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
-
-OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
 OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?title=Main_Page
 

@@ -23,7 +23,7 @@ file included with the OVAL Interpreter, or the OVAL Web site.
 BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE
 TERMS AND CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS,
 DO NOT USE THE OVAL INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED
-WITH THE OVAL INTERPRETER, OR http://oval.mitre.org/oval/about/bsd_license.html.
+WITH THE OVAL INTERPRETER.
 
 
 -- CONTENTS --
@@ -279,8 +279,6 @@ Interpreter, and the OVAL Definitions document that was used.
 OVAL Web site -- http://oval.mitre.org
 
 OVAL Interpreter Source Code -- http://sourceforge.net/projects/ovaldi/files/
-
-OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
 
 OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?title=Main_Page
 
