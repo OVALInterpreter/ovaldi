@@ -7,7 +7,7 @@
           <xsd:appinfo>
                <schema>CatOS System Characteristics</schema>
                <version>5.8</version>
-               <date>9/14/2010 5:11:29 AM</date>
+               <date>9/15/2010 1:55:33 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="catos-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos"/>

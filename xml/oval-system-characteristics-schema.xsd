@@ -8,7 +8,7 @@
         <xsd:appinfo>
             <schema>Core System Characteristics</schema>
             <version>5.8</version>
-            <date>9/14/2010 5:11:32 AM</date>
+            <date>9/15/2010 1:55:34 PM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -346,7 +346,7 @@
                         <!--<sch:assert test="if (@datatype='float') then (matches(., '^[+\-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$|^NaN$|^INF$|^\-INF$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of float.</sch:assert>-->
                         <!--<sch:assert test="if (@datatype='int') then (matches(., '^[+\-]?[0-9]+$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of int.</sch:assert>-->
                     </sch:rule>
-                    <sch:rule context="oval-sc:system_data/*/*[not(@xsi:nil='true') and @datatype='int']|oval-sc:system_data/*/*/*[not(@xsi:nil='true') and @datatype='int']">
+                    <sch:rule context="oval-sc:system_data/*/*[not(@xsi:nil=true()) and @datatype='int']|oval-sc:system_data/*/*/*[not(@xsi:nil=true()) and @datatype='int']">
                         <sch:assert test="(not(contains(.,'.'))) and (number(.) = floor(.))"><sch:value-of select="../@id"/> - The datatype for the <sch:value-of select="name()"/> entity is 'int' but the value is not an integer.</sch:assert>
                         <!--  Must test for decimal point because number(x.0) = floor(x.0) is true -->                        
                     </sch:rule>

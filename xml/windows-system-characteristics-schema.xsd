@@ -7,7 +7,7 @@
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
                <version>5.8</version>
-               <date>9/14/2010 5:11:34 AM</date>
+               <date>9/15/2010 1:55:35 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -27,7 +27,7 @@
                          <xsd:sequence>
                               <xsd:element name="security_principle" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>Security principals include users or groups with either local or domain accounts, and computer accounts created when a computer joins a domain. In Windows, security principals are case-insensitive. As a result, it is recommended that the case-insensitive operations are used for this entity. User rights and permissions to access objects such as Active Directory objects, files, and registry settings are assigned to security principals. In a domain environment, security principals should be identified in the form: "domain\trustee name". For local security principals use: "computer name\trustee name". For built-in accounts on the system, use the trustee name without a domain.</xsd:documentation>
+                                        <xsd:documentation>Security principles include users or groups with either local or domain accounts, and computer accounts created when a computer joins a domain. In Windows, security principles are case-insensitive. As a result, it is recommended that the case-insensitive operations are used for this entity. User rights and permissions to access objects such as Active Directory objects, files, and registry settings are assigned to security principles. In a domain environment, security principles should be identified in the form: "domain\trustee name". For local security principles use: "computer name\trustee name". For built-in accounts on the system, use the trustee name without a domain.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="seassignprimarytokenprivilege" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
@@ -142,7 +142,7 @@
                               </xsd:element>
                               <xsd:element name="serestoreprivilege" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>If this privilege is enabled, it allows a user to circumvent file and directory permissions when restoring backed-up files and directories and to set any valid security principal as the owner of an object.</xsd:documentation>
+                                        <xsd:documentation>If this privilege is enabled, it allows a user to circumvent file and directory permissions when restoring backed-up files and directories and to set any valid security principle as the owner of an object.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="sesecurityprivilege" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
@@ -294,7 +294,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_aditemrelative_dn">
                                                   <sch:rule context="win-sc:activedirectory_item/win-sc:relative_dn">
-                                                       <sch:assert test="not(@xsi:nil='true') or ../win-sc:attribute/@xsi:nil='true'"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
+                                                       <sch:assert test="not(@xsi:nil=true()) or ../win-sc:attribute/@xsi:nil=true()"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -347,7 +347,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_activedirectory57_item_relative_dn">
                                                   <sch:rule context="win-sc:activedirectory57_item/win-sc:relative_dn">
-                                                       <sch:assert test="not(@xsi:nil='true') or ../win-sc:attribute/@xsi:nil='true'"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
+                                                       <sch:assert test="not(@xsi:nil=true()) or ../win-sc:attribute/@xsi:nil=true()"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -1627,7 +1627,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_regitemkey">
                                                   <sch:rule context="win-sc:registry_item/win-sc:key">
-                                                       <sch:assert test="not(@xsi:nil='true') or ../win-sc:name/@xsi:nil='true'"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
+                                                       <sch:assert test="not(@xsi:nil=true()) or ../win-sc:name/@xsi:nil=true()"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>

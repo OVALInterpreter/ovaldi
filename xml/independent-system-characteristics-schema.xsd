@@ -7,7 +7,7 @@
           <xsd:appinfo>
                <schema>Independent System Characteristics</schema>
                <version>5.8</version>
-               <date>9/14/2010 5:11:30 AM</date>
+               <date>9/15/2010 1:55:33 PM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="ind-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent"/>
@@ -232,7 +232,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="ind-sc_ldapitemrelative_dn">
                                                   <sch:rule context="ind-sc:ldap_item/ind-sc:relative_dn">
-                                                       <sch:assert test="not(@xsi:nil='true') or ../ind-sc:attribute/@xsi:nil='true'"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
+                                                       <sch:assert test="not(@xsi:nil=true()) or ../ind-sc:attribute/@xsi:nil=true()"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -285,7 +285,7 @@
                                         <xsd:appinfo>
                                              <sch:pattern id="ind-sc_ldap57itemrelative_dn">
                                                   <sch:rule context="ind-sc:ldap57_item/ind-sc:relative_dn">
-                                                       <sch:assert test="not(@xsi:nil='true') or ../ind-sc:attribute/@xsi:nil='true'"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
+                                                       <sch:assert test="not(@xsi:nil=true()) or ../ind-sc:attribute/@xsi:nil=true()"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>

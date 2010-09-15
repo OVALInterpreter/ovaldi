@@ -8,7 +8,7 @@
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
                   <version>5.8</version>
-                  <date>9/14/2010 5:11:34 AM</date>
+                  <date>9/15/2010 1:55:35 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -60,7 +60,7 @@
       <xsd:element name="accesstoken_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The accesstoken_object element is used by an access token test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An accesstoken_object consists of a single security principal that identifies user, group, or computer account that is associated with the token.</xsd:documentation>
+                  <xsd:documentation>An accesstoken_object consists of a single security principle that identifies user, group, or computer account that is associated with the token.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -72,7 +72,7 @@
                                                 <xsd:element name="behaviors" type="win-def:AccesstokenBehaviors" minOccurs="0"/>
                                                 <xsd:element name="security_principle" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The security_principle element defines the access token being specified. Security principals include users or groups with either local or domain accounts, and computer accounts created when a computer joins a domain. In Windows, security principals are case-insensitive. As a result, it is recommended that the case-insensitive operations are used for this entity. User rights and permissions to access objects such as Active Directory objects, files, and registry settings are assigned to security principals. In a domain environment, security principals should be identified in the form: "domain\trustee name". For local security principals use: "computer name\trustee name". For built-in accounts on the system, use the trustee name without a domain. If an operation other than equals is used to identify matching trustees (i.e. not equal, or a pattern match) then the resulting matches shall be limited to only the trustees referenced in the Local Security Authority database.  The scope is limited here to avoid unnecessarily resource intensive searches for trustees.  Note that the larger scope of all known trustees may be obtained through the use of variables.</xsd:documentation>
+                                                            <xsd:documentation>The security_principle element defines the access token being specified. Security principles include users or groups with either local or domain accounts, and computer accounts created when a computer joins a domain. In Windows, security principles are case-insensitive. As a result, it is recommended that the case-insensitive operations are used for this entity. User rights and permissions to access objects such as Active Directory objects, files, and registry settings are assigned to security principles. In a domain environment, security principles should be identified in the form: "domain\trustee name". For local security principles use: "computer name\trustee name". For built-in accounts on the system, use the trustee name without a domain. If an operation other than equals is used to identify matching trustees (i.e. not equal, or a pattern match) then the resulting matches shall be limited to only the trustees referenced in the Local Security Authority database.  The scope is limited here to avoid unnecessarily resource intensive searches for trustees.  Note that the larger scope of all known trustees may be obtained through the use of variables.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -93,7 +93,7 @@
                               <xsd:sequence>
                                     <xsd:element name="security_principle" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The security_principle element identifies an access token to test for. Security principals include users or groups with either local or domain accounts, and computer accounts created when a computer joins a domain. In Windows, security principals are case-insensitive. As a result, it is recommended that the case-insensitive operations are used for this entity. User rights and permissions to access objects such as Active Directory objects, files, and registry settings are assigned to security principals. In a domain environment, security principals should be identified in the form: "domain\trustee name". For local security principals use: "computer name\trustee name". For built-in accounts on the system, use the trustee name without a domain.</xsd:documentation>
+                                                <xsd:documentation>The security_principle element identifies an access token to test for. Security principles include users or groups with either local or domain accounts, and computer accounts created when a computer joins a domain. In Windows, security principles are case-insensitive. As a result, it is recommended that the case-insensitive operations are used for this entity. User rights and permissions to access objects such as Active Directory objects, files, and registry settings are assigned to security principles. In a domain environment, security principles should be identified in the form: "domain\trustee name". For local security principles use: "computer name\trustee name". For built-in accounts on the system, use the trustee name without a domain.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="seassignprimarytokenprivilege" type="oval-def:EntityStateBoolType" minOccurs="0">
@@ -208,7 +208,7 @@
                                     </xsd:element>
                                     <xsd:element name="serestoreprivilege" type="oval-def:EntityStateBoolType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>If the serestoreprivilege privilege is enabled, it allows a user to circumvent file and directory permissions when restoring backed-up files and directories and to set any valid security principal as the owner of an object.</xsd:documentation>
+                                                <xsd:documentation>If the serestoreprivilege privilege is enabled, it allows a user to circumvent file and directory permissions when restoring backed-up files and directories and to set any valid security principle as the owner of an object.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="sesecurityprivilege" type="oval-def:EntityStateBoolType" minOccurs="0">
@@ -332,7 +332,7 @@
             </xsd:annotation>
             <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                   <xsd:annotation>
-                        <xsd:documentation>If a group security principal is specified, this behavior specifies whether to include the group or not. For example, maybe you want to check the access tokens associated with every user within a group, but not the group itself. In this case, you would set the include_group behavior to 'false'. If the security_principle is not a group, then this behavior should be ignored.</xsd:documentation>
+                        <xsd:documentation>If a group security principle is specified, this behavior specifies whether to include the group or not. For example, maybe you want to check the access tokens associated with every user within a group, but not the group itself. In this case, you would set the include_group behavior to 'false'. If the security_principle is not a group, then this behavior should be ignored.</xsd:documentation>
                   </xsd:annotation>
             </xsd:attribute>
             <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -3672,7 +3672,7 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_regobjkey">
                                                                         <sch:rule context="win-def:registry_object/win-def:key">
-                                                                              <sch:assert test="not(@xsi:nil='true') or ../win-def:name/@xsi:nil='true'"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
+                                                                              <sch:assert test="not(@xsi:nil=true()) or ../win-def:name/@xsi:nil=true()"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>

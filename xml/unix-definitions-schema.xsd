@@ -7,7 +7,7 @@
             <xsd:appinfo>
                   <schema>UNIX Definition</schema>
                   <version>5.8</version>
-                  <date>9/14/2010 5:11:34 AM</date>
+                  <date>9/15/2010 1:55:35 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="unix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"/>
@@ -2333,35 +2333,37 @@
       <xsd:complexType name="EntityStateRoutingTableFlagsType">
             <xsd:annotation>
                   <xsd:documentation>The EntityStateRoutingTableFlagsType complex type restricts a string value to a specific set of values that describe the flags associated with a routing table entry. This list is based off the values defined in the man pages of various platforms. For Linux, please see route(8). For Solaris, please see netstat(1M). For HP-UX, please see netstat(1). For Mac OS, please see netstat(1). For FreeBSD, please see netstat(1). Documentation on each allowed value can be found in the previously listed man pages. The empty string is also allowed to support empty elements associated with variable references. Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
-                  <xsd:documentation>The following table is a mapping between the generic flag enumeration values and the actual flag values found on the various platforms. If the flag value is not specified, for a particular generic flag enumeration value, the flag value is not defined for that platform.</xsd:documentation>
-                  <xsd:documentation>
-                        Name        Linux    Solaris    HPUX    Mac OS    FreeBSD
-                        UP          U        U          U       U         U
-                        GATEWAY     G        G          G       G         G
-                        HOST        H        H          H       H         H
-                        REINSTATE   R                                      
-                        DYNAMIC     D        D                  D         D
-                        MODIFIED    M                           M         M
-                        ADDRCONF    A        A                             
-                        CACHE       C                                      
-                        REJECT      !                           R         R
-                        REDUNDANT   M                                      
-                        SETSRC               S                             
-                        BROADCAST            B                  b         b
-                        LOCAL                L                             
-                        PROTOCOL_1                              1         1
-                        PROTOCOL_2                              2         2
-                        PROTOCOL_3                              3         3
-                        BLACK_HOLE                              B         B
-                        CLONING                                 C         C
-                        PROTOCOL_CLONING                        c         c
-                        INTERFACE_SCOPE                         I          
-                        LINK_LAYER                              L         L
-                        MULTICAST                               m          
-                        STATIC                                  S         S
-                        WAS_CLONED                              W         W
-                        XRESOLVE                                X         X
-                  </xsd:documentation>
+                  <xsd:appinfo>
+                        <evaluation_documentation>The following table is a mapping between the generic flag enumeration values and the actual flag values found on the various platforms. If the flag value is not specified, for a particular generic flag enumeration value, the flag value is not defined for that platform.</evaluation_documentation>                  
+                        <evaluation_chart xml:space="preserve">
+Name        Linux    Solaris    HPUX    Mac OS    FreeBSD
+UP          U        U          U       U         U
+GATEWAY     G        G          G       G         G
+HOST        H        H          H       H         H
+REINSTATE   R                                      
+DYNAMIC     D        D                  D         D
+MODIFIED    M                           M         M
+ADDRCONF    A        A                             
+CACHE       C                                      
+REJECT      !                           R         R
+REDUNDANT   M                                      
+SETSRC               S                             
+BROADCAST            B                  b         b
+LOCAL                L                             
+PROTOCOL_1                              1         1
+PROTOCOL_2                              2         2
+PROTOCOL_3                              3         3
+BLACK_HOLE                              B         B
+CLONING                                 C         C
+PROTOCOL_CLONING                        c         c
+INTERFACE_SCOPE                         I          
+LINK_LAYER                              L         L
+MULTICAST                               m          
+STATIC                                  S         S
+WAS_CLONED                              W         W
+XRESOLVE                                X         X
+                        </evaluation_chart>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:simpleContent>
                   <xsd:restriction base="oval-def:EntityStateStringType">

@@ -8,7 +8,7 @@
         <xsd:appinfo>
             <schema>Core Definition</schema>
             <version>5.8</version>
-            <date>9/14/2010 5:11:32 AM</date>
+            <date>9/15/2010 1:55:34 PM</date>
             <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -176,7 +176,7 @@
             <xsd:documentation>The required id attribute is the OVAL-ID of the Definition. The form of an OVAL-ID must follow the specific format described by the oval:DefinitionIDPattern. The required version attribute holds the current version of the definition. Versions are integers, starting at 1 and incrementing every time a definition is modified. The required class attribute indicates the specific class to which the definition belongs. The class gives a hint to a user so they can know what the definition writer is trying to say. See the definition of oval-def:ClassEnumeration for more information about the different valid classes. The optional deprecated attribute signifies that an id is no longer to be used or referenced but the information has been kept around for historic purposes.</xsd:documentation>
             <xsd:appinfo>
                 <sch:pattern id="oval-def_required_criteria">
-                    <sch:rule context="oval-def:oval_definitions/oval-def:definitions/oval-def:definition[@deprecated='false' or not(@deprecated)]">
+                    <sch:rule context="oval-def:oval_definitions/oval-def:definitions/oval-def:definition[@deprecated=false() or not(@deprecated)]">
                         <sch:assert test="oval-def:criteria">A valid OVAL Definition document must contain a criteria unless the definition is a deprecated definition.</sch:assert>
                     </sch:rule>
                 </sch:pattern>
@@ -1082,7 +1082,7 @@
                     </sch:rule>
                 </sch:pattern>
                 <sch:pattern id="oval-def_definition_entity_type_check_rules">
-                    <sch:rule context="oval-def:objects/*/*[not(@xsi:nil='true') and not(@var_ref) and @datatype='int']|oval-def:states/*/*[not(@xsi:nil='true') and not(@var_ref) and @datatype='int']">
+                    <sch:rule context="oval-def:objects/*/*[not(@xsi:nil=true()) and not(@var_ref) and @datatype='int']|oval-def:states/*/*[not(@xsi:nil=true()) and not(@var_ref) and @datatype='int']">
                         <sch:assert test="(not(contains(.,'.'))) and (number(.) = floor(.))"><sch:value-of select="../@id"/> - The datatype for the <sch:value-of select="name()"/> entity is 'int' but the value is not an integer.</sch:assert>
                         <!--  Must test for decimal point because number(x.0) = floor(x.0) is true -->
                     </sch:rule>

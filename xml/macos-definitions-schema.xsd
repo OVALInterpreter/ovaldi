@@ -8,7 +8,7 @@
             <xsd:appinfo>
                   <schema>MacOS Definition</schema>
                   <version>5.8</version>
-                  <date>9/14/2010 5:11:31 AM</date>
+                  <date>9/15/2010 1:55:34 PM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="macos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos"/>
@@ -639,7 +639,7 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="macos-def_pwpobjusername">
                                                                         <sch:rule context="macos-def:pwpolicy_object/macos-def:username">
-                                                                              <sch:assert test="not(@xsi:nil='true') or ../macos-def:userpass/@xsi:nil='true'"><sch:value-of select="../@id"/> - userpass entity must be nil when username entity is nil</sch:assert>
+                                                                              <sch:assert test="not(@xsi:nil=true()) or ../macos-def:userpass/@xsi:nil=true()"><sch:value-of select="../@id"/> - userpass entity must be nil when username entity is nil</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -652,7 +652,7 @@
                                                                   <sch:pattern id="macos-def_pwpobjuserpass">
                                                                         <sch:rule context="macos-def:pwpolicy_object/macos-def:userpass">
                                                                               <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the userpass entity of a pwpolicy_object should be 'equals', note that this overrules the general operation attribute validation (i.e. follow this one)</sch:assert>
-                                                                              <sch:assert test="not(@xsi:nil='true') or ../macos-def:username/@xsi:nil='true'"><sch:value-of select="../@id"/> - username entity must be nil when userpass entity is nil</sch:assert>
+                                                                              <sch:assert test="not(@xsi:nil=true()) or ../macos-def:username/@xsi:nil=true()"><sch:value-of select="../@id"/> - username entity must be nil when userpass entity is nil</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
