@@ -1426,7 +1426,7 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 	LPTSTR domain = NULL;
 	DWORD sidSize = 128;
 	DWORD domainSize = 128;
-	SID_NAME_USE sid_type;
+	SID_NAME_USE sid_type = SidTypeUnknown;
 	BOOL retVal = FALSE;
 
 	do {
@@ -1523,7 +1523,7 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 	LPTSTR pAccountName = NULL;
 	DWORD accountNameSize = 128;
 	DWORD domainSize = 128;
-	SID_NAME_USE sid_type;
+	SID_NAME_USE sid_type = SidTypeUnknown;
 	BOOL retVal = FALSE;
 
 	do {

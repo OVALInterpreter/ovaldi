@@ -63,8 +63,7 @@ AbsProbe* Process58Probe::Instance() {
 ItemVector* Process58Probe::CollectItems ( Object* object ) {
     // Get the command_line object entity from the provided object
     ObjectEntity* commandLineEntity = object->GetElementByName ( "command_line" );
-	ObjectEntity* pidEntity = object->GetElementByName("pid");
-
+	
     // Check datatypes - only allow the string datatype
     if ( commandLineEntity->GetDatatype() != OvalEnum::DATATYPE_STRING ) {
         throw ProbeException ( "Error: Invalid data type specified on command_line. Found: " + OvalEnum::DatatypeToString ( commandLineEntity->GetDatatype() ) );
@@ -125,10 +124,10 @@ void Process58Probe::GetAllProcesses() {
 	processEntry.dwSize = sizeof(PROCESSENTRY32);
 
     if ( Process32First ( processHandle, &processEntry ) ) {
-        Process58Probe::BuildProcessItem ( processHandle, processEntry );
+        Process58Probe::BuildProcessItem ( processEntry );
 
         while ( Process32Next ( processHandle, &processEntry ) ) {
-            Process58Probe::BuildProcessItem ( processHandle, processEntry );
+            Process58Probe::BuildProcessItem ( processEntry );
         }
     }
 
@@ -157,7 +156,7 @@ Item* Process58Probe::GetProcess ( string commandLineStr ) {
     return NULL;
 }
 
-void Process58Probe::BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 processEntry ) {
+void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
     HANDLE openProcessHandle = OpenProcess ( PROCESS_ALL_ACCESS, false, processEntry.th32ProcessID );
 
     if ( openProcessHandle != NULL ) {
@@ -165,7 +164,7 @@ void Process58Probe::BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 pro
         string commandLineStr = "";
         string deviceProcessImageNameStr = "";
         LPTSTR deviceProcessImageName = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * MAX_PATH );
-        int position = 0;
+        unsigned int position = 0;
 
         if ( ( it = Process58Probe::commandLineMap->find ( Common::ToString ( processEntry.th32ProcessID ) ) ) != Process58Probe::commandLineMap->end() ) {
             commandLineStr = it->second;

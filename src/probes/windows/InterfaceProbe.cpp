@@ -180,7 +180,7 @@ void InterfaceProbe::GetAllInterfaces() {
     DWORD addrSize = 0;
     DWORD ifSize = 0;
     DWORD errorIpAddrTable;
-    DWORD errorIfTable;
+    DWORD errorIfTable = 0;
 
     if ( GetIpAddrTable ( ipAddrTable , &addrSize , 0 ) == ERROR_INSUFFICIENT_BUFFER ) {
         free ( ipAddrTable );

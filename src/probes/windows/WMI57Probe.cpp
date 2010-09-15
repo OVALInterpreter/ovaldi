@@ -87,7 +87,7 @@ ItemVector* WMI57Probe::CollectItems(Object* object) {
 	for(namespaceIt=namespaces->begin(); namespaceIt!=namespaces->end(); namespaceIt++) {
 		
 			// get all the wql queries
-			ItemEntityVector* wqls = this->GetWQLs(wmi_wql, (*namespaceIt));
+			ItemEntityVector* wqls = this->GetWQLs(wmi_wql);
 			ItemEntityVector::iterator wqlIt;
 			for(wqlIt=wqls->begin(); wqlIt!=wqls->end(); wqlIt++) {
 
@@ -152,7 +152,7 @@ ItemEntityVector* WMI57Probe::GetNamespaces(ObjectEntity* wmi_namespace) {
 	return namespaces;
 }
 
-ItemEntityVector* WMI57Probe::GetWQLs(ObjectEntity* wmi_wql, ItemEntity* wmi_namespace) {
+ItemEntityVector* WMI57Probe::GetWQLs(ObjectEntity* wmi_wql) {
 
 	ItemEntityVector* wqls = new ItemEntityVector();
 

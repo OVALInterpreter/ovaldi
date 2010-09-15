@@ -383,7 +383,7 @@ void ActiveDirectoryProbe::GetDomainComponents() {
         // string is formed by breaking up the domain name at each period.
         string retDomainStr = "DC=";
         retDomainStr.append ( domainStr );
-        int pos = retDomainStr.find ( "." );
+        unsigned int pos = retDomainStr.find ( "." );
 
         while ( pos != string::npos ) {
             retDomainStr.replace ( pos, 1, ",DC=" );

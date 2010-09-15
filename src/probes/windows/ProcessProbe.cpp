@@ -166,10 +166,10 @@ void ProcessProbe::GetAllProcesses() {
 	processEntry.dwSize = sizeof(PROCESSENTRY32);
 
     if ( Process32First ( processHandle, &processEntry ) ) {
-        ProcessProbe::BuildProcessItem ( processHandle, processEntry );
+        ProcessProbe::BuildProcessItem ( processEntry );
 
         while ( Process32Next ( processHandle, &processEntry ) ) {
-            ProcessProbe::BuildProcessItem ( processHandle, processEntry );
+            ProcessProbe::BuildProcessItem ( processEntry );
         }
     }
 
@@ -198,7 +198,7 @@ Item* ProcessProbe::GetProcess ( string commandLineStr ) {
     return NULL;
 }
 
-void ProcessProbe::BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 processEntry ) {
+void ProcessProbe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
     HANDLE openProcessHandle = OpenProcess ( PROCESS_ALL_ACCESS, false, processEntry.th32ProcessID );
 
     if ( openProcessHandle != NULL ) {
@@ -206,7 +206,7 @@ void ProcessProbe::BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 proce
         string commandLineStr = "";
         string deviceProcessImageNameStr = "";
         LPTSTR deviceProcessImageName = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * MAX_PATH );
-        int position = 0;
+        unsigned int position = 0;
 
         if ( ( it = ProcessProbe::commandLineMap->find ( Common::ToString ( processEntry.th32ProcessID ) ) ) != ProcessProbe::commandLineMap->end() ) {
             commandLineStr = it->second;

@@ -103,7 +103,7 @@ private:
 	ItemEntityVector* GetNamespaces(ObjectEntity*);
 
 	/** Return the set of wql queries to be run */
-	ItemEntityVector* GetWQLs(ObjectEntity*, ItemEntity*);
+	ItemEntityVector* GetWQLs(ObjectEntity*);
 
 	/** Parse the WQL and extract the field in the select statement.  
 	    If we get the field, return true and fieldName is set to the

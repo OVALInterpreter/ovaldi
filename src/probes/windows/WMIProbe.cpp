@@ -86,7 +86,7 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 	for(namespaceIt=namespaces->begin(); namespaceIt!=namespaces->end(); namespaceIt++) {
 		
 			// get all the wql queries
-			ItemEntityVector* wqls = this->GetWQLs(wmi_wql, (*namespaceIt));
+			ItemEntityVector* wqls = this->GetWQLs(wmi_wql);
 			ItemEntityVector::iterator wqlIt;
 			for(wqlIt=wqls->begin(); wqlIt!=wqls->end(); wqlIt++) {
 
@@ -151,7 +151,7 @@ ItemEntityVector* WMIProbe::GetNamespaces(ObjectEntity* wmi_namespace) {
 	return namespaces;
 }
 
-ItemEntityVector* WMIProbe::GetWQLs(ObjectEntity* wmi_wql, ItemEntity* wmi_namespace) {
+ItemEntityVector* WMIProbe::GetWQLs(ObjectEntity* wmi_wql) {
 
 	ItemEntityVector* wqls = new ItemEntityVector();
 
@@ -426,7 +426,7 @@ bool WMIProbe::GetWqlField(string wqlIn, string* fieldName) {
 
 	string wqlUpperCase = wqlIn;
 	for(unsigned int i=0;i<wqlIn.length();i++) {
-		wqlUpperCase[i] = toupper(wqlIn[i]);
+        wqlUpperCase[i] = ::toupper(wqlIn[i]);
 	}
 
 	// Find the opening SELECT statement

@@ -85,7 +85,7 @@ class ProcessProbe : public AbsProbe {
          *  @param processEntry  A PROCESSENTRY32 which contains data about the process whose Item you are building.
          *  @return Void.
          */
-        void BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 processEntry );
+        void BuildProcessItem ( PROCESSENTRY32 processEntry );
 
         /** Retrieve all of the device paths and their corresponding logical paths.
          *  @return Void.

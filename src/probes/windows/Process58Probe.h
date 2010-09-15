@@ -81,11 +81,10 @@ class Process58Probe : public AbsProbe {
         Item* GetProcess ( string commandLineStr );
 
         /** Build a process Item from the data collected using the various Windows APIs.  All Items are placed in the processes ItemVector.
-         *  @param processHandle A HANDLE which specifies the process that you are building the Item for.
          *  @param processEntry  A PROCESSENTRY32 which contains data about the process whose Item you are building.
          *  @return Void.
          */
-        void BuildProcessItem ( HANDLE processHandle, PROCESSENTRY32 processEntry );
+        void BuildProcessItem ( PROCESSENTRY32 processEntry );
 
         /** Retrieve all of the device paths and their corresponding logical paths.
          *  @return Void.

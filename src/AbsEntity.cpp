@@ -43,7 +43,7 @@ AbsEntity::AbsEntity(string name, string value, OvalEnum::Datatype datatype, boo
 	this->SetIsObjectEntity(isObjectEntity);
 	this->SetOperation(operation);
 	this->SetVarCheck(varCheck);
-	this->SetVarRef(NULL);
+	this->SetVarRef(varRef);
 	this->SetNil(nil);
 }
 
