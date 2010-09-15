@@ -75,7 +75,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
   C. Supporting Libraries
 
        The OVAL Interpreter relies on five c/c++ libraries that can be found
-       on the web. See sections III - VIII for more information about the
+       on the web. See sections III - VII for more information about the
        specific libraries used and where to download their source from.
      
 -- II -- BUILD INSTRUCTIONS --
@@ -99,24 +99,24 @@ install the supporting libraries.
 	To compile and install the PCRE library simply run the following commands.
  
             ./configure -prefix='install path'
-	    make
+			make
             sudo make install
 
   B. Xerces Library
 
        The OVAL Interpreter uses the open source Xerces library.  The
-       binary was compiled with version 2.7.0 of the xerces-c library.
+       binary was compiled with version 2.8.0 of the xerces-c library.
        
        The source code for the Xerces-C library can be downloaded from the following link.
 
-           http://archive.apache.org/dist/xml/xerces-c/Xerces-C_2_7_0/source/
+           http://archive.apache.org/dist/xml/xerces-c/Xerces-C_2_8_0/source/
     
        To compile and install the Xerces-C library simply run the following commands.
 	   
-           export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_7_0'
+           export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_8_0'
            cd $XERCESCROOT/src/xercesc
-	   ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
-	   make
+		   ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
+	       make
            sudo make install
 
   C. Xalan Library
@@ -202,7 +202,7 @@ site:
 -- IV -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.7.0 of the xerces-c library.  From
+binary was compiled with version 2.8.0 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software

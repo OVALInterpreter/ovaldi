@@ -41,6 +41,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for SeTrustedCredManAccessPrivilege in accesstoken_state and accesstoken_item.
 * Added support for drive_type in volume_state and volume_item.
 * Fixed the TextFileContent54 probe so that the "multiline" behavior is correctly applied by default.
+* Added support for the ind-def:filehash58_test.
+* Fixed an infinite loop in REGEX::GetAllMatchingSubstrings().
 
 ---------------------------------------
 ---        Version 5.7 build 2      ---
@@ -49,10 +51,11 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added input filtering so that input files cannot be overwritten by output files.
 * Fixed a bug so that interpreter now correctly exits with an EXIT_FAILURE exit code after experiencing a fatal error.
 * Fixed a bug in the linux/solaris/osx versions of the interpreter where it would quit with a fatal error if it was unable to perform a DNS lookup for the FQDN of the local host.
-* Fixed a bug that caused an error when attempting to read from an empty cd drive that has been mounted as a directory in Windows.
 * Interpreter will now look for the XML schema in /usr/share/ovaldi by default for *nix operating systems.
 * The OpenSSL library was replaced by the Libgcrypt library.
 * Added support for OVAL 5.7 directives.
+* Added support detecting and determining the password encryption method.
+* Added support to allow for multiple messages on an item in an SC document. 
 
 ---------------------------------------
 ---        Version 5.7 build 1      ---
@@ -62,6 +65,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a memory leak that was causing the interpreter to crash while running oval.xml from the repository.
 * Added support for the LDAPTYPE_BINARY datatype in the ind-def:ldap_test.
 * Added support for the win-def:dnscache_test.
+* Added support for the subgroup entity in the win-def:group_test and win-def:group_sid_test.
 * Updated the user_test, user_sid_test, user_sid55_test, group_test, and group_sid_test to align with their clarified documentation regarding search scope and lookups.
 * Added support for new Windows 7 audit settings (kerberos_authentication_service, kerberos_service_ticket_operations, network_policy_server, detailed_file_share) in the auditeventpolicysubcategories_test.
 * Added support for the TCPMUX and TCPMUXPLUS datatypes in the unix-def:xinetd_test.

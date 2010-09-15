@@ -102,7 +102,7 @@ supporting libraries.
   B. Xerces Library
 
        The OVAL Interpreter uses the open source Xerces library.  The
-       binary was compiled with version 2.7.0 of the xerces-c library.
+       binary was compiled with version 2.8.0 of the xerces-c library.
        From the Xerces Web site:
 
          "This product includes software developed by the Apache
@@ -178,7 +178,7 @@ site:
 -- IV -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.7.0 of the xerces-c library.  From
+binary was compiled with version 2.8.0 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
@@ -239,6 +239,8 @@ OVAL Web site -- http://oval.mitre.org
 OVAL Interpreter Source Code -- http://sourceforge.net/projects/ovaldi/files/
 
 OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
+
+OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?title=Main_Page
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland

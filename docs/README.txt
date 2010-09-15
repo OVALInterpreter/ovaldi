@@ -79,7 +79,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
        ovaldi - OVAL Interpreter binary
 
        Libraries:
-       libxerces-c.so.27.0 - Xerces XML library
+       libxerces-c.so.28.0 - Xerces XML library
        libxalan-c.so.110.0 - Xalan XSL library
        libxalanMsg.so.110.0 - Xalan Message library
        libpcre.so.0.0.1 - PCRE Regular Expression library
@@ -117,7 +117,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
     
   B. Sun Solaris Installation
 
-       Not yet supported.
+       Please see build.solaris.txt.
 
 
   C. Microsoft Windows Installation
@@ -137,7 +137,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
        ovaldi.exe - OVAL Interpreter binary
 
        Libraries:
-       xerces-c_2_7_0.dll - Xerces XML library
+       xerces-c_2_8_0.dll - Xerces XML library
        msvcr71.dll - Microsoft C Runtime Library
        pcre.dll - Perl-compatible regular-expression library
        Xalan-C_1_10.dll - Xalan XSLT library
@@ -190,7 +190,7 @@ http://oval.mitre.org/oval/about/bsd_license.html
 
   D. Mac OS Installation
 
-       Not yet supported.
+       Please see build.macos.txt.
 
 
 -- II -- USING THE OVAL INTERPRETER --
@@ -681,6 +681,8 @@ OVAL Repository -- http://oval.mitre.org/repository/
 OVAL Terms of Use -- http://oval.mitre.org/oval/about/termsofuse.html
 
 OVAL Interpreter BSD License -- http://oval.mitre.org/oval/about/bsd_license.html
+
+OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?title=Main_Page
 
 CCE -- http://cce.mitre.org/
 
