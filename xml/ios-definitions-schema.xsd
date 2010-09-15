@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>IOS Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:48 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:30 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                    <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ios-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#ios"/>
@@ -83,7 +83,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="global_command" type="oval-def:EntityStateStringType">
+                                    <xsd:element name="global_command" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The global_command entity identifies a specific line in the ios config file under the global context.</xsd:documentation>
                                           </xsd:annotation>

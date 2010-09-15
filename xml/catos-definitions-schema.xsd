@@ -7,8 +7,8 @@
           <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Eric Grey at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>CatOS Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:46 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:29 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="catos-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#catos"/>
@@ -273,13 +273,13 @@
     </xsd:element>
     <xsd:element name="version55_state" substitutionGroup="oval-def:state">
         <xsd:annotation>
-            <xsd:documentation>The version55_state element defines the version information held within a Cisco CatOS software release. The swtich_series element specifies the Catalyst switch series. The image_name element specifies the name of the CatOS image. The catos_release element specifies the software version information of the module.</xsd:documentation>
+            <xsd:documentation>The version55_state element defines the version information held within a Cisco CatOS software release. The switch_series element specifies the Catalyst switch series. The image_name element specifies the name of the CatOS image. The catos_release element specifies the software version information of the module.</xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="oval-def:StateType">
                     <xsd:sequence>
-                        <xsd:element name="swtich_series" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                        <xsd:element name="switch_series" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>The switch_series entity defines a target Catalyst switch series to check for.  Each version of CatOS traditionally has target a specific Catalyst series of switches.</xsd:documentation>
                             </xsd:annotation>
@@ -396,7 +396,7 @@
                 <xsd:complexContent>
                       <xsd:extension base="oval-def:StateType">
                             <xsd:sequence>
-                                  <xsd:element name="swtich_series" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                  <xsd:element name="switch_series" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                         <xsd:annotation>
                                               <xsd:documentation>A Catalyst switch series to check for.</xsd:documentation>
                                         </xsd:annotation>

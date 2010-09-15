@@ -7,8 +7,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>MacOS System Characteristics</schema>
-               <version>5.8 Release Candidate 1</version>
-               <date>8/19/2010 10:28:49 AM</date>
+               <version>5.8</version>
+               <date>9/14/2010 5:11:31 AM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="macos-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos"/>
@@ -240,7 +240,7 @@
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
-                              <xsd:element name="key" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="key" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>The preference key to check.</xsd:documentation>
                                    </xsd:annotation>
@@ -253,6 +253,11 @@
                               <xsd:element name="filepath" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The absolute path to a plist file (e.g. ~/Library/Preferences/com.apple.Safari.plist).</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="instance" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The instance of the preference key found in the plist. The first instance of a matching preference key is given the instance value of 1, the second instance of a matching preference key is given the instance value of 2, and so on.  Note that the main purpose of this entity is to provide uniqueness for the different plist_items that result from multiple instances of a given preference key in the same plist file.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="type" type="macos-sc:EntityItemPlistTypeType" minOccurs="0" maxOccurs="1">
@@ -286,17 +291,17 @@
                                         <xsd:documentation>The target_user element specifies the user whose password policy information was collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="username" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="username" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>The username element specifies the username of the authenticator.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="userpass" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="userpass" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>The userpass element specifies the password of the authenticator as specified by the username element.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="directory_node" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="directory_node" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>The directory_node element specifies the directory node that the password policy information was collected from.</xsd:documentation>
                                    </xsd:annotation>
@@ -376,37 +381,37 @@
                <xsd:restriction base="oval-sc:EntityItemStringType">
                     <xsd:enumeration value="CFString">
                          <xsd:annotation>
-                              <xsd:documentation>The CFString type is used to describe a preference key that has a string value.</xsd:documentation>
+                              <xsd:documentation>The CFString type is used to describe a preference key that has a string value. The OVAL string datatype should be used to represent CFString values.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="CFNumber">
                          <xsd:annotation>
-                              <xsd:documentation>The CFNumber type is used to describe a preference key that has a integer or float value.</xsd:documentation>
+                              <xsd:documentation>The CFNumber type is used to describe a preference key that has a integer or float value. The OVAL int and float datatypes should be used, as appropriate, to represent CFNumber values.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="CFBoolean">
                          <xsd:annotation>
-                              <xsd:documentation>The CFBoolean type is used to describe a preference key that has a boolean value.</xsd:documentation>
+                              <xsd:documentation>The CFBoolean type is used to describe a preference key that has a boolean value. The OVAL boolean datatype should be used to represent CFBoolean values.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="CFDate">
                          <xsd:annotation>
-                              <xsd:documentation>The CFDate type is used to describe a preference key that has a date value.</xsd:documentation>
+                              <xsd:documentation>The CFDate type is used to describe a preference key that has a date value. The OVAL string datatype should be used to represent CFDate values.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="CFData">
                          <xsd:annotation>
-                              <xsd:documentation>The CFData type is used to describe a preference key that has a binary value.</xsd:documentation>
+                              <xsd:documentation>The CFData type is used to describe a preference key that has a base64-encoded binary value. The OVAL string datatype should be used to represent CFData values.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="CFArray">
                          <xsd:annotation>
-                              <xsd:documentation>The CFArray type is used to describe a preference key that has a collection of values.</xsd:documentation>
+                              <xsd:documentation>The CFArray type is used to describe a preference key that has a collection of values. This is represented as multiple value entities.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="CFDictionary">
                          <xsd:annotation>
-                              <xsd:documentation>The CFDictionary type is used to describe a preference key that has a collection of key-value pairs. Note that even though a CFDictionary can contain CFDictionary values records of records are not currently supported.</xsd:documentation>
+                              <xsd:documentation>The CFDictionary type is used to describe a preference key that has a collection of key-value pairs. Note that the collection of CFDictionary values is not supported. If an attempt is made to collect a CFDictionary value, an error should be reported.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="">

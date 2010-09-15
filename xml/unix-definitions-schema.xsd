@@ -6,8 +6,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>UNIX Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:52 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:34 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="unix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"/>
@@ -842,7 +842,7 @@
                                     </xsd:element>
                                     <xsd:element name="inet_addr" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>This is the IP address of the interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                                                <xsd:documentation>This is the IP address of the interface. Note that the IP address can be IPv4 or IPv6. If the IP address is an IPv6 address, this entity will be expressed as an IPv6 address prefix using CIDR notation and the netmask entity will not be collected.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="broadcast_addr" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
@@ -852,7 +852,7 @@
                                     </xsd:element>
                                     <xsd:element name="netmask" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>This is the bitmask used to calculate the inteface's IP network. The network number is calculated by bitwise-ANDing this with the IP address. The host number on that network is calculated by bitwise-XORing this with the IP address.  Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                                                <xsd:documentation>This is the bitmask used to calculate the interface's IP network. The network number is calculated by bitwise-ANDing this with the IP address. The host number on that network is calculated by bitwise-XORing this with the IP address.  Note that if the inet_addr entity contains an IPv6 address prefix, this entity will not be collected.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="flag" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
@@ -1288,7 +1288,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="routingtable_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The routingtable_test is used to check information about the routing table(s) on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a routingtable_object and the optional routingtable_state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The routingtable_test is used to check information about the IPv4 and IPv6 routing table entries found in a system's primary routing table. It is important to note that only numerical addresses will be collected and that their symbolic representations will not be resolved. This equivalent to using the '-n' option with route(8) or netstat(8). It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a routingtable_object and the optional routingtable_state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>routingtable_test</oval:test>
@@ -1321,7 +1321,7 @@
       </xsd:element>
       <xsd:element name="routingtable_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The routingtable_object element is used by a routingtable_test to define the destination IP address(es) in the routing table to collect. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The routingtable_object element is used by a routingtable_test to define the destination IP address(es), found in a system's primary routing table, to collect. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1345,7 +1345,7 @@
       </xsd:element>
       <xsd:element name="routingtable_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The routingtable_state element defines the different information that can be used to check an entry in the routing table. This includes the destination IP address, gateway, netmask, flags, and the name of the interface associated with it. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>The routingtable_state element defines the different information that can be used to check an entry found in a system's primary routing table. This includes the destination IP address, gateway, netmask, flags, and the name of the interface associated with it. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1353,7 +1353,7 @@
                               <xsd:sequence>
                                     <xsd:element name="destination" type="oval-def:EntityStateIPAddressType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The destination IP address of the routing table entry.</xsd:documentation>
+                                                <xsd:documentation>The destination IP address prefix of the routing table entry. This is the destination IP address and netmask/prefix-length expressed using CIDR notation.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="gateway" type="oval-def:EntityStateIPAddressType" minOccurs="0" maxOccurs="1">
@@ -1361,12 +1361,7 @@
                                                 <xsd:documentation>The gateway of the specified routing table entry.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="netmask" type="oval-def:EntityStateIPAddressType" minOccurs="0" maxOccurs="1">
-                                          <xsd:annotation>
-                                                <xsd:documentation>The netmask of the specified routing table entry.</xsd:documentation>
-                                          </xsd:annotation>
-                                    </xsd:element>
-                                    <xsd:element name="flags" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="flags" type="unix-def:EntityStateRoutingTableFlagsType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The flags associated with the specified routing table entry.</xsd:documentation>
                                           </xsd:annotation>

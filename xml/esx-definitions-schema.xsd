@@ -9,8 +9,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>VMware ESX server Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:47 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:29 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="esx-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx"/>
@@ -241,7 +241,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="patch_number" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="patch_number" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>This is the patch number of a specific patch which will be checked in current VMware ESX server. Many of the security bulletins for VMWARE ESX Server contain non-numerical characters in the patch nubmer, therefore this entity has a datatype of string.</xsd:documentation>
                                           </xsd:annotation>

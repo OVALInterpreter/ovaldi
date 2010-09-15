@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:51 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:33 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sp-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"/>
@@ -194,17 +194,17 @@
                                                 <xsd:documentation>If approveitems is enabled the permission to approve a minor version of a list item or document is available to use for this the Web application.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="deletelistitems" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:element name="deletelistitems" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>If the deletelistitems is enabled the permission to delete items from a list, documents from a document library, and Web discussion comments in documents is available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="deleteversions" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:element name="deleteversions" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>If the deleteversions is enabled the permission to delete past versions of a list item or document is available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="editlistitems" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:element name="editlistitems" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>If the editlistitems is enabled the permission to edit items in lists, edit documents in document libraries, edit Web discussion comments in documents, and customize Web Part Pages in document libraries is available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>
@@ -309,7 +309,7 @@
                                                 <xsd:documentation>If the manageweb is enabled the permission to perform all administration tasks for the Web site as well as manage content is available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="open" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:element name="open" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>If open is enabled the permission to allow users to open a Web site, list, or folder to access items inside that containeris available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>
@@ -319,7 +319,7 @@
                                                 <xsd:documentation>If the useclientintegration is enabled the permission to use features that launch client applications; otherwise, users must work on documents locally and upload changesis is available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="useremoteapis" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:element name="useremoteapis" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>If the useremoteapis is enabled the permission to use SOAP, WebDAV, or Microsoft Office SharePoint Designer interfaces to access the Web siteis available to use for this Web application.</xsd:documentation>
                                           </xsd:annotation>

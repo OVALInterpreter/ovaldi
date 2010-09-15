@@ -7,8 +7,8 @@
 		<xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
 		<xsd:appinfo>
 			<schema>HP-UX System Characteristics</schema>
-		     <version>5.8 Release Candidate 1</version>
-		     <date>8/19/2010 10:28:48 AM</date>
+		     <version>5.8</version>
+		     <date>9/14/2010 5:11:30 AM</date>
 		      <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
 			<sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
 			<sch:ns prefix="hpux-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux"/>
@@ -88,7 +88,12 @@
 			<xsd:complexContent>
 				<xsd:extension base="oval-sc:ItemType">
 					<xsd:sequence>
-					     <xsd:element name="swtype" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+						<xsd:element name="patch_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>This is the patch name to check.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="swtype" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
 					          <xsd:annotation>
 					               <xsd:documentation>HP-UX patch names begin with 'PH'</xsd:documentation>
 					          </xsd:annotation>
@@ -98,7 +103,7 @@
 							     <xsd:documentation>The third and fourth characters in HP-UX patch names indicate the area of software being patched. CO - General HP-UX commands KL - Kernel patches NE - Network specific patches SS - All other subsystems (X11, starbase, etc.)</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
-						<xsd:element name="patch_number" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+						<xsd:element name="patch_base" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
 							<xsd:annotation>
 								<xsd:documentation>The sixth through tenth characters in HP-UX patch names represent a unique numeric identifier for the patch.</xsd:documentation>
 							</xsd:annotation>

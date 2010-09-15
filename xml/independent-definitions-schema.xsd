@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Independent Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:48 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:30 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ind-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"/>
@@ -997,14 +997,14 @@
                               <sch:rule context="ind-def:sql_state">
                                     <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
-                        </sch:pattern>                        
+                        </sch:pattern>
                   </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="engine" type="ind-def:EntityObjectEngineType" minOccurs="0">
+                                    <xsd:element name="engine" type="ind-def:EntityStateEngineType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The engine entity defines a specific database engine.</xsd:documentation>
                                           </xsd:annotation>
@@ -1145,7 +1145,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:StateType">
                               <xsd:sequence>
-                                    <xsd:element name="engine" type="ind-def:EntityObjectEngineType" minOccurs="0">
+                                    <xsd:element name="engine" type="ind-def:EntityStateEngineType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The engine entity defines a specific database engine.</xsd:documentation>
                                           </xsd:annotation>
@@ -1270,7 +1270,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="instance" type="oval-def:EntityObjectIntType">
                                                       <xsd:annotation>
-                                                          <xsd:documentation>The instance entity calls out a specific match of the pattern.  The first match is given an instance value of 1, the second match is given and instance value of 2, and so on.  Note that the main purpose of this entity is to provide uniqueness for different textfilecontent_items that results from multiple matches of a given pattern against the same file. Most likely this entity will be defined as greater than or equal to 1 which would result in the object representing the set of all matches of the pattern.</xsd:documentation>
+                                                          <xsd:documentation>The instance entity calls out a specific match of the pattern.  The first match is given an instance value of 1, the second match is given an instance value of 2, and so on.  Note that the main purpose of this entity is to provide uniqueness for different textfilecontent_items that results from multiple matches of a given pattern against the same file. Most likely this entity will be defined as greater than or equal to 1 which would result in the object representing the set of all matches of the pattern.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>

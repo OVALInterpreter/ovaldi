@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.8 Release Candidate 1</version>
-               <date>8/19/2010 10:28:53 AM</date>
+               <version>5.8</version>
+               <date>9/14/2010 5:11:34 AM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -1261,12 +1261,12 @@
                               </xsd:element>
                               <xsd:element name="hardware_addr" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The hardware_addr entity is the hardware or MAC address of the physical network card. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits.  Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the hardware or MAC address of the physical network card. MAC addresses should be formatted according to the IEEE 802-2001 standard which states that a MAC address is a sequence of six octet values, separated by hyphens, where each octet is represented by two hexadecimal digits.  Uppercase letters should also be used to represent the hexadecimal digits A through F.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="inet_addr" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the IP address of the specific interface. Note that the IP address can be IPv4 or IPv6. If the IP address is an IPv6 address, this entity should be expressed as an IPv6 address prefix using CIDR notation and the netmask entity should not be collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="broadcast_addr" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
@@ -1276,7 +1276,7 @@
                               </xsd:element>
                               <xsd:element name="netmask" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This element specifies the subnet mask for the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                                        <xsd:documentation>This element specifies the subnet mask for the IP address. Note that if the inet_addr entity contains an IPv6 address prefix, this entity should not be collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="addr_type" type="win-sc:EntityItemAddrTypeType" minOccurs="0" maxOccurs="unbounded">
@@ -1669,7 +1669,7 @@
                                         <xsd:documentation>This element specifies the hive of a registry key on the machine from which the SACL was retrieved.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="key" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="key" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>This element specifies a registry key on the machine from which the SACL was retrieved. Note that the hive portion of the string should not be inclueded, as this data should be found under the hive element.</xsd:documentation>
                                    </xsd:annotation>
@@ -1823,7 +1823,7 @@
                                         <xsd:documentation>The hive that the registry key belongs to.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="key" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                              <xsd:element name="key" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true" >
                                    <xsd:annotation>
                                         <xsd:documentation>This element describes a registry key to be gathered. Note that the hive portion of the string should not be inclueded, as this data can be found under the hive element. If the xsi:nil attribute is set to true, then the item being represented is the higher level hive.</xsd:documentation>
                                    </xsd:annotation>
@@ -2159,7 +2159,7 @@
                                         <xsd:documentation>The share name of the resource.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="shared_type" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="shared_type" type="win-sc:EntityItemSharedResourceTypeType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The type of the shared resource.</xsd:documentation>
                                    </xsd:annotation>
@@ -3335,6 +3335,101 @@
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
+     <xsd:complexType name="EntityItemSharedResourceTypeType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityItemSharedResourceTypeType complex type defines the different values that are valid for the type entity of a shared resource item. Note that the Windows API returns a DWORD value and OVAL uses the constant name that is normally defined for these return values. This is done to increase readability and maintainability of OVAL Definitions.  The empty string is also allowed to support empty elements associated with error conditions.</xsd:documentation>
+               <xsd:documentation>It is also important to note that special shared resources are those reserved for remote administration, interprocess communication, and administrative shares.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:enumeration value="STYPE_DISKTREE">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DISKTREE type means that the shared resource is a disk drive. The DWORD value that this corresponds to is 0x00000000.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DISKTREE_SPECIAL">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DISKTREE_SPECIAL type means that the shared resource is a special disk drive. The DWORD value that this corresponds to is 0x80000000.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DISKTREE_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DISKTREE_TEMPORARY type means that the shared resource is a temporary disk drive. The DWORD value that this corresponds to is 0x40000000.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DISKTREE_SPECIAL_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DISKTREE_SPECIAL_TEMPORARY type means that the shared resource is a temporary, special disk drive. The DWORD value that this corresponds to is 0xC0000000.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_PRINTQ">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_PRINTQ type means that the shared resource is a print queue. The DWORD value that this corresponds to is 0x00000001.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_PRINTQ_SPECIAL">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_PRINTQ_SPECIAL type means that the shared resource is a special print queue. The DWORD value that this corresponds to is 0x80000001.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_PRINTQ_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_PRINTQ_TEMPORARY type means that the shared resource is a temporary print queue. The DWORD value that this corresponds to is 0x40000001.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_PRINTQ_SPECIAL_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_PRINTQ_SPECIAL_TEMPORARY type means that the shared resource is a temporary, special print queue. The DWORD value that this corresponds to is 0xC0000001.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DEVICE">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DEVICE type means that the shared resource is a communication device. The DWORD value that this corresponds to is 0x00000002.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DEVICE_SPECIAL">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DEVICE_SPECIAL type means that the shared resource is a special communication device. The DWORD value that this corresponds to is 0x80000002.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DEVICE_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DEVICE_TEMPORARY type means that the shared resource is a temporary communication device. The DWORD value that this corresponds to is 0x40000002.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_DEVICE_SPECIAL_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_DEVICE_SPECIAL_TEMPORARY type means that the shared resource is a temporary, special communication device. The DWORD value that this corresponds to is 0xC0000002.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_IPC">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_IPC type means that the shared resource is a interprocess communication. The DWORD value that this corresponds to is 0x00000003.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_IPC_SPECIAL">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_IPC_SPECIAL type means that the shared resource is a special interprocess communication. The DWORD value that this corresponds to is 0x80000003.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_IPC_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_IPC_TEMPORARY type means that the shared resource is a temporary interprocess communication. The DWORD value that this corresponds to is 0x40000003.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="STYPE_IPC_SPECIAL_TEMPORARY">
+                         <xsd:annotation>
+                              <xsd:documentation>The STYPE_IPC_SPECIAL_TEMPORARY type means that the shared resource is a temporary, special interprocess communication. The DWORD value that this corresponds to is 0xC0000003.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation> The empty string is also allowed to support empty elements associated with error conditions.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                </xsd:restriction>

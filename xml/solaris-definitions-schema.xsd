@@ -6,8 +6,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Solaris Definition</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:52 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:34 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sol-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"/>
@@ -140,7 +140,7 @@
                                           <xsd:sequence>
                                                 <xsd:element name="device" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The name of the device to examine.</xsd:documentation>
+                                                            <xsd:documentation>The name of the device to examine. If multiple instances of this device exist on the system, an item for each instance will be collected.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="parameter" type="oval-def:EntityObjectStringType">
@@ -167,6 +167,11 @@
                                     <xsd:element name="device" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the device to examine.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="instance" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The instance of the device to examine. Certain devices may have multiple instances on a system. If multiple instances exist, an item for each instance will be collected and will have this entity populated with its respective instance value. If only a single instance exists, this entity will not be collected.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="parameter" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
@@ -345,7 +350,7 @@
                                                             <xsd:documentation>The pkginst entity is a string that represents a package designation by its instance. An instance can be the package abbreviation or a specific instance (for example, inst.1 or inst.2).</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
-                                                <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                                <xsd:element name="filepath" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The filepath element specifies the absolute path for a file in the specified package. A directory cannot be specified as a filepath.</xsd:documentation>
                                                       </xsd:annotation>

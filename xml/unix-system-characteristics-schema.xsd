@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Unix System Characteristics</schema>
-               <version>5.8 Release Candidate 1</version>
-               <date>8/19/2010 10:28:52 AM</date>
+               <version>5.8</version>
+               <date>9/14/2010 5:11:34 AM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="unix-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"/>
@@ -234,7 +234,7 @@
                                         <xsd:documentation>The preference key to check.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="source" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="source" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>The source used to look up the preference key.</xsd:documentation>
                                    </xsd:annotation>
@@ -353,7 +353,7 @@
                               </xsd:element>
                               <xsd:element name="inet_addr" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The inet_addr entity is the IP address of the specific interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                                        <xsd:documentation>The inet_addr entity is the IP address of the specific interface. Note that the IP address can be IPv4 or IPv6. If the IP address is an IPv6 address, this entity should be expressed as an IPv6 address prefix using CIDR notation and the netmask entity should not be collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="broadcast_addr" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
@@ -363,7 +363,7 @@
                               </xsd:element>
                               <xsd:element name="netmask" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the bitmask used to calculate the inteface's IP network. The network number is calculated by bitwise-ANDing this with the IP address. The host number on that network is calculated by bitwise-XORing this with the IP address. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
+                                        <xsd:documentation>This is the bitmask used to calculate the interface's IP network. The network number is calculated by bitwise-ANDing this with the IP address. The host number on that network is calculated by bitwise-XORing this with the IP address. Note that if the inet_addr entity contains an IPv6 address prefix, this entity should not be collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="flag" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
@@ -600,7 +600,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="routingtable_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>The routingtable_item holds information about an individual routing table entry found on a system. Each routingtable_item contains a destination IP address, gateway, netmask, flags, and the name of the interface associated with it. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
+               <xsd:documentation>The routingtable_item holds information about an individual routing table entry found in a system's primary routing table. Each routingtable_item contains a destination IP address, gateway, netmask, flags, and the name of the interface associated with it. It is important to note that only numerical addresses will be collected and that their symbolic representations will not be resolved. This equivalent to using the '-n' option with route(8) or netstat(8). It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -608,17 +608,12 @@
                          <xsd:sequence>
                               <xsd:element name="destination" type="oval-sc:EntityItemIPAddressType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The destination IP address of the routing table entry.</xsd:documentation>
+                                        <xsd:documentation>The destination IP address prefix of the routing table entry. This is the destination IP address and netmask/prefix-length expressed using CIDR notation.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="gateway" type="oval-sc:EntityItemIPAddressType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The gateway of the specified routing table entry.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="netmask" type="oval-sc:EntityItemIPAddressType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The netmask of the specified routing table entry.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="flags" type="unix-sc:EntityItemRoutingTableFlagsType" minOccurs="0" maxOccurs="unbounded">
@@ -698,12 +693,12 @@
                                         <xsd:documentation>The name of an SCCS file.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="module_name" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="module_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation/>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="module_type" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="module_type" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation/>
                                    </xsd:annotation>

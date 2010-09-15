@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint System Characteristics</schema>
-                  <version>5.8 Release Candidate 1</version>
-                  <date>8/19/2010 10:28:52 AM</date>
+                  <version>5.8</version>
+                  <date>9/14/2010 5:11:33 AM</date>
                   <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                   <sch:ns prefix="sp-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint"/>
@@ -425,12 +425,12 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-sc:ItemType">
                               <xsd:sequence>
-                                    <xsd:element name="spwebservicename" type="oval-sc:EntityItemStringType">
+                                    <xsd:element name="spwebservicename" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the SP Web Service for which to retrieve the antivirus settings or * for all web services. The default value is * which checks all SP Web services</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="spfarmname" type="oval-sc:EntityItemStringType">
+                                    <xsd:element name="spfarmname" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The Farm in which the SP Web Service resides.</xsd:documentation>
                                           </xsd:annotation>
@@ -553,7 +553,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-sc:ItemType">
                               <xsd:sequence>
-                                    <xsd:element name="spsiteurl" type="oval-sc:EntityItemStringType">
+                                    <xsd:element name="spsiteurl" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>A URL that represents the resource (eg. sites, documents,etc.) on which the crawlrule tests should be run or * if the check should be run on all sites/documents on the server.</xsd:documentation>
                                           </xsd:annotation>
@@ -609,7 +609,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-sc:ItemType">
                               <xsd:sequence>
-                                    <xsd:element name="webappuri" type="oval-sc:EntityItemStringType">
+                                    <xsd:element name="webappuri" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The URI that represents the web application for which the IIS Settings should be checked.</xsd:documentation>
                                           </xsd:annotation>

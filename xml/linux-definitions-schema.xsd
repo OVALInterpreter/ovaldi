@@ -7,8 +7,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux Definition</schema>
-               <version>5.8 Release Candidate 1</version>
-               <date>8/19/2010 10:28:49 AM</date>
+               <version>5.8</version>
+               <date>9/14/2010 5:11:31 AM</date>
                 <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                <sch:ns prefix="linux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"/>
@@ -1054,9 +1054,9 @@
                                                        </xsd:annotation>
                                                   </xsd:element>
                                              </xsd:sequence>
-                                             <xsd:element name="pid" type="oval-def:EntityObjectIntType">
+                                             <xsd:element name="pid" type="oval-def:EntityObjectIntType" nillable="true">
                                                   <xsd:annotation>
-                                                       <xsd:documentation>The pid entity is the process ID of the process.</xsd:documentation>
+                                                       <xsd:documentation>The pid entity is the process ID of the process.  If the xsi:nil attribute is set to true, the process ID shall be the tool's running process.</xsd:documentation>
                                                   </xsd:annotation>
                                              </xsd:element>
                                         </xsd:choice>
@@ -1492,35 +1492,6 @@
                     <xsd:enumeration value="SOCKFS_MAGIC">
                          <xsd:annotation>
                               <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="">
-                         <xsd:annotation>
-                              <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-               </xsd:restriction>
-          </xsd:simpleContent>
-     </xsd:complexType>
-     <xsd:complexType name="EntityStateSeLinuxModeType">
-          <xsd:annotation>
-               <xsd:documentation>The EntityStateSeLinuxModeType complex type restricts a string value to three values: 1)enforcing 2)permissive or 3)disabled. These values indicate the current mode of SELinux on a system. The empty string is also allowed to support the empty element associated with variable references.  Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
-          </xsd:annotation>
-          <xsd:simpleContent>
-               <xsd:restriction base="oval-def:EntityStateStringType">
-                    <xsd:enumeration value="enforcing">
-                         <xsd:annotation>
-                              <xsd:documentation>A value of 'enforcing' indicates that the SELinux security policy is enforced and will deny access based on the security policy rules.</xsd:documentation>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="permissive">
-                         <xsd:annotation>
-                              <xsd:documentation>A value of 'permissive' indicates that the SELinux security policy is not enforced and will not deny access, but, it will still log denial messages.</xsd:documentation>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="disabled">
-                         <xsd:annotation>
-                              <xsd:documentation>A value of 'disabled' indicates that SELinux is disabled.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="">
