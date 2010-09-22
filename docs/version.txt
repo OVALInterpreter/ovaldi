@@ -50,6 +50,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed the TextFileContent54 probe so that the "multiline" behavior is correctly applied by default.
 * Added support for the ind-def:filehash58_test.
 * Fixed an infinite loop in REGEX::GetAllMatchingSubstrings().
+* Added support for the win-def:process58_test.
 
 ---------------------------------------
 ---        Version 5.7 build 2      ---
