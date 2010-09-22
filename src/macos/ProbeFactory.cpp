@@ -76,7 +76,9 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = PasswordProbe::Instance();
 	} else if(objectName.compare("process_object") == 0) {
 		probe = ProcessProbe::Instance();
-	} else if(objectName.compare("runlevel_object") == 0) {
+	} else if(objectName.compare("process58_object") == 0) {
+	        probe = Process58Probe::Instance();
+        } else if(objectName.compare("runlevel_object") == 0) {
 	        //Mac OS has no notion of runlevels
 	        //probe = RunLevelProbe::Instance();
 	} else if(objectName.compare("sccs_object") == 0) {

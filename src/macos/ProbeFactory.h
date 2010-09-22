@@ -56,6 +56,7 @@
 //Not ported yet
 //#include "InetListeningServersProbe.h"
 #include "ProcessProbe.h"
+#include "Process58Probe.h"
 //Not ported yet
 //#include "ShadowProbe.h"
 #include "PasswordProbe.h"
