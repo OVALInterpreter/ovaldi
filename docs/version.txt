@@ -36,6 +36,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 
 * Added support for the collection of the ruid entity in the unix-def:process_test.
+* Added support for the unix-def:process58_test.
 
 ---------------------------------------
 ---        Version 5.8 build 1      ---
