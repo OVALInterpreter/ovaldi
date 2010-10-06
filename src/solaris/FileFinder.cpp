@@ -45,6 +45,8 @@ FileFinder::~FileFinder() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors) {
+
+	StringVector* behaviorPaths = new StringVector();
 	
 	// Process the behaviors to identify any additional paths.
 	// initialize these default values based on the defaults 
@@ -54,38 +56,43 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 		recurseDirection = "none";
 	}
 
-	string maxDepthStr = Behavior::GetBehaviorValue(behaviors, "max_depth");
-	int maxDepth = -1;
-	if(maxDepthStr.compare("") != 0) {
-		maxDepth = atoi(maxDepthStr.c_str());
-		if(maxDepth < -1) 
-			maxDepth = -1;
-	}
+	// We only need to check the recurse, recurse_file_systems, and max_depth behaviors
+	// if recurse_direction is not equal to "none".
+	if ( recurseDirection.compare("none") != 0 ){
 
-	string recurseStr = Behavior::GetBehaviorValue(behaviors, "recurse");
-	if(recurseStr.compare("") != 0) {
-		throw ProbeException("Unsupported behavior: recurse");
-	}
-
-	string recurse_file_systemStr = Behavior::GetBehaviorValue(behaviors, "recurse_file_system");
-	if(recurse_file_systemStr.compare("") != 0) {
-		throw ProbeException("Unsupported behavior: recurse_file_system");
-	}
-
-
-	// only need to address recurseDirection up & down if maxDepth is not 0
-	StringVector* behaviorPaths = new StringVector();
-	if(recurseDirection.compare("up") == 0 && maxDepth != 0) {
-		StringVector::iterator path;
-		for(path = paths->begin(); path != paths->end(); path++) {
-			this->UpwardPathRecursion(behaviorPaths, (*path), maxDepth);
+		string maxDepthStr = Behavior::GetBehaviorValue(behaviors, "max_depth");
+		int maxDepth = -1;
+		if(maxDepthStr.compare("") != 0) {
+			maxDepth = atoi(maxDepthStr.c_str());
+			if(maxDepth < -1) 
+				maxDepth = -1;
 		}
 
-	} else if(recurseDirection.compare("down") == 0 && maxDepth != 0) {
-		StringVector::iterator path;
-for(path = paths->begin(); path != paths->end(); path++) {
-			this->DownwardPathRecursion(behaviorPaths, (*path), maxDepth);
+		string recurseStr = Behavior::GetBehaviorValue(behaviors, "recurse");
+		if(recurseStr.compare("") != 0) {
+			throw ProbeException("Unsupported behavior: recurse");
 		}
+
+		string recurse_file_systemStr = Behavior::GetBehaviorValue(behaviors, "recurse_file_system");
+		if(recurse_file_systemStr.compare("") != 0) {
+			throw ProbeException("Unsupported behavior: recurse_file_system");
+		}
+
+
+		// only need to address recurseDirection up & down if maxDepth is not 0
+		if(recurseDirection.compare("up") == 0 && maxDepth != 0) {
+			StringVector::iterator path;
+			for(path = paths->begin(); path != paths->end(); path++) {
+				this->UpwardPathRecursion(behaviorPaths, (*path), maxDepth);
+			}
+
+		} else if(recurseDirection.compare("down") == 0 && maxDepth != 0) {
+			StringVector::iterator path;
+			for(path = paths->begin(); path != paths->end(); path++) {
+				this->DownwardPathRecursion(behaviorPaths, (*path), maxDepth);
+			}
+		}
+
 	}
 
 	return behaviorPaths;
