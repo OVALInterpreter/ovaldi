@@ -228,66 +228,13 @@ void InterfaceProbe::GetAllInterfaces() {
         Item* item;
 
         for ( unsigned int i = 0 ; i < ifTableLength ; i++ ) {
-            in_addr addr;
-            string inetAddr;
-            string subnetMask;
-            item = this->CreateItem();
-            item->SetStatus ( OvalEnum::STATUS_EXISTS );
-            addr.S_un.S_addr = ipAddrTable->table[i].dwAddr;
-            item->AppendElement ( new ItemEntity ( "inet_addr" , inetAddr = inet_ntoa ( addr ) , OvalEnum::DATATYPE_STRING, false , OvalEnum::STATUS_EXISTS ) );
-            addr.S_un.S_addr = ipAddrTable->table[i].dwMask;
-            item->AppendElement ( new ItemEntity ( "netmask" , subnetMask = inet_ntoa ( addr ) , OvalEnum::DATATYPE_STRING, false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "broadcast_addr" , InterfaceProbe::CalculateBroadcastAddress ( inetAddr , subnetMask ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            StringVector* addrType = InterfaceProbe::GetInterfaceAddressType ( ipAddrTable->table[i].wType );
-            StringVector::iterator it;
+            item = this->CreateItem();			
+			item->SetStatus ( OvalEnum::STATUS_EXISTS );
 
-            for ( it = addrType->begin(); it != addrType->end(); it++ ) {
-                item->AppendElement ( new ItemEntity ( "addr_type" , *it , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            }
-
-            if ( addrType != NULL ) {
-                addrType->clear();
-                delete addrType;
-                addrType = NULL;
-            }
-
-            item->AppendElement ( new ItemEntity ( "index" , Common::ToString ( ipAddrTable->table[i].dwIndex ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
             ifRow->dwIndex = ipAddrTable->table[i].dwIndex;
 
             if ( GetIfEntry ( ifRow ) == NO_ERROR ) {
-                // Format MAC Address
-                char *mac = ( char* ) malloc ( sizeof ( char ) * 30 );
-
-                if ( mac == NULL ) {
-                    InterfaceProbe::DeleteInterfaces();
-
-                    if ( ipAddrTable != NULL ) {
-                        free ( ipAddrTable );
-                        ipAddrTable = NULL;
-                    }
-
-                    if ( ifTable != NULL ) {
-                        free ( ifTable );
-                        ifTable = NULL;
-                    }
-
-                    if ( ifRow != NULL ) {
-                        free ( ifRow );
-                        ifRow = NULL;
-                    }
-
-                    throw ProbeException ( "Error: Unable to allocate memory for the interface's MAC address. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-                }
-
-                ZeroMemory ( mac , 30 );
-
-                for ( unsigned int j = 0 ; j < ifRow->dwPhysAddrLen ; j++ ) {
-                    sprintf ( &mac[j*3] , "%02X-" , ifRow->bPhysAddr[j] );
-                }
-
-                string macStr = mac;
-                item->AppendElement ( new ItemEntity ( "hardware_addr" , macStr.substr ( 0, macStr.length() - 1 ), OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-                item->AppendElement ( new ItemEntity ( "type" , InterfaceProbe::GetInterfaceType ( ifRow->dwType ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                
                 char *desc = ( char* ) malloc ( ifRow->dwDescrLen + 1 );
 
                 if ( desc == NULL ) {
@@ -318,6 +265,64 @@ void InterfaceProbe::GetAllInterfaces() {
                 }
 
                 item->AppendElement ( new ItemEntity ( "name" , desc , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
+				item->AppendElement ( new ItemEntity ( "index" , Common::ToString ( ipAddrTable->table[i].dwIndex ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
+
+				// Format MAC Address
+                char *mac = ( char* ) malloc ( sizeof ( char ) * 30 );
+
+                if ( mac == NULL ) {
+                    InterfaceProbe::DeleteInterfaces();
+
+                    if ( ipAddrTable != NULL ) {
+                        free ( ipAddrTable );
+                        ipAddrTable = NULL;
+                    }
+
+                    if ( ifTable != NULL ) {
+                        free ( ifTable );
+                        ifTable = NULL;
+                    }
+
+                    if ( ifRow != NULL ) {
+                        free ( ifRow );
+                        ifRow = NULL;
+                    }
+
+                    throw ProbeException ( "Error: Unable to allocate memory for the interface's MAC address. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+                }
+
+                ZeroMemory ( mac , 30 );
+
+                for ( unsigned int j = 0 ; j < ifRow->dwPhysAddrLen ; j++ ) {
+                    sprintf ( &mac[j*3] , "%02X-" , ifRow->bPhysAddr[j] );
+                }
+
+                string macStr = mac;
+				item->AppendElement ( new ItemEntity ( "type" , InterfaceProbe::GetInterfaceType ( ifRow->dwType ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                item->AppendElement ( new ItemEntity ( "hardware_addr" , macStr.substr ( 0, macStr.length() - 1 ), OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+
+				in_addr addr;
+				string inetAddr;
+				string subnetMask;
+	            
+				addr.S_un.S_addr = ipAddrTable->table[i].dwAddr;
+				item->AppendElement ( new ItemEntity ( "inet_addr" , inetAddr = inet_ntoa ( addr ) , OvalEnum::DATATYPE_STRING, false , OvalEnum::STATUS_EXISTS ) );
+				addr.S_un.S_addr = ipAddrTable->table[i].dwMask;
+				subnetMask = inet_ntoa ( addr );
+				item->AppendElement ( new ItemEntity ( "broadcast_addr" , InterfaceProbe::CalculateBroadcastAddress ( inetAddr , subnetMask ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+				item->AppendElement ( new ItemEntity ( "netmask" , subnetMask, OvalEnum::DATATYPE_STRING, false , OvalEnum::STATUS_EXISTS ) );
+
+				StringVector* addrType = InterfaceProbe::GetInterfaceAddressType ( ipAddrTable->table[i].wType );				
+				for ( StringVector::iterator it = addrType->begin(); it != addrType->end(); it++ ) {
+					item->AppendElement ( new ItemEntity ( "addr_type" , *it , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+				}
+
+				if ( addrType != NULL ) {
+					addrType->clear();
+					delete addrType;
+					addrType = NULL;
+				}
+
                 InterfaceProbe::interfaces->push_back ( item );
 
             } else {

@@ -209,11 +209,10 @@ void SharedResourceProbe::GetAllSharedResources() {
             }
 
             item->AppendElement ( new ItemEntity ( "netname" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_netname ) , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "local_path" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_path ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+			( ( typeStr = SharedResourceProbe::GetSharedResourceType ( bufPtr->shi2_type ) ).compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR ) ) : item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "max_uses" , Common::ToString ( bufPtr->shi2_max_uses ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "current_uses" , Common::ToString ( bufPtr->shi2_current_uses ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
-            ( ( typeStr = SharedResourceProbe::GetSharedResourceType ( bufPtr->shi2_type ) ).compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR ) ) : item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "access_all_permission" , Common::ToString ( accessAll ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "local_path" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_path ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "access_read_permission" , Common::ToString ( accessRead ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "access_write_permission" , Common::ToString ( accessWrite ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "access_create_permission" , Common::ToString ( accessCreate ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
@@ -221,6 +220,7 @@ void SharedResourceProbe::GetAllSharedResources() {
             item->AppendElement ( new ItemEntity ( "access_delete_permission" , Common::ToString ( accessDelete ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "access_atrib_permission" , Common::ToString ( accessAtrib ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "access_perm_permission" , Common::ToString ( accessPerm ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "access_all_permission" , Common::ToString ( accessAll ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
             resources->push_back ( item );
             bufPtr++;
         }
