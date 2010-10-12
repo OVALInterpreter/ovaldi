@@ -76,7 +76,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 
   C. Supporting Libraries
 
-       The OVAL Interpreter relies on five c/c++ libraries that can be found
+       The OVAL Interpreter relies on five C/C++ libraries that can be found
        on the web. See sections III - VII for more information about the
        specific libraries used and where to download their source from.
      

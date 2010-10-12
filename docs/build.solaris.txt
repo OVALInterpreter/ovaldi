@@ -77,7 +77,7 @@ SourceForge site.
 
   C. Supporting Libraries
 
-       The OVAL Interpreter relies on four c/c++ libraries that can be
+       The OVAL Interpreter relies on four C/C++ libraries that can be
        found on the web. See sections III - VI for more information
        about the specific libraries used and where to download their
        source from.
