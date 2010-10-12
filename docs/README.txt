@@ -138,6 +138,9 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        pcre.dll - Perl-compatible regular-expression library
        Xalan-C_1_10.dll - Xalan XSLT library
        XalanMessages_1_10.dll - Xalan XSLT library
+	   libgcrypt-11.dll - Libgcrypt library
+	   libgpg-error-0.dll - GnuPG error code library
+	   
 
        Documentation:
        README.txt - This file
