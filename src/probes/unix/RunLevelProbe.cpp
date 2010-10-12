@@ -173,8 +173,8 @@ RunLevelProbe::_makeRunlevelItem( const char runlevel, const runlevel_item &rli 
   item->SetStatus( OvalEnum::STATUS_EXISTS );
   item->AppendElement( new ItemEntity( "service_name", rli.service_name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
   item->AppendElement( new ItemEntity( "runlevel", runlevelToStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-  item->AppendElement( new ItemEntity( "start", ( start ) ? "true" : "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-  item->AppendElement( new ItemEntity( "kill", ( !start ) ? "true" : "false", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+  item->AppendElement( new ItemEntity( "start", ( start ) ? "true" : "false", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
+  item->AppendElement( new ItemEntity( "kill", ( !start ) ? "true" : "false", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
   delete[] runlevelToStr;
   return item;

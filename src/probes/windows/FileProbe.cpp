@@ -474,7 +474,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			errorMessage.append("(FileProbe) Unable to get ms_checksum information for the file: '");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
-			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(errorMessage));
 
 		} else {
@@ -501,7 +501,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		item->AppendElement(originalFilename);
 		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
 		item->AppendElement(productName);
-		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_ERROR);
 		item->AppendElement(productVersion);
 		
 		DWORD junk;

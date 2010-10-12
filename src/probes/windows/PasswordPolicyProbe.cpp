@@ -88,10 +88,10 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 			collectedItems = new ItemVector();
 			collectedItems->push_back(item);
 
-			item->AppendElement(new ItemEntity("max_passwd_age",  maxPasswordAge, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("max_passwd_age",  maxPasswordAge, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 
 			std::string passwordComplexity;
 			std::string reversibleEncryption;

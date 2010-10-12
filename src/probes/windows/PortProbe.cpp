@@ -149,7 +149,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                 item->AppendElement ( new ItemEntity ( "protocol" ,  protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
                                 item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "local_port" , localPort->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                item->AppendElement ( new ItemEntity ( "local_port" , localPort->GetValue() , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
 
                             } else {
@@ -160,7 +160,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                     item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
                                     item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "local_port" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                    item->AppendElement ( new ItemEntity ( "local_port" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                     collectedItems->push_back ( item );
                                 }
                             }
@@ -248,7 +248,7 @@ Item* PortProbe::BuildPortItem ( string localAddressStr , unsigned long localPor
 	if (!remoteAddressStr.empty()) {
 		// UDP and TCP server sockets don't have the remote address info
 		item->AppendElement ( new ItemEntity ( "foreign_address" , remoteAddressStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-		item->AppendElement ( new ItemEntity ( "foreign_port" , Common::ToString ( remotePort ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
+		item->AppendElement ( new ItemEntity ( "foreign_port" , Common::ToString ( remotePort ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
 	}
     return item;
 }

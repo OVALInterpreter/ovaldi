@@ -155,12 +155,12 @@ Item *ShadowProbe::CreateItemFromPasswd(const struct spwd *pwInfo) {
 	ItemEntity *nameEntity = new ItemEntity("username", pwInfo->sp_namp,
 											OvalEnum::DATATYPE_STRING, true);
 	ItemEntity *passwordEntity = new ItemEntity("password", pwInfo->sp_pwdp);
-	ItemEntity *lastChangedEntity = new ItemEntity("chg_lst", Common::ToString(pwInfo->sp_lstchg));
-	ItemEntity *changeAllowedEntity = new ItemEntity("chg_allow", Common::ToString(pwInfo->sp_min));
-	ItemEntity *changeRequiredEntity = new ItemEntity("chg_req", Common::ToString(pwInfo->sp_max));
-	ItemEntity *expirationWarningEntity = new ItemEntity("exp_warn", Common::ToString(pwInfo->sp_warn));
-	ItemEntity *accountInactiveEntity = new ItemEntity("exp_inact", Common::ToString(pwInfo->sp_inact));
-	ItemEntity *expirationDateEntity = new ItemEntity("exp_date", Common::ToString(pwInfo->sp_expire));
+	ItemEntity *lastChangedEntity = new ItemEntity("chg_lst", Common::ToString(pwInfo->sp_lstchg), OvalEnum::DATATYPE_INTEGER);
+	ItemEntity *changeAllowedEntity = new ItemEntity("chg_allow", Common::ToString(pwInfo->sp_min), OvalEnum::DATATYPE_INTEGER);
+	ItemEntity *changeRequiredEntity = new ItemEntity("chg_req", Common::ToString(pwInfo->sp_max), OvalEnum::DATATYPE_INTEGER);
+	ItemEntity *expirationWarningEntity = new ItemEntity("exp_warn", Common::ToString(pwInfo->sp_warn), OvalEnum::DATATYPE_INTEGER);
+	ItemEntity *accountInactiveEntity = new ItemEntity("exp_inact", Common::ToString(pwInfo->sp_inact), OvalEnum::DATATYPE_INTEGER);
+	ItemEntity *expirationDateEntity = new ItemEntity("exp_date", Common::ToString(pwInfo->sp_expire), OvalEnum::DATATYPE_INTEGER);
 	ItemEntity *flagsEntity = new ItemEntity("flag", Common::ToString(pwInfo->sp_flag));
 
 	item->AppendElement(nameEntity);

@@ -256,7 +256,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 				DWORD errorNum = GetLastError();
 
-				if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
+				if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND || errorNum == ERROR_NOT_READY) {
 
 					// if the file is not found just return no need to report an error
 					return;
@@ -354,7 +354,7 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 
 			DWORD errorNum = GetLastError();
 
-			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
+			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND || errorNum == ERROR_NOT_READY) {
 
 				// if the file is not found just return no need to report an error
 				return;
@@ -599,6 +599,12 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
 		if (hFind == INVALID_HANDLE_VALUE) {
+			DWORD errorNum = GetLastError();
+			DWORD attrs = GetFileAttributes(path.c_str());
+			if (attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT && errorNum == ERROR_NOT_READY) {
+				// Specified path points to an empty removable media device mounted into the NTFS filesystem.  Skip it.
+				return childDirs;
+			}
 
 			delete childDirs;
 

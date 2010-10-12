@@ -41,6 +41,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the Windows InterfaceProbe::GetAllInterfaces() method so that it now produces valid content.
 * Fixed a bug in the Windows SharedResourceProbe::GetAllSharedResources() method so that it now produces valid content.
 * Fixed several warnings that were discovered when the interpreter was compiled with the /w4 flag in Visual Studio.
+* Fixed a bug where tests that specified recursive behavior on a directory containing a mounted CD drive as a subdirectory would return an error if the CD drive was empty.
+* Fixed data types to align with OVAL 5.8 schema.
 
 ---------------------------------------
 ---        Version 5.8 build 1      ---

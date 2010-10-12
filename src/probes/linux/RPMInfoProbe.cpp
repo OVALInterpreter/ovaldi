@@ -365,7 +365,7 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
 	item->AppendElement(new ItemEntity("epoch",  installed_epoch, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("release",  installed_release, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("version",  installed_version, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("evr",  installed_evr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("evr",  installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("signature_keyid",  installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
     /* add the new item to the vector. */

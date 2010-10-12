@@ -100,8 +100,8 @@ Item *PasswordProbe::CreateItemFromPasswd(const struct passwd *pwInfo) {
 	ItemEntity *nameEntity = new ItemEntity("username", pwInfo->pw_name,
 											OvalEnum::DATATYPE_STRING, true);
 	ItemEntity *passwordEntity = new ItemEntity("password", pwInfo->pw_passwd);
-	ItemEntity *useridEntity = new ItemEntity("user_id", Common::ToString(pwInfo->pw_uid));
-	ItemEntity *groupidEntity = new ItemEntity("group_id", Common::ToString(pwInfo->pw_gid));
+	ItemEntity *useridEntity = new ItemEntity("user_id", Common::ToString(pwInfo->pw_uid), OvalEnum::DATATYPE_INTEGER);
+	ItemEntity *groupidEntity = new ItemEntity("group_id", Common::ToString(pwInfo->pw_gid), OvalEnum::DATATYPE_INTEGER);
 	ItemEntity *gcosEntity = new ItemEntity("gcos", pwInfo->pw_gecos);
 	ItemEntity *homeDirEntity = new ItemEntity("home_dir", pwInfo->pw_dir);
 	ItemEntity *loginShellEntity = new ItemEntity("login_shell", pwInfo->pw_shell);

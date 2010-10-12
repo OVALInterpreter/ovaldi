@@ -188,7 +188,8 @@ class XinetdProbe : public AbsProbe {
 	 */
 	void AddItemEntity(Item *item, 
 					   const ServiceEntryMap& service, 
-					   const std::string& paramName);
+					   const std::string& paramName,
+					   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
 
 	/** 
 	 * Adds an entity to the given item with the given name, from the service param
@@ -198,7 +199,8 @@ class XinetdProbe : public AbsProbe {
 	void AddItemEntity(Item *item, 
 					   const ServiceEntryMap& service, 
 					   const std::string& paramName,
-					   const std::string& entityName);
+					   const std::string& entityName,
+					   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
 
 	/**
 	 * Reads the contents of the given file into the given string.

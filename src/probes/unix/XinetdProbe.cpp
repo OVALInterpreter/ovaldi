@@ -549,7 +549,7 @@ Item* XinetdProbe::Service2Item(const ServiceEntryMap& service,
 	this->AddItemEntity(item, service, "flags");
 	this->AddItemEntity(item, service, "no_access");
 	this->AddItemEntity(item, service, "only_from");
-	this->AddItemEntity(item, service, "port");
+	this->AddItemEntity(item, service, "port", NULL, OvalEnum::DATATYPE_INTEGER);
 	this->AddItemEntity(item, service, "server");
 	this->AddItemEntity(item, service, "server_args", "server_arguments");
 	this->AddItemEntity(item, service, "socket_type");
@@ -661,19 +661,21 @@ bool XinetdProbe::ResolveEnabled(const ServiceEntryMap& service) {
 
 void XinetdProbe::AddItemEntity(Item *item, 
 								const ServiceEntryMap& service, 
-								const std::string& paramName) {
-	this->AddItemEntity(item, service, paramName, paramName);
+								const std::string& paramName,
+								OvalEnum::Datatype dataType) {
+	this->AddItemEntity(item, service, paramName, paramName, dataType);
 }
 
 void XinetdProbe::AddItemEntity(Item *item, 
 								const ServiceEntryMap& service, 
 								const std::string& paramName,
-								const std::string& entityName) {
+								const std::string& entityName,
+								OvalEnum::Datatype dataType) {
 
 	ServiceEntryMap::const_iterator iter;
 	if ((iter = service.find(paramName)) != service.end())
 		item->AppendElement(new ItemEntity(entityName.c_str(), iter->second[0].str(),
-										   OvalEnum::DATATYPE_STRING, false));
+										   dataType, false));
 }
 
 void XinetdProbe::ReadFileToString(const string& fileName, string &contents) {

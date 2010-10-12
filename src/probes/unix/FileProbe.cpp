@@ -259,29 +259,29 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	//////////////////////////////////////////////////////
 	char gidBuf[16];
     snprintf(gidBuf, sizeof(gidBuf), "%u", sbuf.st_gid);
-	item->AppendElement(new ItemEntity("group_id", gidBuf));
+	item->AppendElement(new ItemEntity("group_id", gidBuf, OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  user_id  /////////////////////
 	//////////////////////////////////////////////////////
 	char uidBuf[16];
     snprintf(uidBuf, sizeof(uidBuf), "%u", sbuf.st_uid);
-	item->AppendElement(new ItemEntity("user_id", uidBuf));
+	item->AppendElement(new ItemEntity("user_id", uidBuf, OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  a_time	 /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("a_time", Common::ToString((long)sbuf.st_atime)));
+	item->AppendElement(new ItemEntity("a_time", Common::ToString((long)sbuf.st_atime), OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  c_time	 /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("c_time", Common::ToString((long)sbuf.st_ctime)));
+	item->AppendElement(new ItemEntity("c_time", Common::ToString((long)sbuf.st_ctime), OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  m_time	 /////////////////////
 	//////////////////////////////////////////////////////
-	item->AppendElement(new ItemEntity("m_time", Common::ToString((long)sbuf.st_mtime)));
+	item->AppendElement(new ItemEntity("m_time", Common::ToString((long)sbuf.st_mtime), OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  size     /////////////////////
