@@ -40,6 +40,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug in the FileFinder::ProcessPathBehaviors() such that the max_depth, recurse, recurse_file_systems behaviors are only checked if the recurse_direction behavior has a value other than "none". This was done for all platforms (windows, linux, macos, and solaris).
 * Fixed a bug in the Windows InterfaceProbe::GetAllInterfaces() method so that it now produces valid content.
 * Fixed a bug in the Windows SharedResourceProbe::GetAllSharedResources() method so that it now produces valid content.
+* Fixed several warnings that were discovered when the interpreter was compiled with the /w4 flag in Visual Studio.
 
 ---------------------------------------
 ---        Version 5.8 build 1      ---

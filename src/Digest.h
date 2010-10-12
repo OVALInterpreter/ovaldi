@@ -30,6 +30,10 @@
 #ifndef DIGEST_H
 #define DIGEST_H
 
+#ifdef WIN32
+	#pragma warning(disable:4505)
+#endif
+
 #include "Exception.h"
 #include <string>
 #include <iostream>

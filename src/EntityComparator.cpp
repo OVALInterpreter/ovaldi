@@ -357,14 +357,10 @@ OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation o
 	return result;
 }
 
-OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operation op, string defValue, string scValue) {
-	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-
+OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operation /*op*/, string defValue, string scValue) {
 	// TODO need to implement
 	
 	throw Exception("Error: Comparing IOS versions has not been implemented.");
-	
-	return result;
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation op, string defValue, string scValue) {
@@ -662,7 +658,7 @@ LongLongVector* EntityComparator::ParseVersionStr(string versionStr) {
 	LongLongVector* tokens = new LongLongVector();
 
     long long tokenInt;
-    char* endptr;
+    char* endptr = NULL;
 	int base = 10;
 	
     // Get index of first delimiter

@@ -60,8 +60,7 @@ AbsProbe* AuditEventPolicySubcategoriesProbe::Instance() {
 }
 
 //TODO: Split this into at least 2 methods
-ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object *object) {
-
+ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/) {
 	ItemVector *collectedItems = NULL;
 	Item* item = NULL;	
 	LSA_OBJECT_ATTRIBUTES ObjectAttributes;

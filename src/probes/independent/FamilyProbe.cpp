@@ -66,7 +66,7 @@ AbsProbe* FamilyProbe::Instance() {
 	return instance;	
 }
 
-ItemVector* FamilyProbe::CollectItems(Object *object) {
+ItemVector* FamilyProbe::CollectItems(Object* /*object*/) {
 	ItemVector *collectedItems = new ItemVector();
 
 	Item* item = this->CreateItem();

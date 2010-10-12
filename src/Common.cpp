@@ -536,7 +536,7 @@ string Common::ToUpper(string s) {
 
 	for(iter = s.begin(); iter != s.end(); iter++)
 	{ 
-		upperString += ::toupper(*iter);
+		upperString += (char)std::toupper(*iter);
 	}
 
 	return upperString;
@@ -549,7 +549,7 @@ string Common::ToLower(string s) {
 
 	for(iter = s.begin(); iter != s.end(); iter++)
 	{ 
-		lowerString += ::tolower(*iter);
+		lowerString += (char)std::tolower(*iter);
 	}
 
 	return lowerString;

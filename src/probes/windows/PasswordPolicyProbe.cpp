@@ -55,8 +55,7 @@ AbsProbe* PasswordPolicyProbe::Instance() {
 	return instance;	
 }
 
-ItemVector* PasswordPolicyProbe::CollectItems(Object *object) {
-
+ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 	ItemVector *collectedItems = NULL;
 	
 	DWORD dwLevel = 0;
@@ -203,7 +202,7 @@ void PasswordPolicyProbe::ArePasswordComplexityReverseEncryptionSet(std::string 
 
 			// Skip null bytes, line breaks, and end of line
 			if (c != NULL && c != 0x0A && c != 0x0D && pos < 64 && c != EOF) {
-				line[pos] = c;
+				line[pos] = (char)c;
 				pos++;
 			}
 		} while (c != EOF);

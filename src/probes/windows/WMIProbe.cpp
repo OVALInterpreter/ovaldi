@@ -426,7 +426,7 @@ bool WMIProbe::GetWqlField(string wqlIn, string* fieldName) {
 
 	string wqlUpperCase = wqlIn;
 	for(unsigned int i=0;i<wqlIn.length();i++) {
-        wqlUpperCase[i] = ::toupper(wqlIn[i]);
+        wqlUpperCase[i] = (char)std::toupper(wqlIn[i]);
 	}
 
 	// Find the opening SELECT statement

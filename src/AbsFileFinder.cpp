@@ -286,8 +286,7 @@ bool AbsFileFinder::FilePathExists(string filePath){
 	return exists;
 }
 
-StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName, BehaviorVector* behaviors) {
-
+StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
 	StringVector* fileNames = new StringVector();
 
 	// does this fileName use variables?

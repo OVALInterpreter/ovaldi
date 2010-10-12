@@ -451,9 +451,9 @@ string LDAPProbe::GetLDAPServerLocation() {
 	} else {
 		throw ProbeException ( string ( "Couldn't open file: " ) + filePathStr );
 	}
-	#endif
 
 	return "";
+	#endif
 }
 
 StringSet* LDAPProbe::GetAllAttributes ( string suffixStr, string relativeDnStr ) {

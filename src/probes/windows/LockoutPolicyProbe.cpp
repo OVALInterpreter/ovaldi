@@ -54,8 +54,7 @@ AbsProbe* LockoutPolicyProbe::Instance() {
 	return instance;	
 }
 
-ItemVector* LockoutPolicyProbe::CollectItems(Object *object) {
-
+ItemVector* LockoutPolicyProbe::CollectItems(Object* /*object*/) {
 	ItemVector *collectedItems = NULL;
 
 	Item* item = NULL;

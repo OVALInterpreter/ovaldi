@@ -54,8 +54,7 @@ AbsProbe* AuditEventPolicyProbe::Instance() {
 	return instance;	
 }
 
-ItemVector* AuditEventPolicyProbe::CollectItems(Object *object) {
-
+ItemVector* AuditEventPolicyProbe::CollectItems(Object* /*object*/) {
 	ItemVector *collectedItems = NULL;
 
 	Item* item = NULL;	

@@ -35,8 +35,7 @@ using namespace std;
 //			DataDirResolver Class                                   					  //	
 //****************************************************************************************//
 
-DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const publicId, const XMLCh *const systemId, const XMLCh *const baseURI) {
-	
+DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const /*publicId*/, const XMLCh *const systemId, const XMLCh *const /*baseURI*/) {
 	string path = "";
 	size_t last;
 	string schemapath = Common::GetSchemaPath();

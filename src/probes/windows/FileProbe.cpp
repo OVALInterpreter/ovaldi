@@ -961,8 +961,7 @@ void FileProbe::GetInternalName(LPVOID versionbuf, string filePath, Item *item, 
 	}
 }
 
-void FileProbe::GetLanguage(LPVOID versionbuf, string filePath, Item *item, ItemEntity* language) {
-
+void FileProbe::GetLanguage(LPVOID /*versionbuf*/, string filePath, Item* /*item*/, ItemEntity* language) {
 	language->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 }
 

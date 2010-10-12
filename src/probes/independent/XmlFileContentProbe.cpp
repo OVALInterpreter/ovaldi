@@ -409,7 +409,7 @@ Item* XmlFileContentProbe::CreateItem() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DummyEntityResolver methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-InputSource* DummyEntityResolver::resolveEntity(const XMLCh *const publicId, const XMLCh *const systemId)
+InputSource* DummyEntityResolver::resolveEntity(const XMLCh *const /*publicId*/, const XMLCh *const /*systemId*/)
 {
     return new DummyEntityResolver::NoOpInputSource();
 }
@@ -424,7 +424,7 @@ unsigned int DummyEntityResolver::DoNothingBinInputStream::curPos() const
     return 0;
 }
 
-unsigned int DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const toFill, const unsigned int maxToRead)
+unsigned int DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const /*toFill*/, const unsigned int /*maxToRead*/)
 {
     return 0;
 }

@@ -165,14 +165,15 @@ string WindowsCommon::GetErrorMessage(DWORD dwLastError) {
     //  text to be acquired from the system 
     //  or from the supplied module handle.
     //
-    if(dwBufferLength = FormatMessageA(dwFormatFlags,
-										hModule, // module to get message from (NULL == system)
-										dwLastError,
-										MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
-										(LPSTR) &MessageBuffer,
-										0,
-										NULL
-										))
+	dwBufferLength = FormatMessageA(dwFormatFlags,
+									hModule, // module to get message from (NULL == system)
+									dwLastError,
+									MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
+									(LPSTR) &MessageBuffer,
+									0,
+									NULL
+									);
+    if(dwBufferLength)
     {
 		errMsg = MessageBuffer;
         //
@@ -317,7 +318,7 @@ bool WindowsCommon::ExpandGroupBySID(string groupSidStr, StringSet* memberSids, 
 
 bool WindowsCommon::IsGroupSID(string SID) {
 
-	PSID pSID;	
+	PSID pSID = NULL;
 	DWORD nameBufferSize = NAME_BUFFER_SIZE;	
 	DWORD domainNameBufferSize = NAME_BUFFER_SIZE;
 	char nameBuffer[NAME_BUFFER_SIZE];
@@ -1260,7 +1261,7 @@ PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
 	Log::Debug("Starting GetSIDForTrusteeSID with: " + trusteeSID);
 
 	BOOL retVal = FALSE;
-	PSID pSid;
+	PSID pSid = NULL;
 
 	try {
 		// Call LookupAccountName to get the SID.

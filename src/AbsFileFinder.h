@@ -84,7 +84,7 @@ public:
 		Search the file system for files under the specified path that match the 
 	  	provided ObjectEntity.
 	*/
-	StringVector* GetFileNames(std::string path, ObjectEntity* fileName, BehaviorVector* behaviors = NULL);
+	StringVector* GetFileNames(std::string path, ObjectEntity* fileName);
 
 	/** Return a StringVector of filepaths that match the specified filePath ObjectEntity. 
 	 *  @param filePath A ObjectEntity that represents the filepath(s) to retrieve.
