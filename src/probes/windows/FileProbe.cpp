@@ -115,6 +115,7 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					if (fileName->GetNil()) item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, fileName->GetNil()));
 					collectedItems->push_back(item);
 
 				}

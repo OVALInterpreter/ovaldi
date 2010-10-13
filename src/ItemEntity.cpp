@@ -35,20 +35,22 @@ using namespace std;
 //****************************************************************************************//
 //								ItemEntity Class										  //	
 //****************************************************************************************//
-ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
+ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status, bool isNil) {
 	this->name = name;
 	this->value.push_back(new StringEntityValue(value));
 	this->datatype = datatype;
 	this->isObjectEntity = isObjectEntity;
 	this->scStatus = status;
+	this->nil = isNil;
 }
 
-ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status) {
+ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status, bool isNil) {
 	this->name = name;
 	this->value = value;
 	this->datatype = datatype;
 	this->isObjectEntity = isObjectEntity;
 	this->scStatus = status;
+	this->nil = isNil;
 }
 
 ItemEntity::ItemEntity(const ItemEntity& itemEntity){
@@ -57,6 +59,7 @@ ItemEntity::ItemEntity(const ItemEntity& itemEntity){
     this->datatype = itemEntity.datatype;
     this->isObjectEntity = itemEntity.isObjectEntity;
 	this->scStatus = itemEntity.scStatus;
+	this->nil = itemEntity.nil;
 }
 
 ItemEntity::~ItemEntity() {
@@ -201,6 +204,10 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 	if(strStatus.compare("exists") != 0)
         XmlCommon::AddAttribute(newItemEntityElem, "status", strStatus);
 
+	if (this->GetNil()) {
+		XmlCommon::AddAttribute(newItemEntityElem, "xsi:nil", "true");
+	}
+
 	// Add the value(s)
 	AbsEntityValueVector v = this->GetValues();
 	for(AbsEntityValueVector::iterator it = v.begin(); it != v.end();it++){
@@ -264,4 +271,12 @@ void ItemEntity::Parse(DOMElement* itemEntityElm) {
 		}	
 		this->SetValues(aevv);
 	}
+}
+
+void ItemEntity::SetNil(bool isNil) {
+	this->nil = isNil;
+}
+
+bool ItemEntity::GetNil() {
+	return this->nil;
 }

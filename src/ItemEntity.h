@@ -49,10 +49,10 @@ class ItemEntity {
 public:
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS);
+	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
@@ -155,12 +155,24 @@ public:
 	 */
 	void SetIsObjectEntity(bool isObjectEntity);
 
+	/** Set the nil field's value.
+	 *  @param nil The boolean value indicating whether or not the entity has a nil value.
+	 *  @return void
+	 */
+	void SetNil(bool isNil);
+
+	/** Return true if the xsi:nil is set to true.
+	 *  @return A boolean value indicating whether or not the entity has a nil value.
+	 */
+	bool GetNil();
+
 private:
 	OvalEnum::SCStatus scStatus;
 	std::string name;
 	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
 	bool isObjectEntity;
+	bool nil;
 };
 
 /**	

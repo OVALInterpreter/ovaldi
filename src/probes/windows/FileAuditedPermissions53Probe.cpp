@@ -144,7 +144,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
                         item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
                         collectedItems->push_back ( item );
                     }
 
@@ -167,6 +167,12 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                                 Item* item = this->GetAuditedPermissions ( fp->first, fp->second, ( *iterator ) );
 
                                 if ( item != NULL ) {
+									if (fileName->GetNil()) {
+										ItemEntityVector* fileNameVector = item->GetElementsByName("filename");
+										if (fileNameVector->size() > 0) {
+											fileNameVector->at(0)->SetNil(true);
+										}
+									}
                                     collectedItems->push_back ( item );
                                 }
 
@@ -192,7 +198,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
                                 item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+                                item->AppendElement ( new ItemEntity ( "filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, (fileName != NULL && fileName->GetNil()) ) );
                                 item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
                             }
@@ -239,7 +245,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 					fileNameStatus->SetValue(fpComponents->second);
 					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS, (fileName != NULL && fileName->GetNil())));
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){

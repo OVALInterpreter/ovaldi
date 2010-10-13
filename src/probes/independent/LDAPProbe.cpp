@@ -74,7 +74,7 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 	ObjectEntity* relativeDnEntity = object->GetElementByName ( "relative_dn" );
 	ObjectEntity* attributeEntity = object->GetElementByName ( "attribute" );
 	ItemVector* collectedItems = new ItemVector();
-	ItemEntity* currentRelativeDn = new ItemEntity ( "relative_dn", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+	ItemEntity* currentRelativeDn = new ItemEntity ( "relative_dn", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() );
 	int scopeBehavior = LDAP_SCOPE_BASE;
 
 	for ( BehaviorVector::iterator it = ( object->GetBehaviors() )->begin() ; it != ( object->GetBehaviors() )->end() ; it++ ) {
@@ -104,17 +104,18 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 				item->SetStatus ( OvalEnum::STATUS_EXISTS );
 				item->AppendElement ( new ItemEntity ( "suffix", suffixStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
 
-				if ( ! ( relativeDnEntity->GetNil() && relativeDnStr.compare ( "" ) == 0 ) ) {
-					item->AppendElement ( new ItemEntity ( "relative_dn", relativeDnStr, OvalEnum::DATATYPE_STRING, true , OvalEnum::STATUS_EXISTS ) );
+				if ( ( relativeDnEntity->GetNil() || relativeDnStr.compare ( "" ) != 0 ) ) {
+					item->AppendElement ( new ItemEntity ( "relative_dn", relativeDnStr, OvalEnum::DATATYPE_STRING, true , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
 				}
 				if ( !attributeEntity->GetNil() ) {
-					item->AppendElement ( new ItemEntity ( "attribute", attributeStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+					item->AppendElement ( new ItemEntity ( "attribute", attributeStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, attributeEntity->GetNil() ) );
 					item->AppendElement ( new ItemEntity ( "object_class", objectClassStr, OvalEnum::DATATYPE_STRING, false, ( objectClassStr.compare ( "" ) ==0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 					this->GetLdapItem ( suffixStr, relativeDnStr, attributeStr,item );
 					if ( item != NULL ) {
 						collectedItems->push_back ( new Item ( *item ) );
 					}
 				} else {
+					item->AppendElement ( new ItemEntity ( "attribute", attributeStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, attributeEntity->GetNil() ) );
 					item->AppendElement ( new ItemEntity ( "object_class", objectClassStr, OvalEnum::DATATYPE_STRING, false, ( objectClassStr.compare ( "" ) ==0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 					collectedItems->push_back ( new Item ( *item ) );
 				}
@@ -128,10 +129,8 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 						Item* item = this->CreateItem();
 						item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 						item->AppendElement ( new ItemEntity ( "suffix", suffixStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-						if ( ! ( relativeDnEntity->GetNil() && relativeDnStr.compare ( "" ) == 0 ) ) {
-							item->AppendElement ( new ItemEntity ( "relative_dn", relativeDnStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-						}
-						item->AppendElement ( new ItemEntity ( "attribute", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+						item->AppendElement ( new ItemEntity ( "relative_dn", relativeDnStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
+						item->AppendElement ( new ItemEntity ( "attribute", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
 						item->AppendElement ( new ItemEntity ( "object_class", objectClassStr, OvalEnum::DATATYPE_STRING, false, ( objectClassStr.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 						collectedItems->push_back ( item );
 					}
@@ -145,7 +144,7 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 				Item* item = this->CreateItem();
 				item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 				item->AppendElement ( new ItemEntity ( "suffix", suffixStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-				item->AppendElement ( new ItemEntity ( "relative_dn", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+				item->AppendElement ( new ItemEntity ( "relative_dn", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
 				collectedItems->push_back ( item );
 			}
 		}

@@ -135,7 +135,7 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
                         collectedItems->push_back ( item );
                     }
 
@@ -158,6 +158,12 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
                                 Item* item = this->GetAuditedPermissions ( fp->first, fp->second, ( *iterator ) );
 
                                 if ( item != NULL ) {
+									if (fileName->GetNil()) {
+										ItemEntityVector* fileNameVector = item->GetElementsByName("filename");
+										if (fileNameVector->size() > 0) {
+											fileNameVector->at(0)->SetNil(true);
+										}
+									}
                                     collectedItems->push_back ( item );
                                 }
 
@@ -182,7 +188,7 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
                                 Item* item = this->CreateItem();
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                 item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+                                item->AppendElement ( new ItemEntity ( "filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, fileName->GetNil() ) );
                                 item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
                             }

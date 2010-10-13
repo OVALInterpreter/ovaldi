@@ -86,7 +86,7 @@ ItemVector* MetabaseProbe::CollectItems ( Object* object ) {
 								item = this->CreateItem();
 								item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 								item->AppendElement ( new ItemEntity ( "key",*key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-								item->AppendElement ( new ItemEntity ( "id", ( *iterator ), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+								item->AppendElement ( new ItemEntity ( "id", ( *iterator ), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_DOES_NOT_EXIST, idEntity->GetNil() ) );
 								collectedItems->push_back ( item );
 							}
 						}
@@ -98,6 +98,7 @@ ItemVector* MetabaseProbe::CollectItems ( Object* object ) {
 					item = this->CreateItem();
 					item->SetStatus ( OvalEnum::STATUS_EXISTS );
 					item->AppendElement ( new ItemEntity ( "key", *key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+					item->AppendElement ( new ItemEntity ( "id", "", OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS, true ) );
 					collectedItems->push_back ( item );
 				}
 			}
