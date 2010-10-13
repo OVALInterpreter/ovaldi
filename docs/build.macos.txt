@@ -117,7 +117,7 @@ install the supporting libraries.
            cd $XERCESCROOT/src/xercesc
 		   ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
 	       make
-           sudo make install
+           sudo -E make install
 
   C. Xalan Library
 
@@ -135,7 +135,7 @@ install the supporting libraries.
            cd $XALANCROOT
            ./runConfigure -p macosx -c gcc -x g++ -P 'install path'
            make
-           sudo make install
+           sudo -E make install
 
   F. Libgcrypt Library
 
