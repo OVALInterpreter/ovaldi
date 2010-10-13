@@ -148,7 +148,7 @@ install the supporting libraries.
 	   
        To compile and install the Libgcrypt library simply run the following commands.
   
-           ./config --prefix='install path'
+           ./configure --prefix='install path'
            make
            sudo make install
 
