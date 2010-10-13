@@ -109,7 +109,7 @@ install the supporting libraries.
        
        The source code for the Xerces-C library can be downloaded from the following link.
 
-           http://archive.apache.org/dist/xml/xerces-c/Xerces-C_2_8_0/source/
+           http://archive.apache.org/dist/xerces/c/2/sources/
     
        To compile and install the Xerces-C library simply run the following commands.
 	   
