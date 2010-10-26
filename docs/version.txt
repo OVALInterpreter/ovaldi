@@ -35,6 +35,12 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---        Version 5.8 build 2      ---
 ---------------------------------------
 
+* Fixed two misspelled item entities in the AuditEventPolicySubcategoriesProbe.
+
+---------------------------------------
+---        Version 5.8 build 2      ---
+---------------------------------------
+
 * Fixed a bug in Digest::getDigest() that caused an error stating that sha-224 was not supported on platforms where it should be.
 * Added support for the collection of the ruid entity in the unix-def:process_test.
 * Fixed a bug in the FileFinder::ProcessPathBehaviors() such that the max_depth, recurse, recurse_file_systems behaviors are only checked if the recurse_direction behavior has a value other than "none". This was done for all platforms (windows, linux, macos, and solaris).
