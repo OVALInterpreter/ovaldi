@@ -330,8 +330,8 @@ void AuditEventPolicySubcategoriesProbe::Init() {
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_AuthorizationPolicy, "authorization_policy_change");
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_MpsscvRulePolicy, "mpssvc_rule_level_policy_change");
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_Others, "other_policy_change_events");
-	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_NonSensitive, "non_sensitive_privlege_use");
-	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_Others, "other_privlege_use_events");
+	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_NonSensitive, "non_sensitive_privilege_use");
+	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_Others, "other_privilege_use_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_Sensitive, "sensitive_privilege_use");
 	InsertIntoGuidItemEntityNameMapping(Audit_System_IPSecDriverEvents, "ipsec_driver");
 	InsertIntoGuidItemEntityNameMapping(Audit_System_Others, "other_system_events");
