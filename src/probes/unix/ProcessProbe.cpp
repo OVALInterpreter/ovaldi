@@ -235,7 +235,6 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	// Process Parameters
 	char cmdline[CMDLINE_LEN + 1];
-	char schedulingClass[SCHED_CLASS_LEN + 1];
 
 	int ruid, euid, pid, ppid;
 	long priority = 0;
@@ -260,7 +259,6 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	// Clear the ps values
 	memset(cmdline, 0, CMDLINE_LEN + 1);
-	memset(schedulingClass, 0, SCHED_CLASS_LEN + 1);
 	memset(ttyName, 0, TTY_LEN + 1);
 	euid = ruid = pid = ppid = priority = starttime = 0;
 	adjustedStartTime = execTime = 0;
@@ -315,7 +313,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("scheduling_class",  "-", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
 			item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
