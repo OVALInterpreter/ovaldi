@@ -46,10 +46,10 @@ EXECUTABLE = $(OUTDIR)/ovaldi
 # General options that should be used by g++.
 CPPFLAGS = -Wall -DDARWIN -O $(INCDIRS)
 
-LIBDIR = -L/opt/local/lib -L/usr/lib -L/usr/local/lib
+LIBDIR = -L/usr/lib -L/usr/local/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -llber
+LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -llber
 
 SRC_DIRS = $(SRCDIR) $(MACOSDIR) $(UNIXPROBEDIR) $(MACOSPROBEDIR) $(INDEPENDENTPROBEDIR)
 CPP_FILES = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
