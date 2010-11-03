@@ -60,13 +60,12 @@
 
 // Define some buffer lengths
 #define CMDLINE_LEN 1024
-#define SCHED_CLASS_LEN 128
 #define TTY_LEN PATH_MAX
 
 /**
 	Data collector for process test.
 
-	The following command produces process information sutable fro this probe.
+	The following command produces process information suitable for this probe.
     ps -eo class,etime,pid,uid,start_time,tty,priority,cmd
 */
 class Process58Probe : public AbsProbe {
