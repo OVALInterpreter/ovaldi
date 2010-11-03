@@ -49,7 +49,7 @@ CPPFLAGS = -Wall -O -DBSD_COMP -DSUNOS $(INCDIRS)
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -lsocket -lnsl
+LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -lsocket -lnsl
 
 SRC_DIRS = $(SRCDIR) $(SOLARISDIR) $(UNIXPROBEDIR) $(SOLARISPROBEDIR) $(INDEPENDENTPROBEDIR)
 CPP_FILES = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
