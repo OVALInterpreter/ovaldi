@@ -66,6 +66,7 @@
 #include "XinetdProbe.h"
 #include "RunLevelProbe.h"
 // SOLARIS PORT NOTICE: Add other probes here to support collection of solaris specific objects.
+#include "IsainfoProbe.h"
 
 class AbsProbe;
 

@@ -94,9 +94,9 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = XinetdProbe::Instance();
 
 // here are the solaris specific objects
-/*	} else if(objectName.compare("isainfo_object") == 0) {
-		// SOLARIS PORT NOTICE: get an instance of the probe for this object
-	} else if(objectName.compare("package_object") == 0) {
+	} else if(objectName.compare("isainfo_object") == 0) {
+		probe = IsainfoProbe::Instance();
+/*	} else if(objectName.compare("package_object") == 0) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
 	} else if(objectName.compare("patch_object") == 0) {
 		// SOLARIS PORT NOTICE: get an instance of the probe for this object
