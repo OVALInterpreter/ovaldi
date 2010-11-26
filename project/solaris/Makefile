@@ -49,7 +49,7 @@ CPPFLAGS = -Wall -O -DBSD_COMP -DSUNOS $(INCDIRS)
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -lsocket -lnsl
+LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -lsocket -lnsl -llber
 
 SRC_DIRS = $(SRCDIR) $(SOLARISDIR) $(UNIXPROBEDIR) $(SOLARISPROBEDIR) $(INDEPENDENTPROBEDIR)
 CPP_FILES = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
@@ -75,5 +75,5 @@ update:
 clean :
 	-rm -rf $(OUTDIR) $(OBJ_FILES)
 
-debug: CPPFLAGS = -Wall -O -static-libgcc -ggdb
+debug: CPPFLAGS += -Wall -ggdb
 debug: all
