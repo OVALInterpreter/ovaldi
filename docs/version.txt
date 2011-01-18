@@ -36,6 +36,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 
 * Fixed two misspelled item entities in the AuditEventPolicySubcategoriesProbe.
+* Added support for the sol-def:isainfo_test.
 
 ---------------------------------------
 ---        Version 5.8 build 2      ---
