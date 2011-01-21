@@ -412,7 +412,7 @@ StringSet* PrinterEffectiveRightsProbe::GetAllPrinters() {
     DWORD numberOfPrinters = 0;
     printerDataBuffer = ( PRINTER_INFO_4* ) malloc ( printerBufferSize );
 
-    if ( !EnumPrinters ( PRINTER_ENUM_LOCAL|PRINTER_ENUM_NETWORK, NULL, 4, ( LPBYTE ) printerDataBuffer, printerBufferSize, &printerDataSize, &numberOfPrinters ) ) {
+    if ( !EnumPrinters ( PRINTER_ENUM_LOCAL, NULL, 4, ( LPBYTE ) printerDataBuffer, printerBufferSize, &printerDataSize, &numberOfPrinters ) ) {
         if ( printerDataBuffer != NULL ) {
             free ( printerDataBuffer );
             printerDataBuffer = NULL;
@@ -429,7 +429,7 @@ StringSet* PrinterEffectiveRightsProbe::GetAllPrinters() {
     }
 
     for ( unsigned int i = 0; i < numberOfPrinters; i++ ) {
-		if ( printerDataBuffer[i].Attributes == PRINTER_ATTRIBUTE_LOCAL ) {
+		if ( printerDataBuffer[i].Attributes & PRINTER_ATTRIBUTE_LOCAL ) {
 			printers->insert ( printerDataBuffer[i].pPrinterName );
        }
 	}
