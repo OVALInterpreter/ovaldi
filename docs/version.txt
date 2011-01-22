@@ -37,6 +37,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 
 * Fixed two misspelled item entities in the AuditEventPolicySubcategoriesProbe.
 * Added support for the sol-def:isainfo_test.
+* Added support for the sol-def:patch54_test.
 * Fixed a bug in the win-def:printereffectiverights_test that was preventing all of the local printers from  being collected.
 
 ---------------------------------------
