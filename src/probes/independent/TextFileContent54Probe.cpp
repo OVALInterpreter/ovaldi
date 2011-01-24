@@ -310,7 +310,7 @@ int TextFileContent54Probe::Behaviors2MatchOptions(BehaviorVector *behaviors) {
 		if ((*iter)->GetName() == "ignore_case" && (*iter)->GetValue() == "true")
 			opts |= REGEX::IGNORE_CASE;
 		else if ((*iter)->GetName() == "multiline" && (*iter)->GetValue() == "false")
-			opts &= !REGEX::MULTILINE;
+			opts &= ~REGEX::MULTILINE;
 		else if ((*iter)->GetName() == "singleline" && (*iter)->GetValue() == "true")
 			opts |= REGEX::SINGLELINE;
 	}
