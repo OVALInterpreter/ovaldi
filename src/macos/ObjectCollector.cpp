@@ -70,7 +70,7 @@ bool ObjectCollector::IsApplicable(AbsObject* object) {
 
 	bool isApplicable = false;
 
-	if(object->GetXmlns().rfind("linux") != string::npos) {
+	if(object->GetXmlns().rfind("macos") != string::npos) {
 		isApplicable = true;
 	} else if(object->GetXmlns().rfind("unix") != string::npos) {
 		isApplicable = true;
