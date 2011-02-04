@@ -158,22 +158,14 @@ class Common {
 		static std::string	SwitchChar(std::string stringIn, std::string oldChr, std::string newChr);
 		/** Return true if the specified file exists. */
 		static bool     FileExists(const char* filename);
-		/** Return the int as a string. */
-		static std::string	ToString(int);
-		/** Return the unsigned int as a string. */
-		static std::string	ToString(unsigned int);
-		/** Return the long as a string. */
-		static std::string	ToString(long);
-		/** Return the long long as a string. */
-		static std::string   ToString(long long);
-		/** Return the unsigned long as a string. */
-		static std::string	ToString(unsigned long);
-		/** Return a the bool as a string. */
-		static std::string	ToString(bool);
-		/** Return a the char as a string. */
-		static std::string	ToString(char);
-		/** Return a double as a string. */
-		static std::string	ToString(double);
+
+		template<typename T>
+		static std::string ToString(const T& val) {
+			std::ostringstream result;
+			result << val;
+
+			return result.str();
+		}
 
 		/** Converts a string into a string of all uppercase characters.
 		 *	@param s The string that you would like to convert into all uppercase characters.

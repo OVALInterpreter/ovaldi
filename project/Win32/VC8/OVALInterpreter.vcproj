@@ -11,6 +11,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -188,6 +191,204 @@
 				DataExecutionPrevention="0"
 				SupportUnloadOfDelayLoadedDLL="true"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Debug/DefinitionInterpreter.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE"
+				Optimization="0"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="../../../src;../../../src/windows;../../../src/probes/independent;../../../src/probes/windows"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				TreatWChar_tAsBuiltInType="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\Debug\obj/DefinitionInterpreter.pch"
+				AssemblerListingLocation=".\Debug\obj/"
+				ObjectFile=".\Debug\obj/"
+				ProgramDataBaseFileName=".\Debug\obj/"
+				WarningLevel="4"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				ShowIncludes="false"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib libgcrypt.dll.a libgpg-error.dll.a"
+				OutputFile="Debug/ovaldiD.exe"
+				Version="2.0"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\..\build\Win32\Debug"
+				DelayLoadDLLs="Advapi32.dll;Authz.dll"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\Debug/ovaldiD.pdb"
+				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				SupportUnloadOfDelayLoadedDLL="true"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Release/DefinitionInterpreter.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="../../../src;../../../src/windows;../../../src/probes/windows;../../../src/probes/independent"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_WIN32_DCOM"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				TreatWChar_tAsBuiltInType="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\Release\obj/DefinitionInterpreter.pch"
+				AssemblerListingLocation=".\Release\obj/"
+				ObjectFile=".\Release\obj/"
+				ProgramDataBaseFileName=".\Release\obj/"
+				WarningLevel="4"
+				SuppressStartupBanner="true"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib  libgcrypt.dll.a libgpg-error.dll.a"
+				OutputFile="Release/ovaldi.exe"
+				Version="5.0"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				DelayLoadDLLs="Advapi32.dll;Authz.dll"
+				ProgramDatabaseFile=".\Release/ovaldi.pdb"
+				SubSystem="1"
+				OptimizeReferences="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				SupportUnloadOfDelayLoadedDLL="true"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -911,6 +1112,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step - incrementing build"
+						CommandLine="echo on&#x0D;&#x0A;cd ..\..\..\src&#x0D;&#x0A;perl updateversion.pl&#x0D;&#x0A;cd ..\project\Win32\VC8&#x0D;&#x0A;echo off&#x0D;&#x0A;"
+						Outputs="MITRE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description=""
+						CommandLine=""
+						Outputs=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"

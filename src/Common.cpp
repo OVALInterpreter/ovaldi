@@ -470,65 +470,6 @@ bool Common::FileExists(const char * filename) {
     return false;
 }
 
-string Common::ToString(int num) {
-	ostringstream result;
-	result << num;
-
-	return result.str();
-}
-
-string Common::ToString(unsigned int num) {
-	ostringstream result;
-	result << num;
-
-	return result.str();
-}
-
-string Common::ToString(long num) {
-	ostringstream result;
-	result << num;
-
-	return result.str();
-}
-
-string Common::ToString(long long num) {
-	ostringstream result;
-	result << num;
-
-	return result.str();
-}
-
-string Common::ToString(bool b) {
-	
-	if(b) 
-		return "true";
-	else 
-		return "false";
-}
-
-string Common::ToString(char c) {
-
-	string str;
-	str = c;
-	return str;
-}
-
-string Common::ToString(unsigned long num) {
-
-	ostringstream result;
-	result << num;
-
-	return result.str();
-}
-
-string Common::ToString(double num) {
-
-	ostringstream result;
-	result << num;
-
-	return result.str();
-}
-
 string Common::ToUpper(string s) {
 
 	string upperString;
