@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ind-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" elementFormDefault="qualified" version="5.8">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ind-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" elementFormDefault="qualified" version="5.9">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>This document outlines the items of the OVAL System Characteristics XML schema that are independent of any specific family or platform. Each iten is an extention of a basic System Characteristics item defined in the core System Characteristics XML schema.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Independent System Characteristics</schema>
-               <version>5.8</version>
-               <date>9/15/2010 1:55:33 PM</date>
-                <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.9 Release Candidate 1</version>
+               <date>2/2/2011 11:14:03 AM</date>
+                <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="ind-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent"/>
               <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -228,19 +228,12 @@
                               </xsd:element>
                               <xsd:element name="relative_dn" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
-                                        <xsd:documentation>The relative_dn field is used to uniquely identify an item inside the specified suffix. It contains all of the parts of the item's distinguished name except those outlined by the suffix. If the xsi:nil attribute is set to true, then the item being represented is the higher level suffix. Using xsi:nil here will result in a status of 'does not exist' for object_class, ldaptype, and value since these entities are not associated with a suffix by itself. Note that when xsi:nil is used for the relative dn element, the attribute element should also be nilled.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_ldapitemrelative_dn">
-                                                  <sch:rule context="ind-sc:ldap_item/ind-sc:relative_dn">
-                                                       <sch:assert test="not(@xsi:nil=true()) or ../ind-sc:attribute/@xsi:nil=true()"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
+                                        <xsd:documentation>The relative_dn field is used to uniquely identify an item inside the specified suffix. It contains all of the parts of the item's distinguished name except those outlined by the suffix. If the xsi:nil attribute is set to true, then the item being represented is the higher level suffix. </xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="attribute" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
-                                        <xsd:documentation>Specifies a named value contained by the object. If the xsi:nil attribute is set to true, then the item being represented is the higher level relative distinguished name. Using xsi:nil here will result in a status of 'does not exist' for object_class, ldaptype, and value since these entities are not associated with a relative distinguished name by itself.</xsd:documentation>
+                                        <xsd:documentation>Specifies a named value contained by the object.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="object_class" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
@@ -255,7 +248,7 @@
                               </xsd:element>
                               <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The actual value of the specified LDAP attribute. Note that while an LDAP attribute can contain structured data where it is necessary to collect multiple related fields that can be described by the 'record' datatype, it is not always the case.  It also is possible that an LDAP attribute can contain only a single value or an array of values. In these cases, there is not a name to uniquely identify the corresponding field(s) which is a requirement for fields in the 'record' datatype.  As a result, the name of the LDAP attribute will be used to uniquely identify the field(s) and satisfy this requirement. If the LDAP attribute contains a single value, the 'record' will have a single field identified by the name of the LDAP attribute. If the LDAP attribute contains an array of values, the 'record' will have multiple fields all identified by the name of the LDAP attribute.</xsd:documentation>
+                                        <xsd:documentation>The actual value of the specified LDAP attribute.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -281,19 +274,12 @@
                               </xsd:element>
                               <xsd:element name="relative_dn" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
-                                        <xsd:documentation>The relative_dn field is used to uniquely identify an item inside the specified suffix. It contains all of the parts of the item's distinguished name except those outlined by the suffix. If the xsi:nil attribute is set to true, then the item being represented is the higher level suffix. Using xsi:nil here will result in a status of 'does not exist' for object_class, ldaptype, and value since these entities are not associated with a suffix by itself. Note that when xsi:nil is used for the relative dn element, the attribute element should also be nilled.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="ind-sc_ldap57itemrelative_dn">
-                                                  <sch:rule context="ind-sc:ldap57_item/ind-sc:relative_dn">
-                                                       <sch:assert test="not(@xsi:nil=true()) or ../ind-sc:attribute/@xsi:nil=true()"><sch:value-of select="../@id"/> - attribute entity must be nil when relative_dn is nil</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
+                                        <xsd:documentation>The relative_dn field is used to uniquely identify an item inside the specified suffix. It contains all of the parts of the item's distinguished name except those outlined by the suffix. If the xsi:nil attribute is set to true, then the item being represented is the higher level suffix.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="attribute" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
-                                        <xsd:documentation>Specifies a named value contained by the object. If the xsi:nil attribute is set to true, then the item being represented is the higher level relative distinguished name. Using xsi:nil here will result in a status of 'does not exist' for object_class, ldaptype, and value since these entities are not associated with a relative distinguished name by itself.</xsd:documentation>
+                                        <xsd:documentation>Specifies a named value contained by the object.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="object_class" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
@@ -308,8 +294,15 @@
                               </xsd:element>
                               <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The actual value of the specified LDAP attribute.</xsd:documentation>
-                                   </xsd:annotation>                                   
+                                        <xsd:documentation>The actual value of the specified LDAP attribute. Note that while an LDAP attribute can contain structured data where it is necessary to collect multiple related fields that can be described by the 'record' datatype, it is not always the case.  It also is possible that an LDAP attribute can contain only a single value or an array of values. In these cases, there is not a name to uniquely identify the corresponding field(s) which is a requirement for fields in the 'record' datatype.  As a result, the name of the LDAP attribute will be used to uniquely identify the field(s) and satisfy this requirement. If the LDAP attribute contains a single value, the 'record' will have a single field identified by the name of the LDAP attribute. If the LDAP attribute contains an array of values, the 'record' will have multiple fields all identified by the name of the LDAP attribute.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="ind-sc_ldap57_itemvalue">
+                                                  <sch:rule context="ind-sc:ldap57_item/ind-sc:value">
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a ldap57_item must be 'record'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
                     </xsd:extension>
@@ -332,7 +325,7 @@
                          <sch:rule context="ind-sc:sql_item">
                               <sch:report test="true()">DEPRECATED ITEM: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                          </sch:rule>
-                    </sch:pattern>                        
+                    </sch:pattern>
                </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
@@ -403,7 +396,14 @@
                               <xsd:element name="result" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The result entity holds the results of the specified SQL statement.</xsd:documentation>
-                                   </xsd:annotation>                                   
+                                        <xsd:appinfo>
+                                             <sch:pattern id="ind-sc_sql57_itemresult">
+                                                  <sch:rule context="ind-sc:sql57_item/ind-sc:result">
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the result entity of a sql57_item must be 'record'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
                     </xsd:extension>
@@ -856,7 +856,7 @@
                                                   DEPRECATED ELEMENT VALUE IN: ldap_item ELEMENT VALUE: <sch:value-of select="."/> 
                                              </sch:report>
                                         </sch:rule>
-                                   </sch:pattern>                        
+                                   </sch:pattern>
                               </xsd:appinfo>
                          </xsd:annotation>
                     </xsd:enumeration>
@@ -875,9 +875,9 @@
                                                   DEPRECATED ELEMENT VALUE IN: ldap_item ELEMENT VALUE: <sch:value-of select="."/> 
                                              </sch:report>
                                         </sch:rule>
-                                   </sch:pattern>                        
+                                   </sch:pattern>
                               </xsd:appinfo>
-                         </xsd:annotation>                              
+                         </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>

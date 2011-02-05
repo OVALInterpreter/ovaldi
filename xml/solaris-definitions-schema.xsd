@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sol-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" elementFormDefault="qualified" version="5.8">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sol-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" elementFormDefault="qualified" version="5.9">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Solaris specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Solaris Definition</schema>
-                  <version>5.8</version>
-                  <date>9/15/2010 1:55:34 PM</date>
-                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.9 Release Candidate 1</version>
+                  <date>2/2/2011 11:14:04 AM</date>
+                  <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sol-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -555,7 +555,7 @@
       </xsd:element>
       <xsd:element name="patch54_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The patch54_object element is used by a patch test to define the specific patch to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The patch54_object element is used by a patch test to define the specific patch to be evaluated. Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A patch object consists of a base entity that identifies the patch to be used, and a version entity that represent the patch revision number.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -568,12 +568,12 @@
                                                 <xsd:element name="behaviors" type="sol-def:PatchBehaviors" minOccurs="0" maxOccurs="1"/>
                                                 <xsd:element name="base" type="oval-def:EntityObjectIntType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
+                                                            <xsd:documentation>The base entity represents a patch base code found before the hyphen.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="version" type="oval-def:EntityObjectIntType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
+                                                            <xsd:documentation>The version entity represents a patch version number found after the hyphen.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -586,7 +586,7 @@
       </xsd:element>
       <xsd:element name="patch_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The patch_object element is used by a patch test to define the specific patch to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The patch_object element is used by a patch test to define the specific patch to be evaluated. Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A patch object consists of a single base entity that identifies the patch to be used.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:deprecated_info>
@@ -611,7 +611,7 @@
                                           <xsd:element ref="oval-def:set"/>
                                           <xsd:element name="base" type="oval-def:EntityObjectIntType">
                                                 <xsd:annotation>
-                                                      <xsd:documentation>Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number.</xsd:documentation>
+                                                      <xsd:documentation>The base entity reresents a patch base code found before the hyphen.</xsd:documentation>
                                                 </xsd:annotation>
                                           </xsd:element>
                                     </xsd:choice>
@@ -622,7 +622,7 @@
       </xsd:element>
       <xsd:element name="patch_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The patch_state element defines the different information associated with a specific patch installed on the system. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>The patch_state element defines the different information associated with a specific patch installed on the system. Patches are identified by unique alphanumeric strings, with the patch base code first, a hyphen, and a number that represents the patch revision number. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -635,7 +635,7 @@
                                     </xsd:element>
                                     <xsd:element name="version" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The version entity represents a patch version number found after the hyphen</xsd:documentation>
+                                                <xsd:documentation>The version entity represents a patch version number found after the hyphen.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -649,7 +649,7 @@
             </xsd:annotation>
             <xsd:attribute name="supersedence" use="optional" default="false">
                   <xsd:annotation>
-                        <xsd:documentation>'supersedence' specifies that the object should also match any superseding patches to the one being specified. In other words, if set to True the resulting object set would be the original patch specified plus any superseding patches. The default value is 'false' meaning the object should only match the specified patch.</xsd:documentation>
+                        <xsd:documentation>'supersedence' specifies that the object should also match any superseding patches to the one being specified. In Solaris, a patch can be superseded in two ways. The first way is implicitly when a new revision of a patch is released (e.g. patch 12345-02 supersedes patch 12345-01). The second way is explicitly where a new patch contains the complete functionality of another patch. If set to 'true', the resulting object set would be the original patch specified plus any superseding patches. The default value is 'false' meaning the object should only match the specified patch.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:boolean"/>
