@@ -4,7 +4,7 @@
 
                   OVAL Interpreter
 
- Copyright (c) 2002 - 2010 - The MITRE Corporation
+ Copyright (c) 2002 - 2011 - The MITRE Corporation
 
 ****************************************************
 
@@ -693,5 +693,5 @@ Making Security Measurable - http://msm.mitre.org/
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland Security. OVAL
-and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2010,
+and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2011,
 The MITRE Corporation (www.mitre.org).
