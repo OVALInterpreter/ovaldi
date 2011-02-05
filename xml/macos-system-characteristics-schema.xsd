@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:macos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:macos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos" elementFormDefault="qualified" version="5.8">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the MacOS specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
@@ -7,9 +7,9 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>MacOS System Characteristics</schema>
-               <version>5.9 Release Candidate 1</version>
-               <date>2/2/2011 11:14:03 AM</date>
-                <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.8</version>
+               <date>9/15/2010 1:55:34 PM</date>
+                <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="macos-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos"/>
               <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -53,12 +53,12 @@
                               </xsd:element>
                               <xsd:element name="home_dir" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The home directory for this user account.</xsd:documentation>
+                                        <xsd:documentation/>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="login_shell" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The login shell for this user account.</xsd:documentation>
+                                        <xsd:documentation/>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -280,80 +280,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="pwpolicy_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>Output of 'pwpolicy -getpolicy'. Please see the 'pwpolicy' man page for additional information.</xsd:documentation>
-               <xsd:appinfo>
-                    <oval:deprecated_info>
-                         <oval:version>5.9</oval:version>
-                         <oval:reason>Replaced by the pwpolicy59_item. The username, userpass, and directory_node entities in the pwpolicy_item were underspecified and as a result their meaning was uncertain. A new item was created to resolve this issue. See the pwpolicy59_item.</oval:reason>
-                         <oval:comment>This item has been deprecated and may be removed in a future version of the language.</oval:comment>
-                    </oval:deprecated_info>
-                    <sch:pattern id="macos-sc_pwpolicy_item_dep">
-                         <sch:rule context="macos-sc:pwpolicy_item">
-                              <sch:report test="true()">DEPRECATED ITEM: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                         </sch:rule>
-                    </sch:pattern>                        
-               </xsd:appinfo>
-          </xsd:annotation>
-          <xsd:complexType>
-               <xsd:complexContent>
-                    <xsd:extension base="oval-sc:ItemType">
-                         <xsd:sequence>
-                              <xsd:element name="username" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation/>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="userpass" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation/>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="directory_node" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation/>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="maxChars" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>Maximum number of characters allowed in a password.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="maxFailedLoginAttempts" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>Maximum number of failed logins before the account is locked.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="minChars" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>Minimum number of characters allowed in a password.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="passwordCannotBeName" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>Defines if the password is allowed to be the same as the username or not.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="requiresAlpha" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>Defines if the password must contain an alphabetical character or not.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="requiresNumeric" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>Defines if the password must contain an numeric character or not.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                         </xsd:sequence>
-                    </xsd:extension>
-               </xsd:complexContent>
-          </xsd:complexType>
-     </xsd:element>
-     <!-- =============================================================================== -->
-     <!-- ============================  PWPOLICY ITEM (59)  ============================= -->
-     <!-- =============================================================================== -->
-     <xsd:element name="pwpolicy59_item" substitutionGroup="oval-sc:item">
-          <xsd:annotation>
-               <xsd:documentation>The pwpolicy59_item holds the password policy information for a particular user specified by the target_user element. Please see the 'pwpolicy' man page for additional information.</xsd:documentation>
+               <xsd:documentation>The pwpolicy_item holds the password policy information for a particular user specified by the target_user element. Please see the 'pwpolicy' man page for additional information.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
