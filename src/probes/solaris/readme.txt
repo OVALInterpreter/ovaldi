@@ -1,1 +1,0 @@
-put all solaris probes here.
