@@ -119,10 +119,12 @@ public:
 	*/
 	static void UnalteredMessage(std::string msg);
 
-	static const int DEBUG = 1;
-	static const int INFO = 2;
-	static const int MESSAGE = 3;
-	static const int FATAL = 4;
+	enum {
+		DEBUG = 1,
+		INFO,
+		MESSAGE,
+		FATAL
+	};
 
 	/** Return true if the Logger is configured to write to the screen. */
 	static bool WriteToScreen();

@@ -129,7 +129,7 @@ void Log::SetLevel(string strLevel) {
 	
 	int tmpLevel = atoi(strLevel.c_str());
 	if(tmpLevel > Log::FATAL || tmpLevel < Log::DEBUG) {
-		string msg = "Error setting Log level. A log level between " + Common::ToString(Log::FATAL) + " and " + Common::ToString(Log::DEBUG) + " must be specified. Setting Log level to " + Common::ToString(Log::DEBUG) + ". Note that this message has not been written to the log file.";
+		string msg = "Error setting Log level. A log level between " + Common::ToString((int)Log::FATAL) + " and " + Common::ToString((int)Log::DEBUG) + " must be specified. Setting Log level to " + Common::ToString((int)Log::DEBUG) + ". Note that this message has not been written to the log file.";
 		cout << Common::GetTimeStamp() + " : MESSAGE : " << msg << endl;
 		Log::SetLevel(Log::DEBUG);
 	} else {
