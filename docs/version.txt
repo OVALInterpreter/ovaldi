@@ -32,6 +32,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.9 build 1      ---
+---------------------------------------
+
+* Reverted back to the Xerces-C 2.7.0 library.
+
+---------------------------------------
 ---        Version 5.8 build 3      ---
 ---------------------------------------
 

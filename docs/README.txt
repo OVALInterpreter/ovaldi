@@ -75,7 +75,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        ovaldi - OVAL Interpreter binary
 
        Libraries:
-       libxerces-c.so.28.0 - Xerces XML library
+       libxerces-c.so.27.0 - Xerces XML library
        libxalan-c.so.110.0 - Xalan XSL library
        libxalanMsg.so.110.0 - Xalan Message library
        libpcre.so.0.0.1 - PCRE Regular Expression library
@@ -133,7 +133,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        ovaldi.exe - OVAL Interpreter binary
 
        Libraries:
-       xerces-c_2_8_0.dll - Xerces XML library
+       xerces-c_2_7_0.dll - Xerces XML library
        msvcr71.dll - Microsoft C Runtime Library
        pcre.dll - Perl-compatible regular-expression library
        Xalan-C_1_10.dll - Xalan XSLT library
@@ -499,7 +499,7 @@ site:
 -- V -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.8 of the xerces-c library.  From
+binary was compiled with version 2.7 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software

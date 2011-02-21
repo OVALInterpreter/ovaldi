@@ -1,303 +1,493 @@
-Building 64-bit ovaldi on Windows
-=================================
+****************************************************************
+
+							OVAL Interpreter
+
+					Build Instructions - 64-bit Windows
+
+			Copyright (c) 2002-2011, The MITRE Corporation
+
+****************************************************************
+
+The MITRE Corporation developed the OVAL Interpreter to 
+demonstrate the usability of the OVAL Language. The source for
+the OVAL Interpreter is freely available for reference use. This
+document describes the steps you need to build the OVAL 
+Interpreter.
+
+For information about using the OVAL Interpreter refer to the README.txt
+file included with the OVAL Interpreter, or the OVAL Web site.
+
+      OVAL Interpreter:
+      http://oval.mitre.org/language/download/interpreter/index.html
+
+BY USING THE OVAL INTERPRETER, YOU SIGNIFY YOUR ACCEPTANCE OF THE
+TERMS AND CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS,
+DO NOT USE THE OVAL INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED
+WITH THE OVAL INTERPRETER.
+
+-- CONTENTS --
+
+  I    OVERVIEW
+        A. Source Distribution
+        B. Source Distribution Contents
+        C. Supporting Libraries
+  II   BUILD INSTRUCTIONS
+		A. Prologue
+		B. Install mingw-w64
+		C. Install MSYS
+        D. Build PCRE
+		E. Build libgcrypt
+        F. Build Xerces
+        G. Build Xalan
+        H. Building the OVAL Interpreter
+  III  PCRE
+  IV   XERCES
+  V    XALAN
+  VI   LIBGCRYPT
+  VII  REPORTING PROBLEMS
+  VIII USEFUL LINKS
+
+ -- I -- OVERVIEW --
+
+Download the appropriate installation files from the OVAL Interpreter SourceForge site.
+
+  A. Source Distributions
+
+       The source for the OVAL Interpreter is freely available on the OVAL
+       Interpreter SourceForge site.  There is currently a .zip file for
+	   Windows users that contains all of the source code as well as a Visual
+	   C++ project for the OVAL Interpreter.  To download the source go to:
+
+            http://sourceforge.net/projects/ovaldi/files/
+		
+	   The latest source for the OVAL Interpreter is also freely available on
+	   the OVAL Interpreter SourceForge site and can be accessed via SVN.
+	   Please see the following link for more information:
+	   
+	       http://sourceforge.net/scm/?type=svn&group_id=215469
+		
+  B. Source Distribution Contents
+
+       The source code distribution contains the source for
+       the OVAL Interpreter and a Visual C++ project. The source 
+       distribution does not include the source for the libraries
+       needed to compile the OVAL Interpreter. 
+
+  C. Supporting Libraries
+
+       The OVAL Interpreter relies on four C/C++ libraries that can be found
+       on the Web. See sections III - VI for more information about the
+       specific libraries used and where to download their source from.
+
+-- II -- BUILD INSTRUCTIONS --
+
+The following instructions describe how to build the OVAL Interpreter 
+on a 64-bit Windows system.  The 64-bit OVAL Interpreter has been built and 
+tested on 64-bit Windows 7 using VC8 and the Windows 7 SDK. The source
+distribution includes a project file that can be used to build the OVAL
+Interpreter. Before the OVAL Interpreter can be built, the supporting
+libraries must be installed. Follow the instruction below to setup and
+install the supporting libraries.
+  
+	A. Prologue
+
+		This document is intended for a reasonably technical audience.  It assumes some
+		development experience, and familiarity with the Visual C++ IDE.  When
+		configuring a VC project, don't forget to choose the correct solution 
+		configuration and platform first, or you'll be setting up the wrong one and have
+		to do it all over again!
+
+		For safety's sake, in the instructions that follow, we recommend never 
+		extracting a .tar.gz file with Winzip.  We've found that PCRE's configure script
+		doesn't work correctly if you extract the .tar.gz file with Winzip (config.h is
+		not created properly).  To avoid possible problems with the other libraries, 
+		either get zip archives if they are available, or use the MSYS 'tar' utility to
+		extract .tar.gz files.
 
-0. Prologue
+	B. Install mingw-w64.
 
-This document is intended for a reasonably technical audience.  It assumes some
-development experience, and familiarity with the Visual C++ IDE.  When
-configuring a VC project, don't forget to choose the correct solution 
-configuration and platform first, or you'll be setting up the wrong one and have
-to do it all over again!
+		This is necessary for building libgcrypt as a 64-bit library.  I also take 
+		advantage of it as an easy way to build PCRE.
 
-For safety's sake, in the instructions that follow, we recommend never 
-extracting a .tar.gz file with Winzip.  We've found that PCRE's configure script
-doesn't work correctly if you extract the .tar.gz file with Winzip (config.h is
-not created properly).  To avoid possible problems with the other libraries, 
-either get zip archives if they are available, or use the MSYS 'tar' utility to
-extract .tar.gz files.
+		The URL to the base site is at:
+			
+			http://mingw-w64.sourceforge.net/
 
-1. Install mingw-w64.
+		Click "Win64 Downloads" on the left sidebar.  This brings you to a choice point:
+		"personal" vs. "automated" builds.  I use an automated build in these
+		instructions.  I downloaded the latest mingw build as of the time of this
+		writing, which was mingw-w64-1.0-bin_i686-mingw_20101129.zip.  This build
+		prefixes all GCC executables with "x86_64-w64-mingw32".  I extracted it to
+		c:\mingw.
+
+	C. Install MSYS.
 
-This is necessary for building libgcrypt as a 64-bit library.  I also take 
-advantage of it as an easy way to build PCRE.
+		This is a minimal unix-like environment which allows you to run configure 
+		scripts and build with make and mingw.  A web page describing installation and 
+		use of MSYS with mingw-w64 is at:
 
-The URL to the base site is http://mingw-w64.sourceforge.net/
+			http://sourceforge.net/apps/trac/mingw-w64/wiki/MSYS
 
-Click "Win64 Downloads" on the left sidebar.  This brings you to a choice point:
-"personal" vs. "automated" builds.  I use an automated build in these
-instructions.  I downloaded the latest mingw build as of the time of this
-writing, which was mingw-w64-1.0-bin_i686-mingw_20101129.zip.  This build
-prefixes all GCC executables with "x86_64-w64-mingw32".  I extracted it to
-c:\mingw.
+		There is a download link on that page which takes you to a sourceforge
+		download page.  On that page, don't download the source snapshot, download
+		one of the binary packages.  I downloaded MSYS-20110112.zip.
 
-2. Install MSYS.
+		You might have noticed, if you ran the postinstall script as the instructions 
+		asked, that it couldn't find mingw where you installed it.  So it didn't create
+		your /etc/fstab file to mount your mingw install directory on /mingw.  Manually
+		create /etc/fstab so that the compiler executables are found.  /mingw/bin is on 
+		the executable lookup path by default, so you don't need to change your $path, 
+		you just need to make sure /mingw/bin has the executables.  I created a one-line
+		file with the following:
+
+			c:/mingw        /mingw
+
+	D. Build PCRE
+
+		Get source from http://pcre.org/.  They direct you to an FTP site.  Just get the
+		latest source archive from that site.  As of this writing, it is pcre-8.12.
+		Extract it to a directory.  Open an MSYS terminal window and cd to the directory
+		you extracted it to.
+
+		Run the configure script as:
+
+			$ ./configure --host=x86_64-w64-mingw32 --prefix=whatever
+
+		Unfortunately, although the regular "make install" will work, you won't get the
+		right DLL import library.  MSVC doesn't work with mingw's *.dll.a files very
+		well.  I've seen it work with warnings, and also seen it fail.  To create a
+		proper import library, you need to get mingw to create you a *.def file, and
+		then use MSVC's "lib" utility to create the import lib.  Also unfortunately,
+		getting the normal build process to create the *.def files is really ugly.  You
+		would have to hack the 'libtool' script which comes with PCRE, which is what
+		constructs the gcc commandlines to compile and link.  A less ugly way is to
+		modify the makefile.  There is a user-contributed target for "pcre.dll" at the
+		bottom.  Add another parameter to the GCC commandline in that target:
+			
+			-Wl,--output-def,pcre.def
+
+		The result should look something like:
+
+			pcre.dll: $(DLL_OBJS)
+				$(CC) -shared -o pcre.dll -Wl,"--strip-all" -Wl,"--export-all-symbols"
+			-Wl,--output-def,pcre.def $(DLL_OBJS)
+
+		What I did was run "make install" to get the normal installed directory 
+		structure set up for me, then "make pcre.dll" to run the above target to get
+		another DLL and a *.def file.  Open a MSVC x64 command prompt (start button->
+		All Programs->Microsoft Visual Studio 2008->Visual Studio Tools->
+		Visual Studio x64 Win64 Command Prompt), cd to your PCRE source directory, and
+		run:
+
+			lib /machine:x64 /def:pcre.def
+
+		That will generate pcre.lib.  Copy pcre.dll into the 'bin' subdirectory of your
+		pcre install directory, and pcre.lib into the 'lib' subdirectory.
+
+	E. Build libgcrypt
+
+		Libgcrypt downloads are at http://www.gnupg.org/download/.  You need both
+		libgcrypt and libgpg-error.
+
+		Extract libgpg-error to a directory.  Open an MSYS terminal window and cd to
+		where you extracted it.  Invoke configure as:
+
+			./configure --host=x86_64-w64-mingw32 --prefix=whatever
+
+		Then the usual "make install" will build and install it.  Ignore the error
+		message about 'msgfmt' not being found.  The libraries will install anyway.
+
+		Extract libgcrypt to a directory.  Open an MSYS terminal window and cd to
+		where you extracted it.  Invoke configure as:
+
+			./configure --host=x86_64-w64-mingw32 --prefix=whatever
+			 --with-gpg-error-prefix=<dir where you installed libgpg-error> --disable-asm
+		 
+		I installed libgpg-error and libgcrypt to the same directory.  I had to disable
+		assembly because many of the tests crashed otherwise.  Everything worked with
+		assembly disabled.  (If you try "make check" yourself, it probably won't work.
+		Other hackery was required to make the tests work, which I won't describe here.)
+
+		Happily, libgcrypt does provide you a *.def file.  In an MSVC x64 tools command
+		window, cd to <your libgcrypt install dir>\lib, and run:
+
+			lib /machine:x64 /def:libgcrypt.def
+		 
+		to create an import library named libgcrypt.lib.  When linked to, it will result
+		in a dependency in ovaldi on "libgcrypt.dll", so you'll have to rename or copy
+		libgcrypt-11.dll to libgcrypt.dll.  Don't worry about libgpg-error; it won't be 
+		a direct dependency of ovaldi.
+
+	F. Build Xerces
+
+		The C++ source code for Xerces is available from:
+
+			http://xerces.apache.org/xerces-c/
+
+		Ovaldi requires Xerces 2.x; it is incompatible with 3.x.  Click the "Download"
+		link in the left sidebar, and scroll down to the 2-series releases.  There is a
+		windows x64 binary available, but we can't use it due to different compiler
+		settings between ovaldi and what was used to build those binaries, specifically
+		with regard to treatment of wchar_t.  So grab the 2.7 source.
+
+		Open VC and load up <xerces_dir>\Projects\Win32\VC7.1\xerces-all\xerces-all.sln.
+		Using the 7.1 version of the solution will make building Xalan easier, since it
+		is hard-coded to refer to v7.1 xerces directories.  Let later versions of the
+		IDE upgrade the solution.
+
+		We are concerned specifically with building one project from this solution:
+		XercesLib.  First, we need to create x64 configurations, as the project does not
+		come with them.  Right click the solution in the Solution Explorer pane, click 
+		Properties to bring up the solution properties window.  Click Configuration 
+		Properties in the left pane.  This will enable the Configuration Manager button 
+		on the top right.  Click that button to bring up the config manager window.  
+		Click the "Active solution platform" dropdown on the top right, and click 
+		<New...>.  Another dialog comes up.  Choose x64 in the top dropdown, leave the 
+		rest the same, and click OK.  You should see the values in the Platform column 
+		of the config manager window all change to x64.  Dismiss the remaining dialogs.
+
+		Now if you choose any project and look at its properties, under Linker->Advanced
+		->Target Machine, it should say MachineX64.  Unfortunately, there is still a
+		vestige of an x86 configuration left, and I don't know how to fix it from within
+		the IDE.  The only way I know how is to manually edit the project file in a text
+		editor.  If you don't do this, linking will fail with an error about conflicting
+		x86 and x64 targets.  Do this for x64 configurations in the project file for the
+		aforementioned project:
+
+			<xerces_dir>\Projects\Win32\VC7.1\xerces-all\XercesLib\XercesLib.vcproj
+
+		Close the solution and open this file in, say, notepad.  It's an XML file with 
+		each configuration in a <Configuration> tag.  You can search for "Release|x64" 
+		for the release x64 config, and similar for others.  Scroll down to the 
+		VCLinkerTool.  There is an AdditionalOptions attribute that says /MACHINE:I386.
+		Delete that attribute.  Then load up the solution again in the IDE.
+
+		Since settings were copied from the Win32 configuration, there are still some
+		that need changing.  For the aforementioned project, add WIN64 as a defined 
+		preprocessor symbol (properties->C/C++->Preprocessor->Preprocessor Definitions).
+		Another thing you could change if you wanted to are the output directories.  
+		They're the same between x86 and x64 builds, so they will overwrite each other.
+		If you care about that.
+
+		Also change the wchar_t setting to disable the built-in type for the project:
+		properties->C/C++->Language->Treat wchar_t as Built-in Type
+
+		Right-click the XercesLib project and select Project Only->Build Only XercesLib.
+		The library should build.  There will be many warnings about type conversions.
+		Apparently xerces was not written with x64 portability in mind, but luckily they
+		don't stop the build.
+
+		The results are put into:
+
+			<xerces_dir>\Build\Win32\VC7.1\<Release|Debug>\
+
+		or whatever output directory you chose.  You will have to create a normal
+		installation directory yourself.  Create your own bin and lib subdirs and copy
+		the DLL into the former and import lib into the latter.  Extracting the
+		headers from the source distribution is more trouble... the easiest thing to
+		do is get a prepackaged binary distribution and copy the include directory out
+		of that.
+
+	G. Build Xalan
+
+		The normal xalan build process includes running an nmake file, which doesn't 
+		work with recent versions of VC, and doesn't create the right type of binaries.
+		We'll have to hack it to make it work, in addition to everything else.  I 
+		recommend creating a batch file to invoke nmake with the required environment 
+		and commandline, to make it easy to run repeatedly as you work through the 
+		changes.
+
+		The project which requires the nmake build step is located in
+
+			<xalan_src_dir>\c\Projects\Win32\VC7.1\Utils
+
+		I put my batch file in that directory.  It contains:
+
+			---
+			set XERCESCROOT=<your xerces install dir>
+
+			cd Localization
+			nmake /f BuildMessages.mak BITS=Win64 CFG=Release TYPE=inmem LOCALE=en_US
+			cd ..
+			---
+
+		This batch file builds a release version.  Change to CFG=Debug to build a debug
+		version.
+
+		Open <xalan_src_dir>\c\Projects\Win32\VC7.1\Utils\MsgCreator\MsgCreator.mak
+		in a text editor.  It has several sections, one for each supported 
+		configuration.  Find the appropriate section, identified by a line like:
+
+			!ELSEIF  "$(CFG)" == "MsgCreator - Win64 Release" 
+
+		In that section, edit the CPP_PROJ variable, which contains the compiler
+		commandline to update obsolete, nonexistent, and missing parameters.
+		 - /GX becomes /EHsc (this has to do with exception handling)
+		 - Delete /YX and /Fp params (precompiled header junk)
+		 - /ML becomes /MD (has to do with which C runtime to link to.  xerces used /MD)
+		 - Add /Zc:wchar_t- to disable wchar_t as a built-in type
 
-This is a minimal unix-like environment which allows you to run configure 
-scripts and build with make and mingw.  A web page describing installation and 
-use of MSYS with mingw-w64 is at:
+		Edit the LINK32_FLAGS variable and replace /machine:IA64 at the end of that line
+		with /machine:x64.
+
+		Open <xalan_src_dir>\c\Projects\Win32\VC7.1\Utils\XalanMsgLib\XalanMsgLib.mak
+		in a text editor.  Apply the same treatment to this file as described above, in
+		the appropriate section.
 
-http://sourceforge.net/apps/trac/mingw-w64/wiki/MSYS
+		Open a MSVC x64 command prompt, and from there, run the batch file you created 
+		previously.  It should run successfully, but with many warnings, similar those 
+		we got when building xerces.  Note that the output goes to:
 
-There is a download link on that page which takes you to a sourceforge
-download page.  On that page, don't download the source snapshot, download
-one of the binary packages.  I downloaded MSYS-20110112.zip.
+			<xalan_src_dir>\c\Build\Win64\VC7.1\<Release|Debug>
 
-You might have noticed, if you ran the postinstall script as the instructions 
-asked, that it couldn't find mingw where you installed it.  So it didn't create
-your /etc/fstab file to mount your mingw install directory on /mingw.  Manually
-create /etc/fstab so that the compiler executables are found.  /mingw/bin is on 
-the executable lookup path by default, so you don't need to change your $path, 
-you just need to make sure /mingw/bin has the executables.  I created a one-line
-file with the following:
+		The VC x64 Xalan project we create will be initially configured to write output
+		to a Win32 directory, so we'll need to change that so all the libs go to the
+		same place.
 
-c:/mingw        /mingw
-
-3. Build PCRE
-
-Get source from http://pcre.org/.  They direct you to an FTP site.  Just get the
-latest source archive from that site.  As of this writing, it is pcre-8.12.
-Extract it to a directory.  Open an MSYS terminal window and cd to the directory
-you extracted it to.
-
-Run the configure script as:
-
-  $ ./configure --host=x86_64-w64-mingw32 --prefix=whatever
-
-Unfortunately, although the regular "make install" will work, you won't get the
-right DLL import library.  MSVC doesn't work with mingw's *.dll.a files very
-well.  I've seen it work with warnings, and also seen it fail.  To create a
-proper import library, you need to get mingw to create you a *.def file, and
-then use MSVC's "lib" utility to create the import lib.  Also unfortunately,
-getting the normal build process to create the *.def files is really ugly.  You
-would have to hack the 'libtool' script which comes with PCRE, which is what
-constructs the gcc commandlines to compile and link.  A less ugly way is to
-modify the makefile.  There is a user-contributed target for "pcre.dll" at the
-bottom.  Add another parameter to the GCC commandline in that target:
--Wl,--output-def,pcre.def
-
-The result should look something like:
-
-pcre.dll: $(DLL_OBJS)
-	$(CC) -shared -o pcre.dll -Wl,"--strip-all" -Wl,"--export-all-symbols"
--Wl,--output-def,pcre.def $(DLL_OBJS)
-
-What I did was run "make install" to get the normal installed directory 
-structure set up for me, then "make pcre.dll" to run the above target to get
-another DLL and a *.def file.  Open a MSVC x64 command prompt (start button->
-All Programs->Microsoft Visual Studio 2008->Visual Studio Tools->
-Visual Studio x64 Win64 Command Prompt), cd to your PCRE source directory, and
-run:
-
-lib /machine:x64 /def:pcre.def
-
-That will generate pcre.lib.  Copy pcre.dll into the 'bin' subdirectory of your
-pcre install directory, and pcre.lib into the 'lib' subdirectory.
-
-4. Build libgcrypt
-
-Libgcrypt downloads are at http://www.gnupg.org/download/.  You need both
-libgcrypt and libgpg-error.
-
-Extract libgpg-error to a directory.  Open an MSYS terminal window and cd to
-where you extracted it.  Invoke configure as:
-
-./configure --host=x86_64-w64-mingw32 --prefix=whatever
-
-Then the usual "make install" will build and install it.  Ignore the error
-message about 'msgfmt' not being found.  The libraries will install anyway.
-
-Extract libgcrypt to a directory.  Open an MSYS terminal window and cd to
-where you extracted it.  Invoke configure as:
-
-./configure --host=x86_64-w64-mingw32 --prefix=whatever
- --with-gpg-error-prefix=<dir where you installed libgpg-error> --disable-asm
- 
-I installed libgpg-error and libgcrypt to the same directory.  I had to disable
-assembly because many of the tests crashed otherwise.  Everything worked with
-assembly disabled.  (If you try "make check" yourself, it probably won't work.
-Other hackery was required to make the tests work, which I won't describe here.)
-
-Happily, libgcrypt does provide you a *.def file.  In an MSVC x64 tools command
-window, cd to <your libgcrypt install dir>\lib, and run:
-
-lib /machine:x64 /def:libgcrypt.def
- 
-to create an import library named libgcrypt.lib.  When linked to, it will result
-in a dependency in ovaldi on "libgcrypt.dll", so you'll have to rename or copy
-libgcrypt-11.dll to libgcrypt.dll.  Don't worry about libgpg-error; it won't be 
-a direct dependency of ovaldi.
-
-5. Build Xerces
-
-The C++ source code for Xerces is available from:
-
-http://xerces.apache.org/xerces-c/
-
-Ovaldi requires Xerces 2.x; it is incompatible with 3.x.  Click the "Download"
-link in the left sidebar, and scroll down to the 2-series releases.  There is a
-windows x64 binary available, but we can't use it due to different compiler
-settings between ovaldi and what was used to build those binaries, specifically
-with regard to treatment of wchar_t.  So grab the 2.7 source.
-
-Open VC and load up <xerces_dir>\Projects\Win32\VC7.1\xerces-all\xerces-all.sln.
-Using the 7.1 version of the solution will make building Xalan easier, since it
-is hard-coded to refer to v7.1 xerces directories.  Let later versions of the
-IDE upgrade the solution.
-
-We are concerned specifically with building one project from this solution:
-XercesLib.  First, we need to create x64 configurations, as the project does not
-come with them.  Right click the solution in the Solution Explorer pane, click 
-Properties to bring up the solution properties window.  Click Configuration 
-Properties in the left pane.  This will enable the Configuration Manager button 
-on the top right.  Click that button to bring up the config manager window.  
-Click the "Active solution platform" dropdown on the top right, and click 
-<New...>.  Another dialog comes up.  Choose x64 in the top dropdown, leave the 
-rest the same, and click OK.  You should see the values in the Platform column 
-of the config manager window all change to x64.  Dismiss the remaining dialogs.
-
-Now if you choose any project and look at its properties, under Linker->Advanced
-->Target Machine, it should say MachineX64.  Unfortunately, there is still a
-vestige of an x86 configuration left, and I don't know how to fix it from within
-the IDE.  The only way I know how is to manually edit the project file in a text
-editor.  If you don't do this, linking will fail with an error about conflicting
-x86 and x64 targets.  Do this for x64 configurations in the project file for the
-aforementioned project:
-
-<xerces_dir>\Projects\Win32\VC7.1\xerces-all\XercesLib\XercesLib.vcproj
-
-Close the solution and open this file in, say, notepad.  It's an XML file with 
-each configuration in a <Configuration> tag.  You can search for "Release|x64" 
-for the release x64 config, and similar for others.  Scroll down to the 
-VCLinkerTool.  There is an AdditionalOptions attribute that says /MACHINE:I386.
-Delete that attribute.  Then load up the solution again in the IDE.
-
-Since settings were copied from the Win32 configuration, there are still some
-that need changing.  For the aforementioned project, add WIN64 as a defined 
-preprocessor symbol (properties->C/C++->Preprocessor->Preprocessor Definitions).
-Another thing you could change if you wanted to are the output directories.  
-They're the same between x86 and x64 builds, so they will overwrite each other.
-If you care about that.
-
-Also change the wchar_t setting to disable the built-in type for the project:
-properties->C/C++->Language->Treat wchar_t as Built-in Type
-
-Right-click the XercesLib project and select Project Only->Build Only XercesLib.
-The library should build.  There will be many warnings about type conversions.
-Apparently xerces was not written with x64 portability in mind, but luckily they
-don't stop the build.
-
-The results are put into:
-
-<xerces_dir>\Build\Win32\VC7.1\<Release|Debug>\
-
-or whatever output directory you chose.  You will have to create a normal
-installation directory yourself.  Create your own bin and lib subdirs and copy
-the DLL into the former and import lib into the latter.  Extracting the
-headers from the source distribution is more trouble... the easiest thing to
-do is get a prepackaged binary distribution and copy the include directory out
-of that.
-
-6. Build Xalan
-
-The normal xalan build process includes running an nmake file, which doesn't 
-work with recent versions of VC, and doesn't create the right type of binaries.
-We'll have to hack it to make it work, in addition to everything else.  I 
-recommend creating a batch file to invoke nmake with the required environment 
-and commandline, to make it easy to run repeatedly as you work through the 
-changes.
-
-The project which requires the nmake build step is located in
-
-<xalan_src_dir>\c\Projects\Win32\VC7.1\Utils
-
-I put my batch file in that directory.  It contains:
-
----
-set XERCESCROOT=<your xerces install dir>
-
-cd Localization
-nmake /f BuildMessages.mak BITS=Win64 CFG=Release TYPE=inmem LOCALE=en_US
-cd ..
----
-
-This batch file builds a release version.  Change to CFG=Debug to build a debug
-version.
-
-Open <xalan_src_dir>\c\Projects\Win32\VC7.1\Utils\MsgCreator\MsgCreator.mak
-in a text editor.  It has several sections, one for each supported 
-configuration.  Find the appropriate section, identified by a line like:
-
-!ELSEIF  "$(CFG)" == "MsgCreator - Win64 Release" 
-
-In that section, edit the CPP_PROJ variable, which contains the compiler
-commandline to update obsolete, nonexistent, and missing parameters.
- - /GX becomes /EHsc (this has to do with exception handling)
- - Delete /YX and /Fp params (precompiled header junk)
- - /ML becomes /MD (has to do with which C runtime to link to.  xerces used /MD)
- - Add /Zc:wchar_t- to disable wchar_t as a built-in type
-
-Edit the LINK32_FLAGS variable and replace /machine:IA64 at the end of that line
-with /machine:x64.
-
-Open <xalan_src_dir>\c\Projects\Win32\VC7.1\Utils\XalanMsgLib\XalanMsgLib.mak
-in a text editor.  Apply the same treatment to this file as described above, in
-the appropriate section.
-
-Open a MSVC x64 command prompt, and from there, run the batch file you created 
-previously.  It should run successfully, but with many warnings, similar those 
-we got when building xerces.  Note that the output goes to:
-
-<xalan_src_dir>\c\Build\Win64\VC7.1\<Release|Debug>
-
-The VC x64 Xalan project we create will be initially configured to write output
-to a Win32 directory, so we'll need to change that so all the libs go to the
-same place.
-
-Create an environment variable named XERCESCROOT.  This can point to either your
-source directory or installation directory.  It must be done before starting
-VC, or it won't be picked up.
-
-Start VC and load the Xalan VC project from 
-<xalan_src_dir>\c\Projects\Win32\VC7.1\Xalan.sln.  Let the IDE convert the 
-project to whatever version your IDE is.  Create x64 configurations for all the 
-projects, as described in the xerces build instructions.
-
-The AllInOne project is the one which creates the library.  In the project
-properties for that project, for the x64 configuration you plan to use, make the
-following changes:
- - C/C++->General: change "Win32" to "Win64" in the last path under 
-     Additional Include Directories
- - C/C++->Output Files: change "Win32" in all the output paths to "Win64"
- - C/C++->Language: disable wchar_t as an built-in type
- - Linker->General: change "Win32" in the Output File path to "Win64", and
-     again in the last path listed under Additional Library Directories
- - Linker->Advanced: change "Win32" to "Win64" in the path under Import Library
-
-Close the solution and make the same change to the vcproj file as was done with
-xerces, to remove the erroneous x86 linker setting.  Then load the solution
-again.  The file to edit is:
-
-<xalan_src_dir>\c\Projects\Win32\VC7.1\AllInOne\AllInOne.vcproj
-
-It is also advisable to add two more preprocessor symbols to the project,
-otherwise you will get a *lot* of warning spam about use of insecure functions,
-and the build will take a lot longer:
-_SCL_SECURE_NO_WARNINGS, _CRT_SECURE_NO_WARNINGS
-
-Build the AllInOne project: right click AllInOne in the Solution Explorer pane,
-click Project Only->Build Only AllInOne.
-
-The libraries are written to 
-<xalan_src_dir>\c\Build\Win64\VC7.1\<Release|Debug>.  Now you have the same task
-as for xerces: create an installation directory structure and copy the files 
-into it.  As before, it's probably easiest to just copy the include directory 
-from a binary distribution rather than try to extract all the *.hpp files from 
-the source distribution yourself.
-
-7. Build ovaldi
-
-Load the ovaldi project into VC.  Select the x64 solution platform from the
-dropdown at the top.  Set the include and library directories to the install
-directories for all the libraries you created in the previous steps.  Ovaldi
-should build!
+		Create an environment variable named XERCESCROOT.  This can point to either your
+		source directory or installation directory.  It must be done before starting
+		VC, or it won't be picked up.
 
+		Start VC and load the Xalan VC project from 
+		<xalan_src_dir>\c\Projects\Win32\VC7.1\Xalan.sln.  Let the IDE convert the 
+		project to whatever version your IDE is.  Create x64 configurations for all the 
+		projects, as described in the xerces build instructions.
+
+		The AllInOne project is the one which creates the library.  In the project
+		properties for that project, for the x64 configuration you plan to use, make the
+		following changes:
+		 - C/C++->General: change "Win32" to "Win64" in the last path under 
+			 Additional Include Directories
+		 - C/C++->Output Files: change "Win32" in all the output paths to "Win64"
+		 - C/C++->Language: disable wchar_t as an built-in type
+		 - Linker->General: change "Win32" in the Output File path to "Win64", and
+			 again in the last path listed under Additional Library Directories
+		 - Linker->Advanced: change "Win32" to "Win64" in the path under Import Library
+
+		Close the solution and make the same change to the vcproj file as was done with
+		xerces, to remove the erroneous x86 linker setting.  Then load the solution
+		again.  The file to edit is:
+
+			<xalan_src_dir>\c\Projects\Win32\VC7.1\AllInOne\AllInOne.vcproj
+
+		It is also advisable to add two more preprocessor symbols to the project,
+		otherwise you will get a *lot* of warning spam about use of insecure functions,
+		and the build will take a lot longer:
+		
+			_SCL_SECURE_NO_WARNINGS, _CRT_SECURE_NO_WARNINGS
+
+		Build the AllInOne project: right click AllInOne in the Solution Explorer pane,
+		click Project Only->Build Only AllInOne.
+
+		The libraries are written to 
+		<xalan_src_dir>\c\Build\Win64\VC7.1\<Release|Debug>.  Now you have the same task
+		as for xerces: create an installation directory structure and copy the files 
+		into it.  As before, it's probably easiest to just copy the include directory 
+		from a binary distribution rather than try to extract all the *.hpp files from 
+		the source distribution yourself.
+
+	H. Building the OVAL Interpreter
+
+		Load the ovaldi project into VC.  Select the x64 solution platform from the
+		dropdown at the top.  Set the include and library directories to the install
+		directories for all the libraries you created in the previous steps.  Ovaldi
+		should build!
+
+-- III -- PCRE --
+
+The OVAL Interpreter uses the open source PCRE library.  The OVAL Interpreter
+currently uses version 8.x of the PCRE library.  From the PCRE Web site:
+
+  "Regular expression support is provided by the PCRE library 
+   package, which is open source software, written by Philip Hazel,
+   and copyright by the University of Cambridge, England."
+
+The PCRE library is under the BSD License and is re-distributed in
+ovaldi-x.x.x-setup.exe. As a result, a copy of the license
+(LICENCE.pcre) has been provided.    
+   
+For more information about PCRE visit:
+
+    http://www.pcre.org
+
+To download the source code for PCRE, please use the following FTP
+site:
+
+    ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+
+
+-- IV -- XERCES --
+
+The OVAL Interpreter uses the open source Xerces library.  The
+binary was compiled with version 2.7 of the xerces-c library.  From
+the Xerces Web site:
+
+  "This product includes software developed by the Apache Software
+  Foundation (http://www.apache.org/)."
+
+The Xerces library is under the Apache 2.0 License and is re-distributed
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result, 
+a copy of the license (LICENCE.xerces_xalan) has been provided.    
+  
+For more information about Xerces visit:
+
+    http://xml.apache.org
+
+The source code is also available at the above Web site.
+
+-- V -- XALAN --
+
+The OVAL Interpreter uses the open source Xalan library.  The
+binary was compiled with version 1.10.0 of the xalan-c library.  From
+the Xalan Web site:
+
+  "This product includes software developed by the Apache Software
+  Foundation (http://www.apache.org/)."
+
+The Xalan library is under the Apache 2.0 License and is re-distributed
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result,
+a copy of the license (LICENCE.xerces_xalan) has been provided.  
+  
+For more information about Xalan visit:
+
+    http://xml.apache.org
+
+The source code is also available at the above Web site.
+
+-- VI -- LIBGCRYPT --
+
+The OVAL Interpreter uses the open-source Libgcrypt library.  The binary
+was compiled with version 1.4.6 of the Libgcrypt library.  From the
+Libgcrypt Web site:
+
+	"Libgcrypt is a general purpose cryptographic library based on the
+	code from GnuPG. It provides functions for all cryptographic building
+	blocks: symmetric ciphers, hash algorithms, MACs, public key
+	algorithms, large integer functions, random numbers and a lot of
+	supporting functions."
+  
+For more information about Libgcrypt visit:
+    http://www.gnupg.org/related_software/libraries.en.html#lib-libgcrypt
+
+The source code is also available at the above Web site.
+
+-- VII -- REPORTING PROBLEMS --
+
+To report a problem with OVAL Interpreter, please add a bug tracker item,
+or create a post on the OVAL Interpreter Help Project Forum, with a brief
+description of the problem on the OVAL Interpreter SourceForge site
+(http://sourceforge.net/projects/ovaldi/support). Please include the
+platform the OVAL Interpreter was run on, the version of the OVAL
+Interpreter, and the OVAL Definitions document that was used.
+
+-- VIII -- USEFUL LINKS -- 
+
+OVAL Web site -- http://oval.mitre.org
+
+OVAL Interpreter Source Code -- http://sourceforge.net/projects/ovaldi/files/
+
+OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?title=Main_Page
+
+----------------------------------------------------------
+OVAL is sponsored by US-CERT at the U.S. Department of Homeland
+Security. OVAL and the OVAL logo are trademarks of The MITRE
