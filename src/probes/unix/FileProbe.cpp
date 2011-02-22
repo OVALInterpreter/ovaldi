@@ -267,16 +267,12 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	//////////////////////////////////////////////////////
 	/////////////////////// group_id /////////////////////
 	//////////////////////////////////////////////////////
-	char gidBuf[16];
-    snprintf(gidBuf, sizeof(gidBuf), "%u", sbuf.st_gid);
-	item->AppendElement(new ItemEntity("group_id", gidBuf, OvalEnum::DATATYPE_INTEGER));
+	item->AppendElement(new ItemEntity("group_id", Common::ToString(sbuf.st_gid), OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	//////////////////////  user_id  /////////////////////
 	//////////////////////////////////////////////////////
-	char uidBuf[16];
-    snprintf(uidBuf, sizeof(uidBuf), "%u", sbuf.st_uid);
-	item->AppendElement(new ItemEntity("user_id", uidBuf, OvalEnum::DATATYPE_INTEGER));
+	item->AppendElement(new ItemEntity("user_id", Common::ToString(sbuf.st_uid), OvalEnum::DATATYPE_INTEGER));
 
 	//////////////////////////////////////////////////////
 	/////////////////////  a_time	 /////////////////////
