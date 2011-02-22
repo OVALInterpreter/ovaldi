@@ -86,7 +86,7 @@ SourceForge site.
 
 The following instructions describe how to build the OVAL Interpreter
 on a Solaris system.  The OVAL Interpreter has been built and tested
-on 32 bit Solaris 10. The source distribution includes a Makefile that
+on 32-bit Solaris 10. The source distribution includes a Makefile that
 can be used to build the OVAL Interpreter on Solaris systems.  Before
 the OVAL Interpreter can be built, the supporting libraries must be
 installed.  Follow the instructions below to setup and install the

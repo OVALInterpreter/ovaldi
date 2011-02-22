@@ -26,31 +26,57 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
 -- CONTENTS --
 
-  I    INSTALLATION
+  I    SUPPORTED PLATFORMS
          A. Red Hat Linux 
          B. Sun Solaris
          C. Microsoft Windows
          D. Mac OS
-  II   USING THE OVAL INTERPRETER
+  II   INSTALLATION
+         A. Red Hat Linux 
+         B. Sun Solaris
+         C. Microsoft Windows
+         D. Mac OS
+  III  USING THE OVAL INTERPRETER
          A. Required Privileges
          B. Data Protection
          C. Obtaining Updated Data Files
          D. Quick Usage Guide
          E. Advanced Usage
-  III  INPUT AND OUTPUT
+  IV   INPUT AND OUTPUT
          A. Input
          B. Output
-  IV   PCRE
-  V    XERCES
-  VI   XALAN
-  VII  LIBGCRYPT
-  VIII OPENLDAP
-  IX   TROUBLESHOOTING
-  X    REPORTING PROBLEMS
-  XI   USEFUL LINKS
+  V    PCRE
+  VI   XERCES
+  VII  XALAN
+  VIII LIBGCRYPT
+  IX   OPENLDAP
+  X    TROUBLESHOOTING
+  XI   REPORTING PROBLEMS
+  XII  USEFUL LINKS
 
+-- I -- SUPPORTED PLATFORMS --
 
--- I -- INSTALLATION --
+  A. Red Hat Linux
+
+	  The OVAL Interpreter is currently developed and tested on 32-bit versions of Red Hat 
+	  Enterprise Linux 5.
+  
+  B. Sun Solaris
+  
+	  The OVAL Interpreter is currently developed and tested on 32-bit versions of Sun 
+	  Solaris 10.
+  
+  C. Microsoft Windows
+  
+	  The OVAL Interpreter should run on both 32-bit and 64-bit versions of Windows XP, 
+	  Windows Server 2003, Windows Vista, Windows 2008, and Windows 7.  However, we only
+	  develop and test the OVAL Interpreter on 32-bit Windows XP and 64-bit Windows 7.  
+
+  D. Mac OS  
+
+	  The OVAL Interpreter is currently developed and tested on 32-bit versions Mac OSX 10.6.
+
+-- II -- INSTALLATION --
 
   Download an appropriate installation file of the OVAL Interpreter
   from the OVAL Interpreter SourceForge site,
@@ -59,9 +85,6 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
   instructions to install the OVAL Interpreter on your system.
 
   A. Red Hat Linux Installation
-
-       The OVAL Interpreter can be installed and run on Red
-       Hat Enterprise Linux 5.
 
        Install the RPM simply by running the following command:
 
@@ -118,10 +141,6 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
   C. Microsoft Windows Installation
      
-       The OVAL Interpreter can be installed and run on
-       Microsoft Windows XP, Windows Server 2003, Windows Vista,
-	   Windows Server 2008, and Windows 7.
-
        Install the OVAL Interpreter by running the installer
        executable -      ovaldi-X.X.X-setup.exe
 
@@ -192,7 +211,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        Please see build.macos.txt.
 
 
--- II -- USING THE OVAL INTERPRETER --
+-- III -- USING THE OVAL INTERPRETER --
 
   A. Required Privileges -- IMPORTANT NOTE:
 
@@ -431,7 +450,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
            run the OVAL Interpreter.
 
 
--- III -- INPUT AND OUTPUT --
+-- IV -- INPUT AND OUTPUT --
 
 The input and the output formats used by the OVAL Interpreter are
 defined by individual XML Schemas. The data collected about a system is
@@ -474,7 +493,7 @@ the results of an analysis for inclusion in other applications.
      output to a location other than the default.     
 
 
--- IV -- PCRE --
+-- V -- PCRE --
 
 The OVAL Interpreter uses the open source PCRE library.  The
 binary was compiled with version 6.3 of the PCRE library.  
@@ -496,7 +515,7 @@ site:
     ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
 
 
--- V -- XERCES --
+-- VI -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
 binary was compiled with version 2.8 of the xerces-c library.  From
@@ -515,7 +534,7 @@ For more information about Xerces visit:
 The source code is also available at the above Web site.
 
 
--- VI -- XALAN --
+-- VII -- XALAN --
 
 The OVAL Interpreter uses the open source Xalan library.  The
 binary was compiled with version 1.10.0 of the xalan-c library.  From
@@ -533,7 +552,7 @@ For more information about Xalan visit:
 
 The source code is also available at the above Web site.
 
--- VII -- LIBGCRYPT --
+-- VIII -- LIBGCRYPT --
 
 The OVAL Interpreter uses the open-source Libgcrypt library.  The binary
 was compiled with version 1.4.6 (1.1.12 on Solaris) of the Libgcrypt library.
@@ -550,7 +569,7 @@ For more information about Libgcrypt visit:
 
 The source code is also available at the above Web site.
 
--- VIII -- OPENLDAP --
+-- IX -- OPENLDAP --
   
 The OVAL Interpreter utilizes the open source OpenLDAP library to
 execute the LDAP probe.  The binary was compiled with version 2.3.27 of the
@@ -567,7 +586,7 @@ For more information about OpenLDAP visit:
 
 The source code is also available at the above Web site.
 
--- IX -- TROUBLESHOOTING --
+-- X -- TROUBLESHOOTING --
 
 *********************************** 
 
@@ -651,7 +670,7 @@ of 1 represents that the OVAL Interpreter has completed with an error.
 If the OVAL Interpreter exits with a code of 1, check to make sure that
 all of the command line options and their values, if any, are valid.
 
--- X -- REPORTING PROBLEMS --
+-- XI -- REPORTING PROBLEMS --
 
 To report a problem with OVAL Interpreter, please add a bug tracker item,
 or create a post on the OVAL Interpreter Help Project Forum, with a brief
@@ -669,7 +688,7 @@ OVAL Web Site and join the "OVAL Repository Forum".
 http://oval.mitre.org/community/registration.html
 
 
--- XI ­ USEFUL LINKS --
+-- XII ­ USEFUL LINKS --
 
 OVAL Web site -- http://oval.mitre.org/
 
