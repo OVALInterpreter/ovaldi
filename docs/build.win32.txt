@@ -82,7 +82,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 
 The following instructions describe how to build the OVAL Interpreter 
 on a Windows system.  The OVAL Interpreter has been built and tested on 
-32-bit versions of Windows XP Pro using VC8 and the Windows 7 SDK. The 
+the 32-bit version of Windows XP Pro using VC8 and the Windows 7 SDK. The 
 source distribution includes a project file that can be used to build 
 the OVAL Interpreter. Before the OVAL Interpreter can be built, the 
 supporting libraries must be installed. Follow the instruction below 

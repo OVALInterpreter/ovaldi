@@ -25,57 +25,59 @@ CONDITIONS OF USE.  IF YOU DO NOT AGREE TO THESE TERMS, DO NOT USE THE OVAL
 INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
 -- CONTENTS --
-
-  I    SUPPORTED PLATFORMS
+	
+  I	    SUPPORTED PLATFORMS
+		 A. Red Hat Linux 
+         B. Sun Solaris
+         C. Microsoft Windows
+         D. Mac OS
+  II    INSTALLATION
          A. Red Hat Linux 
          B. Sun Solaris
          C. Microsoft Windows
          D. Mac OS
-  II   INSTALLATION
-         A. Red Hat Linux 
-         B. Sun Solaris
-         C. Microsoft Windows
-         D. Mac OS
-  III  USING THE OVAL INTERPRETER
+  III   USING THE OVAL INTERPRETER
          A. Required Privileges
          B. Data Protection
          C. Obtaining Updated Data Files
          D. Quick Usage Guide
          E. Advanced Usage
-  IV   INPUT AND OUTPUT
+  IV  	INPUT AND OUTPUT
          A. Input
          B. Output
-  V    PCRE
-  VI   XERCES
-  VII  XALAN
-  VIII LIBGCRYPT
-  IX   OPENLDAP
-  X    TROUBLESHOOTING
-  XI   REPORTING PROBLEMS
-  XII  USEFUL LINKS
+  V     PCRE
+  VI    XERCES
+  VII   XALAN
+  VIII  LIBGCRYPT
+  IX    OPENLDAP
+  X     TROUBLESHOOTING
+  XI    REPORTING PROBLEMS
+  XII   USEFUL LINKS
 
 -- I -- SUPPORTED PLATFORMS --
 
   A. Red Hat Linux
 
-	  The OVAL Interpreter is currently developed and tested on 32-bit versions of Red Hat 
+	  The OVAL Interpreter is currently developed and tested on the 32-bit version of Red Hat 
 	  Enterprise Linux 5.
   
   B. Sun Solaris
   
-	  The OVAL Interpreter is currently developed and tested on 32-bit versions of Sun 
+	  The OVAL Interpreter is currently developed and tested on the 32-bit version of Sun 
 	  Solaris 10.
   
   C. Microsoft Windows
   
 	  The OVAL Interpreter should run on both 32-bit and 64-bit versions of Windows XP, 
 	  Windows Server 2003, Windows Vista, Windows 2008, and Windows 7.  However, we only
-	  develop and test the OVAL Interpreter on 32-bit Windows XP and 64-bit Windows 7.  
+	  develop and test the OVAL Interpreter on the 32-bit version of Windows XP and the 64-bit 
+	  version of Windows 7.  
 
   D. Mac OS  
 
-	  The OVAL Interpreter is currently developed and tested on 32-bit versions Mac OSX 10.6.
-
+	  The OVAL Interpreter is currently developed and tested on the 32-bit version Mac 
+	  OSX 10.6.
+	
 -- II -- INSTALLATION --
 
   Download an appropriate installation file of the OVAL Interpreter
