@@ -335,7 +335,7 @@ LDAP* LDAPProbe::OpenConnection ( string hostnameStr ) {
 	}
 	#endif
 
-	#ifdef LINUX
+	#if defined (LINUX) || defined (DARWIN)
 	string hostnameUriStr = "ldap://";
 	hostnameUriStr.append ( hostnameStr );
 	hostnameUriStr.append ( ":389/" );
@@ -354,7 +354,7 @@ LDAP* LDAPProbe::OpenConnection ( string hostnameStr ) {
 	}
 	#endif
 
-	#ifdef LINUX
+	#if defined (LINUX) || defined (DARWIN)
 	berval credentials;
 	credentials.bv_val = NULL;
 	credentials.bv_len = 0;
@@ -373,7 +373,7 @@ void LDAPProbe::CloseConnection ( LDAP* ldap ) {
 	}
 	#endif
 
-	#ifdef LINUX
+	#if defined (LINUX) || defined (DARWIN)
 	if ( ( ldap != NULL ) && ( ldap_unbind_ext_s ( ldap, NULL, NULL ) != LDAP_SUCCESS ) ) {
 		throw ProbeException ( "Error: The LDAP unbind operation could not be completed successfully." );
 	}
@@ -423,7 +423,7 @@ string LDAPProbe::GetLDAPServerLocation() {
 	}
 	#endif
 
-	#ifdef LINUX
+	#if defined (LINUX) || defined (DARWIN)
 	string pathStr = "/etc/";
 	string fileNameStr = "ldap.conf";
 	string bufferStr;

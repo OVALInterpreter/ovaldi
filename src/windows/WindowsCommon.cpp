@@ -1635,7 +1635,7 @@ string WindowsCommon::ToString(DWORD dw) {
 
 	char dwordBuf[12];
 	ZeroMemory(dwordBuf, sizeof(dwordBuf));
-	_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%d", dw);
+	_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%lu", dw);
 	dwordBuf[sizeof(dwordBuf)-1] = '\0';
 
 	string dwStr = dwordBuf;
