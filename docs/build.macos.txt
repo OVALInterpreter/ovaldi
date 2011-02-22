@@ -94,7 +94,7 @@ install the supporting libraries.
 	
 	The source code for the PCRE library can be downloaded from the following link.
 	
-	    http://sourceforge.net/projects/pcre/files/pcre/8.02/
+	        ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
 	
 	To compile and install the PCRE library simply run the following commands.
  
@@ -105,7 +105,7 @@ install the supporting libraries.
   B. Xerces Library
 
        The OVAL Interpreter uses the open source Xerces library.  The
-       binary was compiled with version 2.8.0 of the xerces-c library.
+       binary was compiled with version 2.7.0 of the xerces-c library.
        
        The source code for the Xerces-C library can be downloaded from the following link.
 
@@ -202,7 +202,7 @@ site:
 -- IV -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.8.0 of the xerces-c library.  From
+binary was compiled with version 2.7.0 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software

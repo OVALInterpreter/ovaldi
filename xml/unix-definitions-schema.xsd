@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" elementFormDefault="qualified" version="5.8">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" elementFormDefault="qualified" version="5.9">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose generic UNIX tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>UNIX Definition</schema>
-                  <version>5.8</version>
-                  <date>9/15/2010 1:55:35 PM</date>
-                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.9</version>
+                  <date>2/22/2011 10:52:27 AM</date>
+                  <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="unix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -175,6 +175,13 @@
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType"  nillable="true">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The filename element specifies the name of a file to evaluate. If the xsi:nil attribute is set to true, then the object being specified is the higher level directory object (not all the files in the directory).  In this case, the filename element should not be used during collection and would result in the unique set of items being the directories themselves. For example, one would set xsi:nil to true if the desire was to test the attributes or permissions associated with a directory. Setting xsi:nil equal to true is different than using a .* pattern match, which says to collect every file under a given path.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="unix-def_file_objectfilename">
+                                                                                  <sch:rule context="unix-def:file_object/unix-def:filename">
+                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                     </xsd:sequence>
@@ -460,10 +467,17 @@
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType"  nillable="true">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The filename element specifies the name of a file to evaluate. If the xsi:nil attribute is set to true, then the object being specified is the higher level directory object (not all the files in the directory).  In this case, the filename element should not be used during collection and would result in the unique set of items being the directories themselves. For example, one would set xsi:nil to true if the desire was to test the attributes associated with a directory. Setting xsi:nil equal to true is different than using a .* pattern match, which says to collect every file under a given path.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="unix-def_fileextendedattribute_objectfilename">
+                                                                                  <sch:rule context="unix-def:fileextendedattribute_object/unix-def:filename">
+                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                       </xsd:sequence>
-                                                </xsd:choice>                                                
+                                                </xsd:choice>
                                                 <xsd:element name="attribute_name" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The attribute_name element specifies the name of an extended attribute to evaluate.</xsd:documentation>
@@ -1545,6 +1559,13 @@
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The name of an SCCS file.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="unix-def_sccs_objectfilename">
+                                                                                  <sch:rule context="unix-def:sccs_object/unix-def:filename">
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                       </xsd:sequence>

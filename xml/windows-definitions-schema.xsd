@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" elementFormDefault="qualified" version="5.8">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" elementFormDefault="qualified" version="5.9">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,9 +7,9 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.8</version>
-                  <date>9/15/2010 1:55:35 PM</date>
-                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.9</version>
+                  <date>2/22/2011 10:52:27 AM</date>
+                  <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -371,7 +371,7 @@
                         <oval:deprecated_info>
                               <oval:version>5.7</oval:version>
                               <oval:reason>Replaced by the activedirectory57_test. This test allows for single fields to be selected from active directory. A new test was created to allow more than one field to be selected in one statement. See the activedirectory57_test.</oval:reason>
-                              <oval:comment>This object has been deprecated and may be removed in a future version of the language.</oval:comment>
+                              <oval:comment>This test has been deprecated and may be removed in a future version of the language.</oval:comment>
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_activedirectory_test_dep">
                               <sch:rule context="win-def:activedirectory_test">
@@ -454,7 +454,7 @@
                         <oval:deprecated_info>
                               <oval:version>5.7</oval:version>
                               <oval:reason>Replaced by the activedirectory57_state. This state allows for single fields to be selected from active directory. A new state was created to allow more than one field to be selected in one statement. See the activedirectory57_state.</oval:reason>
-                              <oval:comment>This object has been deprecated and may be removed in a future version of the language.</oval:comment>
+                              <oval:comment>This state has been deprecated and may be removed in a future version of the language.</oval:comment>
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_activedirectory_state_dep">
                               <sch:rule context="win-def:activedirectory_state">
@@ -588,7 +588,7 @@
                                     </xsd:element>
                                     <xsd:element name="relative_dn" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The relative_dn field is used to uniquely identify an object inside the specified naming context. It contains all the parts of the objects distinguished name except those outlined by the naming context.</xsd:documentation>
+                                                <xsd:documentation>The relative_dn field is used to uniquely identify an object inside the specified naming context. It contains all the parts of the object's distinguished name except those outlined by the naming context.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="attribute" type="oval-def:EntityStateStringType" minOccurs="0">
@@ -605,16 +605,23 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The type of information that the specified attribute represents.</xsd:documentation>
                                           </xsd:annotation>
-                                    </xsd:element>                                    
+                                    </xsd:element>
                                     <xsd:element name="value" type="oval-def:EntityStateRecordType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The actual value of the specified Active Directory attribute. Note that while an Active Directory attribute can contain structured data where it is necessary to collect multiple related fields that can be described by the 'record' datatype, it is not always the case.  It also is possible that an Active Directory attribute can contain only a single value or an array of values. In these cases, there is not a name to uniquely identify the corresponding field which is a requirement for fields in the 'record' datatype.  As a result, the name of the Active Directory attribute will be used to uniquely identify the field and satisfy this requirement.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_ad57stevalue">
+                                                            <sch:rule context="win-def:activedirectory57_state/win-def:value">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a activedirectory57_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                           </xsd:annotation>
                                           <xsd:unique name="UniqueAdValueFieldName">
                                                 <xsd:selector xpath="./oval-def:field"/>
                                                 <xsd:field xpath="@name"/>
                                           </xsd:unique>
-                                    </xsd:element>                                    
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -1227,12 +1234,13 @@
                                                                               <sch:pattern id="win-def_fileobjfilename">
                                                                                     <sch:rule context="win-def:file_object/win-def:filename">
                                                                                           <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
+                                                                                          <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                     </sch:rule>
                                                                               </sch:pattern>
                                                                         </xsd:appinfo>
                                                                   </xsd:annotation>
                                                             </xsd:element>
-                                                      </xsd:sequence>                                                      
+                                                      </xsd:sequence>
                                                 </xsd:choice>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                           </xsd:sequence>
@@ -1471,6 +1479,7 @@
                                                                               <sch:pattern id="win-def_fap53objfilename">
                                                                                     <sch:rule context="win-def:fileauditedpermissions53_object/win-def:filename">
                                                                                           <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
+                                                                                          <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                     </sch:rule>
                                                                               </sch:pattern>
                                                                         </xsd:appinfo>
@@ -1746,6 +1755,7 @@
                                                                   <sch:pattern id="win-def_fapobjfilename">
                                                                         <sch:rule context="win-def:fileauditedpermissions_object/win-def:filename">
                                                                             <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -2023,6 +2033,7 @@
                                                                             <sch:pattern id="win-def_fer53objfilename">
                                                                                   <sch:rule context="win-def:fileeffectiverights53_object/win-def:filename">
                                                                                       <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -2300,6 +2311,7 @@
                                                                   <sch:pattern id="win-def_fefobjfilename">
                                                                         <sch:rule context="win-def:fileeffectiverights_object/win-def:filename">
                                                                             <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
+                                                                            <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -6258,13 +6270,18 @@
                                     <xsd:element name="result" type="oval-def:EntityStateRecordType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The result element specifies how to test items in the result set of the specified WQL statement.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_wmi57steresult">
+                                                            <sch:rule context="win-def:wmi57_state/win-def:result">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the result entity of a wmi57_object must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                           </xsd:annotation>
-                                          
                                           <xsd:unique name="UniqueWmiResultFieldName">
                                                 <xsd:selector xpath="./oval-def:field"/>
                                                 <xsd:field xpath="@name"/>
                                           </xsd:unique>
-                                          
                                     </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>

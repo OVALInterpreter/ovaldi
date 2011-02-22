@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" elementFormDefault="qualified" version="5.8">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" elementFormDefault="qualified" version="5.9">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,9 +7,9 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Independent Definition</schema>
-                  <version>5.8</version>
-                  <date>9/15/2010 1:55:33 PM</date>
-                  <terms_of_use>Copyright (c) 2002-2010, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.9</version>
+                  <date>2/22/2011 10:52:25 AM</date>
+                  <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ind-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -166,7 +166,7 @@
                                                                         </sch:pattern>
                                                                   </xsd:appinfo>
                                                             </xsd:annotation>
-                                                      </xsd:element>                                                      
+                                                      </xsd:element>
                                                       <xsd:sequence>
                                                           <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
@@ -176,6 +176,13 @@
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The filename element specifies the name of the file.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="ind-def_hashobjfilename">
+                                                                                  <sch:rule context="ind-def:filehash_object/ind-def:filename">
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                       </xsd:sequence>
@@ -310,6 +317,13 @@
                                                             <xsd:element name="filename" type="oval-def:EntityObjectStringType">
                                                                   <xsd:annotation>
                                                                         <xsd:documentation>The filename entity specifies the name of the file.</xsd:documentation>
+                                                                        <xsd:appinfo>
+                                                                              <sch:pattern id="ind-def_hash58objfilename">
+                                                                                    <sch:rule context="ind-def:filehash58_object/ind-def:filename">
+                                                                                          <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                    </sch:rule>
+                                                                              </sch:pattern>
+                                                                        </xsd:appinfo>
                                                                   </xsd:annotation>
                                                             </xsd:element>
                                                       </xsd:sequence>
@@ -695,7 +709,7 @@
                                     </xsd:element>
                                     <xsd:element name="relative_dn" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The relative_dn field is used to uniquely identify an object inside the specified suffix. It contains all of the parts of the object's distinguished name except those outlined by the suffix. If the xsi:nil attribute is set to true, then the object being specified is the higher level suffix. In this case, the relative_dn element should not be collected or used in analysis. Setting xsi:nil equal to true is different than using a .* pattern match, which says to collect every relative distinguished name under a given suffix. Note that when xsi:nil is used for the relative_dn element, the attribute element should also have the xsi:nil attribute set to true.</xsd:documentation>
+                                                <xsd:documentation>The relative_dn field is used to uniquely identify an object inside the specified suffix. It contains all of the parts of the object's distinguished name except those outlined by the suffix.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="attribute" type="oval-def:EntityStateStringType" minOccurs="0">
@@ -826,7 +840,7 @@
                                     </xsd:element>
                                     <xsd:element name="relative_dn" type="oval-def:EntityStateStringType" minOccurs="0">
                                           <xsd:annotation>
-                                                <xsd:documentation>The relative_dn field is used to uniquely identify an object inside the specified suffix. It contains all of the parts of the object's distinguished name except those outlined by the suffix. If the xsi:nil attribute is set to true, then the object being specified is the higher level suffix. In this case, the relative_dn element should not be collected or used in analysis. Setting xsi:nil equal to true is different than using a .* pattern match, which says to collect every relative distinguished name under a given suffix. Note that when xsi:nil is used for the relative_dn element, the attribute element should also have the xsi:nil attribute set to true.</xsd:documentation>
+                                                <xsd:documentation>The relative_dn field is used to uniquely identify an object inside the specified suffix. It contains all of the parts of the object's distinguished name except those outlined by the suffix.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="attribute" type="oval-def:EntityStateStringType" minOccurs="0">
@@ -847,6 +861,13 @@
                                     <xsd:element name="value" type="oval-def:EntityStateRecordType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The actual value of the specified LDAP attribute. Note that while an LDAP attribute can contain structured data where it is necessary to collect multiple related fields that can be described by the 'record' datatype, it is not always the case.  It also is possible that an LDAP attribute can contain only a single value or an array of values. In these cases, there is not a name to uniquely identify the corresponding field which is a requirement for fields in the 'record' datatype.  As a result, the name of the LDAP attribute will be used to uniquely identify the field and satisfy this requirement.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="ind-def_ldap57stevalue">
+                                                            <sch:rule context="ind-def:ldap57_state/ind-def:value">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a ldap57_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                           </xsd:annotation>
                                           <xsd:unique name="UniqueLdapValueFieldName">
                                                 <xsd:selector xpath="./oval-def:field"/>
@@ -1168,6 +1189,13 @@
                                     <xsd:element name="result" type="oval-def:EntityStateRecordType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>The result entity specifies how to test objects in the result set of the specified SQL statement.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="ind-def_sql57steresult">
+                                                            <sch:rule context="ind-def:sql57_state/ind-def:result">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the result entity of a sql57_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                           </xsd:annotation>
                                           <xsd:unique name="UniqueSqlResultFieldName">
                                                 <xsd:selector xpath="./oval-def:field"/>
@@ -1251,6 +1279,13 @@
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The filename entity specifies the name of a file.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="ind-def_txt54objfilename">
+                                                                                  <sch:rule context="ind-def:textfilecontent54_object/ind-def:filename">
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                       </xsd:sequence>
@@ -1420,7 +1455,7 @@
                                           DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
                                     </sch:report>
                               </sch:rule>
-                        </sch:pattern>                        
+                        </sch:pattern>
                   </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
@@ -1439,6 +1474,13 @@
                                                 <xsd:element name="filename" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The filename element specifies the name of the file.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="ind-def_txtobjfilename">
+                                                                        <sch:rule context="ind-def:textfilecontent_object/ind-def:filename">
+                                                                              <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="line" type="oval-def:EntityObjectStringType">
@@ -1702,6 +1744,13 @@
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The filename element specifies the name of the file.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="ind-def_xmlobjfilename">
+                                                                                  <sch:rule context="ind-def:xmlfilecontent_object/ind-def:filename">
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                       </xsd:sequence>
@@ -2302,7 +2351,7 @@
                                                             DEPRECATED ELEMENT VALUE IN: ldap_state ELEMENT VALUE: <sch:value-of select="."/> 
                                                       </sch:report>
                                                 </sch:rule>
-                                          </sch:pattern>                        
+                                          </sch:pattern>
                                     </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:enumeration>
@@ -2321,7 +2370,7 @@
                                                             DEPRECATED ELEMENT VALUE IN: ldap_state ELEMENT VALUE: <sch:value-of select="."/> 
                                                       </sch:report>
                                                 </sch:rule>
-                                          </sch:pattern>                        
+                                          </sch:pattern>
                                     </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:enumeration>

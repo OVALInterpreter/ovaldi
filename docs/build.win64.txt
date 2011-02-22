@@ -228,7 +228,7 @@ install the supporting libraries.
 		link in the left sidebar, and scroll down to the 2-series releases.  There is a
 		windows x64 binary available, but we can't use it due to different compiler
 		settings between ovaldi and what was used to build those binaries, specifically
-		with regard to treatment of wchar_t.  So grab the 2.8 source.
+		with regard to treatment of wchar_t.  So grab the 2.7 source.
 
 		Open VC and load up <xerces_dir>\Projects\Win32\VC7.1\xerces-all\xerces-all.sln.
 		Using the 7.1 version of the solution will make building Xalan easier, since it
@@ -419,7 +419,7 @@ site:
 -- IV -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.8 of the xerces-c library.  From
+binary was compiled with version 2.7 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
