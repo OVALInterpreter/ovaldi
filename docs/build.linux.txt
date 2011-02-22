@@ -83,7 +83,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 -- II -- BUILD INSTRUCTIONS --
 
 The following instructions describe how to build the OVAL Interpreter on a
-Linux system.  The OVAL Interpreter has been built and tested on 32-bit versions
+Linux system.  The OVAL Interpreter has been built and tested on the 32-bit version
 of Red Hat Enterprise Linux 5. The source distribution includes a Makefile that can
 be used to build the OVAL Interpreter on Linux systems. Before the OVAL Interpreter
 can be built, the supporting libraries must be installed. Follow the instruction 
