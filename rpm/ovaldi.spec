@@ -74,7 +74,7 @@ make
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
 if grep "release 5" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL5/libxerces-c.so.28.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
   /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
   /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
 else
@@ -97,8 +97,8 @@ fi
 %preun libs
 if [ $1 = 0 ]; then
     #// Do stuff specific to uninstalls
-    if [ -e %{_libdir}/ovaldi/libxerces-c.so.28 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.28
+    if [ -e %{_libdir}/ovaldi/libxerces-c.so.27 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.27
     fi
     if [ -e %{_libdir}/ovaldi/libxerces-c.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxerces-c.so
@@ -146,11 +146,14 @@ fi
 /usr/share/ovaldi/*.xsd
 
 %files libs
-%{_libdir}/ovaldi/libxerces-c.so.28.0
+%{_libdir}/ovaldi/libxerces-c.so.27.0
 %{_libdir}/ovaldi/libxalan-c.so.110.0
 %{_libdir}/ovaldi/libxalanMsg.so.110.0
 
 %changelog
+
+* Tues Feb 22 2011 Danny Haynes <dhaynes@mitre.org> 5.9.1-1.0
+* Updated for libxerces-c.so.27
 
 * Wed May 12 2010 Bryan Worrell <bworrell@mitre.org> 5.5.4-1.0
 * Updated for libxerces-c.so.28 
