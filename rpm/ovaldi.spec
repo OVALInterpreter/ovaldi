@@ -152,7 +152,7 @@ fi
 
 %changelog
 
-* Tues Feb 22 2011 Danny Haynes <dhaynes@mitre.org> 5.9.1-1.0
+* Tue Feb 22 2011 Danny Haynes <dhaynes@mitre.org> 5.9.1-1.0
 * Updated for libxerces-c.so.27
 
 * Wed May 12 2010 Bryan Worrell <bworrell@mitre.org> 5.5.4-1.0
