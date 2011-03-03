@@ -153,17 +153,18 @@ install the supporting libraries.
 
 			$ ./configure --host=x86_64-w64-mingw32 --prefix=whatever
 
-		Unfortunately, although the regular "make install" will work, you won't get the
-		right DLL import library.  MSVC doesn't work with mingw's *.dll.a files very
-		well.  I've seen it work with warnings, and also seen it fail.  To create a
-		proper import library, you need to get mingw to create you a *.def file, and
-		then use MSVC's "lib" utility to create the import lib.  Also unfortunately,
-		getting the normal build process to create the *.def files is really ugly.  You
-		would have to hack the 'libtool' script which comes with PCRE, which is what
-		constructs the gcc commandlines to compile and link.  A less ugly way is to
-		modify the makefile.  There is a user-contributed target for "pcre.dll" at the
-		bottom.  Add another parameter to the GCC commandline in that target:
-			
+		Unfortunately, although the regular "make install" will work, you won't get a
+		DLL import library that works.  MSVC doesn't work with mingw's *.dll.a files
+		very well.  I've seen it work with warnings, and also seen it fail.  PCRE's
+		import library as created by MinGW doesn't seem to work.  To create a proper
+		import library, you need to get mingw to create you a *.def file, and then use
+		MSVC's "lib" utility to create the import lib.  Also unfortunately, getting the
+		normal build process to create the *.def files is really ugly.  You would have
+		to hack the 'libtool' script which comes with PCRE, which is what constructs the
+		gcc commandlines to compile and link.  A less ugly way is to modify the
+		makefile. There is a user-contributed target for "pcre.dll" at the bottom.  Add
+		another parameter to the GCC commandline in that target:
+
 			-Wl,--output-def,pcre.def
 
 		The result should look something like:
@@ -208,15 +209,8 @@ install the supporting libraries.
 		assembly disabled.  (If you try "make check" yourself, it probably won't work.
 		Other hackery was required to make the tests work, which I won't describe here.)
 
-		Happily, libgcrypt does provide you a *.def file.  In an MSVC x64 tools command
-		window, cd to <your libgcrypt install dir>\lib, and run:
-
-			lib /machine:x64 /def:libgcrypt.def
-		 
-		to create an import library named libgcrypt.lib.  When linked to, it will result
-		in a dependency in ovaldi on "libgcrypt.dll", so you'll have to rename or copy
-		libgcrypt-11.dll to libgcrypt.dll.  Don't worry about libgpg-error; it won't be 
-		a direct dependency of ovaldi.
+		libgcrypt's DLL import library does seem to work, so you can link directly to
+		libgcrypt.dll.a, which will result in a dependency on libgcrypt-11.dll.
 
 	F. Build Xerces
 
