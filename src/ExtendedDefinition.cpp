@@ -87,9 +87,8 @@ void ExtendedDefinition::Write(DOMElement* parentElm) {
 		XmlCommon::AddAttribute(extendedDefinitionElm, "variable_instance", Common::ToString(this->GetDefinitionRef()->GetVariableInstance()));
 	}
 
-	string negateStr = Common::ToString(this->GetNegate());
-	if(negateStr.compare("true") == 0) {
-		XmlCommon::AddAttribute(extendedDefinitionElm, "negate", negateStr);
+	if(this->GetNegate()) {
+		XmlCommon::AddAttribute(extendedDefinitionElm, "negate", Common::ToString(this->GetNegate()));
 	}
 
 	XmlCommon::AddAttribute(extendedDefinitionElm, "result", OvalEnum::ResultToString(this->GetResult()));

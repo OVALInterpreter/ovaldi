@@ -76,9 +76,8 @@ void Criterion::Write(DOMElement* parentElm) {
 		XmlCommon::AddAttribute(criterionElm, "variable_instance", Common::ToString(this->GetTestRef()->GetVariableInstance()));
 	}
 
-	string negateStr = Common::ToString(this->GetNegate());
-	if(negateStr.compare("true") == 0) {
-		XmlCommon::AddAttribute(criterionElm, "negate", negateStr);
+	if (this->GetNegate()){
+		XmlCommon::AddAttribute(criterionElm, "negate", Common::ToString(this->GetNegate()));
 	}
 
 	XmlCommon::AddAttribute(criterionElm, "result", OvalEnum::ResultToString(this->GetResult()));

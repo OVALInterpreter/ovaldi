@@ -139,9 +139,9 @@ void Criteria::Write(DOMElement* parentElm) {
 
 	// add the attributes
 	XmlCommon::AddAttribute(criteriaElm, "operator", OvalEnum::OperatorToString(this->GetOperator()));
-	string negateStr = Common::ToString(this->GetNegate());
-	if(negateStr.compare("true") == 0) {
-		XmlCommon::AddAttribute(criteriaElm, "negate", negateStr);
+	
+	if(this->GetNegate()) {
+		XmlCommon::AddAttribute(criteriaElm, "negate", Common::ToString(this->GetNegate()));
 	}	
 
 	XmlCommon::AddAttribute(criteriaElm, "result", OvalEnum::ResultToString(this->GetResult()));
