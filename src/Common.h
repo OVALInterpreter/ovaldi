@@ -159,10 +159,15 @@ class Common {
 		/** Return true if the specified file exists. */
 		static bool     FileExists(const char* filename);
 
-		template<typename T>
+		/**
+		 * Converts \p val to a string.  T must be a type such that
+		 * 'out << val' is legal, where out is an ostringstream and val is
+		 * of type T const&.
+		 */
+		template <typename T>
 		static std::string ToString(const T& val) {
 			std::ostringstream result;
-			result << val;
+			result << std::boolalpha << val;
 
 			return result.str();
 		}
