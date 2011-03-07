@@ -69,6 +69,20 @@ bool ObjectCollector::IsApplicable(AbsObject* object) {
 	// -----------------------------------------------------------------------
 
 	bool isApplicable = false;
+	bool isRPM = false;
+	bool isDPKG = false;
+
+        #ifdef PACKAGE_DPKG
+	    isDPKG = true;
+        #endif
+        #ifdef PACKAGE_RPM
+	    isRPM = true;
+        #endif
+	
+	if( ( object->GetName().compare("rpminfo_object")  == 0 && !isRPM  ) || 
+	    ( object->GetName().compare("dpkginfo_object") == 0 && !isDPKG ) ){
+	      return isApplicable;
+	}
 
 	if(object->GetXmlns().rfind("linux") != string::npos) {
 		isApplicable = true;
