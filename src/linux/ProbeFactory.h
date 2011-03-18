@@ -69,7 +69,7 @@
 #include "XinetdProbe.h"
 #include "InetdProbe.h"
 #include "LDAPProbe.h"
-
+#include "PartitionProbe.h"
 
 
 class AbsProbe;

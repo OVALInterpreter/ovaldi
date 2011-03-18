@@ -99,6 +99,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("rpminfo_object") == 0) {
 		probe = RPMInfoProbe::Instance();
 #endif
+	} else if (objectName.compare("partition_object") == 0) {
+		probe = PartitionProbe::Instance();
 	} else {
 		Log::Info(objectName + " is not currently supported.");
 	}
