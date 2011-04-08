@@ -48,6 +48,7 @@
 #include "UnameProbe.h"
 #ifdef PACKAGE_RPM
  #include "RPMInfoProbe.h"
+ #include "RPMVerifyProbe.h"
 #endif
 #ifdef PACKAGE_DPKG
  #include "DPKGInfoProbe.h"
@@ -70,7 +71,6 @@
 #include "InetdProbe.h"
 #include "LDAPProbe.h"
 #include "PartitionProbe.h"
-
 
 class AbsProbe;
 

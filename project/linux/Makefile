@@ -66,9 +66,11 @@ else ifneq (${PACKAGE_DPKG}, )
 	LIBS += -lapt-pkg
 	CPPFLAGS += -DPACKAGE_DPKG
 	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
+	CPP_FILES := $(filter-out %RPMVerifyProbe.cpp, $(CPP_FILES))
 else
 	CPP_FILES := $(filter-out %DPKGInfoProbe.cpp, $(CPP_FILES))
 	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
+	CPP_FILES := $(filter-out %RPMVerifyProbe.cpp, $(CPP_FILES))
 endif
 
 OBJ_FILES = $(CPP_FILES:.cpp=.o)
