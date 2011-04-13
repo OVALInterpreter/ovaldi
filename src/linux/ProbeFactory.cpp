@@ -103,6 +103,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 #endif
 	} else if (objectName.compare("partition_object") == 0) {
 		probe = PartitionProbe::Instance();
+	} else if (objectName.compare("selinuxsecuritycontext_object") == 0) {
+		probe = SelinuxSecurityContextProbe::Instance();
 	} else {
 		Log::Info(objectName + " is not currently supported.");
 	}

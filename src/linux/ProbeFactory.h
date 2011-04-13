@@ -71,6 +71,7 @@
 #include "InetdProbe.h"
 #include "LDAPProbe.h"
 #include "PartitionProbe.h"
+#include "SelinuxSecurityContextProbe.h"
 
 class AbsProbe;
 
