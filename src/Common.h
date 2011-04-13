@@ -162,7 +162,7 @@ class Common {
 		/**
 		 * Converts \p val to a string.  T must be a type such that
 		 * 'out << val' is legal, where out is an ostringstream and val is
-		 * of type T const&.
+		 * of type T const&.  Inspired by boost's lexical_cast function.
 		 */
 		template <typename T>
 		static std::string ToString(const T& val) {
@@ -170,6 +170,22 @@ class Common {
 			result << std::boolalpha << val;
 
 			return result.str();
+		}
+
+		/**
+		 * "Casts" from a string to type T.  The result is placed at the address
+		 * pointed to by \p to.  T must be a type such that 'in >> val'
+		 * is legal, where in is an istringstream, and val is of type T&.  Inspired
+		 * by boost's lexical_cast function.
+		 * @return false on failure, true on success
+		 */
+		template<typename T>
+		static bool FromString(const std::string &str, T *to) {
+			std::istringstream iss(str);
+			iss >> std::boolalpha >> *to;
+			if (!iss)
+				return false;
+			return true;
 		}
 
 		/** Converts a string into a string of all uppercase characters.

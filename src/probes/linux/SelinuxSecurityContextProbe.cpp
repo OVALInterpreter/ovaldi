@@ -41,6 +41,7 @@
 #include <unistd.h> // for getpid()
 
 #include <Behavior.h>
+#include <Common.h>
 #include <FileFinder.h>
 #include <REGEX.h>
 #include <VectorPtrGuard.h>
@@ -137,19 +138,6 @@ namespace {
 		context_t ctx;
 	};
 
-	/**
-	 * "Casts" from a string to type To_Type.
-	 * @return false on failure, true on success
-	 */
-	template<typename To_Type>
-	bool FromString(const string &str, To_Type *to) {
-		istringstream iss(str);
-		iss >> *to;
-		if (!iss)
-			return false;
-		return true;
-	}
-
 	auto_ptr<Item> CreateItem();
 
 	/**
@@ -208,7 +196,6 @@ namespace {
 SelinuxSecurityContextProbe *SelinuxSecurityContextProbe::instance = NULL;
 
 SelinuxSecurityContextProbe::SelinuxSecurityContextProbe() {
-
 }
 
 SelinuxSecurityContextProbe::~SelinuxSecurityContextProbe() {
@@ -338,7 +325,7 @@ namespace {
 				try {
 					// convert pid from string to pid_t
 					pid_t pid;
-					if (!FromString(*pidIter, &pid))
+					if (!Common::FromString(*pidIter, &pid))
 						throw ProbeException("Couldn't convert to a pid_t: " + *pidIter);
 
 					CompletePidItem(itemEntities.get(), pid);
@@ -384,7 +371,7 @@ namespace {
 					continue;
 
 				pid_t pid;
-				if (!FromString(d->d_name, &pid)) {
+				if (!Common::FromString(d->d_name, &pid)) {
 					// but this really ought to work, since we just verified it
 					// had only decimal digits in it.
 					Log::Debug("Couldn't convert to a pid_t: " + string(d->d_name));
