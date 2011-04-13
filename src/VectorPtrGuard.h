@@ -114,36 +114,6 @@ public:
 		return vec;
 	}
 
-	/**
-	 * Returns a begin iterator to the contained vector.
-	 */
-	typename std::vector<T*>::iterator begin() {
-		return vec->begin();
-	}
-
-	/**
-	 * Returns a begin iterator to the contained vector.
-	 */
-	typename std::vector<T*>::const_iterator begin() const {
-		return vec->begin();
-	}
-
-	/**
-	 * Returns an end iterator to the contained vector.  The iterator still
-	 * iterates over T*'s.
-	 */
-	typename std::vector<T*>::iterator end() {
-		return vec->end();
-	}
-
-	/**
-	 * Returns an end iterator to the contained vector.  The iterator still
-	 * iterates over T*'s.
-	 */
-	typename std::vector<T*>::const_iterator end() const {
-		return vec->end();
-	}
-
 private:
 	/**
 	 * Called from the destructor, so can't throw!  (I hope this code doesn't
