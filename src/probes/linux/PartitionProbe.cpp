@@ -31,7 +31,6 @@
 #include <cerrno>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <sys/statfs.h>
 
 // we'll use libblkid to figure out UUIDs of partitions
@@ -213,6 +212,9 @@ void PartitionProbe::CachePartitions() {
 		// I assume here that each line of the mtab file is space-delimited,
 		// with no embedded spaces within a field value... is this reasonable?
 		iss >> device >> mountPoint >> fsType >> mountOpts;
+
+		// replace any octal escape sequences...
+		this->DecodeMtabMountPoint(&mountPoint);
 		
 		if (statfs(mountPoint.c_str(), &buf))
 			throw ProbeException("statfs() error occurred on "+mountPoint+": "+strerror(errno));
@@ -284,3 +286,44 @@ void PartitionProbe::CachePartitions() {
 		this->cachedPartitionItems.push_back(item);
 	}
 }
+
+void PartitionProbe::DecodeMtabMountPoint(string *mountPoint) {
+	string::size_type writeIdx, readIdx;
+	
+	for (writeIdx = 0, readIdx = 0; readIdx < mountPoint->size(); ) {
+		if ((*mountPoint)[readIdx] == '\\') {
+			if (readIdx < mountPoint->size() - 1) {
+				++readIdx;
+
+				//read no more than 3 chars (assumed to be octal digits).  If there
+				//are fewer than 3 chars left in the string, read whatever's left
+				//(not likely to happen).
+				string::size_type numOctCharsToRead = 
+					(readIdx < mountPoint->size()-3) ? 3 : 
+					(mountPoint->size() - readIdx);
+				string octalStr = mountPoint->substr(readIdx, numOctCharsToRead);
+
+				// use istringstream and manipulator to convert the octal
+				// string to an int.
+				istringstream iss(octalStr);
+				int val;
+				iss >> oct >> val;
+
+				if (!iss)
+					throw ProbeException("Could not interpret octal escape sequence '\\"+octalStr+"' in mount point '"+*mountPoint+"'.");
+
+				// now cast to a char and write the char back into the
+				// mountPoint string.
+				(*mountPoint)[writeIdx++] = (char)val;
+
+				readIdx += numOctCharsToRead;
+			} else
+				// last char is a '\'... treat as a normal char
+				(*mountPoint)[writeIdx++] = (*mountPoint)[readIdx++];
+		} else
+			(*mountPoint)[writeIdx++] = (*mountPoint)[readIdx++];
+	}
+
+	mountPoint->resize(writeIdx);
+}
+

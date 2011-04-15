@@ -61,6 +61,15 @@ private:
 	void CachePartitions();
 
 	/**
+	 * Mount point paths as found in the mount point file (e.g. /etc/mtab) can
+	 * have octal escape sequences in them.  This method replaces all such
+	 * sequences with the actual character, to obtain the real path used to look
+	 * into the filesystem.  An escape sequence is assumed to be of the form
+	 * '\xxx' where xxx are 3 octal digits.
+	 */
+	void DecodeMtabMountPoint(std::string *mountPoint);
+
+	/**
 	 * This constitutes a snapshot of the mounts at the time this probe
 	 * is instantiated.
 	 */
