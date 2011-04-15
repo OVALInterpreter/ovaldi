@@ -36,6 +36,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 
 * Added sample OVAL Directives files for full, minimal, compliance, and vulnerability results.
+* Added support for the linux-def:selinuxsecuritycontext_test.
+* Added support for the linux-def:rpmverify_test.
+* Added support for the linux-def:partition_test.
 
 ---------------------------------------
 ---        Version 5.9 build 1      ---
