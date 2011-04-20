@@ -278,11 +278,3 @@ void ItemEntity::SetNil(bool isNil) {
 bool ItemEntity::GetNil() {
 	return this->nil;
 }
-
-std::string ItemEntity::Print(){
-	string output = "";
-	for(AbsEntityValueVector::iterator it = this->value.begin();it != this->value.end();it++){
-		output.append((*it)->Print()+" "+"\n");
-	}
-	return output;
-}
