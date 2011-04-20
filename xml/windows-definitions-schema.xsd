@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" elementFormDefault="qualified" version="5.10">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.9</version>
-                  <date>2/22/2011 10:52:27 AM</date>
+                  <version>5.10 Draft 1</version>
+                  <date>3/10/2011 8:44:04 AM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -1063,6 +1063,412 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>Audit the events that indicate that the integrity security subsystem has been violated.</xsd:documentation>
                                           </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
+      <!-- ==================================  CMDLET TEST  ============================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="cmdlet_1_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>TODO</xsd:documentation>
+                  
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>cmdlet_1_test</oval:test>
+                              <oval:object>cmdlet_1_object</oval:object>
+                              <oval:state>cmdlet_1_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">cmdlet_1_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_cmdlet_1_test">
+                              <sch:rule context="win-def:cmdlet_1_test/win-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/win-def:cmdlet_1_object/@id"><sch:value-of select="../@id"/> - the object child element of an cmdlet_1_test must reference an cmdlet_1_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="win-def:cmdlet_1_test/win-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/win-def:cmdlet_1_state/@id"><sch:value-of select="../@id"/> - the state child element of an cmdlet_1_test must reference an cmdlet_1_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cmdlet_1_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>TODO</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="noun" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="arguments" type="oval-def:EntityObjectStringType" nillable="true">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                            <xsd:documentation>Must allow nil here meaning that no arguments are supplied?</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdlet1objarguments">
+                                                                        <sch:rule context="win-def:cmdlet_1_object/win-def:arguments">
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the arguments entity of a cmdlet_1_object should be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="parameters" type="oval-def:EntityObjectStringType" nillable="true">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                            <xsd:documentation>Must allow nil here meaning that no parameters are supplied?</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdlet1objparameters">
+                                                                        <sch:rule context="win-def:cmdlet_1_object/win-def:parameters">
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_1_object should be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cmdlet_1_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation></xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="noun" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="arguments" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                <xsd:documentation>Must allow nil here meaning that no arguments are supplied?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="parameters" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                <xsd:documentation>Must allow nil here meaning that no parameters are supplied?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="value" type="oval-def:EntityStateRecordType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation></xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdlet_1_stevalue">
+                                                            <sch:rule context="win-def:cmdlet_1_state/win-def:value">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_1_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                          <xsd:unique name="UniqueCmdlet1ValueFieldName">
+                                                <xsd:selector xpath="./oval-def:field"/>
+                                                <xsd:field xpath="@name"/>
+                                          </xsd:unique>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="cmdlet_2_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>TODO</xsd:documentation>
+                  
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>cmdlet_2_test</oval:test>
+                              <oval:object>cmdlet_2_object</oval:object>
+                              <oval:state>cmdlet_2_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">cmdlet_2_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_cmdlet_2_test">
+                              <sch:rule context="win-def:cmdlet_2_test/win-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/win-def:cmdlet_2_object/@id"><sch:value-of select="../@id"/> - the object child element of an cmdlet_2_test must reference an cmdlet_2_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="win-def:cmdlet_2_test/win-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/win-def:cmdlet_2_state/@id"><sch:value-of select="../@id"/> - the state child element of an cmdlet_2_test must reference an cmdlet_2_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cmdlet_2_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>TODO</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="verb" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="noun" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="arguments" type="oval-def:EntityObjectStringType" nillable="true">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                            <xsd:documentation>Must allow nil here meaning that no arguments are supplied?</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdlet2objarguments">
+                                                                        <sch:rule context="win-def:cmdlet_2_object/win-def:arguments">
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the arguments entity of a cmdlet_2_object should be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="parameters" type="oval-def:EntityObjectStringType" nillable="true">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                            <xsd:documentation>Must allow nil here meaning that no parameters are supplied?</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdlet2objparameters">
+                                                                        <sch:rule context="win-def:cmdlet_2_object/win-def:parameters">
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_2_object should be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cmdlet_2_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation></xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="verb" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="noun" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="arguments" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                <xsd:documentation>Must allow nil here meaning that no arguments are supplied?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="parameters" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                <xsd:documentation>Must allow nil here meaning that no parameters are supplied?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="value" type="oval-def:EntityStateRecordType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation></xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdlet_2_stevalue">
+                                                            <sch:rule context="win-def:cmdlet_2_state/win-def:value">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_2_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                          <xsd:unique name="UniqueCmdlet2ValueFieldName">
+                                                <xsd:selector xpath="./oval-def:field"/>
+                                                <xsd:field xpath="@name"/>
+                                          </xsd:unique>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      
+      
+      <xsd:element name="cmdlet_3_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>TODO</xsd:documentation>
+                  
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>cmdlet_3_test</oval:test>
+                              <oval:object>cmdlet_3_object</oval:object>
+                              <oval:state>cmdlet_3_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">cmdlet_3_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_cmdlet_3_test">
+                              <sch:rule context="win-def:cmdlet_3_test/win-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/win-def:cmdlet_3_object/@id"><sch:value-of select="../@id"/> - the object child element of an cmdlet_3_test must reference an cmdlet_3_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="win-def:cmdlet_3_test/win-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/win-def:cmdlet_3_state/@id"><sch:value-of select="../@id"/> - the state child element of an cmdlet_3_test must reference an cmdlet_3_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cmdlet_3_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>TODO</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="cmdlet" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="arguments" type="oval-def:EntityObjectStringType" nillable="true">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                            <xsd:documentation>Must allow nil here meaning that no arguments are supplied?</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdlet3objargumentss">
+                                                                        <sch:rule context="win-def:cmdlet_3_object/win-def:arguments">
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the arguments entity of a cmdlet_3_object should be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="parameters" type="oval-def:EntityObjectStringType" nillable="true">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                            <xsd:documentation>Must allow nil here meaning that no parameters are supplied?</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdlet3objparameters">
+                                                                        <sch:rule context="win-def:cmdlet_3_object/win-def:parameters">
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_3_object should be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cmdlet_3_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation></xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="cmdlet" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="arguments" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                <xsd:documentation>Must allow nil here meaning that no arguments are supplied?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="parameters" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Allow only equals and string. Do we want to restrict var_ref too?</xsd:documentation>
+                                                <xsd:documentation>Must allow nil here meaning that no parameters are supplied?</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="value" type="oval-def:EntityStateRecordType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation></xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdlet_3_stevalue">
+                                                            <sch:rule context="win-def:cmdlet_3_state/win-def:value">
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_3_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
+                                          </xsd:annotation>
+                                          <xsd:unique name="UniqueCmdlet3ValueFieldName">
+                                                <xsd:selector xpath="./oval-def:field"/>
+                                                <xsd:field xpath="@name"/>
+                                          </xsd:unique>
                                     </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>

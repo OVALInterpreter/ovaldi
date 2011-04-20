@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" elementFormDefault="qualified" version="5.10">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the Windows specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.9</version>
-               <date>2/22/2011 10:52:27 AM</date>
+               <version>5.10 Draft 1</version>
+               <date>3/10/2011 8:44:04 AM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -722,6 +722,141 @@
                               <xsd:element name="system_integrity" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>Audit the events that indicate that the integrity security subsystem has been violated.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
+     <!-- ===============================  CMDLET ITEM   ================================ -->
+     <!-- =============================================================================== -->
+     <xsd:element name="cmdlet_1_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>TODO</xsd:documentation>
+               <xsd:documentation>This approach assumes that the verb is always 'get'</xsd:documentation>
+               <xsd:documentation>Is it safe to assume the verb is always get?</xsd:documentation>
+               <xsd:documentation>Is there a benefit to cmdlet piping functionality from the parameters? Perhaps readability?</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="noun" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The noun supplied for the cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The list of arguments for the cmdlet</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="parameters" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The cmdlet paramaters and cmdlet piping functionality to be applied to the .NET object returned by the specified cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The actual value returned from executing the cmdlet with supplied arguments, parameters, and cmdlet piping functionality.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="win-sc_cmdlet_1_itemvalue">
+                                                  <sch:rule context="win-sc:cmdlet_1_item/win-sc:value">
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_1_item must be 'record'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="cmdlet_2_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>TODO</xsd:documentation>
+               <xsd:documentation>This approach allows for the noun and verb to be supplied separately</xsd:documentation>
+               <xsd:documentation>Is there any value to seperating the noun and verb?</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="verb" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The verb supplied for the cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="noun" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The noun supplied for the cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The list of arguments for the cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="parameters" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The cmdlet parameters and cmdlet piping functionality to be applied to the .NET object returned by the specified cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The actual value returned from executing the cmdlet with supplied arguments, parameters, and cmdlet piping functionality.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="win-sc_cmdlet_2_itemvalue">
+                                                  <sch:rule context="win-sc:cmdlet_2_item/win-sc:value">
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_2_item must be 'record'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="cmdlet_3_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>TODO</xsd:documentation>
+               <xsd:documentation>This approach specifies the noun and verb in one entity.</xsd:documentation>
+               <xsd:documentation>This might be most similar to the code examples we have seen.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="cmdlet" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The cmdlet to execute.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The list of arguments for the cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="parameters" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The cmdlet parameters and cmdlet piping functionality to be applied to the .NET object returned by the specified cmdlet.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The actual value returned from executing the cmdlet with supplied arguments, parameters, and cmdlet piping functionality.</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="win-sc_cmdlet_3_itemvalue">
+                                                  <sch:rule context="win-sc:cmdlet_3_item/win-sc:value">
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_3_item must be 'record'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>

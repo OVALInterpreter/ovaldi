@@ -27,46 +27,51 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
-#ifndef ENVIRONMENTVARIABLEPROBE_H
-#define ENVIRONMENTVARIABLEPROBE_H
+#ifndef CMDLETPROBE_H
+#define CMDLETPROBE_H
+
+#pragma warning(disable:4786)
 
 #include "AbsProbe.h"
 
-#include <stdlib.h>
+using namespace std;
 
-#ifdef DARWIN
-#include <crt_externs.h>
-#define _environ (*_NSGetEnviron())
-#endif/*#else
-extern char ** _environ; 
-#endif*/
+using namespace System::Management::Automation::Runspaces;
+
+typedef std::pair < std::string, StringVector* > StringStringVectorPair;
+typedef std::vector < StringStringVectorPair* > SSVPVector;
+typedef std::vector < StringVector* > StringVectorVector;
+
 /**
-	This class is responsible for collecting enviroment variable data.
-	This class should be platform independent.
+	This class is responsible for collecting information for windows cmdlet_objects.
 */
-class EnvironmentVariableProbe : public AbsProbe {
+
+class CmdletProbe : public AbsProbe {
 public:
-	virtual ~EnvironmentVariableProbe();
+	virtual ~CmdletProbe();
 	
-	/** Run the environment variable probe */
+	/** Run the cmdlet probe. 
+	    Return a vector of Items
+     */
 	virtual ItemVector* CollectItems(Object* object);
 
-	/** Ensure that the EnvironmentVariableProbe is a singleton. */
+	/** Ensure that the CmdletProbe is a singleton. */
 	static AbsProbe* Instance();
-	
+
 private:
-	EnvironmentVariableProbe();
-    
-	/**  */
+	CmdletProbe();
+
+	static CmdletProbe* instance;
+
+	/** Return a new Item created for storing information retrieved by executing a cmdlet. */
 	virtual Item* CreateItem();
 
-	/** Get all the environment variables currently defined. */
-	StringPairVector* GetAllEnvs();
+	void ExecutePowerShell(string powershellInput, Item* item);	
+	InitialSessionState^ InitializeRunspace();
+	OvalEnum::Datatype GetDatatype(std::string type);
 
-	/** The static instance of the EnvironmentVariableProbe. 
-	    All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes. 
-    */
-	static EnvironmentVariableProbe *instance;
+	std::string cmdletItem;
+
 };
 
 #endif
