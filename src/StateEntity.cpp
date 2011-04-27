@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include "StateFieldEntityValue.h"
+#include "StringEntityValue.h"
+
 #include "StateEntity.h"
 
 using namespace std;

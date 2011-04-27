@@ -28,6 +28,12 @@
 //
 //****************************************************************************************//
 
+#include <stdlib.h>
+
+#include "Common.h"
+#include "ItemFieldEntityValue.h"
+#include "StringEntityValue.h"
+
 #include "ItemEntity.h"
 
 using namespace std;
@@ -55,14 +61,38 @@ ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Dataty
 
 ItemEntity::ItemEntity(const ItemEntity& itemEntity){
     this->name = itemEntity.name;
-    this->value = itemEntity.value;
     this->datatype = itemEntity.datatype;
     this->isObjectEntity = itemEntity.isObjectEntity;
 	this->scStatus = itemEntity.scStatus;
 	this->nil = itemEntity.nil;
+
+	for (AbsEntityValueVector::const_iterator iter = itemEntity.value.begin();
+		 iter != itemEntity.value.end();
+		 ++iter) {
+
+		// Afaik, these are the only two subclasses of AbsEntityValue which can
+		// be used in an ItemEntity.
+		const StringEntityValue *sv;
+		const ItemFieldEntityValue *iv;
+
+		sv = dynamic_cast<const StringEntityValue*>(*iter);
+		iv = dynamic_cast<const ItemFieldEntityValue*>(*iter);
+
+		if (sv)
+			this->value.push_back(new StringEntityValue(*sv));
+		else if (iv)
+			this->value.push_back(new ItemFieldEntityValue(*iv));
+		else
+			throw Exception("Encountered an unsupported type of item entity value!  "
+							"Please update me to support the new type.");
+	}
 }
 
 ItemEntity::~ItemEntity() {
+	for (AbsEntityValueVector::iterator iter = this->value.begin();
+		 iter != this->value.end();
+		 ++iter)
+		delete *iter;
 }
 
 // ***************************************************************************************	//

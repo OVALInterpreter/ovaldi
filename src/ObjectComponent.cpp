@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include "ItemFieldEntityValue.h"
+
 #include "ObjectComponent.h"
 
 using namespace std;

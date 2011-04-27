@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include "StringEntityValue.h"
+
 #include "AbsEntity.h"
 
 using namespace std;
