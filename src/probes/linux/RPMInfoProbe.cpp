@@ -649,7 +649,7 @@ string RPMInfoProbe::GetSigKeyId(string rpmName) {
 		string text = this->ParentGetSigKeyId(fd1[0], fd2[0], pid);
 		// parse the string and get just the key id portion - just the last 16
 		// chars minus the quotation mark
-		if (text != "\"(not a blob)\"")
+		if (text.size() > 16)
 			sigKeyId = text.substr(text.length()-17, 16);
 	}  
 	return sigKeyId;
