@@ -28,7 +28,13 @@
 //
 //****************************************************************************************//
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include "RPMInfoProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								RPMInfoProbe Class										  //	
@@ -231,7 +237,8 @@ StringVector* RPMInfoProbe::GetMatchingRPMNames(string pattern, bool isRegex) {
 	StringVector* names = new StringVector();
 	while ( (header = rpmdbNextIterator(iterator)) != NULL) {
 		/* Get the rpm_name value for comparision. */
-		installed_rpm_name = readHeaderString(header, RPMTAG_NAME);
+		if (!readHeaderString(header, RPMTAG_NAME, &installed_rpm_name))
+			throw ProbeException("Encountered an rpm without a name!");
 
 		/* Check to see if name found matches input pattern. */
 		if(this->IsMatch(pattern, installed_rpm_name, isRegex)) {
@@ -281,7 +288,8 @@ bool RPMInfoProbe::RPMExists(string name) {
 	/* Look at each installed package matching this name.  Generally, there is only one.*/
 	while ( (header = rpmdbNextIterator(iterator)) != NULL) {
 		/* Get the rpm_name value for comparision. */
-		installed_rpm_name = readHeaderString(header, RPMTAG_NAME);
+		if (!readHeaderString(header, RPMTAG_NAME, &installed_rpm_name))
+			throw ProbeException("Encountered an rpm without a name!");
 
 		/* Check to see if name found matches input pattern. */
 		if(name.compare(installed_rpm_name) == 0) {
@@ -349,28 +357,38 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
 	  installedEpochEvr = installed_epoch;
     }
 
+	OvalEnum::SCStatus verStatus, relStatus, archStatus, keyidStatus;
+	verStatus = relStatus = archStatus = keyidStatus = OvalEnum::STATUS_EXISTS;
+	
     /* the remaining arguments are all normal strings */
-    installed_version = this->readHeaderString(header, RPMTAG_VERSION);
-    installed_release = this->readHeaderString(header, RPMTAG_RELEASE);
-    installed_architecture = this->readHeaderString(header, RPMTAG_ARCH);
-	installed_evr = installedEpochEvr + ":" + installed_version + "-" + installed_release;
+	if (!this->readHeaderString(header, RPMTAG_VERSION, &installed_version))
+		verStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
+    if (!this->readHeaderString(header, RPMTAG_RELEASE, &installed_release))
+		relStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
+    if (!this->readHeaderString(header, RPMTAG_ARCH, &installed_architecture))
+		archStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
 
 	installed_signature_keyid = this->GetSigKeyId(name);  
+	if (installed_signature_keyid.empty())
+		keyidStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
+
+	installed_evr = installedEpochEvr + ":" + 
+		(installed_version.empty() ? "0":installed_version) + '-' +
+		(installed_release.empty() ? "0":installed_release);
 
     /* Put the data in a data object. */
     item = this->CreateItem();
     item->SetStatus(OvalEnum::STATUS_EXISTS);
 	item->AppendElement(new ItemEntity("name",  name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("arch",  installed_architecture, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("arch",  installed_architecture, OvalEnum::DATATYPE_STRING, false, archStatus));
 	item->AppendElement(new ItemEntity("epoch",  installed_epoch, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("release",  installed_release, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("version",  installed_version, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("release",  installed_release, OvalEnum::DATATYPE_STRING, false, relStatus));
+	item->AppendElement(new ItemEntity("version",  installed_version, OvalEnum::DATATYPE_STRING, false, verStatus));
 	item->AppendElement(new ItemEntity("evr",  installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("signature_keyid",  installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("signature_keyid",  installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, keyidStatus));
 
     /* add the new item to the vector. */
     items->push_back(item);
-
   }
 
   /* Free the iterator and transaction set data structures. */
@@ -378,26 +396,26 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
   rpmtsFree(ts);
 }
 
-char* RPMInfoProbe::readHeaderString(Header header, int_32 tag_id) {
-  // This function is from the Red Hat RPM Guide //
-  int_32 type;
-  void *pointer;
-  int_32 data_size;
+bool RPMInfoProbe::readHeaderString(Header header, int_32 tag_id, string *val) {
+	// This function is from the Red Hat RPM Guide //
+	int_32 type;
+	void *pointer;
+	int_32 data_size;
 
-  int header_status = headerGetEntry(header,
-				     tag_id,
-				     &type,
-				     &pointer,
-				     &data_size);
+	int header_status = headerGetEntry(header,
+									   tag_id,
+									   &type,
+									   &pointer,
+									   &data_size);
 
-	
-  if (header_status) {
-    if (type == RPM_STRING_TYPE) {
-      return (char *) pointer;
-    }
-  }
+	if (header_status) {
+		if (type == RPM_STRING_TYPE) {
+			*val = (char *) pointer;
+			return true;
+		}
+	}
 
-  return (NULL);
+	return false;
 }
 
 int_32 RPMInfoProbe::readHeaderInt32(Header header, int_32 tag_id) {
@@ -629,8 +647,10 @@ string RPMInfoProbe::GetSigKeyId(string rpmName) {
 
 		// Get the results of the rpm query
 		string text = this->ParentGetSigKeyId(fd1[0], fd2[0], pid);
-		// parse the string and get just the key id portion - just the last 16 chars minus the quotation mark
-		sigKeyId = text.substr(text.length()-17, 16);
+		// parse the string and get just the key id portion - just the last 16
+		// chars minus the quotation mark
+		if (text != "\"(not a blob)\"")
+			sigKeyId = text.substr(text.length()-17, 16);
 	}  
 	return sigKeyId;
 }
