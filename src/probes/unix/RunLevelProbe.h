@@ -77,35 +77,6 @@ class runlevel_item
     void copy_item( const runlevel_item &r1 ) { this->service_name = r1.service_name; this->is_start = r1.is_start; }
 };
 
-
-
-/**
-  Comparator used by STL (char *) containers with uniqueness constructs.
- */
-struct ltstr_comparator
-{
-  bool operator()( const char * s1, const char * s2 )
-  {
-    return ( strcmp( s1, s2 ) < 0 );
-  }
-};
-
-
-
-/**
-  Comparator used by STL (char) containers with uniqueness constructs.
- */
-struct ltchr_comparator
-{
-  bool operator() ( const char c1, const char c2 )
-  {
-    return ( c1 < c2 );
-  }
-};
-
-
-
-
 /**
   Comparator used by STL (runlevel_item) containers with uniqueness constructs.
  */
@@ -118,12 +89,9 @@ struct ltrunlevel_item_comparator
 
 };
 
-
-
-typedef std::set<char, ltchr_comparator> CharSet;
-typedef std::set<const char *, ltstr_comparator> CharPtrSet;
+typedef std::set<char> CharSet;
 typedef std::set<runlevel_item, ltrunlevel_item_comparator> RunLevelItemSet;
-typedef std::map<const char, RunLevelItemSet, ltchr_comparator> SetMap;
+typedef std::map<const char, RunLevelItemSet> SetMap;
 
 
 /**
@@ -214,11 +182,6 @@ class RunLevelProbe : public AbsProbe {
     */
     void          _analyzeRunlevels();
     
-    /**
-      Erases the contents of the _runlevels  map which contains sets of dynamically allocated memory.
-    */
-    void          _deallocateMap( );
-
     /**
       Converts a character to a single character string.
       @param chr the character being converted into a string

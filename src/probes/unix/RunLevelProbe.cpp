@@ -50,7 +50,6 @@ RunLevelProbe::RunLevelProbe( ) {
 
 
 RunLevelProbe::~RunLevelProbe(){  
-  _deallocateMap();
   RunLevelProbe::_instance = NULL;
 }
 
@@ -551,19 +550,3 @@ RunLevelProbe::_analyzeRunlevels ( ){
     delete[] runlevelDir;
   }
 }
-
-
-
-
-
-void 
-RunLevelProbe::_deallocateMap( ){
-  SetMap::iterator iter;
-
-  for( iter = _runlevels.begin(); iter != _runlevels.end(); iter++ ){
-    RunLevelItemSet rl_set = (*iter).second;
-    _runlevels.erase( iter );
-  }
-
-}
-
