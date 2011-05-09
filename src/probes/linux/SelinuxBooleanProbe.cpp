@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <selinux/selinux.h>
 
