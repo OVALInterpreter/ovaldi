@@ -35,6 +35,7 @@ OUTDIR = ./Release
 # source directories
 SRCDIR = ../../src
 SOLARISDIR = ${SRCDIR}/solaris
+UNIXDIR = ${SRCDIR}/unix
 UNIXPROBEDIR = ${SRCDIR}/probes/unix
 SOLARISPROBEDIR = ${SRCDIR}/probes/solaris
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
@@ -51,7 +52,7 @@ LIBDIR = -L/usr/local/lib -L/usr/lib
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -lsocket -lnsl -llber
 
-SRC_DIRS = $(SRCDIR) $(SOLARISDIR) $(UNIXPROBEDIR) $(SOLARISPROBEDIR) $(INDEPENDENTPROBEDIR)
+SRC_DIRS = $(SRCDIR) $(SOLARISDIR) $(UNIXPROBEDIR) $(SOLARISPROBEDIR) $(INDEPENDENTPROBEDIR) $(UNIXDIR)
 CPP_FILES = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
 OBJ_FILES = $(CPP_FILES:.cpp=.o)

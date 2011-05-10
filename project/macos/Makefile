@@ -35,6 +35,7 @@ OUTDIR = ./Release
 # source directories
 SRCDIR = ../../src
 MACOSDIR = ${SRCDIR}/macos
+UNIXDIR = ${SRCDIR}/unix
 UNIXPROBEDIR = ${SRCDIR}/probes/unix
 MACOSPROBEDIR = ${SRCDIR}/probes/macos
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
@@ -51,7 +52,7 @@ LIBDIR = -L/usr/lib -L/usr/local/lib
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -llber
 
-SRC_DIRS = $(SRCDIR) $(MACOSDIR) $(UNIXPROBEDIR) $(MACOSPROBEDIR) $(INDEPENDENTPROBEDIR)
+SRC_DIRS = $(SRCDIR) $(MACOSDIR) $(UNIXPROBEDIR) $(MACOSPROBEDIR) $(INDEPENDENTPROBEDIR) $(UNIXDIR)
 CPP_FILES = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
 # Filter out the  probes that are not supported on Mac OS.
