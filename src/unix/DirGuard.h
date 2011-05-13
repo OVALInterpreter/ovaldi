@@ -31,6 +31,7 @@
 #ifndef DIRGUARD_H
 #define DIRGUARD_H
 
+#include <dirent.h>
 #include <string>
 #include <Noncopyable.h>
 
