@@ -64,6 +64,9 @@ namespace NetworkInterfaces {
 			PRONET
 		};
 
+		Interface() {
+		}
+
 		Interface(const std::string &name, LinkType type) :
 			name(name),
 			type(type) {
