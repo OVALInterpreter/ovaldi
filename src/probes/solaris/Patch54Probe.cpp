@@ -37,45 +37,14 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include "Patch54Probe.h"
+#include <unix/DirGuard.h>
 #include "ItemEntity.h"
 #include "OvalEnum.h"
+#include "Patch54Probe.h"
 
 using namespace std;
 
 #define PKG_ROOT_DIR "/var/sadm/pkg"
-
-namespace {
-	/**
-	 * Used to manage opening/closing a directory via opendir(), so we can write
-	 * exception-safe code.
-	 */
-	class DirGuard {
-	public:
-		DirGuard(const char *dirName) {
-			d = opendir(dirName);
-			
-			if (!d)
-				throw ProbeException(string("Couldn't open directory ") + dirName +
-									 ": " + strerror(errno));
-		}
-
-		~DirGuard() {
-			if (d) {
-				if (closedir(d) < 0)
-					Log::Info(string("closedir() failed: ") + strerror(errno));
-				// closedir failure is ok, move on
-			}
-		}
-
-		operator DIR*() {
-			return d;
-		}
-
-	private:
-		DIR *d;
-	};
-}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Patch54Probe Class  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
