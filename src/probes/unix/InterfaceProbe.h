@@ -33,29 +33,13 @@
 #include "AbsProbe.h"
 #include "Item.h"
 #include "ItemEntity.h"
-#include "Common.h"
-#include "Log.h"
-
-#include <sys/socket.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
-
-#ifdef DARWIN
-#include <sys/sysctl.h>
-#include <net/if_types.h>
-#include <net/if_dl.h>
-#else
-#include <net/if_arp.h>
-#endif
 
 /**
 	This class is responsible for collecting information about unix interface_objects.
 */
 class InterfaceProbe : public AbsProbe {
 
-	public:
+public:
 
 	virtual ~InterfaceProbe();
 
@@ -65,7 +49,7 @@ class InterfaceProbe : public AbsProbe {
 	/** Ensure that the InterfaceProbe is a singleton. */
 	static AbsProbe* Instance();
 
-	private:
+private:
 
 	InterfaceProbe();
 
@@ -73,48 +57,12 @@ class InterfaceProbe : public AbsProbe {
 	virtual Item* CreateItem();
 
 	/**
-	 * Gets an Item for the named interface, or NULL if no
-	 * interface was found with that name.  This Item should
-	 * not be deleted; it is a member of a shared cache of
-	 * interface items.
-	 */
-	Item* GetInterface(const std::string &name);
-
-	/**
 	 * Caches info about all of the interfaces on the local system.
 	 */
 	void GetAllInterfaces();
 
-	/**
-	 * Gets the names of all network interfaces on the system.
-	 */
-	StringVector GetInterfaceNames();
-
-	/** Populates the map containing hardware type names. */
-	void SetupHardwareTypes();
-
-	/**
-	 * Gets the OVAL hardware type name for the given value, or ""
-	 * if one is not defined.
-	 */
-	std::string HardwareTypeToString(sa_family_t hwFamily);
-
-	#ifdef DARWIN
-	std::string GetHardwareTypesFromIft(unsigned char type);
-	#endif
-	
-	/**
-	 * Creates ItemEntity objects for the given flags.
-	 */
-	ItemEntityVector ProcessFlags(short flags);
-
 	/** A vector that holds cached information about all interfaces on the system */
 	ItemVector interfaces;
-
-	typedef std::map<sa_family_t,std::string> HardwareTypeNameMap;
-
-	/** Maps hardware type constants to names */
-	HardwareTypeNameMap hardwareTypeNameMap;
 
 	/** Singleton instance */
 	static InterfaceProbe* instance;
