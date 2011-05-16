@@ -45,10 +45,6 @@
 #include "Exception.h"
 #include "Log.h"
 
-#ifdef LINUX
-#include <sys/sysinfo.h>
-#endif
-
 #include <sys/utsname.h>
 
 #include <unistd.h>
