@@ -62,20 +62,22 @@ private:
 	virtual Item* CreateItem();
 
 	/**
-		Return the name of all rpms on the system that match the specirfied Object entity's criteria.
-		All names that are return have been checked and exist on the system.
-		@param name an ObjectEntity* that represents the objects to collect on the ssytem
-		@return The mathcing names
+		Return the name of all rpms on the system that match the specified Object entity's criteria.
+		All names that are returned have been checked and exist on the system.
+		@param[in] name an ObjectEntity* that represents the objects to collect on the ssytem
+		@param[out] names The vector to which the names are appended.
+		@return The matching names
 	*/
-	StringVector* GetRPMNames(ObjectEntity* name);
+	void GetRPMNames(ObjectEntity* name, StringVector *names);
 
 	/**
 		Get all rpm names on the system that match the specified pattern.
-		@param pattern a string used that rpm names are compared against.
-		@param isRegex a bool that is indicates how system rpm names should be compared against the specified pattern
-		@return The set of matching names.
+		@param[in] pattern a string used that rpm names are compared against.
+		@param[in] isRegex a bool that is indicates how system rpm names should
+		be compared against the specified pattern
+		@param[out] names The vector to which the names are appended.
 	*/
-	StringVector* GetMatchingRPMNames(std::string pattern, bool isRegex);
+	void GetMatchingRPMNames(std::string pattern, bool isRegex, StringVector *names);
 
 	/**
 		Return true if the specifeid rpm exists on the system.
@@ -86,8 +88,8 @@ private:
 
 	/**
 		Get all the information for the named rpm.
-		@param name a string representing the name of an rpm on the system.
-		@param items a vector of items that matched the rpm name.
+		@param[in] name a string representing the name of an rpm on the system.
+		@param[out] items The vector to which the item is appended.
 	*/
 	void GetRPMInfo(std::string name, ItemVector* items);
 
