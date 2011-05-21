@@ -37,7 +37,7 @@ using namespace std;
 //								DocumentManager Class									  //
 //****************************************************************************************//
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::definitionDoc = NULL;
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::systemCharacterisitcsDoc = NULL;
+XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::systemCharacteristicsDoc = NULL;
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::resultDoc = NULL;
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::externalVariableDoc = NULL;
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::evaluationIdDoc = NULL;
@@ -54,8 +54,8 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetResultDocument()
 	return DocumentManager::resultDoc;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetSystemCharacterisitcsDocument() {
-	return DocumentManager::systemCharacterisitcsDoc;
+XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetSystemCharacteristicsDocument() {
+	return DocumentManager::systemCharacteristicsDoc;
 }
 
 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariableDocument() {
@@ -134,8 +134,8 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDirectivesConfig
 	return DocumentManager::directivesConfigDoc;
 }
 
-void DocumentManager::SetSystemCharacterisitcsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* sc) {
-	DocumentManager::systemCharacterisitcsDoc = sc;
+void DocumentManager::SetSystemCharacteristicsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* sc) {
+	DocumentManager::systemCharacteristicsDoc = sc;
 }
 
 void DocumentManager::SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* r) {

@@ -145,7 +145,7 @@ void CollectedObject::WriteCollectedObjects() {
 	for(iterator = CollectedObject::collectedObjectsMap.begin(); iterator != CollectedObject::collectedObjectsMap.end(); iterator++) {
 		
 		CollectedObject* obj = iterator->second;
-		obj->Write(DocumentManager::GetSystemCharacterisitcsDocument(), AbsDataCollector::Instance()->GetSCCollectedObjectsElm());
+		obj->Write(DocumentManager::GetSystemCharacteristicsDocument(), AbsDataCollector::Instance()->GetSCCollectedObjectsElm());
 		delete obj;
 		obj = NULL;
 	}

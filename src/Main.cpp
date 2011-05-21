@@ -326,7 +326,7 @@ int main(int argc, char* argv[]) {
 			cout << logMessage;
 			Log::UnalteredMessage(logMessage);
 
-			DocumentManager::SetSystemCharacterisitcsDocument(processor->CreateDOMDocumentNS("http://oval.mitre.org/XMLSchema/oval-system-characteristics-5", "oval_system_characteristics"));	       
+			DocumentManager::SetSystemCharacteristicsDocument(processor->CreateDOMDocumentNS("http://oval.mitre.org/XMLSchema/oval-system-characteristics-5", "oval_system_characteristics"));	       
 
 			//	Initialize the data collector and then get and instance.
 			DataCollector::Init();
@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
 			logMessage = " ** saving data model to " + Common::GetDatafile() +".\n";
 			cout << logMessage;
 			Log::UnalteredMessage(logMessage);
-			processor->WriteDOMDocument(DocumentManager::GetSystemCharacterisitcsDocument(), Common::GetDatafile());
+			processor->WriteDOMDocument(DocumentManager::GetSystemCharacteristicsDocument(), Common::GetDatafile());
 
 		//	Read in the data file
 		} else {
@@ -365,7 +365,7 @@ int main(int argc, char* argv[]) {
 			Log::UnalteredMessage(logMessage);
 
 			//	Parse the data file
-			DocumentManager::SetSystemCharacterisitcsDocument(processor->ParseFile(Common::GetDatafile()));
+			DocumentManager::SetSystemCharacteristicsDocument(processor->ParseFile(Common::GetDatafile()));
 		}
 		
 		//////////////////////////////////////////////////////

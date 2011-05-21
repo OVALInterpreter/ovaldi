@@ -39,7 +39,7 @@ OvalEnum::Flag ObjectReader::GetCollectedObjectFlag(string objectId) {
 
 	OvalEnum::Flag flag = OvalEnum::FLAG_ERROR;
 
-	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
+	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "collected_objects");
 	
 	if(collectedObjectsElm != NULL) {
         DOMElement* objectElm = XmlCommon::FindElement(collectedObjectsElm, "object", "id", objectId);
@@ -58,7 +58,7 @@ OvalEnum::Flag ObjectReader::GetCollectedObjectFlag(string objectId) {
 
 ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 
-	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
+	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "collected_objects");
 	
 	ItemVector* items = new ItemVector();
 	if(collectedObjectsElm != NULL) {
@@ -106,7 +106,7 @@ ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 
 VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
 
-	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
+	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "collected_objects");
 	
 	VariableValueVector* values = new VariableValueVector();
 	if(collectedObjectsElm != NULL) {
@@ -154,7 +154,7 @@ VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
 }
 
 StringVector* ObjectReader::GetMessagesForObject(string objectId){
-	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "collected_objects");
+	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "collected_objects");
 	
 	StringVector* messages = new StringVector();
 	if(collectedObjectsElm != NULL) {
