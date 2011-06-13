@@ -1049,6 +1049,7 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
     DWORD recordsEnumerated = 0;
     DWORD totalRecords = 0;
     USER_INFO_0* userInfo = NULL;
+	DWORD resumeHandle = 0;
 
 	do {
 		// NOTE: Even though MAX_PREFERRED_LENGTH is specified, we must still check for
@@ -1065,7 +1066,7 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 						  MAX_PREFERRED_LENGTH,
 						  &recordsEnumerated,
 						  &totalRecords,
-						  NULL);
+						  &resumeHandle);
 
 		if ((nas == NERR_Success) || (nas == ERROR_MORE_DATA)) {
 
