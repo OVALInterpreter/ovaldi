@@ -486,23 +486,23 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		}
 
 		// initialize remaining version information entities...
-		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(version);
-		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(type);
-		ItemEntity* devClass = new ItemEntity("development_class", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* devClass = new ItemEntity("development_class", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(devClass);
-		ItemEntity* company = new ItemEntity("company", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);	
+		ItemEntity* company = new ItemEntity("company", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);	
 		item->AppendElement(company);
-		ItemEntity* internalName = new ItemEntity("internal_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* internalName = new ItemEntity("internal_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(internalName);
-		ItemEntity* language = new ItemEntity("language", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* language = new ItemEntity("language", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(language);
-		ItemEntity* originalFilename = new ItemEntity("original_filename", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* originalFilename = new ItemEntity("original_filename", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(originalFilename);
-		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productName);
-		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_ERROR);
+		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productVersion);
 		
 		DWORD junk;
@@ -526,7 +526,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 				///////////////  development_class  //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetDevelopementClass(versionbuf, filePath, item, devClass);
+				this->GetDevelopmentClass(versionbuf, filePath, item, devClass);
 
 				//////////////////////////////////////////////////////
 				///////////////       company       //////////////////
@@ -565,6 +565,19 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 				this->GetProductVersion(versionbuf, filePath, item, productVersion);
 
 			} else {
+				// we got a size from GetFileVersionInfoSize(), but then getting the
+				// actual info failed.  This seems worthy of error status on these
+				// entities, although MSDN docs are not clear about under which
+				// conditions this can occur.
+				version->SetStatus(OvalEnum::STATUS_ERROR);
+				devClass->SetStatus(OvalEnum::STATUS_ERROR);
+				company->SetStatus(OvalEnum::STATUS_ERROR);
+				internalName->SetStatus(OvalEnum::STATUS_ERROR);
+				language->SetStatus(OvalEnum::STATUS_ERROR);
+				originalFilename->SetStatus(OvalEnum::STATUS_ERROR);
+				productName->SetStatus(OvalEnum::STATUS_ERROR);
+				productVersion->SetStatus(OvalEnum::STATUS_ERROR);
+
 				string errorMessage = "";
 				errorMessage.append("(FileProbe) Unable to get version info for the file: '");
 				errorMessage.append(filePath);
@@ -634,7 +647,6 @@ void FileProbe::GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemE
 		errorMessage.append("(FileProbe) No version information available for the file: '");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
-		version->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendMessage(new OvalMessage(errorMessage));
 
 	} else {
@@ -730,7 +742,7 @@ void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* t
 	}
 }
 
-void FileProbe::GetDevelopementClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass) {
+void FileProbe::GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass) {
 
 	//	Get the language-code page and construct the string for file version request
 	UINT vdatalen;
@@ -768,9 +780,6 @@ void FileProbe::GetDevelopementClass(LPVOID versionbuf, string filePath, Item *i
 				devClass->SetValue(verStr.substr(0, verStr.find(".")));
 				devClass->SetStatus(OvalEnum::STATUS_EXISTS);
 				
-			} else {
-				
-				devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			}
 
 		} else if(vdatalen == 0) {
@@ -780,16 +789,15 @@ void FileProbe::GetDevelopementClass(LPVOID versionbuf, string filePath, Item *i
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-		} else if(retVal == 0) {
+		} else {
 
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get development_class. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 		}
 
 	} else if(vdatalen == 0) {
@@ -799,16 +807,15 @@ void FileProbe::GetDevelopementClass(LPVOID versionbuf, string filePath, Item *i
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-	} else if(retVal == 0) {
+	} else {
 
 		string errorMessage = "";
 		errorMessage.append("(FileProbe) Unable to get development_class. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 	}
 }
 
@@ -844,8 +851,6 @@ void FileProbe::GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemE
 			if(companyNameStr.compare("") != 0) {
 				company->SetValue(companyNameStr);
 				company->SetStatus(OvalEnum::STATUS_EXISTS);
-			} else {
-				company->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			}
 
 		} else if(vdatalen == 0) {
@@ -855,16 +860,15 @@ void FileProbe::GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemE
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			company->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-		} else if(retVal == 0) {
+		} else {
 
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get company. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			company->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 		}
 
 	} else if(vdatalen == 0) {
@@ -874,16 +878,15 @@ void FileProbe::GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemE
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		company->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-	} else if(retVal == 0) {
+	} else {
 
 		string errorMessage = "";
 		errorMessage.append("(FileProbe) Unable to get company. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		company->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 	}
 }
 
@@ -919,8 +922,6 @@ void FileProbe::GetInternalName(LPVOID versionbuf, string filePath, Item *item, 
 			if(internalNameStr.compare("") != 0) {
 				internalName->SetValue(internalNameStr);
 				internalName->SetStatus(OvalEnum::STATUS_EXISTS);
-			} else {
-				internalName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			}
 
 		} else if(vdatalen == 0) {
@@ -930,16 +931,15 @@ void FileProbe::GetInternalName(LPVOID versionbuf, string filePath, Item *item, 
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			internalName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-		} else if(retVal == 0) {
+		} else {
 
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get internal_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			internalName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 		}
 
 	} else if(vdatalen == 0) {
@@ -949,16 +949,15 @@ void FileProbe::GetInternalName(LPVOID versionbuf, string filePath, Item *item, 
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		internalName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-	} else if(retVal == 0) {
+	} else {
 
 		string errorMessage = "";
 		errorMessage.append("(FileProbe) Unable to get internal_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		internalName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 	}
 }
 
@@ -998,8 +997,6 @@ void FileProbe::GetOriginalFilename(LPVOID versionbuf, string filePath, Item *it
 			if(originalFilenameStr.compare("") != 0) {
 				originalFilename->SetValue(originalFilenameStr);
 				originalFilename->SetStatus(OvalEnum::STATUS_EXISTS);
-			} else {
-				originalFilename->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			}
 
 		} else if(vdatalen == 0) {
@@ -1009,16 +1006,15 @@ void FileProbe::GetOriginalFilename(LPVOID versionbuf, string filePath, Item *it
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			originalFilename->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-		} else if(retVal == 0) {
+		} else {
 
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get original_filename. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			originalFilename->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 		}
 
 	} else if(vdatalen == 0) {
@@ -1028,16 +1024,15 @@ void FileProbe::GetOriginalFilename(LPVOID versionbuf, string filePath, Item *it
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		originalFilename->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-	} else if(retVal == 0) {
+	} else {
 
 		string errorMessage = "";
 		errorMessage.append("(FileProbe) Unable to get original_filename. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		originalFilename->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 	}
 }
 
@@ -1073,8 +1068,6 @@ void FileProbe::GetProductName(LPVOID versionbuf, string filePath, Item *item, I
 			if(productNameStr.compare("") != 0) {
 				productName->SetValue(productNameStr);
 				productName->SetStatus(OvalEnum::STATUS_EXISTS);
-			} else {
-				productName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			}
 
 		} else if(vdatalen == 0) {
@@ -1084,16 +1077,15 @@ void FileProbe::GetProductName(LPVOID versionbuf, string filePath, Item *item, I
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			productName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-		} else if(retVal == 0) {
+		} else {
 
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get product_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			productName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 		}
 
 	} else if(vdatalen == 0) {
@@ -1103,16 +1095,15 @@ void FileProbe::GetProductName(LPVOID versionbuf, string filePath, Item *item, I
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		productName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-	} else if(retVal == 0) {
+	} else {
 
 		string errorMessage = "";
 		errorMessage.append("(FileProbe) Unable to get product_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		productName->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 	}
 }
 
@@ -1148,8 +1139,6 @@ void FileProbe::GetProductVersion(LPVOID versionbuf, string filePath, Item *item
 			if(productVersionStr.compare("") != 0) {
 				productVersion->SetValue(productVersionStr);
 				productVersion->SetStatus(OvalEnum::STATUS_EXISTS);
-			} else {
-				productVersion->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			}
 
 		} else if(vdatalen == 0) {
@@ -1159,16 +1148,15 @@ void FileProbe::GetProductVersion(LPVOID versionbuf, string filePath, Item *item
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			productVersion->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-		} else if(retVal == 0) {
+		} else {
 
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get product_version. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
-			productVersion->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 		}
 
 	} else if(vdatalen == 0) {
@@ -1178,15 +1166,14 @@ void FileProbe::GetProductVersion(LPVOID versionbuf, string filePath, Item *item
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		productVersion->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
-	} else if(retVal == 0) {
+	} else {
 
 		string errorMessage = "";
 		errorMessage.append("(FileProbe) Unable to get product_version. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
 		errorMessage.append(filePath);
 		errorMessage.append("'");
 		item->AppendMessage(new OvalMessage(errorMessage));
-		productVersion->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+
 	}
 }
