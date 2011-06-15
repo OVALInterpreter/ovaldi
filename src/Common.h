@@ -243,6 +243,9 @@ class Common {
 		/** Resolves the canonical path for a given path */
 		static std::string GetFullPath(std::string path);
 
+		/** Returns whether the two strings are equal, ignoring case. */
+		static bool EqualsIgnoreCase(const std::string &s1, const std::string &s2);
+
 		static char fileSeperator;
 		static std::string fileSeperatorStr;
 

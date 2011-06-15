@@ -78,6 +78,12 @@ string  Common::definitionIdsFile              = "";
 
 const string Common::REGEX_CHARS = "^$\\.[](){}*+?|";
 
+namespace {
+	bool caseInsensitiveCmpChars(char c1, char c2) {
+		return tolower(c1) == tolower(c2);
+	}
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Accessors  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -833,6 +839,10 @@ string Common::GetFullPath(string path) {
 
 	free(buffer);
 	return fullpath;
+}
+
+bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
+	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
 }
 
 //****************************************************************************************//
