@@ -66,11 +66,6 @@ ItemVector* InterfaceProbe::CollectItems ( Object* object ) {
         throw ProbeException ( "Error: Invalid data type specified on name. Found: " + OvalEnum::DatatypeToString ( name->GetDatatype() ) );
     }
 
-    // Check operation - only allow  equals, not equals and pattern match
-    if ( name->GetOperation() != OvalEnum::OPERATION_EQUALS && name->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && name->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
-        throw ProbeException ( "Error: Invalid operation specified on name. Found: " + OvalEnum::OperationToString ( name->GetOperation() ) );
-    }
-
     //use lazy initialization to gather all the interfaces on the system
     if ( interfaces == NULL ) {
         InterfaceProbe::GetAllInterfaces();
@@ -104,22 +99,32 @@ ItemVector* InterfaceProbe::CollectItems ( Object* object ) {
                 for ( it2 = nameVector->begin() ; it2 != nameVector->end() ; it2++ ) {
                     string first = ( *it2 )->GetValue();
 
-                    if ( name->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                        if ( name->GetValue().compare ( first ) != 0 ) {
-                            Item* temp = new Item ( **it1 );
-                            collectedItems->push_back ( temp );
-                        }
+					bool matched;
+					switch (name->GetOperation()) {
+					case OvalEnum::OPERATION_NOT_EQUAL:
+						matched = name->GetValue() != first;
+						break;
+					case OvalEnum::OPERATION_PATTERN_MATCH:
+						matched = this->myMatcher->IsMatch ( name->GetValue().c_str() , first.c_str() );
+						break;
+					case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+						matched = Common::EqualsIgnoreCase(name->GetValue(), first);
+						break;
+					case OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL:
+						matched = !Common::EqualsIgnoreCase(name->GetValue(), first);
+						break;
+					default:
+				        throw ProbeException ( "Error: Invalid operation specified on name. Found: " + OvalEnum::OperationToString ( name->GetOperation() ) );
+					}
 
-                    } else {
-                        if ( this->myMatcher->IsMatch ( name->GetValue().c_str() , first.c_str() ) ) {
-                            Item* temp = new Item ( **it1 );
-                            collectedItems->push_back ( temp );
-                        }
-                    }
+					if (matched) {
+						Item* temp = new Item ( **it1 );
+						collectedItems->push_back ( temp );
+						break;
+					}
                 }
             }
         }
-
     } else {
         // Loop through all shared interfaces on the system
         // Only keep the shared interfaces that match operation and value and var check
