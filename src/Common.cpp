@@ -842,6 +842,8 @@ string Common::GetFullPath(string path) {
 }
 
 bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
+	if (s1.size() != s2.size())
+		return false;
 	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
 }
 
