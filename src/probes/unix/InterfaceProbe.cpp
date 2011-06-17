@@ -87,11 +87,6 @@ ItemVector* InterfaceProbe::CollectItems(Object* object) {
 		throw ProbeException ( "Error: Invalid data type specified on name. Found: " + OvalEnum::DatatypeToString ( name->GetDatatype() ) );
 	}
 
-	// Check operation - only allow  equals, not equals and pattern match
-	if ( name->GetOperation() != OvalEnum::OPERATION_EQUALS && name->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && name->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
-		throw ProbeException ( "Error: Invalid operation specified on name. Found: " + OvalEnum::OperationToString ( name->GetOperation() ) );
-	}
-
 	ItemVector *collectedItems = new ItemVector();	
 
 	for (ItemVector::iterator iter = this->interfaces.begin();
