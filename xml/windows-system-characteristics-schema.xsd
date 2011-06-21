@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.10 Draft 1</version>
-               <date>3/10/2011 8:44:04 AM</date>
+               <version>5.10 Draft 2</version>
+               <date>6/10/2011 3:09:58 PM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -732,133 +732,97 @@
      <!-- =============================================================================== -->
      <!-- ===============================  CMDLET ITEM   ================================ -->
      <!-- =============================================================================== -->
-     <xsd:element name="cmdlet_1_item" substitutionGroup="oval-sc:item">
+     <xsd:element name="cmdlet_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>TODO</xsd:documentation>
-               <xsd:documentation>This approach assumes that the verb is always 'get'</xsd:documentation>
-               <xsd:documentation>Is it safe to assume the verb is always get?</xsd:documentation>
-               <xsd:documentation>Is there a benefit to cmdlet piping functionality from the parameters? Perhaps readability?</xsd:documentation>
+               <xsd:documentation>The cmdlet_item represents a PowerShell cmdlet, the parameters supplied to it, and the value it returned.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
-                              <xsd:element name="noun" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              
+                              <xsd:element name="module_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The noun supplied for the cmdlet.</xsd:documentation>
+                                        <xsd:documentation>The name of the module that contains the cmdlet.</xsd:documentation>
+                                        <!--
+                                             NOTE: Changed name from modulename to align with naming conventions.
+                                             TODO: Can this be restricted to an allowed set of characters? Is there a documented format for module name?
+                                        -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                              <xsd:element name="module_id" type="win-sc:EntityItemGUIDType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The list of arguments for the cmdlet</xsd:documentation>
+                                        <xsd:documentation>The globally unique identifier for the module.</xsd:documentation>
+                                        <!-- 
+                                             NOTE: Changed name from module id to align with naming conventions.
+                                        -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="parameters" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                              <xsd:element name="module_version" type="oval-sc:EntityItemVersionType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The cmdlet paramaters and cmdlet piping functionality to be applied to the .NET object returned by the specified cmdlet.</xsd:documentation>
+                                        <xsd:documentation>The version of the module that contains the cmdlet in the form of MAJOR.MINOR.</xsd:documentation>
+                                        <!--
+                                             NOTE: Only allows datatype = version.
+                                        -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
+                              <xsd:element name="verb" type="win-sc:EntityItemCmdletVerbType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The actual value returned from executing the cmdlet with supplied arguments, parameters, and cmdlet piping functionality.</xsd:documentation>
-                                        <xsd:appinfo>
-                                             <sch:pattern id="win-sc_cmdlet_1_itemvalue">
-                                                  <sch:rule context="win-sc:cmdlet_1_item/win-sc:value">
-                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_1_item must be 'record'</sch:assert>
-                                                  </sch:rule>
-                                             </sch:pattern>
-                                        </xsd:appinfo>
-                                   </xsd:annotation>
-                              </xsd:element>
-                         </xsd:sequence>
-                    </xsd:extension>
-               </xsd:complexContent>
-          </xsd:complexType>
-     </xsd:element>
-     <xsd:element name="cmdlet_2_item" substitutionGroup="oval-sc:item">
-          <xsd:annotation>
-               <xsd:documentation>TODO</xsd:documentation>
-               <xsd:documentation>This approach allows for the noun and verb to be supplied separately</xsd:documentation>
-               <xsd:documentation>Is there any value to seperating the noun and verb?</xsd:documentation>
-          </xsd:annotation>
-          <xsd:complexType>
-               <xsd:complexContent>
-                    <xsd:extension base="oval-sc:ItemType">
-                         <xsd:sequence>
-                              <xsd:element name="verb" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The verb supplied for the cmdlet.</xsd:documentation>
+                                        <xsd:documentation>The cmdlet verb.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="noun" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The noun supplied for the cmdlet.</xsd:documentation>
+                                        <xsd:documentation>The cmdlet noun.</xsd:documentation>
+                                        <!--
+                                             TODO: Is there an allowed format more restrictive than strings?
+                                        -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                              <xsd:element name="parameters" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The list of arguments for the cmdlet.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="parameters" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The cmdlet parameters and cmdlet piping functionality to be applied to the .NET object returned by the specified cmdlet.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The actual value returned from executing the cmdlet with supplied arguments, parameters, and cmdlet piping functionality.</xsd:documentation>
+                                        <xsd:documentation>A list of properties (name and value pairs) as input to invoke the cmdlet.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="win-sc_cmdlet_2_itemvalue">
-                                                  <sch:rule context="win-sc:cmdlet_2_item/win-sc:value">
-                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_2_item must be 'record'</sch:assert>
+                                             <sch:pattern id="win-sc_cmdletitemparameters">
+                                                  <sch:rule context="win-sc:cmdlet_item/win-sc:parameters">
+                                                       <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_item must be 'equals'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
-                         </xsd:sequence>
-                    </xsd:extension>
-               </xsd:complexContent>
-          </xsd:complexType>
-     </xsd:element>
-     <xsd:element name="cmdlet_3_item" substitutionGroup="oval-sc:item">
-          <xsd:annotation>
-               <xsd:documentation>TODO</xsd:documentation>
-               <xsd:documentation>This approach specifies the noun and verb in one entity.</xsd:documentation>
-               <xsd:documentation>This might be most similar to the code examples we have seen.</xsd:documentation>
-          </xsd:annotation>
-          <xsd:complexType>
-               <xsd:complexContent>
-                    <xsd:extension base="oval-sc:ItemType">
-                         <xsd:sequence>
-                              <xsd:element name="cmdlet" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="where" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The cmdlet to execute.</xsd:documentation>
+                                        <xsd:documentation>A string that is used as input to the Where-Object cmdlet as filter to limit cmdlet outputs.</xsd:documentation>
+                                        <!--
+                                             TODO: Should the where entity be included?
+                                        --> 
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
+                              <xsd:element name="select" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The list of arguments for the cmdlet.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="parameters" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The cmdlet parameters and cmdlet piping functionality to be applied to the .NET object returned by the specified cmdlet.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The actual value returned from executing the cmdlet with supplied arguments, parameters, and cmdlet piping functionality.</xsd:documentation>
+                                        <xsd:documentation>A list of fields (name and value pairs) used as input to the Select-Object cmdlet to select specific output properties.</xsd:documentation>
                                         <xsd:appinfo>
-                                             <sch:pattern id="win-sc_cmdlet_3_itemvalue">
-                                                  <sch:rule context="win-sc:cmdlet_3_item/win-sc:value">
-                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_3_item must be 'record'</sch:assert>
+                                             <sch:pattern id="win-sc_cmdletitemselect">
+                                                  <sch:rule context="win-sc:cmdlet_item/win-sc:select">
+                                                       <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select entity of a cmdlet_item must be 'equals'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
                                    </xsd:annotation>
                               </xsd:element>
+                              <xsd:element name="value" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="unbounded">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The expected value represented as a set of fields (name and value pairs).</xsd:documentation>
+                                        <xsd:appinfo>
+                                             <sch:pattern id="win-sc_cmdletitemvalue">
+                                                  <sch:rule context="win-sc:cmdlet_item/win-sc:value">
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the value entity of a cmdlet_item must be 'record'</sch:assert>
+                                                  </sch:rule>
+                                             </sch:pattern>
+                                        </xsd:appinfo>
+                                   </xsd:annotation>
+                              </xsd:element>                              
                          </xsd:sequence>
                     </xsd:extension>
                </xsd:complexContent>
@@ -1546,6 +1510,282 @@
           </xsd:complexType>
      </xsd:element>
      <!-- =============================================================================== -->
+     <!-- ===========================  PE HEADER ITEM  ================================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="peheader_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>The peheader_item describes the metadata associated with a PE file header. For more information, please see the documentation for the IMAGE_FILE_HEADER and IMAGE_OPTIONAL_HEADER structures.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="header_signature" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The header_signature entity is the signature of the header.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="target_machine_type" type="win-sc:EntityItemPeTargetMachineType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The target_machine_type entity is a WORD that specifies the target architecture that the file is intended for.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="number_of_sections" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The number_of_sections entity is a WORD that specifies the number of sections in the file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="time_date_stamp" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The time_date_stamp entity is a DWORD that specifies the time that the linker produced the file. The value is represented as the number of seconds since January 1, 1970, 00:00:00.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="pointer_to_symbol_table" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The pointer_to_symbol_table entity is a DWORD that specifies the file offset of the COFF symbol table.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="number_of_symbols" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The number_of_symbols entity is a DWORD that specifies the number of symbols in the COFF symbol table.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_optional_header" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_of_optional_header entity is a DWORD that specifies the size of an optional header in bytes.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_relocs_stripped" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_relocs_stripped entity is a boolean value that specifies if the relocation information is stripped from the file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_executable_image" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_executable_image entity is a boolean value that specifies if the file is executable.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_line_nums_stripped" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_line_nums_stripped entity is a boolean value that specifies if the line numbers are stripped from the file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_local_syms_stripped" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_local_syms_stripped entity is a boolean value that specifies if the local symbols are stripped from the file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_aggresive_ws_trim" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_aggressive_ws_trim entity is a boolean value that specifies that the working set should be aggressively trimmed.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_large_address_aware" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_large_address_aware entity is a boolean value that specifies that the application can handle addresses larger than 2GB.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_16bit_machine" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_16bit_machine entity is a boolean value that specifies that the computer supports 16-bit words.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_bytes_reversed_lo" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_bytes_reversed_lo entity is a boolean value that specifies that the bytes of the word are reversed.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_32bit_machine" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_32bit_machine entity is a boolean value that specifies that the computer supports 32-bit words.</xsd:documentation>                                        
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_debug_stripped" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_debug_stripped entity is a boolean value that specifies that the debugging information is stored separately in a .dbg file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_removable_run_from_swap" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_removable_run_from_swap entity is a boolean value that specifies that the image is on removable media, copy and run from the swap file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_system" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_system entity is a boolean value that specifies that the image is a system file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_dll" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_dll entity is a boolean value that specifies that the image is a DLL.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_up_system_only" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_up_system_only entity is a boolean value that specifies that the file should only be run on a uniprocessor computer.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_file_bytes_reveresed_hi" type="oval-sc:EntityItemBoolType" default="false" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_file_bytes_reversed_hi entity is a boolean value that specifies that the bytes of the word are reversed.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="magic_number" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The magic_number entity is a WORD that specifies the state of the image file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="major_linker_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The major_linker_version entity is a BYTE that specifies the major version of the linker that produced the file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="minor_linker_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The minor_linker_version entity is a BYTE that specifies the minor version of the linker that produced the file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_code" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_of_code entity is a DWORD that specifies the total size of all of the code sections.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_initialized_data" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_of_initialized_data entity is a DWORD that specifies the total size of all of the sections that are composed of initialized data.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_uninitialized_data" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_of_uninitialized_data entity is a DWORD that specifies the total size of all of the sections that are composed of uninitialized data.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="address_of_entry_point" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The address_of_entry_point entity is a DWORD that specifies the address where the loader will begin execution.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="base_of_code" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The base_of_code entity is a DWORD that specifies the relative virtual address where the file's code section begins.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="base_of_data" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The base_of_data entity is a DWORD that specifies the relative virtual address where the file's data section begins.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_base_address" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The image_base_address entity is a DWORD that specifies the preferred address fo the first byte of the image when it is loaded into memory.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="section_alignment" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The section_alignment entity is a DWORD that specifies the alignment of the sections loaded into memory.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="file_alignment" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The file_alignment entity is a DWORD that specifies the alignment of the raw data of sections in the image file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="major_operating_system_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The major_operating_system_version entity is a WORD that specifies the major version of the operating system required to use this executable.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="minor_operating_system_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The minor_operating_system_version entity is a WORD that specifies the minor version of the operating system required to use this executable.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="major_image_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The major_image_version entity is a WORD that specifies the major version number of the image.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="minor_image_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The minor_image_version entity is a DWORD that specifies the minor version number of the image.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="major_subsystem_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The major_subsystem_version entity is a WORD that specifies the major version of the subsystem required to run the executable.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="minor_susbsystem_version" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The minor_subsystem_version entity is a WORD that specifies the minor version of the subsystem required to run the executable.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_image" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_of_image entity is a DWORD that specifies the total size of the image including all of the headers.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_headers" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_of_headers entity is a DWORD that specifies the total combined size of the MS-DOS stub, PE header, and the section headers.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="checksum" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The checksum entity is a DWORD that specifies the checksum of the image file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="subsystem" type="win-sc:EntityItemPeSubsystemType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The subsystem entity is a DWORD that specifies the type of subsystem that the executable uses for its user interface.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="dll_characteristics" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="unbounded">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The dll_characteristics entity is a DWORD that specifies the set of flags indicating the circumstances under which a DLL's initialization function will be called..</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_stack_reserve" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The time_date_stamp entity is a DWORD that specifies the number of bytes to reserve for the stack.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_stack_commit" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The time_date_stamp entity is a DWORD that specifies the number of bytes to commit for the stack.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_heap_reserve" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The time_date_stamp entity is a DWORD that specifies the number of bytes to reserve for the local heap.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_of_heap_commit" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The time_date_stamp entity is a DWORD that specifies the number of bytes to commit for the local heap.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="loader_flags" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>TODO - QUESTION: This flag is obsolete - do we need to support it?</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="number_of_rva_and_sizes" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The number_of_rva_and_sizes entity is a DWORD that specifies the number of directory entries in the remainder of the optional header.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="image_base" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>TODO - QUESTION: What is the difference between this and the image_base_address? Do we need to account for data directory entries whose count is specified in the number_of_rva_and sizes entity?</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
      <!-- ==============================  PORT ITEM  ==================================== -->
      <!-- =============================================================================== -->
      <xsd:element name="port_item" substitutionGroup="oval-sc:item">
@@ -1720,12 +1960,27 @@
                               </xsd:element>
                               <xsd:element name="image_path" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                         <xsd:documentation>The image_path entity contains the name of the executable file in question.</xsd:documentation>
+                                        <xsd:documentation>The image_path entity represents the name of the executable file for the process.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="current_dir" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                         <xsd:documentation>The current_directory entity represents the current path to the executable.</xsd:documentation>
+                                         <xsd:documentation>The current_dir entity represents the current path to the executable file for the process.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="creation_time" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The creation_time entity represents the creation time of the process. The value of this entity represents the FILETIME structure which is a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC). See the GetProcessTimes function lpCreationTime.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="dep_enabled" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The dep_enabled entity represents whether or not data execution prevention (DEP) is enabled. See the GetProcessDEPPolicy function lpFlags.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="primary_window_text" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The primary_window_text entity represents the title of the primary window of the process. See the GetWindowText function.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -1764,6 +2019,11 @@
                               <xsd:element name="name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1" nillable="true">
                                    <xsd:annotation>
                                         <xsd:documentation>This element describes the name of a registry key. If the xsi:nil attribute is set to true, then the item being represented is the higher level key. Using xsi:nil here will result in a status of 'does not exist' for the type, and value entities since these entities are not associated with a key by itself.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="last_write_time" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The last time that the key or any of its value entries was modified. The value of this entity represents the FILETIME structure which is a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC). Last write time can be queried on a hive, key, or name. When collecting only information about a registry hive the last write time will be the time the hive or any of its entiries was written to. When collecting only information about a registry hive and key the last write time will be the time the key or any of its entiries was written to. When collecting only information about a registry name the last write time will be the time the name was written to. See the RegQueryInfoKey function lpftLastWriteTime.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="type" type="win-sc:EntityItemRegistryTypeType" minOccurs="0" maxOccurs="1">
@@ -3167,6 +3427,174 @@
                </xsd:restriction>
           </xsd:simpleContent>
      </xsd:complexType>
+     <xsd:complexType name="EntityItemPeTargetMachineType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityItemPeTargetMachineType enumeration identifies the valid machine targets that can be specified in the PE file header.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_UNKNOWN">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_UNKNOWN type is used to indicate an unknown machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_ALPHA">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_ALPHA type is used to indicate an Alpha APX machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_ARM">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_ARM type is used to indicate an ARM little endian machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_ALPHA64">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_ALPHA64 type is used to indicate an 64-bit Alpha APX machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_I386">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_I386 type is used to indicate an Intel 386 machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_IA64">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_IA64 type is used to indicate an Intel Itanium machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_M68K">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_M68K type is used to indicate an M68K machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_MIPS16">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_MIPS16 type is used to indicate a MIPS16 machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_MIPSFPU">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_MIPSFPU type is used to indicate an MIPS machine with FPU.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_MIPSFPU16">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_MIPSFPU16 type is used to indicate a MIPS16 machine with FPU.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_POWERPC">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_POWERPC type is used to indicate an Power PC little endian machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_R3000">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_R3000 type is used to indicate a MIPS little endian, 0x160 big endian machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_R4000">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_R4000 type is used to indicate a MIPS little endian machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_R10000">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_10000 type is used to indicate a MIPS little endian machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_SH3">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_SH3 type is used to indicate a Hitachi SH3 machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_SH4">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_SH4 type is used to indicate a Hitachi SH4 machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_FILE_MACHINE_THUMB">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_FILE_MACHINE_THUMB type is used to indicate an ARM or Thumb ("interworking") machine.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
+     <xsd:complexType name="EntityItemPeSubsystemType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityItemPeSubsystemType enumeration identifies the valid subsystem types that can be specified in the PE file header.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_UNKNOWN">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_UNKNOWN type is used to indicate an unknown subsystem.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_NATIVE">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_NATIVE type is used to indicate that no subsystem is required.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_WINDOWS_GUI">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_WINDOWS_GUI type is used to indicate a Windows graphical user interface (GUI) subsystem.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_WINDOWS_CUI">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_WINDOWS_CUI type is used to indicate a Windows character-mode user interface (CUI) subsystem.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_OS2_CUI">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_OS2_CUI type is used to indicate an OS/2 CUI subsystem.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_POSIX_CUI">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_POSIX_CUI type is used to indicate a POSIX CUI subsystem.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_WINDOWS_CE_GUI">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_WINDOWS_CE_GUI type is used to indicate a Windows CE system.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_EFI_APPLICATION">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_EFI_APPLICATION type is used to indicate an Extensible Firmware Interface (EFI) application.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER type is used to indicate a EFI driver with boot services.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER type is used to indicate a EFI driver with run-time services subsystem.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_EFI_ROM">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_EFI_ROM type is used to indicate an EFI ROM image.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_XBOX">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_XBOX type is used to indicate an Xbox system.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION">
+                         <xsd:annotation>
+                              <xsd:documentation>The IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION type is used to indicate a boot application.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
      <xsd:complexType name="EntityItemProtocolType">
           <xsd:annotation>
                <xsd:documentation>The EntityItemProtocolType restricts a string value to a specific set of values that describe the different available protocols. The empty string is also allowed to support empty elements associated with error conditions.</xsd:documentation>
@@ -3564,7 +3992,133 @@
                     </xsd:enumeration>
                     <xsd:enumeration value="">
                          <xsd:annotation>
-                              <xsd:documentation> The empty string is also allowed to support empty elements associated with error conditions.</xsd:documentation>
+                              <xsd:documentation>The empty string is also allowed to support empty elements associated with error conditions.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
+     <xsd:complexType name="EntityItemGUIDType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityItemGUIDType restricts a string value to a representation of a GUID, used for module ID. The empty string is also allowed to support empty element associated with error conditions.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:pattern value="(\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\}){0,}"/>
+               </xsd:restriction>
+          </xsd:simpleContent>
+     </xsd:complexType>
+     <xsd:complexType name="EntityItemCmdletVerbType">
+          <xsd:annotation>
+               <xsd:documentation>The EntityItemCmdletVerbType restricts a string value to a set of allow cmdlet verbs. The empty string is also allowed to support empty element associated with error conditions.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleContent>
+               <xsd:restriction base="oval-sc:EntityItemStringType">
+                    <xsd:enumeration value="Approve">
+                         <xsd:annotation>
+                              <xsd:documentation>The Approve verb confirms or agrees to the status of a resource or process.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Assert">
+                         <xsd:annotation>
+                              <xsd:documentation>The Assert verb affirms the state of a resource.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Compare">
+                         <xsd:annotation>
+                              <xsd:documentation>The Compare verb evaluates the data from one resource against the data from another resource.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Confirm">
+                         <xsd:annotation>
+                              <xsd:documentation>The Confirm verb acknowledges, verifies, or validates, the state of a resource or process.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Find">
+                         <xsd:annotation>
+                              <xsd:documentation>The Find verb looks for an object in a container that is unknown, implied, optional, or specified.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Get">
+                         <xsd:annotation>
+                              <xsd:documentation>The Get verb specifies an action that retrieves a resource.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Import">
+                         <xsd:annotation>
+                              <xsd:documentation>The Import verb creates a resource from data that is stored in a persistent data store (such as a file) or in an interchange format.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Measure">
+                         <xsd:annotation>
+                              <xsd:documentation>The Measure verb identifies resources that are consumed by a specified operation, or retrieves statistics about a resource.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Open">
+                         <xsd:annotation>
+                              <xsd:documentation>The Open verb changes the state of a resource to make it accessible, available, or usable.</xsd:documentation>
+                              <!-- 
+                                   TODO: Is open a security risk? The documentation says it changes state.
+                              -->
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Ping">
+                         <xsd:annotation>
+                              <xsd:documentation>The Ping verb specifies an action that determines if a resource is active and is responding to requests.</xsd:documentation>
+                              <!-- 
+                                   TODO: Is open a security risk? It seems like you might be able to write valid OVAL content that could flood a network with this? Do we need this verb?
+                                   TODO: the documentation says to use Test instead of Ping. Perhaps this is not needed.
+                              -->
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Read">
+                         <xsd:annotation>
+                              <xsd:documentation>The Read verb acquires information from a source.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Request">
+                         <xsd:annotation>
+                              <xsd:documentation>The Request verb asks for a resource or asks for permissions.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Resolve">
+                         <xsd:annotation>
+                              <xsd:documentation>The Resolve verb maps a shorthand representation of a resource to a more complete representation.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Search">
+                         <xsd:annotation>
+                              <xsd:documentation>The Search verb creates a reference to a resource in a container.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Select">
+                         <xsd:annotation>
+                              <xsd:documentation>The Select verb locates a resource in a container.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Show">
+                         <xsd:annotation>
+                              <xsd:documentation>The Show verb makes a resource visible to the user.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Test">
+                         <xsd:annotation>
+                              <xsd:documentation>The Test verb verifies the operation or consistency of a resource.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Trace">
+                         <xsd:annotation>
+                              <xsd:documentation>The Trace verb tracks the activities of a resource.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="Watch">
+                         <xsd:annotation>
+                              <xsd:documentation>The Watch verb continually inspects or monitors a resource for changes.</xsd:documentation>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="">
+                         <xsd:annotation>
+                              <xsd:documentation>The empty string is also allowed to support empty elements associated with error conditions.</xsd:documentation>
                          </xsd:annotation>
                     </xsd:enumeration>
                </xsd:restriction>
