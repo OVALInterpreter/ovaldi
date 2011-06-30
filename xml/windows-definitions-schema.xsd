@@ -1119,6 +1119,13 @@
                                                 <xsd:element name="module_name" type="oval-def:EntityObjectStringType" nillable="true" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The name of the module that contains the cmdlet.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdletobjmodule_name">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:module_name">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the module_name entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                             <!--
                                                                   NOTE: Changed name from modulename to align with naming conventions.
                                                                   NOTE: Allowed nill - If this is set to nill then the behavior would be to simply use the specified cmdlet that is available in the default execution environment.
@@ -1130,6 +1137,13 @@
                                                 <xsd:element name="module_id" type="win-def:EntityObjectGUIDType" nillable="true" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The globally unique identifier for the module.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdletobjmodule_id">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:module_id">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the module_id entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                             <!-- 
                                                                   NOTE: Changed name from module id to align with naming conventions.
                                                                   NOTE: Allowed nill - If set to nill then the behavior would be to use the cmdlet that is available in the default execution environment.
@@ -1140,6 +1154,13 @@
                                                 <xsd:element name="module_version" type="oval-def:EntityObjectVersionType" nillable="true" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The version of the module that contains the cmdlet in the form of MAJOR.MINOR.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdletobjmodule_version">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:module_version">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the module_version entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                             <!--
                                                                   NOTE: Allowed nill - If this is set to nill then the behavior would be to simply use the specified cmdlet that is available in the default execution environment.
                                                                   NOTE: Only allows datatype = version.
@@ -1150,6 +1171,13 @@
                                                 <xsd:element name="verb" type="win-def:EntityObjectCmdletVerbType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The cmdlet verb.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdletobjverb">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:verb">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the verb entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                             <!--
                                                                   TODO: Can the allowed operation be restricted to equals?
                                                             -->
@@ -1158,6 +1186,13 @@
                                                 <xsd:element name="noun" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The cmdlet noun.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_cmdletobjnoun">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:noun">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the noun entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                             <!--
                                                                   TODO: Is there an allowed format that is more restrictive than strings?
                                                                   TODO: Can the allowed operation be restricted to equals?
@@ -1170,7 +1205,12 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjparameters">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:parameters">
-                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the parameters entity of a cmdlet_object must be 'record'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                                  <sch:pattern id="win-def_cmdletobjparameters_fields">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:parameters/oval-def:field">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the parameters field entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1180,21 +1220,18 @@
                                                             <xsd:field xpath="@name"/>
                                                       </xsd:unique>
                                                 </xsd:element>
-                                                <xsd:element name="where" type="oval-def:EntityObjectStringType" nillable="true">
-                                                      <xsd:annotation>
-                                                            <xsd:documentation>A string that is used as input to the Where-Object cmdlet as filter to limit cmdlet outputs. This is equivalent to piping the output of a cmdlet to the Where-Object cmdlet. When xsi:nill is set to true, the Where-Object cmdlet is not used.</xsd:documentation>
-                                                            <!--
-                                                                  TODO: Should the where entity be included?
-                                                            --> 
-                                                      </xsd:annotation>
-                                                </xsd:element>
                                                 <xsd:element name="select" type="oval-def:EntityObjectRecordType" nillable="true">
                                                       <xsd:annotation>
                                                             <xsd:documentation>A list of fields (name and value pairs) used as input to the Select-Object cmdlet to select specific output properties. Each property name must be unique. This is equivalent to piping the output of a cmdlet to the Select-Object cmdlet. When xsi:nill is set to true, the Select-Object is not used.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjselect">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:select">
-                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the select entity of a cmdlet_object must be 'record'</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                                  <sch:pattern id="win-def_cmdletobjselect_fields">
+                                                                        <sch:rule context="win-def:cmdlet_object/win-def:select/oval-def:field">
+                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the select field entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1223,6 +1260,13 @@
                                     <xsd:element name="module_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the module that contains the cmdlet.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdletstemodule_name">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:module_name">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_name entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                                 <!--
                                                       NOTE: Changed name from modulename to align with naming conventions.
                                                       TODO: Can this be restricted to an allowed set of characters? Is there a documented format for the module name?
@@ -1233,6 +1277,13 @@
                                     <xsd:element name="module_id" type="win-def:EntityStateGUIDType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The globally unique identifier for the module.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdletstemodule_id">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:module_id">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_id entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                                 <!-- 
                                                       NOTE: Changed name from module id to align with naming conventions.
                                                       TODO: Can the allowed operation be restricted to equals?
@@ -1242,6 +1293,13 @@
                                     <xsd:element name="module_version" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The version of the module that contains the cmdlet in the form of MAJOR.MINOR.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdletstemodule_version">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:module_version">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_version entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                                 <!--
                                                       NOTE: Only allows datatype = version.
                                                       TODO: Can the allowed operation be restricted to equals?
@@ -1251,6 +1309,13 @@
                                     <xsd:element name="verb" type="win-def:EntityStateCmdletVerbType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The cmdlet verb.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdletsteverb">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:verb">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the verb entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                                 <!--
                                                       TODO: Can the allowed operation be restricted to equals?
                                                 -->
@@ -1259,6 +1324,13 @@
                                     <xsd:element name="noun" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The cmdlet noun.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <sch:pattern id="win-def_cmdletstenoun">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:noun">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the noun entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                </xsd:appinfo>
                                                 <!--
                                                       TODO: Is there an allowed format more restrictive than strings?
                                                       TODO: Can the allowed operation be restricted to equals?
@@ -1271,7 +1343,12 @@
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_cmdletsteparameters">
                                                             <sch:rule context="win-def:cmdlet_state/win-def:parameters">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the parameters entity of a cmdlet_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                      <sch:pattern id="win-def_cmdletsteparameters_fields">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:parameters/oval-def:field">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters field entity of a cmdlet_state must be 'equals'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -1281,21 +1358,18 @@
                                                 <xsd:field xpath="@name"/>
                                           </xsd:unique>
                                     </xsd:element>
-                                    <xsd:element name="where" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
-                                          <xsd:annotation>
-                                                <xsd:documentation>A string that is used as input to the Where-Object cmdlet as filter to limit cmdlet outputs.</xsd:documentation>
-                                                <!--
-                                                      TODO: Should the where entity be included?
-                                                --> 
-                                          </xsd:annotation>
-                                    </xsd:element>
                                     <xsd:element name="select" type="oval-def:EntityStateRecordType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>A list of fields (name and value pairs) used as input to the Select-Object cmdlet to select specific output properties. Each property name must be unique.</xsd:documentation>
                                                 <xsd:appinfo>
                                                       <sch:pattern id="win-def_cmdletsteselect">
                                                             <sch:rule context="win-def:cmdlet_state/win-def:select">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select entity of a cmdlet_state must be 'equals'</sch:assert>
+                                                                  <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the select entity of a cmdlet_state must be 'record'</sch:assert>
+                                                            </sch:rule>
+                                                      </sch:pattern>
+                                                      <sch:pattern id="win-def_cmdletsteselect_fields">
+                                                            <sch:rule context="win-def:cmdlet_state/win-def:select/oval-def:field">
+                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select field entity of a cmdlet_state must be 'equals'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>

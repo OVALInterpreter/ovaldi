@@ -741,7 +741,7 @@
                     <xsd:extension base="oval-sc:ItemType">
                          <xsd:sequence>
                               
-                              <xsd:element name="module_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="module_name" type="oval-sc:EntityItemStringType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The name of the module that contains the cmdlet.</xsd:documentation>
                                         <!--
@@ -750,7 +750,7 @@
                                         -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="module_id" type="win-sc:EntityItemGUIDType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="module_id" type="win-sc:EntityItemGUIDType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The globally unique identifier for the module.</xsd:documentation>
                                         <!-- 
@@ -758,7 +758,7 @@
                                         -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="module_version" type="oval-sc:EntityItemVersionType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="module_version" type="oval-sc:EntityItemVersionType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The version of the module that contains the cmdlet in the form of MAJOR.MINOR.</xsd:documentation>
                                         <!--
@@ -779,33 +779,25 @@
                                         -->
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="parameters" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="parameters" type="oval-sc:EntityItemRecordType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>A list of properties (name and value pairs) as input to invoke the cmdlet.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_cmdletitemparameters">
                                                   <sch:rule context="win-sc:cmdlet_item/win-sc:parameters">
-                                                       <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters entity of a cmdlet_item must be 'equals'</sch:assert>
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the parameters entity of a cmdlet_item must be 'record'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
-                                        </xsd:appinfo>
+                                        </xsd:appinfo>                                       
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="where" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>A string that is used as input to the Where-Object cmdlet as filter to limit cmdlet outputs.</xsd:documentation>
-                                        <!--
-                                             TODO: Should the where entity be included?
-                                        --> 
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="select" type="oval-sc:EntityItemRecordType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="select" type="oval-sc:EntityItemRecordType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>A list of fields (name and value pairs) used as input to the Select-Object cmdlet to select specific output properties.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_cmdletitemselect">
                                                   <sch:rule context="win-sc:cmdlet_item/win-sc:select">
-                                                       <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select entity of a cmdlet_item must be 'equals'</sch:assert>
+                                                       <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the select entity of a cmdlet_item must be 'record'</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
