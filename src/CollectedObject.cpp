@@ -449,7 +449,7 @@ void CollectedObject::AppendVariableValue(VariableValue* variableValue) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	Add a varaible value to the end of the variable values vector
+	//	Add a variable value to the end of the variable values vector
 	//
 	// -----------------------------------------------------------------------
 

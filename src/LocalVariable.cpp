@@ -62,7 +62,7 @@ void LocalVariable::ComputeValue() {
 	// set the flag for this variable
 	this->SetFlag(value->GetFlag());
 
-	// set the error message for this varaible
+	// set the error message for this variable
 	this->AppendMessages(value->GetMessages());
 
 	// if flag is complete or incomplete create VariableValues for each value.

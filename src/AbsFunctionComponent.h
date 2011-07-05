@@ -36,7 +36,7 @@
 XERCES_CPP_NAMESPACE_USE
 
 /**
-	This class represents abstract function component in a local_varaible in the oval definition schema.
+	This class represents abstract function component in a local_variable in the oval definition schema.
 	The oval definition schema defines a set of funtions for use in local_variables. All functions have 
 	some common aspects. This calls encaplusates those commonalities.
 */

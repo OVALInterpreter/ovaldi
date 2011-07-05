@@ -42,7 +42,7 @@ XERCES_CPP_NAMESPACE_USE
 /**
 	This calss is the base class for all types of variable components.
 	The oval definition schema defines several types of components that ay be grouped 
-	together to form complex local_varaibles. The commonalities among all components
+	together to form complex local_variables. The commonalities among all components
 	are encapsulated in this class.
 */
 class AbsComponent {
