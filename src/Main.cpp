@@ -107,6 +107,10 @@ int main(int argc, char* argv[]) {
 	// Now that the log has been initialized send the header to the log file.
 	Log::UnalteredMessage(headerMessage);
 
+#ifdef WIN32
+	CheckWow64();
+#endif
+
 	//////////////////////////////////////////////////////
 	//////////////////  Check MD5 Flag  //////////////////
 	//////////////////////////////////////////////////////
@@ -887,3 +891,19 @@ void Usage() {
 	cout << "   -z           = return md5 of current oval-definitions file." << endl;
 	cout << endl;
 }
+
+#ifdef WIN32
+void CheckWow64() {
+	BOOL isWow64;
+	BOOL result = IsWow64Process(GetCurrentProcess(), &isWow64);
+
+	if (!result) {
+		Log::Info("Couldn't determine Wow64 status: " + WindowsCommon::GetErrorMessage(GetLastError()));
+		return;
+	}
+
+	if (isWow64)
+		Log::Info("Warning: you are running the interpreter as a 32-bit process on 64-bit Windows.  "
+					"Be aware that you may get different results as compared to a 64-bit process.");
+}
+#endif

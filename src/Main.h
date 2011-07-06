@@ -86,4 +86,12 @@ void ProcessCommandLine(int argc, char* argv[]);
 /** Prints out a list of option flags that can be used with this exe. */
 void Usage();
 
+#ifdef WIN32
+/**
+ * Checks if we're a 32-bit process running under 64-bit
+ * windows, and prints a warning message if so.
+ */
+void CheckWow64();
+#endif
+
 #endif
