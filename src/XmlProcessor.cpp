@@ -100,7 +100,7 @@ XmlProcessor* XmlProcessor::Instance() {
 	return XmlProcessor::instance;
 }
 
-XmlProcessor::XmlProcessor() : parser(NULL), parserWithCallerAdoption(NULL) {
+XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 
     try  {
         XMLPlatformUtils::Initialize();

@@ -62,7 +62,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariable
 
 	if(DocumentManager::externalVariableDoc == NULL) {
 		string varFile = Common::GetExternalVariableFile();
-		if(Common::FileExists(varFile.c_str())) {
+		if(Common::FileExists(varFile)) {
 			try {
 				XmlProcessor *processor = XmlProcessor::Instance();
 				DocumentManager::externalVariableDoc = processor->ParseFile(Common::GetExternalVariableFile());
@@ -86,7 +86,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetEvaluationIdDocu
 
 	if(DocumentManager::evaluationIdDoc == NULL) {
 		string idFile = Common::GetDefinitionIdsFile();
-		if(Common::FileExists(idFile.c_str())) {
+		if(Common::FileExists(idFile)) {
 			try {
 				XmlProcessor *processor = XmlProcessor::Instance();
 				DocumentManager::evaluationIdDoc = processor->ParseFile(Common::GetDefinitionIdsFile());
@@ -110,7 +110,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDirectivesConfig
 
 	if(DocumentManager::directivesConfigDoc == NULL) {
 		string varFile = Common::GetDirectivesConfigFile();
-		if(Common::FileExists(varFile.c_str())) {
+		if(Common::FileExists(varFile)) {
 			try {
 				XmlProcessor *processor = XmlProcessor::Instance();
 				DocumentManager::directivesConfigDoc = processor->ParseFile(Common::GetDirectivesConfigFile());
