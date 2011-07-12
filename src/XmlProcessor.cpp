@@ -27,9 +27,28 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+//	required xerces	includes
+#include <xercesc/dom/DOMImplementationRegistry.hpp>
+#include <xercesc/dom/DOMException.hpp>
+
+// for dom Writer
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/dom/DOMImplementationLS.hpp>
+#include <xercesc/dom/DOMWriter.hpp>
+#include <xercesc/framework/StdOutFormatTarget.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <xercesc/util/XMLUni.hpp>
+
+// for entity resolver
+#include <xercesc/framework/LocalFileInputSource.hpp>
+#include <xercesc/framework/Wrapper4InputSource.hpp>
+
+#include "Common.h" 
 #include "XmlProcessor.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //			DataDirResolver Class                                   					  //	
@@ -81,14 +100,24 @@ XmlProcessor* XmlProcessor::Instance() {
 	return XmlProcessor::instance;
 }
 
-XmlProcessor::XmlProcessor() {
+XmlProcessor::XmlProcessor() : parser(NULL), parserWithCallerAdoption(NULL) {
 
     try  {
         XMLPlatformUtils::Initialize();
+
+		parser = makeParser();
+		parserWithCallerAdoption = makeParser();
+		// add one extra feature on this parser to prevent it from
+		// taking ownership of its documents.
+		parserWithCallerAdoption->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+
     } catch (const XMLException& toCatch) {
         string errMsg = "Error:  An error occured durring initialization of the xml utilities:\n";
         errMsg.append(XmlCommon::ToString(toCatch.getMessage()));
 		errMsg.append("\n");
+
+		if (parser) parser->release();
+		if (parserWithCallerAdoption) parserWithCallerAdoption->release();
 
 		throw XmlProcessorException(errMsg);
     }	
@@ -97,29 +126,30 @@ XmlProcessor::XmlProcessor() {
 XmlProcessor::~XmlProcessor() {
 
 	//  Delete the parser itself.  Must be done prior to calling Terminate, below.
+
 	if(parser != NULL)
-		delete parser; //parser->release();
+		parser->release();
+
+	if (parserWithCallerAdoption != NULL)
+		parserWithCallerAdoption->release();
 
 	XMLPlatformUtils::Terminate();
 
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string filePathIn) {
-	
-    XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *resultDocument = NULL;
-
+DOMBuilder *XmlProcessor::makeParser() {
     // Instantiate the DOM parser.
-    static const XMLCh gLS[] = { chLatin_L, chLatin_S, chNull };
-    DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(gLS);
-    parser = ((DOMImplementationLS*)impl)->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+	static const XMLCh gLS[] = { chLatin_L, chLatin_S, chNull };
+	DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(gLS);
+
+	DOMBuilder *parser = ((DOMImplementationLS*)impl)->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
 
 	///////////////////////////////////////////////////////
-    //	Set fetuares on the builder
+	//	Set features on the builder
 	///////////////////////////////////////////////////////
-
 
 	parser->setFeature(XMLUni::fgDOMComments, false); // Discard Comment nodes in the document. 
-    parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true); // Let the validation process do its datatype normalization that is defined in the used schema language.  
+	parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true); // Let the validation process do its datatype normalization that is defined in the used schema language.  
 	parser->setFeature(XMLUni::fgDOMNamespaces, true); //  Perform Namespace processing
 	parser->setFeature(XMLUni::fgDOMValidation, true); // Report all validation errors.  
 	parser->setFeature(XMLUni::fgXercesSchema, true); //  Enable the parser's schema support.
@@ -132,24 +162,29 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string fileP
 //			The following code was added to handle air-gap operation					  //	
 //****************************************************************************************//
 	/* Look for XML schemas in local directory instead of Internet */
-		DataDirResolver resolver;
-		parser->setEntityResolver (&resolver);
+	parser->setEntityResolver (&resolver);
 //****************************************************************************************//
 //			End of air-gap code															  //	
 //****************************************************************************************//
 
 	///////////////////////////////////////////////////////
-    //	Add an Error Handler
+	//	Add an Error Handler
 	///////////////////////////////////////////////////////
-	// Create a new DOMErrorHandler
-	// and set it to the builder
-	XmlProcessorErrorHandler *errHandler = new XmlProcessorErrorHandler();
-	parser->setErrorHandler(errHandler);
+	parser->setErrorHandler(&errHandler);
+
+	return parser;
+}
+
+XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string filePathIn, bool callerAdopts) {
+	
+    XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *resultDocument = NULL;
 
     try  {
-		// reset document pool
-		parser->resetDocumentPool();
-        resultDocument = parser->parseURI(filePathIn.c_str());
+		errHandler.resetErrors();
+		if (callerAdopts)
+			resultDocument = parserWithCallerAdoption->parseURI(filePathIn.c_str());
+		else
+			resultDocument = parser->parseURI(filePathIn.c_str());
 
     } catch (const XMLException& toCatch) {
 		string error = "Error while parsing xml file:";
@@ -172,9 +207,9 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string fileP
 		throw XmlProcessorException(error);
     }
 
-	if(errHandler->getSawErrors()) {
+	if(errHandler.getSawErrors()) {
 		string error = "Error while parsing xml file:";
-		error.append(errHandler->getErrorMessages());
+		error.append(errHandler.getErrorMessages());
 		throw XmlProcessorException(error);
 	}
 
@@ -251,7 +286,7 @@ void XmlProcessor::WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* 
 		//
 		theSerializer->writeNode(myFormTarget, *doc);
 
-		delete theSerializer;
+		theSerializer->release();
 		delete myFormTarget;
 	}
 	catch(...)
@@ -326,6 +361,7 @@ bool XmlProcessorErrorHandler::handleError(const DOMError& domError) {
 
 void XmlProcessorErrorHandler::resetErrors() {
     fSawErrors = false;
+	errorMessages.clear();
 }
 
 bool XmlProcessorErrorHandler::getSawErrors() const {

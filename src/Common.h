@@ -96,6 +96,12 @@ typedef std::pair < std::string, std::string > StringPair;
 */
 typedef std::vector < StringPair* > StringPairVector;
 
+// Default filenames for various input and output files
+#define DEFAULT_DEFINITION_SCHEMATRON_FILENAME "oval-definitions-schematron.xsl"
+#define DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME "oval-system-characteristics-schematron.xsl"
+#define DEFAULT_RESULTS_SCHEMATRON_FILENAME "oval-results-schematron.xsl"
+#define DEFAULT_RESULTS_XFORM_FILENAME "results_to_html.xsl"
+
 /**
 	This class provides a set of common fuctions used through out the application.
 	All functions are static.
@@ -113,6 +119,7 @@ class Common {
 		static std::string	GetExternalVariableFile();
 		static std::string	GetDirectivesConfigFile();
 		static bool		GetVerifyXMLfile();
+		static bool		GetVerifyOutputs();
 		static std::string	GetXSLFilename();
 		static std::string	GetXSLOutputFilename();
 		static std::string   GetLogFileLocation();
@@ -121,6 +128,8 @@ class Common {
 		static bool     GetLimitEvaluationToDefinitionIds();
 		static bool     GetDoDefinitionSchematron();
 		static std::string   GetDefinitionSchematronPath();
+		static std::string   GetSystemCharacteristicsSchematronPath();
+		static std::string   GetResultsSchematronPath();
 		static std::string   GetDefinitionIdsFile();
 
 		static void		SetDataFile(std::string);
@@ -141,7 +150,10 @@ class Common {
 		static void     SetDefinitionIdsString(std::string definitionIdsString);
 		static void     SetLimitEvaluationToDefinitionIds(bool set);
 		static void     SetDoDefinitionSchematron(bool set);
-		static void     SetDefinitionSchematronPath(std::string definitionSchematronPath);
+		static void		SetVerifyOutputs(bool);
+		static void     SetDefinitionSchematronPath(std::string path);
+		static void     SetSystemCharacteristicsSchematronPath(std::string path);
+		static void     SetResultsSchematronPath(std::string path);
 		static void     SetDefinitionIdsFile(std::string definitionIdsFile);
 
 		static StringVector* ParseDefinitionIdsFile();
@@ -157,7 +169,7 @@ class Common {
 	     */
 		static std::string	SwitchChar(std::string stringIn, std::string oldChr, std::string newChr);
 		/** Return true if the specified file exists. */
-		static bool     FileExists(const char* filename);
+		static bool     FileExists(const std::string &filename);
 
 		/**
 		 * Converts \p val to a string.  T must be a type such that
@@ -271,10 +283,13 @@ class Common {
 		static bool	generateMD5;
 		static bool useProvidedData;
 		static bool verifyXMLfile;
+		static bool verifyOutputs;
 		static bool limitEvaluationToDefinitionIds;
 		static std::string definitionIds;
 		static bool doDefinitionSchematron;
 		static std::string definitionSchematronPath;
+		static std::string resultsSchematronPath;
+		static std::string systemCharacteristicsSchematronPath;
 		static std::string definitionIdsFile;
 
 		/** format of a definition id. */

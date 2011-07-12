@@ -32,6 +32,22 @@
 
 using namespace std;
 
+namespace {
+#ifdef WIN32
+	/**
+	 * Checks if we're a 32-bit process running under 64-bit
+	 * windows, and prints a warning message if so.
+	 */
+	void CheckWow64();
+#endif
+
+	/**
+	 * Runs schematron validation on the given file, via the given schematron XSL file.
+	 * \return true if validation succeeded, false if validation failed.
+	 */
+	bool SchematronValidate(const string &fileToValidate, const string &schematronXSLFile);
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Main  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -284,32 +300,8 @@ int main(int argc, char* argv[]) {
 		//////////////////////////////////////////////////////
 		
 		if(Common::GetDoDefinitionSchematron()) {
-
-			logMessage = " ** running Schematron validation on " + Common::GetXMLfile() + "\n";
-			cout << logMessage;
-			Log::UnalteredMessage(logMessage);
-
-			string result = XslCommon::ApplyXSL(Common::GetXMLfile(), Common::GetDefinitionSchematronPath());
-			// strip the xml declaration
-			if(result.compare("") != 0) {
-				size_t pos = result.rfind(">");
-				if(pos != string::npos) {
-					result = result.substr(pos+1, result.length()-pos);
-				}
-			}
-			if(result.compare("") != 0) {
-				string errorMessage = "ERROR: Schematron validation failed with the following errors:\n";
-				errorMessage.append(result);
-
-				cerr << errorMessage;
-				Log::Fatal(errorMessage);
-				exit( EXIT_FAILURE );
-			} else {
-				logMessage = "     - Schematron validation succeeded\n";
-				cout << logMessage;
-				Log::UnalteredMessage(logMessage);
-			}
-
+			if (!SchematronValidate(Common::GetXMLfile(), Common::GetDefinitionSchematronPath()))
+				exit(EXIT_FAILURE);
 		} else {
 			
 			logMessage = " ** skipping Schematron validation\n";
@@ -359,6 +351,18 @@ int main(int argc, char* argv[]) {
 			cout << logMessage;
 			Log::UnalteredMessage(logMessage);
 			processor->WriteDOMDocument(DocumentManager::GetSystemCharacteristicsDocument(), Common::GetDatafile());
+
+			// Verify what we just wrote, if requested
+			if (Common::GetVerifyOutputs()) {
+				logMessage = " ** running XML-Schema validation on "+Common::GetDatafile()+"\n";
+				cout << logMessage;
+				Log::UnalteredMessage(logMessage);
+				// create the DOM document and then immediately destroy it,
+				// for the purposes of generating validation errors
+				processor->ParseFile(Common::GetDatafile(), true)->release();
+				if (!SchematronValidate(Common::GetDatafile(), Common::GetSystemCharacteristicsSchematronPath()))
+					exit(EXIT_FAILURE);
+			}
 
 		//	Read in the data file
 		} else {
@@ -444,6 +448,18 @@ int main(int argc, char* argv[]) {
 		processor->WriteDOMDocument(DocumentManager::GetResultDocument(), Common::GetOutputFilename());
 
 		delete analyzer;
+
+		if (Common::GetVerifyOutputs()) {
+			logMessage = " ** running XML-Schema validation on "+Common::GetOutputFilename()+"\n";
+			cout << logMessage;
+			Log::UnalteredMessage(logMessage);
+			// create the DOM document and then immediately destroy it,
+			// for the purposes of generating validation errors
+			processor->ParseFile(Common::GetOutputFilename(), true)->release();
+			if (!SchematronValidate(Common::GetOutputFilename(), Common::GetResultsSchematronPath()))
+				exit(EXIT_FAILURE);
+		}
+
 		delete processor;
 
 		// run the xsl
@@ -505,6 +521,14 @@ void ProcessCommandLine(int argc, char* argv[]) {
 	// it is eventually less than or equal to 1.  (NOTE: We have already checked argv[0]
 	// which is why we stop when argc is less than or equal to 1)  This signifies that we
 	// have run out of arguments to check.
+
+	// these vars modify how -a (set schema path) works.  -a can also modify
+	// other file paths, depending on whether the user explicitly
+	// gives paths for them or not.
+	bool definitionSchematronPathGiven = false;
+	bool systemCharacteristicsSchematronPathGiven = false;
+	bool resultsSchematronPathGiven = false;
+	bool resultsXformPathGiven = false;
 
 	try {
 		while (argc > 1) {
@@ -611,6 +635,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 					} else {
 						Common::SetDefinitionSchematronPath(argv[2]);
 						Common::SetDoDefinitionSchematron(true);
+						definitionSchematronPathGiven = true;
 						++argv;
 						--argc;
 					}
@@ -667,6 +692,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 						exit( EXIT_FAILURE );
 					} else {
 						Common::SetXSLFilename(argv[2]);
+						resultsXformPathGiven = true;
 						++argv;
 						--argc;
 					}
@@ -759,6 +785,7 @@ void ProcessCommandLine(int argc, char* argv[]) {
 					exit( EXIT_FAILURE );
 				} else {
 					Common::SetSchemaPath(argv[2]);
+
 					++argv;
 					--argc;
 				}
@@ -772,6 +799,29 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 
+				// **********  Verify output XML files  ********** //
+				case 'b':
+
+					Common::SetVerifyOutputs(true);
+
+					break;
+
+				case 'j':
+					Common::SetSystemCharacteristicsSchematronPath(argv[2]);
+					Common::SetVerifyOutputs(true);
+					systemCharacteristicsSchematronPathGiven = true;
+					++argv;
+					--argc;
+					break;
+
+				case 'k':
+					Common::SetResultsSchematronPath(argv[2]);
+					Common::SetVerifyOutputs(true);
+					resultsSchematronPathGiven = true;
+					++argv;
+					--argc;
+					break;
+
 				// **********  Default  ********** //
 				default:
 
@@ -782,6 +832,31 @@ void ProcessCommandLine(int argc, char* argv[]) {
 			++argv;
 			--argc;
 		}
+
+		// update other paths based on the current schema path,
+		// for each one which the user hasn't explicitly given
+		// an alternative path.  This may be a no-op if the user
+		// also hasn't changed the schema path, but it won't
+		// hurt.
+		if (!definitionSchematronPathGiven)
+			Common::SetDefinitionSchematronPath(
+				Common::BuildFilePath(Common::GetSchemaPath(),
+					DEFAULT_DEFINITION_SCHEMATRON_FILENAME));
+
+		if (!systemCharacteristicsSchematronPathGiven)
+			Common::SetSystemCharacteristicsSchematronPath(
+				Common::BuildFilePath(Common::GetSchemaPath(),
+					DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME));
+
+		if (!resultsSchematronPathGiven)
+			Common::SetResultsSchematronPath(
+				Common::BuildFilePath(Common::GetSchemaPath(),
+					DEFAULT_RESULTS_SCHEMATRON_FILENAME));
+
+		if (!Common::GetNoXsl() && !resultsXformPathGiven)
+			Common::SetXSLFilename(
+				Common::BuildFilePath(Common::GetSchemaPath(),
+					DEFAULT_RESULTS_XFORM_FILENAME));
 
 	} catch(Exception ex) {
 		cout << "*** Input error: " << ex.GetErrorMessage() << " Note that this message has not been written to the log file.\n\n\n----------------------------------------------------" << endl;
@@ -818,6 +893,11 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 	if (Common::GetDoDefinitionSchematron()) {
 		inputs.push_back(Common::GetFullPath(Common::GetDefinitionSchematronPath()));
+	}
+
+	if (Common::GetVerifyOutputs()) {
+		inputs.push_back(Common::GetSystemCharacteristicsSchematronPath());
+		inputs.push_back(Common::GetResultsSchematronPath());
 	}
 
 	if (Common::GetLimitEvaluationToDefinitionIds()) {
@@ -867,7 +947,7 @@ void Usage() {
 	cout << "Input Validation Options:" << endl;
 	cout << "   -m           = do not verify the oval-definitions file with an MD5 hash." << endl;
 	cout << "   -n           = perform Schematron validation of the oval-definitions file." << endl;
-    cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << "oval-definitions-schematron.xsl\"" << endl;
+	cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_DEFINITION_SCHEMATRON_FILENAME << '\"' << endl;
 	cout << "\n";
 
 	cout << "Data Collection Options:" << endl;
@@ -880,10 +960,13 @@ void Usage() {
 	cout << "   -g <string>  = path to the oval directives configuration file. DEFAULT=\"directives.xml\"" << endl;
 	cout << "   -r <string>  = save results to the specified XML file. DEFAULT=\"results.xml\"" << endl;
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
-	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << "results_to_html.xsl\"" << endl;
+	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << DEFAULT_RESULTS_XFORM_FILENAME<<'\"' << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
+	cout << "   -b           = verify XML output files w.r.t. both XML-Schema and Schematron." << endl;
+	cout << "   -j           = path to schematron xsl for system characteristics files. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME << '\"' << endl;
+	cout << "   -k           = path to schematron xsl for results files. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_RESULTS_SCHEMATRON_FILENAME << '\"' << endl;
 	cout << "\n";
-	
+
 	cout << "Other Options:" << endl;
 	cout << "   -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4)" << endl;
 	cout << "   -p           = print all information and error messages." << endl;
@@ -892,18 +975,49 @@ void Usage() {
 	cout << endl;
 }
 
+namespace {
+
 #ifdef WIN32
-void CheckWow64() {
-	BOOL isWow64;
-	BOOL result = IsWow64Process(GetCurrentProcess(), &isWow64);
+	void CheckWow64() {
+		BOOL isWow64;
+		BOOL result = IsWow64Process(GetCurrentProcess(), &isWow64);
 
-	if (!result) {
-		Log::Info("Couldn't determine Wow64 status: " + WindowsCommon::GetErrorMessage(GetLastError()));
-		return;
+		if (!result) {
+			Log::Info("Couldn't determine Wow64 status: " + WindowsCommon::GetErrorMessage(GetLastError()));
+			return;
+		}
+
+		if (isWow64)
+			Log::Info("Warning: you are running the interpreter as a 32-bit process on 64-bit Windows.  "
+						"Be aware that you may get different results as compared to a 64-bit process.");
 	}
-
-	if (isWow64)
-		Log::Info("Warning: you are running the interpreter as a 32-bit process on 64-bit Windows.  "
-					"Be aware that you may get different results as compared to a 64-bit process.");
-}
 #endif
+
+	bool SchematronValidate(const string &fileToValidate, const string &schematronXSLFile) {
+		string logMessage = " ** running Schematron validation on " + fileToValidate + "\n";
+		cout << logMessage;
+		Log::UnalteredMessage(logMessage);
+
+		string result = XslCommon::ApplyXSL(fileToValidate, schematronXSLFile);
+		// strip the xml declaration
+		if(result.compare("") != 0) {
+			size_t pos = result.rfind(">");
+			if(pos != string::npos) {
+				result = result.substr(pos+1, result.length()-pos);
+			}
+		}
+		if(!result.empty()) {
+			string errorMessage = "ERROR: Schematron validation failed with the following errors:\n";
+			errorMessage.append(result);
+
+			cerr << errorMessage;
+			Log::Fatal(errorMessage);
+			return false;
+		} else {
+			logMessage = "     - Schematron validation succeeded\n";
+			cout << logMessage;
+			Log::UnalteredMessage(logMessage);
+			return true;
+		}
+	}
+}
