@@ -36,102 +36,35 @@
 #endif
 
 #include <string>
-#include "Common.h" 
 
 //	required xerces	includes
-#include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMBuilder.hpp>
-#include <xercesc/dom/DOMException.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>
 #include <xercesc/dom/DOMError.hpp>
-#include <xercesc/dom/DOMLocator.hpp>
-#include <xercesc/dom/DOMNamedNodeMap.hpp>
-
-// for dom Writer
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMImplementationLS.hpp>
-#include <xercesc/dom/DOMWriter.hpp>
-#include <xercesc/framework/StdOutFormatTarget.hpp>
-#include <xercesc/framework/LocalFileFormatTarget.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/util/XMLUni.hpp>
 
 // for entity resolver
 #include <xercesc/dom/DOMEntityResolver.hpp>
 #include <xercesc/dom/DOMInputSource.hpp>
-#include <xercesc/framework/LocalFileInputSource.hpp>
-#include <xercesc/framework/Wrapper4InputSource.hpp>
 
-
-XERCES_CPP_NAMESPACE_USE
-
+#include "Exception.h"
 
 /** 
 	This class extends the default DOMEntityResolver and implments the resolve entity method 
 	to support 
 */
-class DataDirResolver : public DOMEntityResolver {
+class DataDirResolver : public xercesc::DOMEntityResolver {
 public:
 	/**
      *     
 	*/
-	DOMInputSource *resolveEntity (const XMLCh *const publicId, const XMLCh *const systemId, const XMLCh *const baseURI);
+	xercesc::DOMInputSource *resolveEntity (const XMLCh *const publicId, const XMLCh *const systemId, const XMLCh *const baseURI);
 };
-
-/**
-	This class uses xerces to parse, create and write XML documents.
-	The XmlProcessor is a singleton. To get and instance of this class call the static Instance method.
-*/
-class XmlProcessor {
-public:
-
-	/** Clean up after the DOMBuilder. */
-	~XmlProcessor();
-
-	/** Static instance method is implemented to keep this calss as a singlton. 
-		This method should be used to get an instance of this class.
-	*/
-	static XmlProcessor* Instance();
-	
-	/** Create a new DOMDocument with the specified root element. */ 
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	CreateDOMDocument(std::string root);
-	/** Create a new DOMDocument with the specified qualifiedName and default namespace. */ 
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	CreateDOMDocumentNS(std::string namespaceURI, std::string qualifiedName);
-	/** Parse the specified file and return a DOMDocument. 
-		'filePathIn' should be the complete path to the desired file.
-		When validating and xml file the schema must be in the same directory as the file.  
-	*/
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*	ParseFile(std::string);
-	/** Write the DOMDocument to the specified XML file.
-		filePath is the filename and path to the file that will be written
-	*/
-	void WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, std::string filePath,	bool writeToFile=true);
-
-private:
-	/** Init the XmlProcessor
-		Throws an exception if there is an error.
-	*/
-	XmlProcessor();
-
-	static XmlProcessor* instance;
-	
-	DOMBuilder *parser;
-};
-
-/** 
-	This class represents an Exception that occured while running the XmlProcessor.
-*/
-class XmlProcessorException	: public Exception {
-public:
-	XmlProcessorException(std::string errMsgIn =	"",	int	severity = ERROR_FATAL);
-	~XmlProcessorException();
-};
-
 
 /**
 	Simple error handler deriviative to	install	on parser.
 */
-class XmlProcessorErrorHandler : public	DOMErrorHandler {
+class XmlProcessorErrorHandler : public	xercesc::DOMErrorHandler {
 public:
 	XmlProcessorErrorHandler();
 	~XmlProcessorErrorHandler();
@@ -139,7 +72,7 @@ public:
 	bool getSawErrors()	const;
 	std::string getErrorMessages() const;
 
-	bool handleError(const DOMError& domError);
+	bool handleError(const xercesc::DOMError& domError);
 	void resetErrors();
 
 private:
@@ -159,5 +92,87 @@ private:
 	*/
 	std::string	errorMessages;
 };
+
+/**
+	This class uses xerces to parse, create and write XML documents.
+	The XmlProcessor is a singleton. To get and instance of this class call the static Instance method.
+*/
+class XmlProcessor {
+public:
+
+	/** Clean up after the DOMBuilder. */
+	~XmlProcessor();
+
+	/** Static instance method is implemented to keep this calss as a singlton. 
+		This method should be used to get an instance of this class.
+	*/
+	static XmlProcessor* Instance();
+	
+	/** Create a new DOMDocument with the specified root element. */ 
+	xercesc::DOMDocument*	CreateDOMDocument(std::string root);
+	/** Create a new DOMDocument with the specified qualifiedName and default namespace. */ 
+	xercesc::DOMDocument*	CreateDOMDocumentNS(std::string namespaceURI, std::string qualifiedName);
+	/** 
+	 * Parse the specified file and return a DOMDocument.  When validating an 
+	 * xml file, the schema must be in the same directory as the file.  
+	 * \param 'filePathIn' the complete path to the desired file.
+	 * \param callerAdopts set to true if you will release the document yourself.
+	 *   Otherwise, the parser owns it and will delete it when the parser is released.
+	 * \return the DOM document
+	 */
+	xercesc::DOMDocument*	ParseFile(std::string filePathIn, bool callerAdopts = false);
+	/** Write the DOMDocument to the specified XML file.
+		filePath is the filename and path to the file that will be written
+	*/
+	void WriteDOMDocument(xercesc::DOMDocument* doc, std::string filePath,	bool writeToFile=true);
+
+private:
+	/** Init the XmlProcessor
+		Throws an exception if there is an error.
+	*/
+	XmlProcessor();
+
+	/**
+	 * Has the common code for creating an XML parser.
+	 */
+	xercesc::DOMBuilder *makeParser();
+
+	static XmlProcessor* instance;
+
+	/**
+	 * This parser has user-adoption switched on, so it never
+	 * owns the documents it builds.  Users must manually destroy
+	 * those documents.
+	 */
+	xercesc::DOMBuilder *parserWithCallerAdoption;
+
+	/**
+	 * This parser doesn't have user-adoption switched on, so it
+	 * owns the documents it builds and will destroy them
+	 * automatically.  Two different parsers are used, because
+	 * from looking at xerces' source, it looked like switching the
+	 * user adoption feature on and off in the same parser won't
+	 * work.  There is a flag, where once it's switched, it didn't
+	 * appear to ever be switched off.  So to make sure this isn't
+	 * leaking memory, I have created separate parsers.
+	 */
+	xercesc::DOMBuilder *parser;
+
+	/** The entity resolver for both parsers. */
+	DataDirResolver resolver;
+	/** The error handler for both parsers. */
+	XmlProcessorErrorHandler errHandler;
+};
+
+/** 
+	This class represents an Exception that occured while running the XmlProcessor.
+*/
+class XmlProcessorException	: public Exception {
+public:
+	XmlProcessorException(std::string errMsgIn =	"",	int	severity = ERROR_FATAL);
+	~XmlProcessorException();
+};
+
+
 
 #endif

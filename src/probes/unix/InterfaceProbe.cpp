@@ -28,17 +28,42 @@
 //
 //****************************************************************************************//
 
+// <net/if.h> doesn't compile without including <sys/socket.h>
+// first, on MacOS.
+#ifdef DARWIN
+#  include <sys/socket.h>
+#endif
+
+#include <net/if.h>
+#include <arpa/inet.h>
+#include <list>
+
+#include <Common.h>
+#include <Log.h>
+#include <unix/NetworkInterfaces.h>
+
 #include "InterfaceProbe.h"
 
 using namespace std;
+using NetworkInterfaces::Interface;
 
-using namespace std;
+namespace {
+	/**
+	 * Returns the OVAL enumerator value for the given interface type.
+	 */
+	string InterfaceType2String(NetworkInterfaces::Interface::LinkType linkType);
+
+	/**
+	 * Checks the given flag bits and creates item entities depending on how
+	 * they're set.
+	 */
+	ItemEntityVector ProcessFlags(short flags);
+}
 
 // the static fields
 InterfaceProbe* InterfaceProbe::instance = NULL;
 
 InterfaceProbe::InterfaceProbe() {
-	this->SetupHardwareTypes();
 }
 
 InterfaceProbe::~InterfaceProbe() {
@@ -62,70 +87,13 @@ ItemVector* InterfaceProbe::CollectItems(Object* object) {
 		throw ProbeException ( "Error: Invalid data type specified on name. Found: " + OvalEnum::DatatypeToString ( name->GetDatatype() ) );
 	}
 
-	// Check operation - only allow  equals, not equals and pattern match
-	if ( name->GetOperation() != OvalEnum::OPERATION_EQUALS && name->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && name->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
-		throw ProbeException ( "Error: Invalid operation specified on name. Found: " + OvalEnum::OperationToString ( name->GetOperation() ) );
-	}
+	ItemVector *collectedItems = new ItemVector();	
 
-	ItemVector *collectedItems = new ItemVector();
-	
-	if ( name->GetVarRef() == NULL ) {
-		if ( name->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
-			Item* aInterface = this->GetInterface ( name->GetValue() );
-
-			if ( aInterface != NULL ) {
-				Item* temp = new Item ( *aInterface );
-				collectedItems->push_back ( temp );
-			} else {
-				aInterface = this->CreateItem();
-				aInterface->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-				aInterface->AppendElement ( new ItemEntity ( "name" , name->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
-				collectedItems->push_back ( aInterface );
-			}
-
-		} else {
-			ItemVector::iterator it1;
-			ItemEntityVector::iterator it2;
-
-			// Loop through all interfaces if they are a regex match on netname create item an return it
-			for ( it1 = this->interfaces.begin() ; it1 != this->interfaces.end() ; it1++ ) {
-				ItemEntityVector* nameVector = ( *it1 )->GetElementsByName ( "name" );
-
-				for ( it2 = nameVector->begin() ; it2 != nameVector->end() ; it2++ ) {
-					string intfName = ( *it2 )->GetValue();
-
-					if ( name->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-						if ( name->GetValue().compare ( intfName ) != 0 ) {
-							Item* temp = new Item ( **it1 );
-							collectedItems->push_back ( temp );
-						}
-
-					} else {
-						if ( this->myMatcher->IsMatch ( name->GetValue().c_str() , intfName.c_str() ) ) {
-							Item* temp = new Item ( **it1 );
-							collectedItems->push_back ( temp );
-						}
-					}
-				}
-			}
-		}
-
-	} else {
-		// Loop through all shared interfaces on the system
-		// Only keep the shared interfaces that match operation and value and var check
-		ItemVector::iterator it1;
-		ItemEntityVector::iterator it2;
-
-		for ( it1 = this->interfaces.begin() ; it1 != this->interfaces.end() ; it1++ ) {
-			ItemEntityVector* nameVector = ( *it1 )->GetElementsByName ( "name" );
-
-			for ( it2 = nameVector->begin() ; it2 != nameVector->end() ; it2++ ) {
-				if ( name->Analyze ( *it2 ) == OvalEnum::RESULT_TRUE ) {
-					Item* temp = new Item ( **it1 );
-					collectedItems->push_back ( temp );
-				}
-			}
-		}
+	for (ItemVector::iterator iter = this->interfaces.begin();
+		 iter != this->interfaces.end();
+		 ++iter) {
+		if (object->Analyze(*iter))
+			collectedItems->push_back(new Item(**iter));
 	}
 
 	return collectedItems;
@@ -163,584 +131,129 @@ AbsProbe* InterfaceProbe::Instance() {
 	return InterfaceProbe::instance;
 }
 
-Item* InterfaceProbe::GetInterface(const string &name) {
-	for(ItemVector::iterator iter = this->interfaces.begin();
-		iter != this->interfaces.end();
-		++iter) {
-
-		ItemEntity *entity = (*iter)->GetElementByName("name");
-
-		// Item::GetElementByName() doesn't ever return NULL.  It
-		// returns a default-constructed ItemEntity if no element
-		// with the given name was found.  So I will just
-		// check for an empty name instead...
-		if (entity->GetName().empty())
-			throw ProbeException("Encountered interface_item without a name entity!");
-
-		if (entity->GetValue() == name)
-			return *iter;
-	}
-
-	return NULL;
-}
-
-#ifdef DARWIN
-void InterfaceProbe::GetAllInterfaces(){
-
-  int socketfd, prev_length, length, addr_length, mib[6], mac_length;
-  char *ptr, *macbuf, *i, *mac;
-  unsigned char *macptr = NULL;
-  struct ifconf ifc;
-  struct ifreq *ifr = NULL;
-  struct sockaddr_in *sinptr = NULL;
-  struct if_msghdr *ifm = NULL;
-  struct sockaddr_dl *sdl = NULL;
-  Item *item = NULL;
-  string typeStr = "";
-  string macStr = "";
-  string ipStr = "";
-  string broadStr = "";
-  string netStr = "";
-  ItemEntityVector allFlags;
-
-  ptr = NULL;
-  macbuf = NULL;
-  i = NULL;
-  mac = NULL;
-  prev_length = 0;
-  length = 10 * sizeof(struct ifreq);
-
-  if ( (socketfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
-    throw ProbeException("Error: failed to open socket");
-  }
-  while(true){
-    ifc.ifc_buf= (char*)malloc(length);
-    ifc.ifc_len = length;
-    if ( ifc.ifc_buf != NULL ){
-      if ( ioctl(socketfd, SIOCGIFCONF, &ifc) < 0 ){
-	if ( ifc.ifc_buf != NULL ){
-	  free(ifc.ifc_buf);
-	  ifc.ifc_buf = NULL;
-	}
-	throw ProbeException("Error: SIOCGIFCONF ioctl error");
-      }else{
-	if ( ifc.ifc_len == prev_length){
-	  ifc.ifc_len = length;
-	  break;
-	}else{
-	  prev_length = ifc.ifc_len;
-	  length = length + 10 * sizeof(struct ifreq);
-	  free(ifc.ifc_buf);
-	}
-      }
-    }else{
-      throw ProbeException("Error: couldn't allocate memory");
-    }
-  }
-
-  if (ioctl(socketfd, SIOCGIFCONF, &ifc) < 0){
-    throw ProbeException("Error: SIOCGIFCONF ioctl error");
-  }
-
-  for (ptr = ifc.ifc_buf; ptr <ifc.ifc_buf + ifc.ifc_len; ) {
-    ifr = (struct ifreq *) ptr;
-    addr_length = sizeof(struct sockaddr);
-
-    if (ifr->ifr_addr.sa_len > addr_length){
-      addr_length = ifr->ifr_addr.sa_len;
-    }
-
-    item = this->CreateItem();
-    item->SetStatus(OvalEnum::STATUS_EXISTS);
-    string errorMsgPrefix = string("Error querying network interface ")+ifr->ifr_name+": ";
-    item->AppendElement(new ItemEntity("name", ifr->ifr_name, OvalEnum::DATATYPE_STRING, true));
-
-    ptr += sizeof(ifr->ifr_name) + addr_length;
-   
-    if ( ifr->ifr_addr.sa_family == AF_INET ){
-      if ( ioctl(socketfd,SIOCGIFFLAGS,ifr) < 0 ){
-	allFlags.push_back(new ItemEntity("flags", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-      }else{
-	allFlags = this->ProcessFlags(ifr->ifr_flags);	
-      }
-
-      mac_length = 0;
-      
-      mib[0] = CTL_NET;
-      mib[1] = AF_ROUTE;
-      mib[2] = 0;
-      mib[3] = AF_LINK;
-      mib[4] = NET_RT_IFLIST;
-      mib[5] = if_nametoindex(ifr->ifr_name);
-      
-      if (mib[5] == 0){
-	throw ProbeException("Error: if_nametoindex error");
-      }
-      
-      if (sysctl(mib, 6, NULL, (size_t*)&mac_length, NULL, 0) < 0){
-	throw ProbeException("Error: sysctl error - retrieving data length");
-      }
-      
-      macbuf = (char*) malloc(mac_length);
-      
-      if ( macbuf == NULL ){
-	throw ProbeException("Error: couldn't allocate memory");
-      }
-      
-      if (sysctl(mib, 6, macbuf, (size_t*)&mac_length, NULL, 0) < 0){
-	throw ProbeException("Error: sysctl error - retrieving data");
-      }
-      
-      ifm = (struct if_msghdr *)macbuf;
-      sdl = (struct sockaddr_dl *)(ifm + 1);
-      
-      typeStr = this->GetHardwareTypesFromIft(sdl->sdl_type);
-      item->AppendElement(new ItemEntity("type",typeStr,OvalEnum::DATATYPE_STRING,false,(typeStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-     
-      macptr = (unsigned char *)LLADDR(sdl);
-      mac = (char*)malloc(sizeof(char)*128);
-      
-      if ( mac == NULL ){
-	throw ProbeException("Error: couldn't allocate memory");
-      }
-      
-      memset(mac, 0, 128);
-      sprintf(mac,"%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", macptr[0], macptr[1], macptr[2], macptr[3], macptr[4], macptr[5]);
-      
-      macStr = mac;
-      item->AppendElement(new ItemEntity("hardware_addr",macStr,OvalEnum::DATATYPE_STRING,false,(macStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-           
-      sinptr = (struct sockaddr_in *) &ifr->ifr_addr;
-      ipStr = inet_ntoa(sinptr->sin_addr);
-      item->AppendElement(new ItemEntity("inet_addr",ipStr,OvalEnum::DATATYPE_STRING,false,(ipStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-
-      if ( ioctl(socketfd, SIOCGIFBRDADDR, ifr) < 0) {
-	item->AppendElement(new ItemEntity("broadcast_addr", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-        item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFBRDADDR: " + strerror(errno),OvalEnum::LEVEL_ERROR));
-        item->SetStatus(OvalEnum::STATUS_ERROR);
-      } else {
-	sinptr = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-        broadStr = inet_ntoa(sinptr->sin_addr);
-        item->AppendElement(new ItemEntity("broadcast_addr", broadStr, OvalEnum::DATATYPE_STRING, false, (broadStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-      }
-      
-      if ( ioctl(socketfd, SIOCGIFNETMASK, ifr) < 0) {
-        item->AppendElement(new ItemEntity("netmask_addr", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-        item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFNETMASK: " + strerror(errno),OvalEnum::LEVEL_ERROR));
-        item->SetStatus(OvalEnum::STATUS_ERROR);
-      } else {
-        sinptr = (struct sockaddr_in *) &ifr->ifr_addr;
-	netStr = inet_ntoa(sinptr->sin_addr);
-        item->AppendElement(new ItemEntity("netmask_addr", netStr, OvalEnum::DATATYPE_STRING, false, (netStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-      }
-      
-      for(ItemEntityVector::iterator it = allFlags.begin(); it != allFlags.end(); it++){
-	item->AppendElement(*it);
-      }
-
-      this->interfaces.push_back(item);
-      
-      free(macbuf);
-      free(mac);
-    }
-  }
-  free(ifc.ifc_buf);
-}
-
-string InterfaceProbe::GetHardwareTypesFromIft(unsigned char type){
-
-string hwTypeStr ="";
-
-switch (type) {
-  case IFT_ETHER:
-    hwTypeStr = "ARPHDR_ETHER";
-    break;
-  case IFT_FDDI:
-    hwTypeStr = "ARPHDR_FDDI";
-    break;
-  case IFT_PPP:
-    hwTypeStr = "ARPHDR_PPP";
-    break;
-  case IFT_SLIP:
-    hwTypeStr = "ARPHDR_SLIP";
-    break;
-  case IFT_LOOP:
-    hwTypeStr = "ARPHDR_LOOPBACK";
-    break;
-  case IFT_P10:
-  case IFT_P80:
-    hwTypeStr = "ARPHDR_PRONET";
-    break;
-  case IFT_OTHER:
-    hwTypeStr = "ARPHDR_VOID";
-    break;
-  default:
-    break;
-  }
- return hwTypeStr;
-}
-
-#else
 void InterfaceProbe::GetAllInterfaces() {
-	StringVector interfaceNames = GetInterfaceNames();
 
-	struct ifreq req;
-#ifdef SUNOS
-	// gotta get MAC address via an ARP ioctl on solaris
-	struct arpreq arp;
-#endif
-	int result;
-
-	short flags = 0;           // the type of struct ifreq.ifr_flags
-	struct sockaddr hwAddr;    // the type of struct ifreq.ifr_hwaddr (or arp.arp_ha on solaris)
-	struct sockaddr ipAddr;    // the type of struct ifreq.ifr_addr
-	struct sockaddr broadAddr; // the type of struct ifreq.ifr_broadaddr
-	struct sockaddr netmask;   // the type of struct ifreq.ifr_netmask
-
-	ItemEntity *nameEntity, *hwTypeEntity, *hwAddrEntity,
-		*ipAddrEntity, *broadAddrEntity, *netmaskEntity;
-	ItemEntityVector flagEntities;
-
-	// All the ioctl() calls we make require a real socket to work off of.
-	int s = socket(AF_INET, SOCK_DGRAM, 0);
-	if (s<0)
-		throw ProbeException(string("Can't create socket: ")+strerror(errno));
-
-	for (StringVector::iterator iter = interfaceNames.begin();
-		 iter != interfaceNames.end();
+	list<Interface> allInterfaces = NetworkInterfaces::GetAllInterfaces();
+	for (list<Interface>::iterator iter = allInterfaces.begin();
+		 iter != allInterfaces.end();
 		 ++iter) {
 
-		nameEntity = hwTypeEntity = hwAddrEntity = ipAddrEntity = broadAddrEntity =
-			netmaskEntity = NULL;
+		string type = InterfaceType2String(iter->GetType());
 
-		Log::Debug(string("Querying interface ") + (*iter) + "...");
-
-		// error messages below will have this common prefix.
-		string errorMsgPrefix = string("Error querying network interface ")+*iter+": ";
-
-		// must create the Item here so it can accumulate error messages as we do the probing.
 		Item *item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_EXISTS); // will be reset on error
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->AppendElement(new ItemEntity("name", iter->GetName(), 
+										   OvalEnum::DATATYPE_STRING, true));
+		item->AppendElement(new ItemEntity("type", type));
 
-		// We already have the name... so no further work required for this entity
-		nameEntity = new ItemEntity("name", *iter, OvalEnum::DATATYPE_STRING, true);
+		if (iter->GetType() == Interface::ETHERNET)
+			item->AppendElement(new ItemEntity("hardware_addr", iter->GetHwAddr()));
+		else
+			item->AppendElement(new ItemEntity("hardware_addr", "", 
+											   OvalEnum::DATATYPE_STRING, false,
+											   OvalEnum::STATUS_DOES_NOT_EXIST));
 
-		// the ifconfig source copies the interface name in
-		// before every ioctl() call.
+		item->AppendElement(new ItemEntity("inet_addr", inet_ntoa(iter->GetIPAddr())));
 
-		// get interface flags
-		strcpy(req.ifr_name, iter->c_str());
-		result = ioctl(s, SIOCGIFFLAGS, &req);
-		if (result >= 0) {
-			flags = req.ifr_flags;
-			flagEntities = this->ProcessFlags(flags);
-		} else {
-			ItemEntity *tmpEntity = new ItemEntity("flag", "", OvalEnum::DATATYPE_STRING,
-												   false, OvalEnum::STATUS_ERROR);
-			flagEntities.push_back(tmpEntity);
-			item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFFLAGS: " + strerror(errno),
-												OvalEnum::LEVEL_ERROR));
-			item->SetStatus(OvalEnum::STATUS_ERROR);
-		}
+		// if not broadcasting, there is no broadcast address.
+		if (iter->GetFlags() & IFF_BROADCAST)
+			item->AppendElement(new ItemEntity("broadcast_addr", 
+											   inet_ntoa(iter->GetBroadAddr())));
+		else
+			item->AppendElement(new ItemEntity("broadcast_addr", "", 
+											   OvalEnum::DATATYPE_STRING, false,
+											   OvalEnum::STATUS_DOES_NOT_EXIST));
 
-		// The following requests require an ipv4 interface.  If the initial
-		// ioctl fails, we won't throw an exception; we'll just leave off
-		// the applicable entities.
+		item->AppendElement(new ItemEntity("netmask", inet_ntoa(iter->GetNetmask())));
 
-		// see if we can get ipv4 address
-		strcpy(req.ifr_name, iter->c_str());
-		req.ifr_addr.sa_family = AF_INET;
-		result = ioctl(s, SIOCGIFADDR, &req);
-		if (result >= 0) {
-
-			struct sockaddr_in *addrPtr;
-
-			ipAddr = req.ifr_addr;
-			addrPtr = (struct sockaddr_in *)&ipAddr;
-			ipAddrEntity = new ItemEntity("inet_addr", inet_ntoa(addrPtr->sin_addr));
-
-			// get broadcast address, if valid
-			if (flags & IFF_BROADCAST) {
-				strcpy(req.ifr_name, iter->c_str());
-				result = ioctl(s, SIOCGIFBRDADDR, &req);
-
-				if (result >= 0) {
-					broadAddr = req.ifr_broadaddr;
-					addrPtr = (struct sockaddr_in *)&broadAddr;
-					broadAddrEntity = new ItemEntity("broadcast_addr", inet_ntoa(addrPtr->sin_addr));
-				} else {
-					broadAddrEntity = new ItemEntity("broadcast_addr", "", OvalEnum::DATATYPE_STRING,
-													 false, OvalEnum::STATUS_ERROR);
-					item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFBRDADDR: " + strerror(errno),
-														OvalEnum::LEVEL_ERROR));
-					item->SetStatus(OvalEnum::STATUS_ERROR);
-				}
-			}
-
-			// get netmask
-			strcpy(req.ifr_name, iter->c_str());
-			result = ioctl(s, SIOCGIFNETMASK, &req);
-			if (result >= 0) {
-				// solaris doesn't have ifr_netmask... ifr_addr yields
-				// the same thing and works on both solaris and linux, so I will use
-				// that instead.
-				//netmask = req.ifr_netmask;
-				netmask = req.ifr_addr;
-				addrPtr = (struct sockaddr_in *)&netmask;
-				netmaskEntity = new ItemEntity("netmask", inet_ntoa(addrPtr->sin_addr));
-			} else {
-				netmaskEntity = new ItemEntity("netmask", "", OvalEnum::DATATYPE_STRING,
-											   false, OvalEnum::STATUS_ERROR);
-				item->AppendMessage(new OvalMessage(errorMsgPrefix + "ioctl SIOCGIFNETMASK error: "+strerror(errno),
-													OvalEnum::LEVEL_ERROR));
-				item->SetStatus(OvalEnum::STATUS_ERROR);
-			}
-		}
-
-		// hardware address/type
-#ifdef SUNOS
-		// on solaris, this requires having obtained the interface address first.
-		memset(&arp, 0, sizeof(arp));
-		arp.arp_pa = ipAddr;
-		result = ioctl(s, SIOCGARP, &arp);
-#else
-		strcpy(req.ifr_name, iter->c_str());
-		result = ioctl(s, SIOCGIFHWADDR, &req);
-#endif
-		if (result >= 0) {
-#ifdef SUNOS
-			// I don't know how to get the hardware type on solaris.  (The types
-			// are defined in the if_arp header and named ARPHRD_*, so you'd think
-			// it might have something to do with the ARP ioctl(), but
-			// arp_ha.sa_family doesn't seem to be filled out.)  So if the ioctl
-			// succeeds at all, I will assume that the hw type is ethernet...
-			// Is there a better way of doing this??
-			hwAddr = arp.arp_ha;
-			sa_family_t hwType = ARPHRD_ETHER;
-#else
-			hwAddr = req.ifr_hwaddr;
-			sa_family_t hwType = hwAddr.sa_family;
-#endif
-
-			string hwTypeStr = this->HardwareTypeToString(hwType);
-			
-			if (!hwTypeStr.empty())
-				hwTypeEntity = new ItemEntity("type", hwTypeStr);
-
-			if (hwType == ARPHRD_ETHER) {
-				char *hwaddr_data = hwAddr.sa_data;
-
-				// enough space for a mac address (6 2-char bytes, 5 separating colons and a null char)
-				char macAddress[20];
-
-				sprintf(macAddress, "%02X-%02X-%02X-%02X-%02X-%02X",
-						hwaddr_data[0] & 0xFF, hwaddr_data[1] & 0xFF, hwaddr_data[2] & 0xFF,
-						hwaddr_data[3] & 0xFF, hwaddr_data[4] & 0xFF, hwaddr_data[5] & 0xFF);
-				hwAddrEntity = new ItemEntity("hardware_addr", macAddress);
-			}
-
-		} else if (!(flags & IFF_LOOPBACK)) {
-			// on solaris I don't know how to get a hardware type, and the SIOCGARP
-			// ioctl fails on the loopback... so a special check here to avoid having
-			// errors on the loopback item.
-			hwAddrEntity = new ItemEntity("hardware_addr", "", OvalEnum::DATATYPE_STRING,
-										  false, OvalEnum::STATUS_ERROR);
-			item->AppendMessage(new OvalMessage(errorMsgPrefix +
-#ifdef SUNOS
-												"ioctl SIOCGARP: " +
-#else
-												"ioctl SIOCGIFHWADDR: " +
-#endif
-												strerror(errno),
-												OvalEnum::LEVEL_ERROR));
-			item->SetStatus(OvalEnum::STATUS_ERROR);
-		}
-
-		// Now, add all the entities we made to our item, in the proper order
-		// according to the schema.
-
-		item->AppendElement(nameEntity);
-		if (hwTypeEntity != NULL)
-			item->AppendElement(hwTypeEntity);
-		if (hwAddrEntity != NULL)
-			item->AppendElement(hwAddrEntity);
-		if (ipAddrEntity != NULL)
-			item->AppendElement(ipAddrEntity);
-		if (broadAddrEntity != NULL)
-			item->AppendElement(broadAddrEntity);
-		if (netmaskEntity != NULL)
-			item->AppendElement(netmaskEntity);
-
-		for (ItemEntityVector::iterator iter = flagEntities.begin();
-			 iter != flagEntities.end();
-			 ++iter)
-			item->AppendElement(*iter);
+		ItemEntityVector flagEntities = ProcessFlags(iter->GetFlags());
+		for (ItemEntityVector::iterator flagIter = flagEntities.begin();
+			 flagIter != flagEntities.end();
+			 ++flagIter)
+			item->AppendElement(*flagIter);
 
 		this->interfaces.push_back(item);
 	}
-
-	close(s);
 }
 
-StringVector InterfaceProbe::GetInterfaceNames() {
-
-	// This technique was taken from the implementation of the linux
-	// 'ifconfig' utility.  An initial buffer is allocated for the
-	// results of an ioctl SIOCGIFCONF request and repeatedly increased
-	// in size until the ioctl request does not fill it up.  That way
-	// we know we got all the interfaces.
-
-	StringVector names;
-
-	int s = socket(AF_INET, SOCK_DGRAM, 0);
-	if (s<0)
-		throw ProbeException(strerror(errno));
-
-	struct ifconf ifc;
-	ifc.ifc_buf = NULL;
-	size_t recordsAllocated = 0; //how much I allocated (in records)
-	size_t bytesUsed; //how much did ioctl actually use (in bytes)
-	size_t recordsUsed; //how much did ioctl actually use (in records)
-	do {
-		recordsAllocated += 5;
-		ifc.ifc_len = recordsAllocated * sizeof(struct ifreq);
-#ifdef SUNOS
-		caddr_t tmpBuf = (caddr_t)realloc(ifc.ifc_buf, ifc.ifc_len);
-#else
-		__caddr_t tmpBuf = (__caddr_t)realloc(ifc.ifc_buf, ifc.ifc_len);
-#endif
-
-		// make sure the allocation succeeded
-		if (tmpBuf == NULL) {
-			if (ifc.ifc_buf != NULL)
-				free(ifc.ifc_buf);
-			close(s);
-			throw ProbeException(string("Unable to allocate ")+Common::ToString(ifc.ifc_len) +
-								 " bytes of memory for ioctl SIOCGIFCONF request!");
+namespace {
+	string InterfaceType2String(Interface::LinkType linkType) {
+	
+		switch (linkType) {
+		case Interface::ETHERNET:
+			return "ARPHRD_ETHER";
+		case Interface::FDDI:
+			return "ARPHRD_FDDI";
+		case Interface::PPP:
+			return "ARPHRD_PPP";
+		case Interface::SLIP:
+			return "ARPHRD_SLIP";
+		case Interface::LOOPBACK:
+			return "ARPHRD_LOOPBACK";
+		case Interface::PRONET:
+			return "ARPHRD_PRONET";
+		case Interface::UNKNOWN:
+			return "ARPHRD_VOID";
+		default:
+			Log::Debug("Unhandled interface type: " + Common::ToString(linkType));
+			return "ARPHRD_VOID";
 		}
-
-		ifc.ifc_buf = tmpBuf;
-
-		int res = ioctl(s, SIOCGIFCONF, &ifc);
-		if (res < 0) {
-			free(ifc.ifc_buf);
-			close(s);
-			throw ProbeException(string("ioctl SIOCGIFCONF error: ")+strerror(errno));
-		}
-
-		bytesUsed = ifc.ifc_len;
-		recordsUsed = bytesUsed / sizeof(struct ifreq);
-	} while(recordsUsed == recordsAllocated);
-
-	struct ifreq *reqPtr = ifc.ifc_req;
-	size_t i;
-	for (i=0; i<recordsUsed; i++) {
-
-		// From my experiments, other fields of the ifreq struct were
-		// not valid.  So ioctl SIOCGIFCONF is just used to get names.
-
-		names.push_back(reqPtr->ifr_name);
-		reqPtr++;
 	}
 
-	free(ifc.ifc_buf);
-	close(s);
+	ItemEntityVector ProcessFlags(short flags) {
+		ItemEntityVector entities;
 
-	return names;
-}
-#endif
+		if (flags & IFF_UP)
+			entities.push_back(new ItemEntity("flag", "UP"));
+		if (flags & IFF_BROADCAST)
+			entities.push_back(new ItemEntity("flag", "BROADCAST"));
+		if (flags & IFF_DEBUG)
+			entities.push_back(new ItemEntity("flag", "DEBUG"));
+		if (flags & IFF_LOOPBACK)
+			entities.push_back(new ItemEntity("flag", "LOOPBACK"));
+		if (flags & IFF_POINTOPOINT) // yes, it's really spelled like that...
+			entities.push_back(new ItemEntity("flag", "POINTOPOINT"));
+		if (flags & IFF_NOTRAILERS)
+			entities.push_back(new ItemEntity("flag", "NOTRAILERS"));
+		if (flags & IFF_RUNNING)
+			entities.push_back(new ItemEntity("flag", "RUNNING"));
+		if (flags & IFF_NOARP)
+			entities.push_back(new ItemEntity("flag", "NOARP"));
+		if (flags & IFF_PROMISC)
+			entities.push_back(new ItemEntity("flag", "PROMISC"));
 
-void InterfaceProbe::SetupHardwareTypes() {
-
-#ifdef ARPHRD_ETHER
-  this->hardwareTypeNameMap[ARPHRD_ETHER] = "ARPHRD_ETHER";
-#endif
-
-#ifdef ARPHRD_FDDI
-	this->hardwareTypeNameMap[ARPHRD_FDDI] = "ARPHRD_FDDI";
-#endif
-
-#ifdef ARPHRD_LOOPBACK
-	this->hardwareTypeNameMap[ARPHRD_LOOPBACK] = "ARPHRD_LOOPBACK";
-#endif
-
-#ifdef ARPHRD_VOID
-	this->hardwareTypeNameMap[ARPHRD_VOID] = "ARPHRD_VOID";
-#endif
-
-#ifdef ARPHRD_PPP
-	this->hardwareTypeNameMap[ARPHRD_PPP] = "ARPHRD_PPP";
-#endif
-
-#ifdef ARPHRD_SLIP
-	this->hardwareTypeNameMap[ARPHRD_SLIP] = "ARPHRD_SLIP";
-#endif
-
-#ifdef ARPHRD_PRONET
-	this->hardwareTypeNameMap[ARPHRD_PRONET] = "ARPHRD_PRONET";
-#endif
-}
-
-string InterfaceProbe::HardwareTypeToString(sa_family_t hwFamily) {
-	HardwareTypeNameMap::iterator iter = this->hardwareTypeNameMap.find(hwFamily);
-	if (iter == this->hardwareTypeNameMap.end())
-		return "";
-	return iter->second;
-}
-
-ItemEntityVector InterfaceProbe::ProcessFlags(short flags) {
-	ItemEntityVector entities;
-
-	if (flags & IFF_UP)
-		entities.push_back(new ItemEntity("flag", "UP"));
-	if (flags & IFF_BROADCAST)
-		entities.push_back(new ItemEntity("flag", "BROADCAST"));
-	if (flags & IFF_DEBUG)
-		entities.push_back(new ItemEntity("flag", "DEBUG"));
-	if (flags & IFF_LOOPBACK)
-		entities.push_back(new ItemEntity("flag", "LOOPBACK"));
-	if (flags & IFF_POINTOPOINT) // yes, it's really spelled like that...
-		entities.push_back(new ItemEntity("flag", "POINTOPOINT"));
-	if (flags & IFF_NOTRAILERS)
-		entities.push_back(new ItemEntity("flag", "NOTRAILERS"));
-	if (flags & IFF_RUNNING)
-		entities.push_back(new ItemEntity("flag", "RUNNING"));
-	if (flags & IFF_NOARP)
-		entities.push_back(new ItemEntity("flag", "NOARP"));
-	if (flags & IFF_PROMISC)
-		entities.push_back(new ItemEntity("flag", "PROMISC"));
-
-	// the header file says this one not supported... won't hurt to handle it though
-	if (flags & IFF_ALLMULTI)
-		entities.push_back(new ItemEntity("flag", "ALLMULTI"));
+		// the header file says this one not supported... won't hurt to handle it though
+		if (flags & IFF_ALLMULTI)
+			entities.push_back(new ItemEntity("flag", "ALLMULTI"));
 
 #ifdef IFF_MASTER
-	if (flags & IFF_MASTER)
-		entities.push_back(new ItemEntity("flag", "MASTER"));
+		if (flags & IFF_MASTER)
+			entities.push_back(new ItemEntity("flag", "MASTER"));
 #endif
 
 #ifdef IFF_SLAVE
-	if (flags & IFF_SLAVE)
-		entities.push_back(new ItemEntity("flag", "SLAVE"));
+		if (flags & IFF_SLAVE)
+			entities.push_back(new ItemEntity("flag", "SLAVE"));
 #endif
 
-	if (flags & IFF_MULTICAST)
-		entities.push_back(new ItemEntity("flag", "MULTICAST"));
+		if (flags & IFF_MULTICAST)
+			entities.push_back(new ItemEntity("flag", "MULTICAST"));
 
 #ifdef IFF_PORTSEL
-	if (flags & IFF_PORTSEL)
-		entities.push_back(new ItemEntity("flag", "PORTSEL"));
+		if (flags & IFF_PORTSEL)
+			entities.push_back(new ItemEntity("flag", "PORTSEL"));
 #endif
 
 #ifdef IFF_AUTOMEDIA
-	if (flags & IFF_AUTOMEDIA)
-		entities.push_back(new ItemEntity("flag", "AUTOMEDIA"));
+		if (flags & IFF_AUTOMEDIA)
+			entities.push_back(new ItemEntity("flag", "AUTOMEDIA"));
 #endif
 
 #ifdef IFF_DYNAMIC
-	if (flags & IFF_DYNAMIC)
-		entities.push_back(new ItemEntity("flag", "DYNAMIC"));
+		if (flags & IFF_DYNAMIC)
+			entities.push_back(new ItemEntity("flag", "DYNAMIC"));
 #endif
 
-	return entities;
+		return entities;
+	}
 }

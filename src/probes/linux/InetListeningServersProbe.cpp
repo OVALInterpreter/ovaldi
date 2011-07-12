@@ -307,7 +307,7 @@ StringVector* InetListeningServersProbe::GetProtocols(ObjectEntity* protocol) {
 			}
 
 		} else {
-            this->GetMatchingProtocols(".*", &allProtocols);
+            this->GetMatchingProtocols(".*", true);
 		}
 	
 		// loop through all names on the system
@@ -419,7 +419,7 @@ StringVector* InetListeningServersProbe::GetLocalAddresses(string protocolStr, O
 			}
 
 		} else {
-            this->GetMatchingLocalAddresses(protocolStr,".*", &allLocalAddresses);
+            this->GetMatchingLocalAddresses(protocolStr,".*", true);
 		}
 	
 		// loop through all names on the system
@@ -535,7 +535,7 @@ StringVector* InetListeningServersProbe::GetLocalPorts(string protocolStr, strin
 			}
 
 		} else {
-            this->GetMatchingLocalPorts(protocolStr, localAddressStr, ".*", &allLocalPorts);
+            this->GetMatchingLocalPorts(protocolStr, localAddressStr, ".*", true);
 		}
 	
 		// loop through all names on the system

@@ -97,7 +97,10 @@ public:
     /**
 	 * Gets values for the given entity.  Insulates me from having
 	 * to care whether they were defined literally or via var_ref.
-	 * The given StringVector is populated with the values.
+	 * The given StringVector is populated with the values.  This 
+	 * may only be called on non-record entities.  Entities of 
+	 * record type have two-dimensional values (e.g. like a matrix,
+	 * or list of lists), which can't be captured with a plain vector.
 	 * <p>
 	 * If the given entity uses a var_ref, the return value will be
 	 * the flag value of the referenced variable.  If the flag is not
@@ -105,9 +108,27 @@ public:
 	 * </p><p>
 	 * If the specified entity does not use a var_ref, FLAG_COMPLETE is
      * returned.
-	 *</p>
+	 * </p>
      */
     OvalEnum::Flag GetEntityValues(StringVector &values);
+
+    /**
+	 * Gets values for the given entity.  Insulates me from having
+	 * to care whether they were defined literally or via var_ref.
+	 * The given StringVector is populated with the values.  This 
+	 * may only be called on record entities.  Entities of 
+	 * record type have two-dimensional values (e.g. like a matrix,
+	 * or list of lists), which can't be captured with a plain vector.
+	 * The given map will be filled out with the field names as map
+	 * keys, and vectors of corresponding field values as the map
+	 * values.
+	 * <p>
+	 * The returned value is a combination of flag values for all fields.
+	 * For fields that don't have a var_ref, FLAG_COMPLETE is used.  The
+	 * flags are combined via OvalEnum::CombineFlags().
+	 * </p>
+     */
+	OvalEnum::Flag GetEntityValues(std::map<std::string, StringVector> &values);
 
 	/** 
 	 *	Return a vector of variable values that were used for this entity.

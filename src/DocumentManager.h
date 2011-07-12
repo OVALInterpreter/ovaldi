@@ -44,8 +44,8 @@ class DocumentManager {
 public:
 	/** Return the definition document. */
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetDefinitionDocument();
-	/** Return the systemCharacterisitcsDoc document. */
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetSystemCharacterisitcsDocument();
+	/** Return the systemCharacteristicsDoc document. */
+	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetSystemCharacteristicsDocument();
 	/** Return the resultDoc document. */
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetResultDocument();
 	/** Return the externalVariableDoc document.
@@ -67,8 +67,8 @@ public:
 
 	/** Set the definitionDoc document. */
 	static void SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
-	/** Set the systemCharacterisitcsDoc document. */
-	static void SetSystemCharacterisitcsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	/** Set the systemCharacteristicsDoc document. */
+	static void SetSystemCharacteristicsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 	/** Set the resultDoc document. */
 	static void SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 	/** Set the externalVariableDoc document. */
@@ -77,7 +77,7 @@ public:
 	static void SetDirectivesConfigDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
 
 private:
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* systemCharacterisitcsDoc;
+	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* systemCharacteristicsDoc;
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* definitionDoc;
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc;
 	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* externalVariableDoc;

@@ -73,6 +73,7 @@
 #include "PartitionProbe.h"
 #include "SelinuxSecurityContextProbe.h"
 #include "SelinuxBooleanProbe.h"
+#include "IfListenersProbe.h"
 
 class AbsProbe;
 

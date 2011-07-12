@@ -330,8 +330,8 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 		//this->SetId(Item::AssignId());
 
 		// add the namespace and schema location to the sc document
-		XmlCommon::AddXmlns(DocumentManager::GetSystemCharacterisitcsDocument(), this->GetXmlns(), this->GetXmlnsAlias());
-		XmlCommon::AddSchemaLocation(DocumentManager::GetSystemCharacterisitcsDocument(), this->GetSchemaLocation());
+		XmlCommon::AddXmlns(DocumentManager::GetSystemCharacteristicsDocument(), this->GetXmlns(), this->GetXmlnsAlias());
+		XmlCommon::AddSchemaLocation(DocumentManager::GetSystemCharacteristicsDocument(), this->GetSchemaLocation());
 
 		// Create a new item element	
 		XMLCh* name = XMLString::transcode(this->GetName().c_str());
@@ -396,7 +396,7 @@ Item* Item::GetItemById(string itemId) {
 	// if not found try to parse it.
 	if(item == NULL) {
 
-		DOMElement* systemDataElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "system_data");
+		DOMElement* systemDataElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "system_data");
 		DOMElement* itemElm = XmlCommon::FindElementByAttribute(systemDataElm, "id", itemId); // TODO - is there a faster search method to use???
 
 		if(itemElm == NULL) {

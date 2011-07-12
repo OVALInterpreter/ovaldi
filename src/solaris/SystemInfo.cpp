@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <unix/NetworkInterfaces.h>
+
 #include "SystemInfo.h"
 
 using namespace std;
@@ -57,15 +59,6 @@ SystemInfo::~SystemInfo() {
 	//	Delete all objects in the interfaces vector.
 	//
 	// -----------------------------------------------------------------------
-
-	IfData *tmp	= NULL;
-	while(interfaces.size() !=0) {
-
-		tmp = interfaces[interfaces.size()-1];
-		interfaces.pop_back();
-		delete tmp;
-		tmp = NULL;
-	}
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -101,7 +94,7 @@ void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc)
 	sysInfoNode->appendChild(interfacesElm);
 
 	// Loop through contents of the interfaces vector and write each IfData objet
-	IfDataVector::iterator iterator;
+	IntfList::iterator iterator;
 	for (iterator=interfaces.begin(); iterator!=interfaces.end(); iterator++) {
 
 		// Create a new interface element
@@ -109,13 +102,13 @@ void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc)
 		interfacesElm->appendChild(interfaceElm);
 
 		// Add the childer to the inerface element
-		tmpElm = XmlCommon::CreateElement(scDoc, "interface_name", (*iterator)->ifName);
+		tmpElm = XmlCommon::CreateElement(scDoc, "interface_name", iterator->GetName());
 		interfaceElm->appendChild(tmpElm);
-		
-		tmpElm = XmlCommon::CreateElement(scDoc, "ip_address", (*iterator)->ipAddress);
+			
+		tmpElm = XmlCommon::CreateElement(scDoc, "ip_address", inet_ntoa(iterator->GetIPAddr()));
 		interfaceElm->appendChild(tmpElm);
 
-		tmpElm = XmlCommon::CreateElement(scDoc, "mac_address", (*iterator)->macAddress);
+		tmpElm = XmlCommon::CreateElement(scDoc, "mac_address", iterator->GetHwAddr());
 		interfaceElm->appendChild(tmpElm);
 	}
 }
@@ -137,6 +130,7 @@ SystemInfo* SystemInfoCollector::CollectSystemInfo() {
 	//  Run the system info collector. Return a SystemInfo object. 
 	//
 	//------------------------------------------------------------------------------------//
+
 	SystemInfo *sysInfo = new SystemInfo();
 	SystemInfoCollector::GetOSInfo(sysInfo);
 	sysInfo->interfaces = SystemInfoCollector::GetInterfaces();
@@ -179,7 +173,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	int res = gethostname(chHostName, MAXHOSTNAMELENGTH);
 
 	if(res != 0) {
-		free(chHostName);
+		free(chHostName);	
 		sysInfo->primary_host_name = "unknown";
 		Log::Debug("Unable to get short hostname from system");
 		return;
@@ -195,12 +189,12 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	} else {
 		Log::Debug("Unable to resolve system FQDN.  Using short hostname instead.");
 	}
-	
+
 	sysInfo->primary_host_name = strHostName;
 	free(chHostName);
 }
 
-IfDataVector SystemInfoCollector::GetInterfaces() {
+IntfList SystemInfoCollector::GetInterfaces() {
 	//------------------------------------------------------------------------------------//
 	//
 	//  ABSTRACT
@@ -211,78 +205,19 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	//	Must get interface_name, ip_address, and mac_address for each interface
 	//------------------------------------------------------------------------------------//
 
-	IfDataVector interfaces;
-
-	/* here is the test sample code i found on the net
-	 */
-
-	unsigned char      *u;
-	int                sockfd, size  = 1;
-	struct ifreq       *ifr;
-	struct ifconf      ifc;
-	struct sockaddr_in sa;
-	struct arpreq arp;
-	char macStr[128];
-	
-
-	if (0 > (sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP))) {
-		throw SystemInfoException("Error: Unable to open socket.");
-	}	
-
-	ifc.ifc_len = IFRSIZE;
-	ifc.ifc_req = NULL;
-
-	do {
-		++size;
-		/* realloc buffer size until no overflow occurs  */
-
-		if (NULL == (ifc.ifc_req = (ifreq*)realloc(ifc.ifc_req, IFRSIZE))) {
-			throw SystemInfoException("Error: Unable to allocate mememory.");
-		}
-		ifc.ifc_len = IFRSIZE;
-		if (ioctl(sockfd, SIOCGIFCONF, &ifc)) {
-			free(ifc.ifc_req);
-			throw SystemInfoException("Error: ioctl SIOCFIFCONF.");
-		}
-	} while  (IFRSIZE <= ifc.ifc_len);
-
-	ifr = ifc.ifc_req;
-
-	for (;(char *) ifr < (char *) ifc.ifc_req + ifc.ifc_len; ++ifr) {
-
-		if (ifr->ifr_addr.sa_data == (ifr+1)->ifr_addr.sa_data) {
-			continue;  // duplicate, skip it
-		}
-
-		//printf("Interface:  %s\n", ifr->ifr_name);
-		//printf("IP Address: %s\n", inet_ntoa(inaddrr(ifr_addr.sa_data)));
-		IfData *tmpIfData = new IfData();
-		tmpIfData->ifName = ifr->ifr_name;
-		tmpIfData->ipAddress = inet_ntoa(inaddrr(ifr_addr.sa_data));
-
-		if (ioctl(sockfd, SIOCGIFADDR, ifr))
-			continue;
-
-		arp.arp_pa = ifr->ifr_addr;
-		if (ioctl(sockfd, SIOCGARP, &arp))
-			continue;
-
-		u = (unsigned char *) arp.arp_ha.sa_data;
-		memset(macStr, 0, sizeof(macStr));
-		if (u[0] + u[1] + u[2] + u[3] + u[4] + u[5]) {
-			sprintf(macStr, "%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", u[0], u[1], u[2], u[3], u[4], u[5]); 
-			tmpIfData->macAddress = macStr;
-		}
-
-		interfaces.push_back(tmpIfData);
+	using namespace NetworkInterfaces;
+	list<Interface> intfs = GetAllInterfaces();
+	for (list<Interface>::iterator iter = intfs.begin();
+		 iter != intfs.end();
+		 ) {
+		// only ethernet interfaces are supported for now, filter out others.
+		if (iter->GetType() == Interface::ETHERNET)
+			++iter;
+		else
+			iter = intfs.erase(iter);
 	}
 
-	close(sockfd);
-
-	/* end sample code from the net
-	 */
-
-	return interfaces;
+	return intfs;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

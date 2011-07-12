@@ -107,6 +107,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = SelinuxSecurityContextProbe::Instance();
 	} else if (objectName.compare("selinuxboolean_object") == 0) {
 		probe = SelinuxBooleanProbe::Instance();
+	} else if (objectName.compare("iflisteners_object") == 0) {
+		probe = IfListenersProbe::Instance();
 	} else {
 		Log::Info(objectName + " is not currently supported.");
 	}

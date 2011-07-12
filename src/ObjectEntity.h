@@ -64,10 +64,10 @@ public:
 	bool Equals(AbsEntity* entity);
 
 	/** Parse the XML representation of a ObjectEntity.
-	 *	@param entitiyElm a DOMElement* that represents the xml version of an entity.
+	 *	@param entityElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.
 	 */
-	void Parse(DOMElement* entitiyElm);
+	void Parse(DOMElement* entityElm);
 };
 
 #endif

@@ -42,18 +42,8 @@
 #include <rpm/rpmds.h> // added for rpm query function
 #include <popt.h> // added for rpm query function
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/termios.h>
-#include <sys/wait.h>
-
-#include <fcntl.h>
-
-#include <iostream>
 #include <string>
-#include <vector>
 
-using namespace std;
 /**
 	Data collector for rpm info test.
 */
@@ -72,45 +62,52 @@ private:
 	virtual Item* CreateItem();
 
 	/**
-		Return the name of all rpms on the system that match the specirfied Object entity's criteria.
-		All names that are return have been checked and exist on the system.
-		@param name an ObjectEntity* that represents the objects to collect on the ssytem
-		@return The mathcing names
+		Return the name of all rpms on the system that match the specified Object entity's criteria.
+		All names that are returned have been checked and exist on the system.
+		@param[in] name an ObjectEntity* that represents the objects to collect on the ssytem
+		@param[out] names The vector to which the names are appended.
+		@return The matching names
 	*/
-	StringVector* GetRPMNames(ObjectEntity* name);
+	void GetRPMNames(ObjectEntity* name, StringVector *names);
 
 	/**
 		Get all rpm names on the system that match the specified pattern.
-		@param pattern a string used that rpm names are compared against.
-		@param isRegex a bool that is indicates how system rpm names should be compared against the specified pattern
-		@return The set of matching names.
+		@param[in] pattern a string used that rpm names are compared against.
+		@param[in] isRegex a bool that is indicates how system rpm names should
+		be compared against the specified pattern
+		@param[out] names The vector to which the names are appended.
 	*/
-	StringVector* GetMatchingRPMNames(string pattern, bool isRegex);
+	void GetMatchingRPMNames(std::string pattern, bool isRegex, StringVector *names);
 
 	/**
 		Return true if the specifeid rpm exists on the system.
 		@param name a string that hold the name of the rpm to check for.
 		@result The result of checking for the specified rpm on the system.
 	*/
-	bool RPMExists(string name);
+	bool RPMExists(std::string name);
 
 	/**
 		Get all the information for the named rpm.
-		@param name a string representing the name of an rpm on the system.
-		@param items a vector of items that matched the rpm name.
+		@param[in] name a string representing the name of an rpm on the system.
+		@param[out] items The vector to which the item is appended.
 	*/
-	void GetRPMInfo(string name, ItemVector* items);
+	void GetRPMInfo(std::string name, ItemVector* items);
 
 	/**
 	   Read readErrh and readh until there is no more data to be read. Wait for the 
        child process to complete. Return a the result string with the data.
     */
-	string ParentGetSigKeyId(int readErrh, int readh, int pid);
-	void ChildGetSigKeyId(int writeErrh, int writeh, string rpmName);
-	string GetSigKeyId(string rpmName);
+	std::string ParentGetSigKeyId(int readErrh, int readh, int pid);
+	void ChildGetSigKeyId(int writeErrh, int writeh, std::string rpmName);
+	std::string GetSigKeyId(std::string rpmName);
 
-	string readHeaderBinary(Header header, int_32 tag_id);
-	char *readHeaderString(Header header, int_32 tag_id);
+	std::string readHeaderBinary(Header header, int_32 tag_id);
+
+	/**
+	 * Reads a string value from the given header.  val receives the result.  If
+	 * the header is not found, false is returned and val is not changed.
+	 */
+	bool readHeaderString(Header header, int_32 tag_id, std::string *val);
 	int_32 readHeaderInt32(Header header, int_32 tag_id);
 
 	static RPMInfoProbe *instance;

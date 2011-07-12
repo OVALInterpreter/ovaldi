@@ -9,16 +9,16 @@
 //
 //     * Redistributions of source code must retain the above copyright notice, this list
 //       of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this 
+//     * Redistributions in binary form must reproduce the above copyright notice, this
 //       list of conditions and the following disclaimer in the documentation and/or other
 //       materials provided with the distribution.
 //     * Neither the name of The MITRE Corporation nor the names of its contributors may be
-//       used to endorse or promote products derived from this software without specific 
+//       used to endorse or promote products derived from this software without specific
 //       prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
 // SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
 // OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -28,15 +28,30 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include <linux/RpmGuards.h>
+#include <VectorPtrGuard.h>
 #include "RPMInfoProbe.h"
 
+using namespace std;
+
+namespace {
+	auto_ptr<Item> CreateItem();
+}
+
 //****************************************************************************************//
-//								RPMInfoProbe Class										  //	
+//								RPMInfoProbe Class										  //
 //****************************************************************************************//
 RPMInfoProbe *RPMInfoProbe::instance = NULL;
 
 RPMInfoProbe::RPMInfoProbe() {
-
+	/* Read in the RPM config files */
+	if (rpmReadConfigFiles( (const char*) NULL, (const char*) NULL))
+		throw ProbeException("Error: (RPMInfoProbe) Could not read RPM config files, which is necessary to read the RPM database.");
 }
 
 RPMInfoProbe::~RPMInfoProbe() {
@@ -49,10 +64,10 @@ RPMInfoProbe::~RPMInfoProbe() {
 AbsProbe* RPMInfoProbe::Instance() {
 
 	// Use lazy initialization
-	if(instance == NULL) 
+	if(instance == NULL)
 		instance = new RPMInfoProbe();
 
-	return instance;	
+	return instance;
 }
 
 ItemVector* RPMInfoProbe::CollectItems(Object* object) {
@@ -69,13 +84,14 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 		throw ProbeException("Error: invalid operation specified on name. Found: " + OvalEnum::OperationToString(name->GetOperation()));
 	}
 
-	ItemVector *collectedItems = new ItemVector();
+	VectorPtrGuard<Item> collectedItems;
 
-	StringVector* names = this->GetRPMNames(name);
-	if(names->size() > 0) {
+	StringVector names;
+	this->GetRPMNames(name, &names);
+	if(!names.empty()) {
 		StringVector::iterator iterator;
-		for(iterator = names->begin(); iterator != names->end(); iterator++) {		
-			this->GetRPMInfo((*iterator), collectedItems);
+		for(iterator = names.begin(); iterator != names.end(); iterator++) {
+			this->GetRPMInfo((*iterator), collectedItems.get());
 		}
 	} else {
 
@@ -83,121 +99,99 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 
 			if(name->GetVarRef() == NULL) {
 
-				Item* item = this->CreateItem();
+				auto_ptr<Item> item = ::CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("name",  name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-				collectedItems->push_back(item);
+				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				collectedItems->push_back(item.release());
 
 			} else {
 
 				VariableValueVector::iterator iterator;
 				for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
 
-					Item* item = this->CreateItem();
+					auto_ptr<Item> item = ::CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("name",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					collectedItems->push_back(item);
+					item->AppendElement(new ItemEntity("name", (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					collectedItems->push_back(item.release());
 				}
 			}
 		}
 	}
-	names->clear();
-	delete names;
 
-	return collectedItems;
-}  
+	return collectedItems.release();
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+// Not used.  I want to return an auto_ptr to prevent memory leaks, and I can't
+// change this method's return type.
 Item* RPMInfoProbe::CreateItem() {
-	// -----------------------------------------------------------------------
-	//
-	//  ABSTRACT
-	//
-	//  Return a new Item created for storing file information
-	//
-	// -----------------------------------------------------------------------
-
-	Item* item = new Item(0, 
-						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux", 
-						"linux-sc", 
-						"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux linux-system-characteristics-schema.xsd", 
-						OvalEnum::STATUS_ERROR, 
-						"rpminfo_item");
-
-	return item;
+	return NULL;
 }
 
-StringVector* RPMInfoProbe::GetRPMNames(ObjectEntity* name) {
+void RPMInfoProbe::GetRPMNames(ObjectEntity* name, StringVector *names) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
 	//
-	//  Get the set of all rpm names on the system taht match the object
+	//  Get the set of all rpm names on the system that match the object
 	//
 	// -----------------------------------------------------------------------
-	StringVector* names = NULL;
 
 	// does this name use variables?
 	if(name->GetVarRef() == NULL) {
-		
+
 		// proceed based on operation
 		if(name->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			names = new StringVector();
-			// if the name exists add it to the list 
+			// if the name exists add it to the list
 			if(this->RPMExists(name->GetValue())) {
 				names->push_back(name->GetValue());
 			}
 
 		} else if(name->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			
-			names = this->GetMatchingRPMNames(name->GetValue(), false);
+
+			this->GetMatchingRPMNames(name->GetValue(), false, names);
 
 		} else if(name->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			names = this->GetMatchingRPMNames(name->GetValue(), true);
-		}		
+			this->GetMatchingRPMNames(name->GetValue(), true, names);
+		}
 
 	} else {
 
-		names = new StringVector();
-
-		// Get all names
-		StringVector allNames;
-
 		if(name->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
+			// in the case of equals simply loop through all the
 			// variable values and add them to the set of all names
 			// if they exist on the system
 			VariableValueVector::iterator iterator;
 			for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
-				
+
 				if(this->RPMExists((*iterator)->GetValue())) {
-					allNames.push_back((*iterator)->GetValue());
+					names->push_back((*iterator)->GetValue());
 				}
 			}
 
 		} else {
-            this->GetMatchingRPMNames(".*", &allNames);
+			this->GetMatchingRPMNames(".*", true, names);
 		}
-	
+
 		// loop through all names on the system
 		// only keep names that match operation and value and var check
 		ItemEntity* tmp = this->CreateItemEntity(name);
 		StringVector::iterator it;
-		for(it = allNames.begin(); it != allNames.end(); it++) {
+		for(it = names->begin(); it != names->end(); ) {
 			tmp->SetValue((*it));
-			
-			if(name->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				names->push_back((*it));
-			}
+
+			if(name->Analyze(tmp) == OvalEnum::RESULT_TRUE)
+				++it;
+			else
+				it = names->erase(it);
 		}
 	}
-
-	return names;
 }
 
-StringVector* RPMInfoProbe::GetMatchingRPMNames(string pattern, bool isRegex) {
+void RPMInfoProbe::GetMatchingRPMNames(string pattern, bool isRegex, StringVector *names) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -206,198 +200,154 @@ StringVector* RPMInfoProbe::GetMatchingRPMNames(string pattern, bool isRegex) {
 	//
 	// -----------------------------------------------------------------------
 
-	/* Transaction sets are the modern way to read the RPM database. */
-	rpmts ts;
-	/* We use an iterator to walk the RPM database. */
-	rpmdbMatchIterator iterator;
 	/* Header object for the installed package. */
 	Header header;
 
 	string installed_rpm_name;
 
-	/* Read in the RPM config files */
-	if (rpmReadConfigFiles( (const char*) NULL, (const char*) NULL)) 
-		throw ProbeException("Error: (RPMInfoProbe) Could not read RPM config files, which is necessary to read the RPM database.");
-
 	/* Create an rpm database transaction set. */
-	ts = rpmtsCreate();
+	RpmtsGuard ts;
 
-	/* Create an iterator to walk the database. */	
-	iterator = rpmtsInitIterator(ts, RPMTAG_NAME, NULL, 0);
-	if (iterator == NULL)
-		throw ProbeException("Error: (RPMInfoProbe) Could not create an iterator to walk the RPM database.");
-	
+	/* Create an iterator to walk the database. */
+	RpmdbIterGuard iterator(ts, RPMTAG_NAME, NULL, 0);
+
 	/* Look at each installed package matching this name.  Generally, there is only one.*/
-	StringVector* names = new StringVector();
 	while ( (header = rpmdbNextIterator(iterator)) != NULL) {
 		/* Get the rpm_name value for comparision. */
-		installed_rpm_name = readHeaderString(header, RPMTAG_NAME);
+		if (!readHeaderString(header, RPMTAG_NAME, &installed_rpm_name))
+			throw ProbeException("Encountered an rpm without a name!");
 
 		/* Check to see if name found matches input pattern. */
 		if(this->IsMatch(pattern, installed_rpm_name, isRegex)) {
 			names->push_back(installed_rpm_name);
 		}
 	}
-
-	/* Free the iterator and transaction set data structures. */
-	rpmdbFreeIterator(iterator);
-	rpmtsFree(ts);
-
-	return names;
 }
-
 
 bool RPMInfoProbe::RPMExists(string name) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
 	//
-	//  return true if the specifeid rpm exists
+	//  return true if the specified rpm exists
 	//
 	// -----------------------------------------------------------------------
 	bool exists = false;
 
-	/* Transaction sets are the modern way to read the RPM database. */
-	rpmts ts;
-	/* We use an iterator to walk the RPM database. */
-	rpmdbMatchIterator iterator;
 	/* Header object for the installed package. */
 	Header header;
 
 	string installed_rpm_name;
 
-	/* Read in the RPM config files */
-	if (rpmReadConfigFiles( (const char*) NULL, (const char*) NULL)) 
-		throw ProbeException("Error: (RPMInfoProbe) Could not read RPM config files, which is necessary to read the RPM database.");
-
 	/* Create an rpm database transaction set. */
-	ts = rpmtsCreate();
+	RpmtsGuard ts;
 
-	/* Create an iterator to walk the database. */	
-	iterator = rpmtsInitIterator(ts, RPMTAG_NAME, NULL, 0);
-	if (iterator == NULL)
-		throw ProbeException("Error: (RPMInfoProbe) Could not create an iterator to walk the RPM database.");
-	
+	/* Create an iterator to walk the database. */
+	RpmdbIterGuard iterator(ts, RPMTAG_NAME, NULL, 0);
+
 	/* Look at each installed package matching this name.  Generally, there is only one.*/
-	while ( (header = rpmdbNextIterator(iterator)) != NULL) {
+	while ( (header = rpmdbNextIterator(iterator)) != NULL && !exists) {
 		/* Get the rpm_name value for comparision. */
-		installed_rpm_name = readHeaderString(header, RPMTAG_NAME);
+		if (!readHeaderString(header, RPMTAG_NAME, &installed_rpm_name))
+			throw ProbeException("Encountered an rpm without a name!");
 
 		/* Check to see if name found matches input pattern. */
-		if(name.compare(installed_rpm_name) == 0) {
+		if(name == installed_rpm_name)
 			exists = true;
-			break;
-		}
 	}
-
-	/* Free the iterator and transaction set data structures. */
-	rpmdbFreeIterator(iterator);
-	rpmtsFree(ts);
 
 	return exists;
 }
 
 void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
-  //------------------------------------------------------------------------------------//
-  //
-  //  ABSTRACT
-  //
-  //  Get the data for all packages that have the name that matches rpm_name.  
-  //
-  //------------------------------------------------------------------------------------//
+	//------------------------------------------------------------------------------------//
+	//
+	//  ABSTRACT
+	//
+	//  Get the data for all packages that have the given name.
+	//
+	//------------------------------------------------------------------------------------//
 
-  /* Get the rpm_name form the data object. */
-  const char *rpm_name = name.c_str();
+	/* Header object for the installed package. */
+	Header header;
+	/* Epoch, version, release and architecture data for output. */
+	string installed_epoch, installed_version, installed_release,installed_architecture, installed_evr, installed_signature_keyid;
 
-  /* Create a tmp data object reference. */
-  Item *item = NULL;
-  
-  /* Transaction sets are the modern way to read the RPM database. */
-  rpmts ts;
-  /* We use an iterator to walk the RPM database. */
-  rpmdbMatchIterator iterator;
-  /* Header object for the installed package. */
-  Header header;
-  /* Epoch, version, release and architecture data for output. */
-  string installed_epoch, installed_version, installed_release,installed_architecture, installed_evr, installed_signature_keyid;
+	/* Create an rpm database transaction set. */
+	RpmtsGuard ts;
 
-  /* Read in the RPM config files */
-  if (rpmReadConfigFiles( (const char*) NULL, (const char*) NULL)) 
-	  throw ProbeException("Error: (RPMInfoProbe) Could not read RPM config files, which is necessary to read the RPM database.");
+	/* Create an iterator to walk the database. */
+	RpmdbIterGuard iterator(ts, RPMTAG_NAME, name.c_str(), 0);
 
-  /* Create an rpm database transaction set. */
-  ts = rpmtsCreate();
+	/* Look at each installed package matching this name.  Generally, there is only one.*/
+	while ( (header = rpmdbNextIterator(iterator)) != NULL) {
 
-  /* Create an iterator to walk the database. */	
-  iterator = rpmtsInitIterator(ts, RPMTAG_NAME, rpm_name, 0);
-  if (iterator == NULL)
-    throw ProbeException("Error: (RPMInfoProbe) Could not create an iterator to walk the RPM database.");
+		/* epoch is an int_32 -- we'll display a string to handle the None case well. */
+		int_32 epoch = readHeaderInt32(header, RPMTAG_EPOCH);
+		string installedEpochEvr;
+		if (epoch == -1 ) {
+			installed_epoch = "(none)";
+			installedEpochEvr = "0";
+		} else {
+			installed_epoch = Common::ToString(epoch);
+			installedEpochEvr = installed_epoch;
+		}
 
-  /* Look at each installed package matching this name.  Generally, there is only one.*/
-  while ( (header = rpmdbNextIterator(iterator)) != NULL) {
+		OvalEnum::SCStatus verStatus, relStatus, archStatus, keyidStatus;
+		verStatus = relStatus = archStatus = keyidStatus = OvalEnum::STATUS_EXISTS;
 
-    /* epoch is an int_32 -- we'll display a string to handle the None case well. */
-    char intermediate_string[11];
-    int_32 epoch = readHeaderInt32(header, RPMTAG_EPOCH);
-	string installedEpochEvr;
-	if (epoch == -1 ) {
-      installed_epoch = "(none)";
-		installedEpochEvr = "0";
-	} else {
-      snprintf(intermediate_string,11,"%d",epoch);
-      installed_epoch = intermediate_string;
-	  installedEpochEvr = installed_epoch;
-    }
+		/* the remaining arguments are all normal strings */
+		if (!this->readHeaderString(header, RPMTAG_VERSION, &installed_version))
+			verStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
+		if (!this->readHeaderString(header, RPMTAG_RELEASE, &installed_release))
+			relStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
+		if (!this->readHeaderString(header, RPMTAG_ARCH, &installed_architecture))
+			archStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
 
-    /* the remaining arguments are all normal strings */
-    installed_version = this->readHeaderString(header, RPMTAG_VERSION);
-    installed_release = this->readHeaderString(header, RPMTAG_RELEASE);
-    installed_architecture = this->readHeaderString(header, RPMTAG_ARCH);
-	installed_evr = installedEpochEvr + ":" + installed_version + "-" + installed_release;
+		installed_signature_keyid = this->GetSigKeyId(name);
+		if (installed_signature_keyid.empty())
+			keyidStatus = OvalEnum::STATUS_DOES_NOT_EXIST;
 
-	installed_signature_keyid = this->GetSigKeyId(name);  
+		installed_evr = installedEpochEvr + ":" +
+			(installed_version.empty() ? "0":installed_version) + '-' +
+			(installed_release.empty() ? "0":installed_release);
 
-    /* Put the data in a data object. */
-    item = this->CreateItem();
-    item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("name",  name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("arch",  installed_architecture, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("epoch",  installed_epoch, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("release",  installed_release, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("version",  installed_version, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("evr",  installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("signature_keyid",  installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		/* Put the data in a data object. */
+		auto_ptr<Item> item = ::CreateItem();
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("arch", installed_architecture, OvalEnum::DATATYPE_STRING, false, archStatus));
+		item->AppendElement(new ItemEntity("epoch", installed_epoch, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("release", installed_release, OvalEnum::DATATYPE_STRING, false, relStatus));
+		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, false, verStatus));
+		item->AppendElement(new ItemEntity("evr", installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("signature_keyid", installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, keyidStatus));
 
-    /* add the new item to the vector. */
-    items->push_back(item);
-
-  }
-
-  /* Free the iterator and transaction set data structures. */
-  rpmdbFreeIterator(iterator);
-  rpmtsFree(ts);
+		/* add the new item to the vector. */
+		items->push_back(item.release());
+	}
 }
 
-char* RPMInfoProbe::readHeaderString(Header header, int_32 tag_id) {
-  // This function is from the Red Hat RPM Guide //
-  int_32 type;
-  void *pointer;
-  int_32 data_size;
+bool RPMInfoProbe::readHeaderString(Header header, int_32 tag_id, string *val) {
+	// This function is from the Red Hat RPM Guide //
+	int_32 type;
+	void *pointer;
+	int_32 data_size;
 
-  int header_status = headerGetEntry(header,
-				     tag_id,
-				     &type,
-				     &pointer,
-				     &data_size);
+	int header_status = headerGetEntry(header,
+									   tag_id,
+									   &type,
+									   &pointer,
+									   &data_size);
 
-	
-  if (header_status) {
-    if (type == RPM_STRING_TYPE) {
-      return (char *) pointer;
-    }
-  }
+	if (header_status) {
+		if (type == RPM_STRING_TYPE) {
+			*val = (char *) pointer;
+			return true;
+		}
+	}
 
-  return (NULL);
+	return false;
 }
 
 int_32 RPMInfoProbe::readHeaderInt32(Header header, int_32 tag_id) {
@@ -411,7 +361,7 @@ int_32 RPMInfoProbe::readHeaderInt32(Header header, int_32 tag_id) {
 				     &type,
 				     (void **) &pointer,
 				     &data_size);
-	
+
   if (header_status) {
     if (type == RPM_INT32_TYPE) {
       int_32 *p = (int_32 *) pointer;
@@ -422,36 +372,36 @@ int_32 RPMInfoProbe::readHeaderInt32(Header header, int_32 tag_id) {
 }
 
 void RPMInfoProbe::ChildGetSigKeyId(int writeErrh, int writeh, string rpmName) {
-  //------------------------------------------------------------------------------------//
-  //  ABSTRACT
-  //  
-  //  Redirect stdout and stderr to the provided pipes (writeh, and writeErrh). 
-  //  Execute rpm query with the correct options.
-  //  see: http://fedora.redhat.com/docs/drafts/rpm-guide-en/ch15s05.html
-  //
-  //------------------------------------------------------------------------------------//
+	//------------------------------------------------------------------------------------//
+	//  ABSTRACT
+	//
+	//  Redirect stdout and stderr to the provided pipes (writeh, and writeErrh).
+	//  Execute rpm query with the correct options.
+	//  see: http://fedora.redhat.com/docs/drafts/rpm-guide-en/ch15s05.html
+	//
+	//------------------------------------------------------------------------------------//
 
-  // Point STDOUT and STDERR of child at pipe.  When exec program, output and
-  // all error messages will be sent down pipe instead of to screen.
-  if (writeh != STDOUT_FILENO) {
-    if (dup2(writeh, STDOUT_FILENO) != STDOUT_FILENO)
-      exit(-1);
-  }
+	// Point STDOUT and STDERR of child at pipe.  When exec program, output and
+	// all error messages will be sent down pipe instead of to screen.
+	if (writeh != STDOUT_FILENO) {
+		if (dup2(writeh, STDOUT_FILENO) != STDOUT_FILENO)
+			exit(-1);
+	}
 
-  if (writeErrh != STDERR_FILENO) {
-    if (dup2(writeErrh, STDERR_FILENO) != STDERR_FILENO)
-      exit(-1);
-  }
+	if (writeErrh != STDERR_FILENO) {
+		if (dup2(writeErrh, STDERR_FILENO) != STDERR_FILENO)
+			exit(-1);
+	}
 
-  // Output redirected (duplicated), no longer need pipe
-  close (writeh);
-  close (writeErrh);
+	// Output redirected (duplicated), no longer need pipe
+	close (writeh);
+	close (writeErrh);
 
-  /////////////////////////////////////////////////////
-  ////////     Call the rpmcli query code  ////////////
-  /////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////
+	////////     Call the rpmcli query code  ////////////
+	/////////////////////////////////////////////////////
 
-  // recreate a set of command line args for rpmcli functions
+	// recreate a set of command line args for rpmcli functions
 	int count = 4;
 	char* arg0 = "blah";
 	char* arg1 = "-q";
@@ -467,51 +417,49 @@ void RPMInfoProbe::ChildGetSigKeyId(int writeErrh, int writeh, string rpmName) {
 	/* Set up a table of options. */
 	struct poptOption optionsTable[] = {
 		{ NULL, '\0', POPT_ARG_INCLUDE_TABLE, rpmcliAllPoptTable, 0, "Common options for all rpm modes and executables:", NULL },
-        { NULL, '\0', POPT_ARG_INCLUDE_TABLE, rpmQueryPoptTable, 0, "Query options (with -q or --query):", NULL },
-        POPT_AUTOALIAS
-        POPT_AUTOHELP
-        POPT_TABLEEND
-        };
+		{ NULL, '\0', POPT_ARG_INCLUDE_TABLE, rpmQueryPoptTable, 0, "Query options (with -q or --query):", NULL },
+		POPT_AUTOALIAS
+		POPT_AUTOHELP
+		POPT_TABLEEND
+	};
 
 	poptContext context;
-	QVA_t qva = &rpmQVKArgs;	
-	rpmts ts;
+	QVA_t qva = &rpmQVKArgs;
 	int ec;
 	context = rpmcliInit(count, args, optionsTable);
 
     if (context == NULL) {
 		/*poptPrintUsage(context, stderr, 0);
-        exit(EXIT_FAILURE);*/
-		cerr << "Error: rpmcliInit returned a null context." << endl; 
+		  exit(EXIT_FAILURE);*/
+		cerr << "Error: rpmcliInit returned a null context." << endl;
     }
 
-    ts = rpmtsCreate();
+	RpmtsGuard ts;
 
 	/* Check for query mode. */
     if (qva->qva_mode == 'q') {
 
-        /* Make sure there's something to do. */
-        if (qva->qva_source != RPMQV_ALL && !poptPeekArg(context)) {
-            fprintf(stderr, "no arguments given for --query");
-            exit(EXIT_FAILURE);
+		/* Make sure there's something to do. */
+		if (qva->qva_source != RPMQV_ALL && !poptPeekArg(context)) {
+			fprintf(stderr, "no arguments given for --query");
+			exit(EXIT_FAILURE);
 		}
-        ec = rpmcliQuery(ts, qva, (const char **) poptGetArgs(context));
+		ec = rpmcliQuery(ts, qva, (const char **) poptGetArgs(context));
 
 	} else {
-		cerr << "Unable to get sig key id for rpm: " << rpmName << endl;        
+		cerr << "Unable to get sig key id for rpm: " << rpmName << endl;
     }
 
-	ts = rpmtsFree(ts);
     context = rpmcliFini(context);
 
-  /////////////////////////////////////////////////////
-  ////////////  end rpmcliquery code   ////////////////
-  /////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////
+	////////////  end rpmcliquery code   ////////////////
+	/////////////////////////////////////////////////////
 
 	exit(0);
-} 
+}
 
-string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) { 
+string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
 
   int bytes = 0;
   int maxFDS = 0;
@@ -528,7 +476,7 @@ string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
 
     // Wait for the child process to complete
     waitpid (pid, NULL, 0);
-      
+
     // Close the pipes
     close (readh);
     close (readErrh);
@@ -546,7 +494,7 @@ string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
 
   // Loop over the call to select without using a timmer
   // Only stop looping when select fails. select will
-  // fail when the file descriptors are closed by the 
+  // fail when the file descriptors are closed by the
   // child process.
   while(!errComplete || !stdComplete) {
 
@@ -557,28 +505,28 @@ string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
 
     if(select(maxFDS, &readfds, NULL, NULL, NULL) != -1) {
       if(FD_ISSET(readErrh, &readfds)) {
-		// Read some error output from command.  
+		// Read some error output from command.
 		memset(buf, '\0', 1024);
 		bytes = read(readErrh, buf, 1023);
 		errText.append(buf);
-		  if(bytes == 0) 
+		  if(bytes == 0)
 		    errComplete = true;
 	  }
 
-      if(FD_ISSET(readh, &readfds)) { 
-	    // Read allsome std output from command. 
+      if(FD_ISSET(readh, &readfds)) {
+	    // Read allsome std output from command.
 	    memset(buf, '\0', 1024);
 	    bytes = read(readh, buf, 1023);
 	    text.append(buf);
 
 	    if(bytes == 0)
 	      stdComplete = true;
-      }	  
-    } else {	    
+      }
+    } else {
        break;
     }
   }
-  
+
   free(buf);
 
   // Wait for the child process to complete
@@ -616,21 +564,45 @@ string RPMInfoProbe::GetSigKeyId(string rpmName) {
 
 		// Close unnecessary pipes
 		close (fd1[0]);
-		close (fd2[0]);  
+		close (fd2[0]);
 
 		this->ChildGetSigKeyId(fd1[1], fd2[1], rpmName);
 
 	// Parent process
 	} else {
-	
+
 		// Close unnecessary pipes
 		close (fd1[1]);
 		close (fd2[1]);
 
 		// Get the results of the rpm query
 		string text = this->ParentGetSigKeyId(fd1[0], fd2[0], pid);
-		// parse the string and get just the key id portion - just the last 16 chars minus the quotation mark
-		sigKeyId = text.substr(text.length()-17, 16);
-	}  
+		// parse the string and get just the key id portion - just the last 16
+		// chars minus the quotation mark
+		if (text.size() > 16)
+			sigKeyId = text.substr(text.length()-17, 16);
+	}
 	return sigKeyId;
+}
+
+namespace {
+	auto_ptr<Item> CreateItem() {
+
+		// -----------------------------------------------------------------------
+		//
+		//  ABSTRACT
+		//
+		//  Return a new Item created for storing file information
+		//
+		// -----------------------------------------------------------------------
+
+		auto_ptr<Item> item(new Item(0,
+									 "http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux",
+									 "linux-sc",
+									 "http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux linux-system-characteristics-schema.xsd",
+									 OvalEnum::STATUS_ERROR,
+									 "rpminfo_item"));
+
+		return item;
+	}
 }

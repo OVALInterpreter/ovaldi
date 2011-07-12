@@ -321,7 +321,14 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 								strFieldValue = Common::ToString(value);
 								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_BOOL)) {
-								errorMsg = "Unsupported datatype VT_BOOL found.";
+								bool value;								
+								if ( V_BOOL(&vtProp) == VARIANT_TRUE ){
+									value = true;
+								}else{
+									value = false;
+								}
+								strFieldValue = Common::ToString(value);
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_DATE)) {
 								errorMsg = "Unsupported datatype VT_DATE found.";
 							} else if ((V_VT(&vtProp) == VT_DECIMAL)) {

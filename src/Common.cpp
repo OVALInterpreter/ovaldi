@@ -59,14 +59,17 @@ string	Common::xmlfileMD5			  = "";
 string	Common::startTime			  = "";
 
 bool    Common::noXsl                 = false;
-string  Common::xslFile			      = "results_to_html.xsl";
+string  Common::xslFile			      = Common::BuildFilePath(Common::schemapath, DEFAULT_RESULTS_XFORM_FILENAME);
 string  Common::xslOutputFile		  = "results.html";
 
 string Common::logFileLocation	      = "";
 string Common::logFileName            = "ovaldi.log";
 
 bool    Common::doDefinitionSchematron   = false;
-string  Common::definitionSchematronPath = "oval-definitions-schematron.xsl";
+bool    Common::verifyOutputs		  = false;
+string  Common::definitionSchematronPath = Common::BuildFilePath(Common::schemapath, DEFAULT_DEFINITION_SCHEMATRON_FILENAME);
+string  Common::systemCharacteristicsSchematronPath = Common::BuildFilePath(Common::schemapath, DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME);
+string  Common::resultsSchematronPath = Common::BuildFilePath(Common::schemapath, DEFAULT_RESULTS_SCHEMATRON_FILENAME);
 
 bool    Common::generateMD5			  = false;
 bool    Common::useProvidedData		  = false;
@@ -77,6 +80,12 @@ string  Common::definitionIds                  = "";
 string  Common::definitionIdsFile              = "";
 
 const string Common::REGEX_CHARS = "^$\\.[](){}*+?|";
+
+namespace {
+	bool caseInsensitiveCmpChars(char c1, char c2) {
+		return tolower(c1) == tolower(c2);
+	}
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Accessors  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -132,15 +141,13 @@ bool Common::GetVerifyXMLfile()
 	return verifyXMLfile;
 }
 
+bool Common::GetVerifyOutputs()
+{
+	return verifyOutputs;
+}
+
 string Common::GetXSLFilename(){
-	// if the the XSL filename is not specified use the default path and filename
-	if ( Common::xslFile.compare("results_to_html.xsl") == 0 ){
-		return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::xslFile;
-	}
-	// otherwise use the specififed value
-	else{
-		return Common::xslFile;	
-	}
+	return Common::xslFile;	
 }
 string Common::GetXSLOutputFilename()
 {
@@ -172,15 +179,15 @@ bool Common::GetDoDefinitionSchematron() {
 }
 
 string Common::GetDefinitionSchematronPath() {
-	
-	// if the filepath to the XSL schematron file is not specified use the default path and filename
-	if ( Common::definitionSchematronPath.compare("oval-definitions-schematron.xsl") == 0 ){
-		return Common::GetSchemaPath() + Common::fileSeperatorStr + Common::definitionSchematronPath;
-	}
-	// otherwise use the specififed value
-	else{
-		return Common::definitionSchematronPath;
-	}
+	return Common::definitionSchematronPath;
+}
+
+string Common::GetSystemCharacteristicsSchematronPath() {
+	return Common::systemCharacteristicsSchematronPath;
+}
+
+string Common::GetResultsSchematronPath() {
+	return Common::resultsSchematronPath;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -196,7 +203,7 @@ void Common::SetGenerateMD5(bool genMD5In) {
 }
 
 void Common::SetXMLfile(string xmlfileIn) {
-	if(Common::FileExists(xmlfileIn.c_str())) {
+	if(Common::FileExists(xmlfileIn)) {
 		xmlfile = xmlfileIn;
 	} else {
 		throw CommonException("The specified definition file does not exist! " + xmlfileIn);
@@ -223,7 +230,7 @@ void Common::SetUseProvidedData(bool useDataIn) {
 
 void Common::SetExternalVariableFile(string varFilenameIn) {
 
-	if(Common::FileExists(varFilenameIn.c_str())) {
+	if(Common::FileExists(varFilenameIn)) {
 		externalVariablesFile = varFilenameIn;
 	} else {
 		throw CommonException("The specified external variables file does not exist! " + varFilenameIn);
@@ -232,7 +239,7 @@ void Common::SetExternalVariableFile(string varFilenameIn) {
 
 void Common::SetDirectivesConfigFile(string varFilenameIn) {
 
-	if(Common::FileExists(varFilenameIn.c_str())) {
+	if(Common::FileExists(varFilenameIn)) {
 		directivesConfigFile = varFilenameIn;
 	} else {
 		throw CommonException("The specified directives file does not exist! " + varFilenameIn);
@@ -244,9 +251,14 @@ void Common::SetVerifyXMLfile(bool verifyXMLfileIn)
 	verifyXMLfile = verifyXMLfileIn;
 }
 
+void Common::SetVerifyOutputs(bool verifyOutputs)
+{
+	Common::verifyOutputs = verifyOutputs;
+}
+
 void Common::SetXSLFilename(string in) {
 	
-	if(Common::FileExists(in.c_str())) {
+	if(Common::FileExists(in)) {
 		Common::xslFile = in;
 	} else {
 		throw CommonException("The specified results xsl file does not exist! " + in);
@@ -276,7 +288,7 @@ void Common::SetDefinitionIdsString(string definitionIdsString) {
 
 void Common::SetDefinitionIdsFile(string definitionIdsFile) {
 
-	if(Common::FileExists(definitionIdsFile.c_str())) {
+	if(Common::FileExists(definitionIdsFile)) {
 		Common::definitionIdsFile = definitionIdsFile;
 	} else {
 		throw CommonException("The specified definition ids file does not exist! " + definitionIdsFile);
@@ -291,12 +303,30 @@ void Common::SetDoDefinitionSchematron(bool set) {
 	Common::doDefinitionSchematron = set;
 }
 
-void Common::SetDefinitionSchematronPath(string definitionSchematronPath) {
-	
-	if(Common::FileExists(definitionSchematronPath.c_str())) {
-		Common::definitionSchematronPath = definitionSchematronPath;
+void Common::SetDefinitionSchematronPath(string path) {
+
+	if(Common::FileExists(path)) {
+		Common::definitionSchematronPath = path;
 	} else {
-		throw CommonException("The specified definition schematron validation file does not exist! " + definitionSchematronPath);
+		throw CommonException("The specified definition schematron validation file does not exist! " + path);
+	}
+}
+
+void Common::SetSystemCharacteristicsSchematronPath(string path) {
+
+	if(Common::FileExists(path)) {
+		Common::systemCharacteristicsSchematronPath = path;
+	} else {
+		throw CommonException("The specified system characteristics schematron validation file does not exist! " + path);
+	}
+}
+
+void Common::SetResultsSchematronPath(string path) {
+
+	if(Common::FileExists(path)) {
+		Common::resultsSchematronPath = path;
+	} else {
+		throw CommonException("The specified results schematron validation file does not exist! " + path);
 	}
 }
 
@@ -460,9 +490,9 @@ string Common::GetTimeStamp() {
 	return (tmpbuf);
 }
 
-bool Common::FileExists(const char * filename) {
+bool Common::FileExists(const string &filename) {
 
-    if (FILE * file = fopen(filename, "r")) {
+    if (FILE * file = fopen(filename.c_str(), "r")) {
         fclose(file);
         return true;
     }
@@ -833,6 +863,12 @@ string Common::GetFullPath(string path) {
 
 	free(buffer);
 	return fullpath;
+}
+
+bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
+	if (s1.size() != s2.size())
+		return false;
+	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
 }
 
 //****************************************************************************************//

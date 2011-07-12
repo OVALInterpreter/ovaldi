@@ -80,7 +80,7 @@ void DataCollector::WriteSystemInfo() {
 	// -----------------------------------------------------------------------
 
 	SystemInfo* systemInfo = SystemInfoCollector::CollectSystemInfo();
-	systemInfo->Write(DocumentManager::GetSystemCharacterisitcsDocument());
+	systemInfo->Write(DocumentManager::GetSystemCharacteristicsDocument());
 }
 
 

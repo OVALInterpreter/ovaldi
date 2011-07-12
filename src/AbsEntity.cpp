@@ -28,7 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <cassert>
+
 #include "AbsEntity.h"
+#include "ObjectFieldEntityValue.h"
+#include "StringEntityValue.h"
 
 using namespace std;
 
@@ -266,6 +270,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 
 OvalEnum::Flag AbsEntity::GetEntityValues(StringVector &values) {
 	
+	assert(GetDatatype() != OvalEnum::DATATYPE_RECORD);
+
 	OvalEnum::Flag flagResult = OvalEnum::FLAG_COMPLETE;
 
 	if (this->GetVarRef() == NULL)
@@ -286,6 +292,44 @@ OvalEnum::Flag AbsEntity::GetEntityValues(StringVector &values) {
 	}
 
     return flagResult;
+}
+
+OvalEnum::Flag AbsEntity::GetEntityValues(std::map<std::string, StringVector> &values) {
+
+	assert(GetDatatype() == OvalEnum::DATATYPE_RECORD);
+
+	// 'cause OvalEnum::CombineFlags() was declared to take a vector of ints instead
+	// of a vector of flags...
+	vector<int> fieldFlags;
+
+	// records can't have var_refs (but the fields can)
+	for (AbsEntityValueVector::iterator valIter = value.begin();
+		valIter != value.end();
+		++valIter) {
+
+		ObjectFieldEntityValue *ofev = dynamic_cast<ObjectFieldEntityValue*>(*valIter);
+		if (!ofev)
+			throw Exception("Encountered an object entity of record datatype, "
+			"with a value that is not an ObjectFieldEntityValue!");
+
+		string fieldName = ofev->GetName();
+		AbsVariable *var = ofev->GetVarRef();
+		if (var) {
+			fieldFlags.push_back(var->GetFlag());
+
+			if (var->GetFlag() == OvalEnum::FLAG_COMPLETE) {
+				VariableValueVector *vvv = var->GetValues();
+				for(VariableValueVector::iterator iter = vvv->begin(); iter != vvv->end(); ++iter)
+					values[fieldName].push_back((*iter)->GetValue());
+			}
+		} else {
+			fieldFlags.push_back(OvalEnum::FLAG_COMPLETE);
+			values[fieldName].push_back(ofev->GetValue());
+		}
+	}
+
+	OvalEnum::Flag flagResult = OvalEnum::CombineFlags(&fieldFlags);
+	return flagResult;
 }
 
 //****************************************************************************************//

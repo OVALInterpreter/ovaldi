@@ -45,57 +45,17 @@
 #include <FileFinder.h>
 #include <REGEX.h>
 #include <VectorPtrGuard.h>
+#include <unix/DirGuard.h>
+#include <Noncopyable.h>
 #include "SelinuxSecurityContextProbe.h"
 
 using namespace std;
 
 namespace {
 	/**
-	 * A trick borrowed from boost... an easy way to make a class noncopyable.
-	 * Wish we could just use boost :-P  Makes sure I don't mess up and make
-	 * accidental copies.
-	 */
-	class noncopyable {
-	protected:
-		noncopyable(){}
-		~noncopyable(){}
-	private:
-		noncopyable(const noncopyable&);
-		noncopyable& operator=(const noncopyable&);
-	};
-
-	/**
-	 * Used to manage opening/closing a directory via opendir()/closedir(), so
-	 * we can write exception-safe code.
-	 */
-	class DirGuard : private noncopyable {
-	public:
-		explicit DirGuard(const char *dirName) {
-			d = opendir(dirName);
-
-			if (!d)
-				throw ProbeException(string("Couldn't open directory ") + dirName +
-									 ": " + strerror(errno));
-		}
-
-		~DirGuard() {
-			if (closedir(d) < 0)
-				Log::Info(string("closedir() failed: ") + strerror(errno));
-			// closedir failure is ok, move on
-		}
-
-		operator DIR*() {
-			return d;
-		}
-
-	private:
-		DIR *d;
-	};
-
-	/**
 	 * Enables exception-safe use of selinux security_context_t values.
 	 */
-	class SecurityContextGuard : private noncopyable {
+	class SecurityContextGuard : private Noncopyable {
 	public:
 		explicit SecurityContextGuard(security_context_t ctx) : ctx(ctx) {
 		}
@@ -113,7 +73,7 @@ namespace {
 		security_context_t ctx;
 	};
 
-	class ContextGuard : private noncopyable {
+	class ContextGuard : private Noncopyable {
 	public:
 		explicit ContextGuard(context_t ctx) : ctx(ctx) {
 		}

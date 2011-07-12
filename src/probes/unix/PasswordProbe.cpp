@@ -82,12 +82,14 @@ ItemVector* PasswordProbe::CollectItems(Object* object) {
 
 	case OvalEnum::OPERATION_NOT_EQUAL:
 	case OvalEnum::OPERATION_PATTERN_MATCH:
+	case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+	case OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL:
 		// in these cases, we must loop thru all names to find matches.
 		items = this->GetMultipleItems(object);
 		break;
 
 	default:
-		throw ProbeException(string("Invalid operator: ") + OvalEnum::OperationToString(op));
+		throw ProbeException(string("Invalid operation: ") + OvalEnum::OperationToString(op));
 	}
 
 	return items;

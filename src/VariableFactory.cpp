@@ -83,7 +83,7 @@ AbsVariable* VariableFactory::GetVariable(string varId) {
 			var->Parse(varElm);
 		} catch(Exception ex) {
 			Log::Info("VariableFactory::GetVariable() - Error while parsing variable: " + varId + " " + ex.GetErrorMessage());
-			throw ex;
+			throw;
 		} catch(...) {
 			Log::Info("VariableFactory::GetVariable() - Error while parsing variable: " + varId + "  Unknown Error");
 			throw Exception("VariableFactory::GetVariable() - Error while parsing variable: " + varId + " Unknown Error");

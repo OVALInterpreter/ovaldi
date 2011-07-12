@@ -33,6 +33,8 @@
 
 #include <vector>
 
+#include <Noncopyable.h>
+
 /**
  * Makes exception-safe use of a vector of pointers more convenient.  Instances
  * of this class own a std::vector<T*>*, and will delete both the vector and its
@@ -45,7 +47,7 @@
  * modify their args...
  */
 template <typename T>
-class VectorPtrGuard {
+class VectorPtrGuard : private Noncopyable {
 public:
 
 	/**
@@ -133,10 +135,6 @@ private:
 	}
 
 	std::vector<T*> *vec;
-
-	// temporary... fix this when I can use the noncopyable class..
-	VectorPtrGuard(const VectorPtrGuard&);
-	VectorPtrGuard<T>& operator=(const VectorPtrGuard<T>&);
 };
 
 #endif

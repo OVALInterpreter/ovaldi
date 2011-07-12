@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <unix/NetworkInterfaces.h>
+
 #include "SystemInfo.h"
 
 using namespace std;
@@ -57,15 +59,6 @@ SystemInfo::~SystemInfo() {
 	//	Delete all objects in the interfaces vector.
 	//
 	// -----------------------------------------------------------------------
-
-	IfData *tmp	= NULL;
-	while(interfaces.size() !=0) {
-
-		tmp = interfaces[interfaces.size()-1];
-		interfaces.pop_back();
-		delete tmp;
-		tmp = NULL;
-	}
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -101,25 +94,22 @@ void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc)
 	sysInfoNode->appendChild(interfacesElm);
 
 	// Loop through contents of the interfaces vector and write each IfData objet
-	IfDataVector::iterator iterator;
+	IntfList::iterator iterator;
 	for (iterator=interfaces.begin(); iterator!=interfaces.end(); iterator++) {
 
-		if((*iterator)->ipAddress.compare("127.0.0.1") != 0) {
+		// Create a new interface element
+		DOMElement* interfaceElm = XmlCommon::CreateElement(scDoc, "interface");
+		interfacesElm->appendChild(interfaceElm);
 
-			// Create a new interface element
-			DOMElement* interfaceElm = XmlCommon::CreateElement(scDoc, "interface");
-			interfacesElm->appendChild(interfaceElm);
-
-			// Add the childer to the inerface element
-			tmpElm = XmlCommon::CreateElement(scDoc, "interface_name", (*iterator)->ifName);
-			interfaceElm->appendChild(tmpElm);
+		// Add the childer to the inerface element
+		tmpElm = XmlCommon::CreateElement(scDoc, "interface_name", iterator->GetName());
+		interfaceElm->appendChild(tmpElm);
 			
-			tmpElm = XmlCommon::CreateElement(scDoc, "ip_address", (*iterator)->ipAddress);
-			interfaceElm->appendChild(tmpElm);
+		tmpElm = XmlCommon::CreateElement(scDoc, "ip_address", inet_ntoa(iterator->GetIPAddr()));
+		interfaceElm->appendChild(tmpElm);
 
-			tmpElm = XmlCommon::CreateElement(scDoc, "mac_address", (*iterator)->macAddress);
-			interfaceElm->appendChild(tmpElm);
-		}
+		tmpElm = XmlCommon::CreateElement(scDoc, "mac_address", iterator->GetHwAddr());
+		interfaceElm->appendChild(tmpElm);
 	}
 }
 
@@ -199,12 +189,12 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	} else {
 		Log::Debug("Unable to resolve system FQDN.  Using short hostname instead.");
 	}
-	
+
 	sysInfo->primary_host_name = strHostName;
 	free(chHostName);
 }
 
-IfDataVector SystemInfoCollector::GetInterfaces() {
+IntfList SystemInfoCollector::GetInterfaces() {
 	//------------------------------------------------------------------------------------//
 	//
 	//  ABSTRACT
@@ -215,134 +205,19 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 	//	Must get interface_name, ip_address, and mac_address for each interface
 	//------------------------------------------------------------------------------------//
 
-	IfDataVector interfaces;
-	IfData *tmpIfData = NULL;
-	int socketfd, prev_length, length, addr_length, mib[6], mac_length;
-        char *ptr, *macbuf, *i, *macstr, *ip;
-	unsigned char *macptr = NULL;
-	struct ifconf ifc;
-        struct in_addr ip4addr;
-	struct ifreq *ifr = NULL;
-	struct sockaddr_in *sinptr = NULL;
-	struct if_msghdr *ifm = NULL;
-	struct sockaddr_dl *sdl = NULL;
-      
-	ptr = NULL;
-	macbuf = NULL;
-	i = NULL;
-	macstr = NULL;
-	prev_length = 0;
-	length = 10 * sizeof(struct ifreq);
-	
-	if ( (socketfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
-	  throw SystemInfoException("Error: failed to open socket");
+	using namespace NetworkInterfaces;
+	list<Interface> intfs = GetAllInterfaces();
+	for (list<Interface>::iterator iter = intfs.begin();
+		 iter != intfs.end();
+		 ) {
+		// only ethernet interfaces are supported for now, filter out others.
+		if (iter->GetType() == Interface::ETHERNET)
+			++iter;
+		else
+			iter = intfs.erase(iter);
 	}
-     
-	while(true){
-	  ifc.ifc_buf= (char*)malloc(length);
-	  ifc.ifc_len = length;
-	  if ( ifc.ifc_buf != NULL ){
-	    if ( ioctl(socketfd, SIOCGIFCONF, &ifc) < 0 ){
-	      if ( ifc.ifc_buf != NULL ){
-		free(ifc.ifc_buf);
-		ifc.ifc_buf = NULL;
-	      }
-	      throw SystemInfoException("Error: SIOCGIFCONF ioctl error");
-	    }else{
-	      if ( ifc.ifc_len == prev_length){
-		ifc.ifc_len = length;
-		break;
-	      }else{
-		prev_length = ifc.ifc_len;
-		length = length + 10 * sizeof(struct ifreq);
-		free(ifc.ifc_buf);
-	      }
-	    }
-	  }else{
-	    throw SystemInfoException("Error: couldn't allocate memory");
-	  }	  
-	}
-	
-	if (ioctl(socketfd, SIOCGIFCONF, &ifc) < 0){
-          throw SystemInfoException("Error: SIOCGIFCONF ioctl error");
-	}
-	
-	for (ptr = ifc.ifc_buf; ptr <ifc.ifc_buf + ifc.ifc_len; ) {
-          ifr = (struct ifreq *) ptr;
-          addr_length = sizeof(struct sockaddr);
-	  
-          if (ifr->ifr_addr.sa_len > addr_length){
-            addr_length = ifr->ifr_addr.sa_len;
-          }
-	  
-          ptr += sizeof(ifr->ifr_name) + addr_length;
-	  
-	  if ( ifr->ifr_addr.sa_family == AF_INET ){
-	    
-	    if ( ioctl(socketfd,SIOCGIFFLAGS,ifr) ){
-	      continue;
-	    }
-	    
-	    if ( !(ifr->ifr_flags & IFF_LOOPBACK) ) {
-	      
-	      sinptr = (struct sockaddr_in *) &ifr->ifr_addr;
-	      mac_length = 0;
-	      
-	      mib[0] = CTL_NET;
-	      mib[1] = AF_ROUTE;
-	      mib[2] = 0;
-	      mib[3] = AF_LINK;
-	      mib[4] = NET_RT_IFLIST;
-	      mib[5] = if_nametoindex(ifr->ifr_name);
-	      
-	      if (mib[5] == 0){
-		throw SystemInfoException("Error: if_nametoindex error");
-	      }
-	      
-	      if (sysctl(mib, 6, NULL, (size_t*)&mac_length, NULL, 0) < 0){
-		throw SystemInfoException("Error: sysctl error - retrieving data length");
-	      }
-	      
-	      macbuf = (char*) malloc(mac_length);
-	      
-	      if ( macbuf == NULL ){
-		throw SystemInfoException("Error: couldn't allocate memory");
-	      }      
 
-	      if (sysctl(mib, 6, macbuf, (size_t*)&mac_length, NULL, 0) < 0){
-		throw SystemInfoException("Error: sysctl error - retrieving data");
-	      }
-	      
-	      ifm = (struct if_msghdr *)macbuf;
-	      sdl = (struct sockaddr_dl *)(ifm + 1);
-	      macptr = (unsigned char *)LLADDR(sdl);
-	      i = NULL;
-	      ip4addr = (struct in_addr)sinptr->sin_addr;
-	      tmpIfData = new IfData();
-	      
-	      macstr = (char*)malloc(sizeof(char)*128);
-	      
-	      if ( macstr == NULL ){
-		throw SystemInfoException("Error: couldn't allocate memory");
-	      }
-
-	      ip = (char*)malloc(sizeof(char)*64);
-	      i = (char*)inet_ntop(AF_INET,(void*)(&ip4addr),ip,64);
-	
-	      tmpIfData->ifName = ifr->ifr_name;
-	      tmpIfData->ipAddress = ip;
-	      memset(macstr, 0, 128);
-	      sprintf(macstr, "%2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X", macptr[0], macptr[1], macptr[2], macptr[3], macptr[4], macptr[5]);
-	      tmpIfData->macAddress = macstr;
-	      interfaces.push_back(tmpIfData);
-	      free(macbuf);
-	      free(macstr);
-	      free(ip);
-	    }
-	  }
-	}
-	free(ifc.ifc_buf);
-	return interfaces;
+	return intfs;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

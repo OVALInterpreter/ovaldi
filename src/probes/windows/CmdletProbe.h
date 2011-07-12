@@ -30,17 +30,9 @@
 #ifndef CMDLETPROBE_H
 #define CMDLETPROBE_H
 
-#pragma warning(disable:4786)
-
+#include <string>
+#include "OvalEnum.h"
 #include "AbsProbe.h"
-
-using namespace std;
-
-using namespace System::Management::Automation::Runspaces;
-
-typedef std::pair < std::string, StringVector* > StringStringVectorPair;
-typedef std::vector < StringStringVectorPair* > SSVPVector;
-typedef std::vector < StringVector* > StringVectorVector;
 
 /**
 	This class is responsible for collecting information for windows cmdlet_objects.
@@ -66,12 +58,9 @@ private:
 	/** Return a new Item created for storing information retrieved by executing a cmdlet. */
 	virtual Item* CreateItem();
 
-	void ExecutePowerShell(string powershellInput, Item* item);	
-	InitialSessionState^ InitializeRunspace();
+	void ExecutePowerShell(std::string powershellInput, Item* item);	
+	System::Management::Automation::Runspaces::InitialSessionState^ InitializeRunspace();
 	OvalEnum::Datatype GetDatatype(std::string type);
-
-	std::string cmdletItem;
-
 };
 
 #endif

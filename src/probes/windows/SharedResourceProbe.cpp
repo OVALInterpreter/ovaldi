@@ -66,11 +66,6 @@ ItemVector* SharedResourceProbe::CollectItems ( Object* object ) {
         throw ProbeException ( "Error: Invalid data type specified on netname. Found: " + OvalEnum::DatatypeToString ( netName->GetDatatype() ) );
     }
 
-    // Check operation - only allow  equals, not equals and pattern match
-    if ( netName->GetOperation() != OvalEnum::OPERATION_EQUALS && netName->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && netName->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
-        throw ProbeException ( "Error: Invalid operation specified on netname. Found: " + OvalEnum::OperationToString ( netName->GetOperation() ) );
-    }
-
     // Use lazy initialization to gather all the shared resources on the system
     if ( resources == NULL ) {
         SharedResourceProbe::GetAllSharedResources();
@@ -102,18 +97,30 @@ ItemVector* SharedResourceProbe::CollectItems ( Object* object ) {
                 ItemEntityVector* netNameVector = ( *it1 )->GetElementsByName ( "netname" );
 
                 for ( it2 = netNameVector->begin() ; it2 != netNameVector->end() ; it2++ ) {
-                    if ( netName->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                        if ( netName->GetValue().compare ( ( *it2 )->GetValue() ) != 0 ) {
-                            Item* temp = new Item ( **it1 );
-                            collectedItems->push_back ( temp );
-                        }
 
-                    } else {
-                        if ( this->myMatcher->IsMatch ( netName->GetValue().c_str() , ( *it2 )->GetValue().c_str() ) ) {
-                            Item* temp = new Item ( **it1 );
-                            collectedItems->push_back ( temp );
-                        }
-                    }
+					boolean matched;
+					switch (netName->GetOperation()) {
+					case OvalEnum::OPERATION_NOT_EQUAL:
+						matched = netName->GetValue() != (*it2)->GetValue();
+						break;
+					case OvalEnum::OPERATION_PATTERN_MATCH:
+						matched = this->myMatcher->IsMatch ( netName->GetValue().c_str() , ( *it2 )->GetValue().c_str() );
+						break;
+					case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+						matched = Common::EqualsIgnoreCase(netName->GetValue(), (*it2)->GetValue());
+						break;
+					case OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL:
+						matched = !Common::EqualsIgnoreCase(netName->GetValue(), (*it2)->GetValue());
+						break;
+					default:
+				        throw ProbeException ( "Error: Invalid operation specified on netname. Found: " + OvalEnum::OperationToString ( netName->GetOperation() ) );
+					}
+
+					if (matched) {
+						Item* temp = new Item ( **it1 );
+						collectedItems->push_back ( temp );
+						break;
+					}
                 }
             }
         }

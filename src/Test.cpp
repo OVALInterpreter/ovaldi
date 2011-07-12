@@ -365,7 +365,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 			this->SetResult(OvalEnum::RESULT_UNKNOWN);
 		} else {
 			// get the collected object from the sc file
-			DOMElement* collectedObjElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacterisitcsDocument(), "object", "id", this->GetObjectId());
+			DOMElement* collectedObjElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "object", "id", this->GetObjectId());
 			OvalEnum::Flag collectedObjFlag = OvalEnum::FLAG_NOT_COLLECTED;
 
 			if(collectedObjElm == NULL) {
@@ -384,7 +384,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 				}
 
 				// Find potential matching items in the system_data section
-				ElementVector* dataElems = XmlCommon::FindAllElements(DocumentManager::GetSystemCharacterisitcsDocument(), componentName + "_item");
+				ElementVector* dataElems = XmlCommon::FindAllElements(DocumentManager::GetSystemCharacteristicsDocument(), componentName + "_item");
                 if(dataElems->size() == 0) {
 					
                     // No potential matching items found

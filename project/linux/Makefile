@@ -35,6 +35,7 @@ OUTDIR = ./Release
 # source directories
 SRCDIR = ../../src
 LINUXDIR = ${SRCDIR}/linux
+UNIXDIR = ${SRCDIR}/unix
 UNIXPROBEDIR = ${SRCDIR}/probes/unix
 LINUXPROBEDIR = ${SRCDIR}/probes/linux
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
@@ -55,7 +56,7 @@ LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -lblkid
 PACKAGE_RPM  = $(shell /usr/bin/env rpm  --version 2>/dev/null)
 PACKAGE_DPKG = $(shell /usr/bin/env dpkg --version 2>/dev/null)
 
-SRC_DIRS = $(SRCDIR) $(LINUXDIR) $(UNIXPROBEDIR) $(LINUXPROBEDIR) $(INDEPENDENTPROBEDIR)
+SRC_DIRS = $(SRCDIR) $(LINUXDIR) $(UNIXPROBEDIR) $(LINUXPROBEDIR) $(INDEPENDENTPROBEDIR) $(UNIXDIR)
 CPP_FILES := $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
 ifneq (${PACKAGE_RPM}, )

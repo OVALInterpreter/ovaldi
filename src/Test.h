@@ -88,7 +88,7 @@ public:
 	            - Then use the check_state to determine the overall result for the test.
 	 	 	- copy variable values from collected object to test as tested_variables
 	 	 		this is just a matter of passing the variable_value element in the colelcted obj
-	  	 		to the testedVaraible->Parse() method.
+	  	 		to the testedVariable->Parse() method.
 	        - save and return the result
 	 */
 	OvalEnum::ResultEnumeration Analyze();

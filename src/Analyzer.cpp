@@ -444,14 +444,14 @@ void Analyzer::FinializeResultsDocument() {
 
 
 	// add the oval_system characteristics element
-	DOMElement* scNode = (DOMElement*)DocumentManager::GetResultDocument()->importNode(DocumentManager::GetSystemCharacterisitcsDocument()->getDocumentElement(), true);
+	DOMElement* scNode = (DOMElement*)DocumentManager::GetResultDocument()->importNode(DocumentManager::GetSystemCharacteristicsDocument()->getDocumentElement(), true);
 	this->resultsSystemElm->appendChild(scNode);
 	// need to clean up the attributes on the oval_definitions element.
 	// copy all namespaces the document root
 	// add all schema locations to the document root.
 	// leave only the xmlns attribute on the element to seet the default ns for all child elements.
-	XmlCommon::CopyNamespaces(DocumentManager::GetSystemCharacterisitcsDocument(), DocumentManager::GetResultDocument());
-	XmlCommon::CopySchemaLocation(DocumentManager::GetSystemCharacterisitcsDocument(), DocumentManager::GetResultDocument());
+	XmlCommon::CopyNamespaces(DocumentManager::GetSystemCharacteristicsDocument(), DocumentManager::GetResultDocument());
+	XmlCommon::CopySchemaLocation(DocumentManager::GetSystemCharacteristicsDocument(), DocumentManager::GetResultDocument());
 	XmlCommon::RemoveAttributes(scNode);
 
 }

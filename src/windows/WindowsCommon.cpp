@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <memory>
 #include "WindowsCommon.h"
 
 StringSet* WindowsCommon::allLocalUserSIDs = NULL;
@@ -359,14 +360,11 @@ bool WindowsCommon::IsGroupSID(string SID) {
 
 StringSet* WindowsCommon::GetAllGroups() {
 
-	StringSet* groups = WindowsCommon::GetAllLocalGroups();
-	StringSet* globalGroups = WindowsCommon::GetAllGlobalGroups();
-	StringSet::iterator iterator;
-	for(iterator = globalGroups->begin(); iterator != globalGroups->end(); iterator++) {
-		groups->insert((*iterator));
-	}
+	auto_ptr<StringSet> groups(WindowsCommon::GetAllLocalGroups());
+	auto_ptr<StringSet> globalGroups(WindowsCommon::GetAllGlobalGroups());
+	groups->insert(globalGroups->begin(), globalGroups->end());
 
-    return groups;
+	return groups.release();
 }
 
 bool WindowsCommon::IsGroup(string trusteeName) {
@@ -833,6 +831,7 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 	NET_API_STATUS nas;
     DWORD recordsEnumerated = 0;
     DWORD totalRecords = 0;
+	DWORD_PTR resumeHandle = 0;
 
 	// Get a handle to the policy object.
 	LSA_HANDLE polHandle;
@@ -853,7 +852,7 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 								MAX_PREFERRED_LENGTH,
 								&recordsEnumerated,
 								&totalRecords,
-								NULL);
+								&resumeHandle);
 
 		if ((nas == NERR_Success) || (nas==ERROR_MORE_DATA)) {
 			// Group account names are limited to 256 characters.
@@ -938,6 +937,7 @@ StringSet* WindowsCommon::GetAllGlobalGroups() {
 
 	NET_API_STATUS nas;
 	GROUP_INFO_0* globalGroupInfo = NULL;
+	DWORD_PTR resumeHandle = 0;
 	do { 
 		
 		DWORD recordsEnumerated = 0;
@@ -948,7 +948,7 @@ StringSet* WindowsCommon::GetAllGlobalGroups() {
 						   MAX_PREFERRED_LENGTH,
 						   &recordsEnumerated,
 						   &totalRecords,
-						   NULL);
+						   &resumeHandle);
 
 		if ((nas == NERR_Success) || (nas==ERROR_MORE_DATA)) {
 			// Group account names are limited to 256 characters.
@@ -1049,6 +1049,7 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
     DWORD recordsEnumerated = 0;
     DWORD totalRecords = 0;
     USER_INFO_0* userInfo = NULL;
+	DWORD resumeHandle = 0;
 
 	do {
 		// NOTE: Even though MAX_PREFERRED_LENGTH is specified, we must still check for
@@ -1065,7 +1066,7 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 						  MAX_PREFERRED_LENGTH,
 						  &recordsEnumerated,
 						  &totalRecords,
-						  NULL);
+						  &resumeHandle);
 
 		if ((nas == NERR_Success) || (nas == ERROR_MORE_DATA)) {
 

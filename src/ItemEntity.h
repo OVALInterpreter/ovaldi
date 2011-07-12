@@ -32,14 +32,8 @@
 #define ITEMENTITY_H
 
 #include <string>
-#include <iostream>
-#include <stdlib.h>
-
-#include "Common.h"
 #include "OvalEnum.h"
 #include "AbsEntityValue.h"
-#include "StringEntityValue.h"
-#include "ItemFieldEntityValue.h"
 XERCES_CPP_NAMESPACE_USE
 
 /**
@@ -51,7 +45,10 @@ public:
 	/** Create a complete ItemEntity object. */
 	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
-	/** Create a complete ItemEntity object. */
+	/**
+	 * Create a complete ItemEntity object.  This ItemEntity takes ownership of
+	 * the given entity values, so don't delete them yourself.
+	 */
 	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
     /** ItemEntity copy constructor. */

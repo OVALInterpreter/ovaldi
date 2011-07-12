@@ -78,7 +78,7 @@ private:
 	/** Get the type of the file. */
 	void GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type);
 	/** Get the developement class of the file. */
-	void GetDevelopementClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass);
+	void GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass);
 	/** Get the company of the file. */
 	void GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemEntity* company);
 	/** Get the internal name of the file. */

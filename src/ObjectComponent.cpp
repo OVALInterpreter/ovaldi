@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include "ItemFieldEntityValue.h"
+
 #include "ObjectComponent.h"
 
 using namespace std;
@@ -134,12 +136,15 @@ ComponentValue* ObjectComponent::ComputeValue() {
 							isRecord = true;
 							if ( this->GetRecordField().compare("") != 0 ){
 								AbsEntityValueVector values = (*iterator1)->GetValues();
-								ItemFieldEntityValueVector* fields = (ItemFieldEntityValueVector*)&values;
-								for(ItemFieldEntityValueVector::iterator iterator2 = fields->begin() ; iterator2 != fields->end() ; iterator2++){
-									if( this->GetRecordField().compare((*iterator2)->GetName()) == 0 ){
-										result->AppendValue((*iterator2)->GetValue());	
-										foundRecordField = true;
-									}
+								for(AbsEntityValueVector::iterator iterator2 = values.begin() ; iterator2 != values.end() ; iterator2++){
+									ItemFieldEntityValue *ifev = dynamic_cast<ItemFieldEntityValue*>(*iterator2);
+									if (ifev) {	
+										if( this->GetRecordField().compare(ifev->GetName()) == 0 ){
+											result->AppendValue(ifev->GetValue());	
+											foundRecordField = true;
+										}
+									} else
+										throw Exception("Found an item entity of record datatype, with a value which is not an ItemEntityFieldValue!");
 								}
 							
 							}else{

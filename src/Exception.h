@@ -38,12 +38,12 @@
 #define ERROR_NOTICE 1
 
 /**
-	This class servers as the generic exception class that all others are based on.
+	This class serves as the generic exception class that all others are based on.
 */
 class Exception {
 	public:
 		Exception(std::string msg = "", int severity = ERROR_FATAL, Exception *cause = NULL);
-		~Exception();
+		virtual ~Exception();
 
 		std::string GetErrorMessage();
 		int GetSeverity();
@@ -53,11 +53,10 @@ class Exception {
 		void SetSeverity(int);
 		void SetCause(Exception* ex);
 
-	private:
+	protected:
 		int severity;
 		std::string errorMessage;
 		Exception* cause;
 };
-
 
 #endif

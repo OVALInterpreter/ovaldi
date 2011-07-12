@@ -34,6 +34,7 @@
 #include "AbsEntityValue.h"
 #include "AbsVariable.h"
 #include "VariableFactory.h"
+#include "ItemFieldEntityValue.h"
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
 

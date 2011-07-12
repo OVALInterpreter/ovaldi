@@ -55,6 +55,7 @@ rpmlib = misc stuff...?
 #include <OvalEnum.h>
 #include <Behavior.h>
 #include <Log.h>
+#include <linux/RpmGuards.h>
 
 using namespace std;
 
@@ -82,98 +83,6 @@ namespace {
 		bool noconfig;
 		bool noghost;
 	};
-
-	/**
-	 * A trick borrowed from boost... an easy way to make a class noncopyable.
-	 * Wish we could just use boost :-P  Makes sure I don't mess up and make
-	 * accidental copies.
-	 */
-	class noncopyable {
-	protected:
-		noncopyable(){}
-		~noncopyable(){}
-	private:
-		noncopyable(const noncopyable&);
-		noncopyable& operator=(const noncopyable&);
-	};
-
-	// Perhaps all these guard classes aren't strictly necessary in all cases,
-	// but in C++ code which uses exceptions, I feel a lot safer having them.
-	// And you never know, someone else may come along later and add a throw
-	// where there wasn't before, which without the guard classes could cause a
-	// resource leak.  I saw an article online somewhere describing a more
-	// general mechanism, where I think you could register any C function to be
-	// called when the object is destroyed.  I might try that, if I could find
-	// the article again....
-
-	class RpmtsGuard : private noncopyable {
-	public:
-		RpmtsGuard() {
-			ts = rpmtsCreate();
-			
-			// I don't think this can ever happen.  From my reading of the rpm
-			// source, I think it would exit the program if memory allocation
-			// failed.  But it doesn't hurt to check...
-			if (!ts)
-				throw ProbeException("Couldn't create RPM database transaction set");
-		}
-
-		~RpmtsGuard() {
-			rpmtsFree(ts);
-		}
-
-		operator rpmts() {
-			return ts;
-		}
-
-	private:
-		rpmts ts;
-	};
-
-	class RpmdbIterGuard : private noncopyable {
-	public:
-		RpmdbIterGuard(const rpmts ts, rpmTag rpmtag,
-			const void * keyp, size_t keylen) {
-			iter = rpmtsInitIterator(ts, rpmtag, keyp, keylen);
-
-			if (!iter)
-				throw ProbeException("Couldn't create RPM database iterator");
-		}
-
-		~RpmdbIterGuard() {
-			rpmdbFreeIterator(iter);
-		}
-
-		operator rpmdbMatchIterator() {
-			return iter;
-		}
-		
-	private:
-		rpmdbMatchIterator iter;
-	};
-
-	class RpmfiGuard : private noncopyable {
-	public:
-
-		RpmfiGuard(rpmts ts, Header hdr, rpmTag tag, 
-				   const string &rpmName /* for error messages */) {
-			fileInfo = rpmfiNew(ts, hdr, tag, 0);
-			
-			if (!fileInfo)
-				throw ProbeException("Couldn't init file iterator on RPM "+rpmName);
-		}
-
-		~RpmfiGuard() {
-			rpmfiFree(fileInfo);
-		}
-		
-		operator rpmfi() {
-			return fileInfo;
-		}		 
-
-	private:
-		rpmfi fileInfo;
-	};	
 
 	/**
 	 * Moved this out so my free functions below could create items.

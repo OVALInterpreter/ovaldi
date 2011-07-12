@@ -45,68 +45,27 @@
 #include "Exception.h"
 #include "Log.h"
 
-#ifdef LINUX
-#include <sys/sysinfo.h>
-#endif
-
 #include <sys/utsname.h>
 
 #include <unistd.h>
 
 #include <netdb.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-
-/* from net */
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <net/if_arp.h>
-
-#ifdef DARWIN
-#include <sys/sysctl.h>
-#include <net/if_types.h>
-#include <net/if_dl.h>
-#endif
-
-#define inaddrr(x) (*(struct in_addr *) &ifr->x[sizeof sa.sin_port])
-#define IFRSIZE   ((int)(size * sizeof (struct ifreq)))
-/* end from net */
 
 #include <iostream>
 #include <string>
-#include <vector>
+#include <list>
+
+#include <unix/NetworkInterfaces.h>
 
 XERCES_CPP_NAMESPACE_USE
 
-/**
-	This class stores interface information as strings.
-	the interface name, mac address and ip address are stored.
-*/
-class IfData {
-public:
-	IfData(){};
-	~IfData(){};
-	IfData(std::string ifn, std::string ipAddr, std::string macAddr) : ifName(ifn), ipAddress(ipAddr), macAddress(macAddr) {}
-
-	std::string ifName;
-	std::string ipAddress;
-	std::string macAddress;
-};
-
-/**	
-	A vector for storing interface data dobjects. 
-	Stores only pointers to the objects. 
-*/
-typedef std::vector < IfData* > IfDataVector;
+typedef std::list<NetworkInterfaces::Interface> IntfList;
 
 /**
-	This class stores system info as defined in the oval system characteristics schema.
-	A write method is provide for writing out the system infor element as defined in the oval 
-	system characteristics schema.
+   This class stores system info as defined in the oval system characteristics schema.
+   A write method is provide for writing out the system infor element as defined in the oval 
+   system characteristics schema.
 */
 class SystemInfo {
 
@@ -119,19 +78,19 @@ public:
 	std::string os_version;
 	std::string architecture;
 	std::string primary_host_name;
-	IfDataVector interfaces;
+	IntfList interfaces;
 };
 
 /**
 	This class is responsible for collecting system information.
 */
 class SystemInfoCollector {
-	public:
-		static SystemInfo* CollectSystemInfo();
+public:
+	static SystemInfo* CollectSystemInfo();
 		
-	private:
-		static void GetOSInfo(SystemInfo*);
-		static IfDataVector GetInterfaces();
+private:
+	static void GetOSInfo(SystemInfo*);
+	static IntfList GetInterfaces();
 };
 
 /** 

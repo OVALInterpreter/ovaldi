@@ -144,7 +144,7 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileMd5Probe::Instance();
 	} else if(objectName.compare("ldap_object") == 0) {
 		probe = LDAPProbe::Instance();
-	} else if(objectName.compare("cmdlet_1_object") == 0||objectName.compare("cmdlet_2_object") == 0 || objectName.compare("cmdlet_3_object") == 0) {
+	} else if(objectName.compare("cmdlet_object") == 0) {
 		probe = CmdletProbe::Instance();
 	} else {
 		Log::Info(objectName + " is not currently supported.");

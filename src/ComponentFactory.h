@@ -47,7 +47,7 @@
 XERCES_CPP_NAMESPACE_USE
 
 /**
-	This class is a Factory class for getting parsed components of a local varaible.
+	This class is a Factory class for getting parsed components of a local variable.
 	This class allows for a single interface to all types of components defined 
 	in the oval definitions schema.
 */
