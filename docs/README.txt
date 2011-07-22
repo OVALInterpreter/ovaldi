@@ -329,6 +329,11 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
                      DEFAULT="results_to_html.xsl"
       -x filename  = output xsl transform results to the specified file.
                      DEFAULT="results.html"
+	  -b 		   = verify XML output files w.r.t both XML-Schema and Schematron.
+	  -j filename  = path to xsl for oval-system-characteristics Schematron validation. 
+					 DEFAULT="oval-system-characteristics-schematron.xsl"
+	  -k filename  = path to xsl for oval-results Schematron validation. 
+					 DEFAULT="oval-results-schematron.xsl"
 
      Other Options:
       -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
@@ -378,11 +383,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
            Forum for public review.
 
      -n -- If set run Schematron validation on the input OVAL Definitions
-           document. Schematron validation is currently optional. In the 
-           future, the OVAL Compatibility program will likely require 
-           Schematron validation. When Schematron validation is required by the
-           OVAL Language, the OVAL Interpreter reference implementation will also require 
-           Schematron validation.  
+           document.
                      
      -c -- Specifies the pathname of the oval-definitions-schematron.xsl
            to be used for Schematron validation. If none is specified 
@@ -424,6 +425,18 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
            are to be saved.  If none is specified, the OVAL Interpreter 
            will default to "results.html" in the OVAL Interpreter directory.
 
+	 -b -- If set run Schematron validation on the output OVAL System Characteristics
+           and OVAL Results documents.
+
+	 -j -- Specifies the pathname of the oval-system-characteristics-schematron.xsl
+           to be used for Schematron validation. If none is specified then the OVAL Interpreter 
+		   will default to "oval-system-characteristics-schematron.xsl" in the OVAL Interpreter 
+		   installation directory.
+			
+	 -k -- Specifies the pathname of the oval-results-schematron.xsl to be used for Schematron 
+		   validation. If none is specified then the OVAL Interpreter will default to 
+		   "oval-results-schematron.xsl" in the OVAL Interpreter installation directory.
+		   
      -l -- Logging level.  Log messages at the specified level. 
            (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
 
