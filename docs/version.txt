@@ -42,6 +42,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the linux-def:selinuxboolean_test.
 * Added support for the collection of boolean values in the win-def:wmi_test.  Thanks to Sandeep Rathan of SecPod Technologies for supplying this patch.
 * Added support for the linux-def:iflisteners_test.
+* Added support for validating the output OVAL System Characteristics and OVAL Results documents.
 
 ---------------------------------------
 ---        Version 5.9 build 1      ---
