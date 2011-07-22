@@ -963,8 +963,8 @@ void Usage() {
 	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << DEFAULT_RESULTS_XFORM_FILENAME<<'\"' << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
 	cout << "   -b           = verify XML output files w.r.t. both XML-Schema and Schematron." << endl;
-	cout << "   -j           = path to xsl for oval-system-characteristics Schematron validation. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME << '\"' << endl;
-	cout << "   -k           = path to xsl for oval-results Schematron validation. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_RESULTS_SCHEMATRON_FILENAME << '\"' << endl;
+	cout << "   -j <string>  = path to xsl for oval-system-characteristics Schematron validation. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME << '\"' << endl;
+	cout << "   -k <string>  = path to xsl for oval-results Schematron validation. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_RESULTS_SCHEMATRON_FILENAME << '\"' << endl;
 	cout << "\n";
 
 	cout << "Other Options:" << endl;
