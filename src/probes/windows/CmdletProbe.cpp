@@ -32,12 +32,13 @@
 #include <map>
 #include <memory>
 #include <sstream>
+#include <string>
 #include <vector>
-#include <msclr\marshal.h>
 #include <msclr\marshal_cppstd.h>
 
 #include <VectorPtrGuard.h>
 #include <ItemFieldEntityValue.h>
+#include <OvalEnum.h>
 #include "CmdletProbe.h"
 
 using namespace std;
@@ -129,6 +130,12 @@ namespace {
 		 */
 		vector<typename _Cont::value_type> combo() const;
 
+		/**
+		 * Resets the object so that the combinations can be enumerated
+		 * again.
+		 */
+		void reset();
+
 	private:
 		/** (pointers to) the containers we are iterating over */
 		vector<const _Cont *> containers;
@@ -144,32 +151,85 @@ namespace {
 		 * beginnings of all the containers, which is the first
 		 * combination.  To be easier to use, the first advance
 		 * call will do nothing, and subsequent advance calls will
-		 * advance to the next combination.  So in effect, to the
-		 * outside world, the illusion is created that instances
-		 * of this class are initialized to not contain any
-		 * combination.  accept() must be called once to move
-		 * to the first combination.
+		 * advance to the next combination.  So in effect, to users,
+		 * the illusion is maintained that instances of this class
+		 * are initialized to not contain any combination; advance()
+		 * must be called once to move to the first combination.
 		 */
 		bool beforeFirstAdvance;
 	};
 
 	/**
-	 * The list of legal cmdlet verbs.
+	 * Represents a module or snapin, identified by the 3 values corresponding
+	 * to the object entities of this test: name, guid, and version.  Guid is
+	 * null for snapins.
 	 */
-	char const * const LEGAL_VERBS[] = {
-		"foreach",
-		"get",
-		"group",
-		"measure",
-		"select",
-		"where"
+	ref struct AvailableModule {
+		AvailableModule(String ^name, Guid ^guid, System::Version ^version)
+			: name(name), guid(guid), version(version) {
+		}
+
+		String ^name;
+		Guid ^guid;
+		System::Version ^version;
 	};
+
+	/**
+	 * I want some managed global data.  I can't put it in the probe class 
+	 * because the probe class is unmanaged.  I can't make it truly global
+	 * (i.e. at file scope) because that's not allowed by the language.  
+	 * So this is a workaround.
+	 */
+	ref struct ManagedGlobals {
+		static Collection<AvailableModule^> ^availableModules = nullptr;
+		initonly static array<String^> ^LEGAL_VERBS = {
+			"approve",
+			"assert",
+			"compare",
+			"confirm",
+			"find",
+			"get",
+			"import",
+			"measure",
+			"open",
+			"ping"
+			"read",
+			"request",
+			"resolve",
+			"search",
+			"select",
+			"show",
+			"test",
+			"trace",
+			"watch"
+		};
+	};
+
+	/**
+	 * Gets available modules (via the Get-Module cmdlet) and returns
+	 * info about them.  This function is called by the ManagedGlobals
+	 * static constructor.  Snapins are not looked up; there doesn't
+	 * seem to be an "Import-Snapin" command anyway.  Maybe they don't
+	 * need importing... I dunno how this stuff works :-P
+	 */
+	Collection<AvailableModule^>^ GetAvailableModules(Runspace ^runspace);
+
+	/**
+	 * Creates a restricted runspace: all cmdlets which don't satisfy
+	 * certain criteria are removed.  This uses the white-list of
+	 * verbs, and filters out aliases.
+	 * <p>
+	 * Logic for this is mostly copied from sample code from Microsoft.
+	 *
+	 * \return a runspace
+	 */
+	Runspace ^MakeRunspace();
 
 	/**
 	 * Checks whether the verb part of the given cmdlet name is
 	 * legal.  It is legal if it is contained in the white-list
-	 * of legal verbs defined by LEGAL_VERBS.  Comparisons are
-	 * done case-insensitively.
+	 * of legal verbs defined by ManagedGlobals::LEGAL_VERBS.
+	 * Comparisons are done case-insensitively.
 	 *
 	 * \return true if the cmdlet has a legal verb, false if not.
 	 */
@@ -181,30 +241,92 @@ namespace {
 	auto_ptr<Item> CreateItem();
 
 	/**
-	 * Creates a restricted runspace: all cmdlets which don't satisfy
-	 * certain criteria are removed.  This uses a white-list of
-	 * verbs, filters out non-cmdlets, and checks the cmdlet modules
-	 * for a match with the given module entities.
-	 *
-	 * \return a runspace, or nullptr if everything was filtered out.
+	 * Attempts to import a module with the given name into the given
+	 * runspace.
 	 */
-	Runspace ^MakeRunspace(ObjectEntity *modNameObjEntity,
-		ObjectEntity *modIdObjEntity,
+	void ImportModule(Runspace ^runspace, String ^moduleName);
+
+	/**
+	 * Attempts to find the module or snapin which contains the given
+	 * command, which satisfies the given module entities.  If moduleName
+	 * is non-NULL, it is prepended to the given verb and noun when forming
+	 * a fully-qualified command name.
+	 *
+	 * \return an AvailableModule object describing a module or snapin with
+	 *   matching name/guid/version, or null if one could not be found.
+	 */
+	AvailableModule ^VerifyModuleInfo(Runspace ^runspace, const string &verb, 
+		const string &noun, const string *moduleName,
+		ObjectEntity *modNameObjEntity, ObjectEntity *modIdObjEntity,
 		ObjectEntity *modVersionObjEntity);
 
-	Collection<PSObject^> ^InvokeCmdlet(Runspace ^runspace, const string &verb, const string &noun,
-		const map<string, StringVector> &params, const map<string, StringVector> &selects,
-		const StringVector &paramCombo, const StringVector &selectCombo);
+	/**
+	 * Creates an item with entity values from the given data: the module_*
+	 * entities come from modUsed, verb and noun from the corresponding
+	 * params, and the parameters and select entities are built from the
+	 * given vectors of names and values.
+	 *
+	 * \return the constructed item
+	 */
+	auto_ptr<Item> StartItem(AvailableModule ^modUsed, const string &verb,
+		const string &noun, const StringVector &paramNames, 
+		const StringVector &selectNames, const StringVector &paramCombo,
+		const StringVector &selectCombo);
 
-	void AddItemsFromCmdletResults(Collection<PSObject^> ^results, 
-		ItemVector *items, ObjectEntity *modNameObjEntity, 
+	/**
+	 * Given a verb and noun and module info, attempts to find a matching
+	 * module, and then invokes the resulting fully qualified command with all
+	 * the different combinations of parameter and select values.
+	 *
+	 * \param runspace the runspace to use when running commands
+	 * \param verb the command verb
+	 * \param noun the command noun
+	 * \param paramNames the command parameter names, if any (could be empty)
+	 * \param selectNames the select parameter names, if any (could be empty)
+	 * \param paramCombos the command parameter value combo generator
+	 * \param selectCombos the select parameter value combo generator
+	 * \param moduleName a module name which further qualifies which command
+	 *   should be run.  Passed as a pointer so that NULL can be passed in the
+	 *   case that the module_name entity was nil'd, meaning we don't care
+	 *   which module the command comes from.
+	 * \param modNameObjEntity module_name object entity, used to verify that
+	 *   a command from the proper module is being run
+	 * \param modIdObjEntity module_id object entity, used to verify that a
+	 *   a command from the proper module is being run
+	 * \param modVersionObjEntity module_version object entity, used to verify
+	 *   that a command from the proper module is being run
+	 * \param items pointer to a vector which receive matching items
+	 */
+	void RunVerbNoun(Runspace ^runspace, const string &verb,
+		const string &noun, const StringVector &paramNames,
+		const StringVector &selectNames,
+		ContainerValueCombinations<StringVector> &paramCombos,
+		ContainerValueCombinations<StringVector> &selectCombos,
+		const string *moduleName, ObjectEntity *modNameObjEntity,
 		ObjectEntity *modIdObjEntity, ObjectEntity *modVersionObjEntity,
-		const string &verb, const string &noun);
+		ItemVector *items);
 
-	auto_ptr<Item> MakeItemFromCmdletResult(PSObject ^result,
-		ObjectEntity *modNameObjEntity, ObjectEntity *modIdObjEntity,
-		ObjectEntity *modVersionObjEntity, const string &verb, 
-		const string &noun);
+	/**
+	 * Invokes the given command from the given module, using the given
+	 * command and select parameters.  Matching items are added to the
+	 * given vector.
+	 */
+	void InvokeCmdlet(Runspace ^runspace, AvailableModule ^modUsed,
+		const string &verb, const string &noun,
+		const StringVector &paramNames, const StringVector &selectNames,
+		const StringVector &paramCombo, const StringVector &selectCombo,
+		ItemVector *items);
+
+	/**
+	 * Adds a value entity to the given item, which contains the given
+	 * command result.
+	 */
+	void AddResultToItem(PSObject ^result, Item *item);
+
+	/**
+	 * Maps a .net type to an Oval type.
+	 */
+	OvalEnum::Datatype GetDatatype(Type ^type);
 }
 
 //****************************************************************************************//
@@ -236,60 +358,69 @@ ItemVector* CmdletProbe::CollectItems(::Object *object) {
 	MANAGED_EXCEPTION_GUARD_BEGIN
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
-	auto_ptr<Item> itemTemplate;
 
 	ObjectEntity
-		*modNameObjEntity,
-		*modIdObjEntity,
-		*modVersionObjEntity,
-		*verbObjEntity,
-		*nounObjEntity,
-		*paramsObjEntity,
-		*selectObjEntity;
+		*modNameObjEntity = object->GetElementByName("module_name"),
+		*modIdObjEntity = object->GetElementByName("module_id"),
+		*modVersionObjEntity = object->GetElementByName("module_version"),
+		*verbObjEntity = object->GetElementByName("verb"),
+		*nounObjEntity = object->GetElementByName("noun"),
+		*paramsObjEntity = object->GetElementByName("parameters"),
+		*selectObjEntity = object->GetElementByName("select");
 
-	modNameObjEntity = object->GetElementByName("module_name");
-	modIdObjEntity = object->GetElementByName("module_id");
-	modVersionObjEntity = object->GetElementByName("module_version");
-	verbObjEntity = object->GetElementByName("verb");
-	nounObjEntity = object->GetElementByName("noun");
-	paramsObjEntity = object->GetElementByName("parameters");
-	selectObjEntity = object->GetElementByName("select");
-
-	StringVector verbs, nouns;
+	StringVector verbs, nouns, moduleNames, paramNames, selectNames;
 	map<string, StringVector> params, selects;
+	vector<const StringVector*> allParams, allSelects;
+
+
+	if (!modNameObjEntity->GetNil())
+	/*OvalEnum::Flag flag =*/ modNameObjEntity->GetEntityValues(moduleNames);
 
 	/*OvalEnum::Flag flag =*/ verbObjEntity->GetEntityValues(verbs);
 	/*OvalEnum::Flag flag =*/ nounObjEntity->GetEntityValues(nouns);
+
 	if (!paramsObjEntity->GetNil())
 		/*OvalEnum::Flag flag =*/ paramsObjEntity->GetEntityValues(params);
 	if (!selectObjEntity->GetNil())
 		/*OvalEnum::Flag flag =*/ selectObjEntity->GetEntityValues(selects);
 
-	Runspace ^runspace = MakeRunspace(modNameObjEntity, modIdObjEntity,
-		modVersionObjEntity);
+	// I decided against reusing a global runspace, because the potential
+	// module importing that would be done could change collection behavior
+	// for future collections.  So a fresh runspace is created each time
+	// to ensure consistent behavior.
+	Runspace ^runspace = MakeRunspace();
 
-	// we match the module entities by filtering disallowed cmdlets
-	// from the runspace.  If that filtered out everything, then no
-	// cmdlets match, so we return the empty vector.
-	if (runspace == nullptr) {
-		Log::Debug("No cmdlets matched!");
-		return collectedItems.release();
-	}
+	// It seems scripts are evaluated in this default runspace; I get
+	// errors when evaluating some property values, unless I set this.
+	Runspace::DefaultRunspace = runspace;
+
+	// the list of available modules need only be obtained once.  Each
+	// AvailableModule object has no connection to any particular
+	// runspace.
+	if (ManagedGlobals::availableModules == nullptr)
+		ManagedGlobals::availableModules = GetAvailableModules(runspace);
 
 	// create our vectors of vectors of params and selects, so we can
 	// enumerate all the combinations.  We'll have to iterate over all
-	// combinations once per verb+noun combination.
-	vector<const StringVector*> allParams;
+	// combinations once per verb+noun+module combination.  I'll also
+	// create a vector of param and select names.  This will be handy
+	// to pair up with each param/select value combo.
 	for (map<string, StringVector>::iterator iter = params.begin();
 		iter != params.end();
-		++iter)
+		++iter) {
+		paramNames.push_back(iter->first);
 		allParams.push_back(&iter->second);
+	}
 
-	vector<const StringVector*> allSelects;
 	for (map<string, StringVector>::iterator iter = selects.begin();
 		iter != selects.end();
-		++iter)
+		++iter) {
+		selectNames.push_back(iter->first);
 		allSelects.push_back(&iter->second);
+	}
+
+	ContainerValueCombinations<StringVector> paramCombos(allParams);
+	ContainerValueCombinations<StringVector> selectCombos(allSelects);
 
 	for (StringVector::iterator verbIter = verbs.begin();
 		verbIter != verbs.end();
@@ -299,51 +430,28 @@ ItemVector* CmdletProbe::CollectItems(::Object *object) {
 			nounIter != nouns.end();
 			++nounIter) {
 
-			// params and select are both nillable... so there are
-			// 4 cases: both are nil, neither, or exactly one or the other.
-			StringVector emptyPh; // used for combo when params or select is nil'd
-			Collection<PSObject^> ^results;
-			if (!params.empty() && !selects.empty()) {
-				ContainerValueCombinations<StringVector> paramCombos(allParams);
-				while (paramCombos.advance()) {
-					ContainerValueCombinations<StringVector> selectCombos(allSelects);
-					while (selectCombos.advance()) {
-						results = InvokeCmdlet(runspace, *verbIter, *nounIter, params, selects, 
-								paramCombos.combo(), selectCombos.combo());
-					}
-				}
-			} else if (!params.empty()) {
-				ContainerValueCombinations<StringVector> paramCombos(allParams);
-				while (paramCombos.advance()) {
-					results = InvokeCmdlet(runspace, *verbIter, *nounIter, params, selects, 
-							paramCombos.combo(), emptyPh);
-				}
-			} else if (!selects.empty()) {
-				ContainerValueCombinations<StringVector> selectCombos(allSelects);
-				while (selectCombos.advance()) {
-					results = InvokeCmdlet(runspace, *verbIter, *nounIter, params, selects, 
-							emptyPh, selectCombos.combo());
-				}
-			} else {
-				// both params and select are nil
-				results = InvokeCmdlet(runspace, *verbIter, *nounIter, params, selects, 
-						emptyPh, emptyPh);
+				if (Common::EqualsIgnoreCase(*verbIter, "Select") && 
+					Common::EqualsIgnoreCase(*nounIter, "Object")) {
+				Log::Info("Illegal cmdlet: Select-Object.  This is only usable indirectly via the select entity.  Ignoring...");
+				continue;
 			}
 
-			AddItemsFromCmdletResults(results, collectedItems.get(), 
-				modNameObjEntity, modIdObjEntity, modVersionObjEntity,
-				*verbIter, *nounIter);
+			if (modNameObjEntity->GetNil())
+				RunVerbNoun(runspace, *verbIter, *nounIter, paramNames,
+					selectNames, paramCombos, selectCombos, NULL, 
+					modNameObjEntity, modIdObjEntity, modVersionObjEntity, 
+					collectedItems.get());
+			else
+				for (StringVector::iterator modNameIter = moduleNames.begin();
+					modNameIter != moduleNames.end();
+					++modNameIter)
+					RunVerbNoun(runspace, *verbIter, *nounIter, paramNames, 
+						selectNames, paramCombos, selectCombos, &*modNameIter,
+						modNameObjEntity, modIdObjEntity, modVersionObjEntity,
+						collectedItems.get());
 		}
 	}
 
-//	item = this->CreateItem();
-//	item->SetStatus(OvalEnum::STATUS_EXISTS);
-//	item->AppendElement(new ItemEntity("verb", verbObjEntity->GetValue(), verbObjEntity->GetDatatype(), true, OvalEnum::STATUS_EXISTS));
-//	item->AppendElement(new ItemEntity("noun", nounObjEntity->GetValue(), nounObjEntity->GetDatatype(), true, OvalEnum::STATUS_EXISTS));
-//	item->AppendElement(new ItemEntity("arguments", argumentsEntity->GetValue(), argumentsEntity->GetDatatype(), true, (argumentsEntity->GetNil())?OvalEnum::STATUS_NOT_COLLECTED:OvalEnum::STATUS_EXISTS,argumentsEntity->GetNil()));
-//	item->AppendElement(new ItemEntity("parameters", parametersEntity->GetValue(), parametersEntity->GetDatatype(), true, (parametersEntity->GetNil())?OvalEnum::STATUS_NOT_COLLECTED:OvalEnum::STATUS_EXISTS,parametersEntity->GetNil()));
-
-//	collectedItems->push_back(item);
 	return collectedItems.release();
 
 
@@ -359,123 +467,6 @@ Item* CmdletProbe::CreateItem() {
 	return NULL;
 }
 
-void CmdletProbe::ExecutePowerShell(string powershellInput, Item* item){
-	AbsEntityValueVector fieldEntityValues;
-	PowerShell^ ps = PowerShell::Create();
-	InitialSessionState^ restrictedSessionState = this->InitializeRunspace();		
-	ps->Runspace = Runspaces::RunspaceFactory::CreateRunspace(restrictedSessionState);
-	ps->Runspace->Open();
-	ps->AddScript(marshal_as<String^>(powershellInput));
-		
-	try{
-		Collection<PSObject^> psObjects = ps->Invoke();
-		if ( psObjects.Count == 0 ){
-			item->AppendElement(new ItemEntity("value",fieldEntityValues,OvalEnum::DATATYPE_RECORD,false,OvalEnum::STATUS_DOES_NOT_EXIST));
-		}
-		for each( PSObject^ psObject in psObjects ){
-			PSMemberInfoCollection<PSPropertyInfo^> ^objectProperties = psObject->Properties;
-			Generic::IEnumerator<PSPropertyInfo^>^ propIterator = objectProperties->GetEnumerator();
-			while ( propIterator->MoveNext() ){
-				PSPropertyInfo^ psProperty = propIterator->Current;		
-				string name = Common::ToLower(marshal_as<string>(psProperty->Name));
-				try{
-					if ( psProperty->IsGettable ){
-						if ( psProperty->Value != nullptr ){
-							OvalEnum::Datatype datatype = this->GetDatatype(marshal_as<string>(psProperty->Value->GetType()->ToString()));
-							try{
-								fieldEntityValues.push_back(new ItemFieldEntityValue(name, (datatype == OvalEnum::DATATYPE_BOOLEAN)?Common::ToLower(marshal_as<string>(psProperty->Value->ToString())):marshal_as<string>(psProperty->Value->ToString()), datatype, OvalEnum::STATUS_EXISTS));                   								
-							}catch(System::Exception^ e){
-								item->AppendMessage(new OvalMessage(marshal_as<string>(e->ToString()),OvalEnum::LEVEL_ERROR));
-								fieldEntityValues.push_back(new ItemFieldEntityValue(name, "", datatype, OvalEnum::STATUS_ERROR));  	
-							}
-						}else{
-							fieldEntityValues.push_back(new ItemFieldEntityValue(name, "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));                                 
-						}
-					}
-				}catch(System::Exception^ e){
-					item->AppendMessage(new OvalMessage(marshal_as<string>(e->ToString()),OvalEnum::LEVEL_ERROR));
-					fieldEntityValues.push_back(new ItemFieldEntityValue(Common::ToLower(marshal_as<string>(psProperty->Name)), "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR)); 
-				}
-			}
-			item->AppendElement(new ItemEntity("value", fieldEntityValues, OvalEnum::DATATYPE_RECORD, false, OvalEnum::STATUS_EXISTS));
-			fieldEntityValues.clear();
-		}
-	}catch(System::Exception^ e){
-		ps->Runspace->Close();	
-		throw ProbeException("Error: There was an error retrieving the results of the cmdlet execution."+marshal_as<string>(e->ToString()));
-	}
-
-	ps->Runspace->Close();
-}
-
-InitialSessionState^ CmdletProbe::InitializeRunspace(){
-
-	InitialSessionState^ restrictedSessionState = InitialSessionState::CreateDefault();
-	PowerShell^ ps = PowerShell::Create();
-	ps->Runspace->DefaultRunspace = Runspaces::RunspaceFactory::CreateRunspace();
-	ps->Runspace->DefaultRunspace->Open();
-	ps->AddScript("get-command | where-object {$_.verb -ne \"foreach\" -and $_.verb -ne \"get\" -and $_.verb -ne \"group\" -and $_.verb -ne \"measure\" -and $_.verb -ne \"select\" -and $_.verb -ne \"where\"} | select-object name");		
-	Collection<String^> restrictedCmdlets;
-	
-	try{
-		Collection<PSObject^> psObjects = ps->Invoke();
-		for each( PSObject^ psObject in psObjects ){
-			for each (PSPropertyInfo ^ psProperty in psObject->Properties ){
-				if ( psProperty->IsGettable && psProperty->Value != nullptr ){
-					restrictedCmdlets.Add(psProperty->Value->ToString());		
-				}
-			}
-		}
-	}catch(System::Exception^ e){
-		ps->Runspace->DefaultRunspace->Close();
-		throw ProbeException("Error: There was an error initializing the restricted runspace."+marshal_as<string>(e->ToString()));
-	}
-
-	for each (String^ cmdlet in restrictedCmdlets){
-		int index = 0;
-		InitialSessionStateEntryCollection<SessionStateCommandEntry^>^ commands = restrictedSessionState->Commands;		
-		for each (SessionStateCommandEntry^ command in commands){
-			if (command->Name->Equals(cmdlet, StringComparison::OrdinalIgnoreCase)){
-				restrictedSessionState->Commands->RemoveItem(index);
-				break;
-			}
-			index++;
-		}
-	}
-
-	ps->Runspace->DefaultRunspace->Close();
-	return restrictedSessionState;
-}
-
-OvalEnum::Datatype CmdletProbe::GetDatatype(std::string type){
-	OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING;
-
-	if ( type.compare("System.Boolean") == 0 ){
-
-		datatype = OvalEnum::DATATYPE_BOOLEAN;
-	
-	}else if ( type.compare("System.Byte") == 0 || 
-			   type.compare("System.Int16") == 0 ||
-			   type.compare("System.Int32") == 0 ||
-			   type.compare("System.Int64") == 0 ||
-			   type.compare("System.UInt16") == 0 ||
-			   type.compare("System.UInt32") == 0 ||
-			   type.compare("System.UInt64") == 0 ||
-			   type.compare("System.Decimal") == 0 ||
-			   type.compare("System.SByte") == 0 ){
-
-		datatype = OvalEnum::DATATYPE_INTEGER;
-
-	}else if ( type.compare("System.Double") == 0 ||
-			   type.compare("System.Single") == 0 ){
-
-				 datatype = OvalEnum::DATATYPE_FLOAT;
-
-	}
-
-	return datatype;
-}
-
 namespace {
 
 	template<typename _Cont>
@@ -484,17 +475,7 @@ namespace {
 			atEndFlag(true), 
 			beforeFirstAdvance(true) {
 
-		// initialize iterators to the beginnings of their containers.  Also
-		// we can check whether we started out at the end, which happens when
-		// all containers are empty.
-		iterators.reserve(containers.size());
-		for (typename vector<const _Cont *>::iterator contIter = this->containers.begin();
-			contIter != this->containers.end();
-			++contIter) {
-			iterators.push_back((*contIter)->begin());
-			if (!(*contIter)->empty())
-				atEndFlag = false;
-		}
+		reset();
 	}
 
 	template<typename _Cont>
@@ -578,15 +559,28 @@ namespace {
 		return vals;
 	}
 
+	template <typename _Cont>
+	void ContainerValueCombinations<_Cont>::reset() {
+
+		atEndFlag = beforeFirstAdvance = true;
+		iterators.clear();
+
+		// initialize iterators to the beginnings of their containers.  Also
+		// we can check whether we started out at the end, which happens when
+		// all containers are empty.
+		for (typename vector<const _Cont *>::iterator contIter = containers.begin();
+			contIter != containers.end();
+			++contIter) {
+			iterators.push_back((*contIter)->begin());
+			if (!(*contIter)->empty())
+				atEndFlag = false;
+		}
+	}
+
 	bool HasLegalVerb(String ^cmdletName) {
-		const int numVerbs = sizeof(LEGAL_VERBS)/sizeof(LEGAL_VERBS[0]);
-
-		// I'd rather have global managed array of managed strings rather
-		// than repeatedly marshaling C-strings, but apparently variables
-		// of managed type can't be global!
-
-		for (int i=0; i<numVerbs; ++i) {
-			if (cmdletName->ToLower()->StartsWith(marshal_as<String^>(LEGAL_VERBS[i])->ToLower()+"-"))
+		for each (String ^legalVerb in ManagedGlobals::LEGAL_VERBS) {
+			if (cmdletName->StartsWith(legalVerb+"-", 
+				StringComparison::OrdinalIgnoreCase))
 				return true;
 		}
 
@@ -602,83 +596,36 @@ namespace {
 							"cmdlet_item"));
 	}
 
-	Runspace ^MakeRunspace(ObjectEntity *modNameObjEntity,
-		ObjectEntity *modIdObjEntity,
-		ObjectEntity *modVersionObjEntity) {
-		//Runspace ^defRunspace = Runspace::DefaultRunspace;
-		//InitialSessionState ^defInitState = defRunspace->InitialSessionState;
-		/*
-		PowerShell^ ps = PowerShell::Create();
-		ps->AddScript("get-command | where-object {$_.verb -eq \"foreach\" -or $_.verb -eq \"get\" -or $_.verb -eq \"group\" -or $_.verb -eq \"measure\" -or $_.verb -eq \"select\" -or $_.verb -eq \"where\"} | select-object name");		
-		Collection<PSObject^> psObjects = ps->Invoke();
-		for each (PSObject ^obj in psObjects) {
-			System::Object ^baseObj = obj->BaseObject;
-			Log::Info("baseObj is a " + marshal_as<string>(baseObj->GetType()->FullName));
-		}
-		*/
-
+	Runspace ^MakeRunspace() {
 		InitialSessionState ^iss = InitialSessionState::CreateDefault();
 		// other setup, copied from Microsoft's sample code
 		iss->LanguageMode = PSLanguageMode::NoLanguage;
 		iss->ThrowOnRunspaceOpenError = true;
 		iss->Formats->Clear();
 
-		Log::Debug("Default InitialSessionState has " + Common::ToString(iss->Commands->Count)+" items");	
+		//Log::Debug("Default InitialSessionState has " + Common::ToString(iss->Commands->Count)+" commands");
 
-		ItemEntity modNameItemEntity("","",OvalEnum::DATATYPE_STRING);
-		ItemEntity modIdItemEntity("","",OvalEnum::DATATYPE_STRING);
-		ItemEntity modVersionItemEntity("","",OvalEnum::DATATYPE_VERSION);
-		bool atLeastOneVisibleCmdlet = false;
-		for (int i=0; i<iss->Commands->Count; ++i) {
-			SessionStateCommandEntry ^cmd = iss->Commands[i];
-
-			// special case: "select" is one of the entities, so that has to be
-			// allowed.  I'm trying to make sure the cmdlet I'm allowing is the
-			// right one, not just any one that is named "Select-Object".
-			// I get all cmdlets with null modules, including Select-Object,
-			// so I hope this restricts it appropriately.
-			if (cmd->Name->Equals("Select-Object") && 
-				cmd->CommandType == CommandTypes::Cmdlet &&
-				cmd->Module == nullptr)
-				continue;
-
-			if (cmd->Module != nullptr) {
-				modNameItemEntity.SetValue(marshal_as<string>(cmd->Module->Name));
-				modIdItemEntity.SetValue("{"+marshal_as<string>(cmd->Module->Guid.ToString())+"}");
-				modVersionItemEntity.SetValue(marshal_as<string>(cmd->Module->Version->ToString()));
-			}
+		for each (SessionStateCommandEntry ^cmd in iss->Commands) {
 
 			// filter out the command if:
-			// - it's not a cmdlet
-			// -or- there is no module, and any of the module-related entities
-			//      are not nil
-			// -or- there is a module, and any of non-nil the module-related
-			//      entities don't match
+			// - it's an alias
 			// -or- the verb is not allowed
 			//
 			// where "filter out" means just hiding it.  This allows legal
 			// cmdlets to call them as part of their implementation.
-			if (cmd->CommandType != CommandTypes::Cmdlet ||
-				(cmd->Module == nullptr &&
-					(!modNameObjEntity->GetNil() ||
-					!modIdObjEntity->GetNil() ||
-					!modVersionObjEntity->GetNil())) ||
-				(cmd->Module != nullptr &&
-					((!modNameObjEntity->GetNil() && modNameObjEntity->Analyze(&modNameItemEntity) != OvalEnum::RESULT_TRUE) ||
-					(!modIdObjEntity->GetNil() && modIdObjEntity->Analyze(&modIdItemEntity) != OvalEnum::RESULT_TRUE) ||
-					(!modVersionObjEntity->GetNil() && modVersionObjEntity->Analyze(&modVersionItemEntity) != OvalEnum::RESULT_TRUE))) ||
+			//
+			// We must also allow Select-Object so that we can process the
+			// "select" object entity, Get-Module so we can get available
+			// modules, and Import-Module so we can load commands from other
+			// available modules as necessary.  Currently, all ought to be
+			// allowed automatically, since their verbs are legal, so no
+			// special action is necessary.
+			if (cmd->CommandType == CommandTypes::Alias ||
 				!HasLegalVerb(cmd->Name))
 				cmd->Visibility = SessionStateEntryVisibility::Private;
-			else {
-				atLeastOneVisibleCmdlet = true;
-				Log::Debug(marshal_as<string>(cmd->Name)+" passed");
-			}
+/*			else
+				Log::Debug(marshal_as<string>(cmd->Name)+" passed");*/
 		}
-
-		// don't bother creating the runspace if we can't find any legal
-		// commands which satisfy the module requirements.
-		if (!atLeastOneVisibleCmdlet)
-			return nullptr;
 
 		Runspace ^runspace = RunspaceFactory::CreateRunspace(iss);
 		// copied from MS sample code
@@ -688,127 +635,472 @@ namespace {
 		return runspace;
 	}
 
-	Collection<PSObject^> ^InvokeCmdlet(Runspace ^runspace, const string &verb, const string &noun,
-		const map<string, StringVector> &params, const map<string, StringVector> &selects,
-		const StringVector &paramCombo, const StringVector &selectCombo) {
+	Collection<AvailableModule^> ^GetAvailableModules(Runspace ^runspace) {
+		PowerShell ^ps = PowerShell::Create();
+		ps->Runspace = runspace;
+		ps->AddCommand("Get-Module")->AddParameter("ListAvailable")
+			->AddCommand("Select-Object")->AddParameter("Property", 
+				gcnew array<String^> {"Name","Guid","Version"});
 
-		ostringstream cmdline; // for debugging
+		Collection<AvailableModule^> ^moduleNames = gcnew Collection<AvailableModule^>();
 
-		if (verb == "Select" && noun == "Object")
-			throw ProbeException("Illegal cmdlet: Select-Object.  This is only usable indirectly via the select entity!");
+		try {
+			Collection<PSObject ^> ^results = ps->Invoke();
+			for each (PSObject ^result in results) {
+				System::Object ^nameObj = result->Properties["Name"]->Value;
+				System::Object ^guidObj = result->Properties["Guid"]->Value;
+				System::Object ^versionObj = result->Properties["Version"]->Value;
 
+				String ^name = safe_cast<String^>(nameObj);
+				Guid ^guid = guidObj == nullptr ? nullptr : safe_cast<Guid^>(guidObj);
+				System::Version ^version = safe_cast<System::Version^>(versionObj);
+
+				moduleNames->Add(gcnew AvailableModule(name, guid, version));
+
+				Log::Debug("Found module: " + marshal_as<string>(name) + "/"+
+					(guid==nullptr ? "(null)":marshal_as<string>(guid->ToString()))+
+					"/"+marshal_as<string>(version->ToString()));
+			}
+		} catch(System::Exception ^e) {
+			Log::Info("Failed to get available powershell modules: " + 
+				marshal_as<string>(e->GetType()->FullName)+": " +
+				marshal_as<string>(e->Message));
+			Log::Info("No modules will be searched for commands.");
+			moduleNames->Clear();
+		} finally {
+			delete ps;
+		}
+
+		return moduleNames;
+	}
+
+	void ImportModule(Runspace ^runspace, String ^moduleName) {
 		PowerShell ^ps = PowerShell::Create();
 		try {
 			ps->Runspace = runspace;
-
-			ps->AddCommand(marshal_as<String^>(verb + "-" + noun));
-			cmdline << verb << '-' << noun;
-
-			int i=0;
-			for (map<string, StringVector>::const_iterator paramIter = params.begin();
-				paramIter != params.end(); ++paramIter, ++i) {
-				ps->AddParameter(marshal_as<String^>(paramIter->first),
-					marshal_as<String^>(paramCombo[i]));
-				cmdline << " -" << paramIter->first << ' ' << paramCombo[i];
-			}
-
-			if (!selects.empty()) {
-				ps->AddCommand("Select-Object");
-				cmdline << " | Select-Object";
-				i = 0;
-				for (map<string, StringVector>::const_iterator selectIter = selects.begin();
-					selectIter != selects.end(); ++selectIter, ++i) {
-					ps->AddParameter(marshal_as<String^>(selectIter->first),
-						marshal_as<String^>(selectCombo[i]));
-					cmdline << " -" << selectIter->first << ' ' << selectCombo[i];
-				}
-			}
-
-			Log::Debug("Invoking PowerShell command: " + cmdline.str());
-			return ps->Invoke();
+			ps->AddCommand("Import-Module")->AddParameter("Name", moduleName);
+			ps->Invoke();
 		} finally {
-			// I wanna deterministically destroy this, since I feel it
-			// may suck up resources, and we will potentially be running
-			// a lot of commands if the definition is large.
 			delete ps;
 		}
 	}
 
-	void AddItemsFromCmdletResults(Collection<PSObject^> ^results, 
-		ItemVector *items, ObjectEntity *modNameObjEntity, 
-		ObjectEntity *modIdObjEntity, ObjectEntity *modVersionObjEntity,
-		const string &verb, const string &noun) {
+	AvailableModule ^VerifyModuleInfo(Runspace ^runspace, const string &verb, 
+		const string &noun, const string *moduleName,
+		ObjectEntity *modNameObjEntity, ObjectEntity *modIdObjEntity,
+		ObjectEntity *modVersionObjEntity) {
 
-		for each (PSObject ^result in results) {
-			auto_ptr<Item> item = MakeItemFromCmdletResult(result,
-				modNameObjEntity, modIdObjEntity, modVersionObjEntity,
-				verb, noun);
-			items->push_back(item.release());
+		// we will reuse these item entities in a couple places
+		ItemEntity modNameIe("module_name");
+		ItemEntity modIdIe("module_id");
+		ItemEntity modVersionIe("module_version", "", OvalEnum::DATATYPE_VERSION);
+
+		string fullyQualifiedName;
+		if (moduleName)
+			fullyQualifiedName = *moduleName + "\\" + verb + "-" + noun;
+		else
+			fullyQualifiedName = verb + "-" + noun;
+
+		CommandInfo ^ci = runspace->SessionStateProxy->InvokeCommand->
+			GetCommand(marshal_as<String^>(fullyQualifiedName), 
+				CommandTypes::Cmdlet|CommandTypes::Function);
+
+		if (modNameObjEntity->GetNil() && ci == nullptr)
+			// if module_name obj entity was nil'd and there is no command
+			// found using the plain Verb-Noun syntax, then we don't look
+			// any further and assume the command doesn't exist.
+			return nullptr;
+
+		if (ci == nullptr) {
+			// A module name was given but we didn't turn up the command
+			// with a fully qualified command name.  Search through the
+			// available modules for a match, import the matches, and
+			// try again to find the command.
+			for each (AvailableModule ^availMod in ManagedGlobals::availableModules) {
+
+				// if the oval definition specifies a guid but this module
+				// doesn't have one, it can't match.  So skip it.
+				if (!modIdObjEntity->GetNil() && availMod->guid == nullptr)
+					continue;
+
+				// so marshal_as will work with members of managed classes....
+				String ^dumbhack;
+				dumbhack = availMod->name;
+				modNameIe.SetValue(marshal_as<string>(dumbhack));
+
+				if (availMod->guid != nullptr) {
+					dumbhack = availMod->guid->ToString();
+					modIdIe.SetValue(marshal_as<string>(dumbhack));
+				}
+
+				dumbhack = availMod->version->ToString();
+				modVersionIe.SetValue(marshal_as<string>(dumbhack));
+
+				bool match =
+					(modNameObjEntity->GetNil() || 
+						(modNameObjEntity->Analyze(&modNameIe) == OvalEnum::RESULT_TRUE)) &&
+					(modIdObjEntity->GetNil() || 
+						(modIdObjEntity->Analyze(&modIdIe) == OvalEnum::RESULT_TRUE)) &&
+					(modVersionObjEntity->GetNil() || 
+						(modVersionObjEntity->Analyze(&modVersionIe) == OvalEnum::RESULT_TRUE));
+
+				if (match) {
+					dumbhack = availMod->name;
+					Log::Debug("Importing module: "+marshal_as<string>(dumbhack));
+					ImportModule(runspace, availMod->name);
+				}
+			}
+
+			// after all matching modules are imported, try once again
+			// to find the command...
+			ci = runspace->SessionStateProxy->InvokeCommand->
+				GetCommand(marshal_as<String^>(fullyQualifiedName), 
+					CommandTypes::Cmdlet|CommandTypes::Function);
 		}
+
+		if (ci == nullptr) {
+			// if still no command found, we give up
+			return nullptr;
+		}
+
+		// else, we found a command.  Double check all its module
+		// properties against the object entities.
+		Guid ^modGuid = nullptr;
+		System::Version ^modVersion = nullptr;
+		String ^modName = nullptr;
+
+		if (ci->Module == nullptr) {
+			// no module... see if it comes from a snapin
+			CmdletInfo ^cmi = safe_cast<CmdletInfo^>(ci);
+			if (cmi != nullptr) {
+				modVersion = cmi->PSSnapIn->Version;
+				modName = cmi->PSSnapIn->Name;
+				// snapins don't have a GUID.
+			}
+		} else {
+			modGuid = ci->Module->Guid;
+			modVersion = ci->Module->Version;
+			modName = ci->Module->Name;
+		}
+
+		// If the user asked for a particular name/guid/version
+		// and we don't have that value, there can be no match.
+		if ((!modVersionObjEntity->GetNil() && modVersion==nullptr) ||
+			(!modIdObjEntity->GetNil() && modGuid==nullptr) ||
+			(!modNameObjEntity->GetNil() && modName==nullptr))
+			return nullptr;
+
+		// for those non-nil'd entities, a final check against the actual
+		// module info.
+		if (modGuid != nullptr) 
+			modIdIe.SetValue(marshal_as<string>(modGuid->ToString()));
+		if (modName != nullptr)
+			modNameIe.SetValue(marshal_as<string>(modName));
+		if (modVersion != nullptr)
+			modVersionIe.SetValue(marshal_as<string>(modVersion->ToString()));
+
+		bool match =
+			(modNameObjEntity->GetNil() || 
+				(modNameObjEntity->Analyze(&modNameIe) == OvalEnum::RESULT_TRUE)) &&
+			(modIdObjEntity->GetNil() || 
+				(modIdObjEntity->Analyze(&modIdIe) == OvalEnum::RESULT_TRUE)) &&
+			(modVersionObjEntity->GetNil() || 
+				(modVersionObjEntity->Analyze(&modVersionIe) == OvalEnum::RESULT_TRUE));
+
+		if (match)
+			return gcnew AvailableModule(modName, modGuid, modVersion);
+
+		return nullptr;
 	}
 
-	auto_ptr<Item> MakeItemFromCmdletResult(PSObject ^result,
-		ObjectEntity *modNameObjEntity, ObjectEntity *modIdObjEntity,
-		ObjectEntity *modVersionObjEntity, const string &verb, 
-		const string &noun) {
+	auto_ptr<Item> StartItem(AvailableModule ^modUsed, const string &verb,
+		const string &noun, const StringVector &paramNames, 
+		const StringVector &selectNames, const StringVector &paramCombo,
+		const StringVector &selectCombo) {
 
 		auto_ptr<Item> item = CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		String ^dumbhack = modUsed->name;
+		item->AppendElement(new ItemEntity("module_name",
+			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
+			OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,
+			dumbhack==nullptr));
 
-// i hate repetition :-P  This creates module_* item entities
-// which correspond to the module_* object entities.
-#define MAKE_MODULE_ITEM_ENTITY(nameInVar, nameInEnt, entType) \
-		ItemEntity *mod##nameInVar##ItemEntity = new ItemEntity("module_" #nameInEnt, \
-			"", OvalEnum::DATATYPE_##entType, true, OvalEnum::STATUS_EXISTS, \
-			mod##nameInVar##ObjEntity->GetNil()); \
-		if (!mod##nameInVar##ObjEntity->GetNil()) \
-			mod##nameInVar##ItemEntity->SetValue(mod##nameInVar##ObjEntity->GetValue()); \
-		item->AppendElement(mod##nameInVar##ItemEntity);
+		dumbhack = modUsed->guid == nullptr ? nullptr : modUsed->guid->ToString();
+		item->AppendElement(new ItemEntity("module_id",
+			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
+			OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,
+			dumbhack==nullptr));
 
-		MAKE_MODULE_ITEM_ENTITY(Name, name, STRING)
-		MAKE_MODULE_ITEM_ENTITY(Id, id, STRING)
-		MAKE_MODULE_ITEM_ENTITY(Version, version, VERSION)
-
-#undef MAKE_MODULE_ITEM_ENTITY
+		dumbhack = modUsed->version == nullptr ? nullptr : modUsed->version->ToString();
+		item->AppendElement(new ItemEntity("module_version",
+			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
+			OvalEnum::DATATYPE_VERSION, true, OvalEnum::STATUS_EXISTS,
+			dumbhack==nullptr));
 
 		item->AppendElement(new ItemEntity("verb", verb, OvalEnum::DATATYPE_STRING,
 			true, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("noun", noun, OvalEnum::DATATYPE_STRING,
 			true, OvalEnum::STATUS_EXISTS));
 
+		AbsEntityValueVector paramEntityValues;
+		StringVector::const_iterator paramNameIter, paramComboIter;
+		for (paramNameIter = paramNames.begin(), paramComboIter = paramCombo.begin();
+			paramNameIter != paramNames.end();
+			++paramNameIter, ++paramComboIter)
+			paramEntityValues.push_back(new ItemFieldEntityValue(
+				*paramNameIter, *paramComboIter));
+
+		if (paramEntityValues.empty())
+			item->AppendElement(new ItemEntity("parameters", paramEntityValues,
+				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS,
+				true));
+		else
+			item->AppendElement(new ItemEntity("parameters", paramEntityValues,
+				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS));
+
+		AbsEntityValueVector selectEntityValues;
+		StringVector::const_iterator selectNameIter, selectComboIter;
+		for (selectNameIter = selectNames.begin(), selectComboIter = selectCombo.begin();
+			selectNameIter != selectNames.end();
+			++selectNameIter, ++selectComboIter)
+			selectEntityValues.push_back(new ItemFieldEntityValue(
+				*selectNameIter, *selectComboIter));
+
+		if (selectEntityValues.empty())
+			item->AppendElement(new ItemEntity("select", selectEntityValues,
+				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS,
+				true));
+		else
+			item->AppendElement(new ItemEntity("select", selectEntityValues,
+				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS));
+
+		return item;
+	}
+
+	void RunVerbNoun(Runspace ^runspace, const string &verb,
+		const string &noun, const StringVector &paramNames,
+		const StringVector &selectNames,
+		ContainerValueCombinations<StringVector> &paramCombos,
+		ContainerValueCombinations<StringVector> &selectCombos,
+		const string *moduleName, ObjectEntity *modNameObjEntity,
+		ObjectEntity *modIdObjEntity, ObjectEntity *modVersionObjEntity,
+		ItemVector *items) {
+
+		AvailableModule ^modUsed = VerifyModuleInfo(runspace, verb, noun, 
+			moduleName, modNameObjEntity, modIdObjEntity, modVersionObjEntity);
+
+		if (modUsed == nullptr)
+			// couldn't find the command in any modules
+			return;
+
+		// params and select are both nillable... so there are
+		// 4 cases: both are nil, neither, or exactly one or the other.
+		StringVector emptyPh; // placeholder for combo, when there are no
+								// names (the entity was nil'd)
+		if (!paramNames.empty() && !selectNames.empty()) {
+			paramCombos.reset();
+			while (paramCombos.advance()) {
+				selectCombos.reset();
+				while (selectCombos.advance()) {
+					InvokeCmdlet(runspace, modUsed, verb, noun, paramNames,
+						selectNames, paramCombos.combo(), selectCombos.combo(),
+						items);
+				}
+			}
+		} else if (!paramNames.empty()) {
+			paramCombos.reset();
+			while (paramCombos.advance()) {
+				InvokeCmdlet(runspace, modUsed, verb, noun, paramNames,
+					selectNames, paramCombos.combo(), emptyPh, 
+					items);
+			}
+		} else if (!selectNames.empty()) {
+			selectCombos.reset();
+			while (selectCombos.advance()) {
+				InvokeCmdlet(runspace, modUsed, verb, noun, paramNames, 
+					selectNames, emptyPh, selectCombos.combo(),
+					items);
+			}
+		} else {
+			// both params and select are nil
+			InvokeCmdlet(runspace, modUsed, verb, noun, paramNames, 
+				selectNames, emptyPh, emptyPh, items);
+		}
+	}
+
+	void InvokeCmdlet(Runspace ^runspace, AvailableModule ^modUsed,
+		const string &verb, const string &noun,
+		const StringVector &paramNames, const StringVector &selectNames,
+		const StringVector &paramCombo, const StringVector &selectCombo,
+		ItemVector *items) {
+
+		auto_ptr<Item> item = StartItem(modUsed, verb, noun, paramNames,
+			selectNames, paramCombo, selectCombo);
+
+		ostringstream cmdline; // for debugging
+		PowerShell ^ps = PowerShell::Create();
+
+		try {
+			ps->Runspace = runspace;
+
+			if (modUsed == nullptr) {
+				ps->AddCommand(marshal_as<String^>(verb + "-" + noun));
+				cmdline << verb << '-' << noun;
+			} else {
+				ps->AddCommand(modUsed->name+"\\"+marshal_as<String^>(verb)+
+					"-"+marshal_as<String^>(noun));
+				// marshal_as has fits with members of managed classes... :(
+				String ^dumbhack = modUsed->name;
+				cmdline << marshal_as<string>(dumbhack) << '\\' << verb << '-' << noun;
+			}
+
+			// For command parameters, I need to support multiple comma-
+			// delimited values.  As long as the parameter type is string, a
+			// string array (of length 1) will work even if the parameter
+			// doesn't support more than one value.  So always splitting on 
+			// "," will give us uniform handling of single and multi-values, 
+			// in that case.  If the parameter type is not string and only 
+			// expects a single value, then even if the individual array 
+			// elements are convertible to the proper type, it won't work.  
+			// You can convert a string to an int, for example, but not a 
+			// length 1 array of strings to an int.  I don't know whether a 
+			// param that expects multiple non-string values will work with a 
+			// string array.  I think you can get type info for a parameter, 
+			// but I couldn't handle any old type anyway.  I hope I can always
+			// provide strings, and let their library handle conversions.  I 
+			// just need to be careful to not use an array if the value doesn't
+			// contain a comma.
+			int i = 0;
+			for (StringVector::const_iterator paramIter = paramNames.begin();
+				paramIter != paramNames.end(); ++paramIter, ++i) {
+				if (paramCombo[i].empty())
+					ps->AddParameter(marshal_as<String^>(*paramIter));
+				else {
+					if (paramCombo[i].find(',') == string::npos)
+						ps->AddParameter(marshal_as<String^>(*paramIter),
+							marshal_as<String^>(paramCombo[i]));
+					else
+						ps->AddParameter(marshal_as<String^>(*paramIter),
+							marshal_as<String^>(paramCombo[i])->Split(','));
+				}
+				cmdline << " -" << *paramIter << ' ' << paramCombo[i];
+			}
+
+			if (!selectNames.empty()) {
+				ps->AddCommand("Select-Object");
+				cmdline << " | Select-Object";
+				i = 0;
+				for (StringVector::const_iterator selectIter = selectNames.begin();
+					selectIter != selectNames.end(); ++selectIter, ++i) {
+					if (selectCombo[i].empty())
+						ps->AddParameter(marshal_as<String^>(*selectIter));
+					else {
+						if (selectCombo[i].find(',') == string::npos)
+							ps->AddParameter(marshal_as<String^>(*selectIter),
+								marshal_as<String^>(selectCombo[i]));
+						else
+							ps->AddParameter(marshal_as<String^>(*selectIter),
+								marshal_as<String^>(selectCombo[i])->Split(','));
+					}
+					cmdline << " -" << *selectIter << ' ' << selectCombo[i];
+				}
+			}
+
+			Log::Debug("Invoking PowerShell command: " + cmdline.str());
+			Collection<PSObject^> ^results = ps->Invoke();
+
+			if (results != nullptr) {
+				for each (PSObject ^result in results)
+					AddResultToItem(result, item.get());
+			}
+
+		// We handle all errors at this point and continue, since we
+		// are at the point here that we know all object entities match
+		// the item.
+		// I think if the exception is neither System::Exception or
+		// ::Exception, it may be serious enough to let it propagate and
+		// interrupt collection.
+		} catch (System::Exception ^e) {
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(marshal_as<string>(e->GetType()->FullName)+": "+marshal_as<string>(e->Message), OvalEnum::LEVEL_ERROR));
+		} catch (::Exception &e) {
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(e.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
+		} finally {
+			// I wanna deterministically destroy this, since I feel it
+			// may suck up resources, and we will potentially be running
+			// a lot of commands if the definition is large.
+			delete ps;
+		}
+
+		items->push_back(item.release());
+	}
+
+	void AddResultToItem(PSObject ^result, Item *item) {
+
+#ifdef _DEBUG
 		ostringstream oss;
+#endif
 		AbsEntityValueVector fieldVals;
-		for each (PSPropertyInfo ^propInfo in result->Properties) {			
+		for each (PSPropertyInfo ^propInfo in result->Properties) {
+#ifdef _DEBUG
 			oss << marshal_as<string>(propInfo->Name) << " = ";
+#endif
 
 			// the value is sometimes retrieved lazily when first
 			// accessed, and may cause an exception to be thrown.
 			try {
 				if (propInfo->Value == nullptr)
-					fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name),
+					fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name->ToLower()),
 						"", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				else
-					// TEMPORARY
-					fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name),
-						marshal_as<string>(propInfo->Value->ToString()), OvalEnum::DATATYPE_STRING));
-
+					fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name->ToLower()),
+						marshal_as<string>(propInfo->Value->ToString()), GetDatatype(propInfo->Value->GetType())));
+#ifdef _DEBUG
 				oss << (propInfo->Value == nullptr ? "(null)" : 
 					marshal_as<string>(propInfo->Value->ToString())) << endl;
-
+#endif
 			} catch (System::Management::Automation::RuntimeException ^e) {
-				fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name),
+				fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name->ToLower()),
 					"", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 				item->AppendMessage(new OvalMessage(marshal_as<string>(e->GetType()->Name) + ": " +
 					marshal_as<string>(e->Message), OvalEnum::LEVEL_ERROR));
-				oss << marshal_as<string>(e->GetType()->Name) << ": " <<
+#ifdef _DEBUG
+				oss << marshal_as<string>(e->GetType()->FullName) << ": " <<
 					marshal_as<string>(e->Message) << endl;
+#endif
 			}
 		}
+
 		item->AppendElement(new ItemEntity("value", fieldVals));
 
-		Log::Debug(oss.str());
-		Log::Debug("");
+#ifdef _DEBUG
+		//Log::Debug(oss.str());
+		//Log::Debug("");
+#endif
+	}
 
-		return item;
+	OvalEnum::Datatype GetDatatype(Type ^type){
+
+		if (type == Boolean::typeid)
+			return OvalEnum::DATATYPE_BOOLEAN;
+
+		else if (type == SByte::typeid ||
+			type == Byte::typeid ||
+			type == Int16::typeid ||
+			type == Int32::typeid ||
+			type == Int64::typeid ||
+			type == UInt16::typeid ||
+			type == UInt32::typeid ||
+			type == UInt64::typeid ||
+			type == Decimal::typeid)
+			return OvalEnum::DATATYPE_INTEGER;
+
+		else if (type == Double::typeid ||
+			type == Single::typeid)
+			return OvalEnum::DATATYPE_FLOAT;
+
+		return OvalEnum::DATATYPE_STRING;
 	}
 }

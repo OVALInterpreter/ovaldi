@@ -30,14 +30,14 @@
 #ifndef CMDLETPROBE_H
 #define CMDLETPROBE_H
 
-#include <string>
-#include "OvalEnum.h"
-#include "AbsProbe.h"
+#include <Item.h>
+#include <Object.h>
+#include <AbsProbe.h>
 
 /**
-	This class is responsible for collecting information for windows cmdlet_objects.
-*/
-
+ * This class is responsible for collecting information for windows 
+ * cmdlet_objects.
+ */
 class CmdletProbe : public AbsProbe {
 public:
 	virtual ~CmdletProbe();
@@ -57,10 +57,6 @@ private:
 
 	/** Return a new Item created for storing information retrieved by executing a cmdlet. */
 	virtual Item* CreateItem();
-
-	void ExecutePowerShell(std::string powershellInput, Item* item);	
-	System::Management::Automation::Runspaces::InitialSessionState^ InitializeRunspace();
-	OvalEnum::Datatype GetDatatype(std::string type);
 };
 
 #endif
