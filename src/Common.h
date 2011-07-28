@@ -119,7 +119,6 @@ class Common {
 		static std::string	GetExternalVariableFile();
 		static std::string	GetDirectivesConfigFile();
 		static bool		GetVerifyXMLfile();
-		static bool		GetVerifyOutputs();
 		static std::string	GetXSLFilename();
 		static std::string	GetXSLOutputFilename();
 		static std::string   GetLogFileLocation();
@@ -127,6 +126,8 @@ class Common {
 		static std::string   GetDefinitionIdsString();
 		static bool     GetLimitEvaluationToDefinitionIds();
 		static bool     GetDoDefinitionSchematron();
+		static bool		GetDoSystemCharacteristicsSchematron();
+		static bool		GetDoResultsSchematron();
 		static std::string   GetDefinitionSchematronPath();
 		static std::string   GetSystemCharacteristicsSchematronPath();
 		static std::string   GetResultsSchematronPath();
@@ -150,7 +151,8 @@ class Common {
 		static void     SetDefinitionIdsString(std::string definitionIdsString);
 		static void     SetLimitEvaluationToDefinitionIds(bool set);
 		static void     SetDoDefinitionSchematron(bool set);
-		static void		SetVerifyOutputs(bool);
+		static void		SetDoSystemCharacteristicsSchematron(bool set);
+		static void		SetDoResultsSchematron(bool set);
 		static void     SetDefinitionSchematronPath(std::string path);
 		static void     SetSystemCharacteristicsSchematronPath(std::string path);
 		static void     SetResultsSchematronPath(std::string path);
@@ -283,10 +285,11 @@ class Common {
 		static bool	generateMD5;
 		static bool useProvidedData;
 		static bool verifyXMLfile;
-		static bool verifyOutputs;
 		static bool limitEvaluationToDefinitionIds;
 		static std::string definitionIds;
 		static bool doDefinitionSchematron;
+		static bool doSystemCharacteristicsSchematron;
+		static bool doResultsSchematron;
 		static std::string definitionSchematronPath;
 		static std::string resultsSchematronPath;
 		static std::string systemCharacteristicsSchematronPath;
