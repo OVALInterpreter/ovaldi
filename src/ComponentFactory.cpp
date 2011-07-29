@@ -68,6 +68,8 @@ AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
         absComponent = new RegexCaptureFunction();
     } else if(elmName.compare("arithmetic")  == 0) {
         absComponent = new ArithmeticFunction();
+    } else if(elmName.compare("count")  == 0) {
+        absComponent = new CountFunction();
     } else {
 		throw Exception("Error: unsupported function: " + elmName);
 	}
