@@ -71,6 +71,9 @@ make
 
 /bin/cp xml/results_to_html.xsl $RPM_BUILD_ROOT/usr/share/ovaldi
 /bin/cp xml/oval-definitions-schematron.xsl $RPM_BUILD_ROOT/usr/share/ovaldi
+/bin/cp xml/oval-system-characteristics-schematron.xsl $RPM_BUILD_ROOT/usr/share/ovaldi
+/bin/cp xml/oval-results-schematron.xsl $RPM_BUILD_ROOT/usr/share/ovaldi
+
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
 if grep "release 5" /etc/redhat-release &> /dev/null ; then
@@ -142,6 +145,8 @@ fi
 %attr(0700,root,root)  /usr/sbin/ovaldi.sh
 %attr(0700,root,root)  /var/log/ovaldi
 /usr/share/ovaldi/oval-definitions-schematron.xsl
+/usr/share/ovaldi/oval-system-characteristics-schematron.xsl
+/usr/share/ovaldi/oval-results-schematron.xsl
 /usr/share/ovaldi/results_to_html.xsl
 /usr/share/ovaldi/*.xsd
 
@@ -151,6 +156,9 @@ fi
 %{_libdir}/ovaldi/libxalanMsg.so.110.0
 
 %changelog
+
+* Thu Jul 28 2011 Danny Haynes <dhaynes@mitre.org> 5.9.2-1.0
+* Updated to include oval-system-characteristics-schematron.xsl and oval-results-schematron.xsl
 
 * Tue Feb 22 2011 Danny Haynes <dhaynes@mitre.org> 5.9.1-1.0
 * Updated for libxerces-c.so.27
