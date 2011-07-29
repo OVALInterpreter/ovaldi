@@ -469,6 +469,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation 
 			// If a field in the StateEntity is not present in the ItemEntity report an error for the field
 			if ( fieldResults.size() == 0 ) {
 				fieldResults.push_back(OvalEnum::RESULT_ERROR);
+				Log::Debug("Warning: encountered state record field named \""+
+					sfev->GetName()+"\" which doesn't match any fields in the item's record.");
 			}
 			OvalEnum::ResultEnumeration fieldFinalResult = OvalEnum::CombineResultsByCheck(&fieldResults, sfev->GetEntityCheck());
 			recordResults.push_back(fieldFinalResult);

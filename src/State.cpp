@@ -28,7 +28,7 @@
 //
 //****************************************************************************************//using namespace std;
 
-
+#include <memory>
 #include "State.h"
 #include "StateEntity.h"
 
@@ -78,15 +78,22 @@ OvalEnum::ResultEnumeration State::Analyze(Item* item) {
 
 		// locate matching elements in the item
 		string stateElmName = stateElm->GetName(); 
-		ItemEntityVector* scElements = item->GetElementsByName(stateElmName);
-
-		// Analyze each matching element
-		ItemEntityVector::iterator scIterator;
+		// i think the vector needs deleting, but the item retains ownership
+		// of the vector's contents.
+		auto_ptr<ItemEntityVector> scElements(item->GetElementsByName(stateElmName));
 		IntVector stateElmResults;
-		for(scIterator = scElements->begin(); scIterator != scElements->end(); scIterator++) {
-			ItemEntity* scElm = (ItemEntity*)(*scIterator);
-			// call StateEntity->analyze method
-			stateElmResults.push_back(stateElm->Analyze(scElm));
+
+		if (scElements->empty())
+			Log::Debug("Warning: can't find match in item, for state entity named: \""+stateElmName+"\"");
+		else {
+
+			// Analyze each matching element
+			ItemEntityVector::iterator scIterator;
+			for(scIterator = scElements->begin(); scIterator != scElements->end(); scIterator++) {
+				ItemEntity* scElm = (ItemEntity*)(*scIterator);
+				// call StateEntity->analyze method
+				stateElmResults.push_back(stateElm->Analyze(scElm));
+			}
 		}
 
 		// compute the overall state result
