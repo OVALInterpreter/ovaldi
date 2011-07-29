@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:sp-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:sp-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"
+      elementFormDefault="qualified" version="5.10">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
-            <xsd:documentation>The following is a description of the elements, types, and attributes that compose the SharePoint specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
+            <xsd:documentation>The following is a description of the elements, types, and attributes that compose the SharePoint specific tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all
+                  OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined
+                  here.</xsd:documentation>
             <xsd:documentation>The SharePoint Component Schema is based on the SharePoint Object Model (Windows SharePoint Services 3.0)</xsd:documentation>
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint Definition</schema>
-                  <version>5.9</version>
-                  <date>2/22/2011 10:52:26 AM</date>
-                  <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+                  <version>5.10 Release Candidate 1</version>
+                  <date>7/19/2011 10:15:37 PM</date>
+                  <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license
+                        header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="sp-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -20,7 +24,8 @@
       <!-- =============================================================================== -->
       <xsd:element name="spwebapplication_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The spwebapplication test is used to check the properties or permission settings of a SharePoint web application. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The spwebapplication test is used to check the properties or permission settings of a SharePoint web application. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a spwebapplication_object and the optional state element
+                        specifies the data to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>spwebapplication_test</oval:test>
@@ -44,7 +49,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -53,7 +58,8 @@
       </xsd:element>
       <xsd:element name="spwebapplication_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spwebapplication_object element is used by a spwebapplication test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The spwebapplication_object element is used by a spwebapplication test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again,
+                        please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spwebapplication object consists of a webapplicationurl used to define a specific web application. See the defintion of the SPWebApplication class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -141,7 +147,7 @@
                                     </xsd:element>
                                     <xsd:element name="outboundmailserverinstance" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The outboundmailserverinstance element identifies the name of the SMPT server.</xsd:documentation>
+                                                <xsd:documentation>The outboundmailserverinstance element identifies the string name of the SMPT server.  Note that there is a small naming inconsistency here.  The SharePoint SDK calls this 'outboundmailserviceinstance'.  </xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="outboundmailsenderaddress" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
@@ -161,7 +167,7 @@
                                     </xsd:element>
                                     <xsd:element name="timeout" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The timeout is the amount of time before security validation expires.</xsd:documentation>
+                                                <xsd:documentation>The timeout is the amount of time before security validation expires in seconds.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="isadministrationwebapplication" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
@@ -354,7 +360,8 @@
       <!-- =============================================================================== -->
       <xsd:element name="spgroup_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The spgroup test is used to check the group properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The spgroup test is used to check the group properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to
+                        check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>spgroup_test</oval:test>
@@ -378,7 +385,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -387,8 +394,9 @@
       </xsd:element>
       <xsd:element name="spgroup_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spgroup_object element is used by a spgroup test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spgroup object consists of a sitecollectionurl used to define a specific site collection.  See the defintion of the SPGroup class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The spgroup_object element is used by a spgroup test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to
+                        the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spgroup object consists of a sitecollectionurl used to define a specific site collection. See the defintion of the SPGroup class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -453,7 +461,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="spweb_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The spweb test is used to check the properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The spweb test is used to check the properties for site collections. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>spweb_test</oval:test>
@@ -477,7 +485,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -486,8 +494,9 @@
       </xsd:element>
       <xsd:element name="spweb_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spweb_object element is used by a spweb test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spweb object consists of a webcollection url and sitecollection url used to define a specific web apoplication and a specific site collection.  See the defintion of the SPWeb class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The spweb_object element is used by a spweb test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the
+                        description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spweb object consists of a webcollection url and sitecollection url used to define a specific web apoplication and a specific site collection. See the defintion of the SPWeb class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -498,7 +507,7 @@
                                           <xsd:sequence>
                                                 <xsd:element name="webcollectionurl" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The webcollurl element defines the web application to evaluate specific web settings.</xsd:documentation>
+                                                            <xsd:documentation>The webcollectionurl element defines the web application to evaluate specific web settings.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="sitecollectionurl" type="oval-def:EntityObjectStringType">
@@ -557,7 +566,8 @@
       <!-- =============================================================================== -->
       <xsd:element name="splist_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The splist test is used to check the properties of lists associated with a SharePoint site or site collection. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an splist_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The splist test is used to check the properties of lists associated with a SharePoint site or site collection. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an splist_object and the optional state element specifies the data
+                        to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>splist_test</oval:test>
@@ -581,7 +591,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -590,7 +600,8 @@
       </xsd:element>
       <xsd:element name="splist_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The splist_object element is used by a splist test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The splist_object element is used by a splist test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the
+                        description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An splist object consists of a spsiteurl used to define a specific site in a site collection that various security related configuration items need to be checked. See the defintion of the SPList class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -675,7 +686,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -684,8 +695,10 @@
       </xsd:element>
       <xsd:element name="spantivirussettings_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spantivirussettings_object element is used by a spantivirussettings test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spantivirussettings object consists of a spwebservicename used to define a specific webservice in a farm that various security related configuration items need to be checked and an spfarmname which denotes the farm of which the spwebservice is a part.  See the defintion of the SPAntiVirusSettings class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The spantivirussettings_object element is used by a spantivirussettings test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.
+                        Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spantivirussettings object consists of a spwebservicename used to define a specific webservice in a farm that various security related configuration items need to be checked and an spfarmname which denotes the farm of which the spwebservice is a part. See the defintion of the SPAntiVirusSettings class in the SharePoint object model documentation.
+                  </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -757,7 +770,7 @@
                                     </xsd:element>
                                     <xsd:element name="timeout" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>Denotes the amount of time before the virus scanner times out.</xsd:documentation>
+                                                <xsd:documentation>Denotes the amount of time before the virus scanner times out in seconds.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="uploadscanenabled" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
@@ -780,7 +793,8 @@
       <!-- =============================================================================== -->
       <xsd:element name="spsiteadministration_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The spsiteadministration test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The spsiteadministration test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to
+                        check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>spsiteadministration_test</oval:test>
@@ -804,7 +818,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -813,8 +827,9 @@
       </xsd:element>
       <xsd:element name="spsiteadministration_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spsiteadministration_object element is used by a spsiteadministration test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spsiteadministration object consists of a webapplicationurl used to define a specific web application. See the defintion of the SPSiteAdministration class in the SharePoint object model documentation.  See the defintion of the SPSiteAdministration class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The spsiteadministration_object element is used by a spsiteadministration test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set
+                        logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spsiteadministration object consists of a webapplicationurl used to define a specific web application. The collected data is available via the SPQuota class, which can be found via the SPSite object.  See the defintions of the SPSite and the SPQuota classes in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -869,7 +884,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="spsite_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The spsite test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The spsite test is used to check the properties of a site. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an spwebapplication_object and the optional state element specifies the data to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>spsite_test</oval:test>
@@ -893,7 +908,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -902,7 +917,8 @@
       </xsd:element>
       <xsd:element name="spsite_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spsite_object element is used by a spsiteadministration test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>The spsite_object element is used by a spsiteadministration test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again,
+                        please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spsite object consists of a sitecollectionurl used to define a specific web application. See the defintion of the SPSite class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -946,6 +962,18 @@
                                     <xsd:element name="url" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The URL is the full URL to the root Web site of the site collection, including host name, port number, and path.</xsd:documentation>
+                                                <xsd:appinfo>
+                                                      <oval:deprecated_info>
+                                                            <oval:version>5.10</oval:version>
+                                                            <oval:reason>The 'url' entity has been deprecated as it has been identified as redundant since the 'sitecollectionurl' is the same URL.</oval:reason>
+                                                            <oval:comment>See the defintion of the SPSite class in the SharePoint object model documentation.</oval:comment>
+                                                      </oval:deprecated_info>
+                                                      <sch:pattern id="sp_def_spsite_state_url_dep">
+                                                            <sch:rule context="oval-def:oval_definitions/oval-def:states/sp-def:spsite_state/sp-def:url">
+                                                                  <sch:report test="true()">DEPRECATED ENTITY IN: sp-def:spsite_state </sch:report>
+                                                            </sch:rule>
+                                                      </sch:pattern>                        
+                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -982,7 +1010,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -992,7 +1020,7 @@
       <xsd:element name="spcrawlrule_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The spcrawlrule_object element is used by a spcrawlrule test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spcrawlrule object consists of a spsiteurl used to define a specific resource (eg. website or document) on a server that can be indexed by the SharePoint indexer.  See the defintion of the CrawlRule class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>An spcrawlrule object consists of a spsiteurl used to define a specific resource (eg. website or document) on a server that can be indexed by the SharePoint indexer. See the defintion of the CrawlRule class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1082,6 +1110,18 @@
                         </oval:element_mapping>
                   </xsd:appinfo>
                   <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>Replaced by the spjobdefinition510_test. This test does not uniquely identify a single job definition. A new test was created to use displaynames, which are unique. See the spjobdefinition510_test.</oval:reason>
+                              <oval:comment>This test has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="sp-def_spjobdefinition_test_dep">
+                              <sch:rule context="sp-def:spjobdefinition_test">
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
                         <sch:pattern id="sp-def_jobdeftst">
                               <sch:rule context="sp-def:spjobdefinition_test/sp-def:object">
                                     <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spjobdefinition_object/@id"><sch:value-of select="../@id"/> - the object child element of a spjobdefinition_test must reference an spjobdefinition_object</sch:assert>
@@ -1096,7 +1136,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1106,7 +1146,19 @@
       <xsd:element name="spjobdefinition_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The spjobdefinition_object element is used by a spjobdefinition test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spjobdefinition object consists of a webappuri used to define a specific web application for which job checks should be done.  See the defintion of the SPJobDefinition class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>An spjobdefinition_object consists of a webappuri used to define a specific web application for which job checks should be done.  See the defintion of the SPJobDefinition class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>Replaced by the spjobdefinition510_object. This test does not uniquely identify a single job definition. A new object was created to use displaynames, which are unique. See the spjobdefinition510_object.</oval:reason>
+                              <oval:comment>This test has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="sp-def_spjobdefinition_object_dep">
+                              <sch:rule context="sp-def:spjobdefinition_object">
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1129,6 +1181,122 @@
             </xsd:complexType>
       </xsd:element>
       <xsd:element name="spjobdefinition_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation>The various properties of a Sharepoint job that can be checked.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>Replaced by the spjobdefinition510_state. This state does not uniquely identify a single job definition. A new state was created to use displaynames, which are unique. See the spjobdefinition510_state.</oval:reason>
+                              <oval:comment>This test has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="sp-def_spjobdefinition_state_dep">
+                              <sch:rule context="sp-def:spjobdefinition_state">
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="webappuri" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The URI that represents the web application for which jobs should be checked.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="displayname" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The name of the job as displayed in the SharePoint Central Administration site.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="isdisabled" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Determines whether or not the job definition is enabled.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="retry" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Determines whether the job definition should be retried if it ends abnormally.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="title" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The title of a job as displayed in the SharePoint Central Administration site.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
+      <!-- ===========================  SPJOBDEFINITION TEST(5.10)   ===================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="spjobdefinition510_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>The spjobdefinition test is used to check the status of the various properties associated with scheduled jobs in the SharePoint system.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>spjobdefinition510_test</oval:test>
+                              <oval:object>spjobdefinition510_object</oval:object>
+                              <oval:state>spjobdefinition510_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint">spjobdefinition510_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_jobdef510tst">
+                              <sch:rule context="sp-def:spjobdefinition510_test/sp-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spjobdefinition510_object/@id"><sch:value-of select="../@id"/> - the object child element of a spjobdefinition510_test must reference an spjobdefinition510_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="sp-def:spjobdefinition510_test/sp-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spjobdefinition510_state/@id"><sch:value-of select="../@id"/> - the state child element of a spjobdefinition510_test must reference an spjobdefinition510_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="spjobdefinition510_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>The spjobdefinition510_object element is used by a spjobdefinition test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spjobdefinition510_object consists of a webappuri and displayname used to define a specific web application for which job checks should be done. See the defintion of the SPJobDefinition class in the SharePoint object model documentation. </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="webappuri" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The URI that represents the web application for which jobs should be checked.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="displayname" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The name of the job as displayed in the SharePoint Central Administration site.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="spjobdefinition510_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation>The various properties of a Sharepoint job that can be checked.</xsd:documentation>
             </xsd:annotation>
@@ -1195,7 +1363,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1204,8 +1372,9 @@
       </xsd:element>
       <xsd:element name="bestbet_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The bestbet_object element is used by a bestbet test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An bestbet object consists of a sitecollectionurl used to define a specific site and a bestbeturl used to define a specific best bet.  See the defintion of the BestBet class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The bestbet_object element is used by a bestbet test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to
+                        the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An bestbet object consists of a sitecollectionurl used to define a specific site and a bestbeturl used to define a specific best bet. See the defintion of the BestBet class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1294,7 +1463,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1303,8 +1472,9 @@
       </xsd:element>
       <xsd:element name="infopolicycoll_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The infopolicycoll_object element is used by a policycoll test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>A infopolicycoll object consists of a sitecollectionurl used to define a specific site and an id used to define a specific information policy.  See the defintion of the Policy class and policycollection class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The infopolicycoll_object element is used by a policycoll test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please
+                        refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>A infopolicycoll object consists of a sitecollectionurl used to define a specific site and an id used to define a specific information policy. See the defintion of the Policy class and policycollection class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1371,7 +1541,7 @@
       </xsd:element>
       <!-- =============================================================================== -->
       <!-- ===========================  SPDIAGNOSTICSSERVICE TEST   ====================== -->
-      <!-- =============================================================================== -->   
+      <!-- =============================================================================== -->
       <xsd:element name="spdiagnosticsservice_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The spdiagnosticsservice test is used to check the diagnostic properties associated with a Sharepoint system.</xsd:documentation>
@@ -1386,19 +1556,19 @@
                   <xsd:appinfo>
                         <sch:pattern id="sp-def_diagnosticsservicetest">
                               <sch:rule context="sp-def:spdiagnosticsservice_test/sp-def:object">
-                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticsservice_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_object</sch:assert> 
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticsservice_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spdiagnosticsservice_test/sp-def:state">
-                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticsservice_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_state</sch:assert> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticsservice_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticsservice_test must reference an spdiagnosticsservice_state</sch:assert>
                               </sch:rule>
-                        </sch:pattern>     
+                        </sch:pattern>
                   </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1407,8 +1577,9 @@
       </xsd:element>
       <xsd:element name="spdiagnosticsservice_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spdiagnosticsservice_object element is used by an spdiagnosticsservice test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spdiagnosticsservice object consists of a farmname used to define a specific Sharepoint farm for which diagnostics properties should be checked.  See the defintion of the SPDiagnosticsService class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The spdiagnosticsservice_object element is used by an spdiagnosticsservice test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set
+                        logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spdiagnosticsservice object consists of a farmname used to define a specific Sharepoint farm for which diagnostics properties should be checked. See the defintion of the SPDiagnosticsService class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1472,7 +1643,7 @@
                                           <xsd:annotation>
                                                 <xsd:documentation>The friendly name for the service as displayed in the Central Administration and in logs. This should be "Windows Sharepoint Diagnostics Service" by default.</xsd:documentation>
                                           </xsd:annotation>
-                                    </xsd:element> 
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -1495,10 +1666,10 @@
                   <xsd:appinfo>
                         <sch:pattern id="sp-def_diagnostics_level_test">
                               <sch:rule context="sp-def:spdiagnosticslevel_test/sp-def:object">
-                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_object</sch:assert>  
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:spdiagnosticslevel_object/@id"><sch:value-of select="../@id"/> - the object child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:spdiagnosticslevel_test/sp-def:state">
-                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_state</sch:assert> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:spdiagnosticslevel_state/@id"><sch:value-of select="../@id"/> - the state child element of an spdiagnosticslevel_test must reference an spdiagnosticslevel_state</sch:assert>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1507,17 +1678,17 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
-            </xsd:complexType>    
+            </xsd:complexType>
       </xsd:element>
       <xsd:element name="spdiagnosticslevel_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The spdiagnosticslevel_object element is used by an spdiagnosticslevel test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An spdiagnosticslevel object consists of a farmname used to define a specific Sharepoint farm for which policy properties should be checked.  See the defintion of the SPWebApplication class in the SharePoint object model documentation.   See the defintion of the IDiagnosticsLevel Interface in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The spdiagnosticslevel_object element is used by an spdiagnosticslevel test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.  Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An spdiagnosticslevel object consists of a farmname used to define a specific Sharepoint farm for which policy properties should be checked. See the defintion of the SPWebApplication class in the SharePoint object model documentation. See the defintion of the IDiagnosticsLevel Interface in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1599,11 +1770,11 @@
                   <xsd:appinfo>
                         <sch:pattern id="sp-def_policyfeature_test">
                               <sch:rule context="sp-def:sppolicyfeature_test/sp-def:object">
-                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicyfeature_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicyfeature_test must reference an sppolicyfeature_object</sch:assert> 
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicyfeature_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicyfeature_test must reference an sppolicyfeature_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:sppolicyfeature_test/sp-def:state">
-                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:sppolicyfeature_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicyfeature_test must reference an sppolicyfeature_state</sch:assert> 
-                              </sch:rule> 
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:sppolicyfeature_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicyfeature_test must reference an sppolicyfeature_state</sch:assert>
+                              </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
             </xsd:annotation>
@@ -1611,7 +1782,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1620,8 +1791,9 @@
       </xsd:element>
       <xsd:element name="sppolicyfeature_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The sppolicyfeature_object element is used by an sppolicyfeature test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An sppolicyfeature object consists of a farmname used to define a specific Sharepoint farm for which policy feature properties should be checked.  See the defintion of the PolicyFeature class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The sppolicyfeature_object element is used by an sppolicyfeature test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again,
+                        please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An sppolicyfeature object consists of a farmname used to define a specific Sharepoint farm for which policy feature properties should be checked. See the defintion of the PolicyFeature class in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1723,11 +1895,11 @@
                   <xsd:appinfo>
                         <sch:pattern id="sp-def_policy_test">
                               <sch:rule context="sp-def:sppolicy_test/sp-def:object">
-                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicy_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicy_test must reference an sppolicy_object</sch:assert> 
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/sp-def:sppolicy_object/@id"><sch:value-of select="../@id"/> - the object child element of an sppolicy_test must reference an sppolicy_object</sch:assert>
                               </sch:rule>
                               <sch:rule context="sp-def:sppolicy_test/sp-def:state">
-                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:sppolicy_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicy_test must reference an sppolicy_state</sch:assert> 
-                              </sch:rule>  
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/sp-def:sppolicy_state/@id"><sch:value-of select="../@id"/> - the state child element of an sppolicy_test must reference an sppolicy_state</sch:assert>
+                              </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
             </xsd:annotation>
@@ -1735,7 +1907,7 @@
                   <xsd:complexContent>
                         <xsd:extension base="oval-def:TestType">
                               <xsd:sequence>
-                                    <xsd:element name="object" type="oval-def:ObjectRefType" />
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
                                     <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="1"/>
                               </xsd:sequence>
                         </xsd:extension>
@@ -1744,8 +1916,9 @@
       </xsd:element>
       <xsd:element name="sppolicy_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
-                  <xsd:documentation>The sppolicy_object element is used by an sppolicy test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>An sppolicy object consists of a webappuri and a URL Zone used to define a specific Sharepoint web application and zone for which policy properties should be checked.  See the defintion of the SPPolicy class and the sppolicyroletype in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:documentation>The sppolicy_object element is used by an sppolicy test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer
+                        to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>An sppolicy object consists of a webappuri and a URL Zone used to define a specific Sharepoint web application and zone for which policy properties should be checked. See the defintion of the SPPolicy class and the sppolicyroletype in the SharePoint object model documentation. </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1817,7 +1990,6 @@
       <!-- =================================================================================================================================== -->
       <!-- ====================================================TYPES========================================================================== -->
       <!-- =================================================================================================================================== -->
-      
       <xsd:complexType name="EntityObjectUrlZoneType">
             <xsd:annotation>
                   <xsd:documentation>The EntityObjectUrlZoneType restricts a string value to a set of values that describe the different IIS Url Zones. The empty string is also allowed to support empty element associated with error conditions.</xsd:documentation>
@@ -1837,10 +2009,9 @@
                   </xsd:restriction>
             </xsd:simpleContent>
       </xsd:complexType>
-      
       <xsd:complexType name="EntityStateEventSeverityType">
             <xsd:annotation>
-                  <xsd:documentation>The EntityStateEventSeverityType restricts a string value to a set of values that describe the different states that can be configured for a diagnostics level  event severity level property of the diagnostics service.</xsd:documentation>
+                  <xsd:documentation>The EntityStateEventSeverityType restricts a string value to a set of values that describe the different states that can be configured for a diagnostics level event severity level property of the diagnostics service.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleContent>
                   <xsd:restriction base="oval-def:EntityStateStringType">
@@ -1862,7 +2033,6 @@
                   </xsd:restriction>
             </xsd:simpleContent>
       </xsd:complexType>
-      
       <xsd:complexType name="EntityStateTraceSeverityType">
             <xsd:annotation>
                   <xsd:documentation>The EntityStateTraceSeverityType restricts a string value to a set of values that describe the different states that can be configured for a diagnostics level trace severity level property of the diagnostics service.</xsd:documentation>
@@ -1883,7 +2053,6 @@
                   </xsd:restriction>
             </xsd:simpleContent>
       </xsd:complexType>
-      
       <xsd:complexType name="EntityStatePolicyRoleType">
             <xsd:annotation>
                   <xsd:documentation>The EntityStatePolicyRoleType restricts a string value to a set of values that describe the different Policy settings for Access Control that are available for users.</xsd:documentation>
@@ -1923,7 +2092,6 @@
                   </xsd:restriction>
             </xsd:simpleContent>
       </xsd:complexType>
-      
       <xsd:complexType name="EntityStatePolicyFeatureStateType">
             <xsd:annotation>
                   <xsd:documentation>The EntityStatePolicyRoleType restricts a string value to a set of values that describe the different policy feature states that can be configured for a policy feature.</xsd:documentation>
@@ -1948,7 +2116,6 @@
                   </xsd:restriction>
             </xsd:simpleContent>
       </xsd:complexType>
-      
       <xsd:complexType name="EntityStateUrlZoneType">
             <xsd:annotation>
                   <xsd:documentation>The EntityStateUrlZoneType restricts a string value to a set of values that describe the different IIS Url Zones.</xsd:documentation>

@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.10 Draft 2</version>
-                  <date>6/10/2011 3:09:58 PM</date>
+                  <version>5.10 Release Candidate 1</version>
+                  <date>7/19/2011 10:15:38 PM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
@@ -333,6 +333,18 @@
             <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                   <xsd:annotation>
                         <xsd:documentation>If a group security principle is specified, this behavior specifies whether to include the group or not. For example, maybe you want to check the access tokens associated with every user within a group, but not the group itself. In this case, you would set the include_group behavior to 'false'. If the security_principle is not a group, then this behavior should be ignored.</xsd:documentation>
+                        <xsd:appinfo>
+                              <oval:deprecated_info>
+                                    <oval:version>5.10</oval:version>
+                                    <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                    <oval:comment>Consider using a sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                              </oval:deprecated_info>
+                              <sch:pattern id="win-def_at_include_group_value_dep">
+                                    <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:accesstoken_object/win-def:behaviors">
+                                          <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:accesstoken_object</sch:report>
+                                    </sch:rule>
+                              </sch:pattern>                        
+                        </xsd:appinfo>
                   </xsd:annotation>
             </xsd:attribute>
             <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -359,6 +371,7 @@
       <xsd:element name="activedirectory_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The active directory test is used to check information about specific entries in active directory. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an activedirectory_object and the optional state element specifies the metadata to check.</xsd:documentation>
+                  <xsd:documentation>Note that this test supports only simple (string based) value collection. For more complex values see the activedirectory57_test.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>activedirectory_test</oval:test>
@@ -366,18 +379,6 @@
                               <oval:state>activedirectory_state</oval:state>
                               <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">activedirectory_item</oval:item>
                         </oval:element_mapping>
-                  </xsd:appinfo>
-                  <xsd:appinfo>
-                        <oval:deprecated_info>
-                              <oval:version>5.7</oval:version>
-                              <oval:reason>Replaced by the activedirectory57_test. This test allows for single fields to be selected from active directory. A new test was created to allow more than one field to be selected in one statement. See the activedirectory57_test.</oval:reason>
-                              <oval:comment>This test has been deprecated and may be removed in a future version of the language.</oval:comment>
-                        </oval:deprecated_info>
-                        <sch:pattern id="win-def_activedirectory_test_dep">
-                              <sch:rule context="win-def:activedirectory_test">
-                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                              </sch:rule>
-                        </sch:pattern> 
                   </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="win-def_adtst">
@@ -405,18 +406,7 @@
             <xsd:annotation>
                   <xsd:documentation>The activedirectory_object element is used by an active directory test to define those objects to evaluated based on a specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An active directory object consists of three pieces of information, a naming context, a relative distinguished name, and an attribute. Each piece helps identify a specific active directory entry.</xsd:documentation>
-                  <xsd:appinfo>
-                        <oval:deprecated_info>
-                              <oval:version>5.7</oval:version>
-                              <oval:reason>Replaced by the activedirectory57_object. This object allows for single fields to be selected from active directory. A new object was created to allow more than one field to be selected in one statement. See the activedirectory57_object.</oval:reason>
-                              <oval:comment>This object has been deprecated and may be removed in a future version of the language.</oval:comment>
-                        </oval:deprecated_info>
-                        <sch:pattern id="win-def_activedirectory_object_dep">
-                              <sch:rule context="win-def:activedirectory_object">
-                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                              </sch:rule>
-                        </sch:pattern>                        
-                  </xsd:appinfo>
+                  <xsd:documentation>Note that this object is paired with a state that supports only simple (string based) value collection. For more complex values see the activedirectory57_object.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -450,18 +440,7 @@
       <xsd:element name="activedirectory_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation>The activedirectory_state element defines the different information that can be used to evaluate the specified entries in active directory. An active directory test will reference a specific instance of this state that defines the exact settings that need to be evaluated. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
-                  <xsd:appinfo>
-                        <oval:deprecated_info>
-                              <oval:version>5.7</oval:version>
-                              <oval:reason>Replaced by the activedirectory57_state. This state allows for single fields to be selected from active directory. A new state was created to allow more than one field to be selected in one statement. See the activedirectory57_state.</oval:reason>
-                              <oval:comment>This state has been deprecated and may be removed in a future version of the language.</oval:comment>
-                        </oval:deprecated_info>
-                        <sch:pattern id="win-def_activedirectory_state_dep">
-                              <sch:rule context="win-def:activedirectory_state">
-                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                              </sch:rule>
-                        </sch:pattern>                        
-                  </xsd:appinfo>
+                  <xsd:documentation>Note that this state supports only simple (string based) value collection. For more complex values see the activedirectory57_state.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -508,6 +487,7 @@
       <xsd:element name="activedirectory57_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>The active directory test is used to check information about specific entries in active directory. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an activedirectory57_object and the optional state element specifies the metadata to check.</xsd:documentation>
+                  <xsd:documentation>Note that this test supports complex values that are in the form of a record. For simple (string based) value collection see the activedirectory_test.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>activedirectory57_test</oval:test>
@@ -542,6 +522,7 @@
             <xsd:annotation>
                   <xsd:documentation>The activedirectory57_object element is used by an active directory test to define those objects to evaluated based on a specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An active directory object consists of three pieces of information, a naming context, a relative distinguished name, and an attribute. Each piece helps identify a specific active directory entry.</xsd:documentation>
+                  <xsd:documentation>Note that this object supports complex values that are in the form of a record. For simple (string based) value collection see the activedirectory_object.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -576,6 +557,7 @@
       <xsd:element name="activedirectory57_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation>The activedirectory57_state element defines the different information that can be used to evaluate the specified entries in active directory. An active directory test will reference a specific instance of this state that defines the exact settings that need to be evaluated. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>Note that this state supports complex values that are in the form of a record. For simple (string based) value collection see the activedirectory_state.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1122,16 +1104,10 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjmodule_name">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:module_name">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the module_name entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_name entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
-                                                            <!--
-                                                                  NOTE: Changed name from modulename to align with naming conventions.
-                                                                  NOTE: Allowed nill - If this is set to nill then the behavior would be to simply use the specified cmdlet that is available in the default execution environment.
-                                                                  TODO: Can this be restricted to an allowed set of characters? Is there a documented format for the module name?
-                                                                  TODO: Can the allowed operation be restricted to equals?
-                                                            -->
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="module_id" type="win-def:EntityObjectGUIDType" nillable="true" minOccurs="1" maxOccurs="1">
@@ -1140,15 +1116,10 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjmodule_id">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:module_id">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the module_id entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_id entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
-                                                            <!-- 
-                                                                  NOTE: Changed name from module id to align with naming conventions.
-                                                                  NOTE: Allowed nill - If set to nill then the behavior would be to use the cmdlet that is available in the default execution environment.
-                                                                  TODO: Can the allowed operation be restricted to equals?
-                                                            -->
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="module_version" type="oval-def:EntityObjectVersionType" nillable="true" minOccurs="1" maxOccurs="1">
@@ -1157,15 +1128,10 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjmodule_version">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:module_version">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the module_version entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_version entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
-                                                            <!--
-                                                                  NOTE: Allowed nill - If this is set to nill then the behavior would be to simply use the specified cmdlet that is available in the default execution environment.
-                                                                  NOTE: Only allows datatype = version.
-                                                                  TODO: Can the allowed operation be restricted to equals?
-                                                            -->
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="verb" type="win-def:EntityObjectCmdletVerbType" minOccurs="1" maxOccurs="1">
@@ -1174,13 +1140,10 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjverb">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:verb">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the verb entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the verb entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
-                                                            <!--
-                                                                  TODO: Can the allowed operation be restricted to equals?
-                                                            -->
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="noun" type="oval-def:EntityObjectStringType" minOccurs="1" maxOccurs="1">
@@ -1189,14 +1152,10 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjnoun">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:noun">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the noun entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the noun entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
-                                                            <!--
-                                                                  TODO: Is there an allowed format that is more restrictive than strings?
-                                                                  TODO: Can the allowed operation be restricted to equals?
-                                                            -->
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="parameters" type="oval-def:EntityObjectRecordType" nillable="true">
@@ -1210,7 +1169,7 @@
                                                                   </sch:pattern>
                                                                   <sch:pattern id="win-def_cmdletobjparameters_fields">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:parameters/oval-def:field">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the parameters field entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters field entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1222,7 +1181,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="select" type="oval-def:EntityObjectRecordType" nillable="true">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>A list of fields (name and value pairs) used as input to the Select-Object cmdlet to select specific output properties. Each property name must be unique. This is equivalent to piping the output of a cmdlet to the Select-Object cmdlet. When xsi:nill is set to true, the Select-Object is not used.</xsd:documentation>
+                                                            <xsd:documentation>A list of fields (name and value pairs) used as input to the Select-Object cmdlet to select specific output properties. Each property name must be unique.  Please note that the use of the '*' character, to select all properties, is not permitted. This is because the value record entity, in the state and item, require unique field name values to ensure that any query results can be evaluated consistently. This is equivalent to piping the output of a cmdlet to the Select-Object cmdlet. When xsi:nill is set to true, the Select-Object is not used.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_cmdletobjselect">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:select">
@@ -1231,7 +1190,7 @@
                                                                   </sch:pattern>
                                                                   <sch:pattern id="win-def_cmdletobjselect_fields">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:select/oval-def:field">
-                                                                              <sch:assert test="not(@operation) or @operation='equals''"><sch:value-of select="../@id"/> - operation attribute for the select field entity of a cmdlet_object must be 'equals'</sch:assert>
+                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select field entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1267,11 +1226,6 @@
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
-                                                <!--
-                                                      NOTE: Changed name from modulename to align with naming conventions.
-                                                      TODO: Can this be restricted to an allowed set of characters? Is there a documented format for the module name?
-                                                      TODO: Can the allowed operation be restricted to equals?
-                                                -->
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="module_id" type="win-def:EntityStateGUIDType" minOccurs="0" maxOccurs="1">
@@ -1284,10 +1238,6 @@
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
-                                                <!-- 
-                                                      NOTE: Changed name from module id to align with naming conventions.
-                                                      TODO: Can the allowed operation be restricted to equals?
-                                                -->
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="module_version" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
@@ -1300,10 +1250,6 @@
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
-                                                <!--
-                                                      NOTE: Only allows datatype = version.
-                                                      TODO: Can the allowed operation be restricted to equals?
-                                                -->
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="verb" type="win-def:EntityStateCmdletVerbType" minOccurs="0" maxOccurs="1">
@@ -1316,9 +1262,6 @@
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
-                                                <!--
-                                                      TODO: Can the allowed operation be restricted to equals?
-                                                -->
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="noun" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
@@ -1331,10 +1274,6 @@
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
-                                                <!--
-                                                      TODO: Is there an allowed format more restrictive than strings?
-                                                      TODO: Can the allowed operation be restricted to equals?
-                                                -->
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="parameters" type="oval-def:EntityStateRecordType" minOccurs="0" maxOccurs="1">
@@ -1565,7 +1504,7 @@
                                                                               <sch:pattern id="win-def_fileobjfilename">
                                                                                     <sch:rule context="win-def:file_object/win-def:filename">
                                                                                           <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
-                                                                                          <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(@var_ref)"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                          <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(@var_ref)"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                     </sch:rule>
                                                                               </sch:pattern>
                                                                         </xsd:appinfo>
@@ -1810,7 +1749,7 @@
                                                                               <sch:pattern id="win-def_fap53objfilename">
                                                                                     <sch:rule context="win-def:fileauditedpermissions53_object/win-def:filename">
                                                                                           <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
-                                                                                          <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or (not(.='') and not(@operation='pattern match'))"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                          <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(.='') or (.='' and @operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                     </sch:rule>
                                                                               </sch:pattern>
                                                                         </xsd:appinfo>
@@ -1977,6 +1916,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group SID should be included in the object when the object is defined by a group SID. For example, the intent of an object defined by a group SID might be to retrieve all the user SIDs that are a member of the group, but not the group SID itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_fap53_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:fileauditedpermissions53_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:fileauditedpermissions53_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>            
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -2021,9 +1972,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_faptst_dep">
                               <sch:rule context="win-def:fileauditedpermissions_test">
-                                    <sch:report test="true()">
-                                          DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -2086,7 +2035,7 @@
                                                                   <sch:pattern id="win-def_fapobjfilename">
                                                                         <sch:rule context="win-def:fileauditedpermissions_object/win-def:filename">
                                                                             <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
-                                                                              <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or (not(.='') and not(@operation='pattern match'))"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                            <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(.='') or (.='' and @operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -2115,9 +2064,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_fapste_dep">
                               <sch:rule context="win-def:fileauditedpermissions_state">
-                                    <sch:report test="true()">
-                                          DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -2265,6 +2212,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group trustee name should be included in the object when the object is defined by a group trustee name. For example, the intent of an object defined by a group trustee name might be to retrieve all the user SIDs that are a member of the group, but not the group trustee name itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_fap_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:fileauditedpermissions_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:fileauditedpermissions_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -2364,7 +2323,7 @@
                                                                             <sch:pattern id="win-def_fer53objfilename">
                                                                                   <sch:rule context="win-def:fileeffectiverights53_object/win-def:filename">
                                                                                       <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
-                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or (not(.='') and not(@operation='pattern match'))"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(.='') or (.='' and @operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -2531,6 +2490,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group SID should be included in the object when the object is defined by a group SID. For example, the intent of an object defined by a group SID might be to retrieve all the user SIDs that are a member of the group, but not the group SID itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_ffr53_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:fileeffectiverights53_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:fileeffectiverights53_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -2575,9 +2546,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_fertst_dep">
                               <sch:rule context="win-def:fileeffectiverights_test">
-                                    <sch:report test="true()">
-                                          DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -2615,9 +2584,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_ferobj_dep">
                               <sch:rule context="win-def:fileeffectiverights_object">
-                                    <sch:report test="true()">
-                                          DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -2642,7 +2609,7 @@
                                                                   <sch:pattern id="win-def_fefobjfilename">
                                                                         <sch:rule context="win-def:fileeffectiverights_object/win-def:filename">
                                                                             <sch:assert test="(not(contains(.,'\') or contains(.,'/') or contains(.,':') or contains(.,'*') or contains(.,'?') or contains(.,'>') or contains(.,'|'))) or (@operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot contain the characters / \ : * ? > | </sch:assert>
-                                                                              <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or (not(.='') and not(@operation='pattern match'))"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                              <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(.='') or (.='' and @operation='pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -2671,9 +2638,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_ferste_dep">
                               <sch:rule context="win-def:fileeffectiverights_state">
-                                    <sch:report test="true()">
-                                          DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -2821,6 +2786,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group trustee name should be included in the object when the object is defined by a group trustee name. For example, the intent of an object defined by a group SID might be to retrieve all the user trustee names that are members of the group, but not the group trustee name itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_ffr_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:fileeffectiverights_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:fileeffectiverights_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -3744,7 +3721,7 @@
                                     </xsd:element>
                                     <xsd:element name="loader_flags" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>TODO - QUESTION: This flag is obsolete - do we need to support it?</xsd:documentation>
+                                                <xsd:documentation>The loader_flags entity is a DWORD that specifies the loader flags of the header.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="number_of_rva_and_sizes" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
@@ -3752,9 +3729,9 @@
                                                 <xsd:documentation>The number_of_rva_and_sizes entity is a DWORD that specifies the number of directory entries in the remainder of the optional header.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
-                                    <xsd:element name="image_base" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                    <xsd:element name="real_number_of_directory_entries" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>TODO - QUESTION: What is the difference between this and the image_base_address? Do we need to account for data directory entries whose count is specified in the number_of_rva_and sizes entity?</xsd:documentation>
+                                                <xsd:documentation>The real_number_of_directory_entries entity is the real number of data directory entries in the remainder of the optional header calculated by enumerating the directory entries.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -4042,6 +4019,18 @@
             <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                   <xsd:annotation>
                         <xsd:documentation>'include_group' defines whether the group trustee name should be included in the object when the object is defined by a group trustee name. For example, the intent of an object defined by a group trustee name might be to retrieve all the user trustee names that are members of the group, but not the group trustee name itself.</xsd:documentation>
+                        <xsd:appinfo>
+                              <oval:deprecated_info>
+                                    <oval:version>5.10</oval:version>
+                                    <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                    <oval:comment>Consider using a sid_sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                              </oval:deprecated_info>
+                              <sch:pattern id="win-def_pef_include_group_value_dep">
+                                    <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:printereffectiverights_object/win-def:behaviors">
+                                          <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:printereffectiverights_object</sch:report>
+                                    </sch:rule>
+                              </sch:pattern>                        
+                        </xsd:appinfo>
                   </xsd:annotation>
             </xsd:attribute>
             <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -4378,8 +4367,8 @@
                                                             <xsd:documentation>The key element describes a registry key to be collected. Note that the hive portion of the string should not be included, as this data should be found under the hive element. If the xsi:nil attribute is set to true, then the object being specified is the higher level hive. In this case, the key element should not be collected or used in analysis. Setting xsi:nil equal to true is different than using a .* pattern match. A .* pattern match says to collect every key under a given hive. Note that when xsi:nil is used for the key element, the name element should also be nilled.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_regobjkey">
-                                                                        <sch:rule context="win-def:registry_object/win-def:key">
-                                                                              <sch:assert test="not(@xsi:nil=true()) or ../win-def:name/@xsi:nil=true()"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
+                                                                        <sch:rule context="win-def:registry_object/win-def:key[@xsi:nil='true' or @xsi:nil='1']">
+                                                                              <sch:assert test="../win-def:name/@xsi:nil='true' or ../win-def:name/@xsi:nil='1'"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -4687,6 +4676,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group SID should be included in the object when the object is defined by a group SID. For example, the intent of an object defined by a group SID might be to retrieve all the user SIDs that are a member of the group, but not the group SID itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_rka53_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:regkeyauditedpermissions53_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:regkeyauditedpermissions53_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -4731,9 +4732,7 @@
                               </oval:deprecated_info>
                               <sch:pattern id="win-def_raptst_dep">
                                     <sch:rule context="win-def:regkeyauditedpermissions_test">
-                                          <sch:report test="true()">
-                                                DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                          </sch:report>
+                                          <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                                     </sch:rule>
                               </sch:pattern>
                   </xsd:appinfo>
@@ -4771,9 +4770,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_rapobj_dep">
                               <sch:rule context="win-def:regkeyauditedpermissions_object">
-                                    <sch:report test="true()">
-                                          DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -4819,9 +4816,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_rapste_dep">
                               <sch:rule context="win-def:regkeyauditedpermissions_state">
-                                    <sch:report test="true()">
-                                          DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -4962,6 +4957,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group trustee name should be included in the object when the object is defined by a group trustee name. For example, the intent of an object defined by a group trustee name might be to retrieve all the user trustee names that are members of the group, but not the group trustee name itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_rka_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:regkeyauditedpermissions_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:regkeyauditedpermissions_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -5200,6 +5207,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group SID should be included in the object when the object is defined by a group SID. For example, the intent of an object defined by a group SID might be to retrieve all the user SIDs that are a member of the group, but not the group SID itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_rke53_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:regkeyeffectiverights53_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:regkeyeffectiverights53_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -5244,9 +5263,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_rertst_dep">
                               <sch:rule context="win-def:regkeyeffectiverights_test">
-                                    <sch:report test="true()">
-                                          DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -5277,14 +5294,12 @@
                   <xsd:appinfo>
                         <oval:deprecated_info>
                               <oval:version>5.3</oval:version>
-                              <oval:reason>Replaced by the fileauditedpermissions53_object. This object uses a trustee_name element for identifying trustees. Trustee names are not unique, and a new object was created to use trustee SIDs, which are unique. See the regkeyeffectiverights53_object.</oval:reason>
+                              <oval:reason>Replaced by the regkeyeffectiverights53_object. This object uses a trustee_name element for identifying trustees. Trustee names are not unique, and a new object was created to use trustee SIDs, which are unique. See the regkeyeffectiverights53_object.</oval:reason>
                               <oval:comment>This object has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_rerobj_dep">
                               <sch:rule context="win-def:regkeyeffectiverights_object">
-                                    <sch:report test="true()">
-                                          DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -5330,9 +5345,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="win-def_rerste_dep">
                               <sch:rule context="win-def:regkeyeffectiverights_state">
-                                    <sch:report test="true()">
-                                          DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -5473,6 +5486,18 @@
                         <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
                               <xsd:annotation>
                                     <xsd:documentation>'include_group' defines whether the group trustee name should be included in the object when the object is defined by a group trustee name. For example, the intent of an object defined by a group trustee name might be to retrieve all the user trustee names that are members of the group, but not the group trustee name itself.</xsd:documentation>
+                                    <xsd:appinfo>
+                                          <oval:deprecated_info>
+                                                <oval:version>5.10</oval:version>
+                                                <oval:reason>The 'include_group' behavior has been deprecated in favor of using variables to reference more efficient objects for expanding groups.</oval:reason>
+                                                <oval:comment>Consider using a sid_sid_object or similar to resolve the members of a group. Then, if needed specifically include the using the include_group behavior on the relevant object.</oval:comment>
+                                          </oval:deprecated_info>
+                                          <sch:pattern id="win-def_rke_include_group_value_dep">
+                                                <sch:rule context="oval-def:oval_definitions/oval-def:objects/win-def:regkeyeffectiverights_object/win-def:behaviors">
+                                                      <sch:report test="@include_group">DEPRECATED BEHAVIOR IN: win-def:regkeyeffectiverights_object</sch:report>
+                                                </sch:rule>
+                                          </sch:pattern>                        
+                                    </xsd:appinfo>
                               </xsd:annotation>
                         </xsd:attribute>
                         <xsd:attribute name="resolve_group" type="xsd:boolean" use="optional" default="false">
@@ -5628,7 +5653,7 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
-       <!-- =============================================================================== -->
+      <!-- =============================================================================== -->
       <!-- ================  SERVICE EFFECTIVE RIGHTS TEST =============================== -->
       <!-- =============================================================================== -->
       <xsd:element name="serviceeffectiverights_test" substitutionGroup="oval-def:test">
@@ -5803,7 +5828,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="sharedresource_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The shared resource test is used to check properties associated with any shared resource on the system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sid_object and the optional state element specifies the metadata to check.</xsd:documentation>
+                  <xsd:documentation>The shared resource test is used to check properties associated with any shared resource on the system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sharedresource_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>sharedresource_test</oval:test>
@@ -5861,7 +5886,7 @@
       </xsd:element>
       <xsd:element name="sharedresource_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The sharedresource_state element defines the different metadata associate with a Windows shared resource. This includes the share type, permissions, and max uses. This state mirror the SHARE_INFO_2 structure. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>The sharedresource_state element defines the different metadata associated with a Windows shared resource. This includes the share type, permissions, and max uses. This state mirrors the SHARE_INFO_2 structure. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -5937,6 +5962,306 @@
                   </xsd:complexContent>
             </xsd:complexType>
       </xsd:element>
+      <!-- =============================================================================== -->
+      <!-- =================  SHARED RESOURCE AUDITED PERMISSIONS TEST   ================= -->
+      <!-- =============================================================================== -->
+      <xsd:element name="sharedresourceauditedpermissions_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>The shared resource audited permissions test is used to check the audit permissions associated with any shared resource on the system. Note that the trustee's audited permissions are the audit permissons that the SACL grants to the trustee or to any groups of which the trustee is a member. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sharedresourceauditedpermissions_object and the optional state element specifies the metadata to check.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>sharedresourceauditedpermissions_test</oval:test>
+                              <oval:object>sharedresourceauditedpermissions_object</oval:object>
+                              <oval:state>sharedresourceauditedpermissions_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">sharedresourceauditedpermissions_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_sraptst">
+                              <sch:rule context="win-def:sharedresourceauditedpermissions_test/win-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/win-def:sharedresourceauditedpermissions_object/@id"><sch:value-of select="../@id"/> - the object child element of a sharedresourceauditedpermissions_test must reference a sharedresourceauditedpermissions_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="win-def:sharedresourceauditedpermissions_test/win-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/win-def:sharedresourceauditedpermissions_state/@id"><sch:value-of select="../@id"/> - the state child element of a sharedresourceauditedpermissions_test must reference a sharedresourceauditedpermissions_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="sharedresourceauditedpermissions_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>The sharedresourceauditedpermissions_object element is used by a shared resource audited permissions test to define the objects used to evaluate against the specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.</xsd:documentation>
+                  <xsd:documentation>A shared resource audited permissions object consists of a netname entity that identifies a specific shared resource and a trustee_sid entity that identifies a specific account (SID) to check the audited permissions of.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="behaviors" type="win-def:SharedResourceAuditedPermissionsBehaviors" minOccurs="0"/>
+                                                <xsd:element name="netname" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The netname element is the unique name that is associated with a specific shared resource.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The trustee_sid entity identifies a unique SID associated with a user, group, system, or program (such as a Windows service).  If an operation other than equals is used to identify matching trustees (i.e. not equal, or a pattern match) then the resulting matches shall be limited to only the trustees referenced in the file's Security Descriptor.  The scope is limited here to avoid unnecessarily resource intensive searches for trustees.  Note that the larger scope of all known trustees may be obtained through the use of variables.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="sharedresourceauditedpermissions_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation>The sharedresourceauditedpermissions_state element defines the different audited permissions that can be associated with a given sharedresourceauditedpermissions_object. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="netname" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>This element specifies the name associated with a particular shared resource.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="trustee_sid" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The trustee_sid element is the unique SID that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_delete" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to delete the object.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_read_control" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to read the information in the object's Security Descriptor, not including the information in the SACL.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_write_dac" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to modify the DACL in the object's Security Descriptor.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_write_owner" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to change the owner in the object's Security Descriptor.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_synchronize" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state. Some object types do not support this access right.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="access_system_security" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Indicates access to a system access control list (SACL).</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_read" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Read access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_write" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Write access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_execute" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Execute access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_all" type="win-def:EntityStateAuditType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Read, write, and execute access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="SharedResourceAuditedPermissionsBehaviors">
+            <xsd:annotation>
+                  <xsd:documentation>The SharedResourceAuditedPermissionsBehaviors complex type defines a behavior that allows for a more detailed definition of the sharedresourceauditedpermissions_object being specified.  Note that using this behavior may result in some unique results.  For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
+                  <xsd:annotation>
+                        <xsd:documentation>'include_group' defines whether the group SID should be included in the object when the object is defined by a group SID. For example, the intent of an object defined by a group SID might be to retrieve all the user SIDs that are a member of the group, but not the group SID itself.</xsd:documentation>
+                  </xsd:annotation>
+            </xsd:attribute>
+      </xsd:complexType>
+      <!-- =============================================================================== -->
+      <!-- ==================  SHARED RESOURCE EFFECTIVE RIGHTS TEST   =================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="sharedresourceeffectiverights_test" substitutionGroup="oval-def:test">
+            <xsd:annotation>
+                  <xsd:documentation>The shared resource effective rights test is used to check the effective rights associated with any shared resource on the system. Note that the trustee's effective access rights are the access rights that the DACL grants to the trustee or to any groups of which the trustee is a member. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sharedresourceeffectiverights_object and the optional state element specifies the metadata to check.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:element_mapping>
+                              <oval:test>sharedresourceeffectiverights_test</oval:test>
+                              <oval:object>sharedresourceeffectiverights_object</oval:object>
+                              <oval:state>sharedresourceeffectiverights_state</oval:state>
+                              <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows">sharedresourceeffectiverights_item</oval:item>
+                        </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_srertst">
+                              <sch:rule context="win-def:sharedresourceeffectiverights_test/win-def:object">
+                                    <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/win-def:sharedresourceeffectiverights_object/@id"><sch:value-of select="../@id"/> - the object child element of a sharedresourceeffectiverights_test must reference a sharedresourceeffectiverights_object</sch:assert>
+                              </sch:rule>
+                              <sch:rule context="win-def:sharedresourceeffectiverights_test/win-def:state">
+                                    <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/win-def:sharedresourceeffectiverights_state/@id"><sch:value-of select="../@id"/> - the state child element of a sharedresourceeffectiverights_test must reference a sharedresourceeffectiverights_state</sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:TestType">
+                              <xsd:sequence>
+                                    <xsd:element name="object" type="oval-def:ObjectRefType"/>
+                                    <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="sharedresourceeffectiverights_object" substitutionGroup="oval-def:object">
+            <xsd:annotation>
+                  <xsd:documentation>The sharedresourceeffectiverights_object element is used by a shared resource effective rights test to define the object, in this case a shared resource effective rights object, to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>A shared resource effective rights object consists of a netname entity that identifies a specific shared resource and a trustee_sid entity that identifies a specific account (SID) to check the effective rights of.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:ObjectType">
+                              <xsd:sequence>
+                                    <xsd:choice>
+                                          <xsd:element ref="oval-def:set"/>
+                                          <xsd:sequence>
+                                                <xsd:element name="behaviors" type="win-def:SharedResourceEffectiveRightsBehaviors" minOccurs="0"/>
+                                                <xsd:element name="netname" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The netname element is the unique name that is associated with a specific shared resource.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
+                                                      <xsd:annotation>
+                                                            <xsd:documentation>The trustee_sid entity identifies a unique SID associated with a user, group, system, or program (such as a Windows service).  If an operation other than equals is used to identify matching trustees (i.e. not equal, or a pattern match) then the resulting matches shall be limited to only the trustees referenced in the file's Security Descriptor.  The scope is limited here to avoid unnecessarily resource intensive searches for trustees.  Note that the larger scope of all known trustees may be obtained through the use of variables.</xsd:documentation>
+                                                      </xsd:annotation>
+                                                </xsd:element>
+                                                <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                          </xsd:sequence>
+                                    </xsd:choice>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="sharedresourceeffectiverights_state" substitutionGroup="oval-def:state">
+            <xsd:annotation>
+                  <xsd:documentation>The sharedresourceeffectiverights_state element defines the different rights that can be associated with a given sharedresourceeffectiverights_object. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-def:StateType">
+                              <xsd:sequence>
+                                    <xsd:element name="netname" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>This element specifies the name associated with a particular shared resource.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="trustee_sid" type="oval-def:EntityStateStringType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The trustee_sid element is the unique SID that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_delete" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to delete the object.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_read_control" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to read the information in the object's Security Descriptor, not including the information in the SACL.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_write_dac" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to modify the DACL in the object's Security Descriptor.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_write_owner" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to change the owner in the object's Security Descriptor.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="standard_synchronize" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state. Some object types do not support this access right.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="access_system_security" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Indicates access to a system access control list (SACL).</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_read" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Read access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_write" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Write access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_execute" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Execute access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="generic_all" type="oval-def:EntityStateBoolType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Read, write, and execute access.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="SharedResourceEffectiveRightsBehaviors">
+            <xsd:annotation>
+                  <xsd:documentation>The SharedResourceEffectiveRightsBehaviors complex type defines a behavior that allows for a more detailed definition of the sharedresourceeffectiverights_object being specified.  Note that using this behavior may result in some unique results.  For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="include_group" type="xsd:boolean" use="optional" default="true">
+                  <xsd:annotation>
+                        <xsd:documentation>'include_group' defines whether the group SID should be included in the object when the object is defined by a group SID. For example, the intent of an object defined by a group SID might be to retrieve all the user SIDs that are a member of the group, but not the group SID itself.</xsd:documentation>
+                  </xsd:annotation>
+            </xsd:attribute>
+      </xsd:complexType>
       <!-- =============================================================================== -->
       <!-- =================================  SID TEST   ================================= -->
       <!-- =============================================================================== -->
@@ -6334,6 +6659,11 @@
                                                 <xsd:documentation>The group element can be included multiple times in a system characteristic item in order to record that a user can be a member of a number of different groups. Note that the entity_check attribute associated with EntityStateStringType guides the evaluation of entities like group that refer to items that can occur an unbounded number of times.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="last_logon" type="oval-def:EntityStateIntType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The date and time when the last logon occurred. This value is stored as the number of seconds that have elapsed since 00:00:00, January 1, 1970, GMT.</xsd:documentation>
+                                          </xsd:annotation>                                          
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -6449,9 +6779,7 @@
                       </oval:deprecated_info>
                       <sch:pattern id="win-def_usersidtst_dep">
                             <sch:rule context="win-def:user_sid_test">
-                                  <sch:report test="true()">
-                                        DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                  </sch:report>
+                                  <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                             </sch:rule>
                       </sch:pattern>
                 </xsd:appinfo>
@@ -6488,9 +6816,7 @@
                       </oval:deprecated_info>
                       <sch:pattern id="win-def_usersidobj_dep">
                             <sch:rule context="win-def:user_sid_object">
-                                  <sch:report test="true()">
-                                        DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                  </sch:report>
+                                  <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                             </sch:rule>
                       </sch:pattern>                        
                 </xsd:appinfo>
@@ -6523,9 +6849,7 @@
                       </oval:deprecated_info>
                       <sch:pattern id="win-def_usersidste_dep">
                             <sch:rule context="win-def:user_sid_state">
-                                  <sch:report test="true()">
-                                        DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                  </sch:report>
+                                  <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                             </sch:rule>
                       </sch:pattern>                        
                 </xsd:appinfo>  
@@ -6931,7 +7255,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="wql" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>A WQL query used to identify the object(s) to test against. Any valid WQL query is usable with one exception, all fields must be named in the SELECT portion of the query. For example SELECT name, age FROM ... is valid. However, SELECT * FROM ... is not valid. This is because the record element in the state and item require a unique field name value to ensure that any query results can be evaluated consistantly.</xsd:documentation>
+                                                            <xsd:documentation>A WQL query used to identify the object(s) to test against. Any valid WQL query is usable with one exception, all fields must be named in the SELECT portion of the query. For example SELECT name, age FROM ... is valid. However, SELECT * FROM ... is not valid. This is because the record element in the state and item require a unique field name value to ensure that any query results can be evaluated consistently.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="win-def_wmi57objwql">
                                                                         <sch:rule context="win-def:wmi57_object/win-def:wql">
@@ -8273,16 +8597,6 @@
                                     <xsd:documentation>The Measure verb identifies resources that are consumed by a specified operation, or retrieves statistics about a resource.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
-                        <xsd:enumeration value="Open">
-                              <xsd:annotation>
-                                    <xsd:documentation>The Open verb changes the state of a resource to make it accessible, available, or usable.</xsd:documentation>
-                              </xsd:annotation>
-                        </xsd:enumeration>
-                        <xsd:enumeration value="Ping">
-                              <xsd:annotation>
-                                    <xsd:documentation>The Ping verb specifies an action that determines if a resource is active and is responding to requests.</xsd:documentation>
-                              </xsd:annotation>
-                        </xsd:enumeration>
                         <xsd:enumeration value="Read">
                               <xsd:annotation>
                                     <xsd:documentation>The Read verb acquires information from a source.</xsd:documentation>
@@ -8380,23 +8694,6 @@
                         <xsd:enumeration value="Measure">
                               <xsd:annotation>
                                     <xsd:documentation>The Measure verb identifies resources that are consumed by a specified operation, or retrieves statistics about a resource.</xsd:documentation>
-                              </xsd:annotation>
-                        </xsd:enumeration>
-                        <xsd:enumeration value="Open">
-                              <xsd:annotation>
-                                    <xsd:documentation>The Open verb changes the state of a resource to make it accessible, available, or usable.</xsd:documentation>
-                                    <!-- 
-                                          TODO: Is open a security risk? The documentation says it changes state.
-                                    -->
-                              </xsd:annotation>
-                        </xsd:enumeration>
-                        <xsd:enumeration value="Ping">
-                              <xsd:annotation>
-                                    <xsd:documentation>The Ping verb specifies an action that determines if a resource is active and is responding to requests.</xsd:documentation>
-                                    <!-- 
-                                          TODO: Is open a security risk? It seems like you might be able to write valid OVAL content that could flood a network with this? Do we need this verb?
-                                          TODO: the documentation says to use Test instead of Ping. Perhaps this is not needed.
-                                    -->
                               </xsd:annotation>
                         </xsd:enumeration>
                         <xsd:enumeration value="Read">

@@ -9,8 +9,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>VMware ESX server Definition</schema>
-                  <version>5.9</version>
-                  <date>2/22/2011 10:52:24 AM</date>
+                  <version>5.10 Release Candidate 1</version>
+                  <date>7/19/2011 10:15:35 PM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="esx-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx"/>
@@ -22,7 +22,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="patch56_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The patch56_test reveals the installation status of a specific patch or patches in VMware ESX Server. This information can be retrieved by the "esxupdate query" command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a patch56_object and the optional state element referencing a patch56_state specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The patch56_test reveals the installation status of a specific patch or patches in VMware ESX Server. This information can be retrieved by the "esxupdate query" command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a patch56_object and the optional state element referencing a patch56_state specifies the metadata to check.</xsd:documentation>
                   <xsd:documentation>Note that different from previous versions, ESX Server 3.0.3 and ESX Server 3.5 use the following patch naming convention: {ProductName}{VersionNumber}-{BundleID}-{Classification}{SupportLevel}. Please refer to http://www.vmware.com/pdf/vi3_35/esx_3/r35/vi3_35_25_esxupdate.pdf for more detailed information.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
@@ -141,7 +141,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="patch_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The patch test reveals the installation status of a specific patch in the VMware ESX server. This information can be retrieved by the "esxupdate query | grep ESX-xxxxxxx" command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a patch_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The patch test reveals the installation status of a specific patch in the VMware ESX server. This information can be retrieved by the "esxupdate query | grep ESX-xxxxxxx" command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a patch_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>patch_test</oval:test>
@@ -281,7 +281,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="version_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The version test reveals information about the release and build version of the VMware ESX server. This information can be retrieved by the "vmware -v" command or by checking the /proc/vmware/version file. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The version test reveals information about the release and build version of the VMware ESX server. This information can be retrieved by the "vmware -v" command or by checking the /proc/vmware/version file. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a version_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>version_test</oval:test>
@@ -350,7 +350,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="visdkmanagedobject_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The visdkmanagedobject_test is used to check information about Managed Objects in the VMware Infrastructure.  This test extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a visdkmanagedobject _object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The visdkmanagedobject_test is used to check information about Managed Objects in the VMware Infrastructure.  This test extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a visdkmanagedobject _object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:documentation>This test has been introduced to enable standardized automated assessments of configuration settings in cloud computing components.  All aspects of the VMware cloud can be considered in this test due to the VMware Infrastructure.  Whether it is a Virutal Machine, a Host System, or even a Data Center, properties are defined in ways that can be enumerated in a common methodology. The VI SDK Programming Guide located at http://www.vmware.com/support/developer/vc-sdk/visdk400pubs/sdk40programmingguide.pdf serves as a great resource.  Chapter 3 discusses the Managed Entities enumerated in the behaviors.</xsd:documentation>
                   <xsd:documentation>There are several Managed Entities in the VMware Infrastructure which have been enumerated in ViSdkManagedEntityBehaviors to enable interpreters to execute efficient interrogations.  This test is designed for an interpreter to access Managed Entity properties (settings) via the VI SDK webservice.  An example use case is to interrogate all virtual machines to ensure that a particular security setting is enabled.  Some properties serve to configure the Virtual Machine, while others can be used to identify.  For example, sets and filters can be used to create a set of all Virtual Machines where bridged networking is employed, and then perform an OVAL state evaluation against each of those Virtual Machines.  This concept applies to all properties across all Managed Entities.  Use the ViSdkManagedEntityBehaviors to avoid enumerating all Managed Objects when only one type should be considered.</xsd:documentation>
                   <xsd:appinfo>

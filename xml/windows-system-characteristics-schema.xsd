@@ -6,8 +6,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Windows System Characteristics</schema>
-               <version>5.10 Draft 2</version>
-               <date>6/10/2011 3:09:58 PM</date>
+               <version>5.10 Release Candidate 1</version>
+               <date>7/19/2011 10:15:38 PM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="win-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows"/>
@@ -266,18 +266,7 @@
      <xsd:element name="activedirectory_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
                <xsd:documentation>The active directory item holds information about specific entries in the Windows Active Directory. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
-               <xsd:appinfo>
-                    <oval:deprecated_info>
-                         <oval:version>5.7</oval:version>
-                         <oval:reason>Replaced by the activedirectory57_item. This item allows for single fields to be selected from active directory. A new item was created to allow more than one field to be selected in one statement. See the activedirectory57_item.</oval:reason>
-                         <oval:comment>This item has been deprecated and may be removed in a future version of the language.</oval:comment>
-                    </oval:deprecated_info>
-                    <sch:pattern id="win-sc_activedirectory_item_dep">
-                         <sch:rule context="win-sc:activedirectory_item">
-                              <sch:report test="true()">DEPRECATED ITEM: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                         </sch:rule>
-                    </sch:pattern>                        
-               </xsd:appinfo>
+               <xsd:documentation>Note that this ite supports only simple (string based) value collection. For more complex values see the activedirectory57_item.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -324,6 +313,7 @@
      <xsd:element name="activedirectory57_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
                <xsd:documentation>The activedirectory57_item holds information about specific entries in the Windows Active Directory. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
+               <xsd:documentation>Note that this item supports complex values that are in the form of a record. For simple (string based) value collection see the activedirectory_item.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -744,26 +734,16 @@
                               <xsd:element name="module_name" type="oval-sc:EntityItemStringType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The name of the module that contains the cmdlet.</xsd:documentation>
-                                        <!--
-                                             NOTE: Changed name from modulename to align with naming conventions.
-                                             TODO: Can this be restricted to an allowed set of characters? Is there a documented format for module name?
-                                        -->
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="module_id" type="win-sc:EntityItemGUIDType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The globally unique identifier for the module.</xsd:documentation>
-                                        <!-- 
-                                             NOTE: Changed name from module id to align with naming conventions.
-                                        -->
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="module_version" type="oval-sc:EntityItemVersionType" nillable="true" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The version of the module that contains the cmdlet in the form of MAJOR.MINOR.</xsd:documentation>
-                                        <!--
-                                             NOTE: Only allows datatype = version.
-                                        -->
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="verb" type="win-sc:EntityItemCmdletVerbType" minOccurs="0" maxOccurs="1">
@@ -774,9 +754,6 @@
                               <xsd:element name="noun" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The cmdlet noun.</xsd:documentation>
-                                        <!--
-                                             TODO: Is there an allowed format more restrictive than strings?
-                                        -->
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="parameters" type="oval-sc:EntityItemRecordType" nillable="true" minOccurs="0" maxOccurs="1">
@@ -1759,7 +1736,7 @@
                               </xsd:element>
                               <xsd:element name="loader_flags" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>TODO - QUESTION: This flag is obsolete - do we need to support it?</xsd:documentation>
+                                        <xsd:documentation>The loader_flags entity is a DWORD that specifies the loader flags of the header.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="number_of_rva_and_sizes" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
@@ -1767,9 +1744,9 @@
                                         <xsd:documentation>The number_of_rva_and_sizes entity is a DWORD that specifies the number of directory entries in the remainder of the optional header.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="image_base" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="real_number_of_directory_entries" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>TODO - QUESTION: What is the difference between this and the image_base_address? Do we need to account for data directory entries whose count is specified in the number_of_rva_and sizes entity?</xsd:documentation>
+                                        <xsd:documentation>The real_number_of_directory_entries entity is the real number of data directory entries in the remainder of the optional header calculated by enumerating the directory entries.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -2001,8 +1978,8 @@
                                         <xsd:documentation>This element describes a registry key to be gathered. Note that the hive portion of the string should not be inclueded, as this data can be found under the hive element. If the xsi:nil attribute is set to true, then the item being represented is the higher level hive. Using xsi:nil here will result in a status of 'does not exist' for the type, and value entities since these entities are not associated with a hive by itself. Note that when xsi:nil is used for the key element, the name element should also be nilled.</xsd:documentation>
                                         <xsd:appinfo>
                                              <sch:pattern id="win-sc_regitemkey">
-                                                  <sch:rule context="win-sc:registry_item/win-sc:key">
-                                                       <sch:assert test="not(@xsi:nil=true()) or ../win-sc:name/@xsi:nil=true()"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
+                                                  <sch:rule context="win-sc:registry_item/win-sc:key[@xsi:nil='true' or @xsi:nil='1']">
+                                                       <sch:assert test="../win-sc:name/@xsi:nil='true' or ../win-sc:name/@xsi:nil='1'"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
                                                   </sch:rule>
                                              </sch:pattern>
                                         </xsd:appinfo>
@@ -2605,6 +2582,158 @@
           </xsd:complexType>
      </xsd:element>
      <!-- =============================================================================== -->
+     <!-- =================  SHARED RESOURCE AUDITED PERMISSIONS ITEM  ================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="sharedresourceauditedpermissions_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>This item stores the audited access rights of a shared resource that a system access control list (SACL) structure grants to a specified trustee. The trustee's audited access rights are determined checking all access control entries (ACEs) in the SACL.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="netname" type="oval-sc:EntityItemStringType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The netname entity specifies the name associated with a particular shared resource.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="trustee_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The trustee_sid entity specifies the SID that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_delete" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to delete the object.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_read_control" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to read the information in the object's security descriptor, not including the information in the SACL.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_write_dac" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to modify the DACL in the object's security descriptor.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_write_owner" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to change the owner in the object's security descriptor.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_synchronize" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state. Some object types do not support this access right.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="access_system_security" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Indicates access to a system access control list (SACL).</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_read" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Read access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_write" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Write access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_execute" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Execute access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_all" type="win-sc:EntityItemAuditType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Read, write, and execute access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
+     <!-- ===================  SHARED RESOURCE EFFECTIVE RIGHTS ITEM  =================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="sharedresourceeffectiverights_item" substitutionGroup="oval-sc:item">
+          <xsd:annotation>
+               <xsd:documentation>This item stores the effective rights of a shared resource that a discretionary access control list (DACL) structure grants to a specified trustee. The trustee's effective rights are determined checking all access-allowed and access-denied access control entries (ACEs) in the DACL.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-sc:ItemType">
+                         <xsd:sequence>
+                              <xsd:element name="netname" type="oval-sc:EntityItemStringType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The netname entity specifies the name associated with a particular shared resource.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="trustee_sid" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The trustee_sid entity specifies the SID that associated a user, group, system, or program (such as a Windows service).</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_delete" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to delete the object.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_read_control" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to read the information in the object's security descriptor, not including the information in the SACL.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_write_dac" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to modify the DACL in the object's security descriptor.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_write_owner" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to change the owner in the object's security descriptor.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="standard_synchronize" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state. Some object types do not support this access right.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="access_system_security" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Indicates access to a system access control list (SACL).</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_read" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Read access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_write" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Write access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_execute" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Execute access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="generic_all" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>Read, write, and execute access.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <!-- =============================================================================== -->
      <!-- =================================  SID ITEM   ================================= -->
      <!-- =============================================================================== -->
      <xsd:element name="sid_item" substitutionGroup="oval-sc:item">
@@ -2754,6 +2883,11 @@
                                         <xsd:documentation>If the specified user belongs to more than one group, then multiple group elements should exist. If the specified user is not a member of a single group, then a single group element should exist with a status of 'does not exist'. If there is an error determining the groups that the user belongs to, then a single group element should be included with a status of 'error'.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
+                              <xsd:element name="last_logon" type="oval-sc:EntityItemIntType" minOccurs="0">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The date and time when the last logon occurred. This value is stored as the number of seconds that have elapsed since 00:00:00, January 1, 1970, GMT.</xsd:documentation>
+                                   </xsd:annotation>                                          
+                              </xsd:element>                              
                          </xsd:sequence>
                     </xsd:extension>
                </xsd:complexContent>
@@ -4044,23 +4178,6 @@
                     <xsd:enumeration value="Measure">
                          <xsd:annotation>
                               <xsd:documentation>The Measure verb identifies resources that are consumed by a specified operation, or retrieves statistics about a resource.</xsd:documentation>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="Open">
-                         <xsd:annotation>
-                              <xsd:documentation>The Open verb changes the state of a resource to make it accessible, available, or usable.</xsd:documentation>
-                              <!-- 
-                                   TODO: Is open a security risk? The documentation says it changes state.
-                              -->
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="Ping">
-                         <xsd:annotation>
-                              <xsd:documentation>The Ping verb specifies an action that determines if a resource is active and is responding to requests.</xsd:documentation>
-                              <!-- 
-                                   TODO: Is open a security risk? It seems like you might be able to write valid OVAL content that could flood a network with this? Do we need this verb?
-                                   TODO: the documentation says to use Test instead of Ping. Perhaps this is not needed.
-                              -->
                          </xsd:annotation>
                     </xsd:enumeration>
                     <xsd:enumeration value="Read">

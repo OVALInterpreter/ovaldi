@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" elementFormDefault="qualified" version="5.10">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
@@ -7,20 +7,21 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Independent Definition</schema>
-                  <version>5.9</version>
-                  <date>2/22/2011 10:52:25 AM</date>
+                  <version>5.10 Release Candidate 1</version>
+                  <date>7/19/2011 10:15:36 PM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="ind-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
             </xsd:appinfo>
       </xsd:annotation>
+      
       <!-- =============================================================================== -->
       <!-- ================================  FAMILY TEST  ================================ -->
       <!-- =============================================================================== -->
       <xsd:element name="family_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The family_test element is used to check the family a certain system belongs to. This test basically allows the high level system types (window, unix, ios, etc.) to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a family_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The family_test element is used to check the family a certain system belongs to. This test basically allows the high level system types (window, unix, ios, etc.) to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a family_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>family_test</oval:test>
@@ -84,7 +85,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="filehash_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The file hash test is used to check the hashes associated with a specified file. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a filehash_object and the optional state element specifies the different hashes to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The file hash test is used to check the hashes associated with a specified file. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a filehash_object and the optional state element specifies the different hashes to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>filehash_test</oval:test>
@@ -179,7 +180,7 @@
                                                                       <xsd:appinfo>
                                                                             <sch:pattern id="ind-def_hashobjfilename">
                                                                                   <sch:rule context="ind-def:filehash_object/ind-def:filename">
-                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -249,7 +250,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="filehash58_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The file hash test is used to check a specific hash type associated with a specified file. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a filehash58_object and the optional state element specifies an expected hash value. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The file hash test is used to check a specific hash type associated with a specified file. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a filehash58_object and the optional state element specifies an expected hash value.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>filehash58_test</oval:test>
@@ -320,7 +321,7 @@
                                                                         <xsd:appinfo>
                                                                               <sch:pattern id="ind-def_hash58objfilename">
                                                                                     <sch:rule context="ind-def:filehash58_object/ind-def:filename">
-                                                                                          <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                          <sch:assert test="(@var_ref and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                     </sch:rule>
                                                                               </sch:pattern>
                                                                         </xsd:appinfo>
@@ -384,7 +385,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="environmentvariable_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The environmentvariable_test element is used to check an environment variable found on the system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a environmentvariable_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The environmentvariable_test element is used to check an environment variable found on the system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a environmentvariable_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>environmentvariable_test</oval:test>
@@ -500,7 +501,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="environmentvariable58_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The environmentvariable_test element is used to check an environment variable for the specified process, which is identified by its process ID, on the system . It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a environmentvariable_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The environmentvariable_test element is used to check an environment variable for the specified process, which is identified by its process ID, on the system . It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a environmentvariable_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>environmentvariable58_test</oval:test>
@@ -593,7 +594,8 @@
       <!-- =============================================================================== -->
       <xsd:element name="ldap_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The LDAP test is used to check information about specific entries in an LDAP directory. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an ldap_object and the optional state element, ldap_state, specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The LDAP test is used to check information about specific entries in an LDAP directory. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an ldap_object and the optional state element, ldap_state, specifies the metadata to check.</xsd:documentation>
+                  <xsd:documentation>Note that this test supports only simple (string based) value collection. For more complex values see the ldap57_test.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>ldap_test</oval:test>
@@ -601,18 +603,6 @@
                               <oval:state>ldap_state</oval:state>
                               <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent">ldap_item</oval:item>
                         </oval:element_mapping>
-                  </xsd:appinfo>
-                  <xsd:appinfo>
-                        <oval:deprecated_info>
-                              <oval:version>5.7</oval:version>
-                              <oval:reason>Replaced by the ldap57_test. This test allows for single fields to be selected from a ldap. A new test was created to allow more than one field to be selected in one statement. See the ldap57_test.</oval:reason>
-                              <oval:comment>This object has been deprecated and may be removed in a future version of the language.</oval:comment>
-                        </oval:deprecated_info>
-                        <sch:pattern id="ind-def_ldap_test_dep">
-                              <sch:rule context="ind-def:ldap_test">
-                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                              </sch:rule>
-                        </sch:pattern> 
                   </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="ind-def_ldaptst">
@@ -639,18 +629,7 @@
       <xsd:element name="ldap_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The ldap_object element is used by an LDAP test to define the objects to be evaluated based on a specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:appinfo>
-                        <oval:deprecated_info>
-                              <oval:version>5.7</oval:version>
-                              <oval:reason>Replaced by the ldap57_object. This object allows for single fields to be selected from ldap. A new object was created to allow more than one field to be selected in one statement. See the ldap57_object.</oval:reason>
-                              <oval:comment>This object has been deprecated and may be removed in a future version of the language.</oval:comment>
-                        </oval:deprecated_info>
-                        <sch:pattern id="ind-def_ldap_object_dep">
-                              <sch:rule context="ind-def:ldap_object">
-                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                              </sch:rule>
-                        </sch:pattern>                        
-                  </xsd:appinfo>
+                  <xsd:documentation>Note that this object is paired with a state that supports only simple (string based) value collection. For more complex values see the ldap57_object.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -685,18 +664,7 @@
       <xsd:element name="ldap_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation>The ldap_state element defines the different information that can be used to evaluate the specified entries in an LDAP directory. An ldap_test will reference a specific instance of this state that defines the exact settings that need to be evaluated. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
-                  <xsd:appinfo>
-                        <oval:deprecated_info>
-                              <oval:version>5.7</oval:version>
-                              <oval:reason>Replaced by the ldap57_state. This state allows for single fields to be selected from ldap. A new state was created to allow more than one field to be selected in one statement. See the ldap57_state.</oval:reason>
-                              <oval:comment>This state has been deprecated and may be removed in a future version of the language.</oval:comment>
-                        </oval:deprecated_info>
-                        <sch:pattern id="ind-def_ldap_state_dep">
-                              <sch:rule context="ind-def:ldap_state">
-                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
-                              </sch:rule>
-                        </sch:pattern>                        
-                  </xsd:appinfo>
+                  <xsd:documentation>Note that this state supports only simple (string based) value collection. For more complex values see the ldap57_state.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -759,7 +727,8 @@
       <!-- =============================================================================== -->
       <xsd:element name="ldap57_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The LDAP test is used to check information about specific entries in an LDAP directory. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an ldap57_object and the optional state element, ldap57_state, specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The LDAP test is used to check information about specific entries in an LDAP directory. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an ldap57_object and the optional state element, ldap57_state, specifies the metadata to check.</xsd:documentation>
+                  <xsd:documentation>Note that this test supports complex values that are in the form of a record. For simple (string based) value collection see the ldap_test.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>ldap57_test</oval:test>
@@ -793,6 +762,7 @@
       <xsd:element name="ldap57_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The ldap57_object element is used by an LDAP test to define the objects to be evaluated based on a specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:documentation>Note that this object supports complex values that are in the form of a record. For simple (string based) value collection see the ldap_object.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -828,6 +798,7 @@
       <xsd:element name="ldap57_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation>The ldap57_state element defines the different information that can be used to evaluate the specified entries in an LDAP directory. An ldap57_test will reference a specific instance of this state that defines the exact settings that need to be evaluated. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>Note that this state supports complex values that are in the form of a record. For simple (string based) value collection see the ldap_state.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -884,7 +855,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="sql_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The sql test is used to check information stored in a database. It is often the case that applications store configuration settings in a database as opposed to a file. This test has been designed to enable those settings to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a wmi_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The sql test is used to check information stored in a database. It is often the case that applications store configuration settings in a database as opposed to a file. This test has been designed to enable those settings to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a wmi_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>sql_test</oval:test>
@@ -1060,7 +1031,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="sql57_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The sql test is used to check information stored in a database. It is often the case that applications store configuration settings in a database as opposed to a file. This test has been designed to enable those settings to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a wmi_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The sql test is used to check information stored in a database. It is often the case that applications store configuration settings in a database as opposed to a file. This test has been designed to enable those settings to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a wmi_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>sql57_test</oval:test>
@@ -1140,7 +1111,7 @@
                                                 </xsd:element>
                                                 <xsd:element name="sql" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The sql entity defines a query used to identify the object(s) to test against. Any valid SQL query is usable with one exception, all fields must be named in the SELECT portion of the query. For example, SELECT name, number FROM ... is valid. However, SELECT * FROM ... is not valid. This is because the record element in the state and item require a unique field name value to ensure that any query results can be evaluated consistantly.</xsd:documentation>
+                                                            <xsd:documentation>The sql entity defines a query used to identify the object(s) to test against. Any valid SQL query is usable with one exception, all fields must be named in the SELECT portion of the query. For example, SELECT name, number FROM ... is valid. However, SELECT * FROM ... is not valid. This is because the record element in the state and item require a unique field name value to ensure that any query results can be evaluated consistently.</xsd:documentation>
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="ind-def_sql57_object_sql">
                                                                         <sch:rule context="ind-def:sql57_object/ind-def:sql">
@@ -1212,7 +1183,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="textfilecontent54_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The textfilecontent54_test element is used to check the contents of a text file (aka a configuration file) by looking at individual blocks of text. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a textfilecontent54_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The textfilecontent54_test element is used to check the contents of a text file (aka a configuration file) by looking at individual blocks of text. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a textfilecontent54_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>textfilecontent54_test</oval:test>
@@ -1282,7 +1253,7 @@
                                                                       <xsd:appinfo>
                                                                             <sch:pattern id="ind-def_txt54objfilename">
                                                                                   <sch:rule context="ind-def:textfilecontent54_object/ind-def:filename">
-                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -1395,7 +1366,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="textfilecontent_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The textfilecontent_test element is used to check the contents of a text file (aka a configuration file) by looking at individual lines. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a textfilecontent_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The textfilecontent_test element is used to check the contents of a text file (aka a configuration file) by looking at individual lines. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a textfilecontent_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>textfilecontent_test</oval:test>
@@ -1412,9 +1383,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="ind-def_txttst_dep">
                               <sch:rule context="ind-def:textfilecontent_test">
-                                    <sch:report test="true()">
-                                          DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -1451,9 +1420,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="ind-def_txtobj_dep">
                               <sch:rule context="ind-def:textfilecontent_object">
-                                    <sch:report test="true()">
-                                          DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
@@ -1477,7 +1444,7 @@
                                                             <xsd:appinfo>
                                                                   <sch:pattern id="ind-def_txtobjfilename">
                                                                         <sch:rule context="ind-def:textfilecontent_object/ind-def:filename">
-                                                                              <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                              <sch:assert test="(@var_ref and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1514,9 +1481,7 @@
                         </oval:deprecated_info>
                         <sch:pattern id="ind-def_txtste_dep">
                               <sch:rule context="ind-def:textfilecontent_state">
-                                    <sch:report test="true()">
-                                          DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/>
-                                    </sch:report>
+                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
                               </sch:rule>
                         </sch:pattern>                        
                   </xsd:appinfo>
@@ -1568,7 +1533,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="variable_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The variable test allows the value of a variable to be compared to a defined value. As an example one might use this test to validate that a variable being passed in from an external source falls within a specified range. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a variable_object and the optional state element specifies the value to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The variable test allows the value of a variable to be compared to a defined value. As an example one might use this test to validate that a variable being passed in from an external source falls within a specified range. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a variable_object and the optional state element specifies the value to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>variable_test</oval:test>
@@ -1677,7 +1642,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="xmlfilecontent_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The xmlfilecontent_test element is used to explore the contents of an xml file. This test allows specific pieces of an xml document specified using xpath to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a xmlfilecontent_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The xmlfilecontent_test element is used to explore the contents of an xml file. This test allows specific pieces of an xml document specified using xpath to be tested. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a xmlfilecontent_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>xmlfilecontent_test</oval:test>
@@ -1747,7 +1712,7 @@
                                                                       <xsd:appinfo>
                                                                             <sch:pattern id="ind-def_xmlobjfilename">
                                                                                   <sch:rule context="ind-def:xmlfilecontent_object/ind-def:filename">
-                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -1939,6 +1904,11 @@
                         <xsd:enumeration value="mimer">
                               <xsd:annotation>
                                     <xsd:documentation>The mimer value describes the Mimer SQL database engine.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="mysql">
+                              <xsd:annotation>
+                                    <xsd:documentation>The mysql value describes the MySQL database engine.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
                         <xsd:enumeration value="oracle">

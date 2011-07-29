@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:tns="http://scap.nist.gov/schema/asset-identification/1.1" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" elementFormDefault="qualified" version="5.10">
     <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
     <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
     <xsd:annotation>
@@ -7,8 +7,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core System Characteristics</schema>
-            <version>5.9</version>
-            <date>2/22/2011 10:52:26 AM</date>
+            <version>5.10 Release Candidate 1</version>
+            <date>7/19/2011 10:15:37 PM</date>
             <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -115,7 +115,13 @@
                     <xsd:documentation>The required interfaces element outlines the network interfaces that exist on the system.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip">
+                <xsd:annotation>
+                    <xsd:documentation>The Asset Identification specification (http://scap.nist.gov/specifications/ai/) provides a standardized way of reporting asset information across different organizations.</xsd:documentation>
+                    <xsd:documentation>The information contained within an AI computing-device element is similar to the information collected by OVAL's SystemInfoType.</xsd:documentation> 
+                    <xsd:documentation>To support greater interoperability, an ai:computing-device element describing the system that data was collected from may appear at this point in an OVAL System Characteristics document.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:any>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="InterfacesType">
@@ -140,7 +146,7 @@
                     <xsd:documentation>The required interface_name element is the name of the interface</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="ip_address" type="oval-sc:EntityItemIPAddressStringType">
+            <xsd:element name="ip_address" type="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>The required ip_address element holds the IP address for the interface. Note that the IP address can be IPv4 or IPv6.</xsd:documentation>
                 </xsd:annotation>
@@ -167,7 +173,11 @@
         <xsd:annotation>
             <xsd:documentation>The ObjectType complex type provides a reference between items collected and a related global OVAL Object.</xsd:documentation>
             <xsd:documentation>If an OVAL Object does not exist on the system, then an object element is still provided but with the flag attribute set to 'does not exist'. For details on how to handle items, when an OVAL Object does not exist on the system, please see the ItemType documentation. This shows that the object was looked for but not found on the system. If no object element is written in this case, users of the system characteristics file will not know whether the object was not found or no attempt was made to collect it.</xsd:documentation>
-            <xsd:documentation>The required id attribute is the id of the global OVAL Object. The required version attribute is the specific version of the global OVAL Object that was used by the data collection engine. The version is necessary so that analysis using a system characteristics file knows exactly what was collected. The optional variable_instance identifier is a unique id that differentiates each unique instance of an object. Capabilities that use OVAL may reference the same definition multiple times and provide different sets of variable values each time the definition is referenced. This will result in multiple instances of an object being included in the OVAL System Characteristics file (definitions that do not use variables can only have one unique instance). The inclusion of a unique instance identifier will allow the OVAL results file to report the correct item associated with an object for each combination of supplied values. The optional comment attribute provides a short description of the object. The required flag attribute holds information regarding the outcome of the data collection. For example, if there was an error looking for items that match the object specification, then the flag would be 'error'. Please refer to the description of FlagEnumeration for details about the different flag values.</xsd:documentation>
+            <xsd:documentation>The required id attribute is the id of the global OVAL Object.</xsd:documentation>
+            <xsd:documentation>The required version attribute is the specific version of the global OVAL Object that was used by the data collection engine. The version is necessary so that analysis using a system characteristics file knows exactly what was collected.</xsd:documentation>
+            <xsd:documentation>The optional variable_instance identifier is a unique id that differentiates each unique instance of an object. Capabilities that use OVAL may reference the same definition multiple times and provide different variable values each time the definition is referenced. This will result in multiple instances of an object being included in the OVAL System Characteristics file (definitions that do not use variables can only have one unique instance). The inclusion of this unique instance identifier allows the OVAL Results document to associate the correct objects and items for each combination of supplied values.</xsd:documentation>
+            <xsd:documentation>The optional comment attribute provides a short description of the object.</xsd:documentation>
+            <xsd:documentation>The required flag attribute holds information regarding the outcome of the data collection. For example, if there was an error looking for items that match the object specification, then the flag would be 'error'. Please refer to the description of FlagEnumeration for details about the different flag values.</xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
             <xsd:element name="message" type="oval:MessageType" minOccurs="0" maxOccurs="unbounded">
@@ -226,7 +236,10 @@
     </xsd:element>
     <xsd:complexType name="ItemType">
         <xsd:annotation>
-            <xsd:documentation>The ItemType complex type specifies an optional message element that is used to pass things like error messages during data collection to a tool that will utilize the information. The required id attribute is a unique (to the file) identifier that allows the specific item to be referenced. The required status attribute holds information regarding the success of the data collection. For example, if an item exists on the system then the status would reflect this with a value of 'exists'. If there was an error collecting any information about an item that is known to exist, then the status would be 'error'. An error specific to a particular entity should be addressed at the entity level and not the item level. When creating items, any entities that can successfully be collected should be reported. When an object entity does not exist and uses the equals operation, an item entity with that value should be appended to the item with a status of 'does not exist'. The item's status should also be changed to 'does not exist'. An example of this is when a file_object has a path entity equal to 'C:\' and a filename entity equal to 'test.txt' where 'test.txt' does not exist in the 'C:\' directory. This would result in the creation of a file_item with a status of 'does not exist' where the path entity equals 'C:\' and the filename entity equals 'test.txt' with a status of 'does not exist'. Note that this does not apply when behaviors or any operations, other than equals, are used.  In these cases, when an object entity does not exist, items should not be created.</xsd:documentation>
+            <xsd:documentation>The ItemType complex type specifies an optional message element that is used to pass things like error messages during data collection to a tool that will utilize the information.</xsd:documentation>
+            <xsd:documentation>The required id attribute is a unique (to the file) identifier that allows the specific item to be referenced.</xsd:documentation>
+            <xsd:documentation>The required status attribute holds information regarding the success of the data collection. For example, if an item exists on the system then the status would reflect this with a value of 'exists'. If there was an error collecting any information about an item that is known to exist, then the status would be 'error'. An error specific to a particular entity should be addressed at the entity level and not the item level. When creating items, any entities that can successfully be collected should be reported.</xsd:documentation>
+            <xsd:documentation>In some cases, when an item for a specified object does not exist, it may be beneficial to report a partial match of an item showing what entities did exist and what entities did not exist for debugging purposes. This is especially true when considering items that are collected by objects with hierarchical object entities. An example of such a case is when a file_object has a path entity equal to 'C:\' and a filename entity equal to 'test.txt' where 'test.txt' does not exist in the 'C:\' directory. This would result in the creation of a partially matching file_item with a status of 'does not exist' where the path entity equals 'C:\' and the filename entity equals 'test.txt' with a status of 'does not exist'. By showing the partial match, someone reading a system-characteristics document can quickly see that a matching file_item did not exist because the specified filename did not exist and not that the specified path did not exist. Again, please note that the implementation of partial matches, when an item for a specified object does not exist,  is completely optional.  </xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
             <xsd:element name="message" type="oval:MessageType" minOccurs="0" maxOccurs="50"/>
@@ -316,7 +329,7 @@
             </xsd:enumeration>
             <xsd:enumeration value="does not exist">
                 <xsd:annotation>
-                    <xsd:documentation>A status of 'does not exist' says that the item or specific piece of information does not exist and therefore has not been collected. This status assumes that an attempt was made to collect the information, but the information just does't exist. This can happen when a certain entity is only pertinent to particular instances, or when xsi:nil is used to refer to a higher level object.</xsd:documentation>
+                    <xsd:documentation>A status of 'does not exist' says that the item or specific piece of information does not exist and therefore has not been collected. This status assumes that an attempt was made to collect the information, but the information just does not exist. This can happen when a certain entity is only pertinent to particular instances.</xsd:documentation>
                 </xsd:annotation>
             </xsd:enumeration>
             <xsd:enumeration value="not collected">
@@ -337,14 +350,13 @@
                 <sch:pattern id="oval-sc_entity_rules">
                     <sch:rule context="oval-sc:system_data/*/*|oval-sc:system_data/*/*/*">
                         <sch:assert test="not(@status) or @status='exists' or .=''">item <sch:value-of select="../@id"/> - a value for the <sch:value-of select="name()"/> entity should only be supplied if the status attribute is 'exists'</sch:assert>
-                        <sch:assert test="not(@mask) or @mask='false' or .=''">item <sch:value-of select="../@id"/> - a value for the <sch:value-of select="name()"/> entity should only be supplied if the mask attribute is 'false'</sch:assert>
                         <!--<sch:assert test="if (@datatype='binary') then (matches(., '^[0-9a-fA-F]*$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of binary.</sch:assert>-->
                         <!--<sch:assert test="if (@datatype='boolean') then (matches(., '^true$|^false$|^1$|^0$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of boolean.</sch:assert>-->
                         <!--<sch:assert test="if (@datatype='evr_string') then (matches(., '^[^:\-]*:[^:\-]*-[^:\-]*$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of evr_string.</sch:assert>-->
                         <!--<sch:assert test="if (@datatype='float') then (matches(., '^[+\-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$|^NaN$|^INF$|^\-INF$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of float.</sch:assert>-->
                         <!--<sch:assert test="if (@datatype='int') then (matches(., '^[+\-]?[0-9]+$')) else (1=1)"><sch:value-of select="../@id"/> - A value of '<sch:value-of select="."/>' for the <sch:value-of select="name()"/> entity is not valid given a datatype of int.</sch:assert>-->
                     </sch:rule>
-                    <sch:rule context="oval-sc:system_data/*/*[not(@xsi:nil=true()) and @datatype='int']|oval-sc:system_data/*/*/*[not(@xsi:nil=true()) and @datatype='int']">
+                    <sch:rule context="oval-sc:system_data/*/*[not((@xsi:nil='1' or @xsi:nil='true')) and @datatype='int']|oval-sc:system_data/*/*/*[not((@xsi:nil='1' or @xsi:nil='true')) and @datatype='int']">
                         <sch:assert test="(not(contains(.,'.'))) and (number(.) = floor(.))"><sch:value-of select="../@id"/> - The datatype for the <sch:value-of select="name()"/> entity is 'int' but the value is not an integer.</sch:assert>
                         <!--  Must test for decimal point because number(x.0) = floor(x.0) is true -->                        
                     </sch:rule>
@@ -358,7 +370,7 @@
         </xsd:attribute>
         <xsd:attribute name="mask" type="xsd:boolean" use="optional" default="false">
             <xsd:annotation>
-                <xsd:documentation>The optional mask attribute is used to identify values that have been hidden for sensitivity concerns. This is used by the result file which uses the system characteristic schema to format the information found on a specific system. If the original definition set the mask attribute of an entity to 'true', then the value obtained from the system should not be presented in the results file. A system characteristics file that is not held within a results file should not use the mask attribute.</xsd:documentation>
+                <xsd:documentation>The optional mask attribute is used to identify values that have been hidden for sensitivity concerns. This is used by the result file which uses the system characteristic schema to format the information found on a specific system. If the original definition set the mask attribute of an entity to 'true', then the value obtained from the system should not be presented in the results file. A system characteristics file that is not held within a results file should not use the mask attribute.  It is possible for masking conflicts to occur where one entity has mask set to true and another entity has mask set to false. A conflict will occur when the mask attribute is set differently on an OVAL Object and matching OVAL State or when two OVAL Objects identify the same OVAL Item(s). When such a conflict occurs the result is always to mask the entity.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="status" type="oval-sc:StatusEnumeration" use="optional" default="exists">
@@ -395,7 +407,7 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype">
+                <xsd:attribute name="datatype" use="required">
                     <xsd:simpleType>
                         <xsd:restriction base="oval:SimpleDatatypeEnumeration">
                             <xsd:enumeration value="ipv4_address"/>
@@ -415,7 +427,7 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype">
+                <xsd:attribute name="datatype" use="optional" default="string">
                     <xsd:simpleType>
                         <xsd:restriction base="oval:SimpleDatatypeEnumeration">
                             <xsd:enumeration value="ipv4_address"/>
@@ -436,7 +448,7 @@
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration"/>
+                <xsd:attribute name="datatype" type="oval:SimpleDatatypeEnumeration" use="optional" default="string"/>
             </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
@@ -509,12 +521,17 @@
         <xsd:annotation>
             <xsd:documentation>The EntityItemRecordType defines an entity that consists of a number of named fields. This structure is used for representing a record from a database query and other similar structures where multiple related fields must be collected at once. Note that for all entities of this type, the only allowed datatype is 'record'.</xsd:documentation>
             <xsd:documentation>Note the datatype attribute must be set to 'record'.</xsd:documentation>
+            <!-- 
+                NOTE: The restriction that the only allowed datatype is 'record' is enforced by scheamtron rules placed on each entity that uses this type. 
+                This is due to the fact that this type is developed as an xsd:extension of the oval-sc:EntityItemFieldType. This base type declares a datatype attribute. To restrict the 
+                datatype attribute to only allow 'record' would need an xsd:restriction. We cannot do both and xsd:extension and an xsd:restriction at the same time.
+            -->
             <xsd:documentation>Note that when the mask attribute is set to 'true', all child field elements must be masked regardless of the child field's mask attribute value.</xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="oval-sc:EntityItemComplexBaseType">
                 <xsd:sequence>
-                    <xsd:element name="field" type="oval-sc:EntityItemFieldType" minOccurs="0" maxOccurs="unbounded"/>                    
+                    <xsd:element name="field" type="oval-sc:EntityItemFieldType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

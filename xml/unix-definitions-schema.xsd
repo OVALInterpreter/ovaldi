@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" elementFormDefault="qualified" version="5.10">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose generic UNIX tests found in Open Vulnerability and Assessment Language (OVAL). Each test is an extension of the standard test element defined in the Core Definition Schema. Through extension, each test inherits a set of elements and attributes that are shared amongst all OVAL tests. Each test is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core Definition Schema is not outlined here.</xsd:documentation>
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>UNIX Definition</schema>
-                  <version>5.9</version>
-                  <date>2/22/2011 10:52:27 AM</date>
+                  <version>5.10 Release Candidate 1</version>
+                  <date>7/19/2011 10:15:37 PM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="unix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"/>
@@ -19,7 +19,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="dnscache_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The dnscache_test is used to check the time to live and IP addresses associated with a domain name.  The time to live and IP addresses for a particular domain name are retrieved from the DNS cache on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a dnscache_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The dnscache_test is used to check the time to live and IP addresses associated with a domain name.  The time to live and IP addresses for a particular domain name are retrieved from the DNS cache on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a dnscache_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>dnscache_test</oval:test>
@@ -107,7 +107,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="file_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The file test is used to check metadata associated with UNIX files, of the sort returned by either an ls command, stat command or stat() system call. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a file_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The file test is used to check metadata associated with UNIX files, of the sort returned by either an ls command, stat command or stat() system call. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a file_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>file_test</oval:test>
@@ -178,7 +178,7 @@
                                                                       <xsd:appinfo>
                                                                             <sch:pattern id="unix-def_file_objectfilename">
                                                                                   <sch:rule context="unix-def:file_object/unix-def:filename">
-                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='1' or @xsi:nil='true') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -224,12 +224,12 @@
                                     </xsd:element>
                                     <xsd:element name="group_id" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The group_id entity represents the group owner of a file, by group number. To test for a file with no group assigned to it, this entity would be used with an empty value.</xsd:documentation>
+                                                <xsd:documentation>The group_id entity represents the group owner of a file, by group number.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="user_id" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd. This element represents the owner of the file. To test for a file with no user assigned to it, this entity would be used with an empty value.</xsd:documentation>
+                                                <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd. This element represents the owner of the file.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="a_time" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
@@ -343,11 +343,6 @@
                   <xsd:annotation>
                         <xsd:documentation>'recurse' defines how to recurse into the path entity, in other words what to follow during recursion. Options include symlinks, directories, or both. Note that a max-depth has to be specified for recursion to take place and for this attribute to mean anything.</xsd:documentation>
                         <xsd:appinfo>
-                              <oval:deprecated_info>
-                                    <oval:version>5.4</oval:version>
-                                    <oval:reason>The values 'files', 'files and directories', and 'none' are being removed because it is not possible to recurse files and the value 'none' was intended to mean no recursion, however, this is already covered by the recurse_direction attribute.</oval:reason>
-                                    <oval:comment>These values have been deprecated and will be removed in version 6.0 of the language.</oval:comment>
-                              </oval:deprecated_info>
                               <sch:pattern id="unix-def_recurse_value_file_dep">
                                     <sch:rule context="oval-def:oval_definitions/oval-def:objects/unix-def:file_object/unix-def:behaviors">
                                           <sch:report test="@recurse='files'">DEPRECATED ATTRIBUTE VALUE IN: <sch:value-of select="name()"/> ATTRIBUTE VALUE: <sch:value-of select="@recurse"/></sch:report>
@@ -359,10 +354,40 @@
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:string">
-                              <xsd:enumeration value="none"/>
-                              <xsd:enumeration value="files"/>
+                              <xsd:enumeration value="none">
+                                <xsd:annotation>
+                                  <xsd:appinfo>
+                                    <oval:deprecated_info>
+                                      <oval:version>5.4</oval:version>
+                                      <oval:reason>The values 'files', 'files and directories', and 'none' are being removed because it is not possible to recurse files and the value 'none' was intended to mean no recursion, however, this is already covered by the recurse_direction attribute.</oval:reason>
+                                      <oval:comment>These values have been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                    </oval:deprecated_info>
+                                  </xsd:appinfo>
+                                </xsd:annotation>                                
+                              </xsd:enumeration>
+                              <xsd:enumeration value="files">
+                                <xsd:annotation>
+                                  <xsd:appinfo>
+                                    <oval:deprecated_info>
+                                      <oval:version>5.4</oval:version>
+                                      <oval:reason>The values 'files', 'files and directories', and 'none' are being removed because it is not possible to recurse files and the value 'none' was intended to mean no recursion, however, this is already covered by the recurse_direction attribute.</oval:reason>
+                                      <oval:comment>These values have been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                    </oval:deprecated_info>
+                                    </xsd:appinfo>
+                                </xsd:annotation>
+                              </xsd:enumeration>
                               <xsd:enumeration value="directories"/>
-                              <xsd:enumeration value="files and directories"/>
+                              <xsd:enumeration value="files and directories">
+                                <xsd:annotation>
+                                  <xsd:appinfo>
+                                    <oval:deprecated_info>
+                                      <oval:version>5.4</oval:version>
+                                      <oval:reason>The values 'files', 'files and directories', and 'none' are being removed because it is not possible to recurse files and the value 'none' was intended to mean no recursion, however, this is already covered by the recurse_direction attribute.</oval:reason>
+                                      <oval:comment>These values have been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                                    </oval:deprecated_info>
+                                  </xsd:appinfo>
+                                </xsd:annotation>                                
+                              </xsd:enumeration>
                               <xsd:enumeration value="symlinks"/>
                               <xsd:enumeration value="symlinks and directories"/>
                         </xsd:restriction>
@@ -398,7 +423,7 @@
       <!-- ================================================================================ -->
       <xsd:element name="fileextendedattribute_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The file extended attribute test is used to check extended attribute values associated with UNIX files, of the sort returned by the getfattr command or getxattr() system call. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a fileextendedattribute_object and the optional state element specifies the extended attributes to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The file extended attribute test is used to check extended attribute values associated with UNIX files, of the sort returned by the getfattr command or getxattr() system call. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a fileextendedattribute_object and the optional state element specifies the extended attributes to check.</xsd:documentation>
                   <xsd:documentation>NOTE: Solaris has a very different implementation of "extended attributes" in which the attributes are really an orthogonal directory hierarchy of files. See the Solaris documentation for more details. The file extended attribute test only handles simple name/value pairs as implemented by most other UNIX derived operating systems.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
@@ -470,7 +495,7 @@
                                                                       <xsd:appinfo>
                                                                             <sch:pattern id="unix-def_fileextendedattribute_objectfilename">
                                                                                   <sch:rule context="unix-def:fileextendedattribute_object/unix-def:filename">
-                                                                                        <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -534,7 +559,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="gconf_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The gconf_test is used to check the attributes and value(s) associated with GConf preference keys. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a gconf_object and the optional gconf_state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The gconf_test is used to check the attributes and value(s) associated with GConf preference keys. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a gconf_object and the optional gconf_state element specifies the data to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>gconf_test</oval:test>
@@ -661,7 +686,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="inetd_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The inetd test is used to check information associated with different Internet services. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The inetd test is used to check information associated with different Internet services. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>inetd_test</oval:test>
@@ -775,7 +800,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="interface_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The interface test enumerates various attributes about the interfaces on a system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an interface_object and the optional state element specifies the interface information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The interface test enumerates various attributes about the interfaces on a system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an interface_object and the optional state element specifies the interface information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>interface_test</oval:test>
@@ -885,7 +910,7 @@
       <xsd:element name="password_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
                   <xsd:documentation>/etc/passwd. See passwd(4).</xsd:documentation>
-                  <xsd:documentation>The password test is used to check metadata associated with the UNIX password file, of the sort returned by the passwd command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a password_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The password test is used to check metadata associated with the UNIX password file, of the sort returned by the passwd command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a password_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>password_test</oval:test>
@@ -919,7 +944,7 @@
       <xsd:element name="password_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The password_object element is used by a password test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
-                  <xsd:documentation>A password object consists of a single username entity that identifies the user whos passwords are to be evaluated.</xsd:documentation>
+                  <xsd:documentation>A password object consists of a single username entity that identifies the user(s) whose password is to be evaluated.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -930,7 +955,7 @@
                                           <xsd:sequence>
                                                 <xsd:element name="username" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation/>
+                                                            <xsd:documentation>The user(s) account whose password is to be evaluated.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -944,6 +969,7 @@
       <xsd:element name="password_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation>The password_state element defines the different information associated with the system passwords. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>See documentation on /etc/passwd for more details on the fields.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -951,37 +977,42 @@
                               <xsd:sequence>
                                     <xsd:element name="username" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The UNIX account name.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="password" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>This is the encrypted version of the user's password.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="user_id" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd. This element represents the owner of the file.</xsd:documentation>
+                                                <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="group_id" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The id of the primary UNIX group the user belongs to.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="gcos" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The GECOS (or GCOS) field from /etc/passwd; typically contains the user's full name.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="home_dir" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The user's home directory.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="login_shell" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The user's shell program.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="last_login" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The date and time when the last login occurred. This value is stored as the number of seconds that have elapsed since 00:00:00, January 1, 1970, UTC.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -994,7 +1025,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="process_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The process test is used to check information found in the UNIX processes. It is equivalent to parsing the output of the ps command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a process_object and the optional state element specifies the process information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The process test is used to check information found in the UNIX processes. It is equivalent to parsing the output of the ps command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a process_object and the optional state element specifies the process information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>process_test</oval:test>
@@ -1148,7 +1179,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="process58_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The process58_test is used to check information found in the UNIX processes. It is equivalent to parsing the output of the ps command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a process58_object and the optional state element references a process58_state that specifies the process information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The process58_test is used to check information found in the UNIX processes. It is equivalent to parsing the output of the ps command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a process58_object and the optional state element references a process58_state that specifies the process information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>process58_test</oval:test>
@@ -1302,7 +1333,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="routingtable_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The routingtable_test is used to check information about the IPv4 and IPv6 routing table entries found in a system's primary routing table. It is important to note that only numerical addresses will be collected and that their symbolic representations will not be resolved. This equivalent to using the '-n' option with route(8) or netstat(8). It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a routingtable_object and the optional routingtable_state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The routingtable_test is used to check information about the IPv4 and IPv6 routing table entries found in a system's primary routing table. It is important to note that only numerical addresses will be collected and that their symbolic representations will not be resolved. This equivalent to using the '-n' option with route(8) or netstat(8). It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a routingtable_object and the optional routingtable_state element specifies the data to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>routingtable_test</oval:test>
@@ -1395,7 +1426,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="runlevel_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The runlevel test is used to check information about which runlevel specified service are scheduled to exist at. For more information see the output generated by a chkconfig --list. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a runlevel_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The runlevel test is used to check information about which runlevel specified services are scheduled to exist at. For more information see the output generated by a chkconfig --list. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a runlevel_object and the optional state element specifies the data to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>runlevel_test</oval:test>
@@ -1439,12 +1470,12 @@
                                           <xsd:sequence>
                                                 <xsd:element name="service_name" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The service_name entity refers the name associated with a service. This name is usually the filename of the script file located in /etc/init.d directory.</xsd:documentation>
+                                                            <xsd:documentation>The service_name entity refers to the name associated with a service. This name is usually the filename of the script file located in the /etc/init.d directory.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="runlevel" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The runlevel entity refers to which runlevel a system is at. A runlevel is defined as a software configuration of the system that allows only a selected group of processes to exist.</xsd:documentation>
+                                                            <xsd:documentation>The system runlevel to examine. A runlevel is defined as a software configuration of the system that allows only a selected group of processes to exist.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -1457,7 +1488,7 @@
       </xsd:element>
       <xsd:element name="runlevel_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
-                  <xsd:documentation>The runlevel_state element holds information about whether a specific service is schedule to start or kill at a given runlevel. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+                  <xsd:documentation>The runlevel_state element holds information about whether a specific service is scheduled to start or stop at a given runlevel. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1465,12 +1496,12 @@
                               <xsd:sequence>
                                     <xsd:element name="service_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The service_name entity refers the name associated with a service. This name is usually the filename of the script file located in /etc/init.d directory.</xsd:documentation>
+                                                <xsd:documentation>The service_name entity refers the name associated with a service. This name is usually the filename of the script file located in the /etc/init.d directory.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="runlevel" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The runlevel entity refers to which runlevel a system is at. A runlevel is defined as a software configuration of the system that allows only a selected group of processes to exist.</xsd:documentation>
+                                                <xsd:documentation>The runlevel entity refers to the system runlevel associated with a service. A runlevel is defined as a software configuration of the system that allows only a selected group of processes to exist.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="start" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
@@ -1480,7 +1511,7 @@
                                     </xsd:element>
                                     <xsd:element name="kill" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The kill entity determines if the proces is supposed to be killed at the specified runlevel.</xsd:documentation>
+                                                <xsd:documentation>The kill entity determines if the process is supposed to be killed at the specified runlevel.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -1501,6 +1532,17 @@
                               <oval:state>sccs_state</oval:state>
                               <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix">sccs_item</oval:item>
                         </oval:element_mapping>
+                  </xsd:appinfo>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>The sccs_test has been deprecated because the Source Code Control System (SCCS) is obsolete.  The sccs_test may be removed in a future version of the language.</oval:reason>
+                        </oval:deprecated_info>
+                        <sch:pattern id="unix-def_sccstst_dep">
+                              <sch:rule context="unix-def:sccs_test">
+                                    <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
                   </xsd:appinfo>
                   <xsd:appinfo>
                         <sch:pattern id="unix-def_sccstst">
@@ -1528,6 +1570,17 @@
             <xsd:annotation>
                   <xsd:documentation>The set of files to be evaluated may be identified with either a complete filepath or a path and filename. Only one of these options may be selected.</xsd:documentation>
                   <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>The sccs_object has been deprecated because the Source Code Control System (SCCS) is obsolete.  The sccs_object may be removed in a future version of the language.</oval:reason>
+                        </oval:deprecated_info>
+                        <sch:pattern id="unix-def_sccsobj_dep">
+                              <sch:rule context="unix-def:sccs_object">
+                                    <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1562,7 +1615,7 @@
                                                                       <xsd:appinfo>
                                                                             <sch:pattern id="unix-def_sccs_objectfilename">
                                                                                   <sch:rule context="unix-def:sccs_object/unix-def:filename">
-                                                                                        <sch:assert test="(@var_ref and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                                        <sch:assert test="(@var_ref and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                                   </sch:rule>
                                                                             </sch:pattern>
                                                                       </xsd:appinfo>
@@ -1581,6 +1634,17 @@
       <xsd:element name="sccs_state" substitutionGroup="oval-def:state">
             <xsd:annotation>
                   <xsd:documentation/>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>The sccs_state has been deprecated because the Source Code Control System (SCCS) is obsolete.  The sccs_state may be removed in a future version of the language.</oval:reason>
+                        </oval:deprecated_info>
+                        <sch:pattern id="unix-def_sccsste_dep">
+                              <sch:rule context="unix-def:sccs_state">
+                                    <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1646,7 +1710,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="shadow_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The shadow test is used to check information from the /etc/shadow file for a specific user. This file contains a user's password, but also their password aging and lockout information. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an shadow_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The shadow test is used to check information from the /etc/shadow file for a specific user. This file contains a user's password, but also their password aging and lockout information. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an shadow_object and the optional state element specifies the information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>shadow_test</oval:test>
@@ -1770,7 +1834,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="sysctl_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The sysctl_test is used to check the values associated with the kernel parameters that are used by the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sysctl_object and the optional state element references a sysctl_state that specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The sysctl_test is used to check the values associated with the kernel parameters that are used by the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a sysctl_object and the optional state element references a sysctl_state that specifies the information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>sysctl_test</oval:test>
@@ -1853,7 +1917,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="uname_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The uname test reveals information about the hardware the machine is running on. This information is the parsed equivalent of uname -a. For example: "Linux quark 2.6.5-7.108-default #1 Wed Aug 25 13:34:40 UTC 2004 i686 i686 i386 GNU/Linux" or "Darwin TestHost 7.7.0 Darwin Kernel Version 7.7.0: Sun Nov 7 16:06:51 PST 2004; root:xnu/xnu-517.9.5.obj~1/RELEASE_PPC Power Macintosh powerpc". It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a uname_object and the optional state element specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The uname test reveals information about the hardware the machine is running on. This information is the parsed equivalent of uname -a. For example: "Linux quark 2.6.5-7.108-default #1 Wed Aug 25 13:34:40 UTC 2004 i686 i686 i386 GNU/Linux" or "Darwin TestHost 7.7.0 Darwin Kernel Version 7.7.0: Sun Nov 7 16:06:51 PST 2004; root:xnu/xnu-517.9.5.obj~1/RELEASE_PPC Power Macintosh powerpc". It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a uname_object and the optional state element specifies the metadata to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>uname_test</oval:test>
@@ -1942,7 +2006,7 @@
       <!-- =============================================================================== -->
       <xsd:element name="xinetd_test" substitutionGroup="oval-def:test">
             <xsd:annotation>
-                  <xsd:documentation>The xinetd test is used to check information associated with different Internet services. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+                  <xsd:documentation>The xinetd test is used to check information associated with different Internet services. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetd_object and the optional state element specifies the information to check.</xsd:documentation>
                   <xsd:appinfo>
                         <oval:element_mapping>
                               <oval:test>xinetd_test</oval:test>
@@ -1987,12 +2051,12 @@
                                           <xsd:sequence>
                                                 <xsd:element name="protocol" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>A recognized protocol.</xsd:documentation>
+                                                            <xsd:documentation>The protocol entity specifies the protocol that is used by the service.  The list of valid protocols can be found in /etc/protocols.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="service_name" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
-                                                            <xsd:documentation>The name of a valid service.</xsd:documentation>
+                                                            <xsd:documentation>The service_name entity specifies the name of the service.</xsd:documentation>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -2013,67 +2077,67 @@
                               <xsd:sequence>
                                     <xsd:element name="protocol" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>A recognized protocol.</xsd:documentation>
+                                                <xsd:documentation>The protocol entity specifies the protocol that is used by the service.  The list of valid protocols can be found in /etc/protocols.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="service_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The name of a valid service.</xsd:documentation>
+                                                <xsd:documentation>The service_name entity specifies the name of the service.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="flags" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The flags entity specifies miscellaneous settings associated with the service.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="no_access" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The no_access entity specifies the remote hosts to which the service is unavailable.  Please see the xinetd.conf(5) man page for information on the different formats that can be used to describe a host.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="only_from" type="oval-def:EntityStateIPAddressStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The only_from entity specifies the remote hosts to which the service is available.  Please see the xinetd.conf(5) man page for information on the different formats that can be used to describe a host.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="port" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The port entity specifies the port used by the service.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="server" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The server entity specifies the executable that is used to launch the service.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="server_arguments" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The server_arguments entity specifies the arguments that are passed to the executable when launching the service.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="socket_type" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The socket_type entity specifies the type of socket that is used by the service.  Possible values include: stream, dgram, raw, or seqpacket.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="type" type="unix-def:EntityStateXinetdTypeStatusType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The type entity specifies the type of the service.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="user" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The user entity specifies the user identifier of the process that is running the service.  The user identifier may be expressed as a numerical value or as a user name that exists in /etc/passwd.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="wait" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The wait entity specifies whether or not the service is single-threaded or multi-threaded and whether or not xinetd accepts the connection or the service accepts the connection.  A value of 'true' indicates that the service is single-threaded and the service will accept the connection.  A value of 'false' indicates that the service is multi-threaded and xinetd will accept the connection.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="disabled" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation/>
+                                                <xsd:documentation>The disabled entity specifies whether or not the service is disabled.  A value of 'true' indicates that the service is disabled and will not start.  A value of 'false' indicates that the service is not disabled.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -2357,32 +2421,35 @@
                   <xsd:appinfo>
                         <evaluation_documentation>The following table is a mapping between the generic flag enumeration values and the actual flag values found on the various platforms. If the flag value is not specified, for a particular generic flag enumeration value, the flag value is not defined for that platform.</evaluation_documentation>                  
                         <evaluation_chart xml:space="preserve">
-Name        Linux    Solaris    HPUX    Mac OS    FreeBSD
-UP          U        U          U       U         U
-GATEWAY     G        G          G       G         G
-HOST        H        H          H       H         H
-REINSTATE   R                                      
-DYNAMIC     D        D                  D         D
-MODIFIED    M                           M         M
-ADDRCONF    A        A                             
-CACHE       C                                      
-REJECT      !                           R         R
-REDUNDANT   M                                      
-SETSRC               S                             
-BROADCAST            B                  b         b
-LOCAL                L                             
-PROTOCOL_1                              1         1
-PROTOCOL_2                              2         2
-PROTOCOL_3                              3         3
-BLACK_HOLE                              B         B
-CLONING                                 C         C
-PROTOCOL_CLONING                        c         c
-INTERFACE_SCOPE                         I          
-LINK_LAYER                              L         L
-MULTICAST                               m          
-STATIC                                  S         S
-WAS_CLONED                              W         W
-XRESOLVE                                X         X
+Name                           Linux    Solaris    HPUX    Mac OS    FreeBSD    AIX
+UP                             U        U          U       U         U          U
+GATEWAY                        G        G          G       G         G          G
+HOST                           H        H          H       H         H          H
+REINSTATE                      R                                      
+DYNAMIC                        D        D                  D         D          D
+MODIFIED                       M                           M         M          M
+ADDRCONF                       A        A                             
+CACHE                          C                                                e
+REJECT                         !                           R         R          R
+REDUNDANT                               M (>=9)                                      
+SETSRC                                  S                             
+BROADCAST                               B                  b         b          b
+LOCAL                                   L                                       l
+PROTOCOL_1                                                 1         1          1
+PROTOCOL_2                                                 2         2          2
+PROTOCOL_3                                                 3         3          3
+BLACK_HOLE                                                 B         B
+CLONING                                                    C         C          c
+PROTOCOL_CLONING                                           c         c
+INTERFACE_SCOPE                                            I          
+LINK_LAYER                                                 L         L          L
+MULTICAST                                                  m                    m
+STATIC                                                     S         S          S
+WAS_CLONED                                                 W         W          W
+XRESOLVE                                                   X         X
+USABLE                                                                          u 
+PINNED                                                                          P 
+ACTIVE_DEAD_GATEWAY_DETECTION                                                   A (>=5.1) 
                         </evaluation_chart>
                   </xsd:appinfo>
             </xsd:annotation>
@@ -2509,6 +2576,21 @@ XRESOLVE                                X         X
                               </xsd:annotation>
                         </xsd:enumeration>
                         <xsd:enumeration value="XRESOLVE">
+                              <xsd:annotation>
+                                    <xsd:documentation/>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="USABLE">
+                              <xsd:annotation>
+                                    <xsd:documentation/>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="PINNED">
+                              <xsd:annotation>
+                                    <xsd:documentation/>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="ACTIVE_DEAD_GATEWAY_DETECTION">
                               <xsd:annotation>
                                     <xsd:documentation/>
                               </xsd:annotation>
