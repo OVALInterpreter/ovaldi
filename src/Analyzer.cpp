@@ -186,6 +186,10 @@ void Analyzer::Run() {
 		string logMessage = "\n    No definitions found in the input oval-definitions document! \n";
 		cout << logMessage;
 		Log::UnalteredMessage(logMessage);
+				
+		//Even though we did not analyze any definitions, we still need to include the OVAL Definitions and OVAL System Characteristics Documents
+		this->GetResultsSystemElm();
+		this->FinializeResultsDocument();
 	}
 }
 
@@ -299,6 +303,10 @@ void Analyzer::Run(StringVector* definitionIds) {
 		string logMessage = "\n    No definitions found in the input oval-definitions document! \n";
 		cout << logMessage;
 		Log::UnalteredMessage(logMessage);
+
+		//Even though we did not analyze any definitions, we still need to include the OVAL Definitions and OVAL System Characteristics Documents
+		this->GetResultsSystemElm();
+		this->FinializeResultsDocument();
 	}
 }
 

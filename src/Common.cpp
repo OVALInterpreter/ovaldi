@@ -66,7 +66,8 @@ string Common::logFileLocation	      = "";
 string Common::logFileName            = "ovaldi.log";
 
 bool    Common::doDefinitionSchematron   = false;
-bool    Common::verifyOutputs		  = false;
+bool    Common::doSystemCharacteristicsSchematron   = false;
+bool    Common::doResultsSchematron   = false;
 string  Common::definitionSchematronPath = Common::BuildFilePath(Common::schemapath, DEFAULT_DEFINITION_SCHEMATRON_FILENAME);
 string  Common::systemCharacteristicsSchematronPath = Common::BuildFilePath(Common::schemapath, DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME);
 string  Common::resultsSchematronPath = Common::BuildFilePath(Common::schemapath, DEFAULT_RESULTS_SCHEMATRON_FILENAME);
@@ -141,11 +142,6 @@ bool Common::GetVerifyXMLfile()
 	return verifyXMLfile;
 }
 
-bool Common::GetVerifyOutputs()
-{
-	return verifyOutputs;
-}
-
 string Common::GetXSLFilename(){
 	return Common::xslFile;	
 }
@@ -176,6 +172,14 @@ bool Common::GetLimitEvaluationToDefinitionIds() {
 
 bool Common::GetDoDefinitionSchematron() {
 	return Common::doDefinitionSchematron;
+}
+
+bool Common::GetDoSystemCharacteristicsSchematron() {
+	return Common::doSystemCharacteristicsSchematron;
+}
+
+bool Common::GetDoResultsSchematron() {
+	return Common::doResultsSchematron;
 }
 
 string Common::GetDefinitionSchematronPath() {
@@ -251,11 +255,6 @@ void Common::SetVerifyXMLfile(bool verifyXMLfileIn)
 	verifyXMLfile = verifyXMLfileIn;
 }
 
-void Common::SetVerifyOutputs(bool verifyOutputs)
-{
-	Common::verifyOutputs = verifyOutputs;
-}
-
 void Common::SetXSLFilename(string in) {
 	
 	if(Common::FileExists(in)) {
@@ -301,6 +300,14 @@ void Common::SetLimitEvaluationToDefinitionIds(bool set) {
 
 void Common::SetDoDefinitionSchematron(bool set) {
 	Common::doDefinitionSchematron = set;
+}
+
+void Common::SetDoSystemCharacteristicsSchematron(bool set) {
+	Common::doSystemCharacteristicsSchematron = set;
+}
+
+void Common::SetDoResultsSchematron(bool set) {
+	Common::doResultsSchematron = set;
 }
 
 void Common::SetDefinitionSchematronPath(string path) {

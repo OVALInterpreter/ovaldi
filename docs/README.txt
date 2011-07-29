@@ -308,8 +308,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
      Input Validation Options:
       -m           = do not verify the oval-definitions file with an MD5 hash
-      -n           = perform Schematron validation of the oval-definitions file.
-      -c filename  = path to xsl for oval-definitions Schematron validation. 
+      -c filename  = perform Schematron validation on the input OVAL Definitions. The path to an xsl for Schematron validation may optionally be specified. 
                      DEFAULT="oval-definitions-schematron.xsl"    
 
      Data Collection Options:
@@ -329,6 +328,10 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
                      DEFAULT="results_to_html.xsl"
       -x filename  = output xsl transform results to the specified file.
                      DEFAULT="results.html"
+	  -j filename  = perform schema/schematron validation on the output OVAL System Characteristics. The path to an xsl for Schematron validation may optionally be specified. 
+					 DEFAULT="oval-system-characteristics-schematron.xsl"
+	  -k filename  = perform schema/schematron validation on the output OVAL Results. The path to an xsl for Schematron validation may optionally be specified. 
+					 DEFAULT="oval-results-schematron.xsl"
 
      Other Options:
       -l <integer> = Log messages at the specified level. (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
@@ -376,18 +379,11 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
            Use of this option is recommended only when testing your own
            draft OVAL Definitions document before submitting them to the OVAL Community 
            Forum for public review.
-
-     -n -- If set run Schematron validation on the input OVAL Definitions
-           document. Schematron validation is currently optional. In the 
-           future, the OVAL Compatibility program will likely require 
-           Schematron validation. When Schematron validation is required by the
-           OVAL Language, the OVAL Interpreter reference implementation will also require 
-           Schematron validation.  
                      
-     -c -- Specifies the pathname of the oval-definitions-schematron.xsl
-           to be used for Schematron validation. If none is specified 
-           then the Interpreter will default to 
-           "oval-definitions-schematron.xsl" in the OVAL Interpreter installation directory.
+     -c -- Perform Schematron validation on the input OVAL Definitions document. If a path to an xsl
+		   is specified, it will be used for Schematron validation. If a path is not specified, the 
+		   OVAL Interpreter will default to "oval-definitions-schematron.xsl" in the OVAL Interpreter 
+		   schema directory.
 
      -a -- Specifies the pathname of the directory that contains the OVAL
            Schema and other XML resources. On Windows platforms, DEFAULT="xml".
@@ -424,6 +420,15 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
            are to be saved.  If none is specified, the OVAL Interpreter 
            will default to "results.html" in the OVAL Interpreter directory.
 
+	 -j -- Perform Schema and Schematron validation on the output OVAL System Characteristics document. 
+		   If a path to an xsl is specified, it will be used for Schematron validation. If a path is not 
+		   specified, the OVAL Interpreter will default to "oval-system-characteristics-schematron.xsl" in 
+		   the OVAL Interpreter schema directory.
+			
+	 -k -- Perform Schema and Schematron validation on the output OVAL Results document. If a path to an xsl 
+		   is specified, it will be used for Schematron validation. If a path is not specified, the OVAL 
+		   Interpreter will default to "oval-results-schematron.xsl" in the OVAL Interpreter schema directory.
+		   
      -l -- Logging level.  Log messages at the specified level. 
            (DEBUG = 1, INFO = 2, MESSAGE = 3, FATAL = 4). DEFAULT=2
 

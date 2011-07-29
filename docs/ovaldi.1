@@ -1,9 +1,9 @@
-.TH ovaldi 1 "February 22, 2011" "Version 5.9.1" "USER COMMANDS"
+.TH ovaldi 1 "July 28, 2011" "Version 5.9.2" "USER COMMANDS"
 .SH NAME
 ovaldi \- a reference interpreter for the Open Vulnerability and Assessment Language
 .SH SYNOPSIS
 .B ovaldi
-[\-a dir name] [\-c filename] [\-d filename] [\-e <string>] [\-f filename] [\-g filename] [\-i filename] [\-l <integer>] [\-o filename] [\-r filename] [\-t filename] [\-v filename] [\-x filename] [\-hmnpsyz] [MD5Hash]
+[\-a dir name] [\-c filename] [\-d filename] [\-e <string>] [\-f filename] [\-g filename] [\-i filename] [\-j filename] [\-k filename] [\-l <integer>] [\-o filename] [\-r filename] [\-t filename] [\-v filename] [\-x filename] [\-hmnpsyz] [MD5Hash]
 .SH DESCRIPTION
 The MITRE Corporation developed the Open Vulnerability and Assessment Language
 (OVAL) Interpreter to provide the OVAL Community with an open source reference
@@ -47,13 +47,11 @@ Use of this option is recommended only when testing your own draft OVAL
 Definitions before submitting them to the OVAL Community Forum for public 
 review.
 .TP
-.B \-n
-Perform Schematron validation of the OVAL Definitions document.
-.TP
 .B \-c filename
-Specifies the pathname of the oval-definitions-schematron.xsl to be used for
-Schematron validation. If none is specified then the OVAL Interpreter will 
-default to "oval-definitions-schematron.xsl" in the OVAL Interpreter directory.
+Perform Schematron validation on the input OVAL Definitions document. If a path to an xsl
+is specified, it will be used for Schematron validation. If a path is not specified, the 
+OVAL Interpreter will default to "oval-definitions-schematron.xsl" in the OVAL Interpreter 
+schema directory.
 .TP
 .B \-a dir name
 Specifies the pathname of the directory that contains the OVAL Language Schema
@@ -93,6 +91,17 @@ default to "results_to_html.xsl" in the OVAL Interpreter directory.
 Specifies the pathname of the file which XSL transform results are to be saved.
 If none is specified then the OVAL Interpreter will default to "results.html" 
 in the OVAL Interpreter directory.
+.TP
+.B \-j filename
+Perform Schema and Schematron validation on the output OVAL System Characteristics document. 
+If a path to an xsl is specified, it will be used for Schematron validation. If a path is not 
+specified, the OVAL Interpreter will default to "oval-system-characteristics-schematron.xsl" in 
+the OVAL Interpreter schema directory.
+.TP
+.B \-k filename
+Perform Schema and Schematron validation on the output OVAL Results document. If a path to an xsl 
+is specified, it will be used for Schematron validation. If a path is not specified, the OVAL 
+Interpreter will default to "oval-results-schematron.xsl" in the OVAL Interpreter schema directory.
 .TP
 .B \-l <integer>
 Logging level.  Log messages at the specified level. 

@@ -353,7 +353,7 @@ int main(int argc, char* argv[]) {
 			processor->WriteDOMDocument(DocumentManager::GetSystemCharacteristicsDocument(), Common::GetDatafile());
 
 			// Verify what we just wrote, if requested
-			if (Common::GetVerifyOutputs()) {
+			if (Common::GetDoSystemCharacteristicsSchematron()) {
 				logMessage = " ** running XML-Schema validation on "+Common::GetDatafile()+"\n";
 				cout << logMessage;
 				Log::UnalteredMessage(logMessage);
@@ -449,7 +449,7 @@ int main(int argc, char* argv[]) {
 
 		delete analyzer;
 
-		if (Common::GetVerifyOutputs()) {
+		if (Common::GetDoResultsSchematron()) {
 			logMessage = " ** running XML-Schema validation on "+Common::GetOutputFilename()+"\n";
 			cout << logMessage;
 			Log::UnalteredMessage(logMessage);
@@ -619,20 +619,11 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 
-				// ********  do oval definition schematron validation  ******** //
-				case 'n':
-
-					Common::SetDoDefinitionSchematron(true);
-
-					break;
-
 				// **********  path to the oval definitions schematron xsl  ********** //
 				case 'c':
-
-					if ((argc < 3) || (argv[2][0] == '-')) {
-						Usage();
-						exit( EXIT_FAILURE );
-					} else {
+					if ( ( argc > 2 && argv[2][0] == '-' ) || argc == 2 ) { //a path to the xsl was not specified - use default
+							Common::SetDoDefinitionSchematron(true);
+					}else{ //a path to the xsl was specified - use provided path
 						Common::SetDefinitionSchematronPath(argv[2]);
 						Common::SetDoDefinitionSchematron(true);
 						definitionSchematronPathGiven = true;
@@ -799,27 +790,30 @@ void ProcessCommandLine(int argc, char* argv[]) {
 
 					break;
 
-				// **********  Verify output XML files  ********** //
-				case 'b':
-
-					Common::SetVerifyOutputs(true);
-
-					break;
-
 				case 'j':
-					Common::SetSystemCharacteristicsSchematronPath(argv[2]);
-					Common::SetVerifyOutputs(true);
-					systemCharacteristicsSchematronPathGiven = true;
-					++argv;
-					--argc;
+					if ( ( argc > 2 && argv[2][0] == '-' ) || argc == 2 ) { //a path to the xsl was not specified - use default
+						Common::SetDoSystemCharacteristicsSchematron(true);
+					} else{ //a path to the xsl was specified - use provided path
+						Common::SetSystemCharacteristicsSchematronPath(argv[2]);
+						Common::SetDoSystemCharacteristicsSchematron(true);
+						systemCharacteristicsSchematronPathGiven = true;
+						++argv;
+						--argc;
+					}
+
 					break;
 
 				case 'k':
-					Common::SetResultsSchematronPath(argv[2]);
-					Common::SetVerifyOutputs(true);
-					resultsSchematronPathGiven = true;
-					++argv;
-					--argc;
+					if ( ( argc > 2 && argv[2][0] == '-' ) || argc == 2 ) { //a path to the xsl was not specified - use default
+						Common::SetDoResultsSchematron(true);
+					} else{ //a path to the xsl was specified - use provided path
+						Common::SetResultsSchematronPath(argv[2]);
+						Common::SetDoResultsSchematron(true);
+						resultsSchematronPathGiven = true;
+						++argv;
+						--argc;
+					}
+
 					break;
 
 				// **********  Default  ********** //
@@ -895,8 +889,11 @@ void ProcessCommandLine(int argc, char* argv[]) {
 		inputs.push_back(Common::GetFullPath(Common::GetDefinitionSchematronPath()));
 	}
 
-	if (Common::GetVerifyOutputs()) {
+	if (Common::GetDoSystemCharacteristicsSchematron()) {
 		inputs.push_back(Common::GetSystemCharacteristicsSchematronPath());
+	}
+
+	if (Common::GetDoResultsSchematron()) {
 		inputs.push_back(Common::GetResultsSchematronPath());
 	}
 
@@ -946,8 +943,7 @@ void Usage() {
 	
 	cout << "Input Validation Options:" << endl;
 	cout << "   -m           = do not verify the oval-definitions file with an MD5 hash." << endl;
-	cout << "   -n           = perform Schematron validation of the oval-definitions file." << endl;
-	cout << "   -c <string>  = path to xsl for oval-definitions Schematron validation. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_DEFINITION_SCHEMATRON_FILENAME << '\"' << endl;
+	cout << "   -c <string>  = perform Schematron validation on the input OVAL Definitions. Path to an xsl may optionally be specified. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_DEFINITION_SCHEMATRON_FILENAME << '\"' << endl;
 	cout << "\n";
 
 	cout << "Data Collection Options:" << endl;
@@ -962,9 +958,8 @@ void Usage() {
 	cout << "   -s           = do not apply a stylesheet to the results xml." << endl;
 	cout << "   -t <string>  = apply the specified xsl to the results xml. DEFAULT=\"" << defaultSchemaPath << Common::fileSeperatorStr << DEFAULT_RESULTS_XFORM_FILENAME<<'\"' << endl;
 	cout << "   -x <string>  = output xsl transform results to the specified file. DEFAULT=\"results.html\"" << endl;
-	cout << "   -b           = verify XML output files w.r.t. both XML-Schema and Schematron." << endl;
-	cout << "   -j           = path to schematron xsl for system characteristics files. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME << '\"' << endl;
-	cout << "   -k           = path to schematron xsl for results files. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_RESULTS_SCHEMATRON_FILENAME << '\"' << endl;
+	cout << "   -j <string>  = perform schema/schematron validation on the output OVAL System Characteristics. Path to an xsl may optionally be specified. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_SYSTEM_CHARACTERISTICS_SCHEMATRON_FILENAME << '\"' << endl;
+	cout << "   -k <string>  = perform schema/schematron validation on the output OVAL Results. Path to an xsl may optionally be specified. DEFAULT=\"" << defaultSchemaPath<<Common::fileSeperator<<DEFAULT_RESULTS_SCHEMATRON_FILENAME << '\"' << endl;
 	cout << "\n";
 
 	cout << "Other Options:" << endl;
