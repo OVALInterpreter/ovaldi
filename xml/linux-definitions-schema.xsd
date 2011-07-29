@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" elementFormDefault="qualified" version="5.10">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:annotation>
@@ -7,8 +7,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux Definition</schema>
-               <version>5.9</version>
-               <date>2/22/2011 10:52:25 AM</date>
+               <version>5.10 Release Candidate 1</version>
+               <date>7/19/2011 10:15:36 PM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                <sch:ns prefix="linux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"/>
@@ -20,7 +20,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="dpkginfo_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The dpkginfo test is used to check information for a given DPKG package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a dpkginfo_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The dpkginfo test is used to check information for a given DPKG package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a dpkginfo_object and the optional state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>dpkginfo_test</oval:test>
@@ -166,7 +166,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="iflisteners_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The iflisteners_test is used to check what applications such as packet sniffers that are bound to an interface on the system. This is limited to applications that are listening on AF_PACKET sockets. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an iflisteners_object and the optional iflisteners_state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The iflisteners_test is used to check what applications such as packet sniffers that are bound to an interface on the system. This is limited to applications that are listening on AF_PACKET sockets. Furthermore, only applications bound to an ethernet interface should be collected. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an iflisteners_object and the optional iflisteners_state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>iflisteners_test</oval:test>
@@ -254,7 +254,7 @@
                                         <xsd:documentation>The pid is the process ID of a specific process.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="user_id" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="user_id" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd. It represents the owner, and thus privilege level, of the specified program.</xsd:documentation>
                                    </xsd:annotation>
@@ -269,7 +269,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="inetlisteningservers_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The inet listening servers test is used to check what applications are listening on the network.  This is limited to applications that are listening for connections that use the TCP or UDP protocols and have addresses represented as IPv4 or IPv6 addresses (AF_INET or AF_INET6). It is generally using the parsed output of running the command netstat -tuwlnpe with root privilege. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetlisteningservers_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The inet listening servers test is used to check what applications are listening on the network.  This is limited to applications that are listening for connections that use the TCP or UDP protocols and have addresses represented as IPv4 or IPv6 addresses (AF_INET or AF_INET6). It is generally using the parsed output of running the command netstat -tuwlnpe with root privilege. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an inetlisteningservers_object and the optional state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>inetlisteningservers_test</oval:test>
@@ -403,7 +403,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="partition_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The partition_test is used to check the information associated with partitions on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a partition_object and the optional state element references a partition_state that specifies the information to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The partition_test is used to check the information associated with partitions on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a partition_object and the optional state element references a partition_state that specifies the information to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>partition_test</oval:test>
@@ -481,7 +481,7 @@
                                         <xsd:documentation>The uuid element contains a string that represents the universally unique identifier associated with a partition.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="fs_type" type="linux-def:EntityStateFileSystemTypeType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="fs_type" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The fs_type element contains a string that represents the type of filesystem on a partition.</xsd:documentation>
                                    </xsd:annotation>
@@ -516,7 +516,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="rpminfo_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The rpm info test is used to check the RPM header information for a given RPM package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpminfo_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The rpm info test is used to check the RPM header information for a given RPM package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpminfo_object and the optional state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>rpminfo_test</oval:test>
@@ -654,7 +654,7 @@
                               </xsd:element>
                               <xsd:element name="signature_keyid" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This field contains the 64-bit PGP key ID that the RPM issuer (generally the original operating system vendor) uses to sign the key. Note that the value should NOT contain a hyphen to seperat the higher 32-bits from the lower 32-bits. It should simply be a 16 character hex string. PGP is used to verify the authenticity and integrity of the RPM being considered. Software packages and patches are signed cryptographically to allow administrators to allay concerns that the distribution mechanism has been compromised, whether that mechanism is web site, FTP server, or even a mirror controlled by a hostile party. OVAL uses this field most of all to confirm that the package installed on the system is that shipped by the vendor, since comparing package version numbers against patch announcements is only programmatically valid if the installed package is known to contain the patched code.</xsd:documentation>
+                                        <xsd:documentation>This field contains the 64-bit PGP key ID that the RPM issuer (generally the original operating system vendor) uses to sign the key. Note that the value should NOT contain a hyphen to separate the higher 32-bits from the lower 32-bits. It should simply be a 16 character hex string. PGP is used to verify the authenticity and integrity of the RPM being considered. Software packages and patches are signed cryptographically to allow administrators to allay concerns that the distribution mechanism has been compromised, whether that mechanism is web site, FTP server, or even a mirror controlled by a hostile party. OVAL uses this field most of all to confirm that the package installed on the system is that shipped by the vendor, since comparing package version numbers against patch announcements is only programmatically valid if the installed package is known to contain the patched code.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -667,7 +667,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="rpmverify_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The rpmverify_test is used to verify the integrity of installed RPMs. This test aligns with the rpm -V command for verifying RPMs. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpmverify_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The rpmverify_test is used to verify the integrity of installed RPMs. This test aligns with the rpm -V command for verifying RPMs. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpmverify_object and the optional state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>rpmverify_test</oval:test>
@@ -717,9 +717,9 @@
                                         </xsd:element>
                                         <xsd:element name="filepath" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
-                                                  <xsd:documentation>The filepath element specifies the absolute path for a file in the specified package. A directory cannot be specified as a filepath.</xsd:documentation>
+                                                  <xsd:documentation>The filepath element specifies the absolute path for a file or directory in the specified package.</xsd:documentation>
                                              </xsd:annotation>
-                                        </xsd:element>
+                                        </xsd:element>                                        
                                         <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
                                    </xsd:sequence>
                               </xsd:choice>
@@ -743,7 +743,27 @@
                               </xsd:element>
                               <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The filepath element specifies the absolute path for a file in the specified package. A directory cannot be specified as a filepath.</xsd:documentation>
+                                        <xsd:documentation>The filepath element specifies the absolute path for a file or directory in the specified package.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="dependency_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The dependency_check_passed entity indicates whether or not the dependency check passed. If the dependency check is not performed, due to the 'nodeps' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="digest_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The digest_check_passed entity indicates whether or not the verification of the package or header digests passed. If the digest check is not performed, due to the 'nodigest' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="verification_script_successful" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The verification_script_successful entity indicates whether or not the verification script executed successfully. If the verification script is not executed, due to the 'noscripts' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>                              
+                              <xsd:element name="signature_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The signature_check_passed entity indicates whether or not the verification of the package or header signatures passed. If the signature check is not performed, due to the 'nosignature' behavior, this entity must not be collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="size_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
@@ -837,7 +857,7 @@
           </xsd:attribute>
           <xsd:attribute name="nofiles" use="optional" type="xsd:boolean" default="false">
                <xsd:annotation>
-                    <xsd:documentation>'nofiles' when true this behavior means, don't verify any attributes of package files.</xsd:documentation>
+                    <xsd:documentation>'nofiles' when true this behavior means, don't verify any attributes of package files. The entities related to the verification of package files must not be collected.</xsd:documentation>
                </xsd:annotation>
           </xsd:attribute>
           <xsd:attribute name="noscripts" use="optional" type="xsd:boolean" default="false">
@@ -902,11 +922,11 @@
           </xsd:attribute>
      </xsd:complexType>
      <!-- =============================================================================== -->
-     <!-- ===========================  SELINUX BOOLEAN TEST  =========+================== -->
+     <!-- ===========================  SELINUX BOOLEAN TEST  ============================ -->
      <!-- =============================================================================== -->
      <xsd:element name="selinuxboolean_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The selinuxboolean_test is used to check the current and pending status of a SELinux boolean. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a selinuxboolean_object and the optional state element references a selinuxboolean_state that specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The selinuxboolean_test is used to check the current and pending status of a SELinux boolean. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a selinuxboolean_object and the optional state element references a selinuxboolean_state that specifies the metadata to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>selinuxboolean_test</oval:test>
@@ -994,7 +1014,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="selinuxsecuritycontext_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The selinuxsecuritycontext_test is used to check the security context of a file or process on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a selinuxsecuritycontext_object and the optional state element references a selinuxsecuritycontext_state that specifies the metadata to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The selinuxsecuritycontext_test is used to check the security context of a file or process on the local system. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a selinuxsecuritycontext_object and the optional state element references a selinuxsecuritycontext_state that specifies the metadata to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>selinuxsecuritycontext_test</oval:test>
@@ -1036,6 +1056,7 @@
                               <xsd:choice>
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
+                                        <xsd:element name="behaviors" type="linux-def:FileBehaviors" minOccurs="0"/>
                                         <xsd:choice>
                                              <xsd:element name="filepath" type="oval-def:EntityObjectStringType">
                                                   <xsd:annotation>
@@ -1054,7 +1075,7 @@
                                                             <xsd:appinfo>
                                                                  <sch:pattern id="linux-def_selinuxsecuritycontext_objectfilename">
                                                                       <sch:rule context="linux-def:selinuxsecuritycontext_object/linux-def:filename">
-                                                                           <sch:assert test="(@var_ref and .='') or (@xsi:nil='true' and .='') or not(.='')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
+                                                                           <sch:assert test="(@var_ref and .='') or ((@xsi:nil='1' or @xsi:nil='true') and .='') or not(.='') or (.='' and @operation = 'pattern match')"><sch:value-of select="../@id"/> - filename entity cannot be empty unless the xsi:nil attribute is set to true or a var_ref is used</sch:assert>
                                                                       </sch:rule>
                                                                  </sch:pattern>
                                                             </xsd:appinfo>
@@ -1168,7 +1189,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="slackwarepkginfo_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The slackware package info test is used to check information associated with a given Slackware package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a slackwarepkginfo_object and the optional state element specifies the data to check. The evaluation of the test is guided by the check attribute that is inherited from the TestType.</xsd:documentation>
+               <xsd:documentation>The slackware package info test is used to check information associated with a given Slackware package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a slackwarepkginfo_object and the optional state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>slackwarepkginfo_test</oval:test>
@@ -1260,255 +1281,60 @@
      <!-- =============================================================================== -->
      <!-- =============================================================================== -->
      <!-- =============================================================================== -->
-     <xsd:complexType name="EntityStateFileSystemTypeType">
+     <xsd:complexType name="FileBehaviors">
           <xsd:annotation>
-               <xsd:documentation>The EntityStateFileSystemTypeType complex type restricts a string value to the set of values that are used to describe file systems on a Linux system. This list is based off of the values defined in linux/magic.h. Please consult linux/magic.h for additional information on each allowed value. The empty string is also allowed to support the empty element associated with variable references.  Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>
+               <xsd:documentation>The FileBehaviors complex type defines a number of behaviors that allow a more detailed definition of a set of files or file related items to collect.  Note that using these behaviors may result in some unique results.  For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in.</xsd:documentation>
+               <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleContent>
-               <xsd:restriction base="oval-def:EntityStateStringType">
-                    <xsd:enumeration value="ADFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="AFFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="AFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="AUTOFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="CODA_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="CRAMFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="CRAMFS_MAGIC_WEND">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="DEBUGFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SYSFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SECURITYFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SELINUX_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="RAMFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="TMPFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="HUGETLBFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SQUASHFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="EFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="EXT2_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="EXT3_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="XENFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="EXT4_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="BTRFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="HPFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="ISOFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="JFFS2_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="ANON_INODE_FS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MINIX_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MINIX_SUPER_MAGIC2">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MINIX2_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MINIX2_SUPER_MAGIC2">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MINIX3_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MSDOS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="NCP_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="NFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="OPENPROM_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="PROC_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="QNX4_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="REISERFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="REISERFS_SUPER_MAGIC_STRING">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="REISER2FS_SUPER_MAGIC_STRING">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="REISER2FS_JR_SUPER_MAGIC_STRING">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SMB_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="USBDEVICE_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="CGROUP_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="FUTEXFS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="STACK_END_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="DEVPTS_SUPER_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SOCKFS_MAGIC">
-                         <xsd:annotation>
-                              <xsd:documentation/>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="">
-                         <xsd:annotation>
-                              <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
-                         </xsd:annotation>
-                    </xsd:enumeration>
-               </xsd:restriction>
-          </xsd:simpleContent>
-     </xsd:complexType>
+          <xsd:attribute name="max_depth" use="optional" default="-1">
+               <xsd:annotation>
+                    <xsd:documentation>'max_depth' defines the maximum depth of recursion to perform when a recurse_direction is specified. A value of '0' is equivalent to no recursion, '1' means to step only one directory level up/down, and so on. The default value is '-1' meaning no limitation. For a 'max_depth' of -1 or any value of 1 or more the starting directory must be considered in the recursive search.</xsd:documentation>
+                    <xsd:documentation>Note that the default recurse_direction behavior is 'none' so even though max_depth specifies no limitation by default, the recurse_direction behavior turns recursion off.</xsd:documentation>
+               </xsd:annotation>
+               <xsd:simpleType>
+                    <xsd:restriction base="xsd:integer">
+                         <xsd:fractionDigits value="0"/>
+                         <xsd:minInclusive value="-1"/>
+                    </xsd:restriction>
+               </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="recurse" use="optional" default="symlinks and directories">
+               <xsd:annotation>
+                    <xsd:documentation>'recurse' defines how to recurse into the path entity, in other words what to follow during recursion. Options include symlinks, directories, or both. Note that a max-depth has to be specified for recursion to take place and for this attribute to mean anything. Also note that this behavior does not apply to Windows systems since they do not support symbolic links. On Windows systems the 'recurse' behavior is always equivalent to directories.</xsd:documentation>
+               </xsd:annotation>
+               <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                         <xsd:enumeration value="directories"/>
+                         <xsd:enumeration value="symlinks"/>
+                         <xsd:enumeration value="symlinks and directories"/>
+                    </xsd:restriction>
+               </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="recurse_direction" use="optional" default="none">
+               <xsd:annotation>
+                    <xsd:documentation>'recurse_direction' defines the direction to recurse, either 'up' to parent directories, or 'down' into child directories. The default value is 'none' for no recursion.</xsd:documentation>
+               </xsd:annotation>
+               <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                         <xsd:enumeration value="none"/>
+                         <xsd:enumeration value="up"/>
+                         <xsd:enumeration value="down"/>
+                    </xsd:restriction>
+               </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="recurse_file_system" use="optional" default="all">
+               <xsd:annotation>
+                    <xsd:documentation>'recurse_file_system' defines the file system limitation of any recursion, either 'local' limiting data collection to local file systems (as opposed to file systems mounted from an external system), or 'defined' to keep any recursion within the file system that the file_object (path+filename) has specified. The default value is 'all' meaning to use all available file systems for data collection.</xsd:documentation>
+               </xsd:annotation>
+               <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                         <xsd:enumeration value="all"/>
+                         <xsd:enumeration value="local"/>
+                         <xsd:enumeration value="defined"/>
+                    </xsd:restriction>
+               </xsd:simpleType>
+          </xsd:attribute>
+     </xsd:complexType>     
      <xsd:complexType name="EntityStateRpmVerifyResultType">
           <xsd:annotation>
                <xsd:documentation>The EntityStateRpmVerifyResultType complex type restricts a string value to the set of possible outcomes of checking an attribute of a file included in an RPM against the actual value of that attribute in the RPM database. The empty string is also allowed to support the empty element associated with variable references.  Note that when using pattern matches and variables care must be taken to ensure that the regular expression and variable values align with the enumerated values.</xsd:documentation>

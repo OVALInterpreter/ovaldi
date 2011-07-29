@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-common-5" elementFormDefault="qualified" version="5.10">
      <xsd:annotation>
           <xsd:documentation>The following is a description of the common types that are shared across the different schemas within Open Vulnerability and Assessment Language (OVAL). Each type is described in detail and should provide the information necessary to understand what each represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between these type is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Common</schema>
-               <version>5.9</version>
-               <date>2/22/2011 10:52:26 AM</date>
+               <version>5.10 Release Candidate 1</version>
+               <date>7/19/2011 10:15:36 PM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
               <sch:ns prefix="oval" uri="http://oval.mitre.org/XMLSchema/oval-common-5"/>
               <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
@@ -93,7 +93,7 @@
      </xsd:complexType>
      <xsd:complexType name="GeneratorType">
           <xsd:annotation>
-               <xsd:documentation>The GeneratorType complex type defines an element that is used to hold information about when a particular OVAL document was compiled, what version of the schema was used, what tool compiled the document, and what version of that tools was used. </xsd:documentation>
+               <xsd:documentation>The GeneratorType complex type defines an element that is used to hold information about when a particular OVAL document was compiled, what version of the schema was used, what tool compiled the document, and what version of that tool was used. </xsd:documentation>
                <xsd:documentation>Additional generator information is also allowed although it is not part of the official OVAL Schema. Individual organizations can place generator information that they feel are important and these will be skipped during the validation. All OVAL really cares about is that the stated generator information is there.</xsd:documentation>
           </xsd:annotation>
           <xsd:sequence>
@@ -114,10 +114,17 @@
                </xsd:element>
                <xsd:element name="timestamp" type="xsd:dateTime">
                     <xsd:annotation>
+                         <!--- TODO - Add schematron to enforce yyyy-mm-ddThh:mm:ss format -->
                          <xsd:documentation>The required timestamp specifies when the particular OVAL document was compiled. The format for the timestamp is yyyy-mm-ddThh:mm:ss. Note that the timestamp element does not specify when a definition (or set of definitions) was created or modified but rather when the actual XML document that contains the definition was created. For example, the document might have pulled a bunch of existing OVAL Definitions together, each of the definitions having been created at some point in the past. The timestamp in this case would be when the combined document was created.</xsd:documentation>
                     </xsd:annotation>
                </xsd:element>
-               <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+               <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip">
+               <xsd:annotation>
+                    <xsd:documentation>The Asset Identification specification (http://scap.nist.gov/specifications/ai/) provides a standardized way of reporting asset information across different organizations.</xsd:documentation>
+                    <xsd:documentation>Asset Identification elements can hold data useful for identifying what tool, what version of that tool was used, and identify other assets used to compile an OVAL document, such as persons or organizations.</xsd:documentation> 
+                    <xsd:documentation>To support greater interoperability, an ai:assets element describing assets used to produce an OVAL document may appear at this point in an OVAL document.</xsd:documentation>
+               </xsd:annotation>
+               </xsd:any>
           </xsd:sequence>
      </xsd:complexType>
      <xsd:complexType name="MessageType">
@@ -289,7 +296,7 @@
                </xsd:enumeration>
                <xsd:enumeration value="fileset_revision">
                     <xsd:annotation>
-                         <xsd:documentation>The fileset_revision datatype represents the version string related to filesets in HP-UX. An example would be 'A.03.61.00'. As far as implementing operations, right now there is a IP licensing issue being discussed on our ability to publicize the method to do this; however, the HP-UX team is willing to discuss how to implement this with anyone who would like to do it while we are waiting for the IP licensing issue to be resolved. Expected operations within OVAL for fileset_version values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
+                         <xsd:documentation>The fileset_revision datatype represents the version string related to filesets in HP-UX. An example would be 'A.03.61.00'. For more information, see the HP-UX "Software Distributor Administration Guide" (http://h20000.www2.hp.com/bc/docs/support/SupportManual/c01919399/c01919399.pdf).  Expected operations within OVAL for fileset_version values are 'equals', 'not equal', 'greater than', 'greater than or equal', 'less than', and 'less than or equal'.</xsd:documentation>
                     </xsd:annotation>
                </xsd:enumeration>
                <xsd:enumeration value="float">

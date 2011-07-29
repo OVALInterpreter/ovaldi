@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:sp-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:sp-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint" elementFormDefault="qualified" version="5.10">
       <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
       <xsd:annotation>
             <xsd:documentation>The following is a description of the elements, types, and attributes that compose the SharePoint specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
@@ -7,8 +7,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint System Characteristics</schema>
-                  <version>5.9</version>
-                  <date>2/22/2011 10:52:26 AM</date>
+                  <version>5.10 Release Candidate 1</version>
+                  <date>7/19/2011 10:15:37 PM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                   <sch:ns prefix="sp-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint"/>
@@ -83,7 +83,7 @@
                                     </xsd:element>
                                     <xsd:element name="outboundmailserverinstance" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The name of the outboundmailserver.</xsd:documentation>
+                                                <xsd:documentation>The string name of the outboundmailserver.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="outboundmailsenderaddress" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
@@ -103,7 +103,7 @@
                                     </xsd:element>
                                     <xsd:element name="timeout" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The timeout is the amount of time before security validation expires.</xsd:documentation>
+                                                <xsd:documentation>The timeout is the amount of time before security validation expires in seconds.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="isadministrationwebapplication" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
@@ -462,7 +462,7 @@
                                     </xsd:element>
                                     <xsd:element name="timeout" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
-                                                <xsd:documentation>The amount of time before the virus scanner times out.</xsd:documentation>
+                                                <xsd:documentation>The amount of time before the virus scanner times out in seconds.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="uploadscanenabled" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
@@ -602,6 +602,59 @@
       <!-- ========================  SPJOBDEFINITION ITEM  ============================== -->
       <!-- =============================================================================== -->
       <xsd:element name="spjobdefinition_item" substitutionGroup="oval-sc:item">
+            <xsd:annotation>
+                  <xsd:documentation>This represents the set of Job Definitions that are scheduled to run on each SharePoint Web Application</xsd:documentation>
+                  <xsd:appinfo>
+                        <oval:deprecated_info>
+                              <oval:version>5.10</oval:version>
+                              <oval:reason>Replaced by the spjobdefinition510_item. This item does not uniquely identify a single job definition. A new state was created to use displaynames, which are unique. See the spjobdefinition510_item.</oval:reason>
+                              <oval:comment>This item has been deprecated and may be removed in a future version of the language.</oval:comment>
+                        </oval:deprecated_info>
+                        <sch:pattern id="sp-sc_spjobdefinition_item_dep">
+                              <sch:rule context="sp-sc:spjobdefinition_item">
+                                    <sch:report test="true()">DEPRECATED ITEM: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+                  <xsd:complexContent>
+                        <xsd:extension base="oval-sc:ItemType">
+                              <xsd:sequence>
+                                    <xsd:element name="webappuri" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The URI that represents the web application for which the IIS Settings should be checked.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="displayname" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The name of the job as displayed in the SharePoint Central Administration site.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="isdisabled" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Determines whether or not the job definition is enabled.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="retry" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>Determines whether the job definition should be retried if it ends abnormally.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="title" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The title of a job as displayed in the SharePoint Central Administration site.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                              </xsd:sequence>
+                        </xsd:extension>
+                  </xsd:complexContent>
+            </xsd:complexType>
+      </xsd:element>
+      <!-- =============================================================================== -->
+      <!-- ========================  SPJOBDEFINITION ITEM(510)  ========================== -->
+      <!-- =============================================================================== -->
+      <xsd:element name="spjobdefinition510_item" substitutionGroup="oval-sc:item">
             <xsd:annotation>
                   <xsd:documentation>This represents the set of Job Definitions that are scheduled to run on each SharePoint Web Application</xsd:documentation>
             </xsd:annotation>

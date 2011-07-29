@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-results-5" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-results-5" elementFormDefault="qualified" version="5.10">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
@@ -9,8 +9,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Core Results</schema>
-               <version>5.9</version>
-               <date>2/22/2011 10:52:26 AM</date>
+               <version>5.10 Release Candidate 1</version>
+               <date>7/19/2011 10:15:37 PM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-res" uri="http://oval.mitre.org/XMLSchema/oval-results-5"/>
           </xsd:appinfo>
@@ -34,12 +34,12 @@
                               <xsd:documentation>The required directives section presents flags describing what information has been included in the results document. This element represents the default set of directives. These directives apply to all classes of definitions for which there is not a class specific set of directives.</xsd:documentation>
                               <xsd:appinfo>
                                    <sch:pattern id="oval-res_directives_include_oval_definitions">
-                                        <sch:rule context="oval-res:oval_results/oval-res:directives[@include_source_definitions = true() or not(@include_source_definitions)]">
+                                        <sch:rule context="oval-res:oval_results/oval-res:directives[@include_source_definitions='true' or @include_source_definitions='1' or not(@include_source_definitions)]">
                                              <sch:assert test="ancestor::oval-res:oval_results[oval-def:oval_definitions]">
                                                   The source OVAL Definition document must be included when the directives include_source_definitions attribute is set to true.
                                              </sch:assert>
                                         </sch:rule>
-                                        <sch:rule context="oval-res:oval_results/oval-res:directives[@include_source_definitions = false()]">
+                                        <sch:rule context="oval-res:oval_results/oval-res:directives[@include_source_definitions='false' or @include_source_definitions='0']">
                                              <sch:assert test="ancestor::oval-res:oval_results[not(oval-def:oval_definitions)]">
                                                   The source OVAL Definition document must not be included when the directives include_source_definitions attribute is set to false.
                                              </sch:assert>
@@ -192,19 +192,19 @@
                     <sch:pattern id="oval-res_system">
                          <sch:rule context="oval-res:system[oval-res:tests]">
                               <!-- Confirm that something somewhere expects full results -->
-                              <sch:assert test="/oval-res:oval_results/oval-res:directives/*[@reported=true()]/@content='full'
-                                                or /oval-res:oval_results/oval-res:directives/*[@reported=true() and not(@content)]
-                                                or /oval-res:oval_results/oval-res:class_directives/*[@reported=true()]/@content='full'
-                                                or /oval-res:oval_results/oval-res:class_directives/*[@reported=true()and not(@content)]">
+                              <sch:assert test="/oval-res:oval_results/oval-res:directives/*[@reported='true' or @reported='1']/@content='full'
+                                                or /oval-res:oval_results/oval-res:directives/*[(@reported='true' or @reported='1') and not(@content)]
+                                                or /oval-res:oval_results/oval-res:class_directives/*[@reported='true' or @reported='1']/@content='full'
+                                                or /oval-res:oval_results/oval-res:class_directives/*[(@reported='true' or @reported='1') and not(@content)]">
                                    The tests element should not be included unless full results are to be provided (see directives)
                               </sch:assert>
                          </sch:rule>
                          <sch:rule context="oval-res:system[not(oval-res:tests)]">
                               <!-- Confirm that nothing anywhere expects full results -->                              
-                              <sch:assert test="not(oval-res:oval_results/oval-res:directives/*[@reported=true()]/@content='full') 
-                                                and not(/oval-res:oval_results/oval-res:directives/*[@reported=true() and not(@content)])
-                                                and not(/oval-res:oval_results/oval-res:class_directives/*[@reported=true()]/@content='full')
-                                                and not(/oval-res:oval_results/oval-res:class_directives/*[@reported=true()and not(@content)])">
+                              <sch:assert test="not(oval-res:oval_results/oval-res:directives/*[@reported='true' or @reported='1']/@content='full') 
+                                                and not(/oval-res:oval_results/oval-res:directives/*[(@reported='true' or @reported='1') and not(@content)])
+                                                and not(/oval-res:oval_results/oval-res:class_directives/*[@reported='true' or @reported='1']/@content='full')
+                                                and not(/oval-res:oval_results/oval-res:class_directives/*[(@reported='true' or @reported='1') and not(@content)])">
                                    The tests element should be included when full results are specified (see directives)
                               </sch:assert>
                          </sch:rule>
@@ -214,7 +214,17 @@
           <xsd:sequence>
                <xsd:element name="definitions" type="oval-res:DefinitionsType" minOccurs="0" maxOccurs="1"/>
                <xsd:element name="tests" type="oval-res:TestsType" minOccurs="0" maxOccurs="1"/>
-               <xsd:element ref="oval-sc:oval_system_characteristics" />
+               <xsd:element ref="oval-sc:oval_system_characteristics" >
+                    <xsd:annotation>
+                         <xsd:appinfo>
+                              <sch:pattern id="oval-res_mask_rule">
+                                   <sch:rule context="/oval-res:oval_results/oval-res:results/oval-res:system/oval-sc:oval_system_characteristics/oval-sc:system_data/*/*|/oval-res:oval_results/oval-res:results/oval-res:system/oval-sc:oval_system_characteristics/oval-sc:system_data/*/*/*">
+                                        <sch:assert test="not(@mask) or @mask='false' or @mask='0' or .=''">item <sch:value-of select="../@id"/> - a value for the <sch:value-of select="name()"/> entity should only be supplied if the mask attribute is 'false'.</sch:assert>
+                                   </sch:rule>
+                              </sch:pattern>
+                         </xsd:appinfo>
+                    </xsd:annotation>
+               </xsd:element>
           </xsd:sequence>
      </xsd:complexType>
      <xsd:complexType name="DefinitionsType">
@@ -228,16 +238,20 @@
      <xsd:complexType name="DefinitionType">
           <xsd:annotation>
                <xsd:documentation>The DefinitionType complex type holds the result of the evaluation of an OVAL Definition. The message element holds an error message or some other string that the analysis engine wishes to pass along. In addition, the optional criteria element provides the results of the individual pieces of the criteria. Please refer to the description of the CriteriaType for more information.</xsd:documentation>
-               <xsd:documentation>The required definition_id attribute is the OVAL id of the definition. The required version attribute is the specific version of the OVAL Definition used during analysis. The optional variable_instance attribute is a unique id that differentiates each unique instance of a definition. Capabilities that use OVAL may reference the same definition multiple times and provide different sets of variable values each time the definition is referenced. This will result in multiple instances of a definition being included in the OVAL Results document (definitions that do not use variables can only have one unique instance). The inclusion of a unique instance identifier will allow the OVAL Results document to report the correct item associated with an object for each combination of supplied values. The required result attribute holds the result of the evaluation. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
+               <xsd:documentation>The required definition_id attribute is the OVAL id of the definition.</xsd:documentation>
+               <xsd:documentation>The required version attribute is the specific version of the OVAL Definition used during analysis.</xsd:documentation>
+               <xsd:documentation>The optional variable_instance attribute is a unique id that differentiates each unique instance of a definition. Capabilities that use OVAL may reference the same definition multiple times and provide different variable values each time the definition is referenced. This will result in multiple instances of a definition being included in the OVAL Results document (definitions that do not use variables can only have one unique instance). The inclusion of this unique instance identifier allows the OVAL Results document to associate the correct objects and items for each combination of supplied values.</xsd:documentation>
+               <xsd:documentation>The optional class attribute ...</xsd:documentation>
+               <xsd:documentation>The required result attribute holds the result of the evaluation. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
                <xsd:appinfo>
                     <sch:pattern id="oval-res_directives">
                          <!-- Check definition_true reported='true' and content='full' -->
                          <sch:rule context="oval-res:definition[@result='true' and oval-res:criteria]">
                               <!-- Check that the global directives say to report this and that there are no class directives for this class (to override the global directive),
                                    or that the class directive for this class says to report this. -->
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_true/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_true/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_true/@reported='1')
                                    and not(oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_true/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_true/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_true/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of TRUE should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_true/@content='full')
@@ -249,9 +263,9 @@
                          
                          <!-- Check definition_true reported='true' and content='thin' -->                         
                          <sch:rule context="oval-res:definition[@result='true' and not(oval-res:criteria)]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_true/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_true/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_true/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_true/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_true/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_true/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of TRUE should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_true/@content='thin')
@@ -263,9 +277,9 @@
                          
                          <!-- Check definition_false reported='true' and content='full' -->
                          <sch:rule context="oval-res:definition[@result='false' and oval-res:criteria]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_false/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_false/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_false/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_false/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_false/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_false/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of FALSE should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_false/@content='full')
@@ -277,9 +291,9 @@
                          
                          <!-- Check definition_false reported='true' and content='thin' -->                         
                          <sch:rule context="oval-res:definition[@result='false' and not(oval-res:criteria)]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_false/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_false/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_false/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_false/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_false/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_false/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of FALSE should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_false/@content='thin')
@@ -291,9 +305,9 @@
                          
                          <!-- Check definition_unknown reported='true' and content='full' -->
                          <sch:rule context="oval-res:definition[@result='unknown' and oval-res:criteria]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of UNKNOWN should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@content='full')
@@ -305,9 +319,9 @@
                          
                          <!-- Check definition_unknown reported='true' and content='thin' -->                         
                          <sch:rule context="oval-res:definition[@result='unknown' and not(oval-res:criteria)]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of UNKNOWN should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_unknown/@content='thin')
@@ -319,9 +333,9 @@
                          
                          <!-- Check definition_error reported='true' and content='full' -->
                          <sch:rule context="oval-res:definition[@result='error' and oval-res:criteria]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_error/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_error/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_error/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of ERROR should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@content='full')
@@ -333,9 +347,9 @@
                          
                          <!-- Check definition_error reported='true' and content='thin' -->                         
                          <sch:rule context="oval-res:definition[@result='error' and not(oval-res:criteria)]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_error/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_unknown/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of ERROR should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_error/@content='thin')
@@ -347,9 +361,9 @@
                          
                          <!-- Check definition_not_evaluated reported='true' and content='full' -->
                          <sch:rule context="oval-res:definition[@result='not evaluated' and oval-res:criteria]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_evaluated/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_evaluated/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_evaluated/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of NOT EVALUATED should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@content='full')
@@ -361,9 +375,9 @@
                          
                          <!-- Check definition_not_evaluated reported='true' and content='thin' -->                         
                          <sch:rule context="oval-res:definition[@result='not evaluated' and not(oval-res:criteria)]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_evaluated/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_evaluated/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_evaluated/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of NOT EVALUATED should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_evaluated/@content='thin')
@@ -375,9 +389,9 @@
                          
                          <!-- Check definition_not_applicable reported='true' and content='full' -->
                          <sch:rule context="oval-res:definition[@result='not applicable' and oval-res:criteria]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_applicable/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_applicable/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_applicable/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of NOT APPLICABLE should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@content='full')
@@ -389,9 +403,9 @@
                          
                          <!-- Check definition_not_applicable reported='true' and content='thin' -->                         
                          <sch:rule context="oval-res:definition[@result='not applicable' and not(oval-res:criteria)]">
-                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported=true())
+                              <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported='true' or /oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@reported='1')
                                    and not(/oval-res:oval_results/oval-res:class_directives[@class = ./@class]))
-                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_applicable/@reported=true())">
+                                   or (/oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_applicable/@reported='true' or /oval-res:oval_results/oval-res:class_directives[@class = ./@class]/oval-res:definition_not_applicable/@reported='1')">
                                    <sch:value-of select="@definition_id"/> - definitions with a result of NOT APPLICABLE should not be included (see directives)
                               </sch:assert>
                               <sch:assert test="((/oval-res:oval_results/oval-res:directives/oval-res:definition_not_applicable/@content='thin')
@@ -417,12 +431,14 @@
           <xsd:annotation>
                <xsd:documentation>The CriteriaType complex type describes the high level container for all the tests and represents the meat of the definition. Each criteria can contain other criteria elements in a recursive structure allowing complex logical trees to be constructed. Each referenced test is represented by a criterion element. Please refer to the description of the CriterionType for more information about and individual criterion element. The optional extend_definition element allows existing definitions to be included in the criteria. Refer to the description of the ExtendDefinitionType for more information.</xsd:documentation>
                <xsd:documentation>The required operator attribute provides the logical operator that binds the different statements inside a criteria together. The optional negate attribute signifies that the result of an extended definition should be negated during analysis. For example, consider a definition that evaluates TRUE if a certain software is installed. By negating the definition, it now evaluates to TRUE if the software is NOT installed. The required result attribute holds the result of the evaluation of the criteria. Note that this would be after any negation operation has been applied. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
+               <xsd:documentation>The optional applicability_check attribute provides a Boolean flag that when true indicates that the criteria is being used to determine whether the OVAL Definition applies to a given system.</xsd:documentation>
           </xsd:annotation>
           <xsd:choice minOccurs="1" maxOccurs="unbounded">
                <xsd:element name="criteria" type="oval-res:CriteriaType"/>
                <xsd:element name="criterion" type="oval-res:CriterionType"/>
                <xsd:element name="extend_definition" type="oval-res:ExtendDefinitionType"/>
           </xsd:choice>
+          <xsd:attribute name="applicability_check" type="xsd:boolean" use="optional"/>
           <xsd:attribute name="operator" type="oval:OperatorEnumeration" use="required"/>
           <xsd:attribute name="negate" type="xsd:boolean" use="optional" default="false"/>
           <xsd:attribute name="result" type="oval-res:ResultEnumeration" use="required"/>
@@ -430,8 +446,14 @@
      <xsd:complexType name="CriterionType">
           <xsd:annotation>
                <xsd:documentation>The CriterionType complex type identifies a specific test that is included in the definition's criteria.</xsd:documentation>
-               <xsd:documentation>The required test_id attribute is the actual id of the included test. The required version attribute is the specific version of the OVAL Test used during analysis. The optional variable_instance attribute differentiates between unique instances of a test. This can happen when a test includes a variable reference and different values for that variable are used by different definitions. The optional negate attribute signifies that the result of an individual test should be negated during analysis. For example, consider a test that evaluates to TRUE if a specific patch is installed. By negating this test, it now evaluates to TRUE if the patch is NOT installed. The required result attribute holds the result of the evaluation. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
+               <xsd:documentation>The optional applicability_check attribute provides a Boolean flag that when true indicates that the criterion is being used to determine whether the OVAL Definition applies to a given system.</xsd:documentation>
+               <xsd:documentation>The required test_ref attribute is the actual id of the included test.</xsd:documentation>
+               <xsd:documentation>The required version attribute is the specific version of the OVAL Test used during analysis.</xsd:documentation>
+               <xsd:documentation>The optional variable_instance attribute differentiates between unique instances of a test. This can happen when a test includes a variable reference and different variable values are used by different definitions.</xsd:documentation>
+               <xsd:documentation>The optional negate attribute signifies that the result of an individual test should be negated during analysis. For example, consider a test that evaluates to TRUE if a specific patch is installed. By negating this test, it now evaluates to TRUE if the patch is NOT installed.</xsd:documentation>
+               <xsd:documentation>The required result attribute holds the result of the evaluation. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
           </xsd:annotation>
+          <xsd:attribute name="applicability_check" type="xsd:boolean" use="optional"/>
           <xsd:attribute name="test_ref" type="oval:TestIDPattern" use="required"/>
           <xsd:attribute name="version" type="xsd:nonNegativeInteger" use="required"/>
           <xsd:attribute name="variable_instance" type="xsd:nonNegativeInteger" use="optional" default="1"/>
@@ -441,8 +463,14 @@
      <xsd:complexType name="ExtendDefinitionType">
           <xsd:annotation>
                <xsd:documentation>The ExtendDefinitionType complex type identifies a specific definition that has been extended by the criteria.</xsd:documentation>
-               <xsd:documentation>The required definition_ref attribute is the actual id of the extended definition. The required version attribute is the specific version of the OVAL Definition used during analysis. The optional variable_instance identifier is a unique id that differentiates each unique instance of a definition in the OVAL Results document based on the combination of variable values used. Capabilities that use OVAL may reference the same definition multiple times and provide different sets of variable values each time the definition is referenced. This will result in multiple instances of a definition being included in the OVAL Results document (definitions that do not use variables can only have one unique instance). The inclusion of a unique instance identifier will allow the OVAL Results document to report the correct item associated with an object for each combination of supplied values. The optional negate attribute signifies that the result of an extended definition should be negated during analysis. For example, consider a definition that evaluates TRUE if certain software is installed. By negating the definition, it now evaluates to TRUE if the software is NOT installed. The required result attribute holds the result of the evaluation. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
+               <xsd:documentation>The optional applicability_check attribute provides a Boolean flag that when true indicates that the extend_definition is being used to determine whether the OVAL Definition applies to a given system.</xsd:documentation>
+               <xsd:documentation>The required definition_ref attribute is the actual id of the extended definition.</xsd:documentation>
+               <xsd:documentation>The required version attribute is the specific version of the OVAL Definition used during analysis.</xsd:documentation>
+               <xsd:documentation>The optional variable_instance attribute is a unique id that differentiates each unique instance of a definition. Capabilities that use OVAL may reference the same definition multiple times and provide different variable values each time the definition is referenced. This will result in multiple instances of a definition being included in the OVAL Results document (definitions that do not use variables can only have one unique instance). The inclusion of this unique instance identifier allows the OVAL Results document to associate the correct objects and items for each combination of supplied values.</xsd:documentation>
+               <xsd:documentation>The optional negate attribute signifies that the result of an extended definition should be negated during analysis. For example, consider a definition that evaluates TRUE if certain software is installed. By negating the definition, it now evaluates to TRUE if the software is NOT installed.</xsd:documentation>
+               <xsd:documentation>The required result attribute holds the result of the evaluation. Please refer to the description of the ResultEnumeration for details about the different result values.</xsd:documentation>
           </xsd:annotation>
+          <xsd:attribute name="applicability_check" type="xsd:boolean" use="optional"/>
           <xsd:attribute name="definition_ref" type="oval:DefinitionIDPattern" use="required"/>
           <xsd:attribute name="version" type="xsd:nonNegativeInteger" use="required"/>
           <xsd:attribute name="variable_instance" type="xsd:nonNegativeInteger" use="optional" default="1"/>
@@ -460,7 +488,9 @@
      <xsd:complexType name="TestType">
           <xsd:annotation>
                <xsd:documentation>The TestType complex type provides a reference to every item that matched the object section of the original test as well as providing an overall test result based on those items. The optional message element holds an error message or some other string that the analysis engine wishes to pass along. The optional tested_variable elements hold the value of each variable used by the test during evaluation. This includes the values used in both OVAL Objects and OVAL States. If a variable represents an array of values, then multiple tested_variable elements would exist with the same variable_id attribute. Please refer to the description of oval-res:TestedVariableType for more information.</xsd:documentation>
-               <xsd:documentation>The required test_id attribute identifies the test and must conform to the format specified by the oval:TestIDPattern simple type. The required version attribute is the specific version of the OVAL Test used during analysis. The optional variable_instance attribute differentiates between unique instances of a test. This can happen when a test includes a variable reference and different values for that variable are used by different definitions.</xsd:documentation>
+               <xsd:documentation>The required test_id attribute identifies the test and must conform to the format specified by the oval:TestIDPattern simple type.</xsd:documentation>
+               <xsd:documentation>The required version attribute is the specific version of the OVAL Test used during analysis.</xsd:documentation>
+               <xsd:documentation>The optional variable_instance attribute differentiates between unique instances of a test. This can happen when a test includes a variable reference and different values for that variable are used by different definitions.</xsd:documentation>
                <xsd:documentation>The check_existence, check, and state_operator attributes reflect the values that were specified on the test as it was evaluated. These evaluation control attributes are copied into the OVAL Results file to enable post processing of results documents.  More information on each of these attributes is provided with the definition of the oval-def:TestType.</xsd:documentation>
                <xsd:documentation>The required result attribute holds the result of the evaluation after all referenced items have been examined and the evaluation control attributes have been applied. Please refer to the description of the oval-res:ResultEnumeration for details about the different result values.  In general, the overall result of an OVAL Test is determined by combining the results of each matching item based first on the check_existence attribute, then the check attribute, and finally the state_operator attribute.</xsd:documentation>
                <xsd:documentation>The following section provides a more detailed description of  how the result for an OVAL Test is determined when using an OVAL System Characteristics document. An OVAL System Characteristics document can contain an optional collected_objects section. When the collected_objects section is present the following rules specify how the overall result for an OVAL Test is determined: When an oval-sc:collected_objects/oval-sc:object with an id that matches the OVAL Object id that is referenced by the OVAL Test is not found, the result for the OVAL Test must be "unknown". When the flag attribute of the corresponding oval-sc:collected_objects/oval-sc:object is "error", the result of the OVAL Test must be "error". When the flag attribute of the corresponding oval-sc:collected_objects/oval-sc:object is "not collected", the result of the OVAL Test must be "unknown".  When the flag attribute of the corresponding oval-sc:collected_objects/oval-sc:object is "not applicable", the result of the OVAL Test must be "not applicable".  When the flag attribute of the corresponding oval-sc:collected_objects/oval-sc:object is "does not exist", the result of the OVAL Test is determined by examining the check_existence attribute's value and if the check_existence attribute is "none_exist" or "any_exist" the OVAL Test should evaluate to "true", for all other values of the check_existence attribute the OVAL Test should evaluate to "false". The check and state_operator attributes do not need to be considered in this condition. When the flag attribute of the corresponding oval-sc:collected_objects/oval-sc:object is "complete", the result of the OVAL Test is determined by first evaluating the check_existence attribute specified by the OVAL Test and then evaluating the check and state_operator attributes. The check attribute only needs to be considered if the result of evaluating the check_existence attribute is "true". When the flag attribute of the corresponding oval-sc:collected_objects/oval-sc:object is "incomplete", the result of the OVAL Test must be "unknown" with the following exceptions: 1) When the check_existence attribute of the OVAL Test is set to "none_exist" and the collected object has 1 or more item references with a status of "exists", a result of "false" must be reported;  2) When the check_existence attribute of the OVAL Test is set to "only_one_exists", the collected object has more than 1 item reference with a status of "exists", a result of "false" must be reported;  3) If after evaluating the check_existence attribute a non "true" result has not been determined, the check attribute must be considered as follows: 3a) If the check attribute evaluation results in "false", then the OVAL Test result must be "false"; 3b) If the check attribute is set to "at_least_one_satisfies" and its evaluation results in "true", the OVAL Test result must be "true".  When the collected_objects section is not present in the OVAL System Characteristics document, the evaluation engine must search the system characteristics for all Items that match the OVAL Object referenced by the OVAL Test. The set of matching OVAL Items is then evaluated first based on the check_existence attribute, then the check attribute, and finally the state_operator attribute.</xsd:documentation>

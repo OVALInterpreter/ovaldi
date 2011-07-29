@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" elementFormDefault="qualified" version="5.9">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" elementFormDefault="qualified" version="5.10">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" schemaLocation="oval-system-characteristics-schema.xsd"/>
      <xsd:annotation>
           <xsd:documentation>The following is a description of the elements, types, and attributes that compose the UNIX specific system characteristic items found in Open Vulnerability and Assessment Language (OVAL). Each item is an extension of the standard item element defined in the Core System Characteristic Schema. Through extension, each item inherits a set of elements and attributes that are shared amongst all OVAL Items. Each item is described in detail and should provide the information necessary to understand what each element and attribute represents. This document is intended for developers and assumes some familiarity with XML. A high level description of the interaction between the different tests and their relationship to the Core System Characteristic Schema is not outlined here.</xsd:documentation>
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Unix System Characteristics</schema>
-               <version>5.9</version>
-               <date>2/22/2011 10:52:27 AM</date>
+               <version>5.10 Release Candidate 1</version>
+               <date>7/19/2011 10:15:38 PM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"/>
                <sch:ns prefix="unix-sc" uri="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"/>
@@ -399,29 +399,34 @@
                               </xsd:element>
                               <xsd:element name="user_id" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd. This element represents the owner of the file.</xsd:documentation>
+                                        <xsd:documentation>The numeric user id, or uid, is the third column of each user's entry in /etc/passwd.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="group_id" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the group owner of the file, by group number.</xsd:documentation>
+                                        <xsd:documentation>The id of the primary UNIX group the user belongs to.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="gcos" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The GECOS (or GCOS) field from /etc/passwd; typically contains the user's full name.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="home_dir" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The user's home directory.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="login_shell" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The user's shell program.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
+                              <xsd:element name="last_login" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The date and time when the last login occurred. This value is stored as the number of seconds that have elapsed since 00:00:00, January 1, 1970, UTC.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>                              
                          </xsd:sequence>
                     </xsd:extension>
                </xsd:complexContent>
@@ -636,7 +641,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="runlevel_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
-               <xsd:documentation>The runlevel item holds information about the start or kill state of a specified service at a given runlevel. Each runlevel item contains service_name and runlevel information as well as start and kill information. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
+               <xsd:documentation>The runlevel item holds information about the start or kill state of a specified service at a given runlevel. Each runlevel item contains service name and runlevel information as well as start and kill information. It extends the standard ItemType as defined in the oval-system-characteristics schema and one should refer to the ItemType description for more information.</xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -649,17 +654,17 @@
                               </xsd:element>
                               <xsd:element name="runlevel" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The runlevel entity specifies is the runlevel the system is currently at.</xsd:documentation>
+                                        <xsd:documentation>The runlevel entity specifies the system runlevel associated with a service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="start" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The start entity specifies whether the service is scheduled to start at the current runlevel.</xsd:documentation>
+                                        <xsd:documentation>The start entity specifies whether the service is scheduled to start at the runlevel.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="kill" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The kill entity specifies whether the service is scheduled to be killed at the current runlevel.</xsd:documentation>
+                                        <xsd:documentation>The kill entity specifies whether the service is scheduled to be killed at the runlevel.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -673,6 +678,17 @@
      <xsd:element name="sccs_item" substitutionGroup="oval-sc:item">
           <xsd:annotation>
                <xsd:documentation/>
+               <xsd:appinfo>
+                    <oval:deprecated_info>
+                         <oval:version>5.10</oval:version>
+                         <oval:reason>The sccs_item has been deprecated because the Source Code Control System (SCCS) is obsolete.  The sccs_item may be removed in a future version of the language.</oval:reason>
+                    </oval:deprecated_info>
+                    <sch:pattern id="unix-sc_sccsitem_dep">
+                         <sch:rule context="unix-sc:sccs_item">
+                              <sch:report test="true()">DEPRECATED ITEM: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -815,7 +831,7 @@
                                         <xsd:documentation>The name element contains a string that represents the name of a kernel parameter that was collected from the local system.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
-                              <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="1">
+                              <xsd:element name="value" type="oval-sc:EntityItemAnySimpleType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
                                         <xsd:documentation>The value element contains a string that represents the current value(s) for the specified kernel parameter on the local system.</xsd:documentation>
                                    </xsd:annotation>
@@ -884,67 +900,67 @@
                          <xsd:sequence>
                               <xsd:element name="protocol" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The protocol entity describes the protocol related to the service item.</xsd:documentation>
+                                        <xsd:documentation>The protocol entity specifies the protocol that is used by the service. The list of valid protocols can be found in /etc/protocols.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="service_name" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The service_name entity describes the name of the service.</xsd:documentation>
+                                        <xsd:documentation>The service_name entity specifies the name of the service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="flags" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The flags entity describes miscellaneous settings like TCP keepalives or libwrap deactivation.</xsd:documentation>
+                                        <xsd:documentation>The flags entity specifies miscellaneous settings associated with the service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="no_access" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The no_access entity specifies the remote hosts to which the service is unavailable.  Please see the xinetd.conf(5) man page for information on the different formats that can be used to describe a host.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="only_from" type="oval-sc:EntityItemIPAddressStringType" minOccurs="0" maxOccurs="unbounded">
                                    <xsd:annotation>
-                                        <xsd:documentation>The only_from entity describes specifies an exclusive set of IP addresses that may connect to this service</xsd:documentation>
+                                        <xsd:documentation>The only_from entity specifies the remote hosts to which the service is available.  Please see the xinetd.conf(5) man page for information on the different formats that can be used to describe a host.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="port" type="oval-sc:EntityItemIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The port entity specifies the port used by the service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="server" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>what program listens on this port</xsd:documentation>
+                                        <xsd:documentation>The server entity specifies the executable that is used to launch the service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="server_arguments" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The server_arguments entity specifies the arguments that are passed to the executable when launching the service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="socket_type" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The socket_type entity specifies the type of socket that is used by the service.  Possible values include: stream, dgram, raw, or seqpacket.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="type" type="unix-sc:EntityItemXinetdTypeStatusType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation/>
+                                        <xsd:documentation>The type entity specifies the type of the service.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="user" type="oval-sc:EntityItemStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The user entity describes user that xinetd should run the service as.</xsd:documentation>
+                                        <xsd:documentation>The user entity specifies the user identifier of the process that is running the service.  The user identifier may be expressed as a numerical value or as a user name that exists in /etc/passwd.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="wait" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The wait entity describes whether the service allows only one connection at a time.</xsd:documentation>
+                                        <xsd:documentation>The wait entity specifies whether or not the service is single-threaded or multi-threaded and whether or not xinetd accepts the connection or the service accepts the connection.  A value of 'true' indicates that the service is single-threaded and the service will accept the connection.  A value of 'false' indicates that the service is multi-threaded and xinetd will accept the connection.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="disabled" type="oval-sc:EntityItemBoolType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>The disabled entity describes whether this service is on or not.</xsd:documentation>
+                                        <xsd:documentation>The disabled entity specifies whether or not the service is disabled.  A value of 'true' indicates that the service is disabled and will not start.  A value of 'false' indicates that the service is not disabled.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                          </xsd:sequence>
@@ -1228,32 +1244,35 @@
                <xsd:appinfo>               
                     <evaluation_documentation>The following table is a mapping between the generic flag enumeration values and the actual flag values found on the various platforms. If the flag value is not specified, for a particular generic flag enumeration value, the flag value is not defined for that platform.</evaluation_documentation>
                <evaluation_chart xml:space="preserve">
-Name        Linux    Solaris    HPUX    Mac OS    FreeBSD
-UP          U        U          U       U         U
-GATEWAY     G        G          G       G         G
-HOST        H        H          H       H         H
-REINSTATE   R                                      
-DYNAMIC     D        D                  D         D
-MODIFIED    M                           M         M
-ADDRCONF    A        A                             
-CACHE       C                                      
-REJECT      !                           R         R
-REDUNDANT   M                                      
-SETSRC               S                             
-BROADCAST            B                  b         b
-LOCAL                L                             
-PROTOCOL_1                              1         1
-PROTOCOL_2                              2         2
-PROTOCOL_3                              3         3
-BLACK_HOLE                              B         B
-CLONING                                 C         C
-PROTOCOL_CLONING                        c         c
-INTERFACE_SCOPE                         I          
-LINK_LAYER                              L         L
-MULTICAST                               m          
-STATIC                                  S         S
-WAS_CLONED                              W         W
-XRESOLVE                                X         X
+Name                           Linux    Solaris    HPUX    Mac OS    FreeBSD    AIX
+UP                             U        U          U       U         U          U
+GATEWAY                        G        G          G       G         G          G
+HOST                           H        H          H       H         H          H
+REINSTATE                      R                                      
+DYNAMIC                        D        D                  D         D          D
+MODIFIED                       M                           M         M          M
+ADDRCONF                       A        A                             
+CACHE                          C                                                e
+REJECT                         !                           R         R          R
+REDUNDANT                               M (>=9)                                      
+SETSRC                                  S                             
+BROADCAST                               B                  b         b          b
+LOCAL                                   L                                       l
+PROTOCOL_1                                                 1         1          1
+PROTOCOL_2                                                 2         2          2
+PROTOCOL_3                                                 3         3          3
+BLACK_HOLE                                                 B         B
+CLONING                                                    C         C          c
+PROTOCOL_CLONING                                           c         c
+INTERFACE_SCOPE                                            I          
+LINK_LAYER                                                 L         L          L
+MULTICAST                                                  m                    m
+STATIC                                                     S         S          S
+WAS_CLONED                                                 W         W          W
+XRESOLVE                                                   X         X
+USABLE                                                                          u 
+PINNED                                                                          P 
+ACTIVE_DEAD_GATEWAY_DETECTION                                                   A (>=5.1) 
                </evaluation_chart>
                </xsd:appinfo>
           </xsd:annotation>
@@ -1384,6 +1403,21 @@ XRESOLVE                                X         X
                               <xsd:documentation/>
                          </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="USABLE">
+                         <xsd:annotation>
+                              <xsd:documentation/>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="PINNED">
+                         <xsd:annotation>
+                              <xsd:documentation/>
+                         </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ACTIVE_DEAD_GATEWAY_DETECTION">
+                         <xsd:annotation>
+                              <xsd:documentation/>
+                         </xsd:annotation>
+                    </xsd:enumeration>                    
                     <xsd:enumeration value="">
                          <xsd:annotation>
                               <xsd:documentation>The empty string value is permitted here to allow for detailed error reporting.</xsd:documentation>
