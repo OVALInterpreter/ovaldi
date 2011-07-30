@@ -29,7 +29,7 @@
 //****************************************************************************************//
 
 #include "ObjectEntity.h"
-#include "ObjectFieldEntityValue.h"
+#include "StateOrObjectFieldEntityValue.h"
 
 using namespace std;
 
@@ -125,7 +125,7 @@ void ObjectEntity::Parse(DOMElement* objectEntityElm) {
 				//	get the name of the child
 				string childName = XmlCommon::GetElementName(objectEntityChild);
 				if ( childName == "field" || childName == "oval-def:field"){
-					ObjectFieldEntityValue* fev = new ObjectFieldEntityValue();
+					StateOrObjectFieldEntityValue* fev = new StateOrObjectFieldEntityValue();
 					fev->Parse(objectEntityChild);
 					parsedValues.push_back(fev);
 				}else{

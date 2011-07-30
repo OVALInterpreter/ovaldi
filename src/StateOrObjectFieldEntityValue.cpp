@@ -28,17 +28,17 @@
 //
 //****************************************************************************************//
 
-#include "ObjectFieldEntityValue.h"
+#include "StateOrObjectFieldEntityValue.h"
 #include "VariableFactory.h"
 
 using namespace std;
 using namespace xercesc;
 
 //****************************************************************************************//
-//								ObjectFieldEntityValue Class								      //	
+//								StateOrObjectFieldEntityValue Class								      //	
 //****************************************************************************************//
 
-ObjectFieldEntityValue::ObjectFieldEntityValue(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check entityCheck, OvalEnum::Check varCheck) : AbsEntityValue(value) {
+StateOrObjectFieldEntityValue::StateOrObjectFieldEntityValue(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check entityCheck, OvalEnum::Check varCheck) : AbsEntityValue(value) {
 	this->name = name;
 	this->datatype = datatype;
 	this->operation = operation;
@@ -47,25 +47,25 @@ ObjectFieldEntityValue::ObjectFieldEntityValue(string name, string value, OvalEn
 	this->entityCheck = entityCheck;
 }
 
-ObjectFieldEntityValue::ObjectFieldEntityValue(const ObjectFieldEntityValue& objectFieldEntity){
-	this->name = objectFieldEntity.name;
-	this->value = objectFieldEntity.value;
-	this->datatype = objectFieldEntity.datatype;
-	this->operation = objectFieldEntity.operation;
-	this->varRef = objectFieldEntity.varRef;
-	this->varCheck = objectFieldEntity.varCheck;
-	this->entityCheck = objectFieldEntity.entityCheck;
+StateOrObjectFieldEntityValue::StateOrObjectFieldEntityValue(const StateOrObjectFieldEntityValue& otherFieldEntity){
+	this->name = otherFieldEntity.name;
+	this->value = otherFieldEntity.value;
+	this->datatype = otherFieldEntity.datatype;
+	this->operation = otherFieldEntity.operation;
+	this->varRef = otherFieldEntity.varRef;
+	this->varCheck = otherFieldEntity.varCheck;
+	this->entityCheck = otherFieldEntity.entityCheck;
 }
 
-ObjectFieldEntityValue::~ObjectFieldEntityValue() {
+StateOrObjectFieldEntityValue::~StateOrObjectFieldEntityValue() {
 
 }
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-bool ObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
-	ObjectFieldEntityValue* fieldEntityValue = (ObjectFieldEntityValue*)entityValue;
+bool StateOrObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
+	StateOrObjectFieldEntityValue* fieldEntityValue = (StateOrObjectFieldEntityValue*)entityValue;
 	bool isEqual = false;
 
 	if(this->GetDatatype() == fieldEntityValue->GetDatatype()) {
@@ -84,7 +84,7 @@ bool ObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
 	return isEqual;
 }
 
-void ObjectFieldEntityValue::Parse(DOMElement* objectEntityElm) {
+void StateOrObjectFieldEntityValue::Parse(DOMElement* objectEntityElm) {
 
 	this->SetName(XmlCommon::GetAttributeByName(objectEntityElm,"name"));
 	this->SetValue(XmlCommon::GetDataNodeValue(objectEntityElm));
@@ -118,67 +118,67 @@ void ObjectFieldEntityValue::Parse(DOMElement* objectEntityElm) {
 	}
 }
 
-string ObjectFieldEntityValue::GetName() {
+string StateOrObjectFieldEntityValue::GetName() {
 
 	return this->name;
 }
 
-void ObjectFieldEntityValue::SetName(string name) {
+void StateOrObjectFieldEntityValue::SetName(string name) {
 
 	this->name = name;
 }
 
-OvalEnum::Datatype ObjectFieldEntityValue::GetDatatype() {
+OvalEnum::Datatype StateOrObjectFieldEntityValue::GetDatatype() {
 
 	return this->datatype;
 }
 
-void ObjectFieldEntityValue::SetDatatype(OvalEnum::Datatype datatype) {
+void StateOrObjectFieldEntityValue::SetDatatype(OvalEnum::Datatype datatype) {
 
 	this->datatype = datatype;
 }
 
-OvalEnum::Operation ObjectFieldEntityValue::GetOperation() {
+OvalEnum::Operation StateOrObjectFieldEntityValue::GetOperation() {
 
 	return this->operation;
 }
 
-void ObjectFieldEntityValue::SetOperation(OvalEnum::Operation operation) {
+void StateOrObjectFieldEntityValue::SetOperation(OvalEnum::Operation operation) {
 	
 	this->operation = operation;
 }
 
-OvalEnum::Check ObjectFieldEntityValue::GetEntityCheck() {
+OvalEnum::Check StateOrObjectFieldEntityValue::GetEntityCheck() {
 
 	return this->entityCheck;
 }
 
-void ObjectFieldEntityValue::SetEntityCheck(OvalEnum::Check entityCheck) {
+void StateOrObjectFieldEntityValue::SetEntityCheck(OvalEnum::Check entityCheck) {
 
 	this->entityCheck = entityCheck;
 }
 
-AbsVariable* ObjectFieldEntityValue::GetVarRef() {
+AbsVariable* StateOrObjectFieldEntityValue::GetVarRef() {
 
 	return this->varRef;
 }
 
-void ObjectFieldEntityValue::SetVarRef(AbsVariable* varRef) {
+void StateOrObjectFieldEntityValue::SetVarRef(AbsVariable* varRef) {
 
 	this->varRef = varRef;
 }
 
-OvalEnum::Check ObjectFieldEntityValue::GetVarCheck() {
+OvalEnum::Check StateOrObjectFieldEntityValue::GetVarCheck() {
 
 	return this->varCheck;
 }
 
-void ObjectFieldEntityValue::SetVarCheck(OvalEnum::Check varCheck) {
+void StateOrObjectFieldEntityValue::SetVarCheck(OvalEnum::Check varCheck) {
 
 	this->varCheck = varCheck;
 }
 
-OvalEnum::ResultEnumeration ObjectFieldEntityValue::Analyze(ItemFieldEntityValue* scField){
+OvalEnum::ResultEnumeration StateOrObjectFieldEntityValue::Analyze(ItemFieldEntityValue* scField){
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 	

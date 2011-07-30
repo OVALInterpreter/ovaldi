@@ -530,10 +530,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\ObjectFieldEntityValue.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\ObjectReader.cpp"
 				>
 			</File>
@@ -562,7 +558,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\StateFieldEntityValue.cpp"
+				RelativePath="..\..\..\src\StateOrObjectFieldEntityValue.cpp"
 				>
 			</File>
 			<File
@@ -1071,10 +1067,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\ObjectFieldEntityValue.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\ObjectReader.h"
 				>
 			</File>
@@ -1103,7 +1095,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\StateFieldEntityValue.h"
+				RelativePath="..\..\..\src\StateOrObjectFieldEntityValue.h"
 				>
 			</File>
 			<File

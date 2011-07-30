@@ -28,9 +28,13 @@
 //
 //****************************************************************************************//
 
+#include <typeinfo>
+
 #include "EntityComparator.h"
-#include "StateFieldEntityValue.h"
+#include "StateOrObjectFieldEntityValue.h"
 #include "ItemFieldEntityValue.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								EntityComparator Class									  //	
@@ -457,7 +461,8 @@ OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation 
 		IntVector recordResults;
 		IntVector fieldEntityResults;
 		for(AbsEntityValueVector::iterator defIt = defValue.begin(); defIt != defValue.end(); defIt++){
-			StateFieldEntityValue* sfev = (StateFieldEntityValue*)(*defIt);
+			StateOrObjectFieldEntityValue* sfev = dynamic_cast<StateOrObjectFieldEntityValue*>(*defIt);
+			if (!sfev) throw Exception("Don't know how to handle entity value of type: " + string(typeid(*defIt).name()));
 			IntVector fieldResults;
 			
 			for(AbsEntityValueVector::iterator scIt = scValue.begin(); scIt != scValue.end(); scIt++){
@@ -466,7 +471,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation 
 					fieldResults.push_back(sfev->Analyze(ifev));
 				}
 			}
-			// If a field in the StateEntity is not present in the ItemEntity report an error for the field
+			// If a field in the object/state entity is not present in the ItemEntity report an error for the field
 			if ( fieldResults.size() == 0 ) {
 				fieldResults.push_back(OvalEnum::RESULT_ERROR);
 			}

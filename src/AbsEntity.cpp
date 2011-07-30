@@ -31,7 +31,7 @@
 #include <cassert>
 
 #include "AbsEntity.h"
-#include "ObjectFieldEntityValue.h"
+#include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
 
 using namespace std;
@@ -307,10 +307,10 @@ OvalEnum::Flag AbsEntity::GetEntityValues(std::map<std::string, StringVector> &v
 		valIter != value.end();
 		++valIter) {
 
-		ObjectFieldEntityValue *ofev = dynamic_cast<ObjectFieldEntityValue*>(*valIter);
+		StateOrObjectFieldEntityValue *ofev = dynamic_cast<StateOrObjectFieldEntityValue*>(*valIter);
 		if (!ofev)
 			throw Exception("Encountered an object entity of record datatype, "
-			"with a value that is not an ObjectFieldEntityValue!");
+			"with a value that is not a StateOrObjectFieldEntityValue!");
 
 		string fieldName = ofev->GetName();
 		AbsVariable *var = ofev->GetVarRef();

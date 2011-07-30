@@ -28,8 +28,8 @@
 //
 //****************************************************************************************//
 
-#ifndef OBJECTFIELDENTITYVALUE_H
-#define OBJECTFIELDENTITYVALUE_H
+#ifndef STATEOROBJECTFIELDENTITYVALUE_H
+#define STATEOROBJECTFIELDENTITYVALUE_H
 
 #include <string>
 #include <vector>
@@ -43,17 +43,17 @@
 /**
 	This class represents a field entity in an state entity that has a datatype of record as defined in the oval system characteristics schema.
 */
-class ObjectFieldEntityValue : public AbsEntityValue {
+class StateOrObjectFieldEntityValue : public AbsEntityValue {
 public:
 
-	/** Create a complete ObjectFieldEntityValue object. */
-	ObjectFieldEntityValue(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check entityCheck = OvalEnum::CHECK_ALL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL);
+	/** Create a complete StateOrObjectFieldEntityValue object. */
+	StateOrObjectFieldEntityValue(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check entityCheck = OvalEnum::CHECK_ALL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL);
 	
-    /** ObjectFieldEntityValue copy constructor. */
-    ObjectFieldEntityValue(const ObjectFieldEntityValue& ObjectFieldEntityValue);
+    /** StateOrObjectFieldEntityValue copy constructor. */
+    StateOrObjectFieldEntityValue(const StateOrObjectFieldEntityValue& otherFieldEntity);
 
-    /** ObjectFieldEntityValue destructor. */
-    ~ObjectFieldEntityValue();
+    /** StateOrObjectFieldEntityValue destructor. */
+    ~StateOrObjectFieldEntityValue();
 
 	/** Return the name value of the field.
 	 *  @return A std::string representing the name value of the field.
@@ -133,8 +133,8 @@ public:
 	 */
 	virtual void Parse(xercesc::DOMElement* entityElm);
 	
-	/** Analyze an ItemFieldEntityValue against this ObjectFieldEntityValue.
-		@param scField the ItemFieldEntityValue which to analyze against this ObjectFieldEntityValue.
+	/** Analyze an ItemFieldEntityValue against this StateOrObjectFieldEntityValue.
+		@param scField the ItemFieldEntityValue which to analyze against this StateOrObjectFieldEntityValue.
 		@return A OvalEnum::ResultEnumeration indicating the results of the analysis.
 	*/
 	OvalEnum::ResultEnumeration Analyze(ItemFieldEntityValue* scField);
@@ -153,7 +153,7 @@ private:
 	A vector for storing EntityValue objects. 
 	Stores only pointers to the objects. 
 */
-typedef std::vector < ObjectFieldEntityValue*> ObjectFieldEntityValueVector;
+typedef std::vector < StateOrObjectFieldEntityValue*> StateOrObjectFieldEntityValueVector;
 
 #endif
 
