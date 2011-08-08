@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "ObjectEntity.h"
+#include "StateOrObjectFieldEntityValue.h"
 
 using namespace std;
 
@@ -100,13 +101,43 @@ bool ObjectEntity::Equals(AbsEntity* entity) {
 	return isEqual;
 }
 
-void ObjectEntity::Parse(DOMElement* ObjectEntityElm) {
+void ObjectEntity::Parse(DOMElement* objectEntityElm) {
 
-	this->SetName(XmlCommon::GetElementName(ObjectEntityElm));
-	this->SetValue(XmlCommon::GetDataNodeValue(ObjectEntityElm));
-	this->SetOperation(OvalEnum::ToOperation(XmlCommon::GetAttributeByName(ObjectEntityElm, "operation")));
-	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(ObjectEntityElm, "datatype")));
-	this->SetVarCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(ObjectEntityElm, "var_check")));
+	this->SetName(XmlCommon::GetElementName(objectEntityElm));
+	this->SetOperation(OvalEnum::ToOperation(XmlCommon::GetAttributeByName(objectEntityElm, "operation")));
+	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(objectEntityElm, "datatype")));
+	this->SetVarCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(objectEntityElm, "var_check")));
+
+	// The datatype is not 'record' so we can just grab the string value in the element.
+	if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
+		this->SetValue(XmlCommon::GetDataNodeValue(objectEntityElm));
+	}else{
+		// The datatype is 'record' so we need to loop over all of the elements (which are the fields).
+		DOMNodeList *objectEntityChildren = objectEntityElm->getChildNodes();
+		unsigned int index = 0;
+		AbsEntityValueVector parsedValues;
+		while(index < objectEntityChildren->getLength()) {
+			DOMNode* tmpNode = objectEntityChildren->item(index);
+
+			if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+				DOMElement* objectEntityChild = (DOMElement*)tmpNode;
+
+				//	get the name of the child
+				string childName = XmlCommon::GetElementName(objectEntityChild);
+				if ( childName == "field" || childName == "oval-def:field"){
+					StateOrObjectFieldEntityValue* fev = new StateOrObjectFieldEntityValue();
+					fev->Parse(objectEntityChild);
+					parsedValues.push_back(fev);
+				}else{
+					// shouldn't happen, if we validated against the xml schema...
+					throw Exception("Encountered a non-field child element of "
+						"an object entity with record type (" + childName + ")");
+				}
+			}
+			index ++;
+		}	
+		this->SetValues(parsedValues);
+	}
 
 	// to support version 5.3 it is best to just look for the deprected check = none exist 
 	// and report it in the log
@@ -116,7 +147,7 @@ void ObjectEntity::Parse(DOMElement* ObjectEntityElm) {
 	}
 
 	// get the nill attribute
-	string nilAttr = XmlCommon::GetAttributeByName(ObjectEntityElm, "xsi:nil");
+	string nilAttr = XmlCommon::GetAttributeByName(objectEntityElm, "xsi:nil");
 	if(nilAttr.compare("") == 0 || nilAttr.compare("false") == 0) {
 		this->SetNil(false);
 	} else {
@@ -124,7 +155,7 @@ void ObjectEntity::Parse(DOMElement* ObjectEntityElm) {
 	}
 
 	// get variable value if needed
-	string varRefStr = XmlCommon::GetAttributeByName(ObjectEntityElm, "var_ref");
+	string varRefStr = XmlCommon::GetAttributeByName(objectEntityElm, "var_ref");
 	if(varRefStr.compare("") != 0) {
 		//Log::Debug("ObjectEntity::Parse() - Found var_ref on object entity var id: " + varRefStr);
 		AbsVariable* var = VariableFactory::GetVariable(varRefStr);

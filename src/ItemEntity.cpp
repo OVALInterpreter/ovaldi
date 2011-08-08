@@ -241,12 +241,10 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 	// Add the value(s)
 	AbsEntityValueVector v = this->GetValues();
 	for(AbsEntityValueVector::iterator it = v.begin(); it != v.end();it++){
-		if( ((*it)->GetValue()).compare("") != 0) {
-			if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
-				((StringEntityValue*)*it)->Write(scFile,newItemEntityElem);
-			}else{
-				((ItemFieldEntityValue*)*it)->Write(scFile,newItemEntityElem);
-			}
+		if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
+			((StringEntityValue*)*it)->Write(scFile,newItemEntityElem);
+		}else{
+			((ItemFieldEntityValue*)*it)->Write(scFile,newItemEntityElem);
 		}
 	}
 }

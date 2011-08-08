@@ -119,10 +119,8 @@ void ItemFieldEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scF
         XmlCommon::AddAttribute(newEntityValueElem, "status", strStatus);
 
 	// Add the value
-	if(this->GetValue().compare("") != 0) {
-		DOMText* newEntityValueElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
-		newEntityValueElem->appendChild(newEntityValueElemValue);
-	}
+	DOMText* newEntityValueElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
+	newEntityValueElem->appendChild(newEntityValueElemValue);
 }
 
 void ItemFieldEntityValue::Parse(DOMElement* fieldEntityElm) {

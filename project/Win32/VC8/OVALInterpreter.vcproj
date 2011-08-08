@@ -5,7 +5,7 @@
 	Name="OVALInterpreter"
 	ProjectGUID="{07DF4833-B0AB-4276-807F-5758BF0ED7A9}"
 	RootNamespace="OVALInterpreter"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -27,6 +27,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="0"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -52,8 +53,8 @@
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../../src;../../../src/windows;../../../src/probes/independent;../../../src/probes/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="3"
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
@@ -63,7 +64,7 @@
 				ProgramDataBaseFileName=".\Debug\obj/"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				ShowIncludes="false"
 			/>
@@ -80,13 +81,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib libgcrypt.dll.a"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib libgcrypt.lib"
 				OutputFile="Debug/ovaldiD.exe"
 				Version="2.0"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\build\Win32\Debug"
 				DelayLoadDLLs="Advapi32.dll;Authz.dll"
 				GenerateDebugInformation="true"
+				AssemblyDebug="1"
 				ProgramDatabaseFile=".\Debug/ovaldiD.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -125,6 +127,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="0"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -151,8 +154,8 @@
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../../src;../../../src/windows;../../../src/probes/independent;../../../src/probes/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="3"
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
@@ -179,13 +182,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib libgcrypt.dll.a"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib User32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib libgcrypt.lib"
 				OutputFile="Debug/ovaldiD.exe"
 				Version="2.0"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\build\Win32\Debug"
 				DelayLoadDLLs="Advapi32.dll;Authz.dll"
 				GenerateDebugInformation="true"
+				AssemblyDebug="1"
 				ProgramDatabaseFile=".\Debug/ovaldiD.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -224,6 +228,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -251,7 +256,7 @@
 				AdditionalIncludeDirectories="../../../src;../../../src/windows;../../../src/probes/windows;../../../src/probes/independent"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_WIN32_DCOM"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="true"
@@ -277,12 +282,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib  libgcrypt.dll.a"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib  libgcrypt.lib"
 				OutputFile="Release/ovaldi.exe"
 				Version="5.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				DelayLoadDLLs="Advapi32.dll;Authz.dll"
+				AssemblyDebug="1"
 				ProgramDatabaseFile=".\Release/ovaldi.pdb"
 				SubSystem="1"
 				OptimizeReferences="1"
@@ -322,6 +328,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -350,7 +357,7 @@
 				AdditionalIncludeDirectories="../../../src;../../../src/windows;../../../src/probes/windows;../../../src/probes/independent"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_WIN32_DCOM"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="true"
@@ -376,12 +383,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib  libgcrypt.dll.a"
+				AdditionalDependencies="Wuguid.lib Wbemuuid.lib pcre.lib xerces-c_2.lib Xalan-C_1.lib version.lib imagehlp.lib IPHlpAPI.lib Wldap32.lib Netapi32.lib WS2_32.lib Authz.lib ActiveDs.lib ADSIid.lib Psapi.Lib Dnsapi.lib  libgcrypt.lib"
 				OutputFile="Release/ovaldi.exe"
 				Version="5.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				DelayLoadDLLs="Advapi32.dll;Authz.dll"
+				AssemblyDebug="1"
 				ProgramDatabaseFile=".\Release/ovaldi.pdb"
 				SubSystem="1"
 				OptimizeReferences="1"
@@ -414,6 +422,11 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<AssemblyReference
+			RelativePath="System.Management.Automation.dll"
+			AssemblyName="System.Management.Automation, Version=1.0.0.0, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -549,7 +562,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\StateFieldEntityValue.cpp"
+				RelativePath="..\..\..\src\StateOrObjectFieldEntityValue.cpp"
 				>
 			</File>
 			<File
@@ -597,6 +610,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\CmdletProbe.cpp"
 					>
 				</File>
 				<File
@@ -1086,7 +1103,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\StateFieldEntityValue.h"
+				RelativePath="..\..\..\src\StateOrObjectFieldEntityValue.h"
 				>
 			</File>
 			<File
@@ -1174,6 +1191,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\probes\windows\CmdletProbe.h"
 					>
 				</File>
 				<File

@@ -27,65 +27,36 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
-//
+#ifndef CMDLETPROBE_H
+#define CMDLETPROBE_H
 
-#include "Version.h"
+#include <Item.h>
+#include <Object.h>
+#include <AbsProbe.h>
 
-using namespace std;
-
-// Define the version.  The build and date are automatically updated
-// prior to each build.
-//
-#define MAJOR_VERSION "5"
-#define MIN_COMPATIBLE_VERSION "5.0"
-#define VENDOR "The MITRE Corporation"
-#define VERSION "5.10"
-#define BUILD 2
-
-#define SCHEMA_VERSION "5.10"
-
-string Version::GetMinumumCompatibleVersion() {
-
-	string version;
-	version.append(MIN_COMPATIBLE_VERSION);
-    return(version);
-}
-
-string Version::GetVendor() {
-
-	string vendor;
-	vendor.append(VENDOR);
-    return(vendor);
-}
-
-string Version::GetVersion() {
-
-	string version;
-	version.append(VERSION);
-    return(version);
-}
-
-string Version::GetBuild() {
+/**
+ * This class is responsible for collecting information for windows 
+ * cmdlet_objects.
+ */
+class CmdletProbe : public AbsProbe {
+public:
+	virtual ~CmdletProbe();
 	
-	string version;
-	ostringstream bld;
-	bld << BUILD;
-	version.append(bld.str());
-    return(version);
-}
+	/** Run the cmdlet probe. 
+	    Return a vector of Items
+     */
+	virtual ItemVector* CollectItems(Object* object);
 
-string Version::GetBuildDate() {
+	/** Ensure that the CmdletProbe is a singleton. */
+	static AbsProbe* Instance();
 
-	string version;
-	version.append(__DATE__);
-	version.append(" ");
-	version.append(__TIME__);
-    return(version);
-}
+private:
+	CmdletProbe();
 
-string Version::GetSchemaVersion() {
+	static CmdletProbe* instance;
 
-	string version;
-	version.append(VERSION);
-    return(version);
-}
+	/** Return a new Item created for storing information retrieved by executing a cmdlet. */
+	virtual Item* CreateItem();
+};
+
+#endif

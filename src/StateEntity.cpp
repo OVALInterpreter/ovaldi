@@ -28,7 +28,7 @@
 //
 //****************************************************************************************//
 
-#include "StateFieldEntityValue.h"
+#include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
 
 #include "StateEntity.h"
@@ -173,7 +173,7 @@ void StateEntity::Parse(DOMElement* stateEntityElm) {
 				//	get the name of the child
 				string childName = XmlCommon::GetElementName(stateChild);
 				if ( childName.compare("field") == 0 || childName.compare("oval-def:field") == 0){
-					StateFieldEntityValue* fev = new StateFieldEntityValue();
+					StateOrObjectFieldEntityValue* fev = new StateOrObjectFieldEntityValue();
 					fev->Parse(stateChild);
 					parsedValues.push_back(fev);
 				}else{
