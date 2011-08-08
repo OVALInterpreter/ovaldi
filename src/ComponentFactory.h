@@ -43,6 +43,7 @@
 #include "RegexCaptureFunction.h"
 #include "ArithmeticFunction.h"
 #include "TimeDifferenceFunction.h"
+#include "CountFunction.h"
 
 XERCES_CPP_NAMESPACE_USE
 

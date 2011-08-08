@@ -869,6 +869,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\CountFunction.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\EndFunction.cpp"
 					>
 				</File>
@@ -1443,6 +1447,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\ConstantVariable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\CountFunction.h"
 					>
 				</File>
 				<File
