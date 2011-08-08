@@ -33,7 +33,6 @@
 
 #include "AbsEntity.h" 
 #include "VariableFactory.h"
-#include "StateFieldEntityValue.h"
 
 XERCES_CPP_NAMESPACE_USE
 
