@@ -755,11 +755,6 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
     string objectClassValue = "";
     string pathNameStr = LDAP_PROTOCOL;
     string distinguishedNameStr = ActiveDirectoryProbe::BuildDistinguishedName ( namingContextStr, relativeDnStr );
-    hResult = CoInitialize ( NULL );
-
-    if ( FAILED ( hResult ) ) {
-        throw ProbeException ( "Error: The COM library could not be initialized. Microsoft System Error (" + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-    }
 
     if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::GET_ALL_DISTINGUISHED_NAMES ) == 0 ) {
         pathNameStr.append ( ActiveDirectoryProbe::dnsName );
@@ -1096,7 +1091,6 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
         Log::Debug ( message );
     }
 
-    CoUninitialize();
     return exists;
 }
 

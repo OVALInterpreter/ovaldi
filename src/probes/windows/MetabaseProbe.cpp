@@ -139,12 +139,7 @@ Item* MetabaseProbe::CreateItem() {
 }
 
 void MetabaseProbe::InitializeIMSAdminBaseInterface() {
-	HRESULT hResult = CoInitialize ( NULL );
-
-	if ( hResult != S_OK ) {
-		throw ProbeException ( "Error: The COM library could not be initialized properly." );
-	}
-
+	HRESULT hResult;
 	hResult = CoCreateInstance ( CLSID_MSAdminBase, NULL, CLSCTX_ALL, IID_IMSAdminBase, ( void** ) &metabase );
 
 	if ( hResult != S_OK ) {
@@ -153,7 +148,6 @@ void MetabaseProbe::InitializeIMSAdminBaseInterface() {
 }
 
 void MetabaseProbe::CloseIMSAdminBaseInterface() {
-	CoUninitialize();
 	metabase = NULL;
 }
 

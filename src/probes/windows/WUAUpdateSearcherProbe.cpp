@@ -179,8 +179,6 @@ void WUAUpdateSearcherProbe::ShutdownWUASearcher() {
         pIUSearcher->Release();
         pIUSearcher = NULL;
     }
-
-    CoUninitialize();
 }
 
 Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
@@ -332,13 +330,6 @@ void WUAUpdateSearcherProbe::InitWUASearcher() {
 	HRESULT hres;
 
 	try {
-
-		// establish COM connection
-		hres = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); 
-		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WUAUpdateSearcherProbe) Failed to initialize COM library. " + errorMessage, ERROR_FATAL);
-		}
 
 		// set security of COM connection to the default
 		hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);

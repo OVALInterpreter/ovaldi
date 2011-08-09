@@ -194,13 +194,6 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 	try {
 		HRESULT hres;
 
-		// establish COM connection
-		hres = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); 
-		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WMI57Probe) Failed to initialize COM library.  " + errorMessage, ERROR_FATAL);
-		}
-
 		// set security of COM connection to the default
 		hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
 		if (FAILED(hres)) {
@@ -384,8 +377,6 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		if (pSvc != NULL) pSvc->Release();
 		if (pLoc != NULL) pLoc->Release();
 
-		CoUninitialize();
-
 		// re-throw the error so it can be caught higher up.
 
 		throw ex;
@@ -397,8 +388,6 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		if (pSvc != NULL) pSvc->Release();
 		if (pLoc != NULL) pLoc->Release();
 
-		CoUninitialize();
-
 		// re-throw the error so it can be caught higher up.
 
 		throw ProbeException("An unknown error occured while executing a wql.");
@@ -409,9 +398,6 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 	if (pSvc != NULL) pSvc->Release();
 	if (pLoc != NULL) pLoc->Release();
 
-	// Close the COM library on the current thread
-	CoUninitialize();
-
 	return item;
 }
 
@@ -419,11 +405,7 @@ StringVector* WMI57Probe::GetWqlFields(string wqlIn, WQLFieldType wqlFieldType) 
 	IWbemQuery *wqlQuery = NULL;
 	HRESULT hResult = NULL;
 	StringVector* fieldNames = new StringVector();
-	if ( FAILED((hResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))) {
-			string errorMessage = _com_error(hResult).ErrorMessage();
-			throw ProbeException("(WMI57Probe) Failed to initialize COM library.  " + errorMessage, ERROR_FATAL);
-	}
-	
+
 	if ( FAILED((hResult = CoCreateInstance(CLSID_WbemQuery,0,CLSCTX_INPROC_SERVER,IID_IWbemQuery,(LPVOID *)&wqlQuery)))) {
 			string errorMessage = _com_error(hResult).ErrorMessage();
 			throw ProbeException("(WMI57Probe) Failed to create IWbemQuery object.  " + errorMessage, ERROR_FATAL);
@@ -477,8 +459,5 @@ StringVector* WMI57Probe::GetWqlFields(string wqlIn, WQLFieldType wqlFieldType) 
 		throw ProbeException("(WMI57Probe) Failed to parse the wql.  " + errorMessage, ERROR_FATAL);
 	}
 	
-	// Close the COM library on the current thread
-	CoUninitialize();
-
 	return fieldNames;
 }

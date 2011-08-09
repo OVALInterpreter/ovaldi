@@ -191,13 +191,6 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 	try {
 		HRESULT hres;
 
-		// establish COM connection
-		hres = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); 
-		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WMIProbe) Failed to initialize COM library.  " + errorMessage, ERROR_FATAL);
-		}
-
 		// set security of COM connection to the default
 		hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
 		if (FAILED(hres)) {
@@ -394,8 +387,6 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		if (pSvc != NULL) pSvc->Release();
 		if (pLoc != NULL) pLoc->Release();
 
-		CoUninitialize();
-
 		// re-throw the error so it can be caught higher up.
 
 		throw ex;
@@ -407,8 +398,6 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		if (pSvc != NULL) pSvc->Release();
 		if (pLoc != NULL) pLoc->Release();
 
-		CoUninitialize();
-
 		// re-throw the error so it can be caught higher up.
 
 		throw ProbeException("An unknown error occured while executing a wql.");
@@ -418,9 +407,6 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 	if (pEnumerator != NULL) pEnumerator->Release();
 	if (pSvc != NULL) pSvc->Release();
 	if (pLoc != NULL) pLoc->Release();
-
-	// Close the COM library on the current thread
-	CoUninitialize();
 
 	return item;
 }
