@@ -194,13 +194,6 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 	try {
 		HRESULT hres;
 
-		// set security of COM connection to the default
-		hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
-		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WMI57Probe) Failed to initialize COM security.  " + errorMessage, ERROR_FATAL);
-		}
-
 		// find the WMI Locator
 		hres = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
 		if (FAILED(hres)) {

@@ -331,13 +331,6 @@ void WUAUpdateSearcherProbe::InitWUASearcher() {
 
 	try {
 
-		// set security of COM connection to the default
-		hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
-		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
-			throw ProbeException("(WUAUpdateSearcherProbe) Failed to initialize COM security. " + errorMessage, ERROR_FATAL);
-		}
-
 		// create the Update Session			
 		hres = CoCreateInstance(CLSID_UpdateSession, NULL, CLSCTX_INPROC_SERVER, IID_IUpdateSession, (LPVOID *)&pIUpdateSession);
 		if (FAILED(hres)) {
