@@ -925,6 +925,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\src\UniqueFunction.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\src\VariableComponent.cpp"
 					>
 				</File>
@@ -1503,6 +1507,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\TimeDifferenceFunction.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\src\UniqueFunction.h"
 					>
 				</File>
 				<File

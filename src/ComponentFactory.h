@@ -44,6 +44,7 @@
 #include "ArithmeticFunction.h"
 #include "TimeDifferenceFunction.h"
 #include "CountFunction.h"
+#include "UniqueFunction.h"
 
 XERCES_CPP_NAMESPACE_USE
 
