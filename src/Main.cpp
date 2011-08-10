@@ -102,6 +102,7 @@ int main(int argc, char* argv[]) {
 		Log::SetToScreen(false);
 	#endif
 
+#ifdef WIN32
 	// set security of COM connection to the default
 	// can only be done once!
 	HRESULT hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
@@ -110,6 +111,7 @@ int main(int argc, char* argv[]) {
 		Log::Fatal("Failed to initialize COM security: " + errorMessage);
 		return EXIT_FAILURE;
 	}
+#endif
 
 	//////////////////////////////////////////////////////
 	/////////  Parse Command-line Options  ///////////////
