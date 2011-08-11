@@ -74,6 +74,7 @@
 #include "SelinuxSecurityContextProbe.h"
 #include "SelinuxBooleanProbe.h"
 #include "IfListenersProbe.h"
+#include "SysctlProbe.h"
 
 class AbsProbe;
 
