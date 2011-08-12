@@ -32,6 +32,16 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.10 build 1     ---
+---------------------------------------
+
+* Added support for the win-def:cmdlet_test.
+* Added support for the oval-def:unique function.
+* Added support for the oval-def:count function.
+* Removed all COM init/uninit code, since in a managed application, the CLR handles this for you.
+* Added support for the unix-def:sysctl_test.
+
+---------------------------------------
 ---        Version 5.9 build 2      ---
 ---------------------------------------
 
