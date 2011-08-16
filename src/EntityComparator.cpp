@@ -36,10 +36,11 @@
 // stupid windows doesn't have stdint.h.... sigh
 #  include <BaseTsd.h> // for UINT32
 #  define uint32_t UINT32
-#  include <winsock2.h> // for struct in_addr
+#  include <winsock2.h>
 #else
 #  include <stdint.h>
 #  include <netinet/in.h>
+#  include <arpa/inet.h>
 #endif
 
 #include "EntityComparator.h"
