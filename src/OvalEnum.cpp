@@ -254,6 +254,9 @@ string OvalEnum::DatatypeToString(OvalEnum::Datatype datatype){
 		case (DATATYPE_RECORD):
 			datatypeStr = "record";
 			break;
+		case (DATATYPE_IPV4_ADDRESS):
+			datatypeStr = "ipv4_address";
+			break;
 		default:	
 			throw Exception("OvalEnum::DatatypeToString - Error unsupported datatype.");
 			break;
@@ -290,6 +293,8 @@ OvalEnum::Datatype OvalEnum::ToDatatype(string datatypeStr){
 		datatype = DATATYPE_VERSION;
 	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_RECORD)) == 0) {
 		datatype = DATATYPE_RECORD;
+	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_IPV4_ADDRESS)) == 0) {
+		datatype = DATATYPE_IPV4_ADDRESS;
 	} else {
 		throw Exception("OvalEnum::ToDatatype - Error unsupported datatype value: " + datatypeStr);
 	}
@@ -556,6 +561,12 @@ string OvalEnum::OperationToString(OvalEnum::Operation operation){
 			operationStr = "case insensitive not equal";
 			break;
         /* LS End */
+		case (OPERATION_SUBSET_OF):
+			operationStr = "subset of";
+			break;
+		case (OPERATION_SUPERSET_OF):
+			operationStr = "superset of";
+			break;
 		default:
 			throw Exception("OvalEnum::OperationToString - Error unsupported operation value.");
 			break;
@@ -594,6 +605,10 @@ OvalEnum::Operation OvalEnum::ToOperation(string operationStr){
 		operation = OPERATION_CASE_INSENSITIVE_EQUALS;
 	} else if(operationStr.compare(OvalEnum::OperationToString(OPERATION_CASE_INSENSITIVE_NOT_EQUAL)) == 0) {
 		operation = OPERATION_CASE_INSENSITIVE_NOT_EQUAL;
+	} else if(operationStr.compare(OvalEnum::OperationToString(OPERATION_SUBSET_OF)) == 0) {
+		operation = OPERATION_SUBSET_OF;
+	} else if(operationStr.compare(OvalEnum::OperationToString(OPERATION_SUPERSET_OF)) == 0) {
+		operation = OPERATION_SUPERSET_OF;
 	} else {
 		throw Exception("OvalEnum::ToOperation - Error unsupported operation value: " + operationStr);
 	}

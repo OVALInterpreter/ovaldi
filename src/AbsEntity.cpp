@@ -217,6 +217,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 				result = EntityComparator::CompareVersion(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
 				result = EntityComparator::CompareRecord(this->GetOperation(), this->GetValues(), scElement->GetValues());
+			} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
+				result = EntityComparator::CompareIpv4Address(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			}
 
 		} else {
@@ -246,6 +248,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 						tmp = EntityComparator::CompareVersion(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
 						throw Exception("Error: A var_ref attribute is not allowed on an entity with a datatype of 'record'.");
+					} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
+						tmp = EntityComparator::CompareIpv4Address(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
 					}
 
 					results.push_back(tmp);

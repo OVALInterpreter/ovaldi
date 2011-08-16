@@ -212,6 +212,8 @@ OvalEnum::ResultEnumeration StateOrObjectFieldEntityValue::Analyze(ItemFieldEnti
 				result = EntityComparator::CompareString(this->GetOperation(), this->GetValue(), scField->GetValue());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 				result = EntityComparator::CompareVersion(this->GetOperation(), this->GetValue(), scField->GetValue());
+			} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
+				result = EntityComparator::CompareIpv4Address(this->GetOperation(), this->GetValue(), scField->GetValue());
 			}
 
 		} else {
@@ -239,6 +241,8 @@ OvalEnum::ResultEnumeration StateOrObjectFieldEntityValue::Analyze(ItemFieldEnti
 						tmp = EntityComparator::CompareString(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
 						tmp = EntityComparator::CompareVersion(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+					} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
+						tmp = EntityComparator::CompareIpv4Address(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
 					}
 
 					results.push_back(tmp);

@@ -87,6 +87,10 @@ public:
 	*/
 	static OvalEnum::ResultEnumeration CompareVersion(OvalEnum::Operation op, std::string defValue, std::string scValue);
 
+	/** Compare two ipv4_address strings based on the input operation. 
+		@return Returns the result of the comparison.
+	*/
+	static OvalEnum::ResultEnumeration CompareIpv4Address(OvalEnum::Operation op, std::string defValue, std::string scValue);
 private:
 
 	/** 

@@ -79,7 +79,8 @@ public:
 					DATATYPE_EVR_STRING,
 					DATATYPE_FLOAT,
 					DATATYPE_VERSION,
-					DATATYPE_RECORD};
+					DATATYPE_RECORD,
+					DATATYPE_IPV4_ADDRESS};
 	static std::string DatatypeToString(OvalEnum::Datatype datatype);
 	static OvalEnum::Datatype ToDatatype(std::string datatypeStr);
 
@@ -123,7 +124,10 @@ public:
 					OPERATION_BITWISE_OR, 
 					OPERATION_PATTERN_MATCH,
 					OPERATION_CASE_INSENSITIVE_EQUALS,
-					OPERATION_CASE_INSENSITIVE_NOT_EQUAL };
+					OPERATION_CASE_INSENSITIVE_NOT_EQUAL,
+					OPERATION_SUBSET_OF,
+					OPERATION_SUPERSET_OF
+	};
 	static std::string OperationToString(OvalEnum::Operation operation);
 	static OvalEnum::Operation ToOperation(std::string operationStr);
 

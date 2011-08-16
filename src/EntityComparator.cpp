@@ -28,13 +28,126 @@
 //
 //****************************************************************************************//
 
+#include <cassert>
 #include <typeinfo>
+#include <ostream>
+
+#ifdef WIN32
+// stupid windows doesn't have stdint.h.... sigh
+#  include <BaseTsd.h> // for UINT32
+#  define uint32_t UINT32
+#  include <winsock2.h> // for struct in_addr
+#else
+#  include <stdint.h>
+#  include <netinet/in.h>
+#endif
 
 #include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "ItemFieldEntityValue.h"
 
 using namespace std;
+
+namespace {
+	/**
+	 * Represents the ipv4 address of a host or network.  A prefix size
+	 * can be specified in CIDR-notation, or a netmask in CIDR-like notation.
+	 * A host address has a prefix size of 32.  Bits outside the prefix are
+	 * ignored.  Addresses in in_addr structs passed in and out of methods of
+	 * this class are assumed to be in host byte order.  I think it makes the 
+	 * bit-twiddling code clearer.
+	 * <p>
+	 * One might think this class could be useful in other areas of the code.
+	 * I hope someone factors (or allows me to factor) it out, if necessary.
+	 */
+	class Ipv4Address {
+
+	public:
+		Ipv4Address(const string &addrStr) {
+			setFromString(addrStr);
+
+			// simple check that might catch netmask/prefixSize
+			// desync error.  But might not.
+			assert(
+				(prefixSize==0 && netmask.s_addr==0) ||
+				(prefixSize>0 && (netmask.s_addr & (1U<<(32-prefixSize))))
+			);
+		}
+
+		/**
+		 * Two ipv4 addresses are equal if their prefix bits are equal
+		 * (so they must have the same netmask).  Address bits outside the
+		 * prefix are ignored.
+		 */
+		bool operator==(const Ipv4Address &other) const {
+			return getInAddr().s_addr == other.getInAddr().s_addr &&
+				getNetmask().s_addr == other.getNetmask().s_addr;
+		}
+
+		/**
+		 * Two ipv4 addresses are equal if their prefix bits are equal
+		 * (so they must have the same netmask).  Address bits outside the
+		 * prefix are ignored.
+		 */
+		bool operator!=(const Ipv4Address &other) const {
+			return !(*this == other);
+		}
+
+		/**
+		 * Returns the number of bits in the prefix.  (== number
+		 * of 1 bits in the netmask.)
+		 */
+		size_t getPrefixSize() const {
+			return prefixSize;
+		}
+
+		/**
+		 * Gets a prefix netmask, i.e. an ipv4 address such that
+		 * some contiguous sequence of high-order bits are all 1,
+		 * and all remaining bits are 0.
+		 */
+		in_addr getNetmask() const {
+			return netmask;
+		}
+
+		/**
+		 * Gets an in_addr structure for this address.
+		 */
+		in_addr getInAddr() const {
+			return addr;
+		}
+
+		/**
+		 * Returns true if \p otherAddr is a prefix of or equal to this
+		 * address.
+		 */
+		bool subsetOf(const Ipv4Address &otherAddr) const;
+
+		/**
+		 * Returns true if this address is a prefix of or equal to
+		 * otherAddr.
+		 */
+		bool supersetOf(const Ipv4Address &otherAddr) const {
+			return otherAddr.subsetOf(*this);
+		}
+
+	private:
+
+		void setFromString(const string &addrStr);
+
+		in_addr addr;
+
+		// the following two of course must be kept in sync!
+		// It's faster to keep both than repeatedly compute one
+		// from the other.
+		in_addr netmask;
+		size_t prefixSize;
+	};
+
+	in_addr dottedQuadToInAddr(const string &addrStr);
+
+	ostream &operator<<(ostream &out, const Ipv4Address &addr);
+}
 
 //****************************************************************************************//
 //								EntityComparator Class									  //	
@@ -906,3 +1019,191 @@ string EntityComparator::GetReleaseFromEVR(string evrStr) {
 	return release;
 }
 
+OvalEnum::ResultEnumeration EntityComparator::CompareIpv4Address(OvalEnum::Operation op, string defValue, string scValue) {
+
+	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+
+	Ipv4Address defAddr(defValue), scAddr(scValue);
+
+	switch (op) {
+	case OvalEnum::OPERATION_EQUALS:
+		result = scAddr == defAddr ? 
+			OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_NOT_EQUAL:
+		result = scAddr == defAddr ? 
+			OvalEnum::RESULT_FALSE : OvalEnum::RESULT_TRUE;
+		break;
+
+	case OvalEnum::OPERATION_GREATER_THAN:
+		result = scAddr.getNetmask().s_addr != defAddr.getNetmask().s_addr ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getInAddr().s_addr > defAddr.getInAddr().s_addr ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL:
+		result = scAddr.getNetmask().s_addr != defAddr.getNetmask().s_addr ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getInAddr().s_addr >= defAddr.getInAddr().s_addr ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_LESS_THAN:
+		result = scAddr.getNetmask().s_addr != defAddr.getNetmask().s_addr ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getInAddr().s_addr < defAddr.getInAddr().s_addr ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_LESS_THAN_OR_EQUAL:
+		result = scAddr.getNetmask().s_addr != defAddr.getNetmask().s_addr ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getInAddr().s_addr <= defAddr.getInAddr().s_addr ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_SUBSET_OF:
+		result = scAddr.subsetOf(defAddr) ? 
+			OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_SUPERSET_OF:
+		result = scAddr.supersetOf(defAddr) ? 
+			OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	default:
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
+	}
+
+	return result;
+}
+
+namespace {
+
+	bool Ipv4Address::subsetOf(const Ipv4Address &otherAddr) const {
+		if (getPrefixSize() < otherAddr.getPrefixSize())
+			return false;
+		// here, otherAddr must have an equal or shorter prefix
+		in_addr otherNetmask = otherAddr.getNetmask();
+		return (otherAddr.getInAddr().s_addr & otherNetmask.s_addr) ==
+			(getInAddr().s_addr & otherNetmask.s_addr);
+	}
+
+	void Ipv4Address::setFromString(const string &addrStr) {
+		REGEX re;
+		string netmaskPart, ipPart;
+
+		size_t slashOffset = addrStr.find('/');
+		if (slashOffset == string::npos) 
+			ipPart = addrStr;
+		else {
+			if (slashOffset < addrStr.size()-1)
+				netmaskPart = addrStr.substr(slashOffset+1);
+			ipPart = addrStr.substr(0, slashOffset);
+		}
+
+		// ---- IP part
+		this->addr = dottedQuadToInAddr(ipPart);
+
+		// ---- netmask/prefix part
+		if (netmaskPart.empty()) {
+			// if no '/' was found, interpret as a host address
+			// (prefixSize==32)
+			this->netmask.s_addr = 0xFFFFFFFFU;
+			this->prefixSize = 32;
+
+		} else if (re.IsMatch("^\\d+$", netmaskPart.c_str())) {
+			if (!Common::FromString(netmaskPart, &this->prefixSize))
+				throw Exception("Invalid ipv4_address syntax: "+addrStr);
+			if (this->prefixSize > 32)
+				throw Exception("Invalid ipv4_address syntax (CIDR prefix size out of range): "+addrStr);
+
+			// I found out the hard way that bit-shifting by greater than
+			// or equal to 8*sizeof(T) bits is undefined... :-P  So gotta always
+			// special-case 32-bit shifts!
+			this->netmask.s_addr = this->prefixSize==0 ? 0 : (0xFFFFFFFFU << (32 - this->prefixSize));
+
+		} else if (re.IsMatch("^\\d+\\.\\d+\\.\\d+\\.\\d+$", netmaskPart.c_str())) {
+			this->netmask = dottedQuadToInAddr(netmaskPart);
+
+			// make sure the value consists all 1 bits on the left and
+			// all 0 bits on the right.  So no "01" bit sequences.
+			// The loop does double-duty, also finding the first 1 bit
+			// so we can compute the prefix size.
+			int idxOfFirst1 = -1;
+			for (int i=0; i<31; ++i) {
+				if (this->netmask.s_addr & (1U << i)) {
+					if (!(this->netmask.s_addr & (1U << (i+1))))
+						throw Exception("Invalid ipv4_address syntax (netmask doesn't represent a prefix): "+addrStr);
+					else if (idxOfFirst1 == -1)
+						idxOfFirst1 = i;
+				}
+			}
+
+			// the above loop only looped up to bit 30 (indexed
+			// starting at 0).  So if we didn't find a 1 bit, we check 
+			// bit 31 here.  If the netmask is 0.0.0.0, the prefix
+			// size is also set to 0.
+			if (idxOfFirst1 == -1) {
+				if (this->netmask.s_addr & 0x80000000U)
+					this->prefixSize = 1;
+				else
+					this->prefixSize = 0;
+			} else
+				this->prefixSize = 32 - idxOfFirst1;
+
+		} else
+			throw Exception("Invalid ipv4_address syntax (bad CIDR prefix size or netmask):"+addrStr);
+
+		// Strip off the low bits, since we're ignoring them.
+		// This will simplify other code, which can assume that
+		// the lower order bits are always 0.
+		this->addr.s_addr &= this->netmask.s_addr;
+	}
+
+	in_addr dottedQuadToInAddr(const string &addrStr) {
+		REGEX re;
+		if (!re.IsMatch("^\\d+\\.\\d+\\.\\d+\\.\\d+$", addrStr.c_str()))
+			throw Exception("Invalid ipv4 address syntax: "+addrStr);
+
+		// can't use inet_addr(), since it would interpret
+		// 0-prefixed values as octal, 0x as hex, etc.  But
+		// the oval spec doesn't allow non-digits in an octet,
+		// and doesn't ascribe any special meaning to leading zeros.
+		vector<StringVector> matches;
+		re.GetAllMatchingSubstrings("\\d+", addrStr, matches);
+		if (matches.size() != 4)
+			throw Exception("Invalid ipv4 address syntax (must be exactly 4 octets): "+addrStr);
+
+		uint32_t octet[4];
+		for (int i=0; i<4; ++i) {
+			if (!Common::FromString(matches[i][0], &octet[i]))
+				throw Exception("Couldn't parse octet in "+addrStr+" ("+matches[i][0]+')');
+			if (octet[i] > 255) 
+				throw Exception("Octet out of range in "+addrStr);
+		}
+
+		in_addr result;
+		result.s_addr =
+			(octet[0]<<24) |
+			(octet[1]<<16) |
+			(octet[2]<<8) |
+			octet[3];
+
+		return result;
+	}
+
+	ostream &operator<<(ostream &out, const Ipv4Address &addr) {
+		// inet_ntoa is gonna expect network byte order, so I gotta
+		// flip the bytes.
+		in_addr tmp;
+		tmp.s_addr = htonl(addr.getInAddr().s_addr);
+		out << inet_ntoa(tmp);
+		if (addr.getPrefixSize() < 32)
+			out << '/' << addr.getPrefixSize();
+		return out;
+	}
+}
