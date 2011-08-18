@@ -190,17 +190,15 @@ class Common {
 		 * "Casts" from a string to type T.  The result is placed at the address
 		 * pointed to by \p to.  T must be a type such that 'in >> val'
 		 * is legal, where in is an istringstream, and val is of type T&.  Inspired
-		 * by boost's lexical_cast function.
+		 * by boost's lexical_cast function.  There is a specialization of the
+		 * template for T=bool, since you don't seem to be able to tell an istream
+		 * to accept both 1 and "true" for true, and similar for false.  So that
+		 * specialization doesn't use istreams at all.
+		 *
 		 * @return false on failure, true on success
 		 */
 		template<typename T>
-		static bool FromString(const std::string &str, T *to) {
-			std::istringstream iss(str);
-			iss >> std::boolalpha >> *to;
-			if (!iss)
-				return false;
-			return true;
-		}
+		static bool FromString(const std::string &str, T *to);
 
 		/** Converts a string into a string of all uppercase characters.
 		 *	@param s The string that you would like to convert into all uppercase characters.
@@ -302,6 +300,18 @@ class Common {
 		static const std::string DEFINITION_ID_LIST;
 
 };
+
+template<typename T>
+bool Common::FromString(const std::string &str, T *to) {
+	std::istringstream iss(str);
+	iss >> *to;
+	if (!iss)
+		return false;
+	return true;
+}
+
+template<>
+bool Common::FromString<bool>(const std::string &str, bool *to);
 
 /** 
 	This class represents an Exception that occured while running a function in the Common class.

@@ -878,6 +878,19 @@ bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
 	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
 }
 
+template<>
+bool Common::FromString<bool>(const std::string &str, bool *to) {
+	if (str=="1" || Common::EqualsIgnoreCase(str, "true")) {
+		*to = true;
+		return true;
+	} else if (str=="0" || Common::EqualsIgnoreCase(str, "false")) {
+		*to = false;
+		return true;
+	}
+
+	return false;
+}
+
 //****************************************************************************************//
 //							CommonException Class										  //	
 //****************************************************************************************//
