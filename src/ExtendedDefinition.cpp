@@ -35,8 +35,9 @@ using namespace std;
 //****************************************************************************************//
 //								ExtendedDefinition Class								  //	
 //****************************************************************************************//
-ExtendedDefinition::ExtendedDefinition(bool negate, OvalEnum::ResultEnumeration result, Definition* definitionRef) 
-					: AbsCriteria(negate, result) {
+ExtendedDefinition::ExtendedDefinition(bool negate, ApplicabilityCheck appCheck, OvalEnum::ResultEnumeration result, Definition* definitionRef)
+					: AbsCriteria(negate, appCheck, result) {
+
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -83,6 +84,12 @@ void ExtendedDefinition::Write(DOMElement* parentElm) {
 
 	XmlCommon::AddAttribute(extendedDefinitionElm, "version", Common::ToString(this->GetDefinitionRef()->GetVersion()));
 
+	if (this->GetApplicabilityCheck() == APPLICABILITY_CHECK_TRUE)
+		XmlCommon::AddAttribute(extendedDefinitionElm, "applicability_check", "true");
+	else if (this->GetApplicabilityCheck() == APPLICABILITY_CHECK_FALSE)
+		XmlCommon::AddAttribute(extendedDefinitionElm, "applicability_check", "false");
+	// else, leave the attribute off
+
 	if(this->GetDefinitionRef()->GetVariableInstance() != 1) {
 		XmlCommon::AddAttribute(extendedDefinitionElm, "variable_instance", Common::ToString(this->GetDefinitionRef()->GetVariableInstance()));
 	}
@@ -105,6 +112,18 @@ void ExtendedDefinition::Parse(DOMElement* extendedDefinitionElm) {
         this->SetNegate(false);
 	} else {
 	    this->SetNegate(true);
+	}
+
+	string appCheckStr = XmlCommon::GetAttributeByName(extendedDefinitionElm,
+		"applicability_check");
+	if (appCheckStr.empty())
+		this->SetApplicabilityCheck(APPLICABILITY_CHECK_UNKNOWN);
+	else {
+		bool appCheckBool;
+		if (!Common::FromString(appCheckStr, &appCheckBool))
+			throw Exception("Can't interpret "+appCheckStr+" as an xsd:boolean!");
+		this->SetApplicabilityCheck(appCheckBool ? APPLICABILITY_CHECK_TRUE :
+			APPLICABILITY_CHECK_FALSE);
 	}
 
 	// get the definition ref

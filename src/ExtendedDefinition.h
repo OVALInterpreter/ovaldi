@@ -47,7 +47,7 @@ class Definition;
 class ExtendedDefinition : public AbsCriteria {
 
 public:
-	ExtendedDefinition(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, Definition* definitionRef = NULL);
+	ExtendedDefinition(bool negate = false, ApplicabilityCheck appCheck = APPLICABILITY_CHECK_UNKNOWN, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, Definition* definitionRef = NULL);
 	~ExtendedDefinition();
 
 	/** Writes a ExtendedDefinition element as a child of the parentElm.

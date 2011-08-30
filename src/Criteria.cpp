@@ -35,8 +35,11 @@ using namespace std;
 //****************************************************************************************//
 //								AbsCriteria Class										  //	
 //****************************************************************************************//
-Criteria::Criteria(bool negate, OvalEnum::ResultEnumeration result, string comment, OvalEnum::Operator op) 
-					: AbsCriteria(negate, result) {
+Criteria::Criteria(bool negate, ApplicabilityCheck appCheck,
+		OvalEnum::ResultEnumeration result, std::string comment,
+		OvalEnum::Operator op)
+					: AbsCriteria(negate, appCheck, result) {
+//Criteria::Criteria(bool negate, OvalEnum::ResultEnumeration result, string comment, OvalEnum::Operator op) 
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -146,6 +149,11 @@ void Criteria::Write(DOMElement* parentElm) {
 
 	XmlCommon::AddAttribute(criteriaElm, "result", OvalEnum::ResultToString(this->GetResult()));
 	
+	if (this->GetApplicabilityCheck() == APPLICABILITY_CHECK_TRUE)
+		XmlCommon::AddAttribute(criteriaElm, "applicability_check", "true");
+	else if (this->GetApplicabilityCheck() == APPLICABILITY_CHECK_FALSE)
+		XmlCommon::AddAttribute(criteriaElm, "applicability_check", "false");
+	// else, leave the attribute off
 
 	// loop through all childCriteria and call write method
 	AbsCriteriaVector::iterator iterator;
@@ -172,6 +180,21 @@ void Criteria::Parse(DOMElement* criteriaElm) {
 	}
 	
 	this->SetOperator(OvalEnum::ToOperator(XmlCommon::GetAttributeByName(criteriaElm, "operator")));
+
+	string appCheckStr = XmlCommon::GetAttributeByName(criteriaElm,
+		"applicability_check");
+	if (appCheckStr.empty())
+		// actually a little fib... I think the value is deducible if
+		// not explicitly given, according to rules I've proposed, but
+		// I don't think anyone wants me to try to deduce it. :-P
+		this->SetApplicabilityCheck(APPLICABILITY_CHECK_UNKNOWN);
+	else {
+		bool appCheckBool;
+		if (!Common::FromString(appCheckStr, &appCheckBool))
+			throw Exception("Can't interpret "+appCheckStr+" as an xsd:boolean!");
+		this->SetApplicabilityCheck(appCheckBool ? APPLICABILITY_CHECK_TRUE :
+			APPLICABILITY_CHECK_FALSE);
+	}
 
 	// loop over all child elements and call AbsCriteria-.Parse
 	DOMNodeList *criteriaChildren = criteriaElm->getChildNodes();

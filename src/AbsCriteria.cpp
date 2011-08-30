@@ -33,10 +33,12 @@
 //****************************************************************************************//
 //								AbsCriteria Class										  //	
 //****************************************************************************************//
-AbsCriteria::AbsCriteria(bool negate, OvalEnum::ResultEnumeration result) {
+AbsCriteria::AbsCriteria(bool negate, ApplicabilityCheck appCheck,
+						 OvalEnum::ResultEnumeration result) {
 
 	this->SetNegate(negate);
 	this->SetResult(result);
+	this->SetApplicabilityCheck(appCheck);
 }
 
 AbsCriteria::~AbsCriteria() {
@@ -65,4 +67,12 @@ OvalEnum::ResultEnumeration AbsCriteria::GetResult() {
 void AbsCriteria::SetResult(OvalEnum::ResultEnumeration result) {
 
 	this->result = result;
+}
+
+void AbsCriteria::SetApplicabilityCheck(AbsCriteria::ApplicabilityCheck appCheck) {
+	this->applicabilityCheck = appCheck;
+}
+
+AbsCriteria::ApplicabilityCheck AbsCriteria::GetApplicabilityCheck() {
+	return this->applicabilityCheck;
 }

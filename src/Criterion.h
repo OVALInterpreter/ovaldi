@@ -47,7 +47,8 @@ class Criterion : public AbsCriteria {
 
 public:
 	/** Create a complete Criterion object. */
-	Criterion(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, Test* testRef = NULL);
+	Criterion(bool negate = false, ApplicabilityCheck appCheck = APPLICABILITY_CHECK_UNKNOWN,
+		OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, Test* testRef = NULL);
 	/** Empty destructor. */
 	~Criterion();
 

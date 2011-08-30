@@ -35,8 +35,10 @@ using namespace std;
 //****************************************************************************************//
 //								Criterion Class											  //	
 //****************************************************************************************//
-Criterion::Criterion(bool negate, OvalEnum::ResultEnumeration result, Test* testRef) 
-					: AbsCriteria(negate, result) {
+Criterion::Criterion(bool negate, ApplicabilityCheck appCheck,
+		OvalEnum::ResultEnumeration result, Test* testRef)
+					: AbsCriteria(negate, appCheck, result) {
+//Criterion::Criterion(bool negate, OvalEnum::ResultEnumeration result, Test* testRef) 
 
 	this->SetTestRef(testRef);
 }
@@ -82,6 +84,12 @@ void Criterion::Write(DOMElement* parentElm) {
 
 	XmlCommon::AddAttribute(criterionElm, "result", OvalEnum::ResultToString(this->GetResult()));
 
+	if (this->GetApplicabilityCheck() == APPLICABILITY_CHECK_TRUE)
+		XmlCommon::AddAttribute(criterionElm, "applicability_check", "true");
+	else if (this->GetApplicabilityCheck() == APPLICABILITY_CHECK_FALSE)
+		XmlCommon::AddAttribute(criterionElm, "applicability_check", "false");
+	// else, leave the attribute off
+
 	// write the test ref
 	this->GetTestRef()->Write(Analyzer::GetResultsSystemTestsElm());
 }
@@ -94,6 +102,21 @@ void Criterion::Parse(DOMElement* criterionElm) {
         this->SetNegate(false);
 	} else {
 	    this->SetNegate(true);
+	}
+
+	string appCheckStr = XmlCommon::GetAttributeByName(criterionElm,
+		"applicability_check");
+	if (appCheckStr.empty())
+		// actually a little fib... I think the value is deducible if
+		// not explicitly given, according to rules I've proposed, but
+		// I don't think anyone wants me to try to deduce it. :-P
+		this->SetApplicabilityCheck(APPLICABILITY_CHECK_UNKNOWN);
+	else {
+		bool appCheckBool;
+		if (!Common::FromString(appCheckStr, &appCheckBool))
+			throw Exception("Can't interpret "+appCheckStr+" as an xsd:boolean!");
+		this->SetApplicabilityCheck(appCheckBool ? APPLICABILITY_CHECK_TRUE :
+			APPLICABILITY_CHECK_FALSE);
 	}
 
 	string testRefStr = XmlCommon::GetAttributeByName(criterionElm, "test_ref");

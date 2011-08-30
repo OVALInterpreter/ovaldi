@@ -52,11 +52,29 @@ class AbsCriteria;
 class AbsCriteria {
 
 public :
+
+	/**
+	 * Possible values for a criteria, criterion, or extend_definition's
+	 * applicability_check attribute.  APPLICABILITY_CHECK_UNKNOWN is
+	 * required as a possible value because the attribute is optional,
+	 * and the definition referenced by an extend_definition element may
+	 * not be available.  So you wouldn't be able to determine the actual
+	 * value of the attribute.  Actually, assuming the document is valid,
+	 * it would sometimes be deducible from the applicability_check's of
+	 * other criteria/on in the definition, but not always.
+	 */
+	enum ApplicabilityCheck {
+		APPLICABILITY_CHECK_FALSE,
+		APPLICABILITY_CHECK_TRUE,
+		APPLICABILITY_CHECK_UNKNOWN
+	};
+
 	/** Create a complete AbsCriteria object. 
 		All paremters are initialized with default values. 
 		Default values are: negate = false; result = error
 	*/
-	AbsCriteria(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR);
+	AbsCriteria(bool negate = false, ApplicabilityCheck appCheck = APPLICABILITY_CHECK_UNKNOWN,
+		OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR);
 
 	/** Empty destructor. */
 	virtual ~AbsCriteria();
@@ -83,11 +101,19 @@ public :
 	/** Set the negate attribute for the criteria. */
 	void SetNegate(bool negate);
 
+	void SetApplicabilityCheck(ApplicabilityCheck appCheck);
+	ApplicabilityCheck GetApplicabilityCheck();
+
 private:
 	/** A flag used to indicate wheter or not that result of this criteria should be negated. */
 	bool negate;
 	/** The result of this criteria after it has been analyzed. */
 	OvalEnum::ResultEnumeration result;
+	/**
+	 * Whether this criteria/criterion is considered an (or part of an)
+	 * applicability check.
+	 */
+	ApplicabilityCheck applicabilityCheck;
 };
 
 /**	

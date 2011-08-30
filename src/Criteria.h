@@ -48,7 +48,9 @@ typedef std::vector < AbsCriteria* > AbsCriteriaVector;
 class Criteria : public AbsCriteria {
 
 public:
-	Criteria(bool negate = false, OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, std::string comment = "", OvalEnum::Operator op = OvalEnum::OPERATOR_AND);
+	Criteria(bool negate = false, ApplicabilityCheck appCheck = APPLICABILITY_CHECK_UNKNOWN,
+		OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR, std::string comment = "",
+		OvalEnum::Operator op = OvalEnum::OPERATOR_AND);
 	~Criteria();
 
 	void Write(DOMElement* parent);
