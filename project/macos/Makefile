@@ -40,7 +40,7 @@ UNIXPROBEDIR = ${SRCDIR}/probes/unix
 MACOSPROBEDIR = ${SRCDIR}/probes/macos
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
 
-INCDIRS = -I${MACOSDIR} -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I/opt/local/include -I/usr/local/include -I/usr/include
+INCDIRS = -I${MACOSDIR} -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I$(UNIXDIR) -I/opt/local/include -I/usr/local/include -I/usr/include
 
 EXECUTABLE = $(OUTDIR)/ovaldi
 
