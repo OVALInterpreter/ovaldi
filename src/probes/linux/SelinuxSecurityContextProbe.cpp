@@ -45,7 +45,7 @@
 #include <FileFinder.h>
 #include <REGEX.h>
 #include <VectorPtrGuard.h>
-#include <unix/DirGuard.h>
+#include <DirGuard.h>
 #include <Noncopyable.h>
 #include "SelinuxSecurityContextProbe.h"
 

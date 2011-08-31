@@ -60,7 +60,7 @@
 #include <string>
 #include <list>
 
-#include <unix/NetworkInterfaces.h>
+#include <NetworkInterfaces.h>
 
 XERCES_CPP_NAMESPACE_USE
 

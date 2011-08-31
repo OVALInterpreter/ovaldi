@@ -40,7 +40,7 @@
 
 #include <Common.h>
 #include <Log.h>
-#include <unix/NetworkInterfaces.h>
+#include <NetworkInterfaces.h>
 
 #include "InterfaceProbe.h"
 

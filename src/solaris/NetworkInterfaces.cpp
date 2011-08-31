@@ -43,10 +43,10 @@
 #include <Noncopyable.h>
 #include <IOException.h>
 #include <OutOfMemoryException.h>
-#include <unix/SocketGuard.h>
+#include <SocketGuard.h>
 #include <Log.h>
 
-#include <unix/NetworkInterfaces.h>
+#include <NetworkInterfaces.h>
 
 using namespace std;
 

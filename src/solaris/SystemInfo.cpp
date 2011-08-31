@@ -28,7 +28,7 @@
 //
 //****************************************************************************************//
 
-#include <unix/NetworkInterfaces.h>
+#include <NetworkInterfaces.h>
 
 #include "SystemInfo.h"
 

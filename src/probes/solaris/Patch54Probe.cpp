@@ -37,7 +37,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include <unix/DirGuard.h>
+#include <DirGuard.h>
 #include "ItemEntity.h"
 #include "OvalEnum.h"
 #include "Patch54Probe.h"

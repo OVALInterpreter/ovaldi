@@ -44,8 +44,8 @@
 #include <unistd.h>
 
 #include <VectorPtrGuard.h>
-#include <unix/DirGuard.h>
-#include <unix/NetworkInterfaces.h>
+#include <DirGuard.h>
+#include <NetworkInterfaces.h>
 #include "IfListenersProbe.h"
 
 using namespace std;
