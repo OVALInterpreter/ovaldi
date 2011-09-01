@@ -40,6 +40,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for the oval-def:count function.
 * ovaldi on Windows is now a managed application targeting .NET 3.5.
 * Added support for the unix-def:sysctl_test on linux.  Other unix-like platforms are not yet supported.
+* Added support for pass-through of applicability_check attributes to results documents.
 
 ---------------------------------------
 ---        Version 5.9 build 2      ---
