@@ -54,9 +54,12 @@ public:
 	 * Initialize to wrap an empty vector.
 	 */
 	VectorPtrGuard() : vec(NULL) {
-		vec = new std::vector<T*>();
 	}
 
+	/**
+	 * Creates the guard, taking ownership of the given
+	 * vector.
+	 */
 	explicit VectorPtrGuard(std::vector<T*> *vec) : vec(vec) {
 	}
 

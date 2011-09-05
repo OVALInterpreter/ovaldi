@@ -120,7 +120,7 @@ AbsProbe* IfListenersProbe::Instance() {
 
 ItemVector* IfListenersProbe::CollectItems(Object* object) {
 
-	VectorPtrGuard<Item> collectedItems;
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	for (list<Item>::iterator iter = packetListeners.begin();
 		 iter != packetListeners.end();

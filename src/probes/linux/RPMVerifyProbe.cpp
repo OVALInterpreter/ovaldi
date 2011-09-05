@@ -169,7 +169,7 @@ AbsProbe* RPMVerifyProbe::Instance() {
 
 ItemVector* RPMVerifyProbe::CollectItems(Object* object) {
 
-	VectorPtrGuard<Item> collectedItems;
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 	ObjectEntity *nameObjEntity = object->GetElementByName("name");
 	ObjectEntity *filepathObjEntity = object->GetElementByName("filepath");
 

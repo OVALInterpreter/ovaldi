@@ -89,7 +89,7 @@ AbsProbe* SelinuxBooleanProbe::Instance() {
 
 ItemVector* SelinuxBooleanProbe::CollectItems(Object* object) {
 
-	VectorPtrGuard<Item> collectedItems;
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	ObjectEntity *nameObjEntity = object->GetElementByName("name");
 

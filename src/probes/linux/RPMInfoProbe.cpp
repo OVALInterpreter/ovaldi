@@ -84,7 +84,7 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 		throw ProbeException("Error: invalid operation specified on name. Found: " + OvalEnum::OperationToString(name->GetOperation()));
 	}
 
-	VectorPtrGuard<Item> collectedItems;
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	StringVector names;
 	this->GetRPMNames(name, &names);

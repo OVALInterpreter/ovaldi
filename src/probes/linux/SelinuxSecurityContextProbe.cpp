@@ -175,7 +175,7 @@ AbsProbe* SelinuxSecurityContextProbe::Instance() {
 
 ItemVector* SelinuxSecurityContextProbe::CollectItems(Object* object) {
 
-	VectorPtrGuard<Item> collectedItems;
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 	ObjectEntity *filepathObjEntity = object->GetElementByName("filepath");
 	ObjectEntity *pathObjEntity = object->GetElementByName("path");
 	ObjectEntity *filenameObjEntity = object->GetElementByName("filename");
@@ -184,7 +184,7 @@ ItemVector* SelinuxSecurityContextProbe::CollectItems(Object* object) {
 	// In v5.8 of the language when this test was introduced, behaviors were
 	// erroneously omitted from the objects.  So I am creating hard-coded
 	// behaviors to use, until that is fixed.
-	VectorPtrGuard<Behavior> beh;
+	VectorPtrGuard<Behavior> beh(new BehaviorVector());
 	beh->push_back(new Behavior("recurse_direction", "none"));
 
 	if (pidObjEntity)
@@ -234,7 +234,7 @@ namespace {
 		// everything else.
 		if (pidObjEntity->GetNil()) {
 			pid_t currentPid = getpid();
-			VectorPtrGuard<ItemEntity> itemEntities;
+			VectorPtrGuard<ItemEntity> itemEntities(new ItemEntityVector());
 
 			itemEntities->push_back(new ItemEntity("pid", Common::ToString(currentPid), 
 												   OvalEnum::DATATYPE_INTEGER, true));
@@ -276,7 +276,7 @@ namespace {
 				if (pidObjEntity->Analyze(pidItemEntity.get()) != OvalEnum::RESULT_TRUE)
 					continue;
 
-				VectorPtrGuard<ItemEntity> itemEntities;
+				VectorPtrGuard<ItemEntity> itemEntities(new ItemEntityVector());
 				itemEntities->push_back(pidItemEntity.release());
 
 				// we already know this item matches, so catch exceptions, flag
@@ -338,7 +338,7 @@ namespace {
 					continue;
 				}
 
-				VectorPtrGuard<ItemEntity> itemEntities;
+				VectorPtrGuard<ItemEntity> itemEntities(new ItemEntityVector());
 				itemEntities->push_back(pidItemEntity.release());
 
 				// we already know this item matches, so catch exceptions, flag
@@ -407,7 +407,7 @@ namespace {
 					   ItemVector *items) {
 
 		FileFinder fileFinder;
-		VectorPtrGuard<StringPair> filePaths;
+		VectorPtrGuard<StringPair> filePaths(new StringPairVector());
 
 		if(filepathObjEntity)
 			filePaths.reset(fileFinder.SearchFiles(filepathObjEntity));
