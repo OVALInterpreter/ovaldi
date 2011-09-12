@@ -7,18 +7,12 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>Windows Definition</schema>
-                  <version>5.10 Release Candidate 1</version>
-                  <date>7/19/2011 10:15:38 PM</date>
+                  <version>5.10</version>
+                  <date>9/14/2011 8:58:23 AM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="win-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"/>
                   <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
-                  <sch:pattern id="win-def_affected_platform">
-                        <sch:rule context="oval-def:affected[@family='windows']">
-                              <sch:assert test="not(oval-def:platform) or oval-def:platform='Microsoft Windows 95' or oval-def:platform='Microsoft Windows 98' or oval-def:platform='Microsoft Windows ME' or oval-def:platform='Microsoft Windows NT' or oval-def:platform='Microsoft Windows 2000' or oval-def:platform='Microsoft Windows XP' or oval-def:platform='Microsoft Windows Server 2003' or oval-def:platform='Microsoft Windows Vista' or oval-def:platform='Microsoft Windows Server 2008' or oval-def:platform='Microsoft Windows 7'">
-                                    <sch:value-of select="../../@id"/> - the value "<sch:value-of select="oval-def:platform"/>" found in platform element as part of the affected element is not a valid windows platform.</sch:assert>
-                        </sch:rule>
-                  </sch:pattern>
             </xsd:appinfo>
       </xsd:annotation>
       <!-- =============================================================================== -->
@@ -61,6 +55,19 @@
             <xsd:annotation>
                   <xsd:documentation>The accesstoken_object element is used by an access token test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An accesstoken_object consists of a single security principle that identifies user, group, or computer account that is associated with the token.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_accesstoken_object_verify_filter_state">
+                              <sch:rule context="win-def:accesstoken_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:accesstoken_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='accesstoken_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -523,6 +530,19 @@
                   <xsd:documentation>The activedirectory57_object element is used by an active directory test to define those objects to evaluated based on a specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An active directory object consists of three pieces of information, a naming context, a relative distinguished name, and an attribute. Each piece helps identify a specific active directory entry.</xsd:documentation>
                   <xsd:documentation>Note that this object supports complex values that are in the form of a record. For simple (string based) value collection see the activedirectory_object.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_activedirectory57_object_verify_filter_state">
+                              <sch:rule context="win-def:activedirectory57_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:activedirectory57_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='activedirectory57_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1090,6 +1110,19 @@
       <xsd:element name="cmdlet_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The cmdlet_object element is used by a cmdlet_test to identify the set of cmdlets to use and the parameters to provide to them for checking the state of a system. In order to ensure the consistency of PowerShell cmdlet support among OVAL interpreters as well as ensure that the state of a system is not changed, every OVAL interpreter must implement the following requirements.  An OVAL interpreter must only support the processing of the verbs specified in the EntityObjectCmdletVerbType.  If a cmdlet verb that is not defined in this enumeration is discovered, an error should be reported and the cmdlet must not be executed on the system.  While XML Schema validation will enforce this requirement, it is strongly recommended that OVAL interpreters implement a whitelist of allowed cmdlets.  This can be done using constrained runspaces which can limit the PowerShell execution environment.  For more information, please see Microsoft’s documentation on Windows PowerShell Host Application Concepts.  Furthermore, it is strongly recommended that OVAL interpreters also implement PowerShell support with the NoLanguage mode enabled.  The NoLanguage mode ensures that scripts that need to be evaluated are not allowed in the runspace. For more information about the NoLanguage mode, please see the PSLanguageMode enumeration documentation.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_cmdlet_object_verify_filter_state">
+                              <sch:rule context="win-def:cmdlet_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:cmdlet_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='cmdlet_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1167,11 +1200,6 @@
                                                                               <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the parameters entity of a cmdlet_object must be 'record'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
-                                                                  <sch:pattern id="win-def_cmdletobjparameters_fields">
-                                                                        <sch:rule context="win-def:cmdlet_object/win-def:parameters/oval-def:field">
-                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters field entity of a cmdlet_object must be 'equals'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
                                                             </xsd:appinfo>
                                                       </xsd:annotation>
                                                       <xsd:unique name="UniqueCmdletObjParametersFieldName">
@@ -1186,11 +1214,6 @@
                                                                   <sch:pattern id="win-def_cmdletobjselect">
                                                                         <sch:rule context="win-def:cmdlet_object/win-def:select">
                                                                               <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the select entity of a cmdlet_object must be 'record'</sch:assert>
-                                                                        </sch:rule>
-                                                                  </sch:pattern>
-                                                                  <sch:pattern id="win-def_cmdletobjselect_fields">
-                                                                        <sch:rule context="win-def:cmdlet_object/win-def:select/oval-def:field">
-                                                                              <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select field entity of a cmdlet_object must be 'equals'</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -1219,61 +1242,26 @@
                                     <xsd:element name="module_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The name of the module that contains the cmdlet.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="win-def_cmdletstemodule_name">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:module_name">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_name entity of a cmdlet_state must be 'equals'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="module_id" type="win-def:EntityStateGUIDType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The globally unique identifier for the module.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="win-def_cmdletstemodule_id">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:module_id">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_id entity of a cmdlet_state must be 'equals'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="module_version" type="oval-def:EntityStateVersionType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The version of the module that contains the cmdlet in the form of MAJOR.MINOR.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="win-def_cmdletstemodule_version">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:module_version">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the module_version entity of a cmdlet_state must be 'equals'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="verb" type="win-def:EntityStateCmdletVerbType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The cmdlet verb.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="win-def_cmdletsteverb">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:verb">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the verb entity of a cmdlet_state must be 'equals'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="noun" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                           <xsd:annotation>
                                                 <xsd:documentation>The cmdlet noun.</xsd:documentation>
-                                                <xsd:appinfo>
-                                                      <sch:pattern id="win-def_cmdletstenoun">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:noun">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the noun entity of a cmdlet_state must be 'equals'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                </xsd:appinfo>
                                           </xsd:annotation>
                                     </xsd:element>
                                     <xsd:element name="parameters" type="oval-def:EntityStateRecordType" minOccurs="0" maxOccurs="1">
@@ -1283,11 +1271,6 @@
                                                       <sch:pattern id="win-def_cmdletsteparameters">
                                                             <sch:rule context="win-def:cmdlet_state/win-def:parameters">
                                                                   <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the parameters entity of a cmdlet_state must be 'record'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                      <sch:pattern id="win-def_cmdletsteparameters_fields">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:parameters/oval-def:field">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the parameters field entity of a cmdlet_state must be 'equals'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -1304,11 +1287,6 @@
                                                       <sch:pattern id="win-def_cmdletsteselect">
                                                             <sch:rule context="win-def:cmdlet_state/win-def:select">
                                                                   <sch:assert test="@datatype='record'"><sch:value-of select="../@id"/> - datatype attribute for the select entity of a cmdlet_state must be 'record'</sch:assert>
-                                                            </sch:rule>
-                                                      </sch:pattern>
-                                                      <sch:pattern id="win-def_cmdletsteselect_fields">
-                                                            <sch:rule context="win-def:cmdlet_state/win-def:select/oval-def:field">
-                                                                  <sch:assert test="not(@operation) or @operation='equals'"><sch:value-of select="../@id"/> - operation attribute for the select field entity of a cmdlet_state must be 'equals'</sch:assert>
                                                             </sch:rule>
                                                       </sch:pattern>
                                                 </xsd:appinfo>
@@ -1378,6 +1356,19 @@
       <xsd:element name="dnscache_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The dnscache_object is used by the dnscache_test to specify the domain name(s) that should be collected from the DNS cache on the local system. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_dnscache_object_verify_filter_state">
+                              <sch:rule context="win-def:dnscache_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:dnscache_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='dnscache_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1469,6 +1460,19 @@
                   <xsd:documentation>A file object defines the path and filename or complete filepath of the file(s). In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the FileBehaviors complex type for more information about specific behaviors.</xsd:documentation>
                   <xsd:documentation>The set of files to be evaluated may be identified with either a complete filepath or a path and filename. Only one of these options may be selected.</xsd:documentation>
                   <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_file_object_verify_filter_state">
+                              <sch:rule context="win-def:file_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:file_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='file_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1488,6 +1492,11 @@
                                                                                   <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
                                                                             </sch:rule>
                                                                       </sch:pattern>
+                                                                      <sch:pattern id="win-def_fileobjfilepath2">
+                                                                            <sch:rule context="win-def:file_object/win-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                  <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
+                                                                            </sch:rule>
+                                                                      </sch:pattern>
                                                                 </xsd:appinfo>
                                                           </xsd:annotation>
                                                     </xsd:element>
@@ -1495,6 +1504,15 @@
                                                             <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                   <xsd:annotation>
                                                                         <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
+                                                                        <xsd:appinfo>
+                                                                              <sch:pattern id="win-def_fileobjpath">
+                                                                                    <sch:rule context="win-def:file_object/win-def:path[not(@operation='equals' or not(@operation))]">                                                                                          
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                    </sch:rule>
+                                                                              </sch:pattern>
+                                                                        </xsd:appinfo>
                                                                   </xsd:annotation>
                                                             </xsd:element>
                                                             <xsd:element name="filename" type="oval-def:EntityObjectStringType" nillable="true">
@@ -1625,6 +1643,11 @@
                                                 <xsd:documentation>This entity defines a product version to be found within the version-information structure.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -1639,6 +1662,7 @@
                   <xsd:annotation>
                         <xsd:documentation>'max_depth' defines the maximum depth of recursion to perform when a recurse_direction is specified. A value of '0' is equivalent to no recursion, '1' means to step only one directory level up/down, and so on. The default value is '-1' meaning no limitation. For a 'max_depth' of -1 or any value of 1 or more the starting directory must be considered in the recursive search.</xsd:documentation>
                         <xsd:documentation>Note that the default recurse_direction behavior is 'none' so even though max_depth specifies no limitation by default, the recurse_direction behavior turns recursion off.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
@@ -1650,6 +1674,7 @@
             <xsd:attribute name="recurse_direction" use="optional" default="none">
                   <xsd:annotation>
                         <xsd:documentation>'recurse_direction' defines the direction, either 'up' to parent directories, or 'down' into child directories to recursively search for files. When recursing up or down, one is limited by the max_depth behavior. Note that it is not an error if max_depth specifies a certain level of recursion and that level does not exist. Recursing should only go as deep as available. The default value is 'none' for no recursion.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:string">
@@ -1661,13 +1686,26 @@
             </xsd:attribute>
             <xsd:attribute name="recurse_file_system" use="optional" default="all">
                   <xsd:annotation>
-                        <xsd:documentation>'recurse_file_system' defines the file system limitation of any recursion, either 'local' limiting data collection to local file systems (as opposed to file systems mounted from an external system), or 'defined' to keep any recursion within the file system that the file_object (path+filename) has specified. The default value is 'all' meaning to use all available file systems for data collection.</xsd:documentation>
+                        <xsd:documentation>'recurse_file_system' defines the file system limitation of any searching and applies to all operations as specified on the path or filepath entity. The value of 'local' limits the search scope to local file systems (as opposed to file systems mounted from an external system). The value of 'defined' keeps any recursion within the file system that the file_object (path+filename or filepath) has specified. The value of 'defined' only applies when an equality operation is used for searching because the path or filepath entity must explicitly define a file system. The default value is 'all' meaning to search all available file systems for data collection.</xsd:documentation>
+                        <xsd:documentation>Note that in most cases it is recommended that the value of 'local' be used to ensure that file system searching is limited to only the local file systems. Searching 'all' file systems may have performance implications.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:string">
                               <xsd:enumeration value="all"/>
                               <xsd:enumeration value="local"/>
                               <xsd:enumeration value="defined"/>
+                        </xsd:restriction>
+                  </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="windows_view" use="optional" default="64_bit">
+                  <xsd:annotation>
+                        <xsd:documentation>64-bit versions of Windows provide an alternate file system and registry views to 32-bit applications. This behavior allows the OVAL Object to state which view should be examined. This behavior only applies to 64-bit Windows, and must not be applied on other platforms. </xsd:documentation>
+                        <xsd:documentation>Note that the values have the following meaning: '64_bit' – Indicates that the 64-bit view on 64-bit Windows operating systems must be examined. On a 32-bit system, the Object must be evaluated without applying the behavior. '32_bit' – Indicates that the 32-bit view must be examined. On a 32-bit system, the Object must be evaluated without applying the behavior. It is recommended that the corresponding 'windows_view' entity be set on the OVAL Items that are collected when this behavior is used to distinguish between OVAL Items that were collected in the 32-bit or 64-bit views.</xsd:documentation>
+                  </xsd:annotation>
+                  <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                              <xsd:enumeration value="32_bit"/>
+                              <xsd:enumeration value="64_bit"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -1714,6 +1752,19 @@
                   <xsd:documentation>A fileauditedpermissions53_object is defined as a combination of a Windows file and trustee SID. The file represents the file to be evaluated while the trustee SID represents the account (SID) to check audited permissions of. If multiple files or SIDs are matched by either reference, then each possible combination of file and SID is a matching file audited permissions object. In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the FileAuditPermissions53Behaviors complex type for more information about specific behaviors.</xsd:documentation>
                   <xsd:documentation>The set of files to be evaluated may be identified with either a complete filepath or a path and filename. Only one of these options may be selected.</xsd:documentation>
                   <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_fileauditedpermissions53_object_verify_filter_state">
+                              <sch:rule context="win-def:fileauditedpermissions53_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:fileauditedpermissions53_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='fileauditedpermissions53_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1733,6 +1784,11 @@
                                                                                     <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
                                                                               </sch:rule>
                                                                         </sch:pattern>
+                                                                        <sch:pattern id="win-def_fap53objfilepath2">
+                                                                              <sch:rule context="win-def:fileauditedpermissions53_object/win-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                    <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
+                                                                              </sch:rule>
+                                                                        </sch:pattern>
                                                                   </xsd:appinfo>
                                                             </xsd:annotation>
                                                       </xsd:element>
@@ -1740,6 +1796,15 @@
                                                             <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                   <xsd:annotation>
                                                                         <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
+                                                                        <xsd:appinfo>
+                                                                              <sch:pattern id="win-def_fap53objpath">
+                                                                                    <sch:rule context="win-def:fileauditedpermissions53_object/win-def:path[not(@operation='equals' or not(@operation))]">                                                                                          
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                    </sch:rule>
+                                                                              </sch:pattern>
+                                                                        </xsd:appinfo>
                                                                   </xsd:annotation>
                                                             </xsd:element>
                                                             <xsd:element name="filename" type="oval-def:EntityObjectStringType" nillable="true">
@@ -1898,6 +1963,11 @@
                                     <xsd:element name="file_write_attributes" type="win-def:EntityStateAuditType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>Grants the right to change file attributes.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -2190,6 +2260,11 @@
                                                 <xsd:documentation>Grants the right to change file attributes.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -2288,6 +2363,19 @@
                   <xsd:documentation>A fileeffectiverights53_object is defined as a combination of a Windows file and trustee SID. The file represents the file to be evaluated while the trustee SID represents the account (SID) to check effective rights of. If multiple files or SIDs are matched by either reference, then each possible combination of file and SID is a matching file effective rights object. In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the FileEffectiveRights53Behaviors complex type for more information about specific behaviors.</xsd:documentation>
                   <xsd:documentation>The set of files to be evaluated may be identified with either a complete filepath or a path and filename. Only one of these options may be selected.</xsd:documentation>
                   <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_fileeffectiverights53_object_verify_filter_state">
+                              <sch:rule context="win-def:fileeffectiverights53_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:fileeffectiverights53_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='fileeffectiverights53_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -2307,6 +2395,11 @@
                                                                                     <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
                                                                               </sch:rule>
                                                                         </sch:pattern>
+                                                                        <sch:pattern id="win-def_fer53objfilepath2">
+                                                                              <sch:rule context="win-def:fileeffectiverights53_object/win-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                    <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
+                                                                              </sch:rule>
+                                                                        </sch:pattern>
                                                                   </xsd:appinfo>
                                                             </xsd:annotation>
                                                       </xsd:element>
@@ -2314,6 +2407,15 @@
                                                           <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="win-def_fer53objpath">
+                                                                                  <sch:rule context="win-def:fileeffectiverights53_object/win-def:path[not(@operation='equals' or not(@operation))]">                                                                                          
+                                                                                        <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType" nillable="true">
@@ -2472,6 +2574,11 @@
                                     <xsd:element name="file_write_attributes" type="oval-def:EntityStateBoolType" minOccurs="0">
                                           <xsd:annotation>
                                                 <xsd:documentation>Grants the right to change file, or directory, attributes.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
                               </xsd:sequence>
@@ -2764,6 +2871,11 @@
                                                 <xsd:documentation>Grants the right to change file, or directory, attributes.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -2859,6 +2971,19 @@
       <xsd:element name="group_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The group_object element is used by a group test to define the specific group(s) (identified by name) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_group_object_verify_filter_state">
+                              <sch:rule context="win-def:group_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:group_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='group_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -2949,6 +3074,19 @@
       <xsd:element name="group_sid_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The group_sid_object element is used by a group_test to define the specific group(s) (identified by SID) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_group_sid_object_verify_filter_state">
+                              <sch:rule context="win-def:group_sid_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:group_sid_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='group_sid_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -3038,6 +3176,19 @@
             <xsd:annotation>
                   <xsd:documentation>The interface_object element is used by an interface test to define the specific interfaces(s) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An interface object consists of a single name entity that identifies which interface is being specified. For help understanding this object, see the MIB_IFROW and MIB_IPADDRROW structures.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_interface_object_verify_filter_state">
+                              <sch:rule context="win-def:interface_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:interface_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='interface_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -3231,6 +3382,19 @@
             <xsd:annotation>
                   <xsd:documentation>The metabase_object element is used by a metabase test to define the specific metabase item(s) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A metabase object defines the key and id of the item(s).</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_metabase_object_verify_filter_state">
+                              <sch:rule context="win-def:metabase_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:metabase_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='metabase_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -3430,8 +3594,12 @@
                                                                   <xsd:appinfo>
                                                                         <sch:pattern id="win-def_peheaderobjfilepath">
                                                                               <sch:rule context="win-def:peheader_object/win-def:filepath">
-                                                                                    <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth or @recurse_direction])">
-                                                                                          <sch:value-of select="../@id"/> - the max_depth and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
+                                                                                    <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
+                                                                              </sch:rule>
+                                                                        </sch:pattern>
+                                                                        <sch:pattern id="win-def_peheaderobjfilepath2">
+                                                                              <sch:rule context="win-def:peheader_object/win-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                    <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
                                                                               </sch:rule>
                                                                         </sch:pattern>
                                                                   </xsd:appinfo>
@@ -3441,6 +3609,15 @@
                                                             <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                   <xsd:annotation>
                                                                         <xsd:documentation>The path element specifies the directory component of the absolute path to a PE file on the machine.</xsd:documentation>
+                                                                        <xsd:appinfo>
+                                                                              <sch:pattern id="win-def_peheaderobjpath">
+                                                                                    <sch:rule context="win-def:peheader_object/win-def:filepath[not(@operation='equals' or not(@operation))]">                                                                                          
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                          <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                    </sch:rule>
+                                                                              </sch:pattern>
+                                                                        </xsd:appinfo>
                                                                   </xsd:annotation>
                                                             </xsd:element>
                                                             <xsd:element name="filename" type="oval-def:EntityObjectStringType">
@@ -3779,6 +3956,19 @@
             <xsd:annotation>
                   <xsd:documentation>The port_object element is used by a port test to define the specific port(s) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A port object defines the local address, port number, and protocol of the port(s).</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_port_object_verify_filter_state">
+                              <sch:rule context="win-def:port_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:port_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='port_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -3892,6 +4082,19 @@
       <xsd:element name="printereffectiverights_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation/>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_printereffectiverights_object_verify_filter_state">
+                              <sch:rule context="win-def:printereffectiverights_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:printereffectiverights_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='printereffectiverights_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -4225,6 +4428,19 @@
             <xsd:annotation>
                   <xsd:documentation>The process58_object element is used by a process58_test to define the specific process(es) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A process58_object defines the command line used to start the process(es)and pid.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_process58_object_verify_filter_state">
+                              <sch:rule context="win-def:process58_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:process58_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='process58_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -4348,6 +4564,19 @@
       <xsd:element name="registry_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation/>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_registry_object_verify_filter_state">
+                              <sch:rule context="win-def:registry_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:registry_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='registry_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -4369,6 +4598,12 @@
                                                                   <sch:pattern id="win-def_regobjkey">
                                                                         <sch:rule context="win-def:registry_object/win-def:key[@xsi:nil='true' or @xsi:nil='1']">
                                                                               <sch:assert test="../win-def:name/@xsi:nil='true' or ../win-def:name/@xsi:nil='1'"><sch:value-of select="../@id"/> - name entity must be nil when key is nil</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                                  <sch:pattern id="win-def_regobjkey2">
+                                                                        <sch:rule context="win-def:registry_object/win-def:key[not(@operation='equals' or not(@operation))]">
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
                                                                         </sch:rule>
                                                                   </sch:pattern>
                                                             </xsd:appinfo>
@@ -4426,6 +4661,11 @@
                                                 <xsd:documentation>Note that if the intent is to test a version number held in the registry (as a reg_sz) then instead of setting the datatype to 'string', the datatype can be set to 'version'. This allows tools performing the evaluation to know how to perform less than and greater than operations correctly.</xsd:documentation>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -4439,6 +4679,7 @@
                   <xsd:annotation>
                         <xsd:documentation>'max_depth' defines the maximum depth of recursion to perform when a recurse_direction is specified. A value of '0' is equivalent to no recursion, '1' means to step only one directory level up/down, and so on. The default value is '-1' meaning no limitation. For a 'max_depth' of -1 or any value of 1 or more the starting key must be considered in the recursive search.</xsd:documentation>
                         <xsd:documentation>Note that the default recurse_direction behavior is 'none' so even though max_depth specifies no limitation by default, the recurse_direction behavior turns recursion off.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the key entity.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
@@ -4450,12 +4691,25 @@
             <xsd:attribute name="recurse_direction" use="optional" default="none">
                   <xsd:annotation>
                         <xsd:documentation>'recurse_direction' defines the direction, either 'up' to parent keys, or 'down' into child keys to recursively search for registry keys. When recursing up or down, one is limited by the max_depth behavior. Note that it is not an error if max_depth specifies a certain level of recursion and that level does not exist. Recursing should only go as deep as available. The default value is 'none' for no recursion.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the key entity.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:string">
                               <xsd:enumeration value="none"/>
                               <xsd:enumeration value="up"/>
                               <xsd:enumeration value="down"/>
+                        </xsd:restriction>
+                  </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="windows_view" use="optional" default="64_bit">
+                  <xsd:annotation>
+                        <xsd:documentation>64-bit versions of Windows provide an alternate file system and registry views to 32-bit applications. This behavior allows the OVAL Object to specify which view should be examined. This behavior only applies to 64-bit Windows, and must not be applied on other platforms. </xsd:documentation>
+                        <xsd:documentation>Note that the values have the following meaning: '64_bit' – Indicates that the 64-bit view on 64-bit Windows operating systems must be examined. On a 32-bit system, the Object must be evaluated without applying the behavior. '32_bit' – Indicates that the 32-bit view must be examined. On a 32-bit system, the Object must be evaluated without applying the behavior. It is recommended that the corresponding 'windows_view' entity be set on the OVAL Items that are collected when this behavior is used to distinguish between the OVAL Items that are collected in the 32-bit or 64-bit views.</xsd:documentation>
+                  </xsd:annotation>
+                  <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                              <xsd:enumeration value="32_bit"/>
+                              <xsd:enumeration value="64_bit"/>
                         </xsd:restriction>
                   </xsd:simpleType>
             </xsd:attribute>
@@ -4500,6 +4754,19 @@
             <xsd:annotation>
                   <xsd:documentation>The regkeyauditedpermissions53_object element is used by a registry key audited permissions test to define the objects used to evalutate against the specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.</xsd:documentation>
                   <xsd:documentation>A regkeyauditedpermissions53_object is defined as a combination of a Windows registry key and trustee name. The hive and key elements represents the registry key to be evaluated while the trustee name represents the account (SID) to check audited permissions of. If multiple keys or SIDs are matched by either reference, then each possible combination of registry key and SID is a matching registry key audited permissions object. In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the RegkeyAuditPermissions53Behaviors complex type for more information about specific behaviors.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_regkeyauditedpermissions53_object_verify_filter_state">
+                              <sch:rule context="win-def:regkeyauditedpermissions53_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:regkeyauditedpermissions53_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='regkeyauditedpermissions53_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -4517,6 +4784,14 @@
                                                 <xsd:element name="key" type="oval-def:EntityObjectStringType" nillable="true">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The key element describes a registry key to be collected. Note that the hive portion of the string should not be included, as this data should be found under the hive element. If the xsi:nil attribute is set to true, then the object being specified is the higher level hive. In this case, the key element should not be collected or used in analysis. Setting xsi:nil equal to true is different than using a .* pattern match. A .* pattern match says to collect every key under a given hive.</xsd:documentation>
+                                                            <xsd:appinfo>                                                                  
+                                                                  <sch:pattern id="win-def_regkeyauditedpermissions53_objectkey">
+                                                                        <sch:rule context="win-def:regkeyauditedpermissions53_object/win-def:key[not(@operation='equals' or not(@operation))]">
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
@@ -4661,6 +4936,11 @@
                                                 <xsd:documentation/>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -4791,6 +5071,14 @@
                                                 <xsd:element name="key" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The key element describes a registry key to be collected. Note that the hive portion of the string should not be included, as this data should be found under the hive element.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_regkeyauditedpermissions_objectkey">
+                                                                        <sch:rule context="win-def:regkeyauditedpermissions_object/win-def:key[not(@operation='equals' or not(@operation))]">
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="trustee_name" type="oval-def:EntityObjectStringType">
@@ -4935,6 +5223,11 @@
                                                 <xsd:documentation/>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -5031,6 +5324,19 @@
             <xsd:annotation>
                   <xsd:documentation>The regkeyeffectiverights53_object element is used by a registry key effective rights test to define the objects used to evalutate against the specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.</xsd:documentation>
                   <xsd:documentation>A regkeyeffectiverights53_object is defined as a combination of a Windows registry and trustee SID. The key entity represents the registry key to be evaluated while the trustee SID represents the account (SID) to check effective rights of. If multiple files or SIDs are matched by either reference, then each possible combination of registry key and SID is a matching registry key effective rights object. In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the RegkeyEffectiveRights53Behaviors complex type for more information about specific behaviors.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_regkeyeffectiverights53_object_verify_filter_state">
+                              <sch:rule context="win-def:regkeyeffectiverights53_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:regkeyeffectiverights53_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='regkeyeffectiverights53_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -5048,6 +5354,14 @@
                                                 <xsd:element name="key" type="oval-def:EntityObjectStringType" nillable="true">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The key element describes a registry key to be collected. Note that the hive portion of the string should not be included, as this data should be found under the hive element. If the xsi:nil attribute is set to true, then the object being specified is the higher level hive. In this case, the key element should not be collected or used in analysis. Setting xsi:nil equal to true is different than using a .* pattern match. A .* pattern match says to collect every key under a given hive.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_regkeyeffectiverights53_objectkey">
+                                                                        <sch:rule context="win-def:regkeyeffectiverights53_object/win-def:key[not(@operation='equals' or not(@operation))]">
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="trustee_sid" type="oval-def:EntityObjectStringType">
@@ -5192,6 +5506,11 @@
                                                 <xsd:documentation/>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -5320,6 +5639,14 @@
                                                 <xsd:element name="key" type="oval-def:EntityObjectStringType">
                                                       <xsd:annotation>
                                                             <xsd:documentation>The key element describes a registry key to be collected. Note that the hive portion of the string should not be included, as this data should be found under the hive element.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                  <sch:pattern id="win-def_regkeyeffectiverights_objectkey">
+                                                                        <sch:rule context="win-def:regkeyeffectiverights_object/win-def:key[not(@operation='equals' or not(@operation))]">
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                              <sch:assert test="not(preceding-sibling::win-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a key entity.</sch:assert>
+                                                                        </sch:rule>
+                                                                  </sch:pattern>
+                                                            </xsd:appinfo>
                                                       </xsd:annotation>
                                                 </xsd:element>
                                                 <xsd:element name="trustee_name" type="oval-def:EntityObjectStringType">
@@ -5464,6 +5791,11 @@
                                                 <xsd:documentation/>
                                           </xsd:annotation>
                                     </xsd:element>
+                                    <xsd:element name="windows_view" type="win-def:EntityStateWindowsViewType" minOccurs="0">
+                                          <xsd:annotation>
+                                                <xsd:documentation>The windows view value to which this was targeted. This is used to indicate which view (32-bit or 64-bit), the associated State applies to.</xsd:documentation>
+                                          </xsd:annotation>
+                                    </xsd:element>
                               </xsd:sequence>
                         </xsd:extension>
                   </xsd:complexContent>
@@ -5559,6 +5891,19 @@
       <xsd:element name="service_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The service_object element is used by a service_test to define the specific service(s) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_service_object_verify_filter_state">
+                              <sch:rule context="win-def:service_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:service_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='service_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -5693,6 +6038,19 @@
             <xsd:annotation>
                   <xsd:documentation>The serviceeffectiverights_object element is used by the serviceeffectiverights_test to define the objects used to evalutate against the specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.</xsd:documentation>                  
                   <xsd:documentation>A serviceeffectiverights_object is defined as a combination of a Windows service_name and trustee_sid. The service_name entity represents the service to be evaluated while the trustee_sid entity represents the account (SID) to check the effective rights of.  If multiple services or SIDs are matched by either reference, then each possible combination of service and SID is a matching service effective rights object.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_serviceeffectiverights_object_verify_filter_state">
+                              <sch:rule context="win-def:serviceeffectiverights_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:serviceeffectiverights_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='serviceeffectiverights_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                <xsd:complexContent>
@@ -5863,6 +6221,19 @@
             <xsd:annotation>
                   <xsd:documentation>The sharedresource_object element is used by a shared resource test to define the object, in this case a shared resource, to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An shared resource object consists of a single netname entity that identifies a specific shared resource.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_sharedresource_object_verify_filter_state">
+                              <sch:rule context="win-def:sharedresource_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:sharedresource_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='sharedresource_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -6002,6 +6373,19 @@
             <xsd:annotation>
                   <xsd:documentation>The sharedresourceauditedpermissions_object element is used by a shared resource audited permissions test to define the objects used to evaluate against the specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.</xsd:documentation>
                   <xsd:documentation>A shared resource audited permissions object consists of a netname entity that identifies a specific shared resource and a trustee_sid entity that identifies a specific account (SID) to check the audited permissions of.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_sharedresourceauditedpermissions_object_verify_filter_state">
+                              <sch:rule context="win-def:sharedresourceauditedpermissions_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:sharedresourceauditedpermissions_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='sharedresourceauditedpermissions_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -6152,6 +6536,19 @@
             <xsd:annotation>
                   <xsd:documentation>The sharedresourceeffectiverights_object element is used by a shared resource effective rights test to define the object, in this case a shared resource effective rights object, to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A shared resource effective rights object consists of a netname entity that identifies a specific shared resource and a trustee_sid entity that identifies a specific account (SID) to check the effective rights of.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_sharedresourceeffectiverights_object_verify_filter_state">
+                              <sch:rule context="win-def:sharedresourceeffectiverights_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:sharedresourceeffectiverights_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='sharedresourceeffectiverights_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -6301,6 +6698,19 @@
       <xsd:element name="sid_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The sid_object element is used by a sid_test to define the object set, in this case a set of SIDs (identified by name), to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_sid_object_verify_filter_state">
+                              <sch:rule context="win-def:sid_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:sid_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='sid_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -6406,6 +6816,19 @@
       <xsd:element name="sid_sid_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The sid_sid_object element is used by a sid_sid_test to define the object set, in this case a set of SIDs, to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_sid_sid_object_verify_filter_state">
+                              <sch:rule context="win-def:sid_sid_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:sid_sid_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='sid_sid_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -6614,6 +7037,19 @@
       <xsd:element name="user_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation/>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_user_object_verify_filter_state">
+                              <sch:rule context="win-def:user_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:user_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='user_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -6708,6 +7144,19 @@
       <xsd:element name="user_sid55_object" substitutionGroup="oval-def:object">
         <xsd:annotation>
             <xsd:documentation>The user_sid55_object represents a set of users on a Windows system.  This set (which might contain only one user) is identified by a SID.</xsd:documentation>
+              <xsd:appinfo>
+                    <sch:pattern id="win-def_user_sid55_object_verify_filter_state">
+                          <sch:rule context="win-def:user_sid55_object//oval-def:filter">
+                                <sch:let name="parent_object" value="ancestor::win-def:user_sid55_object"/>
+                                <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                <sch:let name="state_ref" value="."/>
+                                <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='user_sid55_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                          </sch:rule>
+                    </sch:pattern>
+              </xsd:appinfo>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
@@ -6918,6 +7367,19 @@
             <xsd:annotation>
                   <xsd:documentation>The volume_object element is used by a volume test to define the specific volume(s) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A volume object defines the rootpath of the volume(s).</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_volume_object_verify_filter_state">
+                              <sch:rule context="win-def:volume_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:volume_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='volume_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -7233,6 +7695,19 @@
       <xsd:element name="wmi57_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation/>
+                  <xsd:appinfo>
+                        <sch:pattern id="win-def_wmi57_object_verify_filter_state">
+                              <sch:rule context="win-def:wmi57_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::win-def:wmi57_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='wmi57_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -7356,6 +7831,19 @@
       <xsd:element name="wuaupdatesearcher_object" substitutionGroup="oval-def:object">
         <xsd:annotation>
             <xsd:documentation>The wuaupdatesearcher_object element is used by a wuaupdatesearcher_test to define the specific search criteria to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+              <xsd:appinfo>
+                    <sch:pattern id="win-def_wuaupdatesearcher_object_verify_filter_state">
+                          <sch:rule context="win-def:wuaupdatesearcher_object//oval-def:filter">
+                                <sch:let name="parent_object" value="ancestor::win-def:wuaupdatesearcher_object"/>
+                                <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                <sch:let name="state_ref" value="."/>
+                                <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#windows') and ($state_name='wuaupdatesearcher_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                          </sch:rule>
+                    </sch:pattern>
+              </xsd:appinfo>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
@@ -7372,7 +7860,7 @@
                                             <sch:pattern id="win-def_wuaupdatesearcherobjsearchcriteria">
                                                 <sch:rule context="win-def:wuaupdatesearcher_object/win-def:search_criteria">
                                                     <sch:assert test="not(@operation) or @operation='equals'">
-                                                        <sch:value-of select="../@id"/> - operation attribute for the search_criteria entity of a wuaupdatesearcher_object should be 'equals'
+                                                        <sch:value-of select="../@id"/> - operation attribute for the search_criteria entity of a wuaupdatesearcher_object must be 'equals'
                                                     </sch:assert>
                                                 </sch:rule>
                                             </sch:pattern>
@@ -8739,6 +9227,30 @@
                         <xsd:enumeration value="Watch">
                               <xsd:annotation>
                                     <xsd:documentation>The Watch verb continually inspects or monitors a resource for changes.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="">
+                              <xsd:annotation>
+                                    <xsd:documentation>The empty string value is permitted here to allow for empty elements associated with variable references.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                  </xsd:restriction>
+            </xsd:simpleContent>
+      </xsd:complexType>
+      <xsd:complexType name="EntityStateWindowsViewType">
+            <xsd:annotation>
+                  <xsd:documentation>The EntityStateWindowsViewType restricts a string value to a specific set of values: 32-bit and 64-bit. These values describe the different values possible for the windows view behavior.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleContent>
+                  <xsd:restriction base="oval-def:EntityStateStringType">
+                        <xsd:enumeration value="32_bit">
+                              <xsd:annotation>
+                                    <xsd:documentation>Indicates the 32_bit windows view.</xsd:documentation>
+                              </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="64_bit">
+                              <xsd:annotation>
+                                    <xsd:documentation>Indicates the 64_bit windows view.</xsd:documentation>
                               </xsd:annotation>
                         </xsd:enumeration>
                         <xsd:enumeration value="">

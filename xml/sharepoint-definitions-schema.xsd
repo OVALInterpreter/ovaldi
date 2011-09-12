@@ -10,8 +10,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>SharePoint Definition</schema>
-                  <version>5.10 Release Candidate 1</version>
-                  <date>7/19/2011 10:15:37 PM</date>
+                  <version>5.10</version>
+                  <date>9/14/2011 8:58:23 AM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license
                         header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
@@ -61,6 +61,19 @@
                   <xsd:documentation>The spwebapplication_object element is used by a spwebapplication test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again,
                         please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spwebapplication object consists of a webapplicationurl used to define a specific web application. See the defintion of the SPWebApplication class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spwebapplication_object_verify_filter_state">
+                              <sch:rule context="sp-def:spwebapplication_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spwebapplication_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spwebapplication_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -397,6 +410,19 @@
                   <xsd:documentation>The spgroup_object element is used by a spgroup test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to
                         the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spgroup object consists of a sitecollectionurl used to define a specific site collection. See the defintion of the SPGroup class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spgroup_object_verify_filter_state">
+                              <sch:rule context="sp-def:spgroup_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spgroup_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spgroup_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -497,6 +523,19 @@
                   <xsd:documentation>The spweb_object element is used by a spweb test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the
                         description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spweb object consists of a webcollection url and sitecollection url used to define a specific web apoplication and a specific site collection. See the defintion of the SPWeb class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spweb_object_verify_filter_state">
+                              <sch:rule context="sp-def:spweb_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spweb_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spweb_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -603,6 +642,19 @@
                   <xsd:documentation>The splist_object element is used by a splist test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the
                         description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An splist object consists of a spsiteurl used to define a specific site in a site collection that various security related configuration items need to be checked. See the defintion of the SPList class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_splist_object_verify_filter_state">
+                              <sch:rule context="sp-def:splist_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:splist_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='splist_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -699,6 +751,19 @@
                         Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spantivirussettings object consists of a spwebservicename used to define a specific webservice in a farm that various security related configuration items need to be checked and an spfarmname which denotes the farm of which the spwebservice is a part. See the defintion of the SPAntiVirusSettings class in the SharePoint object model documentation.
                   </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spantivirussettings_object_verify_filter_state">
+                              <sch:rule context="sp-def:spantivirussettings_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spantivirussettings_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spantivirussettings_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -830,6 +895,19 @@
                   <xsd:documentation>The spsiteadministration_object element is used by a spsiteadministration test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set
                         logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spsiteadministration object consists of a webapplicationurl used to define a specific web application. The collected data is available via the SPQuota class, which can be found via the SPSite object.  See the defintions of the SPSite and the SPQuota classes in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spsiteadministration_object_verify_filter_state">
+                              <sch:rule context="sp-def:spsiteadministration_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spsiteadministration_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spsiteadministration_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -920,6 +998,19 @@
                   <xsd:documentation>The spsite_object element is used by a spsiteadministration test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again,
                         please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spsite object consists of a sitecollectionurl used to define a specific web application. See the defintion of the SPSite class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spsite_object_verify_filter_state">
+                              <sch:rule context="sp-def:spsite_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spsite_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spsite_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1021,6 +1112,19 @@
             <xsd:annotation>
                   <xsd:documentation>The spcrawlrule_object element is used by a spcrawlrule test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spcrawlrule object consists of a spsiteurl used to define a specific resource (eg. website or document) on a server that can be indexed by the SharePoint indexer. See the defintion of the CrawlRule class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spcrawlrule_object_verify_filter_state">
+                              <sch:rule context="sp-def:spcrawlrule_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spcrawlrule_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spcrawlrule_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1159,6 +1263,19 @@
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spjobdefinition_object_verify_filter_state">
+                              <sch:rule context="sp-def:spjobdefinition_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spjobdefinition_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spjobdefinition_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1270,6 +1387,19 @@
             <xsd:annotation>
                   <xsd:documentation>The spjobdefinition510_object element is used by a spjobdefinition test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spjobdefinition510_object consists of a webappuri and displayname used to define a specific web application for which job checks should be done. See the defintion of the SPJobDefinition class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spjobdefinition510_object_verify_filter_state">
+                              <sch:rule context="sp-def:spjobdefinition510_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spjobdefinition510_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spjobdefinition510_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1375,6 +1505,19 @@
                   <xsd:documentation>The bestbet_object element is used by a bestbet test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to
                         the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An bestbet object consists of a sitecollectionurl used to define a specific site and a bestbeturl used to define a specific best bet. See the defintion of the BestBet class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_bestbet_object_verify_filter_state">
+                              <sch:rule context="sp-def:bestbet_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:bestbet_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='bestbet_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1475,6 +1618,19 @@
                   <xsd:documentation>The infopolicycoll_object element is used by a policycoll test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please
                         refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A infopolicycoll object consists of a sitecollectionurl used to define a specific site and an id used to define a specific information policy. See the defintion of the Policy class and policycollection class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_infopolicycoll_object_verify_filter_state">
+                              <sch:rule context="sp-def:infopolicycoll_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:infopolicycoll_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='infopolicycoll_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1580,6 +1736,19 @@
                   <xsd:documentation>The spdiagnosticsservice_object element is used by an spdiagnosticsservice test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set
                         logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spdiagnosticsservice object consists of a farmname used to define a specific Sharepoint farm for which diagnostics properties should be checked. See the defintion of the SPDiagnosticsService class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spdiagnosticsservice_object_verify_filter_state">
+                              <sch:rule context="sp-def:spdiagnosticsservice_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spdiagnosticsservice_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spdiagnosticsservice_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1689,6 +1858,19 @@
             <xsd:annotation>
                   <xsd:documentation>The spdiagnosticslevel_object element is used by an spdiagnosticslevel test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.  Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An spdiagnosticslevel object consists of a farmname used to define a specific Sharepoint farm for which policy properties should be checked. See the defintion of the SPWebApplication class in the SharePoint object model documentation. See the defintion of the IDiagnosticsLevel Interface in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_spdiagnosticslevel_object_verify_filter_state">
+                              <sch:rule context="sp-def:spdiagnosticslevel_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:spdiagnosticslevel_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='spdiagnosticslevel_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1794,6 +1976,19 @@
                   <xsd:documentation>The sppolicyfeature_object element is used by an sppolicyfeature test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again,
                         please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An sppolicyfeature object consists of a farmname used to define a specific Sharepoint farm for which policy feature properties should be checked. See the defintion of the PolicyFeature class in the SharePoint object model documentation. </xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="sp-def_sppolicyfeature_object_verify_filter_state">
+                              <sch:rule context="sp-def:sppolicyfeature_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::sp-def:sppolicyfeature_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#sharepoint') and ($state_name='sppolicyfeature_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>

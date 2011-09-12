@@ -9,8 +9,8 @@
             <xsd:documentation>This schema was originally developed by Yuzheng Zhou and Todd Dolinsky at Hewlett-Packard. The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>VMware ESX server Definition</schema>
-                  <version>5.10 Release Candidate 1</version>
-                  <date>7/19/2011 10:15:35 PM</date>
+                  <version>5.10</version>
+                  <date>9/14/2011 8:58:23 AM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="esx-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#esx"/>
@@ -58,6 +58,19 @@
             <xsd:annotation>
                   <xsd:documentation>The patch56_object element is used by a patch56_test to define those objects to be evaluated against a specified state. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A patch56_object consists of a single patch_name entity that identifies the patch to be checked.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="esx-def_patch56_object_verify_filter_state">
+                              <sch:rule context="esx-def:patch56_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::esx-def:patch56_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#esx') and ($state_name='patch56_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -386,6 +399,19 @@
       <xsd:element name="visdkmanagedobject_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The visdkmanagedobject_object element is used by the visdkmanagedobject_test to define those objects to be evaluated based on a specified state.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="esx-def_visdkmanagedobject_object_verify_filter_state">
+                              <sch:rule context="esx-def:visdkmanagedobject_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::esx-def:visdkmanagedobject_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#esx') and ($state_name='visdkmanagedobject_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>

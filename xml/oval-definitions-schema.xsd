@@ -7,8 +7,8 @@
         <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
         <xsd:appinfo>
             <schema>Core Definition</schema>
-            <version>5.10 Release Candidate 1</version>
-            <date>7/19/2011 10:15:36 PM</date>
+            <version>5.10</version>
+            <date>9/14/2011 8:58:23 AM</date>
             <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
             <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -232,13 +232,13 @@
             </xsd:element>
             <xsd:element name="reference" type="oval-def:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="description" type="xsd:string"/>
-            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
             <!-- For the next major release of OVAL, the xsd:any tag above will be modified to
 		         only allow elements from namespaces other than the default namespace.  This
 		         fixes a bug in the current schema where the affected or reference element can
 		         appear after the description element and still produce a vailid document.
 
-		        <xsd:any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="skip"/>
+		        <xsd:any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax"/>
 		    -->
         </xsd:sequence>
     </xsd:complexType>
@@ -1142,7 +1142,7 @@
         </xsd:attribute>
         <xsd:attribute name="mask" type="xsd:boolean" use="optional" default="false">
             <xsd:annotation>
-                <xsd:documentation>The optional mask attribute can be used in situations where information is needed for evaluation, but this information should not be disclosed in the results file (maybe due to sensitivity concerns). If the mask attribute is set to 'true', then the observed value of this field, along with the operation used, must not appear in the results section of an OVAL Results document. Note that this value would appear in the copy of the system characteristics contained in the results file. In this case, the results file must make use of the corresponding mask attribute in the system characteristics schema and must be set to true and the value must be omitted. It is possible for masking conflicts to occur where one entity has mask set to true and another entity has mask set to false. A conflict will occur when the mask attribute is set differently on an OVAL Object and matching OVAL State or when two OVAL Objects identify the same OVAL Item(s). When such a conflict occurs the result is always to mask the entity.</xsd:documentation>
+                <xsd:documentation>The optional mask attribute is used to identify values that have been hidden for sensitivity concerns. This is used by the result file which uses the system characteristic schema to format the information found on a specific system. If the mask attribute is set to 'true', then the observed value of this field must not be presented in the results file. A system characteristics file that is not held within a results file must not use the mask attribute.  It is possible for masking conflicts to occur where one entity has mask set to true and another entity has mask set to false. A conflict will occur when the mask attribute is set differently on an OVAL Object and matching OVAL State or when more than one OVAL Objects identify the same OVAL Item(s). When such a conflict occurs the result is always to mask the entity.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="var_ref" type="oval:VariableIDPattern" use="optional">

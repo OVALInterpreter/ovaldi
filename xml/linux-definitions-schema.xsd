@@ -7,8 +7,8 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux Definition</schema>
-               <version>5.10 Release Candidate 1</version>
-               <date>7/19/2011 10:15:36 PM</date>
+               <version>5.10</version>
+               <date>9/14/2011 8:58:23 AM</date>
                 <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                <sch:ns prefix="linux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"/>
@@ -55,6 +55,19 @@
           <xsd:annotation>
                <xsd:documentation>The dpkginfo_object element is used by a dpkginfo test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>A dpkginfo object consists of a single name entity that identifies the package being checked.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_dpkginfo_object_verify_filter_state">
+                         <sch:rule context="linux-def:dpkginfo_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:dpkginfo_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='dpkginfo_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -200,6 +213,19 @@
      <xsd:element name="iflisteners_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
                <xsd:documentation>The iflisteners_object element is used by an iflisteners_test to define the specific interface to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_iflisteners_object_verify_filter_state">
+                         <sch:rule context="linux-def:iflisteners_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:iflisteners_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='iflisteners_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -304,6 +330,19 @@
           <xsd:annotation>
                <xsd:documentation>The inetlisteningservers_object element is used by an inet listening servers test to define the specific protocol-address-port to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>An inet listening servers object consists of three entities. The first identifies a specific IP address. The second entity represents a certain port number. While the third identifies the protocol.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_inetlisteningservers_object_verify_filter_state">
+                         <sch:rule context="linux-def:inetlisteningservers_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:inetlisteningservers_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='inetlisteningservers_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -437,6 +476,19 @@
      <xsd:element name="partition_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
                <xsd:documentation>The partition_object is used by a partition_test to define which partitions on the local system should be collected. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_partition_object_verify_filter_state">
+                         <sch:rule context="linux-def:partition_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:partition_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='partition_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -516,7 +568,7 @@
      <!-- =============================================================================== -->
      <xsd:element name="rpminfo_test" substitutionGroup="oval-def:test">
           <xsd:annotation>
-               <xsd:documentation>The rpm info test is used to check the RPM header information for a given RPM package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpminfo_object and the optional state element specifies the data to check.</xsd:documentation>
+               <xsd:documentation>The rpminfo_test is used to check the RPM header information for a given RPM package. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpminfo_object and the optional state element specifies the data to check.</xsd:documentation>
                <xsd:appinfo>
                     <oval:element_mapping>
                          <oval:test>rpminfo_test</oval:test>
@@ -551,6 +603,19 @@
           <xsd:annotation>
                <xsd:documentation>The rpminfo_object element is used by a rpm info test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>A rpm info object consists of a single name entity that identifies the package being checked.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpminfo_object_verify_filter_state">
+                         <sch:rule context="linux-def:rpminfo_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:rpminfo_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='rpminfo_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -559,6 +624,7 @@
                               <xsd:choice>
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
+                                        <xsd:element name="behaviors" type="linux-def:RpmInfoBehaviors" minOccurs="0" maxOccurs="1"/>
                                         <xsd:element name="name" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the package name to check.</xsd:documentation>
@@ -657,11 +723,31 @@
                                         <xsd:documentation>This field contains the 64-bit PGP key ID that the RPM issuer (generally the original operating system vendor) uses to sign the key. Note that the value should NOT contain a hyphen to separate the higher 32-bits from the lower 32-bits. It should simply be a 16 character hex string. PGP is used to verify the authenticity and integrity of the RPM being considered. Software packages and patches are signed cryptographically to allow administrators to allay concerns that the distribution mechanism has been compromised, whether that mechanism is web site, FTP server, or even a mirror controlled by a hostile party. OVAL uses this field most of all to confirm that the package installed on the system is that shipped by the vendor, since comparing package version numbers against patch announcements is only programmatically valid if the installed package is known to contain the patched code.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
+                              <xsd:element name="extended_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This represents the name, epoch, version, release, and architecture fields as a single version string. It has the form "NAME-EPOCH:VERSION-RELEASE.ARCHITECTURE". Note that a null epoch (or '(none)' as returned by rpm) is equivalent to '0' and would hence have the form NAME-0:VERSION-RELEASE.ARCHITECTURE.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This field contains the absolute path of a file or directory included in the rpm.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
                          </xsd:sequence>
                     </xsd:extension>
                </xsd:complexContent>
           </xsd:complexType>
      </xsd:element>
+     <xsd:complexType name="RpmInfoBehaviors">
+          <xsd:annotation>
+               <xsd:documentation>The RpmInfoBehaviors complex type defines a set of behaviors for controlling what data, for installed rpms, is collected. This behavior aligns with the rpm command.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:attribute name="filepaths" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'filepaths', when true, this behavior means collect all filepaths (directory and file information) from the rpm database for the package.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>          
+     </xsd:complexType>
      <!-- =============================================================================== -->
      <!-- ==============================  RPM VERIFY TEST  ============================== -->
      <!-- =============================================================================== -->
@@ -675,6 +761,18 @@
                          <oval:state>rpmverify_state</oval:state>
                          <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux">rpmverify_item</oval:item>
                     </oval:element_mapping>
+               </xsd:appinfo>
+               <xsd:appinfo>
+                    <oval:deprecated_info>
+                         <oval:version>5.10</oval:version>
+                         <oval:reason>Replaced by the rpmverifyfile_test and the rpmverifypackage_test. The rpmverify_test was split into two tests to distinguish between the verification of the files in an rpm and the verification of an rpm as a whole. By making this distinction, content authoring is simplified and information is no longer duplicated across items. See the rpmverifyfile_test and rpmverifypackage_test.</oval:reason>
+                         <oval:comment>This test has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                    </oval:deprecated_info>
+                    <sch:pattern id="linux-def_rpmverifytst_dep">
+                         <sch:rule context="linux-def:rpmverify_test">
+                              <sch:report test="true()">DEPRECATED TEST: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                         </sch:rule>
+                    </sch:pattern>
                </xsd:appinfo>
                <xsd:appinfo>
                     <sch:pattern id="linux-def_rpmverify_test">
@@ -701,6 +799,31 @@
      <xsd:element name="rpmverify_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
                <xsd:documentation>The rpmverify_object element is used by a rpmverity_test to define a set of files within a set of RPMs to verify. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpmverify_object_verify_filter_state">
+                         <sch:rule context="linux-def:rpmverify_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:rpmverify_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='rpmverify_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+               <xsd:appinfo>
+                    <oval:deprecated_info>
+                         <oval:version>5.10</oval:version>
+                         <oval:reason>Replaced by the rpmverifyfile_object and rpmverifypackage_object. The rpmverify_test was split into two tests to distinguish between the verification of the files in an rpm and the verification of an rpm as a whole. By making this distinction, content authoring is simplified and information is no longer duplicated across items. See the rpmverifyfile_object and rpmverifypackage_object.</oval:reason>
+                         <oval:comment>This object has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                    </oval:deprecated_info>
+                    <sch:pattern id="linux-def_rpmverifyobj_dep">
+                         <sch:rule context="linux-def:rpmverify_object">
+                              <sch:report test="true()">DEPRECATED OBJECT: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -731,6 +854,18 @@
      <xsd:element name="rpmverify_state" substitutionGroup="oval-def:state">
           <xsd:annotation>
                <xsd:documentation>The rpmverify_state element defines the different information that can be used to evaluate the specified rpm. This includes the architecture, epoch number, and version numbers. Most of this information can be obtained through the rpm function. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+               <xsd:appinfo>
+                    <oval:deprecated_info>
+                         <oval:version>5.10</oval:version>
+                         <oval:reason>Replaced by the rpmverifyfile_state and rpmverifypackage_state. The rpmverify_test was split into two tests to distinguish between the verification of the files in an rpm and the verification of an rpm as a whole. By making this distinction, content authoring is simplified and information is no longer duplicated across items. See the rpmverifyfile_state and rpmverifypackage_state.</oval:reason>
+                         <oval:comment>This state has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                    </oval:deprecated_info>
+                    <sch:pattern id="linux-def_rpmverifyste_dep">
+                         <sch:rule context="linux-def:rpmverify_state">
+                              <sch:report test="true()">DEPRECATED STATE: <sch:value-of select="name()"/> ID: <sch:value-of select="@id"/></sch:report>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -744,26 +879,6 @@
                               <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>The filepath element specifies the absolute path for a file or directory in the specified package.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="dependency_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The dependency_check_passed entity indicates whether or not the dependency check passed. If the dependency check is not performed, due to the 'nodeps' behavior, this entity must not be collected.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="digest_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The digest_check_passed entity indicates whether or not the verification of the package or header digests passed. If the digest check is not performed, due to the 'nodigest' behavior, this entity must not be collected.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>
-                              <xsd:element name="verification_script_successful" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The verification_script_successful entity indicates whether or not the verification script executed successfully. If the verification script is not executed, due to the 'noscripts' behavior, this entity must not be collected.</xsd:documentation>
-                                   </xsd:annotation>
-                              </xsd:element>                              
-                              <xsd:element name="signature_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
-                                   <xsd:annotation>
-                                        <xsd:documentation>The signature_check_passed entity indicates whether or not the verification of the package or header signatures passed. If the signature check is not performed, due to the 'nosignature' behavior, this entity must not be collected.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="size_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
@@ -844,6 +959,13 @@
      <xsd:complexType name="RpmVerifyBehaviors">
           <xsd:annotation>
                <xsd:documentation>The RpmVerifyBehaviors complex type defines a set of behaviors that for controlling how installed rpms are verified. These behaviors align with the verify-options of the rpm command with the addition of two behaviors that will indicate that a file with a given attribute marker should not be collected.</xsd:documentation>
+               <xsd:appinfo>
+                    <oval:deprecated_info>
+                         <oval:version>5.10</oval:version>
+                         <oval:reason>Replaced by the RpmVerifyFileBehaviors and the RpmVerifyPackageBehaviors. The RpmVerifyBehaviors complex type is used by the rpmverify_test which was split into two tests to distinguish between the verification of the files in an rpm and the verification of an rpm as a whole. By making this distinction, content authoring is simplified and information is no longer duplicated across items. The new tests utilize the RpmVerifyFileBehaviors and RpmVerifyPackageBehaviors complex types, and as a result, the RpmVerifyBehaviors complex type is no longer needed.</oval:reason>
+                         <oval:comment>This complex type has been deprecated and will be removed in version 6.0 of the language.</oval:comment>
+                    </oval:deprecated_info>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:attribute name="nodeps" use="optional" type="xsd:boolean" default="false">
                <xsd:annotation>
@@ -857,7 +979,7 @@
           </xsd:attribute>
           <xsd:attribute name="nofiles" use="optional" type="xsd:boolean" default="false">
                <xsd:annotation>
-                    <xsd:documentation>'nofiles' when true this behavior means, don't verify any attributes of package files. The entities related to the verification of package files must not be collected.</xsd:documentation>
+                    <xsd:documentation>'nofiles' when true this behavior means, don't verify any attributes of package files.</xsd:documentation>
                </xsd:annotation>
           </xsd:attribute>
           <xsd:attribute name="noscripts" use="optional" type="xsd:boolean" default="false">
@@ -922,6 +1044,623 @@
           </xsd:attribute>
      </xsd:complexType>
      <!-- =============================================================================== -->
+     <!-- ============================  RPM VERIFY FILE TEST  =========================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="rpmverifyfile_test" substitutionGroup="oval-def:test">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverifyfile_test is used to verify the integrity of the individual files in installed RPMs. This test aligns with the rpm -V command for verifying RPMs. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpmverifyfile_object and the optional state element specifies the data to check.</xsd:documentation>
+               <xsd:appinfo>
+                    <oval:element_mapping>
+                         <oval:test>rpmverifyfile_test</oval:test>
+                         <oval:object>rpmverifyfile_object</oval:object>
+                         <oval:state>rpmverifyfile_state</oval:state>
+                         <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux">rpmverifyfile_item</oval:item>
+                    </oval:element_mapping>
+               </xsd:appinfo>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpmverifyfile_test">
+                         <sch:rule context="linux-def:rpmverifyfile_test/linux-def:object">
+                              <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/linux-def:rpmverifyfile_object/@id"><sch:value-of select="../@id"/> - the object child element of an rpmverifyfile_test must reference an rpmverifyfile_object</sch:assert>
+                         </sch:rule>
+                         <sch:rule context="linux-def:rpmverifyfile_test/linux-def:state">
+                              <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/linux-def:rpmverifyfile_state/@id"><sch:value-of select="../@id"/> - the state child element of an rpmverifyfile_test must reference an rpmverifyfile_state</sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:TestType">
+                         <xsd:sequence>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
+                              <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="rpmverifyfile_object" substitutionGroup="oval-def:object">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverifyfile_object element is used by a rpmverifyfile_test to define a set of files within a set of RPMs to verify. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpmverifyfile_object_verify_filter_state">
+                         <sch:rule context="linux-def:rpmverifyfile_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:rpmverifyfile_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='rpmverifyfile_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:ObjectType">
+                         <xsd:sequence>
+                              <xsd:choice>
+                                   <xsd:element ref="oval-def:set"/>
+                                   <xsd:sequence>
+                                        <xsd:element name="behaviors" type="linux-def:RpmVerifyFileBehaviors" minOccurs="0" maxOccurs="1"/>
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the package name to check.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                        <xsd:element name="epoch" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) the string '(none)' should be used.. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
+                                             </xsd:annotation>
+                                             <xsd:complexType>
+                                                  <xsd:simpleContent>
+                                                       <xsd:restriction base="oval-def:EntityObjectAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                 <xsd:simpleType>
+                                                                      <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                           <xsd:enumeration value="string"/>
+                                                                           <xsd:enumeration value="int"/>
+                                                                      </xsd:restriction>
+                                                                 </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                       </xsd:restriction>
+                                                  </xsd:simpleContent>
+                                             </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="version" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
+                                             </xsd:annotation>
+                                             <xsd:complexType>
+                                                  <xsd:simpleContent>
+                                                       <xsd:restriction base="oval-def:EntityObjectAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                 <xsd:simpleType>
+                                                                      <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                           <xsd:enumeration value="string"/>
+                                                                           <xsd:enumeration value="version"/>
+                                                                      </xsd:restriction>
+                                                                 </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                       </xsd:restriction>
+                                                  </xsd:simpleContent>
+                                             </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="release" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
+                                             </xsd:annotation>
+                                             <xsd:complexType>
+                                                  <xsd:simpleContent>
+                                                       <xsd:restriction base="oval-def:EntityObjectAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                 <xsd:simpleType>
+                                                                      <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                           <xsd:enumeration value="string"/>
+                                                                           <xsd:enumeration value="version"/>
+                                                                      </xsd:restriction>
+                                                                 </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                       </xsd:restriction>
+                                                  </xsd:simpleContent>
+                                             </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="arch" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                        <xsd:element name="filepath" type="oval-def:EntityObjectStringType">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>The filepath element specifies the absolute path for a file or directory in the specified package.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                        <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                   </xsd:sequence>
+                              </xsd:choice>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="rpmverifyfile_state" substitutionGroup="oval-def:state">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverifyfile_state element defines the different information that can be used to determine if a set of files within a set of RPMs passed verification. This includes the architecture, epoch number, version numbers, and the verification of various file attributes. Most of this information can be obtained through the rpm function. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:StateType">
+                         <xsd:sequence>
+                              <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the package name to check.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="epoch" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) the string '(none)' should be used.. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
+                                   </xsd:annotation>
+                                   <xsd:complexType>
+                                        <xsd:simpleContent>
+                                             <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                  <xsd:attribute name="datatype" use="optional" default="string">
+                                                       <xsd:simpleType>
+                                                            <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                 <xsd:enumeration value="string"/>
+                                                                 <xsd:enumeration value="int"/>
+                                                            </xsd:restriction>
+                                                       </xsd:simpleType>
+                                                  </xsd:attribute>
+                                             </xsd:restriction>
+                                        </xsd:simpleContent>
+                                   </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="version" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
+                                   </xsd:annotation>
+                                   <xsd:complexType>
+                                        <xsd:simpleContent>
+                                             <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                  <xsd:attribute name="datatype" use="optional" default="string">
+                                                       <xsd:simpleType>
+                                                            <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                 <xsd:enumeration value="string"/>
+                                                                 <xsd:enumeration value="version"/>
+                                                            </xsd:restriction>
+                                                       </xsd:simpleType>
+                                                  </xsd:attribute>
+                                             </xsd:restriction>
+                                        </xsd:simpleContent>
+                                   </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="release" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
+                                   </xsd:annotation>
+                                   <xsd:complexType>
+                                        <xsd:simpleContent>
+                                             <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                  <xsd:attribute name="datatype" use="optional" default="string">
+                                                       <xsd:simpleType>
+                                                            <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                 <xsd:enumeration value="string"/>
+                                                                 <xsd:enumeration value="version"/>
+                                                            </xsd:restriction>
+                                                       </xsd:simpleType>
+                                                  </xsd:attribute>
+                                             </xsd:restriction>
+                                        </xsd:simpleContent>
+                                   </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="arch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="filepath" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The filepath element specifies the absolute path for a file or directory in the specified package.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="extended_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This represents the name, epoch, version, release, and architecture fields as a single version string. It has the form "NAME-EPOCH:VERSION-RELEASE.ARCHITECTURE". Note that a null epoch (or '(none)' as returned by rpm) is equivalent to '0' and would hence have the form NAME-0:VERSION-RELEASE.ARCHITECTURE.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="size_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_differs entity aligns with the first character ('S' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="mode_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The mode_differs entity aligns with the second character ('M' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="md5_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The md5_differs entity aligns with the third character ('5' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="device_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The device_differs entity aligns with the fourth character ('D' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="link_mismatch" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The link_mismatch entity aligns with the fifth character ('L' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="ownership_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The ownership_differs entity aligns with the sixth character ('U' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="group_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The group_differs entity aligns with the seventh character ('U' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="mtime_differs" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The mtime_differs entity aligns with the eighth character ('T' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="capabilities_differ" type="linux-def:EntityStateRpmVerifyResultType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The size_differs entity aligns with the ninth character ('P' flag) in the character string in the output generated by running rpm –V on a specific file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="configuration_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The configuration_file entity represents the configuration file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="documentation_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The documentation_file entity represents the documenation file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="ghost_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The ghost_file entity represents the ghost file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="license_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The license_file entity represents the license file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="readme_file" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The readme_file entity represents the readme file attribute marker that may be present on a file.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:complexType name="RpmVerifyFileBehaviors">
+          <xsd:annotation>
+               <xsd:documentation>The RpmVerifyFileBehaviors complex type defines a set of behaviors that for controlling how the individual files in installed rpms are verified. These behaviors align with the verify-options of the rpm command with the addition of two behaviors that will indicate that a file with a given attribute marker should not be collected.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:attribute name="nolinkto" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nolinkto' when true this behavior means, don't verify symbolic links attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nomd5" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nomd5' when true this behavior means, don't verify the file md5 attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nosize" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nosize' when true this behavior means, don't verify the file size attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nouser" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nouser' when true this behavior means, don't verify the file owner attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nogroup" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nogroup' when true this behavior means, don't verify the file group owner attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nomtime" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nomtime' when true this behavior means, don't verify the file mtime attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nomode" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nomode' when true this behavior means, don't verify the file mode attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nordev" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nordev' when true this behavior means, don't verify the file rdev attribute.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="noconfigfiles" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'noconfigfiles' when true this behavior means, skip files that are marked with the %config attribute marker.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="noghostfiles" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'noghostfiles' when true this behavior means, skip files that are maked with %ghost attribute marker.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+     </xsd:complexType>
+     <!-- =============================================================================== -->
+     <!-- ==========================  RPM VERIFY PACKAGE TEST  ========================== -->
+     <!-- =============================================================================== -->
+     <xsd:element name="rpmverifypackage_test" substitutionGroup="oval-def:test">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverifypackage_test is used to verify the integrity of installed RPMs. This test aligns with the rpm -V command for verifying RPMs. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a rpmverifypackage_object and the optional state element specifies the data to check.</xsd:documentation>
+               <xsd:appinfo>
+                    <oval:element_mapping>
+                         <oval:test>rpmverifypackage_test</oval:test>
+                         <oval:object>rpmverifypackage_object</oval:object>
+                         <oval:state>rpmverifypackage_state</oval:state>
+                         <oval:item target_namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux">rpmverifypackage_item</oval:item>
+                    </oval:element_mapping>
+               </xsd:appinfo>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpmverifypackage_test">
+                         <sch:rule context="linux-def:rpmverifypackage_test/linux-def:object">
+                              <sch:assert test="@object_ref=ancestor::oval-def:oval_definitions/oval-def:objects/linux-def:rpmverifypackage_object/@id"><sch:value-of select="../@id"/> - the object child element of an rpmverifypackage_test must reference an rpmverifypackage_object</sch:assert>
+                         </sch:rule>
+                         <sch:rule context="linux-def:rpmverifypackage_test/linux-def:state">
+                              <sch:assert test="@state_ref=ancestor::oval-def:oval_definitions/oval-def:states/linux-def:rpmverifypackage_state/@id"><sch:value-of select="../@id"/> - the state child element of an rpmverifypackage_test must reference an rpmverifypackage_state</sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:TestType">
+                         <xsd:sequence>
+                              <xsd:element name="object" type="oval-def:ObjectRefType" />
+                              <xsd:element name="state" type="oval-def:StateRefType" minOccurs="0" maxOccurs="unbounded"/>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="rpmverifypackage_object" substitutionGroup="oval-def:object">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverifypackage_object element is used by a rpmverity_test to define a set of RPMs to verify. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_rpmverifypackage_object_verify_filter_state">
+                         <sch:rule context="linux-def:rpmverifypackage_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:rpmverifypackage_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='rpmverifypackage_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:ObjectType">
+                         <xsd:sequence>
+                              <xsd:choice>
+                                   <xsd:element ref="oval-def:set"/>
+                                   <xsd:sequence>
+                                        <xsd:element name="behaviors" type="linux-def:RpmVerifyPackageBehaviors" minOccurs="0" maxOccurs="1"/>
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the package name to check.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                        <xsd:element name="epoch" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) the string '(none)' should be used.. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
+                                             </xsd:annotation>
+                                             <xsd:complexType>
+                                                  <xsd:simpleContent>
+                                                       <xsd:restriction base="oval-def:EntityObjectAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                 <xsd:simpleType>
+                                                                      <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                           <xsd:enumeration value="string"/>
+                                                                           <xsd:enumeration value="int"/>
+                                                                      </xsd:restriction>
+                                                                 </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                       </xsd:restriction>
+                                                  </xsd:simpleContent>
+                                             </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="version" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
+                                             </xsd:annotation>
+                                             <xsd:complexType>
+                                                  <xsd:simpleContent>
+                                                       <xsd:restriction base="oval-def:EntityObjectAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                 <xsd:simpleType>
+                                                                      <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                           <xsd:enumeration value="string"/>
+                                                                           <xsd:enumeration value="version"/>
+                                                                      </xsd:restriction>
+                                                                 </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                       </xsd:restriction>
+                                                  </xsd:simpleContent>
+                                             </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="release" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
+                                             </xsd:annotation>
+                                             <xsd:complexType>
+                                                  <xsd:simpleContent>
+                                                       <xsd:restriction base="oval-def:EntityObjectAnySimpleType">
+                                                            <xsd:attribute name="datatype" use="optional" default="string">
+                                                                 <xsd:simpleType>
+                                                                      <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                           <xsd:enumeration value="string"/>
+                                                                           <xsd:enumeration value="version"/>
+                                                                      </xsd:restriction>
+                                                                 </xsd:simpleType>
+                                                            </xsd:attribute>
+                                                       </xsd:restriction>
+                                                  </xsd:simpleContent>
+                                             </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="arch" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                             <xsd:annotation>
+                                                  <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:element>
+                                        <xsd:element ref="oval-def:filter" minOccurs="0" maxOccurs="unbounded"/>
+                                   </xsd:sequence>
+                              </xsd:choice>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:element name="rpmverifypackage_state" substitutionGroup="oval-def:state">
+          <xsd:annotation>
+               <xsd:documentation>The rpmverifypackage_state element defines the different information that can be used to verify the integrity of installed rpms. This includes the architecture, epoch number, version numbers, verification of variuos attributes of an rpm. Most of this information can be obtained through the rpm function. Please refer to the individual elements in the schema for more details about what each represents.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+               <xsd:complexContent>
+                    <xsd:extension base="oval-def:StateType">
+                         <xsd:sequence>
+                              <xsd:element name="name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the package name to check.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="epoch" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) the string '(none)' should be used.. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
+                                   </xsd:annotation>
+                                   <xsd:complexType>
+                                        <xsd:simpleContent>
+                                             <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                  <xsd:attribute name="datatype" use="optional" default="string">
+                                                       <xsd:simpleType>
+                                                            <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                 <xsd:enumeration value="string"/>
+                                                                 <xsd:enumeration value="int"/>
+                                                            </xsd:restriction>
+                                                       </xsd:simpleType>
+                                                  </xsd:attribute>
+                                             </xsd:restriction>
+                                        </xsd:simpleContent>
+                                   </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="version" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
+                                   </xsd:annotation>
+                                   <xsd:complexType>
+                                        <xsd:simpleContent>
+                                             <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                  <xsd:attribute name="datatype" use="optional" default="string">
+                                                       <xsd:simpleType>
+                                                            <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                 <xsd:enumeration value="string"/>
+                                                                 <xsd:enumeration value="version"/>
+                                                            </xsd:restriction>
+                                                       </xsd:simpleType>
+                                                  </xsd:attribute>
+                                             </xsd:restriction>
+                                        </xsd:simpleContent>
+                                   </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="release" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
+                                   </xsd:annotation>
+                                   <xsd:complexType>
+                                        <xsd:simpleContent>
+                                             <xsd:restriction base="oval-def:EntityStateAnySimpleType">
+                                                  <xsd:attribute name="datatype" use="optional" default="string">
+                                                       <xsd:simpleType>
+                                                            <xsd:restriction base="oval:SimpleDatatypeEnumeration">
+                                                                 <xsd:enumeration value="string"/>
+                                                                 <xsd:enumeration value="version"/>
+                                                            </xsd:restriction>
+                                                       </xsd:simpleType>
+                                                  </xsd:attribute>
+                                             </xsd:restriction>
+                                        </xsd:simpleContent>
+                                   </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="arch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="dependency_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The dependency_check_passed entity indicates whether or not the dependency check passed. If the dependency check is not performed, due to the 'nodeps' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="digest_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The digest_check_passed entity indicates whether or not the verification of the package or header digests passed. If the digest check is not performed, due to the 'nodigest' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="verification_script_successful" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The verification_script_successful entity indicates whether or not the verification script executed successfully. If the verification script is not executed, due to the 'noscripts' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="signature_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>The signature_check_passed entity indicates whether or not the verification of the package or header signatures passed. If the signature check is not performed, due to the 'nosignature' behavior, this entity must not be collected.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                         </xsd:sequence>
+                    </xsd:extension>
+               </xsd:complexContent>
+          </xsd:complexType>
+     </xsd:element>
+     <xsd:complexType name="RpmVerifyPackageBehaviors">
+          <xsd:annotation>
+               <xsd:documentation>The RpmVerifyPackageBehaviors complex type defines a set of behaviors that for controlling how installed rpms are verified. These behaviors align with the verify-options of the rpm command.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:attribute name="nodeps" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nodeps' when true this behavior means, don't verify dependencies of packages.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nodigest" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nodigest' when true this behavior means, don't verify package or header digests when reading.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="noscripts" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'noscripts' when true this behavior means, don't execute the %verifyscript scriptlet (if any).</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="nosignature" use="optional" type="xsd:boolean" default="false">
+               <xsd:annotation>
+                    <xsd:documentation>'nosignature' when true this behavior means, don't verify package or header signatures when reading.</xsd:documentation>
+               </xsd:annotation>
+          </xsd:attribute>
+     </xsd:complexType>
+     <!-- =============================================================================== -->
      <!-- ===========================  SELINUX BOOLEAN TEST  ============================ -->
      <!-- =============================================================================== -->
      <xsd:element name="selinuxboolean_test" substitutionGroup="oval-def:test">
@@ -960,6 +1699,19 @@
      <xsd:element name="selinuxboolean_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
                <xsd:documentation>The selinuxboolean_object element is used by an selinuxboolean_test to define the items to evaluate based on a specified state.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_selinuxboolean_object_verify_filter_state">
+                         <sch:rule context="linux-def:selinuxboolean_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:selinuxboolean_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='selinuxboolean_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -1048,6 +1800,19 @@
      <xsd:element name="selinuxsecuritycontext_object" substitutionGroup="oval-def:object">
           <xsd:annotation>
                <xsd:documentation>The selinuxsecuritycontext_object element is used by an selinuxsecuritycontext_test to define the security contexts of files and processes to collect from the local system. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_selinuxsecuritycontext_object_verify_filter_state">
+                         <sch:rule context="linux-def:selinuxsecuritycontext_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:selinuxsecuritycontext_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='selinuxsecuritycontext_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -1061,12 +1826,34 @@
                                              <xsd:element name="filepath" type="oval-def:EntityObjectStringType">
                                                   <xsd:annotation>
                                                        <xsd:documentation>The filepath element specifies the absolute path for a file on the machine. A directory cannot be specified as a filepath.</xsd:documentation>
+                                                       <xsd:appinfo>
+                                                            <sch:pattern id="linux-def_selinuxsecuritycontext_objectfilepath">
+                                                                 <sch:rule context="linux-def:selinuxsecuritycontext_object/linux-def:filepath">
+                                                                      <sch:assert test="not(preceding-sibling::linux-def:behaviors[@max_depth or @recurse or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth, recurse, and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
+                                                                 </sch:rule>
+                                                            </sch:pattern>
+                                                            <sch:pattern id="unix-def_selinuxsecuritycontext_objectfilepath2">
+                                                                 <sch:rule context="linux-def:selinuxsecuritycontext_object/linux-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                      <sch:assert test="not(preceding-sibling::linux-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
+                                                                 </sch:rule>
+                                                            </sch:pattern>
+                                                       </xsd:appinfo>
                                                   </xsd:annotation>
                                              </xsd:element>
                                              <xsd:sequence>
                                                   <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                        <xsd:annotation>
                                                             <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
+                                                            <xsd:appinfo>
+                                                                 <sch:pattern id="linux-def_selinuxsecuritycontext_objectpath">
+                                                                      <sch:rule context="linux-def:selinuxsecuritycontext_object/linux-def:path[not(@operation='equals' or not(@operation))]">
+                                                                           <sch:assert test="not(preceding-sibling::linux-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                           <sch:assert test="not(preceding-sibling::linux-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                           <sch:assert test="not(preceding-sibling::linux-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                           <sch:assert test="not(preceding-sibling::linux-def:behaviors[@recurse])"><sch:value-of select="../@id"/> - the recurse behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                      </sch:rule>
+                                                                 </sch:pattern>
+                                                            </xsd:appinfo>
                                                        </xsd:annotation>
                                                   </xsd:element>
                                                   <xsd:element name="filename" type="oval-def:EntityObjectStringType"  nillable="true">
@@ -1224,6 +2011,19 @@
           <xsd:annotation>
                <xsd:documentation>The slackwarepkginfo_object element is used by a slackware package info test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                <xsd:documentation>A slackware package info object consists of a single name entity that identifies the package being checked.</xsd:documentation>
+               <xsd:appinfo>
+                    <sch:pattern id="linux-def_slackwarepkginfo_object_verify_filter_state">
+                         <sch:rule context="linux-def:slackwarepkginfo_object//oval-def:filter">
+                              <sch:let name="parent_object" value="ancestor::linux-def:slackwarepkginfo_object"/>
+                              <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                              <sch:let name="state_ref" value="."/>
+                              <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                              <sch:let name="state_name" value="local-name($reffed_state)"/>
+                              <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                              <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#linux') and ($state_name='slackwarepkginfo_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                         </sch:rule>
+                    </sch:pattern>
+               </xsd:appinfo>
           </xsd:annotation>
           <xsd:complexType>
                <xsd:complexContent>
@@ -1290,6 +2090,7 @@
                <xsd:annotation>
                     <xsd:documentation>'max_depth' defines the maximum depth of recursion to perform when a recurse_direction is specified. A value of '0' is equivalent to no recursion, '1' means to step only one directory level up/down, and so on. The default value is '-1' meaning no limitation. For a 'max_depth' of -1 or any value of 1 or more the starting directory must be considered in the recursive search.</xsd:documentation>
                     <xsd:documentation>Note that the default recurse_direction behavior is 'none' so even though max_depth specifies no limitation by default, the recurse_direction behavior turns recursion off.</xsd:documentation>
+                    <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                </xsd:annotation>
                <xsd:simpleType>
                     <xsd:restriction base="xsd:integer">
@@ -1300,7 +2101,8 @@
           </xsd:attribute>
           <xsd:attribute name="recurse" use="optional" default="symlinks and directories">
                <xsd:annotation>
-                    <xsd:documentation>'recurse' defines how to recurse into the path entity, in other words what to follow during recursion. Options include symlinks, directories, or both. Note that a max-depth has to be specified for recursion to take place and for this attribute to mean anything. Also note that this behavior does not apply to Windows systems since they do not support symbolic links. On Windows systems the 'recurse' behavior is always equivalent to directories.</xsd:documentation>
+                    <xsd:documentation>'recurse' defines how to recurse into the path entity, in other words what to follow during recursion. Options include symlinks, directories, or both. Note that a max-depth other than 0 has to be specified for recursion to take place and for this attribute to mean anything. Also note that this behavior does not apply to Windows systems since they do not support symbolic links. On Windows systems the 'recurse' behavior is always equivalent to directories.</xsd:documentation>
+                    <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                </xsd:annotation>
                <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
@@ -1313,6 +2115,7 @@
           <xsd:attribute name="recurse_direction" use="optional" default="none">
                <xsd:annotation>
                     <xsd:documentation>'recurse_direction' defines the direction to recurse, either 'up' to parent directories, or 'down' into child directories. The default value is 'none' for no recursion.</xsd:documentation>
+                    <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                </xsd:annotation>
                <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
@@ -1324,7 +2127,8 @@
           </xsd:attribute>
           <xsd:attribute name="recurse_file_system" use="optional" default="all">
                <xsd:annotation>
-                    <xsd:documentation>'recurse_file_system' defines the file system limitation of any recursion, either 'local' limiting data collection to local file systems (as opposed to file systems mounted from an external system), or 'defined' to keep any recursion within the file system that the file_object (path+filename) has specified. The default value is 'all' meaning to use all available file systems for data collection.</xsd:documentation>
+                    <xsd:documentation>'recurse_file_system' defines the file system limitation of any searching and applies to all operations as specified on the path or filepath entity. The value of 'local' limits the search scope to local file systems (as opposed to file systems mounted from an external system). The value of 'defined' keeps any recursion within the file system that the file_object (path+filename or filepath) has specified. The value of 'defined' only applies when an equality operation is used for searching because the path or filepath entity must explicitly define a file system. The default value is 'all' meaning to search all available file systems for data collection.</xsd:documentation>
+                    <xsd:documentation>Note that in most cases it is recommended that the value of 'local' be used to ensure that file system searching is limited to only the local file systems. Searching 'all' file systems may have performance implications.</xsd:documentation>
                </xsd:annotation>
                <xsd:simpleType>
                     <xsd:restriction base="xsd:string">

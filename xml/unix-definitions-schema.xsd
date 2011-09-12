@@ -6,8 +6,8 @@
             <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
             <xsd:appinfo>
                   <schema>UNIX Definition</schema>
-                  <version>5.10 Release Candidate 1</version>
-                  <date>7/19/2011 10:15:37 PM</date>
+                  <version>5.10</version>
+                  <date>9/14/2011 8:58:23 AM</date>
                   <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                   <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                   <sch:ns prefix="unix-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"/>
@@ -53,6 +53,19 @@
       <xsd:element name="dnscache_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The dnscache_object is used by the dnscache_test to specify the domain name(s) that should be collected from the DNS cache on the local system. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_dnscache_object_verify_filter_state">
+                              <sch:rule context="unix-def:dnscache_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:dnscache_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='dnscache_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -144,6 +157,19 @@
                   <xsd:documentation>A file object defines the path and filename of the file(s). In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the FileBehaviors complex type for more information about specific behaviors.</xsd:documentation>
                   <xsd:documentation>The set of files to be evaluated may be identified with either a complete filepath or a path and filename. Only one of these options may be selected.</xsd:documentation>
                   <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_file_object_verify_filter_state">
+                              <sch:rule context="unix-def:file_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:file_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='file_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -160,7 +186,12 @@
                                                                   <xsd:appinfo>
                                                                         <sch:pattern id="unix-def_fileobjfilepath">
                                                                               <sch:rule context="unix-def:file_object/unix-def:filepath">
-                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth or @recurse or @recurse_direction or @recurse_file_system])"><sch:value-of select="../@id"/> - the max_depth, recurse, recurse_direction and recurse_file_system behaviors are not allowed with a filepath entity</sch:assert>
+                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth or @recurse or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth, recurse, and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
+                                                                              </sch:rule>
+                                                                        </sch:pattern>
+                                                                        <sch:pattern id="unix-def_fileobjfilepath2">
+                                                                              <sch:rule context="unix-def:file_object/unix-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
                                                                               </sch:rule>
                                                                         </sch:pattern>
                                                                   </xsd:appinfo>
@@ -170,6 +201,16 @@
                                                           <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="unix-def_fileobjpath">
+                                                                                  <sch:rule context="unix-def:file_object/unix-def:path[not(@operation='equals' or not(@operation))]">
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse])"><sch:value-of select="../@id"/> - the recurse behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType"  nillable="true">
@@ -331,6 +372,7 @@
                   <xsd:annotation>
                         <xsd:documentation>'max_depth' defines the maximum depth of recursion to perform when a recurse_direction is specified. A value of '0' is equivalent to no recursion, '1' means to step only one directory level up/down, and so on. The default value is '-1' meaning no limitation. For a 'max_depth' of -1 or any value of 1 or more the starting directory must be considered in the recursive search.</xsd:documentation>
                         <xsd:documentation>Note that the default recurse_direction behavior is 'none' so even though max_depth specifies no limitation by default, the recurse_direction behavior turns recursion off.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:integer">
@@ -341,7 +383,8 @@
             </xsd:attribute>
             <xsd:attribute name="recurse" use="optional" default="symlinks and directories">
                   <xsd:annotation>
-                        <xsd:documentation>'recurse' defines how to recurse into the path entity, in other words what to follow during recursion. Options include symlinks, directories, or both. Note that a max-depth has to be specified for recursion to take place and for this attribute to mean anything.</xsd:documentation>
+                        <xsd:documentation>'recurse' defines how to recurse into the path entity, in other words what to follow during recursion. Options include symlinks, directories, or both. Note that a max-depth other than 0 has to be specified for recursion to take place and for this attribute to mean anything.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                         <xsd:appinfo>
                               <sch:pattern id="unix-def_recurse_value_file_dep">
                                     <sch:rule context="oval-def:oval_definitions/oval-def:objects/unix-def:file_object/unix-def:behaviors">
@@ -396,6 +439,7 @@
             <xsd:attribute name="recurse_direction" use="optional" default="none">
                   <xsd:annotation>
                         <xsd:documentation>'recurse_direction' defines the direction to recurse, either 'up' to parent directories, or 'down' into child directories. The default value is 'none' for no recursion.</xsd:documentation>
+                        <xsd:documentation>Note that this behavior only applies with the equality operation on the path entity.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:string">
@@ -407,7 +451,8 @@
             </xsd:attribute>
             <xsd:attribute name="recurse_file_system" use="optional" default="all">
                   <xsd:annotation>
-                        <xsd:documentation>'recurse_file_system' defines the file system limitation of any recursion, either 'local' limiting data collection to local file systems (as opposed to file systems mounted from an external system), or 'defined' to keep any recursion within the file system that the file_object (path+filename) has specified. The default value is 'all' meaning to use all available file systems for data collection.</xsd:documentation>
+                        <xsd:documentation>'recurse_file_system' defines the file system limitation of any searching and applies to all operations as specified on the path or filepath entity. The value of 'local' limits the search scope to local file systems (as opposed to file systems mounted from an external system). The value of 'defined' keeps any recursion within the file system that the file_object (path+filename or filepath) has specified. The value of 'defined' only applies when an equality operation is used for searching because the path or filepath entity must explicitly define a file system. The default value is 'all' meaning to search all available file systems for data collection.</xsd:documentation>
+                        <xsd:documentation>Note that in most cases it is recommended that the value of 'local' be used to ensure that file system searching is limited to only the local file systems. Searching 'all' file systems may have performance implications.</xsd:documentation>
                   </xsd:annotation>
                   <xsd:simpleType>
                         <xsd:restriction base="xsd:string">
@@ -461,6 +506,19 @@
                   <xsd:documentation>A file extended attribute object defines the path, filename and attribute name. In addition, a number of behaviors may be provided that help guide the collection of objects. Please refer to the FileExtendedAttributeBehaviors complex type for more information about specific behaviors.</xsd:documentation>
                   <xsd:documentation>The set of files to be evaluated may be identified with either a complete filepath or a path and filename. Only one of these options may be selected.</xsd:documentation>
                   <xsd:documentation>It is important to note that the 'max_depth' and 'recurse_direction' attributes of the 'behaviors' element do not apply to the 'filepath' element, only to the 'path' and 'filename' elements.  This is because the 'filepath' element represents an absolute path to a particular file and it is not possible to recurse over a file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_fileextendedattribute_object_verify_filter_state">
+                              <sch:rule context="unix-def:fileextendedattribute_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:fileextendedattribute_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='fileextendedattribute_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -477,7 +535,12 @@
                                                                   <xsd:appinfo>
                                                                         <sch:pattern id="unix-def_file_ea_objfilepath">
                                                                               <sch:rule context="unix-def:fileextendedattribute_object/unix-def:filepath">
-                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth or @recurse or @recurse_direction or @recurse_file_system])"><sch:value-of select="../@id"/> - the max_depth, recurse, recurse_direction and recurse_file_system behaviors are not allowed with a filepath entity</sch:assert>
+                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth or @recurse or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth, recurse, and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
+                                                                              </sch:rule>
+                                                                        </sch:pattern>
+                                                                        <sch:pattern id="unix-def_file_ea_objfilepath2">
+                                                                              <sch:rule context="unix-def:fileextendedattribute_object/unix-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
                                                                               </sch:rule>
                                                                         </sch:pattern>
                                                                   </xsd:appinfo>
@@ -487,6 +550,16 @@
                                                           <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The path element specifies the directory component of the absolute path to a file on the machine.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="unix-def_file_ea_objpath">
+                                                                                  <sch:rule context="unix-def:fileextendedattribute_object/unix-def:path[not(@operation='equals' or not(@operation))]">
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse])"><sch:value-of select="../@id"/> - the recurse behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType"  nillable="true">
@@ -593,6 +666,19 @@
       <xsd:element name="gconf_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The gconf_object element is used by a gconf_test to define the preference keys to collect and the sources from which to collect the preference keys. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_gconf_object_verify_filter_state">
+                              <sch:rule context="unix-def:gconf_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:gconf_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='gconf_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -721,6 +807,19 @@
             <xsd:annotation>
                   <xsd:documentation>The inetd_object element is used by an inetd test to define the specific protocol-service to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An inetd object consists of a protocol entity and a service_name entity that identifies the specific service to be tested.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_inetd_object_verify_filter_state">
+                              <sch:rule context="unix-def:inetd_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:inetd_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='inetd_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -835,6 +934,19 @@
             <xsd:annotation>
                   <xsd:documentation>The interface_object element is used by an interface test to define the specific interfaces(s) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An interface object consists of a single name entity that identifies which interface is being specified.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_interface_object_verify_filter_state">
+                              <sch:rule context="unix-def:interface_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:interface_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='interface_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -945,6 +1057,19 @@
             <xsd:annotation>
                   <xsd:documentation>The password_object element is used by a password test to define the object to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A password object consists of a single username entity that identifies the user(s) whose password is to be evaluated.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_password_object_verify_filter_state">
+                              <sch:rule context="unix-def:password_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:password_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='password_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1214,6 +1339,19 @@
             <xsd:annotation>
                   <xsd:documentation>The process58_object element is used by a process58_test to define the specific process(es) to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A process58_object defines the command line used to start the process(es) and pid.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_process58_object_verify_filter_state">
+                              <sch:rule context="unix-def:process58_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:process58_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='process58_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1367,6 +1505,19 @@
       <xsd:element name="routingtable_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The routingtable_object element is used by a routingtable_test to define the destination IP address(es), found in a system's primary routing table, to collect. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_routingtable_object_verify_filter_state">
+                              <sch:rule context="unix-def:routingtable_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:routingtable_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='routingtable_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1460,6 +1611,19 @@
       <xsd:element name="runlevel_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The runlevel_object element is used by a runlevel_test to define the specific service(s)/runlevel combination to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_runlevel_object_verify_filter_state">
+                              <sch:rule context="unix-def:runlevel_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:runlevel_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='runlevel_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1581,6 +1745,19 @@
                               </sch:rule>
                         </sch:pattern>
                   </xsd:appinfo>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_sccs_object_verify_filter_state">
+                              <sch:rule context="unix-def:sccs_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:sccs_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='sccs_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1597,7 +1774,12 @@
                                                                   <xsd:appinfo>
                                                                         <sch:pattern id="unix-def_sccsobjfilepath">
                                                                               <sch:rule context="unix-def:sccs_object/unix-def:filepath">
-                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth or @recurse or @recurse_direction or @recurse_file_system])"><sch:value-of select="../@id"/> - the max_depth, recurse, recurse_direction and recurse_file_system behaviors are not allowed with a filepath entity</sch:assert>
+                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth or @recurse or @recurse_direction])"><sch:value-of select="../@id"/> - the max_depth, recurse, and recurse_direction behaviors are not allowed with a filepath entity</sch:assert>
+                                                                              </sch:rule>
+                                                                        </sch:pattern>                                                                        
+                                                                        <sch:pattern id="unix-def_sccsobjfilepath2">
+                                                                              <sch:rule context="unix-def:sccs_object/unix-def:filepath[not(@operation='equals' or not(@operation))]">
+                                                                                    <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a filepath entity.</sch:assert>
                                                                               </sch:rule>
                                                                         </sch:pattern>
                                                                   </xsd:appinfo>
@@ -1607,6 +1789,16 @@
                                                           <xsd:element name="path" type="oval-def:EntityObjectStringType">
                                                                 <xsd:annotation>
                                                                       <xsd:documentation>The path element specifies the directory component of the absolute path to an SCCS file.</xsd:documentation>
+                                                                      <xsd:appinfo>
+                                                                            <sch:pattern id="unix-def_sccsobjpath">
+                                                                                  <sch:rule context="unix-def:sccs_object/unix-def:path[not(@operation='equals' or not(@operation))]">
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_file_system='defined'])"><sch:value-of select="../@id"/> - the recurse_file_system behavior MUST not be set to 'defined' when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@max_depth])"><sch:value-of select="../@id"/> - the max_depth behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse_direction])"><sch:value-of select="../@id"/> - the recurse_direction behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                        <sch:assert test="not(preceding-sibling::unix-def:behaviors[@recurse])"><sch:value-of select="../@id"/> - the recurse behavior MUST not be used when a pattern match is used with a path entity.</sch:assert>
+                                                                                  </sch:rule>
+                                                                            </sch:pattern>
+                                                                      </xsd:appinfo>
                                                                 </xsd:annotation>
                                                           </xsd:element>
                                                           <xsd:element name="filename" type="oval-def:EntityObjectStringType">
@@ -1745,6 +1937,19 @@
             <xsd:annotation>
                   <xsd:documentation>The shadow_object element is used by a shadow test to define the shadow file to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>A shdow object consists of a single user entity that identifies the username associted with the shadow file.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_shadow_object_verify_filter_state">
+                              <sch:rule context="unix-def:shadow_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:shadow_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='shadow_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -1868,6 +2073,19 @@
       <xsd:element name="sysctl_object" substitutionGroup="oval-def:object">
             <xsd:annotation>
                   <xsd:documentation>The sysctl_object is used by a sysctl_test to define which kernel parameters on the local system should be collected. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_sysctl_object_verify_filter_state">
+                              <sch:rule context="unix-def:sysctl_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:sysctl_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='sysctl_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
@@ -2041,6 +2259,19 @@
             <xsd:annotation>
                   <xsd:documentation>The xinetd_object element is used by an xinetd test to define the specific protocol-service to be evaluated. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic. Again, please refer to the description of the set element in the oval-definitions-schema.</xsd:documentation>
                   <xsd:documentation>An xinetd object consists of a protocol entity and a service_name entity that identifies the specific service to be tested.</xsd:documentation>
+                  <xsd:appinfo>
+                        <sch:pattern id="unix-def_xinetd_object_verify_filter_state">
+                              <sch:rule context="unix-def:xinetd_object//oval-def:filter">
+                                    <sch:let name="parent_object" value="ancestor::unix-def:xinetd_object"/>
+                                    <sch:let name="parent_object_id" value="$parent_object/@id"/>
+                                    <sch:let name="state_ref" value="."/>
+                                    <sch:let name="reffed_state" value="ancestor::oval-def:oval_definitions/oval-def:states/*[@id=$state_ref]"/>
+                                    <sch:let name="state_name" value="local-name($reffed_state)"/>
+                                    <sch:let name="state_namespace" value="namespace-uri($reffed_state)"/>
+                                    <sch:assert test="(($state_namespace='http://oval.mitre.org/XMLSchema/oval-definitions-5#unix') and ($state_name='xinetd_state'))">State referenced in filter for <sch:value-of select="name($parent_object)"/> '<sch:value-of select="$parent_object_id"/>' is of the wrong type. </sch:assert>
+                              </sch:rule>
+                        </sch:pattern>
+                  </xsd:appinfo>
             </xsd:annotation>
             <xsd:complexType>
                   <xsd:complexContent>
