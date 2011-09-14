@@ -113,7 +113,7 @@ install the supporting libraries.
     
        To compile and install the Xerces-C library simply run the following commands.
 	   
-           export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_8_0'
+           export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_7_0'
            cd $XERCESCROOT/src/xercesc
 		   ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
 	       make
