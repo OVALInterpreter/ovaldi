@@ -1,0 +1,602 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{07DF4833-B0AB-4276-807F-5758BF0ED7A9}</ProjectGuid>
+    <RootNamespace>OVALInterpreter</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>NotSet</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>NotSet</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\obj\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\obj\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\obj\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\obj\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ovaldi</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ovaldiD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ovaldiD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ovaldi</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Debug/DefinitionInterpreter.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../../src;../../../src/windows;../../../src/probes/independent;../../../src/probes/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\DefinitionInterpreter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(Platform)\$(Configuration)\obj\</AssemblerListingLocation>
+      <ObjectFileName>$(Platform)\$(Configuration)\obj\</ObjectFileName>
+      <ProgramDataBaseFileName>$(Platform)\$(Configuration)\obj\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;User32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(Platform)\$(Configuration)\ovaldiD.exe</OutputFile>
+      <Version>2.0</Version>
+      <AdditionalLibraryDirectories>..\..\..\build\Win32\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>Advapi32.dll;Authz.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <ProgramDatabaseFile>$(Platform)\$(Configuration)\ovaldiD.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/DefinitionInterpreter.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../../src;../../../src/windows;../../../src/probes/independent;../../../src/probes/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\obj\DefinitionInterpreter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(Platform)\$(Configuration)\obj\</AssemblerListingLocation>
+      <ObjectFileName>$(Platform)\$(Configuration)\obj\</ObjectFileName>
+      <ProgramDataBaseFileName>$(Platform)\$(Configuration)\obj\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;User32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(Platform)\$(Configuration)\ovaldiD.exe</OutputFile>
+      <Version>2.0</Version>
+      <AdditionalLibraryDirectories>..\..\..\build\Win32\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>Advapi32.dll;Authz.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <ProgramDatabaseFile>$(Platform)\$(Configuration)\obj\ovaldiD.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Release/DefinitionInterpreter.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../../src;../../../src/windows;../../../src/probes/windows;../../../src/probes/independent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_DCOM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\DefinitionInterpreter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(Platform)\$(Configuration)\obj\</AssemblerListingLocation>
+      <ObjectFileName>$(Platform)\$(Configuration)\obj\</ObjectFileName>
+      <ProgramDataBaseFileName>$(Platform)\$(Configuration)\obj\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(Platform)\$(Configuration)\ovaldi.exe</OutputFile>
+      <Version>5.0</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DelayLoadDLLs>Advapi32.dll;Authz.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AssemblyDebug>true</AssemblyDebug>
+      <ProgramDatabaseFile>$(Platform)\$(Configuration)\ovaldi.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>false</OptimizeReferences>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/DefinitionInterpreter.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../../src;../../../src/windows;../../../src/probes/windows;../../../src/probes/independent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_DCOM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\DefinitionInterpreter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(Platform)\$(Configuration)\obj\</AssemblerListingLocation>
+      <ObjectFileName>$(Platform)\$(Configuration)\obj\</ObjectFileName>
+      <ProgramDataBaseFileName>$(Platform)\$(Configuration)\obj\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(Platform)\$(Configuration)\ovaldi.exe</OutputFile>
+      <Version>5.0</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DelayLoadDLLs>Advapi32.dll;Authz.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AssemblyDebug>true</AssemblyDebug>
+      <ProgramDatabaseFile>$(Platform)\$(Configuration)\ovaldi.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>false</OptimizeReferences>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System.Management.Automation">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\AbsCriteria.cpp" />
+    <ClCompile Include="..\..\..\src\AbsDataCollector.cpp" />
+    <ClCompile Include="..\..\..\src\AbsEntity.cpp" />
+    <ClCompile Include="..\..\..\src\AbsEntityValue.cpp" />
+    <ClCompile Include="..\..\..\src\AbsObject.cpp" />
+    <ClCompile Include="..\..\..\src\AbsObjectCollector.cpp" />
+    <ClCompile Include="..\..\..\src\AbsState.cpp" />
+    <ClCompile Include="..\..\..\src\Analyzer.cpp" />
+    <ClCompile Include="..\..\..\src\Behavior.cpp" />
+    <ClCompile Include="..\..\..\src\CollectedObject.cpp" />
+    <ClCompile Include="..\..\..\src\CollectedSet.cpp" />
+    <ClCompile Include="..\..\..\src\Criteria.cpp" />
+    <ClCompile Include="..\..\..\src\Criterion.cpp" />
+    <ClCompile Include="..\..\..\src\Definition.cpp" />
+    <ClCompile Include="..\..\..\src\Directive.cpp" />
+    <ClCompile Include="..\..\..\src\EntityComparator.cpp" />
+    <ClCompile Include="..\..\..\src\ExtendedDefinition.cpp" />
+    <ClCompile Include="..\..\..\src\Filter.cpp" />
+    <ClCompile Include="..\..\..\src\Item.cpp" />
+    <ClCompile Include="..\..\..\src\ItemEntity.cpp" />
+    <ClCompile Include="..\..\..\src\ItemFieldEntityValue.cpp" />
+    <ClCompile Include="..\..\..\src\Main.cpp" />
+    <ClCompile Include="..\..\..\src\Object.cpp" />
+    <ClCompile Include="..\..\..\src\ObjectEntity.cpp" />
+    <ClCompile Include="..\..\..\src\ObjectFactory.cpp" />
+    <ClCompile Include="..\..\..\src\ObjectReader.cpp" />
+    <ClCompile Include="..\..\..\src\OvalEnum.cpp" />
+    <ClCompile Include="..\..\..\src\OvalMessage.cpp" />
+    <ClCompile Include="..\..\..\src\Set.cpp" />
+    <ClCompile Include="..\..\..\src\SetObject.cpp" />
+    <ClCompile Include="..\..\..\src\State.cpp" />
+    <ClCompile Include="..\..\..\src\StateEntity.cpp" />
+    <ClCompile Include="..\..\..\src\StateOrObjectFieldEntityValue.cpp" />
+    <ClCompile Include="..\..\..\src\StringEntityValue.cpp" />
+    <ClCompile Include="..\..\..\src\Test.cpp" />
+    <ClCompile Include="..\..\..\src\TestedItem.cpp" />
+    <ClCompile Include="..\..\..\src\Version.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\AbsEffectiveRightsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\AbsFileFinder.cpp" />
+    <ClCompile Include="..\..\..\src\AbsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\AccessTokenProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\ActiveDirectoryProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\AuditEventPolicyProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\CmdletProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\DNSCacheProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\EnvironmentVariableProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\FamilyProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\FileAuditedPermissions53Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\windows\FileFinder.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\FileHash58Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\FileHashProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\FileMd5Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\FileProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\GroupProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\GroupSidProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\InterfaceProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\LDAPProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\LockoutPolicyProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\MetabaseProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\PasswordPolicyProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\PortProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\Process58Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\ProcessProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\RegistryProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyAuditedPermissions53Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyAuditedPermissionsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyEffectiveRights53Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyEffectiveRightsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\SharedResourceProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\SidProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\SidSidProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\TextFileContent54Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\TextFileContentProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\UserProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\UserSid55Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\UserSidProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\VariableProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\VolumeProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\WMI57Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\WMIProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\WUAUpdateSearcherProbe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\XmlFileContentProbe.cpp" />
+    <ClCompile Include="..\..\..\src\Common.cpp" />
+    <ClCompile Include="..\..\..\src\Digest.cpp" />
+    <ClCompile Include="..\..\..\src\DocumentManager.cpp" />
+    <ClCompile Include="..\..\..\src\Exception.cpp" />
+    <ClCompile Include="..\..\..\src\Log.cpp" />
+    <ClCompile Include="..\..\..\src\REGEX.cpp" />
+    <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
+    <ClCompile Include="..\..\..\src\XmlProcessor.cpp" />
+    <ClCompile Include="..\..\..\src\XslCommon.cpp" />
+    <ClCompile Include="..\..\..\src\AbsComponent.cpp" />
+    <ClCompile Include="..\..\..\src\AbsFunctionComponent.cpp" />
+    <ClCompile Include="..\..\..\src\AbsVariable.cpp" />
+    <ClCompile Include="..\..\..\src\ArithmeticFunction.cpp" />
+    <ClCompile Include="..\..\..\src\BeginFunction.cpp" />
+    <ClCompile Include="..\..\..\src\ComponentFactory.cpp" />
+    <ClCompile Include="..\..\..\src\ComponentValue.cpp" />
+    <ClCompile Include="..\..\..\src\ConcatFunction.cpp" />
+    <ClCompile Include="..\..\..\src\ConstantVariable.cpp" />
+    <ClCompile Include="..\..\..\src\CountFunction.cpp" />
+    <ClCompile Include="..\..\..\src\EndFunction.cpp" />
+    <ClCompile Include="..\..\..\src\EscapeRegexFunction.cpp" />
+    <ClCompile Include="..\..\..\src\ExternalVariable.cpp" />
+    <ClCompile Include="..\..\..\src\LiteralComponent.cpp" />
+    <ClCompile Include="..\..\..\src\LocalVariable.cpp" />
+    <ClCompile Include="..\..\..\src\ObjectComponent.cpp" />
+    <ClCompile Include="..\..\..\src\PossibleRestrictionType.cpp" />
+    <ClCompile Include="..\..\..\src\PossibleValueType.cpp" />
+    <ClCompile Include="..\..\..\src\RegexCaptureFunction.cpp" />
+    <ClCompile Include="..\..\..\src\RestrictionType.cpp" />
+    <ClCompile Include="..\..\..\src\SplitFunction.cpp" />
+    <ClCompile Include="..\..\..\src\SubstringFunction.cpp" />
+    <ClCompile Include="..\..\..\src\TimeDifferenceFunction.cpp" />
+    <ClCompile Include="..\..\..\src\UniqueFunction.cpp" />
+    <ClCompile Include="..\..\..\src\VariableComponent.cpp" />
+    <ClCompile Include="..\..\..\src\VariableFactory.cpp" />
+    <ClCompile Include="..\..\..\src\VariableValue.cpp" />
+    <ClCompile Include="..\..\..\src\windows\DataCollector.cpp" />
+    <ClCompile Include="..\..\..\src\windows\ObjectCollector.cpp" />
+    <ClCompile Include="..\..\..\src\windows\ProbeFactory.cpp" />
+    <ClCompile Include="..\..\..\src\windows\RegistryFinder.cpp" />
+    <ClCompile Include="..\..\..\src\windows\SystemInfo.cpp" />
+    <ClCompile Include="..\..\..\src\windows\WindowsCommon.cpp" />
+    <ClCompile Include="..\..\..\src\windows\WMIUtil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\AbsCriteria.h" />
+    <ClInclude Include="..\..\..\src\AbsDataCollector.h" />
+    <ClInclude Include="..\..\..\src\AbsEntity.h" />
+    <ClInclude Include="..\..\..\src\AbsEntityValue.h" />
+    <ClInclude Include="..\..\..\src\AbsObject.h" />
+    <ClInclude Include="..\..\..\src\AbsObjectCollector.h" />
+    <ClInclude Include="..\..\..\src\AbsState.h" />
+    <ClInclude Include="..\..\..\src\Analyzer.h" />
+    <ClInclude Include="..\..\..\src\Behavior.h" />
+    <ClInclude Include="..\..\..\src\CollectedObject.h" />
+    <ClInclude Include="..\..\..\src\CollectedSet.h" />
+    <ClInclude Include="..\..\..\src\Criteria.h" />
+    <ClInclude Include="..\..\..\src\Criterion.h" />
+    <ClInclude Include="..\..\..\src\Definition.h" />
+    <ClInclude Include="..\..\..\src\Directive.h" />
+    <ClInclude Include="..\..\..\src\EntityComparator.h" />
+    <ClInclude Include="..\..\..\src\ExtendedDefinition.h" />
+    <ClInclude Include="..\..\..\src\Filter.h" />
+    <ClInclude Include="..\..\..\src\Item.h" />
+    <ClInclude Include="..\..\..\src\ItemEntity.h" />
+    <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />
+    <ClInclude Include="..\..\..\src\Main.h" />
+    <ClInclude Include="..\..\..\src\Object.h" />
+    <ClInclude Include="..\..\..\src\ObjectEntity.h" />
+    <ClInclude Include="..\..\..\src\ObjectFactory.h" />
+    <ClInclude Include="..\..\..\src\ObjectReader.h" />
+    <ClInclude Include="..\..\..\src\OvalEnum.h" />
+    <ClInclude Include="..\..\..\src\OvalMessage.h" />
+    <ClInclude Include="..\..\..\src\Set.h" />
+    <ClInclude Include="..\..\..\src\SetObject.h" />
+    <ClInclude Include="..\..\..\src\State.h" />
+    <ClInclude Include="..\..\..\src\StateEntity.h" />
+    <ClInclude Include="..\..\..\src\StateOrObjectFieldEntityValue.h" />
+    <ClInclude Include="..\..\..\src\StringEntityValue.h" />
+    <ClInclude Include="..\..\..\src\Test.h" />
+    <ClInclude Include="..\..\..\src\TestedItem.h" />
+    <CustomBuild Include="..\..\..\src\Version.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Performing Custom Build Step - incrementing build</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">echo on
+cd ..\..\..\src
+perl updateversion.pl
+cd ..\project\Win32\VC8
+echo off
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MITRE;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Performing Custom Build Step - incrementing build</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">echo on
+cd ..\..\..\src
+perl updateversion.pl
+cd ..\project\Win32\VC8
+echo off
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MITRE;%(Outputs)</Outputs>
+    </CustomBuild>
+    <ClInclude Include="..\..\..\src\probes\windows\AbsEffectiveRightsProbe.h" />
+    <ClInclude Include="..\..\..\src\AbsFileFinder.h" />
+    <ClInclude Include="..\..\..\src\AbsProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\AccessTokenProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\ActiveDirectoryProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\AuditEventPolicyProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\CmdletProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\DNSCacheProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\EnvironmentVariableProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\FamilyProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\FileAuditedPermissions53Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h" />
+    <ClInclude Include="..\..\..\src\windows\FileFinder.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\FileMd5Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\FileProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\GroupProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\GroupSidProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\InterfaceProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\LDAPProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\LockoutPolicyProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\MetabaseProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\PasswordPolicyProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\PortProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\Process58Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\ProcessProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\RegistryProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyAuditedPermissions53Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyAuditedPermissionsProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyEffectiveRights53Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyEffectiveRightsProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\SharedResourceProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\SidProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\SidSidProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\TextFileContent54Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\TextFileContentProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\UserProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\UserSid55Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\UserSidProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\VariableProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\VolumeProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\WMI57Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\WMIProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\WUAUpdateSearcherProbe.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\XmlFileContentProbe.h" />
+    <ClInclude Include="..\..\..\src\Common.h" />
+    <ClInclude Include="..\..\..\src\Digest.h" />
+    <ClInclude Include="..\..\..\src\DocumentManager.h" />
+    <ClInclude Include="..\..\..\src\Exception.h" />
+    <ClInclude Include="..\..\..\src\Log.h" />
+    <ClInclude Include="..\..\..\src\REGEX.h" />
+    <ClInclude Include="..\..\..\src\XmlCommon.h" />
+    <ClInclude Include="..\..\..\src\XmlProcessor.h" />
+    <ClInclude Include="..\..\..\src\XslCommon.h" />
+    <ClInclude Include="..\..\..\src\AbsComponent.h" />
+    <ClInclude Include="..\..\..\src\AbsFunctionComponent.h" />
+    <ClInclude Include="..\..\..\src\AbsVariable.h" />
+    <ClInclude Include="..\..\..\src\ArithmeticFunction.h" />
+    <ClInclude Include="..\..\..\src\BeginFunction.h" />
+    <ClInclude Include="..\..\..\src\ComponentFactory.h" />
+    <ClInclude Include="..\..\..\src\ComponentValue.h" />
+    <ClInclude Include="..\..\..\src\ConcatFunction.h" />
+    <ClInclude Include="..\..\..\src\ConstantVariable.h" />
+    <ClInclude Include="..\..\..\src\CountFunction.h" />
+    <ClInclude Include="..\..\..\src\EndFunction.h" />
+    <ClInclude Include="..\..\..\src\EscapeRegexFunction.h" />
+    <ClInclude Include="..\..\..\src\ExternalVariable.h" />
+    <ClInclude Include="..\..\..\src\LiteralComponent.h" />
+    <ClInclude Include="..\..\..\src\LocalVariable.h" />
+    <ClInclude Include="..\..\..\src\ObjectComponent.h" />
+    <ClInclude Include="..\..\..\src\PossibleRestrictionType.h" />
+    <ClInclude Include="..\..\..\src\PossibleValueType.h" />
+    <ClInclude Include="..\..\..\src\RegexCaptureFunction.h" />
+    <ClInclude Include="..\..\..\src\RestrictionType.h" />
+    <ClInclude Include="..\..\..\src\SplitFunction.h" />
+    <ClInclude Include="..\..\..\src\SubstringFunction.h" />
+    <ClInclude Include="..\..\..\src\TimeDifferenceFunction.h" />
+    <ClInclude Include="..\..\..\src\UniqueFunction.h" />
+    <ClInclude Include="..\..\..\src\VariableComponent.h" />
+    <ClInclude Include="..\..\..\src\VariableFactory.h" />
+    <ClInclude Include="..\..\..\src\VariableValue.h" />
+    <ClInclude Include="..\..\..\src\windows\DataCollector.h" />
+    <ClInclude Include="..\..\..\src\windows\ObjectCollector.h" />
+    <ClInclude Include="..\..\..\src\windows\ProbeFactory.h" />
+    <ClInclude Include="..\..\..\src\windows\RegistryFinder.h" />
+    <ClInclude Include="..\..\..\src\windows\SystemInfo.h" />
+    <ClInclude Include="..\..\..\src\windows\WindowsCommon.h" />
+    <ClInclude Include="..\..\..\src\windows\WMIItem.h" />
+    <ClInclude Include="..\..\..\src\windows\WMIUtil.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
