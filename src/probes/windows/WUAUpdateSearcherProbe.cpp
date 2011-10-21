@@ -37,7 +37,11 @@
 WUAUpdateSearcherProbe* WUAUpdateSearcherProbe::instance = NULL;
 
 WUAUpdateSearcherProbe::WUAUpdateSearcherProbe() {
-
+	pIUpdateSession = NULL;
+	pIUpdateServiceManager = NULL;
+	pIUSearcher = NULL;
+	pIUpdateCollection = NULL;
+	pISearchResult = NULL;
 }
 
 WUAUpdateSearcherProbe::~WUAUpdateSearcherProbe() {
