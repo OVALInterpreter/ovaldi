@@ -74,7 +74,7 @@ public:
 
 	/**
 		Run the probe and collect all items on the system that match the specified object.
-		This method is the starting point for all probes. the Run method probides a set of common
+		This method is the starting point for all probes. the Run method provides a set of common
 		functionality to all probes and then calls the AbsProbe::CollectItems(Object* object) virtual 
 		method for actually collecting system items.
 		@param object the Object* that is used to guide data colelction.
@@ -90,7 +90,7 @@ public:
 protected:	
 	/**
 		Collects all Items on the system that match the specified Object.
-		@param object A Object* that specifies what information to collecto on the system.
+		@param object A Object* that specifies what information to collect on the system.
 		@return A vector of Items found on the system.
 	*/
 	virtual ItemVector* CollectItems(Object* object) = 0;

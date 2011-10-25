@@ -109,8 +109,20 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, key->GetNil()));
-					if (name->GetNil()) item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, name->GetNil()));
+					if (key->GetNil()){
+						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+					}
+					else
+					{
+						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+					}
+					if (name->GetNil()){
+						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+					}
+					else
+					{
+						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
+					}
 					collectedItems->push_back(item);
 				}
 
@@ -130,16 +142,28 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 							item = this->CreateItem();
 							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 							item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, key->GetNil()));
-							item->AppendElement(new ItemEntity("name", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, name->GetNil()));
+							if (key->GetNil()){
+								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+							}
+							else
+							{
+								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+							}
+							item->AppendElement(new ItemEntity("name", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, true));
 							collectedItems->push_back(item);
 						}
 					} else {
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_EXISTS);
 						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, key->GetNil()));
-						if (name->GetNil()) item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, name->GetNil()));
+						if (key->GetNil()){
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+						}
+						else
+						{
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+						}
+						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true as checked above
 						collectedItems->push_back(item);
 					}
 					if ( names != NULL ){

@@ -398,7 +398,7 @@ void Analyzer::InitResultsDocument() {
 	// add the generator element
 	DOMElement *ovalResultsElm = DocumentManager::GetResultDocument()->getDocumentElement();
 	DOMElement *generatorElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), ovalResultsElm, "generator");
-	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:product_name", "OVAL Definition Interpreter");
+	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:product_name", "cpe:/a:mitre:ovaldi:" + Version::GetVersion() + "." + Version::GetBuild());
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:schema_version", Version::GetSchemaVersion());
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:timestamp", Common::GetTimeStamp());

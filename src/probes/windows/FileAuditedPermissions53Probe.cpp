@@ -89,7 +89,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                 if ( behavior->GetValue().compare ( "false" ) == 0 ) {
                     includeGroupBehavior = false;
                 }
-
+				Log::Info("Deprecated behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
             } else if ( behavior->GetName().compare ( "resolve_group" ) == 0 ) {
                 if ( behavior->GetValue().compare ( "true" ) == 0 ) {
                     resolveGroupBehavior = true;
@@ -171,6 +171,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 										ItemEntityVector* fileNameVector = item->GetElementsByName("filename");
 										if (fileNameVector->size() > 0) {
 											fileNameVector->at(0)->SetNil(true);
+											fileNameVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 										}
 									}
                                     collectedItems->push_back ( item );
@@ -198,7 +199,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
                                 item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "filename", fp->second, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, (fileName != NULL && fileName->GetNil()) ) );
+								item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, true,  ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
                                 item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
                             }

@@ -108,9 +108,10 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 							ItemEntityVector* fileNameVector = item->GetElementsByName("filename");
 							if (fileNameVector->size() == 1) {
 								fileNameVector->at(0)->SetNil(true);
+								fileNameVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 							} else if (fileNameVector->size() == 0) {
 								ItemEntityVector* itemVector = item->GetElements();
-								itemVector->insert(itemVector->begin() + item->GetElementsByName("path")->size() + item->GetElementsByName("filepath")->size(), new ItemEntity ( "filename" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS, true ));
+								itemVector->insert(itemVector->begin() + item->GetElementsByName("path")->size() + item->GetElementsByName("filepath")->size(), new ItemEntity ( "filename" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_NOT_COLLECTED, true ));
 							}
 						}
 						

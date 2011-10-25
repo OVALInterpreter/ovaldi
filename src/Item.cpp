@@ -378,8 +378,8 @@ string Item::UniqueString() {
     uniqueString.append(this->GetName());
 
 
-    ItemEntityVector* myObjElms = this->GetObjectElements();
-	for(ItemEntityVector::iterator it = myObjElms->begin(); it != myObjElms->end(); it++) {
+    ItemEntityVector* myElms = this->GetElements();
+	for(ItemEntityVector::iterator it = myElms->begin(); it != myElms->end(); it++) {
 		uniqueString.append((*it)->UniqueString());
 	}
 

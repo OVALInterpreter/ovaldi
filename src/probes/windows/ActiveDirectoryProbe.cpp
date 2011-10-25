@@ -132,8 +132,9 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
 									ItemEntityVector* relativednVector = item->GetElementsByName("relative_dn");
 									if (relativednVector->size() == 1) {
 										relativednVector->at(0)->SetNil(true);
+										relativednVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									} else if (relativednVector->size() == 0) {
-										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "relative_dn" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS, true ));
+										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "relative_dn" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_NOT_COLLECTED, true ));
 									}
 								}
 								// Increment the index so that future items are inserted after the relative_dn item.
@@ -143,8 +144,9 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
 									ItemEntityVector* attributeVector = item->GetElementsByName("attribute");
 									if (attributeVector->size() == 1) {
 										attributeVector->at(0)->SetNil(true);
+										attributeVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									} else if (attributeVector->size() == 0) {
-										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "attribute" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS, true ));
+										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "attribute" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_NOT_COLLECTED, true ));
 									}
 								}
 

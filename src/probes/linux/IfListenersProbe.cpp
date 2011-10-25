@@ -285,9 +285,8 @@ namespace {
 			}
 
 			item.AppendElement(new ItemEntity("program_name", exePath));
-			item.AppendElement(new ItemEntity("pid", Common::ToString(pid),
-											  OvalEnum::DATATYPE_INTEGER));
-			item.AppendElement(new ItemEntity("user_id", Common::ToString(uid)));
+			item.AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER));
+			item.AppendElement(new ItemEntity("user_id", Common::ToString(uid), OvalEnum::DATATYPE_INTEGER));
 
 			packetListeners.push_back(item);
 		}

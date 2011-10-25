@@ -203,7 +203,7 @@ void AbsDataCollector::WriteGenerator() {
 
 	DOMElement *scNode = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "oval_system_characteristics");
 	DOMElement *generatorElm = XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), scNode, "generator");
-	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:product_name", "OVAL Definition Interpreter");
+	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:product_name", "cpe:/a:mitre:ovaldi:" + Version::GetVersion() + "." + Version::GetBuild());
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:schema_version", Version::GetSchemaVersion());
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:timestamp", Common::GetTimeStamp());

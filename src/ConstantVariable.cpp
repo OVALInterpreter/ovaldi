@@ -88,16 +88,10 @@ void ConstantVariable::Parse(DOMElement* constantVariableElm) {
 			if(XmlCommon::GetElementName(childElm).compare("value") == 0) {
 				foundValue = true;
 				string elmValue = XmlCommon::GetDataNodeValue(childElm);
-				if(elmValue.compare("") != 0) {
-					// get and save the value.
-					VariableValue* varValue = new VariableValue(this->GetId(), elmValue);
-					this->AppendVariableValue(varValue);
-					this->SetFlag(OvalEnum::FLAG_COMPLETE);
-				} else {
-					this->SetFlag(OvalEnum::FLAG_ERROR);
-					this->AppendMessage("Error a value element with an empty string value was found for the constant variable.");
-					return;
-				}
+				// get and save the value.
+				VariableValue* varValue = new VariableValue(this->GetId(), elmValue);
+				this->AppendVariableValue(varValue);
+				this->SetFlag(OvalEnum::FLAG_COMPLETE);
 			}
 		}
 		index ++;

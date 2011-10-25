@@ -93,12 +93,12 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
                 if ( behavior->GetValue().compare ( "false" ) == 0 ) {
                     includeGroupBehavior = false;
                 }
-
+				Log::Info("Deprecated behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
             } else if ( behavior->GetName().compare ( "resolve_group" ) == 0 ) {
                 if ( behavior->GetValue().compare ( "true" ) == 0 ) {
                     resolveGroupBehavior = true;
                 }
-
+				Log::Info("Deprecated behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
             } else {
                 Log::Info ( "Unsupported behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
             }

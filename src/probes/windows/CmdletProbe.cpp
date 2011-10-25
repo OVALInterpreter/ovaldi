@@ -823,19 +823,19 @@ namespace {
 		String ^dumbhack = modUsed->name;
 		item->AppendElement(new ItemEntity("module_name",
 			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
-			OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,
+			OvalEnum::DATATYPE_STRING, true, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
 			dumbhack==nullptr));
 
 		dumbhack = modUsed->guid == nullptr ? nullptr : modUsed->guid->ToString();
 		item->AppendElement(new ItemEntity("module_id",
 			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
-			OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,
+			OvalEnum::DATATYPE_STRING, true, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
 			dumbhack==nullptr));
 
 		dumbhack = modUsed->version == nullptr ? nullptr : modUsed->version->ToString();
 		item->AppendElement(new ItemEntity("module_version",
 			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
-			OvalEnum::DATATYPE_VERSION, true, OvalEnum::STATUS_EXISTS,
+			OvalEnum::DATATYPE_VERSION, true, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
 			dumbhack==nullptr));
 
 		item->AppendElement(new ItemEntity("verb", verb, OvalEnum::DATATYPE_STRING,
@@ -853,7 +853,7 @@ namespace {
 
 		if (paramEntityValues.empty())
 			item->AppendElement(new ItemEntity("parameters", paramEntityValues,
-				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS,
+				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_NOT_COLLECTED,
 				true));
 		else
 			item->AppendElement(new ItemEntity("parameters", paramEntityValues,
@@ -869,7 +869,7 @@ namespace {
 
 		if (selectEntityValues.empty())
 			item->AppendElement(new ItemEntity("select", selectEntityValues,
-				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS,
+				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_NOT_COLLECTED,
 				true));
 		else
 			item->AppendElement(new ItemEntity("select", selectEntityValues,

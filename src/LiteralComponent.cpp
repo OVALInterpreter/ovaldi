@@ -87,22 +87,13 @@ ComponentValue* LiteralComponent::ComputeValue() {
 	//
 	//	Compute the value for this component. 
 	//  Allows only one value.
-	//  If the value is an empty string set the OvalEnum::Flag on the 
-	//  resulting ComponentValue to OvalEnum::FLAG_ERROR
 	// -----------------------------------------------------------------------
 	
 	ComponentValue* result = new ComponentValue();
-
-	if(this->GetValue().compare("") != 0) {
-		StringVector* values = new StringVector();
-		values->push_back(this->GetValue());
-		result->SetValues(values);
-		result->SetFlag(OvalEnum::FLAG_COMPLETE);
-	} else {
-		result->SetFlag(OvalEnum::FLAG_ERROR);
-		result->AppendMessage("Error the specified literal component did not have a value. Literal components are required to have values.");
-	}
-
+	StringVector* values = new StringVector();
+	values->push_back(this->GetValue());
+	result->SetValues(values);
+	result->SetFlag(OvalEnum::FLAG_COMPLETE);
 	return result;	
 }
 

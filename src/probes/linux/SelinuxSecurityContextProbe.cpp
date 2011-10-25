@@ -186,7 +186,6 @@ ItemVector* SelinuxSecurityContextProbe::CollectItems(Object* object) {
 	// behaviors to use, until that is fixed.
 	VectorPtrGuard<Behavior> beh(new BehaviorVector());
 	beh->push_back(new Behavior("recurse_direction", "none"));
-
 	if (pidObjEntity)
 		SearchByPid(pidObjEntity, collectedItems.get());
 	else
@@ -264,7 +263,6 @@ namespace {
 		}
 
 		if (pidObjEntity->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-
 			/* OvalEnum::Flag flag = */ pidObjEntity->GetEntityValues(pids);
 
 			for (StringVector::iterator pidIter = pids.begin();
