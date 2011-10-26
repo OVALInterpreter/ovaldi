@@ -32,6 +32,19 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---        Version 5.10 build 2     ---
+---------------------------------------
+
+* Added support for variables with an empty string as a value.
+* Fixed datatype of user_id entity in linux-def:iflisteners_test.
+* Removed enumeration restriction to fs_type entity in linux-def:partition_test.
+* Fixed status for nil object entities to be "not collected" in system characteristics file.
+* Added support to check all item entities to determine uniqueness.
+* Added deprecated behavior messages to include_group behavior.
+* Added CPE name to product_name field in the OVAL generator section of the System Characteristics and Results documents.
+* Fixed a bug in the interpreter where it would crash when trying to read a directives file that had a namespace prefix on the oval_directives element.
+
+---------------------------------------
 ---        Version 5.10 build 1     ---
 ---------------------------------------
 
@@ -41,13 +54,6 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * ovaldi on Windows is now a managed application targeting .NET 3.5.
 * Added support for the unix-def:sysctl_test on linux.  Other unix-like platforms are not yet supported.
 * Added support for pass-through of applicability_check attributes to results documents.
-* Added support for variables with an empty string as a value.
-* Fixed datatype of user_id entity in linux-def:iflisteners_test.
-* Removed enumeration restriction to fs_type entity in linux-def:partition_test.
-* Fixed status for nil object entities to be "not collected" in system characteristics file.
-* Added support to check all item entities to determine uniqueness.
-* Added deprecated behavior messages to include_group behavior.
-* Added CPE name to product_name field in the OVAL generator section of the System Characteristics and Results documents.
 
 ---------------------------------------
 ---        Version 5.9 build 2      ---
