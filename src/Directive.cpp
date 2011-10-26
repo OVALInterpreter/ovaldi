@@ -67,7 +67,7 @@ void Directive::LoadDirectives() {
 
 	// Read the XML and create appropriate Directive objects.
 	
-	DOMElement* directivesElem = XmlCommon::FindElement(config, "oval_directives");
+	DOMElement* directivesElem = XmlCommon::FindElementNS(config, "oval_directives");
 	DOMNodeList* directiveClassNodes = directivesElem->getChildNodes();
 	for (unsigned int j = 0; j < directiveClassNodes->getLength(); j++) {
 		DOMNode* classNode = directiveClassNodes->item(j);
