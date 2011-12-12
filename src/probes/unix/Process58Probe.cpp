@@ -796,6 +796,11 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	else
 		item->AppendElement(new ItemEntity("tty", devicePath));
 	item->AppendElement(new ItemEntity("user_id", Common::ToString(eUserId), OvalEnum::DATATYPE_INTEGER));
+	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_NOT_COLLECTED));
+ 	item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+ 	item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("session_id", Common::ToString(info.pr_sid), OvalEnum::DATATYPE_INTEGER));
 
 	items->push_back(item);
 }
