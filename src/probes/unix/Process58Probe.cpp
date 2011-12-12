@@ -28,6 +28,18 @@
 //
 //****************************************************************************************//
 
+#ifdef LINUX
+#  include <selinux/selinux.h>
+#  include <selinux/context.h>
+#  include <sys/capability.h>
+#  include <SecurityContextGuard.h>
+#endif
+
+#include <fstream>
+#include <memory>
+#include <vector>
+
+#include <Log.h>
 #include "Process58Probe.h"
 
 using namespace std;
@@ -53,15 +65,74 @@ namespace {
 		devPath = filename;
 		return 1;
 	}
-
 }
 
 #endif
 
-Process58Probe::Process58Probe() {}
+#ifdef LINUX
+namespace {
+	/**
+	 * Maps integral capability constants to string names as required by the
+	 * OVAL schema.
+	 */
+	vector<string> capMap;
+}
+#endif
 
 
+Process58Probe::Process58Probe() {
+#ifdef LINUX
 
+	// Implicit in this map idea is the assumption that none of these integral
+	// constants have the same value.
+	// The following macro allows us to more easily create a vector of just the
+	// right size to map all capability constants to strings.  I decided a
+	// vector makes more sense than a map when the keys are plain integers.
+#define ADD_CAP(_x)								\
+    if (capMap.size() <= (_x))					\
+		capMap.resize((_x)+1);					\
+	capMap[(_x)] = #_x
+
+
+	// so the repeated resizes will hopefully not require any reallocation.
+	capMap.reserve(50);
+
+	ADD_CAP(CAP_CHOWN);
+	ADD_CAP(CAP_DAC_OVERRIDE);
+	ADD_CAP(CAP_DAC_READ_SEARCH);
+	ADD_CAP(CAP_FOWNER);
+	ADD_CAP(CAP_FSETID);
+	ADD_CAP(CAP_KILL);
+	ADD_CAP(CAP_SETGID);
+	ADD_CAP(CAP_SETUID);
+	ADD_CAP(CAP_SETPCAP);
+	ADD_CAP(CAP_LINUX_IMMUTABLE);
+	ADD_CAP(CAP_NET_BIND_SERVICE);
+	ADD_CAP(CAP_NET_BROADCAST);
+	ADD_CAP(CAP_NET_ADMIN);
+	ADD_CAP(CAP_NET_RAW);
+	ADD_CAP(CAP_IPC_LOCK);
+	ADD_CAP(CAP_IPC_OWNER);
+	ADD_CAP(CAP_SYS_MODULE);
+	ADD_CAP(CAP_SYS_RAWIO);
+	ADD_CAP(CAP_SYS_CHROOT);
+	ADD_CAP(CAP_SYS_PTRACE);
+	ADD_CAP(CAP_SYS_ADMIN);
+	ADD_CAP(CAP_SYS_BOOT);
+	ADD_CAP(CAP_SYS_NICE);
+	ADD_CAP(CAP_SYS_RESOURCE);
+	ADD_CAP(CAP_SYS_TIME);
+	ADD_CAP(CAP_SYS_TTY_CONFIG);
+	ADD_CAP(CAP_MKNOD);
+	ADD_CAP(CAP_LEASE);
+	ADD_CAP(CAP_AUDIT_WRITE);
+	ADD_CAP(CAP_AUDIT_CONTROL);
+	// linux doesn't have CAP_SETFCAP, CAP_MAC_OVERRIDE, CAP_MAC_ADMIN
+
+#undef ADD_CAP
+
+#endif
+}
 
 Process58Probe::~Process58Probe() {
   instance = NULL;
@@ -80,9 +151,6 @@ AbsProbe* Process58Probe::Instance() {
 
 	return instance;	
 }
-
-
-
 
 ItemVector* Process58Probe::CollectItems(Object* object) {
 
@@ -253,18 +321,25 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	// Process Parameters
 	char cmdline[CMDLINE_LEN + 1];
 
-	int ruid, euid, pid, ppid;
+	uid_t ruid, *ruidp=&ruid, euid, *euidp=&euid;
+	pid_t pid, ppid;
 	long priority = 0;
 	unsigned long starttime = 0;
+	pid_t sessionId;
+	uid_t loginuid;
+	uint64_t effCap, *effCapp=&effCap;
+	string selinuxDomainLabel;
 
-	int status = 0;
+	Process58Probe::ProcStatus statStatus, statusStatus, ttyStatus, loginuidStatus;
+
+	if (!Common::FromString(pidStr, &pid))
+		throw ProbeException("Couldn't interpret \""+pidStr+"\" as a pid!");
 
 	// Grab the current time and uptime(Linux only) to calculate start and exec times later
 	currentTime = time(NULL);
 
 	unsigned long uptime = 0;
-	status = RetrieveUptime(&uptime, &errMsg);
-	if(status < 0) {
+	if(!RetrieveUptime(&uptime, &errMsg)) {
 		throw ProbeException(errMsg);
     }
 
@@ -277,109 +352,204 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	// Clear the ps values
 	memset(cmdline, 0, CMDLINE_LEN + 1);
 	memset(ttyName, 0, TTY_LEN + 1);
-	euid = ruid = pid = ppid = priority = starttime = 0;
+	euid = ruid = ppid = priority = starttime = 0;
 	adjustedStartTime = execTime = 0;
-	errMsg = "";
+	effCap = 0;
 
-	// Retrieve the command line with arguments
-	status = RetrieveCommandLine(pidStr.c_str(), cmdline, &errMsg);
-	if(status < 0) { 
-		//				    closedir(proc);
-		throw ProbeException(errMsg);
+	auto_ptr<Item> item(this->CreateItem());
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	item->AppendElement(new ItemEntity("command_line",  command, OvalEnum::DATATYPE_STRING, true));
 
-		// If the command line matches the input command line get the remaining 
-		// data and add a new data object to the items
-	} else if(status == 0 && command.compare(cmdline) == 0) {
+	// Below, I try to get everything, but behave correctly if the /proc/<pid>
+	// directory unexpectedly goes away (just ignore that process, because it
+	// must have terminated), or if there is an error (set the proper error
+	// message and status, but keep looking for other information).
+	
+	statStatus = RetrieveStatFile(pidStr, &ppid, &priority, 
+								  &starttime, &sessionId, &errMsg);
+	if (statStatus == PROC_TERMINATED) {
+		Log::Debug("Process "+pidStr+" went away (stat), skipping...");
+		return;
+	} else if (statStatus == PROC_ERROR) {
+		item->AppendMessage(new OvalMessage(errMsg, OvalEnum::LEVEL_ERROR));
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+	}
 
-		Item* item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("command_line",  command, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-
-		// Read the 'stat' and 'status' files for the remaining process parameters
-		status = RetrieveStatFile(pidStr.c_str(), &pid, &ppid, &priority, &starttime, &errMsg);
-		if (status==0) status = RetrieveStatusFile(pidStr.c_str(), &ruid, &euid, &errMsg);
-		if(status < 0) {
-			item->AppendMessage(new OvalMessage(errMsg));
-		} else {
-
-			// We can retrieve a value for the tty from the 'stat' file, but it's unclear
-			// how you convert that to a device name.  Therefore, we ignore that value
-			// and grab the device stdout(fd/0) is attached to.
-			RetrieveTTY(pidStr.c_str(), ttyName);
-
-			// The Linux start time is represented as the number of jiffies (1/100 sec)
-			// that the application was started after the last system reboot.  To get an
-			// actual timestamp, we have to do some gymnastics.  We then use the calculated
-			// start time to determine the exec time.
-			//
-			if(uptime > 0) {
-				adjustedStartTime = currentTime - (uptime - (starttime/100));
-				execTime = currentTime - adjustedStartTime;
-			}
-			string execTimeStr = this->FormatExecTime(execTime);
-			string adjustedStartTimeStr = this->FormatStartTime(adjustedStartTime);
-
-			// Add the data to a new data object and add th resultVector
-			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			if(errMsg.compare("") != 0) {
-				item->AppendMessage(new OvalMessage(errMsg));
-			}
-
-			item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-			item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+	statusStatus = RetrieveStatusFile(pidStr, &ruidp, &euidp, &effCapp, &errMsg);
+	if (statusStatus == PROC_TERMINATED) {
+		Log::Debug("Process "+pidStr+" went away (status), skipping...");
+		return;
+	} else if (statusStatus == PROC_ERROR) {
+		item->AppendMessage(new OvalMessage(errMsg, OvalEnum::LEVEL_ERROR));
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+	} else {
+		// I assume the things I am looking for are not optional in the status
+		// file, so if they aren't found, that's an error that should be
+		// reported.
+		if (!ruidp || !euidp) {		
+			item->AppendMessage(
+				new OvalMessage("Couldn't locate euid or ruid in " + procDir +
+								"/status", OvalEnum::LEVEL_ERROR));
+			item->SetStatus(OvalEnum::STATUS_ERROR);
 		}
 
-		items->push_back(item); 
+		if (!effCapp) {
+			item->AppendMessage(
+				new OvalMessage("Couldn't locate effective capabilities in " + 
+								procDir + "/status", OvalEnum::LEVEL_ERROR));
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+		}
 	}
+
+	// We can retrieve a value for the tty from the 'stat' file, but it's unclear
+	// how you convert that to a device name.  Therefore, we ignore that value
+	// and grab the device stdout(fd/0) is attached to.
+	ttyStatus = RetrieveTTY(pidStr, ttyName, &errMsg);
+	if (ttyStatus == PROC_TERMINATED) {
+		Log::Debug("Process "+pidStr+" went away (tty), skipping...");
+		return;
+	} else if (ttyStatus == PROC_ERROR)
+		item->AppendMessage(new OvalMessage(errMsg, OvalEnum::LEVEL_ERROR));
+	// we will skip setting error status on item for this, to be consistent with
+	// previous behavior.
+
+	loginuidStatus = RetrieveLoginUid(pid, &loginuid, &errMsg);
+	if (loginuidStatus == PROC_TERMINATED) {
+		Log::Debug("Process "+pidStr+" went away (tty), skipping...");
+		return;
+	} else if (loginuidStatus == PROC_ERROR) {
+		item->AppendMessage(new OvalMessage(errMsg, OvalEnum::LEVEL_ERROR));
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+	}
+
+	// this one doesn't require reading anything in /proc
+	if (!RetrieveSelinuxDomainLabel(pid, &selinuxDomainLabel, &errMsg)) {
+		item->AppendMessage(new OvalMessage(errMsg, OvalEnum::LEVEL_ERROR));
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+	}
+
+	// The Linux start time is represented as the number of jiffies (1/100 sec)
+	// that the application was started after the last system reboot.  To get an
+	// actual timestamp, we have to do some gymnastics.  We then use the calculated
+	// start time to determine the exec time.
+	// We won't have starttime if we couldn't read the stat file, so make sure
+	// we have it.
+	//
+	string execTimeStr, adjustedStartTimeStr;
+	if(uptime > 0 && statStatus == PROC_OK) {
+		execTime = uptime - (starttime/100);
+		adjustedStartTime = currentTime - execTime;
+		execTimeStr = this->FormatExecTime(execTime);
+		adjustedStartTimeStr = this->FormatStartTime(adjustedStartTime);
+		item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING));
+	} else
+		item->AppendElement(new ItemEntity("exec_time",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+
+	item->AppendElement(new ItemEntity("pid", pidStr, OvalEnum::DATATYPE_INTEGER, true));
+
+	if (statStatus == PROC_OK) {
+		item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
+		item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER));
+	} else {
+		item->AppendElement(new ItemEntity("ppid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("priority", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+	}
+
+	if (statusStatus == PROC_OK && ruidp) {
+		item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER));
+	} else
+		item->AppendElement(new ItemEntity("ruid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+
+	item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+
+	if (statStatus == PROC_OK)
+		item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr));
+
+	// To remain consistent with previous behavior for this entity, "?" will be
+	// used as the value and no error status set on the entity, even if there
+	// was an error.
+	item->AppendElement(new ItemEntity("tty", ttyName));
+
+	if (statusStatus == PROC_OK && euidp)
+		item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+	else
+		item->AppendElement(new ItemEntity("user_id", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+
+	// for now...
+	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
+
+	if (loginuidStatus == PROC_OK)
+		item->AppendElement(new ItemEntity("loginuid", Common::ToString(loginuid), OvalEnum::DATATYPE_INTEGER));
+	else
+		item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+
+	if (statusStatus == PROC_OK && effCapp)
+		this->AddCapabilities(item.get(), effCap);
+	else
+		// I add an entity with error status here, so consumers know that posix
+		// capabilities couldn't be determined due to error, not that there just
+		// aren't any.
+		item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+
+	if (selinuxDomainLabel.empty())
+		item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+	else
+		item->AppendElement(new ItemEntity("selinux_domain_label", selinuxDomainLabel));
+
+	if (statStatus == PROC_OK)
+		item->AppendElement(new ItemEntity("session_id", Common::ToString(sessionId), OvalEnum::DATATYPE_INTEGER));
+	else
+		item->AppendElement(new ItemEntity("session_id", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+
+	items->push_back(item.release());
 }
 
-int Process58Probe::RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
+Process58Probe::ProcStatus Process58Probe::RetrieveStatFile(const string &process, int *ppid, long *priority, unsigned long *starttime, pid_t *session, string *errMsg) {
 
-  // Stat File parameters.  While we're really only concerned with gathering the parameters
-  // that are passed in, these variables are good placeholders in case we decide to collect
-  // something else in the future.
-  //
-  int pgrp, session, tty, tpgid, exit_signal, processor = 0;
-  long cutime, cstime, nice, placeholder, itrealvalue, rss = 0;
-  unsigned long flags, minflt, cminflt, majflt, cmajflt, utime, stime, vsize, rlim = 0;
-  unsigned long startcode, endcode, startstack, kstkesp, kstkeip, signal, blocked, sigignore = 0;
-  unsigned long sigcatch, wchan, nswap, cnswap = 0;
-  char comm[PATH_MAX];
-  char state;
+	// Stat File parameters.  While we're really only concerned with gathering the parameters
+	// that are passed in, these variables are good placeholders in case we decide to collect
+	// something else in the future.
+	//
+	pid_t pid; // obviously we already know this...
+	int pgrp, tty, tpgid, exit_signal, processor = 0;
+	long cutime, cstime, nice, placeholder, itrealvalue, rss = 0;
+	unsigned long flags, minflt, cminflt, majflt, cmajflt, utime, stime, vsize, rlim = 0;
+	unsigned long startcode, endcode, startstack, kstkesp, kstkeip, signal, blocked, sigignore = 0;
+	unsigned long sigcatch, wchan, nswap, cnswap = 0;
+	char comm[PATH_MAX];
+	char state;
 
-  FILE *statFile = NULL;
+	FILE *statFile = NULL;
 
-  // Generate the absolute path name for the 'stat' file
-  string statPath = "/proc/";
-  statPath.append(process);
-  statPath.append("/stat");
+	// Generate the absolute path name for the 'stat' file
+	string statPath = "/proc/"+process+"/stat";
 
-  // Open the 'stat' file and read the contents
-  if((statFile = fopen(statPath.c_str(), "r")) == NULL) {
-    errMsg->append("Process58Probe: Unable to obtain process information for pid: ");
-    errMsg->append(process);
-    return(-1);
+	// Open the 'stat' file and read the contents
+	if((statFile = fopen(statPath.c_str(), "r")) == NULL) {
+		if (errno == ENOENT)
+			return PROC_TERMINATED;
 
-  } else {
+		*errMsg = "Process58Probe: Error opening "+statPath+": "+strerror(errno);
+		return PROC_ERROR;
 
-    // Linux gives us a nicely formatted file for fscanf to pull in
-    fscanf(statFile, "%d %s %c %d %d %d %d %d %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %lu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d", pid, comm, &state, ppid, &pgrp, &session, &tty, &tpgid, &flags, &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime, &cutime, &cstime, priority, &nice, &placeholder, &itrealvalue, starttime, &vsize, &rss, &rlim, &startcode, &endcode, &startstack, &kstkesp, &kstkeip, &signal, &blocked, &sigignore, &sigcatch, &wchan, &nswap, &cnswap, &exit_signal, &processor);
+	} else {
 
-  }
-  fclose(statFile);
+		// Linux gives us a nicely formatted file for fscanf to pull in
+		fscanf(statFile, "%d %s %c %d %d %d %d %d %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %lu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d", &pid, comm, &state, ppid, &pgrp, session, &tty, &tpgid, &flags, &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime, &cutime, &cstime, priority, &nice, &placeholder, &itrealvalue, starttime, &vsize, &rss, &rlim, &startcode, &endcode, &startstack, &kstkesp, &kstkeip, &signal, &blocked, &sigignore, &sigcatch, &wchan, &nswap, &cnswap, &exit_signal, &processor);
 
-  return(0);
+	}
+
+	if (fclose(statFile) == EOF) {
+		*errMsg = "Error closing "+statPath+": "+strerror(errno);
+		return PROC_ERROR;
+	}
+
+	return PROC_OK;
 }
 
-int Process58Probe::RetrieveStatusFile(const char *process, int *ruid, int *euid, string *errMsg) {
-	string statusFileName = string("/proc/")+process+"/status";
+Process58Probe::ProcStatus Process58Probe::RetrieveStatusFile(const string &process, uid_t **ruid, uid_t **euid, uint64_t **effCap, string *errMsg) {
+	string statusFileName = "/proc/"+process+"/status";
+	bool foundUid=false, foundCapEff=false;
 	errno = 0;
 	ifstream statusFile(statusFileName.c_str());
 
@@ -388,74 +558,179 @@ int Process58Probe::RetrieveStatusFile(const char *process, int *ruid, int *euid
 		// No need to report.  If there was some other
 		// error, throw an exception.
 		if (errno == ENOENT)
-			return -1;
+			return PROC_TERMINATED;
 
 		*errMsg = "Process58Probe: Error opening "+statusFileName+": "+strerror(errno);
-		return -1;
+		return PROC_ERROR;
 	}
 
-	string line, label;
+	string line;
 	while (statusFile) {
 		getline(statusFile, line);
-		istringstream iss(line);
-		iss >> label;
-		if (label == "Uid:") {
-			*ruid = *euid = -1;
-			errno = 0;
-			iss >> *ruid >> *euid;
-			if (iss)
-				return 1;
 
-			if ((*ruid == -1 || *euid == -1) && iss.eof())
-				// we didn't get values for both... eol was premature
-				*errMsg = "Premature end-of-line while reading ruid and euid from "+
+		// eof is ok, other errors are not
+		if (!statusFile) {
+			if (statusFile.eof())
+				break;
+			else {
+				*errMsg = "Error reading "+statusFileName+": "+strerror(errno);
+				return Process58Probe::PROC_ERROR;
+			}
+		}
+
+		istringstream iss(line);
+		string label;
+		errno = 0;
+		iss >> label;
+
+		if (!iss) {
+			*errMsg = "Couldn't read label from line \""+line+"\" in "+statusFileName;
+			return PROC_ERROR;
+		}
+
+		if (label == "Uid:") {
+			iss >> **ruid >> **euid;
+			foundUid = true;
+
+		} else if (label == "CapEff:") {
+			iss >> hex >> **effCap >> dec;
+			foundCapEff = true;
+		}
+
+		if (!iss) {
+			if (iss.eof())
+				// eol was premature
+				*errMsg = "Premature end-of-line while reading "+label+" from "+
 					statusFileName;
-			else if (errno != 0)
+			else
 				*errMsg = "Error encountered while reading "+statusFileName+": "+
 					strerror(errno);
-			//else... we dunno what happened...
 
-			return -1;
+			return PROC_ERROR;
 		}
 	}
 
-	*errMsg += "'Uid:' line not found in "+statusFileName;
-	return -1;
+	if (!foundUid) *ruid = *euid = NULL;
+	if (!foundCapEff) *effCap = NULL;
+
+	return PROC_OK;
 }
 
-void Process58Probe::RetrieveTTY(const char *process, char *ttyName) {
-  int bytes = 0;
+Process58Probe::ProcStatus Process58Probe::RetrieveTTY(const string &process, char *ttyName, string *err) {
+	int bytes = 0;
 
-  // Generate the absolute path name for the stdout(0) file in 'fd'
-  string ttyPath = "/proc/";
-  ttyPath.append(process);
-  ttyPath.append("/fd/0");
+	// Generate the absolute path name for the stdout(0) file in 'fd'
+	string ttyPath = "/proc/" + process + "/fd/0";
 
-  // Attempt to read the name of the file linked to '0'
-  bytes = readlink(ttyPath.c_str(), ttyName, TTY_LEN);
+	// Attempt to read the name of the file linked to '0'
+	bytes = readlink(ttyPath.c_str(), ttyName, TTY_LEN);
 
-  // If there is an error, set the tty string to '?'
-  if(bytes < 0 || strncmp(ttyName, "/dev", 4) != 0) {
-    strncpy(ttyName, "?\0", 2);
-  }
+	// If there is an error, set the tty string to '?'
+	if(bytes < 0 || strncmp(ttyName, "/dev", 4) != 0) {
+		strncpy(ttyName, "?\0", 2);
+
+		if (bytes < 0) {
+			// we can't check for ENOENT and return PROC_TERMINATED here, since
+			// not all processes have a /proc/<pid>/fd/0 symlink.  If the link
+			// isn't there, we just assume the process is there but doesn't have
+			// a stdout.  Actually, that shouldn't be an error either.  It
+			// should only be an error if the link was there but we just
+			// couldn't read it.  So let's say ENOENT is ok.
+			if (errno == ENOENT)
+				return PROC_OK;
+
+			*err = "readlink("+ttyPath+"): "+strerror(errno);
+			return PROC_ERROR;
+		}
+	}
+
+	return PROC_OK;
 }
 
-int  Process58Probe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
-  // The second value in this file represents idle time - we're not concerned with this.
-  unsigned long idle = 0;
-  FILE *uptimeHandle = NULL;
+bool Process58Probe::RetrieveUptime(unsigned long *uptime, string *errMsg) {
+	// The second value in this file represents idle time - we're not concerned with this.
+	unsigned long idle = 0;
+	FILE *uptimeHandle = NULL;
 
-  // Open and parse the 'uptime' file
-  if((uptimeHandle = fopen("/proc/uptime", "r")) == NULL) {
-    errMsg->append("Process58Probe: Could not open /proc/uptime");
-    uptime = 0;
-    return(-1);
-  } else {
-    fscanf(uptimeHandle, "%lu %lu", uptime, &idle);
-  }
-  fclose(uptimeHandle);
+	// Open and parse the 'uptime' file
+	if((uptimeHandle = fopen("/proc/uptime", "r")) == NULL) {
+		*errMsg = string("Process58Probe: Could not open /proc/uptime: ") + strerror(errno);
+		uptime = 0;
+		return false;
+	} else {
+		fscanf(uptimeHandle, "%lu %lu", uptime, &idle);
+	}
 
-  return(0);
+	if (fclose(uptimeHandle) == EOF) {
+		*errMsg = string("fclose(/proc/uptime): ") + strerror(errno);
+		return false;
+	}
+
+	return true;
+}
+
+Process58Probe::ProcStatus Process58Probe::RetrieveLoginUid(pid_t pid, uid_t *loginUid, string *err) {
+	string loginUidFilename = "/proc/" + Common::ToString(pid) + "/loginuid";
+	errno = 0;
+	ifstream in(loginUidFilename.c_str());
+
+	if (!in) {
+		if (errno == ENOENT)
+			return PROC_TERMINATED;
+
+		*err = "Couldn't open " + loginUidFilename + ": " + strerror(errno);
+		return PROC_ERROR;
+	}
+
+	in >> *loginUid;
+
+	if (in)
+		return PROC_OK;
+
+	*err = "Couldn't interpret contents of " + loginUidFilename +
+		" as a uid";
+
+	return PROC_ERROR;
+}
+
+void Process58Probe::AddCapabilities(Item *item, uint64_t effCap) {
+	// the capgetp() function is not available by default (since gcc sets
+	// _POSIX_SOURCE), so I guess I won't use that.  Instead, I've read a value
+	// from /proc/<pid>/status, which I interpret as a bit set.  Here I iterate
+	// through the bits.
+	for (size_t capEnum=0; capEnum<capMap.size(); ++capEnum) {
+
+		// in case there's gaps in the sequence of capability constants
+		if (capMap[capEnum].empty())
+			continue;
+
+		if (effCap & (1ULL << capEnum))
+			item->AppendElement(new ItemEntity("posix_capability",
+											   capMap[capEnum]));
+	}
+}
+
+bool Process58Probe::RetrieveSelinuxDomainLabel(pid_t pid, string *label, string *err) {
+	security_context_t sctx;
+	int ec = getpidcon(pid, &sctx);
+	if (ec == -1) {
+		// getpidcon man page doesn't say errno is set... so we can't get a
+		// reason for the error.
+		*err = "getpidcon() failed";
+		return false;
+	}
+
+	SecurityContextGuard scg(sctx);
+	ContextGuard cg(sctx);
+
+	const char *tmp = context_type_get(cg);
+	if (!tmp) {
+		*err = string("context_get_type(")+sctx+"): "+strerror(errno);
+		return false;
+	}
+
+	*label = tmp;
+	return true;
 }
 
 #elif defined SUNOS

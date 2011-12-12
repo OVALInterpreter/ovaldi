@@ -47,56 +47,12 @@
 #include <VectorPtrGuard.h>
 #include <DirGuard.h>
 #include <Noncopyable.h>
+#include <SecurityContextGuard.h>
 #include "SelinuxSecurityContextProbe.h"
 
 using namespace std;
 
 namespace {
-	/**
-	 * Enables exception-safe use of selinux security_context_t values.
-	 */
-	class SecurityContextGuard : private Noncopyable {
-	public:
-		explicit SecurityContextGuard(security_context_t ctx) : ctx(ctx) {
-		}
-
-		~SecurityContextGuard() {
-			if (ctx)
-				freecon(ctx);
-		}
-
-		operator security_context_t() {
-			return ctx;
-		}
-
-	private:
-		security_context_t ctx;
-	};
-
-	class ContextGuard : private Noncopyable {
-	public:
-		explicit ContextGuard(context_t ctx) : ctx(ctx) {
-		}
-
-		explicit ContextGuard(security_context_t sCtx) : ctx(NULL) {
-			ctx = context_new(sCtx);
-			if (!ctx)
-				throw ProbeException("Error during context_new("+string(sCtx)+"): " +
-									 strerror(errno));
-		}
-
-		~ContextGuard() {
-			if (ctx)
-				context_free(ctx);
-		}
-
-		operator context_t() {
-			return ctx;
-		}
-
-	private:
-		context_t ctx;
-	};
 
 	auto_ptr<Item> CreateItem();
 

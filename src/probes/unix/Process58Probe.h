@@ -47,7 +47,6 @@
 #include <string>
 
 #ifdef SUNOS
-#include <fstream>
 #include <procfs.h>
 #include <ftw.h>
 #include <algorithm>
@@ -78,6 +77,7 @@ public:
 	static AbsProbe* Instance();
 	  
 private:
+
 	Process58Probe();
 
 	/** Return a new Item created for storing process information. */
@@ -133,18 +133,54 @@ private:
 #ifdef LINUX
 
 	/**
+	 * Every time we try to read something from /proc/<pid>, there is a chance
+	 * that the process terminated (which means the /proc/<pid> directory
+	 * disappeared).  That's ok, and should cause the item to be omitted, rather
+	 * than an error to be generated.  I use these constants to distinguish
+	 * between the two cases.
+	 */
+	enum ProcStatus {
+		PROC_OK, ///< no error
+		PROC_TERMINATED, ///< the process terminated
+		PROC_ERROR ///< some other error occurred
+	};
+
+	/**
 		Read the stat file for a specific process
 	*/
-	int RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
+	ProcStatus RetrieveStatFile(const std::string &process, pid_t *ppid, 
+						 long *priority, unsigned long *starttime,
+						 pid_t *session, std::string *errMsg);
 
 	/**
 	 * Reads uid's from the /proc/pid/status file.  This file supposedly contains
 	 * a more human readable form of what's in /proc/pid/stat.  But it seems like
 	 * it contains more than that: as far as I've been able to figure out, process
 	 * uid's are only available here.
+	 * <p>
+	 * I wanted to return an error indication if the required values weren't able
+	 * to be located in the status file.  A plain old special flag value won't
+	 * work, since uid_t's are unsigned, and afaik there are no illegal values
+	 * throughout its range.  (maybe UINT_MAX or some such might be good enough?
+	 * But I wanted something more fool-proof.)  My idea is have the caller
+	 * initialize pointers to the actual variables, and then pass the addresses
+	 * of the pointers into this method.  So that is a precondition for calling
+	 * this method: the double-pointer parameters \em must be properly
+	 * initialized!  Then, if the values can be found, this method simply stores
+	 * them in **var.  If they are not found, *var is set to NULL.  The caller
+	 * can then check their pointers.  If the pointer is NULL, the value was not
+	 * found; if non-NULL, correct values have been stored in the pointees.
+	 * (I think boost::optional would have been perfect for this :( )
+	 * <p>
+	 * Whether or not the required values were found inside the status file, if
+	 * there were no I/O or parse errors reading the file, PROC_OK is returned.
+	 * If PROC_ERROR or PROC_TERMINATED is returned, pointer and pointee values
+	 * are undefined.
 	 */
-	int RetrieveStatusFile(const char *process, int *ruid, int *euid, std::string *errMsg);
-	
+	ProcStatus RetrieveStatusFile(const std::string &process, uid_t **ruid, 
+								  uid_t **euid, uint64_t **effCap, 
+								  std::string *errMsg);
+
 	/**
 		 Since there appears to be no simple way to convert the 'tty' value contained in
 		 '/proc/<pid>/stat' into a device name, we instead use '/proc/<pid>/fd/0', which is
@@ -152,13 +188,28 @@ private:
 		 if this probe is not run as root, many of these reads will fail.  In that case, we
 		 return '?' as the tty value.		
 	*/
-	void RetrieveTTY(const char *process, char *ttyName);
+	ProcStatus RetrieveTTY(const std::string &process, char *ttyName, std::string *err);
 
 	/**
 		Read the value contained in '/proc/uptime/' so that we can calculate
 		the start time and exec time of the running processes.
 	*/
-	int RetrieveUptime(unsigned long *uptime, std::string *errMsg);
+	bool RetrieveUptime(unsigned long *uptime, std::string *errMsg);
+
+	/**
+	 * Get the contents of /proc/<pid>/loginuid
+	 */
+	ProcStatus RetrieveLoginUid(pid_t pid, uid_t *loginUid, std::string *err);
+
+	/**
+	 * Adds posix_capability entities to \p item according to the given bit set.
+	 */
+	void AddCapabilities(Item *item, uint64_t effCap);
+
+	/**
+	 * Gets the selinux domain for the given pid, and stores it in \p label.
+	 */
+	bool RetrieveSelinuxDomainLabel(pid_t pid, std::string *label, std::string *err);
 
 #endif
 
