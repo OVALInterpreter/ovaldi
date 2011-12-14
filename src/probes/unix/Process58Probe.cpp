@@ -945,12 +945,20 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
     item->AppendElement(new ItemEntity("exec_time", formattedExecTime, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
     item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER, true));
     item->AppendElement(new ItemEntity("ppid", Common::ToString(procdata[i].kp_eproc.e_ppid), OvalEnum::DATATYPE_INTEGER));
-    item->AppendElement(new ItemEntity("priority", Common::ToString(procdata[i].kp_proc.p_priority), OvalEnum::DATATYPE_INTEGER));
+    item->AppendElement(new ItemEntity("priority", Common::ToString((int)procdata[i].kp_proc.p_priority), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("ruid", Common::ToString(procdata[i].kp_eproc.e_pcred.p_ruid), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
     item->AppendElement(new ItemEntity("start_time", formattedStartTime));
     item->AppendElement(new ItemEntity("tty", ttyStr, OvalEnum::DATATYPE_STRING, false, (ttyStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
     item->AppendElement(new ItemEntity("user_id", Common::ToString(procdata[i].kp_eproc.e_ucred.cr_uid), OvalEnum::DATATYPE_INTEGER));
+
+	// the rest of these are either not applicable, or it's not clear what to
+	// get or how to get it.
+	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("session_id", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_NOT_COLLECTED));
     
     items->push_back(item);
   }
