@@ -39,16 +39,17 @@ using namespace std;
 #define MAJOR_VERSION "5"
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
-#define VERSION "5.10"
+#define VERSION "5.10.1"
+#define UPDATE 1
 #define BUILD 1
 
-#define SCHEMA_VERSION "5.10"
+#define SCHEMA_VERSION "5.10.1"
 
 string Version::GetMinumumCompatibleVersion() {
 
-	string version;
-	version.append(MIN_COMPATIBLE_VERSION);
-    return(version);
+	string minVersion;
+	minVersion.append(MIN_COMPATIBLE_VERSION);
+    return(minVersion);
 }
 
 string Version::GetVendor() {
@@ -67,25 +68,34 @@ string Version::GetVersion() {
 
 string Version::GetBuild() {
 	
-	string version;
+	string build;
 	ostringstream bld;
 	bld << BUILD;
-	version.append(bld.str());
-    return(version);
+	build.append(bld.str());
+    return(build);
 }
 
 string Version::GetBuildDate() {
 
-	string version;
-	version.append(__DATE__);
-	version.append(" ");
-	version.append(__TIME__);
-    return(version);
+	string buildDate;
+	buildDate.append(__DATE__);
+	buildDate.append(" ");
+	buildDate.append(__TIME__);
+    return(buildDate);
+}
+
+string Version::GetUpdate() {
+	
+	string update;
+	ostringstream upd;
+	upd << UPDATE;
+	update.append(upd.str());
+    return(update);
 }
 
 string Version::GetSchemaVersion() {
 
-	string version;
-	version.append(VERSION);
-    return(version);
+	string schemaVersion;
+	schemaVersion.append(VERSION);
+    return(schemaVersion);
 }

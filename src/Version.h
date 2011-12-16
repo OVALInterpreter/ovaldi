@@ -43,6 +43,9 @@ class Version {
 		/** Return the build of this interpreter as a string. */
 		static std::string GetBuild();
 
+		/** Return the update of this interpreter as a string. */
+		static std::string GetUpdate();
+
 		/** Return the build date of this interpreter as a string. */
 		static std::string GetBuildDate();
 
