@@ -442,7 +442,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 				char dwordBuf[12];
 
 				ZeroMemory(dwordBuf, sizeof(dwordBuf));
-				_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%d", *((DWORD *)valueIn));
+				_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%u", *((DWORD *)valueIn));
 				dwordBuf[sizeof(dwordBuf)-1] = '\0';
 				item->AppendElement(new ItemEntity("value",  dwordBuf, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 
