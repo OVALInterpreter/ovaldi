@@ -71,13 +71,8 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 		if (pBuf != NULL) {
 			string minPasswordLen = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_len);
 
-			string maxPasswordAge = "-1";
-			if(pBuf->usrmod0_max_passwd_age == TIMEQ_FOREVER) {
-				maxPasswordAge = "-1";
-			} else {
-				maxPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_max_passwd_age);
-			}
-
+			string maxPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_max_passwd_age);
+			
 			string minPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_age);
 
 			string passwordHistoryLen = WindowsCommon::ToString(pBuf->usrmod0_password_hist_len);
