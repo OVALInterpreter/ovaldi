@@ -111,7 +111,12 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 			item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
 			collectedItems = new ItemVector();
-			collectedItems->push_back(item);
+
+			//pre-populate a sorted version of the auditeventpolicysubcategories_item entities
+			for(vector<GuidString>::iterator it = _guidItemElementNameVector.begin(); it != _guidItemElementNameVector.end(); ++it) {
+					ItemEntity *pSortedItemEntity = new ItemEntity(it->second,  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+					item->AppendElement(pSortedItemEntity);
+			}
 
 			// if auditing is turned on loop through the auditing options
 			if(pPAEInfo->AuditingMode) {
@@ -133,7 +138,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 					if(AuditEnumerateSubCategories(&auditCategoryId, FALSE, &pAuditSubCategoryGuids, &subCategoryCount) == FALSE) {
 						throw ProbeException("Error enumerating audit event policy subcategories.  Error Code:" + WindowsCommon::ToString(GetLastError()));
 					}
-							
+
 					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditQuerySystemPolicy()");
 					if(AuditQuerySystemPolicy(pAuditSubCategoryGuids, subCategoryCount, &pAuditPolicies) == FALSE) {
 						throw ProbeException("Error retrieving policy information for audit event policy subcategories.  Error Code:" + WindowsCommon::ToString(GetLastError()));
@@ -151,9 +156,16 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 								string itemEntityName = *it;
 								if(itemEntityName.compare("") != 0) {
 									Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - itemEntityName=" + itemEntityName);
-									ItemEntity *pItemEntity = new ItemEntity(itemEntityName,  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
-									item->AppendElement(pItemEntity);
-
+									ItemEntity *pItemEntity = NULL;
+									//loop through, grab reference to ItemEntity in-place
+									for(ItemEntityVector::iterator itemEntityIterator = (item->GetElements())->begin(); itemEntityIterator != item->GetElements()->end(); itemEntityIterator++) {
+										ItemEntity* element = (ItemEntity*)(*itemEntityIterator);
+										if(element->GetName().compare(itemEntityName) == 0) {  //entities here are unique
+											pItemEntity = element;   
+											break;
+										}
+									}
+									
 									ReadAuditOptions(item, pItemEntity, currentPolicy.AuditingInformation);
 								}
 							}
@@ -169,9 +181,11 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 				Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - pPAEInfo->AuditingMode is false");	
 				
 				// auditing is off so set all items to no auditing				
-				for(vector<GuidString>::iterator it = _guidItemElementNameVector.begin(); it != _guidItemElementNameVector.end(); ++it) {
-					item->AppendElement(new ItemEntity(it->second,  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				}		
+				//loop through, edit ItemEntity in-place
+				for(ItemEntityVector::iterator itemEntityIterator = (item->GetElements())->begin(); itemEntityIterator != item->GetElements()->end(); itemEntityIterator++) {
+					((ItemEntity*)(*itemEntityIterator))->SetValue("AUDIT_NONE");
+					((ItemEntity*)(*itemEntityIterator))->SetStatus(OvalEnum::STATUS_EXISTS);
+				}
 			}
 		} else {
 
@@ -217,6 +231,8 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 	if(pAuditPolicies != NULL) {
 		AuditFree(pAuditPolicies);
 	}
+
+	collectedItems->push_back(item);
 	
 	Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems - about to return");	
 	return collectedItems;
@@ -289,33 +305,48 @@ void AuditEventPolicySubcategoriesProbe::ReadAuditOptions(Item* item, ItemEntity
 void AuditEventPolicySubcategoriesProbe::Init() {
 	Log::Debug("AuditEventPolicySubcategoriesProbe::ReadAuditOptions() - Enter");
 
-	InsertIntoGuidItemEntityNameMapping(Audit_System_SecurityStateChange, "security_state_change");
+	//Account Logon Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_CredentialValidation, "credential_validation");
+	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_KerbCredentialValidation, "kerberos_authentication_service");
+	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Kerberos, "kerberos_service_ticket_operations");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Kerberos, "kerberos_ticket_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Others, "other_account_logon_events");
+		
+	//Account Management Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_ApplicationGroup, "application_group_management");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_ComputerAccount, "computer_account_management");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_DistributionGroup, "distribution_group_management");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_Others, "other_account_management_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_SecurityGroup, "security_group_management");
 	InsertIntoGuidItemEntityNameMapping(Audit_AccountManagement_UserAccount, "user_account_management");
+
+	//Detailed Tracking Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_DetailedTracking_DpapiActivity, "dpapi_activity");
 	InsertIntoGuidItemEntityNameMapping(Audit_DetailedTracking_ProcessCreation, "process_creation");
 	InsertIntoGuidItemEntityNameMapping(Audit_DetailedTracking_ProcessTermination, "process_termination");
 	InsertIntoGuidItemEntityNameMapping(Audit_DetailedTracking_RpcCall, "rpc_events");
+
+	//DS Access Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_DSAccess_DSAccess, "directory_service_access");
 	InsertIntoGuidItemEntityNameMapping(Audit_DsAccess_AdAuditChanges, "directory_service_changes");
 	InsertIntoGuidItemEntityNameMapping(Audit_Ds_Replication, "directory_service_replication");
 	InsertIntoGuidItemEntityNameMapping(Audit_Ds_DetailedReplication, "detailed_directory_service_replication");
+	
+	//Logon/Logoff Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_AccountLockout, "account_lockout");
+	InsertIntoGuidItemEntityNameMapping(Audit_Logon_IPSecUserMode, "ipsec_extended_mode");
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_IPSecMainMode, "ipsec_main_mode");
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_IPSecQuickMode,"ipsec_quick_mode");
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_Logoff, "logoff"); 
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_Logon, "logon");
+	InsertIntoGuidItemEntityNameMapping(Audit_Logon_NPS, "network_policy_server");
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_Others, "other_logon_logoff_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_Logon_SpecialLogon, "special_logon");
+	
+	//Object Access Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_ApplicationGenerated, "application_generated");
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_CertificationServices, "certification_services");
+	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_DetailedFileShare, "detailed_file_share");
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_Share, "file_share");
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_FileSystem, "file_system");
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_FirewallConnection, "filtering_platform_connection");
@@ -325,27 +356,27 @@ void AuditEventPolicySubcategoriesProbe::Init() {
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_Other, "other_object_access_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_Registry, "registry");
 	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_Sam, "sam");
+
+	//Policy Change Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_AuditPolicy, "audit_policy_change"); 
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_AuthenticationPolicy, "authentication_policy_change");
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_AuthorizationPolicy, "authorization_policy_change");
+	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_WfpIPSecPolicy, "filtering_platform_policy_change"); 
 	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_MpsscvRulePolicy, "mpssvc_rule_level_policy_change");
-	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_Others, "other_policy_change_events");
+	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_Others, "other_policy_change_events");	
+
+	//Privilege Use Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_NonSensitive, "non_sensitive_privilege_use");
 	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_Others, "other_privilege_use_events");
 	InsertIntoGuidItemEntityNameMapping(Audit_PrivilegeUse_Sensitive, "sensitive_privilege_use");
+	
+	//System Audit Policy Subcategories
 	InsertIntoGuidItemEntityNameMapping(Audit_System_IPSecDriverEvents, "ipsec_driver");
 	InsertIntoGuidItemEntityNameMapping(Audit_System_Others, "other_system_events");
+	InsertIntoGuidItemEntityNameMapping(Audit_System_SecurityStateChange, "security_state_change");
 	InsertIntoGuidItemEntityNameMapping(Audit_System_SecuritySubsystemExtension, "security_system_extension");
 	InsertIntoGuidItemEntityNameMapping(Audit_System_Integrity, "system_integrity");
-	InsertIntoGuidItemEntityNameMapping(Audit_PolicyChange_WfpIPSecPolicy, "filtering_platform_policy_change"); 
-	InsertIntoGuidItemEntityNameMapping(Audit_Logon_IPSecUserMode, "ipsec_extended_mode");
 
-	//Complete listing of audit event setting GUIDs - http://msdn.microsoft.com/en-us/library/dd973928(PROT.10).aspx (GUID listed in NTSecApi.h)
-	//These are new for Windows 7.
-	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_Kerberos, "kerberos_service_ticket_operations");              //GUID = {0CCE9240-69AE-11D9-BED3-505054503030}
-	InsertIntoGuidItemEntityNameMapping(Audit_AccountLogon_KerbCredentialValidation, "kerberos_authentication_service"); //GUID = {0CCE9242-69AE-11D9-BED3-505054503030}
-	InsertIntoGuidItemEntityNameMapping(Audit_Logon_NPS, "network_policy_server");                                       //GUID = {0CCE9243-69AE-11D9-BED3-505054503030}
-	InsertIntoGuidItemEntityNameMapping(Audit_ObjectAccess_DetailedFileShare, "detailed_file_share");                    //GUID = {0CCE9244-69AE-11D9-BED3-505054503030}
 }
 
 void AuditEventPolicySubcategoriesProbe::InsertIntoGuidItemEntityNameMapping(GUID guid, string itemEntityName) {
