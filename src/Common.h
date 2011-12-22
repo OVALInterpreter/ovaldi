@@ -241,6 +241,13 @@ class Common {
          */
 		static StringPair* SplitFilePath(const std::string filepath);
 
+		/**
+		 *	Split a valid filepath into its path and filename components when the filepath is a regular expression.
+		 *	@param filepath a non-NULL, non-empty, string representing the regular expression of the filepath that you would like split.
+		 *	@return a pointer to a StringPair that contains the path and filename components of the specified filepath.
+         */
+		static StringPair* SplitFilePathRegex(const std::string filepath);
+
 		/** Removes whitespace at the start of the given string. */
 		static void TrimStart(std::string& str);
 

@@ -259,7 +259,7 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 void AbsFileFinder::GetFilePathsForPattern(string pattern, StringVector* filePaths, bool isRegex){
 	StringVector* paths = new StringVector();
 	if ( isRegex ){
-		StringPair* fp = Common::SplitFilePath(pattern);
+		StringPair* fp = Common::SplitFilePathRegex(pattern);
 		this->FindPaths(fp->first,paths,isRegex);
 		if ( fp != NULL ){
 			delete fp;
@@ -374,7 +374,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 
 		} else if(filePath->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
 			this->GetFilePathsForPattern(filePath->GetValue(), filePaths, true);
-		}		
+		}
 
 	} else {
 
