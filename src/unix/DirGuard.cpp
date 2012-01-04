@@ -38,21 +38,36 @@
 
 using namespace std;
 
-DirGuard::DirGuard(const string &dirName) {
+DirGuard::DirGuard(const string &dirName, bool throwOnFailure) : closed(false) {
 	d = opendir(dirName.c_str());
 
-	if (!d)
-		throw IOException(string("Couldn't open directory ") + dirName +
-							 ": " + strerror(errno));
+	if (!d) {
+		this->closed = true;
+		if (throwOnFailure)
+			throw IOException(string("Couldn't open directory ") + dirName +
+							  ": " + strerror(errno));
+	}
 }
 
 DirGuard::~DirGuard() {
+	if (this->closed)
+		return;
+
 	if (closedir(d) < 0)
 		Log::Info(string("closedir() failed: ") + strerror(errno));
 	// closedir failure is ok, move on
 }
 
 DirGuard::operator DIR*() {
+	if (this->closed)
+		return NULL;
+	
 	return d;
 }
 
+int DirGuard::close() {
+	if (this->closed)
+		return 0;
+	this->closed = true;
+	return closedir(d);
+}

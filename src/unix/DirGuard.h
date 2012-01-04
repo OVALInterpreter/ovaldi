@@ -43,14 +43,42 @@ class DirGuard : private Noncopyable {
 public:
 
 	/**
-	 * Throws an IOException if the directory could not be opened.
+	 * Initializes the guard by attempting to open the given directory.  If
+	 * throwOnFailure==true and the open fails, IOException is thrown.  If
+	 * throwOnFailure==false and the open fails, the directory is simply marked
+	 * as closed and no exception is thrown.  Callers can call isClosed()
+	 * immediately after creating the object to determine whether the open
+	 * succeeded.
 	 */
-	explicit DirGuard(const std::string &dirName);
+	explicit DirGuard(const std::string &dirName, bool throwOnFailure = true);
 	~DirGuard();
+
+	/**
+	 * Returns a pointer to the encapsulated DIR structure.  If the directory
+	 * has been closed, this returns NULL.
+	 */
 	operator DIR*();
+
+	/**
+	 * Closes the directory, if not already closed.  After this, the directory
+	 * is flagged as closed and will not be closed again (either by the
+	 * destructor or this method).  Manual close capability is provided for
+	 * compatibility with code that wants to close the directory itself, and
+	 * throw an exception if closure failed.
+	 *
+	 * \return if the directory is not closed, returns the return value of
+	 * closedir().  If the directory was already closed, returns 0.  errno can
+	 * be queried to determine reasons for failure.
+	 */
+	int close();
+
+	bool isClosed() const {
+		return closed;
+	}
 
 private:
 	DIR *d;
+	bool closed;
 };
 
 #endif

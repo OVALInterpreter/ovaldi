@@ -58,10 +58,25 @@ private:
 	StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
 	bool PathExists(std::string path);
+	/**
+	 * \see AbsFileFinder::PathExistsCaseInsensitive
+	 */
+	virtual void PathExistsCaseInsensitive(const std::string &path, 
+										   StringVector *pathsFound);
 	bool FileNameExists(std::string path, std::string fileName);
-	void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
-	void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
-	void GetPathsForPattern(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
+
+	/**
+	 * \see AbsFileFinder::FileNameExistsCaseInsensitive
+	 */
+	virtual void FileNameExistsCaseInsensitive(const std::string &path, 
+											   const std::string &fileName,
+											   StringVector *fileNamesFound);
+	void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op);
+	//void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
+	void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath);
+	//void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
+	void GetPathsForPattern(std::string dirIn, std::string pattern, StringVector* pathVector, OvalEnum::Operation op);
+	//void GetPathsForPattern(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/

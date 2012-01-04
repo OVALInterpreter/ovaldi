@@ -130,28 +130,39 @@ protected:
 
 	/** Return true if the specified directory exists. */
 	virtual bool PathExists(std::string path) = 0;
+
+	/**
+	 * Searches for case-insensitive matches to the given path, and
+	 * collects them into the given vector.  On windows this does
+	 * not involve a search, since its filesystem is natively
+	 * case-insensitive.
+	 */
+	virtual void PathExistsCaseInsensitive(const std::string &path, 
+										   StringVector *pathsFound) = 0;
 	
 	/** Return true if the specified filename is found in the specified directory. */
 	virtual bool FileNameExists(std::string path, std::string fileName) = 0;
 	
+	/**
+	 * The given \p path is assumed to exist.  This method collects the names of
+	 * all regular files in directory \p path which case-insensitively match
+	 * \p fileName.  The results are collected in \p fileNamesFound.
+	 */
+	virtual void FileNameExistsCaseInsensitive(const std::string &path, 
+											   const std::string &fileName,
+											   StringVector *fileNamesFound) = 0;
+
 	/** Get the set of all paths that match the specified pattern. */
-	virtual void FindPaths(std::string regex, StringVector* paths, bool isRegex = true) = 0;
+	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op) = 0;
 	
 	/** Get the set of files in the specified directory that match the specified pattern. */
-	virtual void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false) = 0;
+	virtual void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false) = 0;
 	
 	/** Get the full path of the parent directory as a string. */
 	//virtual std::string GetParentDirectory(std::string path) = 0;
 	
 	/** Get the full path of all child directories as a StringVector. */
 	virtual StringVector* GetChildDirectories(std::string path) = 0;
-
-	/** Return true if the specified value matches the specified pattern. 
-	    If the isRegex flag is true the match is treated as a regex, otherwise
-		a string comparison is preformed to check that the value is not equal to 
-		the pattern. 
-	*/
-	bool IsMatch(std::string pattern, std::string value, bool isRegex = true);
 
 	/** Do a recusive search down the file system until the specified maxDepth is hit. 
 	    Each directory traversed is added to the set of paths. If maxDepth is a positive
@@ -173,7 +184,7 @@ protected:
 	 *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
 	 *  @return Void.
 	 */
-	void GetFilePathsForPattern(std::string pattern, StringVector* filePaths, bool isRegex = true);
+	void GetFilePathsForPattern(std::string queryVal, StringVector* filePaths, OvalEnum::Operation op);
 	
 	/** Return true if the specified filepath is found.
 	 *  @param filePath A string that represents the filepath whose existence you would like to determine.

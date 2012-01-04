@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
 #include "AbsFileFinder.h"
 
 using namespace std;
@@ -88,94 +89,77 @@ StringPairVector* AbsFileFinder::SearchFiles(ObjectEntity* filePath){
 
 StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behaviors) {
 
-	StringVector* paths = new StringVector();
+	auto_ptr<StringVector> pathsFound(new StringVector());
 
-	// does this path use variables?
-	if(path->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(path->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			if(this->PathExists(path->GetValue())) {
-				paths->push_back(path->GetValue());
-			}
-		} else if(path->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			// turn the provided path value into a negative pattern match
-			// then get all that match the pattern
-			this->FindPaths(path->GetValue(), paths, false);
+	// make a copy of the path so I can switch its operation without
+	// affecting the original.
+	ObjectEntity tmpPath(path);
 
-		} else if(path->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->FindPaths(path->GetValue(), paths);
-		}		
+#ifdef WIN32
+	// On windows, always ignore case sensitivity.
+	// I implement this by forcibly changing the op so
+	// we get the desired behavior out of EntityComparator.
+	if (tmpPath.GetOperation() == OvalEnum::OPERATION_NOT_EQUAL)
+		tmpPath.SetOperation(OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL);
+	else if (tmpPath.GetOperation() == OvalEnum::OPERATION_EQUALS)
+		tmpPath.SetOperation(OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS);
+#endif
 
-	} else {
+	StringVector pathsToSearch;
+	tmpPath.GetEntityValues(pathsToSearch);
 
-		StringVector* allPaths = new StringVector();
+	for (StringVector::iterator iter = pathsToSearch.begin();
+		iter != pathsToSearch.end();
+		++iter) {
 
-		if(path->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all paths
-			// if they exist on the system
-			VariableValueVector::iterator iterator;
-			for(iterator = path->GetVarRef()->GetValues()->begin(); iterator != path->GetVarRef()->GetValues()->end(); iterator++) {				
-				if(this->PathExists((*iterator)->GetValue())) {
-					paths->push_back((*iterator)->GetValue());
-				}
-			}
+		switch (tmpPath.GetOperation()) {
 
-		} else {
-			// for not equals and pattern match fetch all paths that match
-			// any of the variable values. Then analyze each path found on 
-			// the system against the variable values 			
+		case OvalEnum::OPERATION_EQUALS:
+			// due to the op change above, this won't be executed
+			// on windows... but the case-insensitive impl is
+			// identical.
+			if (this->PathExists(*iter))
+				pathsFound->push_back(*iter);
+			break;
 
-			// loop through all variable values and call findFiles
-			VariableValueVector* values = path->GetVariableValues();
-			VariableValueVector::iterator iterator;
-			for(iterator = values->begin(); iterator != values->end(); iterator++) {
-				if(path->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-					this->FindPaths((*iterator)->GetValue(), allPaths, false);
-				} else {
-					this->FindPaths((*iterator)->GetValue(), allPaths, true);
-				}
-			}
+		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+#ifdef WIN32
+			if (this->PathExists(*iter))
+				pathsFound->push_back(*iter);
+			break;
+#else
+			this->PathExistsCaseInsensitive(*iter, pathsFound.get());
+#endif
+
+		default:
+			// all other ops require searching.
+			this->FindPaths(*iter, pathsFound.get(), tmpPath.GetOperation());
 		}
+	}
 
+	if (tmpPath.GetVarRef() != NULL) {
 		// only keep paths that match operation and value and var check
-		ItemEntity* tmp = new ItemEntity("path","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		ItemEntity tmp("path","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
 		StringVector::iterator it;
-		for(it = allPaths->begin(); it != allPaths->end(); it++) {
-			tmp->SetValue((*it));
-			if(path->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				paths->push_back((*it));
-			}
+		for(it = pathsFound->begin(); it != pathsFound->end(); ) {
+			tmp.SetValue(*it);
+			if(tmpPath.Analyze(&tmp) != OvalEnum::RESULT_TRUE)
+				it = pathsFound->erase(it);
+			else
+				++it;
 		}
-		delete tmp;
-		delete allPaths;
 	}
 
 	// apply any behaviors and consolidate the results
-	StringVector* behaviorPaths = this->ProcessPathBehaviors(paths, behaviors);
-
-	// combine all the paths into a set to ensure uniqueness
-	StringSet pathSet;
-	StringVector::iterator it;
-	for(it = paths->begin(); it != paths->end(); it++) {
-		pathSet.insert((*it));
-	}
-	delete paths;
-	for(it = behaviorPaths->begin(); it != behaviorPaths->end(); it++) {
-		pathSet.insert((*it));
-	}
+	StringVector* behaviorPaths = this->ProcessPathBehaviors(pathsFound.get(), behaviors);
+	pathsFound->insert(pathsFound->end(), behaviorPaths->begin(), behaviorPaths->end());
 	delete behaviorPaths;
 
-	
-	// convert back to a vector (I know this is ugly) ...
-	StringVector* uniquePaths = new StringVector();
-	StringSet::iterator setIterator;
-	for(setIterator = pathSet.begin(); setIterator != pathSet.end(); setIterator++) {
-		uniquePaths->push_back((*setIterator));
-	}
+	// unique() only removes adjacent dupes, so we sort first
+	sort(pathsFound->begin(), pathsFound->end());
+	unique(pathsFound->begin(), pathsFound->end());
 
-	return uniquePaths;
+	return pathsFound.release();
 }
 
 void AbsFileFinder::DownwardPathRecursion(StringVector* paths, string path, int maxDepth) {
@@ -234,7 +218,7 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 	} 
 
 	// find the last file seperator
-	basic_string <char>::size_type index = path.find_last_of(Common::fileSeperator);
+	string::size_type index = path.find_last_of(Common::fileSeperator);
 
 	// if no path seperator is found stop recursing up.
 	if(index == string::npos) {
@@ -256,23 +240,28 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 	}
 }
 
-void AbsFileFinder::GetFilePathsForPattern(string pattern, StringVector* filePaths, bool isRegex){
-	StringVector* paths = new StringVector();
-	if ( isRegex ){
-		StringPair* fp = Common::SplitFilePathRegex(pattern);
-		this->FindPaths(fp->first,paths,isRegex);
-		if ( fp != NULL ){
-			delete fp;
-			fp = NULL;
+void AbsFileFinder::GetFilePathsForPattern(string queryVal, StringVector* filePaths, OvalEnum::Operation op){
+	auto_ptr<StringVector> paths(new StringVector());
+	auto_ptr<StringPair> fp;
+
+	if ( op == OvalEnum::OPERATION_PATTERN_MATCH ) {
+		fp.reset(Common::SplitFilePathRegex(queryVal));
+		if (fp.get() == NULL)
+			// no path sep char found to do the split... so
+			// use the whole value as a regex for both paths
+			// and filepaths.
+			this->FindPaths(queryVal, paths.get(), op);
+		else{
+			this->FindPaths(fp->first, paths.get(), op);
 		}
-	}else{
-		this->FindPaths(".*",paths,isRegex);
+
+	} else {
+		this->FindPaths(".*", paths.get(), op);
 	}
-	for(StringVector::iterator it = paths->begin() ; it != paths->end() ; it++){
-		this->GetFilesForPattern(*it, pattern, filePaths, isRegex, true);
+
+	for(StringVector::iterator it = paths->begin() ; it != paths->end() ; it++) {
+		this->GetFilesForPattern(*it, queryVal, filePaths, op, true);
 	}
-	delete paths;
-	paths = NULL;
 }
 
 bool AbsFileFinder::FilePathExists(string filePath){
@@ -287,142 +276,140 @@ bool AbsFileFinder::FilePathExists(string filePath){
 }
 
 StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
-	StringVector* fileNames = new StringVector();
 
-	// does this fileName use variables?
-	if(fileName->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(fileName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			if(this->FileNameExists(path, fileName->GetValue())) {
-				fileNames->push_back(fileName->GetValue());
-			}
+	auto_ptr<StringVector> fileNamesFound(new StringVector());
 
-		} else if(fileName->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			// turn the provided fileName value into a negative pattern match
-			// then get all that match the pattern
-			this->GetFilesForPattern(path, fileName->GetValue(), fileNames, false);
+	// make a copy of the path so I can switch its operation without
+	// affecting the original.
+	ObjectEntity tmpFileName(fileName);
 
-		} else if(fileName->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->GetFilesForPattern(path, fileName->GetValue(), fileNames);
-		}		
+#ifdef WIN32
+	// On windows, always ignore case sensitivity.
+	// I implement this by forcibly changing the op so
+	// we get the desired behavior out of EntityComparator.
+	if (tmpFileName.GetOperation() == OvalEnum::OPERATION_NOT_EQUAL)
+		tmpFileName.SetOperation(OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL);
+	else if (tmpFileName.GetOperation() == OvalEnum::OPERATION_EQUALS)
+		tmpFileName.SetOperation(OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS);
+#endif
 
-	} else {
+	StringVector fileNamesToSearch;
+	tmpFileName.GetEntityValues(fileNamesToSearch);
 
-		StringVector* allFileNames = new StringVector();
+	for (StringVector::iterator iter = fileNamesToSearch.begin();
+		iter != fileNamesToSearch.end();
+		++iter) {
 
-		if(fileName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all file names
-			// if they exist on the system
-			VariableValueVector::iterator iterator;
-			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
-				if(this->FileNameExists(path, (*iterator)->GetValue())) {
-					fileNames->push_back((*iterator)->GetValue());
-				}
-			}
-		} else {
-	
-			// for not equals and pattern match fetch all files that
-			// match any of the variable values.		
+		switch (tmpFileName.GetOperation()) {
 
-			// loop through all variable values and call GetFilesForPattern
-			VariableValueVector* values = fileName->GetVariableValues();
-			VariableValueVector::iterator iterator;
-			for(iterator = values->begin(); iterator != values->end(); iterator++) {
-				if(fileName->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-					this->GetFilesForPattern(path, (*iterator)->GetValue(), allFileNames, false);
-				} else {
-					this->GetFilesForPattern(path, (*iterator)->GetValue(), allFileNames, true);
-				}
-			}
+		case OvalEnum::OPERATION_EQUALS:
+			// due to the op change above, this won't be executed
+			// on windows... but the case-insensitive impl is
+			// identical.
+			if (this->FileNameExists(path, *iter))
+				fileNamesFound->push_back(*iter);
+			break;
+
+		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+#ifdef WIN32
+			if (this->FileNameExists(path, *iter))
+				fileNamesFound->push_back(*iter);
+#else
+			this->FileNameExistsCaseInsensitive(path, *iter, fileNamesFound.get());
+#endif
+			break;
+
+		default:
+			// all other ops require searching.
+			this->GetFilesForPattern(path, *iter, fileNamesFound.get(),
+				tmpFileName.GetOperation(), false);
 		}
-
-		// only keep files that match operation and value and var check
-		ItemEntity* tmp = new ItemEntity("filename","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
-		StringVector::iterator it;
-		for(it = allFileNames->begin(); it != allFileNames->end(); it++) {
-			tmp->SetValue((*it));
-			if(fileName->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				fileNames->push_back((*it));
-			}
-		}
-		delete tmp;
-		delete allFileNames;
 	}
 
-	return fileNames;
+	if (tmpFileName.GetVarRef() != NULL) {
+		// only keep filenames that match operation and value and var check
+		ItemEntity tmp("filename","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		StringVector::iterator it;
+		for(it = fileNamesFound->begin(); it != fileNamesFound->end(); ) {
+			tmp.SetValue(*it);
+			if(tmpFileName.Analyze(&tmp) != OvalEnum::RESULT_TRUE)
+				it = fileNamesFound->erase(it);
+			else
+				++it;
+		}
+	}
+
+	return fileNamesFound.release();
 }
 
 StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 
-	StringVector* filePaths = new StringVector();
+	auto_ptr<StringVector> filePathsFound(new StringVector());
 
-	// does this filePath use variables?
-	if(filePath->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			if(this->FilePathExists(filePath->GetValue())) {
-				filePaths->push_back(filePath->GetValue());
-			}
+	// make a copy of the filepath so I can switch its operation without
+	// affecting the original.
+	ObjectEntity tmpFilePath(filePath);
 
-		} else if(filePath->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			// turn the provided filePath value into a negative pattern match
-			// then get all that match the pattern
-			this->GetFilePathsForPattern(filePath->GetValue(), filePaths, false);
+#ifdef WIN32
+	// On windows, always ignore case sensitivity.
+	// I implement this by forcibly changing the op so
+	// we get the desired behavior out of EntityComparator.
+	if (tmpFilePath.GetOperation() == OvalEnum::OPERATION_NOT_EQUAL)
+		tmpFilePath.SetOperation(OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL);
+	else if (tmpFilePath.GetOperation() == OvalEnum::OPERATION_EQUALS)
+		tmpFilePath.SetOperation(OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS);
+#endif
 
-		} else if(filePath->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			this->GetFilePathsForPattern(filePath->GetValue(), filePaths, true);
+	StringVector filePathsToSearch;
+	tmpFilePath.GetEntityValues(filePathsToSearch);
+
+	for (StringVector::iterator iter = filePathsToSearch.begin();
+		iter != filePathsToSearch.end();
+		++iter) {
+
+		switch (filePath->GetOperation()) {
+
+		case OvalEnum::OPERATION_EQUALS:
+			// due to the op change above, this won't be executed
+			// on windows... but the case-insensitive impl is
+			// identical.
+			if (this->FilePathExists(*iter))
+				filePathsFound->push_back(*iter);
+			break;
+
+		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+#ifdef WIN32
+			// under windows, this works exactly as op=equals
+			if (this->FilePathExists(*iter))
+				filePathsFound->push_back(*iter);
+			break;
+#else
+			// *nix is case-sensitive.  To do a case-insensitive existence
+			// check, we have to get fancy.
+			// TODO: implement this for *nix!
+#endif
+
+		default:
+			// all other ops require searching.
+			this->GetFilePathsForPattern(*iter, filePathsFound.get(), 
+				tmpFilePath.GetOperation());
 		}
-
-	} else {
-
-		StringVector* allfilePaths = new StringVector();
-
-		if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all file names
-			// if they exist on the system
-			VariableValueVector::iterator iterator;
-			for(iterator = filePath->GetVarRef()->GetValues()->begin(); iterator != filePath->GetVarRef()->GetValues()->end(); iterator++) {
-				
-				if(this->FilePathExists((*iterator)->GetValue())) {
-					filePaths->push_back((*iterator)->GetValue());
-				}
-			}
-
-		} else {
-	
-			// for not equals and pattern match fetch all files that
-			// match any of the variable values.		
-
-			// loop through all variable values and call GetFilePathsForPattern
-			VariableValueVector* values = filePath->GetVariableValues();
-			VariableValueVector::iterator iterator;
-			for(iterator = values->begin(); iterator != values->end(); iterator++) {
-				if(filePath->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-					this->GetFilePathsForPattern((*iterator)->GetValue(), allfilePaths, false);
-				} else {
-					this->GetFilePathsForPattern((*iterator)->GetValue(), allfilePaths, true);
-				}
-			}
-		}
-
-		// only keep files that match operation and value and var check
-		ItemEntity* tmp = new ItemEntity("filepath","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
-		StringVector::iterator it;
-		for(it = allfilePaths->begin(); it != allfilePaths->end(); it++) {
-			tmp->SetValue((*it));
-			if(filePath->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				filePaths->push_back((*it));
-			}
-		}
-		delete tmp;
-		delete allfilePaths;
 	}
 
-	return filePaths;
+	if (tmpFilePath.GetVarRef() != NULL) {
+		// only keep filepaths that match operation and value and var check
+		ItemEntity tmp("filepath","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		StringVector::iterator it;
+		for(it = filePathsFound->begin(); it != filePathsFound->end(); ) {
+			tmp.SetValue(*it);
+			if(tmpFilePath.Analyze(&tmp) != OvalEnum::RESULT_TRUE)
+				it = filePathsFound->erase(it);
+			else
+				++it;
+		}
+	}
+
+	return filePathsFound.release();
 }
 
 bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* paths) {
@@ -502,27 +489,6 @@ bool AbsFileFinder::ReportFilePathDoesNotExist(ObjectEntity *filePath, StringVec
 	}
 
 	return  result;
-}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Private Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
-bool AbsFileFinder::IsMatch(string pattern, string value, bool isRegex) {
-
-	bool match = false;
-
-	if(isRegex) {
-		if(this->fileMatcher->IsMatch(pattern.c_str(), value.c_str())) {
-			match = true;
-		}
-	} else {	
-		if(value.compare(pattern) != 0) {
-			match = true;
-		}
-	}
-
-	return match;
 }
 
 //****************************************************************************************//
