@@ -316,37 +316,19 @@ void FileFinder::GetFilesForOperation(string path, string pattern, StringVector*
 
 			//	Call stat 
 			struct stat statbuf;
-			string filepath = path;
-			filepath.append(dirp->d_name);
+			string filepath = Common::BuildFilePath(path, dirp->d_name);
 			if(lstat(filepath.c_str(), &statbuf) < 0) {
-				//if(errno == ENOTDIR) {
-				//	throw ProbeException("A component of the path prefix is not a directory.");
-				//} else if(errno == ENAMETOOLONG) {
-				//	throw ProbeException("A component of a pathname exceeded {NAME_MAX} characters, or an entire path name exceeded {PATH_MAX} characters.");		
-				//} else if(errno == EACCES) {
-				//	throw ProbeException("Search permission is denied for a component of the path prefix.");
-				//} else if(errno == ELOOP) {
-				//	throw ProbeException("Too many symbolic links were encountered in translating the pathname.");
-				//} else if(errno == EFAULT) {
-				//	throw ProbeException("Sb or name points to an invalid address.");
-				//} else if(errno == EIO) {	
-				//	throw ProbeException("An I/O error occurred while reading from or writing to the file system.");
-				//} else if(errno == ENOENT) {
-				//	throw ProbeException("Does not exist");
-				//}
-				// no errors to report
+				continue;
 			}
 
-			//	If not a directory check if a match
+			//	If a regular file, check if a match
 			if(S_ISREG(statbuf.st_mode)) {
-				string fileName = dirp->d_name;
 				if ( isFilePath ){
-					string filepath = Common::BuildFilePath(path,fileName);
 					if (EntityComparator::CompareString(op, pattern, filepath) == OvalEnum::RESULT_TRUE)
 						fileNames->push_back(filepath);
-				}else{
-					if (EntityComparator::CompareString(op, pattern, fileName) == OvalEnum::RESULT_TRUE)
-						fileNames->push_back(fileName);
+				} else {
+					if (EntityComparator::CompareString(op, pattern, dirp->d_name) == OvalEnum::RESULT_TRUE)
+						fileNames->push_back(dirp->d_name);
 				}
 			}
 		}
@@ -387,7 +369,7 @@ bool FileFinder::PathExists(string path) {
 	// -----------------------------------------------------------------------
 
 	struct stat st;
-	return lstat(path.c_str(), &st) != -1 && S_ISDIR(st.st_mode));
+	return (lstat(path.c_str(), &st) != -1 && S_ISDIR(st.st_mode));
 }
 
 void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pathsFound) {
