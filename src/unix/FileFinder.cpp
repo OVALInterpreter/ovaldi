@@ -387,7 +387,7 @@ bool FileFinder::PathExists(string path) {
 	// -----------------------------------------------------------------------
 
 	struct stat st;
-	return (stat(path.c_str(), &st) != -1 && S_ISDIR(st.st_mode));
+	return lstat(path.c_str(), &st) != -1 && S_ISDIR(st.st_mode));
 }
 
 void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pathsFound) {
@@ -432,7 +432,7 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 	//	Call stat 
 	struct stat statbuf;
 	string filepath = path + fileName;
-	if(stat(filepath.c_str(), &statbuf) == 0) {
+	if(lstat(filepath.c_str(), &statbuf) == 0) {
 		exists = true;
 	}
 
@@ -466,7 +466,7 @@ void FileFinder::FileNameExistsCaseInsensitive(const string &path,
 		if (Common::EqualsIgnoreCase(fileName, dirp->d_name)) {
 			// ignore non-regular-files and stat() errors
 			string tmpPath = Common::BuildFilePath(path, dirp->d_name);
-			if (stat(tmpPath.c_str(), &st) == -1 || !S_ISREG(st.st_mode))
+			if (lstat(tmpPath.c_str(), &st) == -1 || !S_ISREG(st.st_mode))
 				continue;
 
 			fileNamesFound->push_back(dirp->d_name);
@@ -593,7 +593,7 @@ namespace {
 			if (Common::EqualsIgnoreCase(dirp->d_name, pathComp)) {
 				// ignore non-directories and stat() errors
 				string tmpPath = Common::BuildFilePath(currPath, dirp->d_name);
-				if (stat(tmpPath.c_str(), &st) == -1 || !S_ISDIR(st.st_mode))
+				if (lstat(tmpPath.c_str(), &st) == -1 || !S_ISDIR(st.st_mode))
 					continue;
 
 				if (nextSepIdx == string::npos ||
