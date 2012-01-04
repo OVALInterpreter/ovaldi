@@ -149,14 +149,14 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
 
 		//	Call search function
-		this->GetPathsForPattern(constPortion, queryVal, paths, op);
+		this->GetPathsForOperation(constPortion, queryVal, paths, op);
 
 		//	No constant portion.
 	} else if(constPortion.compare("") == 0) { 
 		
 		try  {
 
-			this->GetPathsForPattern(fileSeperatorStr, queryVal, paths, op);
+			this->GetPathsForOperation(fileSeperatorStr, queryVal, paths, op);
 
 		} catch(REGEXException ex) {
 			if(ex.GetSeverity() == ERROR_WARN) {
@@ -180,7 +180,7 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 
 }
 
-void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector* pathVector, OvalEnum::Operation op) {
+void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector* pathVector, OvalEnum::Operation op) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -252,7 +252,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector* 
 				tmp = dirIn + dirp->d_name;
 
 				// Nake recursive call
-				GetPathsForPattern(tmp, pattern, pathVector, op);
+				GetPathsForOperation(tmp, pattern, pathVector, op);
 			}
 
 
@@ -281,8 +281,8 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector* 
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
-//void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
+void FileFinder::GetFilesForOperation(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
+//void FileFinder::GetFilesForOperation(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -449,8 +449,8 @@ void FileFinder::FileNameExistsCaseInsensitive(const string &path,
 	struct stat st;
 	DirGuard dir(path, false);
 
-	// copy behavior from GetFilesForPattern
-	if(dp.isClosed()) {
+	// copy behavior from GetFilesForOperation
+	if(dir.isClosed()) {
 		string errorMessage = "Error opening directory " + path + ": " +
 			strerror(errno);
 		throw FileFinderException(errorMessage);

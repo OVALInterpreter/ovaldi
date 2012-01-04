@@ -240,7 +240,7 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 	}
 }
 
-void AbsFileFinder::GetFilePathsForPattern(string queryVal, StringVector* filePaths, OvalEnum::Operation op){
+void AbsFileFinder::GetFilePathsForOperation(string queryVal, StringVector* filePaths, OvalEnum::Operation op){
 	auto_ptr<StringVector> paths(new StringVector());
 	auto_ptr<StringPair> fp;
 
@@ -260,7 +260,7 @@ void AbsFileFinder::GetFilePathsForPattern(string queryVal, StringVector* filePa
 	}
 
 	for(StringVector::iterator it = paths->begin() ; it != paths->end() ; it++) {
-		this->GetFilesForPattern(*it, queryVal, filePaths, op, true);
+		this->GetFilesForOperation(*it, queryVal, filePaths, op, true);
 	}
 }
 
@@ -321,7 +321,7 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
 
 		default:
 			// all other ops require searching.
-			this->GetFilesForPattern(path, *iter, fileNamesFound.get(),
+			this->GetFilesForOperation(path, *iter, fileNamesFound.get(),
 				tmpFileName.GetOperation(), false);
 		}
 	}
@@ -391,7 +391,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 
 		default:
 			// all other ops require searching.
-			this->GetFilePathsForPattern(*iter, filePathsFound.get(), 
+			this->GetFilePathsForOperation(*iter, filePathsFound.get(), 
 				tmpFilePath.GetOperation());
 		}
 	}

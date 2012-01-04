@@ -156,7 +156,7 @@ protected:
 	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op) = 0;
 	
 	/** Get the set of files in the specified directory that match the specified pattern. */
-	virtual void GetFilesForPattern(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false) = 0;
+	virtual void GetFilesForOperation(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false) = 0;
 	
 	/** Get the full path of the parent directory as a string. */
 	//virtual std::string GetParentDirectory(std::string path) = 0;
@@ -184,7 +184,7 @@ protected:
 	 *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
 	 *  @return Void.
 	 */
-	void GetFilePathsForPattern(std::string queryVal, StringVector* filePaths, OvalEnum::Operation op);
+	void GetFilePathsForOperation(std::string queryVal, StringVector* filePaths, OvalEnum::Operation op);
 	
 	/** Return true if the specified filepath is found.
 	 *  @param filePath A string that represents the filepath whose existence you would like to determine.
