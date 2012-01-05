@@ -55,32 +55,26 @@ private:
 		recurse_direction, max_depth, recurse, and recurse_file_system
 		Currently only recurse_direction and max_depth are implemented.
 	*/
-	StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
+	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
-	bool PathExists(std::string path);
+	virtual bool PathExists(std::string path);
 	/**
 	 * \see AbsFileFinder::PathExistsCaseInsensitive
 	 */
 	virtual void PathExistsCaseInsensitive(const std::string &path, 
 										   StringVector *pathsFound);
-	bool FileNameExists(std::string path, std::string fileName);
+	virtual bool FileNameExists(std::string path, std::string fileName);
 
-	/**
-	 * \see AbsFileFinder::FileNameExistsCaseInsensitive
-	 */
-	virtual void FileNameExistsCaseInsensitive(const std::string &path, 
-											   const std::string &fileName,
-											   StringVector *fileNamesFound);
-	void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op);
+	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op);
 	//void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
-	void GetFilesForOperation(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath);
+	virtual void GetFilesForOperation(std::string path, std::string queryVal, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false);
 	//void GetFilesForOperation(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
-	void GetPathsForOperation(std::string dirIn, std::string pattern, StringVector* pathVector, OvalEnum::Operation op);
+	void GetPathsForOperation(std::string dirIn, std::string queryVal, StringVector* pathVector, OvalEnum::Operation op);
 	//void GetPathsForOperation(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/
-	StringVector* GetChildDirectories(std::string path);
+	virtual StringVector* GetChildDirectories(std::string path);
 };
 
 #endif

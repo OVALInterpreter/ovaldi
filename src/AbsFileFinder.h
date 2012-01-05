@@ -143,20 +143,11 @@ protected:
 	/** Return true if the specified filename is found in the specified directory. */
 	virtual bool FileNameExists(std::string path, std::string fileName) = 0;
 	
-	/**
-	 * The given \p path is assumed to exist.  This method collects the names of
-	 * all regular files in directory \p path which case-insensitively match
-	 * \p fileName.  The results are collected in \p fileNamesFound.
-	 */
-	virtual void FileNameExistsCaseInsensitive(const std::string &path, 
-											   const std::string &fileName,
-											   StringVector *fileNamesFound) = 0;
-
 	/** Get the set of all paths that match the specified pattern. */
 	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op) = 0;
 	
 	/** Get the set of files in the specified directory that match the specified pattern. */
-	virtual void GetFilesForOperation(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false) = 0;
+	virtual void GetFilesForOperation(std::string path, std::string queryVal, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false) = 0;
 	
 	/** Get the full path of the parent directory as a string. */
 	//virtual std::string GetParentDirectory(std::string path) = 0;
@@ -191,6 +182,8 @@ protected:
 	 *  @return A boolean value that indicates whether or not the specified filepath exists.
 	 */
 	bool FilePathExists(std::string filePath);
+
+	void FilePathExistsCaseInsensitive(std::string filePath, StringVector *matchingFilePaths);
 
 	REGEX *fileMatcher;
 

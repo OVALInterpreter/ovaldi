@@ -180,12 +180,12 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 
 }
 
-void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector* pathVector, OvalEnum::Operation op) {
+void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVector* pathVector, OvalEnum::Operation op) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
 	//
-	//  This function gets all paths that match a given pattern.
+	//  This function gets all paths that match a given queryVal.
 	//	This does call itself recursively as it must search all sub directories of dirIn.
 	//	If a match is found the path is pushed on to a vector of strings.
 	//
@@ -199,22 +199,6 @@ void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector
 
 		//	Call stat 
 		if(lstat(dirIn.c_str(), &statbuf) < 0) {
-			//if(errno == ENOTDIR) {
-			//	throw ProbeException("A component of the path prefix is not a directory.");
-			//} else if(errno == ENAMETOOLONG) {
-			//	throw ProbeException("A component of a pathname exceeded {NAME_MAX} characters, or an entire path name exceeded {PATH_MAX} characters.");		
-			//} else if(errno == EACCES) {
-			//	throw ProbeException("Search permission is denied for a component of the path prefix.");
-			//} else if(errno == ELOOP) {
-			//	throw ProbeException("Too many symbolic links were encountered in translating the pathname.");
-			//} else if(errno == EFAULT) {
-			//	throw ProbeException("Sb or name points to an invalid address.");
-			//} else if(errno == EIO) {	
-			//	throw ProbeException("An I/O error occurred while reading from or writing to the file system.");
-			//} else if(errno == ENOENT) {
-			//	// does not exist
-			//}
-
 			return; 
 		}
 
@@ -222,7 +206,7 @@ void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector
 		if(S_ISDIR(statbuf.st_mode)) {
 
 			// record it if it matches the regex.
-			if (EntityComparator::CompareString(op, pattern, dirIn) == OvalEnum::RESULT_TRUE)
+			if (EntityComparator::CompareString(op, queryVal, dirIn) == OvalEnum::RESULT_TRUE)
 				pathVector->push_back(dirIn);
 
 			//	Open the directory
@@ -252,7 +236,7 @@ void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector
 				tmp = dirIn + dirp->d_name;
 
 				// Nake recursive call
-				GetPathsForOperation(tmp, pattern, pathVector, op);
+				GetPathsForOperation(tmp, queryVal, pathVector, op);
 			}
 
 
@@ -271,33 +255,30 @@ void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector
 		throw;
 	} catch(...) {
 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
-		errorMessage.append(dirIn);
-		errorMessage.append("\n\tPattern: ");
-		errorMessage.append(pattern);
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: " +
+			dirIn +
+			"\n\tQuery: " +
+			queryVal +
+			"\n\tOperation: " +
+			OvalEnum::OperationToString(op);
+
 		throw FileFinderException(errorMessage);
 	}
 }
 
-void FileFinder::GetFilesForOperation(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
-//void FileFinder::GetFilesForOperation(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
+void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
 	//
-	//  This function gets all file names that match a given pattern on the spaecified path.
+	//  This function gets all file names that match a given queryVal on the specified path.
 	//	If a match is found the filename is pushed on to a vector of strings.
 	//
 	// -----------------------------------------------------------------------
 
 	try {
-
-		// Verify that the path that was passed into this function ends with a slash.  If
-		// it doesn't, then add one.
-		if (path[path.length()-1] != Common::fileSeperator)
-			path.append(1, Common::fileSeperator);
 
 		//	Open the directory
 		DirGuard dp(path, false);
@@ -324,10 +305,10 @@ void FileFinder::GetFilesForOperation(string path, string pattern, StringVector*
 			//	If a regular file, check if a match
 			if(S_ISREG(statbuf.st_mode)) {
 				if ( isFilePath ){
-					if (EntityComparator::CompareString(op, pattern, filepath) == OvalEnum::RESULT_TRUE)
+					if (EntityComparator::CompareString(op, queryVal, filepath) == OvalEnum::RESULT_TRUE)
 						fileNames->push_back(filepath);
 				} else {
-					if (EntityComparator::CompareString(op, pattern, dirp->d_name) == OvalEnum::RESULT_TRUE)
+					if (EntityComparator::CompareString(op, queryVal, dirp->d_name) == OvalEnum::RESULT_TRUE)
 						fileNames->push_back(dirp->d_name);
 				}
 			}
@@ -349,12 +330,15 @@ void FileFinder::GetFilesForOperation(string path, string pattern, StringVector*
 
 	} catch(...) {
 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
-		errorMessage.append(path);
-		errorMessage.append("\n\tPattern: ");
-		errorMessage.append(pattern);
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: " +
+			path +
+			"\n\tQuery: " +
+			queryVal +
+			"\n\tOperation: " +
+			OvalEnum::OperationToString(op);
+
 		throw FileFinderException(errorMessage);
 	}
 }
@@ -419,41 +403,6 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 	}
 
 	return exists;
-}
-
-void FileFinder::FileNameExistsCaseInsensitive(const string &path, 
-											   const string &fileName, 
-											   StringVector *fileNamesFound) {
-	// We assume the given path is already known to exist, and just
-	// search the files within it.  That's how AbsFileFinder will
-	// invoke us: as the second step of a 2-step process.
-	dirent *dirp;
-	struct stat st;
-	DirGuard dir(path, false);
-
-	// copy behavior from GetFilesForOperation
-	if(dir.isClosed()) {
-		string errorMessage = "Error opening directory " + path + ": " +
-			strerror(errno);
-		throw FileFinderException(errorMessage);
-	}
-	// ignore dir open error
-	if (dir.isClosed())
-		return;
-
-	while((dirp = readdir(dir)) != NULL) {
-		if (!strcmp(dirp->d_name, ".") || !strcmp(dirp->d_name, ".."))
-			continue;
-
-		if (Common::EqualsIgnoreCase(fileName, dirp->d_name)) {
-			// ignore non-regular-files and stat() errors
-			string tmpPath = Common::BuildFilePath(path, dirp->d_name);
-			if (lstat(tmpPath.c_str(), &st) == -1 || !S_ISREG(st.st_mode))
-				continue;
-
-			fileNamesFound->push_back(dirp->d_name);
-		}
-	}	
 }
 
 StringVector* FileFinder::GetChildDirectories(string path) {

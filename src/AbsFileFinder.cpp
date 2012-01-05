@@ -126,10 +126,10 @@ StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behavi
 #ifdef WIN32
 			if (this->PathExists(*iter))
 				pathsFound->push_back(*iter);
-			break;
 #else
 			this->PathExistsCaseInsensitive(*iter, pathsFound.get());
 #endif
+			break;
 
 		default:
 			// all other ops require searching.
@@ -266,13 +266,28 @@ void AbsFileFinder::GetFilePathsForOperation(string queryVal, StringVector* file
 
 bool AbsFileFinder::FilePathExists(string filePath){
 	bool exists = false;
-	StringPair* fpComponents = Common::SplitFilePath(filePath);
-	if ( fpComponents != NULL ){
+	auto_ptr<StringPair> fpComponents(Common::SplitFilePath(filePath));
+	if ( fpComponents.get() != NULL )
 		exists = this->FileNameExists(fpComponents->first, fpComponents->second);
-		delete fpComponents;
-		fpComponents = NULL;
-	}
+
 	return exists;
+}
+
+void AbsFileFinder::FilePathExistsCaseInsensitive(string filePath, StringVector *matchingFilePaths) {
+	auto_ptr<StringPair> fpComponents(Common::SplitFilePath(filePath));
+
+	if ( fpComponents.get() != NULL ) {
+		StringVector matchingPaths;
+
+		this->PathExistsCaseInsensitive(fpComponents->first, &matchingPaths);
+
+		for (StringVector::iterator iter = matchingPaths.begin();
+			 iter != matchingPaths.end();
+			 ++iter)
+			 this->GetFilesForOperation(*iter, filePath, matchingFilePaths,
+										OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS,
+										true);
+	}
 }
 
 StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
@@ -310,14 +325,16 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
 				fileNamesFound->push_back(*iter);
 			break;
 
-		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
 #ifdef WIN32
+			// On windows, this is a simple existence check.  On *nix, it
+			// requires searching, and the same GetFilesForOperation() method
+			// will actually work in this case.  So on *nix we can skip this
+			// case altogether and drop to the default.
+		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
 			if (this->FileNameExists(path, *iter))
 				fileNamesFound->push_back(*iter);
-#else
-			this->FileNameExistsCaseInsensitive(path, *iter, fileNamesFound.get());
-#endif
 			break;
+#endif
 
 		default:
 			// all other ops require searching.
@@ -382,12 +399,10 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 			// under windows, this works exactly as op=equals
 			if (this->FilePathExists(*iter))
 				filePathsFound->push_back(*iter);
-			break;
 #else
-			// *nix is case-sensitive.  To do a case-insensitive existence
-			// check, we have to get fancy.
-			// TODO: implement this for *nix!
+			this->FilePathExistsCaseInsensitive(*iter, filePathsFound.get());
 #endif
+			break;
 
 		default:
 			// all other ops require searching.
