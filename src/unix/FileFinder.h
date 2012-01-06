@@ -66,11 +66,11 @@ private:
 	virtual bool FileNameExists(std::string path, std::string fileName);
 
 	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op);
-	//void FindPaths(std::string regex, StringVector* paths, bool isRegex = true);
+
 	virtual void GetFilesForOperation(std::string path, std::string queryVal, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath = false);
-	//void GetFilesForOperation(std::string path, std::string pattern, StringVector* fileNames, bool isRegex = true, bool isFilePath = false);
+
 	void GetPathsForOperation(std::string dirIn, std::string queryVal, StringVector* pathVector, OvalEnum::Operation op);
-	//void GetPathsForOperation(std::string dirIn, std::string pattern, StringVector* pathVector, bool isRegex = true);	
+
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/
