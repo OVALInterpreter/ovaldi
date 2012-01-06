@@ -115,20 +115,14 @@ StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behavi
 		switch (tmpPath.GetOperation()) {
 
 		case OvalEnum::OPERATION_EQUALS:
-			// due to the op change above, this won't be executed
-			// on windows... but the case-insensitive impl is
-			// identical.
+			// On windows: due to the op change above this won't be executed,
+			// but the case-insensitive impl is effectively identical.
 			if (this->PathExists(*iter))
 				pathsFound->push_back(*iter);
 			break;
 
 		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
-#ifdef WIN32
-			if (this->PathExists(*iter))
-				pathsFound->push_back(*iter);
-#else
 			this->PathExistsCaseInsensitive(*iter, pathsFound.get());
-#endif
 			break;
 
 		default:
@@ -395,13 +389,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 			break;
 
 		case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
-#ifdef WIN32
-			// under windows, this works exactly as op=equals
-			if (this->FilePathExists(*iter))
-				filePathsFound->push_back(*iter);
-#else
 			this->FilePathExistsCaseInsensitive(*iter, filePathsFound.get());
-#endif
 			break;
 
 		default:

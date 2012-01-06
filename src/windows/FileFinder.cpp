@@ -28,7 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <FindCloseGuard.h>
 #include "FileFinder.h"
+
+using namespace std;
 
 FileFinder::FileFinder() {
 
@@ -84,40 +88,39 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 	return behaviorPaths;
 }
 
-void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
+void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op) {
 
-	StringVector* drives;
-	string fileName = "";
+	string fileName;
 
-	string patternOut= "";
-	string constPortion= "";
+	string patternOut;
+	string constPortion;
 
 	// This optimization only applies when the regex is anchored to
 	// the beginning of paths. (regex has to start with '^')
-	if (isRegex && !regex.empty() && regex[0] == '^') {		
-		this->fileMatcher->GetConstantPortion(regex, Common::fileSeperator, &patternOut, &constPortion);
+	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
+		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes
 		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
 	}
-
+	Log::Debug("const portion='"+constPortion+"', pattern portion='"+patternOut+"'");
 	// Found a constant portion
-	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
+	if(!constPortion.empty() && !patternOut.empty()) {
 
 		//	Call search function
-		this->GetPathsForPattern(constPortion, regex, paths);
+		this->GetPathsForOperation(constPortion, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
 
 	//	No constant portion.
-	} else if(constPortion.compare("") == 0) { 
+	} else if(constPortion.empty()) { 
 		
 		//	Must start searching for matches on each drive.
-		drives = this->GetDrives();
+		auto_ptr<StringVector> drives(this->GetDrives());
 
 		StringVector::iterator drive;
 		for (drive=drives->begin(); drive!=drives->end(); drive++) {
 			//	Call search function
 			try  {
 
-				this->GetPathsForPattern((*drive), regex, paths, isRegex);
+				this->GetPathsForOperation((*drive), queryVal, paths, op);
 
 			} catch(REGEXException ex) {
 				if(ex.GetSeverity() == ERROR_WARN) {
@@ -127,14 +130,11 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 					pcreMsg.append(ex.GetErrorMessage());
 					Log::Debug(pcreMsg);
 				} else {
-					delete drives;
 					throw;
 				}		
 			}
 		}
-		delete drives;
-
-	} else if(patternOut.compare("") == 0) {
+	} else if(patternOut.empty()) {
 
 		//	There are no pattern matching chars treat this as a normal path 
 		if(this->PathExists(constPortion)) {
@@ -222,17 +222,17 @@ StringVector* FileFinder::GetDrives() {
 	return drives;
 }
 
-void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *pathVector, bool isRegex) {
+void FileFinder::GetPathsForOperation(string dirIn, string pattern, StringVector *pathVector, OvalEnum::Operation op) {
 
 	try {
 
-		//	Stop is a Null Dir
-		if ((dirIn.empty() == true) || (dirIn == ""))
+		//	Stop if a Null Dir
+		if (dirIn.empty())
 			return;
 
 		if ( this->PathExists(dirIn) ){
 
-			if(this->IsMatch(pattern, dirIn, isRegex))
+			if(EntityComparator::CompareString(op, pattern, dirIn) == OvalEnum::RESULT_TRUE)
 				pathVector->push_back(dirIn);
 
 			// Append a '*' to the end of the path to signify that we want to find all files
@@ -276,9 +276,9 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 			}
 
 			//	Loop through each file in the directory.  
-			//	If a sub-directory is found, make a recursive call to GetFilePathsForPattern to search its contents.
+			//	If a sub-directory is found, make a recursive call to GetFilePathsForOperation to search its contents.
 			//	If a file is found get the file path and check it against the pattern
-
+			FindCloseGuard fcg(hFind);
 			do {
 
 				// Skip ., .., and System Volume 
@@ -288,17 +288,13 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				{
 				
 				// Found a dir
-				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+					GetPathsForOperation(dirIn + FindFileData.cFileName, pattern, pathVector, op);
 
-					string dirToSearch = dirIn;					
-					dirToSearch.append(FindFileData.cFileName);
-					GetPathsForPattern(dirToSearch, pattern, pathVector, isRegex);
-				
-				}
 			} while (FindNextFile(hFind, &FindFileData));
 
 			//	Close the handle to the file search object.
-			if(!FindClose(hFind)) {
+			if(!fcg.close()) {
 
 				DWORD errorNum = GetLastError();
 				string msg = WindowsCommon::GetErrorMessage(errorNum);
@@ -320,7 +316,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 	} catch(...) {
 
-		string errorMessage = "";
+		string errorMessage;
 		errorMessage.append("Error: ");
 		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. Directory: ");
 		errorMessage.append(dirIn);
@@ -330,7 +326,7 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
+void FileFinder::GetFilesForOperation(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
 
 	try {
 
@@ -375,6 +371,7 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 
 		//	Loop through each file in the directory.  
 		//	If a file is found get the file path and check it against the pattern
+		FindCloseGuard fcg(hFind);
 		do {
 
 			// Skip ., .., and System Volume 
@@ -395,18 +392,19 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 				//	Check pattern
 				if ( isFilePath ){
 					string filepath = Common::BuildFilePath(path, fileName);
-					if(this->IsMatch(pattern, filepath, isRegex))
+					if(EntityComparator::CompareString(op, pattern, filepath) ==
+						OvalEnum::RESULT_TRUE)
 						fileNames->push_back(filepath);
-				}else{
-					if(this->IsMatch(pattern, fileName, isRegex))
+				} else {
+					if(EntityComparator::CompareString(op, pattern, fileName) ==
+						OvalEnum::RESULT_TRUE)
 						fileNames->push_back(fileName);
 				}
-
 			}
 		} while (FindNextFile(hFind, &FindFileData));
 
 		//	Close the handle to the file search object.
-		if(!FindClose(hFind)) {
+		if(!fcg.close()) {
 
 			DWORD errorNum = GetLastError();
 			string msg = WindowsCommon::GetErrorMessage(errorNum);
@@ -510,6 +508,15 @@ bool FileFinder::PathExists(string path) {
 	return exists;
 }
 
+void FileFinder::PathExistsCaseInsensitive(const std::string &path, 
+	StringVector *pathsFound) {
+
+	// windows is natively case-insensitive, so we only need to do a plain
+	// existence check.
+	if (this->PathExists(path))
+		pathsFound->push_back(path);
+}
+
 bool FileFinder::FileNameExists(string path, string fileName) {
 
 
@@ -557,15 +564,17 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 			}
 		} else {
 			exists = true;
+			CloseHandle(hFile); 
 		}
-		CloseHandle(hFile); 
 
 	} catch(Exception ex) {
-		CloseHandle(hFile); 
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
 		throw;
 
 	} catch(...) {
-		CloseHandle(hFile); 
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
 		string errorMessage = "";
 		errorMessage.append("Error: ");
 		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
