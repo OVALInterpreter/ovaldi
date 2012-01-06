@@ -102,7 +102,7 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 		// Remove extra slashes
 		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
 	}
-	Log::Debug("const portion='"+constPortion+"', pattern portion='"+patternOut+"'");
+
 	// Found a constant portion
 	if(!constPortion.empty() && !patternOut.empty()) {
 
