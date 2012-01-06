@@ -353,7 +353,7 @@ bool FileFinder::PathExists(string path) {
 	// -----------------------------------------------------------------------
 
 	struct stat st;
-	return (lstat(path.c_str(), &st) != -1 && S_ISDIR(st.st_mode));
+	return (lstat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
 }
 
 void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pathsFound) {
@@ -364,7 +364,7 @@ void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pat
 	size_t i=0;
 	while (i < path.size() && path[i] == Common::fileSeperator)
 		++i;
-
+ 
 	// if path starts with a separator char, it's absolute, and we will start our
 	// search at the filesystem root.  Otherwise, start at the current
 	// directory.  If it consists of only sep chars, we only check for existence
