@@ -523,7 +523,7 @@ bool FileFinder::FileNameExists(string path, string fileName, string *actualFile
 
 	try {
 		hFile = CreateFile(filePath.c_str(),				// file name
-								GENERIC_READ,				// access mode
+								0/*GENERIC_READ*/,				// access mode
 								FILE_SHARE_READ,			// share mode
 								NULL,						// SD
 								OPEN_EXISTING,				// how to create
