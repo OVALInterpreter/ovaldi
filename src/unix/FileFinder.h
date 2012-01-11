@@ -57,13 +57,15 @@ private:
 	*/
 	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
-	virtual bool PathExists(std::string path);
+	virtual bool PathExists(const std::string &path, std::string *actualPath = NULL);
+
 	/**
 	 * \see AbsFileFinder::PathExistsCaseInsensitive
 	 */
 	virtual void PathExistsCaseInsensitive(const std::string &path, 
 										   StringVector *pathsFound);
-	virtual bool FileNameExists(std::string path, std::string fileName);
+
+	virtual bool FileNameExists(std::string path, std::string fileName, std::string *actualFileName = NULL);
 
 	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op);
 

@@ -343,7 +343,7 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 	}
 }
 
-bool FileFinder::PathExists(string path) {
+bool FileFinder::PathExists(const string &path, string *actualPath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -353,7 +353,11 @@ bool FileFinder::PathExists(string path) {
 	// -----------------------------------------------------------------------
 
 	struct stat st;
-	return (lstat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
+
+	bool exists = lstat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
+	if (exists && actualPath != NULL)
+		*actualPath = path;
+	return exists;
 }
 
 void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pathsFound) {
@@ -379,7 +383,8 @@ void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pat
 	}
 }
 
-bool FileFinder::FileNameExists(string path, string fileName) {
+bool FileFinder::FileNameExists(string path, string fileName, 
+								string *actualFileName) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -390,16 +395,13 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 
 	bool exists = false;
 
-	// Verify that the path that was passed into this function ends with a slash.  If
-	// it doesn't, then add one.
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
 	//	Call stat 
 	struct stat statbuf;
-	string filepath = path + fileName;
-	if(lstat(filepath.c_str(), &statbuf) == 0) {
+	string filepath = Common::BuildFilePath(path, fileName);
+	if(lstat(filepath.c_str(), &statbuf) == 0 && !S_ISDIR(statbuf.st_mode)) {
 		exists = true;
+		if (actualFileName)
+			*actualFileName = fileName;
 	}
 
 	return exists;
