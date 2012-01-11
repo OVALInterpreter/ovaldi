@@ -128,24 +128,41 @@ protected:
 	/** Return the set of matching paths after applying behaviors */
 	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors) = 0;
 
-	/** Return true if the specified directory exists.  If it exists, the actual 
-	 * path, i.e. as it exists in the filesystem, is assigned to *actualPath, if
-	 * actualPath is non-NULL.  This will always be the same on *nix, but on 
-	 * windows it can be different, since that OS is case-insensitive but also
-	 * case-aware.
+	/**
+	 * Return true if the specified directory exists.  If it exists, the actual 
+	 * path, capitalized as it is in the filesystem, is assigned to *actualPath, if
+	 * actualPath is non-NULL.  The actualPath out-param is specifically for
+	 * supporting windows, which has a case-insensitive but case-aware filesystem.
+	 * \param[in] path The directory to check
+	 * \param[out] actualPath If not NULL, receives the directory capitalized how
+	 *   it is in the filesystem.
+	 * \return true if the path existed, false if not
 	 */
 	virtual bool PathExists(const std::string &path, std::string *actualPath = NULL) = 0;
 
 	/**
-	 * Searches for case-insensitive matches to the given path, and
+	 * On *nix, searches for case-insensitive matches to the given path, and
 	 * collects them into the given vector.  On windows this does
-	 * not involve a search, since its filesystem is natively
-	 * case-insensitive.
+	 * not perform a search; it is merely an existence check, since its 
+	 * filesystem is natively case-insensitive.  On windows, if the path
+	 * exists, it will be added to the given vector, capitalized how it
+	 * actually is in the filesystem.
 	 */
 	virtual void PathExistsCaseInsensitive(const std::string &path, 
 										   StringVector *pathsFound) = 0;
 	
-	/** Return true if the specified filename is found in the specified directory. */
+	/**
+	 * Return true if the specified file exists.  The path is assumed to exist.
+	 * If the file exists, the actual filename capitalized as it is in the 
+	 * filesystem, is assigned to *actualFileName, if actualFileName is non-NULL.  The 
+	 * actualFileName out-param is specifically for supporting windows, which has 
+	 * a case-insensitive but case-aware filesystem.
+	 * \param[in] path The directory to check
+	 * \param[in] fileName the name of the file in directory \p path to check
+	 * \param[out] actualFileName If not NULL, receives the file name capitalized how
+	 *   it is in the filesystem.
+	 * \return true if the file existed, false if not
+	 */
 	virtual bool FileNameExists(std::string path, std::string fileName, std::string *actualFileName = NULL) = 0;
 	
 	/** Get the set of all paths that match the specified pattern. */
@@ -182,12 +199,26 @@ protected:
 	 */
 	void GetFilePathsForOperation(std::string queryVal, StringVector* filePaths, OvalEnum::Operation op);
 	
-	/** Return true if the specified filepath is found.
-	 *  @param filePath A string that represents the filepath whose existence you would like to determine.
-	 *  @return A boolean value that indicates whether or not the specified filepath exists.
+	/**
+	 * Return true if the specified filepath exists.  If the filepath exists, the actual
+	 * path capitalized as it is in the filesystem, is assigned to *actualFilePath, if
+	 * actualFilePath is non-NULL.  The actualFilePath out-param is specifically for 
+	 * supporting windows, which has a case-insensitive but case-aware filesystem.
+	 * \param[in] filePath the filepath to check
+	 * \param[out] actualFilePath If not NULL, receives the filepath capitalized how
+	 *   it is in the filesystem.
+	 * \return true if the filepath existed, false if not
 	 */
 	bool FilePathExists(std::string filePath, std::string *actualFilePath = NULL);
 
+	/**
+	 * On *nix, searches for case-insensitive matches to the given filepath, and
+	 * collects them into the given vector.  On windows this does
+	 * not perform a search; it is merely an existence check, since its 
+	 * filesystem is natively case-insensitive.  On windows, if the filepath
+	 * exists, it will be added to the given vector, capitalized how it
+	 * actually is in the filesystem.
+	 */
 	void FilePathExistsCaseInsensitive(std::string filePath, StringVector *matchingFilePaths);
 
 	REGEX *fileMatcher;
