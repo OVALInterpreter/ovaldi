@@ -128,8 +128,13 @@ protected:
 	/** Return the set of matching paths after applying behaviors */
 	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors) = 0;
 
-	/** Return true if the specified directory exists. */
-	virtual bool PathExists(std::string path) = 0;
+	/** Return true if the specified directory exists.  If it exists, the actual 
+	 * path, i.e. as it exists in the filesystem, is assigned to *actualPath, if
+	 * actualPath is non-NULL.  This will always be the same on *nix, but on 
+	 * windows it can be different, since that OS is case-insensitive but also
+	 * case-aware.
+	 */
+	virtual bool PathExists(const std::string &path, std::string *actualPath = NULL) = 0;
 
 	/**
 	 * Searches for case-insensitive matches to the given path, and
@@ -141,7 +146,7 @@ protected:
 										   StringVector *pathsFound) = 0;
 	
 	/** Return true if the specified filename is found in the specified directory. */
-	virtual bool FileNameExists(std::string path, std::string fileName) = 0;
+	virtual bool FileNameExists(std::string path, std::string fileName, std::string *actualFileName = NULL) = 0;
 	
 	/** Get the set of all paths that match the specified pattern. */
 	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op) = 0;
@@ -181,7 +186,7 @@ protected:
 	 *  @param filePath A string that represents the filepath whose existence you would like to determine.
 	 *  @return A boolean value that indicates whether or not the specified filepath exists.
 	 */
-	bool FilePathExists(std::string filePath);
+	bool FilePathExists(std::string filePath, std::string *actualFilePath = NULL);
 
 	void FilePathExistsCaseInsensitive(std::string filePath, StringVector *matchingFilePaths);
 

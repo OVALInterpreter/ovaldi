@@ -433,19 +433,15 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 	}
 }
 
-bool FileFinder::PathExists(string path) {
+bool FileFinder::PathExists(const string &path, string *actualPath) {
 
 	bool exists = false;
-
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	try {
 		hFile = CreateFile(path.c_str(),					// DirName
-								GENERIC_READ,				// access mode
+								0/*GENERIC_READ*/,				// access mode
 								FILE_SHARE_READ,			// share mode
 								NULL,						// SD
 								OPEN_EXISTING,				// how to create
@@ -473,29 +469,30 @@ bool FileFinder::PathExists(string path) {
 					exists = true;
 				}
 			} else {
-				char errorCodeBuffer[33];
-				_ltoa(errorNum, errorCodeBuffer, 10);
-
-				string errorMessage;
-				errorMessage.append("(FileProbe) Unable to open a handle to the file '");
-				errorMessage.append(path);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
+				string errorMessage =
+					"(FileProbe) Unable to open a handle to the file '" +
+					path +
+					"': " +
+					WindowsCommon::GetErrorMessage(errorNum);
 				throw FileFinderException(errorMessage);
 			}
 		} else {
 			exists = true;
+			CloseHandle(hFile); 
 		}
-		CloseHandle(hFile); 
+
+		if (exists && actualPath != NULL)
+			*actualPath = WindowsCommon::GetActualPathWithCase(path);
 
 	} catch(Exception ex) {
-
-		CloseHandle(hFile); 
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
 		throw;
 
 	} catch(...) {
 
-		CloseHandle(hFile); 
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
 		string errorMessage;
 		errorMessage.append("Error: ");
 		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
@@ -506,24 +503,21 @@ bool FileFinder::PathExists(string path) {
 	return exists;
 }
 
-void FileFinder::PathExistsCaseInsensitive(const std::string &path, 
+void FileFinder::PathExistsCaseInsensitive(const string &path, 
 	StringVector *pathsFound) {
 
 	// windows is natively case-insensitive, so we only need to do a plain
 	// existence check.
-	if (this->PathExists(path))
-		pathsFound->push_back(path);
+	string tmpPath;
+	if (this->PathExists(path, &tmpPath))
+		pathsFound->push_back(tmpPath);
 }
 
-bool FileFinder::FileNameExists(string path, string fileName) {
-
+bool FileFinder::FileNameExists(string path, string fileName, string *actualFileName) {
 
 	bool exists = false;
 
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
-	string filePath = path + fileName;
+	string filePath = Common::BuildFilePath(path, fileName);
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
@@ -560,6 +554,12 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 		} else {
 			exists = true;
 			CloseHandle(hFile); 
+		}
+
+		if (exists && actualFileName != NULL) {
+			string actualFilepath = WindowsCommon::GetActualPathWithCase(filePath);
+			auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
+			*actualFileName = split->second;
 		}
 
 	} catch(Exception ex) {

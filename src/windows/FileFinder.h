@@ -57,10 +57,12 @@ private:
 		recurse_direction and max_depth
 		Both of these are implemented.
 	*/
-	StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
+	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
-	/** Return true if the specified path exists. */
-	bool PathExists(string path);
+	/** Return true if the specified path exists.  \see AbsFileFinder::PathExists 
+	 * And make sure the param defaults are the same here as in AbsFileFinder... :-P
+	 */
+	virtual bool PathExists(const std::string &path, std::string *actualPath = NULL);
 
 	/**
 	 * \see AbsFileFinder::PathExistsCaseInsensitive
@@ -69,17 +71,17 @@ private:
 										   StringVector *pathsFound);
 
 	/** Return true if the specified file exists on the specifeid path. */
-	bool FileNameExists(string path, string fileName);
+	virtual bool FileNameExists(string path, string fileName, string *actualFileName = NULL);
 
 	/** This function gets all file names that match a given pattern on the spaecified path.
 	    If a match is found the filename is pushed on to a vector of strings.
 	*/
-	void GetFilesForOperation(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath);
+	virtual void GetFilesForOperation(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath);
 
 	/** Search the file system for paths that match the provided regex.
 	    Attempt to break off a constant portion of the path to spead up searching. 
 	*/
-	void FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op);
+	virtual void FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op);
 
 	/** Get all fixed drives on the system. Return them in a string vector. */
 	StringVector* GetDrives();
@@ -96,7 +98,7 @@ private:
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/
-	StringVector* GetChildDirectories(string path);
+	virtual StringVector* GetChildDirectories(string path);
 };
 
 #endif

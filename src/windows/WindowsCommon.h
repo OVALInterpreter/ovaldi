@@ -304,6 +304,47 @@ public:
 	*/
 	static string GetObjectType ( SE_OBJECT_TYPE objectType );
 
+	/**
+	 * Windows (NTFS anyway, afaik) is case-insensitive, but case-aware.  We
+	 * should have in our items, filenames and paths as they actually are
+	 * in the filesystem, matching case.  This is especially important when
+	 * doing case-insensitive matching, since the values given in object
+	 * entities can be in all different cases, and on windows we need to treat
+	 * matches as all the same.
+	 * <p>
+	 * Actually taking a path and resolving it to the actual path in the
+	 * filesystem, with the exact case like this, is annoyingly difficult
+	 * on XP.  There's simply no straightforward way to do it.  One way
+	 * involves mapping the file to memory:
+	 * <p>
+	 * http://msdn.microsoft.com/en-us/library/aa366789%28VS.85%29.aspx
+	 * <p>
+	 * but according to the code on that page, it doesn't work for zero-
+	 * length files, since I guess you can't memory-map those.  Another way
+	 * would be to do a filesystem search with the FindFirst/FindNext
+	 * functions according to the path components, and piece together the path
+	 * from that.  That seems like a stupidly inefficient way to do it.  There
+	 * is an undocumented way to do it which involves pasting in prototypes
+	 * for hidden functions into your own code:
+	 * <p>
+	 * http://stackoverflow.com/questions/65170/how-to-get-name-associated-with-open-handle
+	 * <p>
+	 * That is also very ugly.  I found in a forum somewhere a mention that
+	 * someone did it by using GetShortPathName() and GetLongPathName():
+	 * just take your path and shorten it with the former function, then
+	 * take the result and lengthen it with the latter.  I tried it and it
+	 * worked, and the functions are available on XP.  I also read that
+	 * short path names can be disabled in filesystem, so this technique
+	 * may not always work.  But it's by far the simplest way I've been
+	 * able to find, which works on XP.
+	 * <p>
+	 * On Vista+, there is a GetFileInformationByHandleEx() function, with
+	 * which you can get filename info.  If that can be made to work, it would
+	 * much simpler than any of the above techniques.  But we must stay
+	 * compatible with XP.
+	 */
+	static std::string GetActualPathWithCase(const std::string &path);
+
 private:
 	
 	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
