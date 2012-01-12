@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <cctype>
+#include <cstring>
 #include <memory>
 #include <ArrayGuard.h>
 #include "WindowsCommon.h"
@@ -2595,6 +2597,13 @@ string WindowsCommon::GetActualPathWithCase(const string &path) {
 	} else if (sz2 == 0)
 		throw Exception("GetLongPathName("+path+"): "+
 			WindowsCommon::GetErrorMessage(GetLastError()));
+
+	// The short->long conversion doesn't seem to affect drive letters.
+	// So let's just decide they should all be uppercase.
+	if (strlen(longBuf.get()) >= 2 &&
+		isalpha(longBuf[0]) &&
+		longBuf[1] == ':')
+		longBuf[0] = static_cast<char>(toupper(longBuf[0]));
 
 	return string(longBuf.get());
 }
