@@ -28,7 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <FindCloseGuard.h>
 #include "FileFinder.h"
+
+using namespace std;
 
 FileFinder::FileFinder() {
 
@@ -84,57 +88,53 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 	return behaviorPaths;
 }
 
-void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
+void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op) {
 
-	StringVector* drives;
-	string fileName = "";
+	string fileName;
 
-	string patternOut= "";
-	string constPortion= "";
+	string patternOut;
+	string constPortion;
 
 	// This optimization only applies when the regex is anchored to
 	// the beginning of paths. (regex has to start with '^')
-	if (isRegex && !regex.empty() && regex[0] == '^') {		
-		this->fileMatcher->GetConstantPortion(regex, Common::fileSeperator, &patternOut, &constPortion);
+	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
+		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes
 		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
 	}
 
 	// Found a constant portion
-	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
+	if(!constPortion.empty() && !patternOut.empty()) {
 
 		//	Call search function
-		this->GetPathsForPattern(constPortion, regex, paths);
+		this->GetPathsForOperation(constPortion, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
 
 	//	No constant portion.
-	} else if(constPortion.compare("") == 0) { 
+	} else if(constPortion.empty()) { 
 		
 		//	Must start searching for matches on each drive.
-		drives = this->GetDrives();
+		auto_ptr<StringVector> drives(this->GetDrives());
 
 		StringVector::iterator drive;
 		for (drive=drives->begin(); drive!=drives->end(); drive++) {
 			//	Call search function
 			try  {
 
-				this->GetPathsForPattern((*drive), regex, paths, isRegex);
+				this->GetPathsForOperation((*drive), queryVal, paths, op);
 
 			} catch(REGEXException ex) {
 				if(ex.GetSeverity() == ERROR_WARN) {
-					string pcreMsg = "";
+					string pcreMsg;
 					pcreMsg.append("Filefinder Warning - while searching for matching files:\n");
 					pcreMsg.append("-----------------------------------------------------------------------\n");
 					pcreMsg.append(ex.GetErrorMessage());
 					Log::Debug(pcreMsg);
 				} else {
-					delete drives;
 					throw;
 				}		
 			}
 		}
-		delete drives;
-
-	} else if(patternOut.compare("") == 0) {
+	} else if(patternOut.empty()) {
 
 		//	There are no pattern matching chars treat this as a normal path 
 		if(this->PathExists(constPortion)) {
@@ -147,9 +147,9 @@ StringVector* FileFinder::GetDrives() {
 
 	StringVector* drives = new StringVector();	
 	unsigned int index	= 0;
-	string tmp			= "";
-	string drive		= "";
-	string errMsg		= "";
+	string tmp;
+	string drive;
+	string errMsg;
 	DWORD nBufferLength = 0;
 	DWORD dwResult		= 0;
 	LPTSTR lpBuffer		= new char[0];
@@ -222,17 +222,17 @@ StringVector* FileFinder::GetDrives() {
 	return drives;
 }
 
-void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *pathVector, bool isRegex) {
+void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVector *pathVector, OvalEnum::Operation op) {
 
 	try {
 
-		//	Stop is a Null Dir
-		if ((dirIn.empty() == true) || (dirIn == ""))
+		//	Stop if a Null Dir
+		if (dirIn.empty())
 			return;
 
 		if ( this->PathExists(dirIn) ){
 
-			if(this->IsMatch(pattern, dirIn, isRegex))
+			if(EntityComparator::CompareString(op, queryVal, dirIn) == OvalEnum::RESULT_TRUE)
 				pathVector->push_back(dirIn);
 
 			// Append a '*' to the end of the path to signify that we want to find all files
@@ -263,22 +263,22 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 				} else {
 					
-					// report other errors that might occure
-					string msg = WindowsCommon::GetErrorMessage(errorNum);
-					string errorMessage = "";
-					errorMessage.append("Error while seaching for matching file paths. " + msg);
-					errorMessage.append(" Directory: ");
-					errorMessage.append(dirIn);
-					errorMessage.append(" Pattern: ");
-					errorMessage.append(pattern);
+					// report other errors that might occur
+					string errorMessage =
+						"Error while seaching for matching file paths. " +
+						WindowsCommon::GetErrorMessage(errorNum) +
+						" Directory: " +
+						dirIn +
+						" Pattern: " +
+						queryVal;
 					throw FileFinderException(errorMessage);
 				}
 			}
 
 			//	Loop through each file in the directory.  
-			//	If a sub-directory is found, make a recursive call to GetFilePathsForPattern to search its contents.
-			//	If a file is found get the file path and check it against the pattern
-
+			//	If a sub-directory is found, make a recursive call to GetFilePathsForOperation to search its contents.
+			//	If a file is found get the file path and check it against the queryVal
+			FindCloseGuard fcg(hFind);
 			do {
 
 				// Skip ., .., and System Volume 
@@ -288,26 +288,20 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				{
 				
 				// Found a dir
-				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+					GetPathsForOperation(dirIn + FindFileData.cFileName, queryVal, pathVector, op);
 
-					string dirToSearch = dirIn;					
-					dirToSearch.append(FindFileData.cFileName);
-					GetPathsForPattern(dirToSearch, pattern, pathVector, isRegex);
-				
-				}
 			} while (FindNextFile(hFind, &FindFileData));
 
 			//	Close the handle to the file search object.
-			if(!FindClose(hFind)) {
-
-				DWORD errorNum = GetLastError();
-				string msg = WindowsCommon::GetErrorMessage(errorNum);
-				string errorMessage = "";
-				errorMessage.append("Error: Unable to close search handle while trying to search for matching paths. " + msg);
-				errorMessage.append(" Directory: ");
-				errorMessage.append(dirIn);
-				errorMessage.append(" Pattern: ");
-				errorMessage.append(pattern);
+			if(!fcg.close()) {
+				string errorMessage =
+					"Error: Unable to close search handle while trying to search for matching paths. " + 
+					WindowsCommon::GetErrorMessage(GetLastError()) +
+					" Directory: " +
+					dirIn +
+					" Pattern: " +
+					queryVal;
 				throw FileFinderException(errorMessage);	
 			}
 
@@ -320,17 +314,17 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 	} catch(...) {
 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. Directory: ");
-		errorMessage.append(dirIn);
-		errorMessage.append(" Pattern: ");
-		errorMessage.append(pattern);
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. Directory: " +
+			dirIn +
+			" Pattern: " +
+			queryVal;
 		throw FileFinderException(errorMessage);
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
+void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
 
 	try {
 
@@ -363,18 +357,20 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 				
 				// report other errors that might occure
 				string msg = WindowsCommon::GetErrorMessage(errorNum);
-				string errorMessage = "";
-				errorMessage.append("Error while seaching for matching files. " + msg);
-				errorMessage.append(" Directory: ");
-				errorMessage.append(path);
-				errorMessage.append(" Pattern: ");
-				errorMessage.append(pattern);
+				string errorMessage =
+					"Error while seaching for matching files. " +
+					WindowsCommon::GetErrorMessage(errorNum) +
+					" Directory: " +
+					path +
+					" Pattern: " +
+					queryVal;
 				throw FileFinderException(errorMessage);
 			}
 		}
 
 		//	Loop through each file in the directory.  
-		//	If a file is found get the file path and check it against the pattern
+		//	If a file is found get the file path and check it against the queryVal
+		FindCloseGuard fcg(hFind);
 		do {
 
 			// Skip ., .., and System Volume 
@@ -392,30 +388,30 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 			
 				string fileName = FindFileData.cFileName;
 
-				//	Check pattern
+				//	Check queryVal
 				if ( isFilePath ){
 					string filepath = Common::BuildFilePath(path, fileName);
-					if(this->IsMatch(pattern, filepath, isRegex))
+					if(EntityComparator::CompareString(op, queryVal, filepath) ==
+						OvalEnum::RESULT_TRUE)
 						fileNames->push_back(filepath);
-				}else{
-					if(this->IsMatch(pattern, fileName, isRegex))
+				} else {
+					if(EntityComparator::CompareString(op, queryVal, fileName) ==
+						OvalEnum::RESULT_TRUE)
 						fileNames->push_back(fileName);
 				}
-
 			}
 		} while (FindNextFile(hFind, &FindFileData));
 
 		//	Close the handle to the file search object.
-		if(!FindClose(hFind)) {
+		if(!fcg.close()) {
 
-			DWORD errorNum = GetLastError();
-			string msg = WindowsCommon::GetErrorMessage(errorNum);
-			string errorMessage = "";
-			errorMessage.append("Error: Unable to close search handle while trying to search for matching files. " + msg);
-			errorMessage.append(" Directory: ");
-			errorMessage.append(path);
-			errorMessage.append(" Pattern: ");
-			errorMessage.append(pattern);
+			string errorMessage =
+				"Error: Unable to close search handle while trying to search for matching files. " +
+				WindowsCommon::GetErrorMessage(GetLastError()) +
+				" Directory: " +
+				path +
+				" Pattern: " +
+				queryVal;
 			throw FileFinderException(errorMessage);
 		}
 
@@ -427,29 +423,25 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 
 	} catch(...) {
 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
-		errorMessage.append(path);
-		errorMessage.append("\n\tPattern: ");
-		errorMessage.append(pattern);
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: " +
+			path +
+			"\n\tPattern: " +
+			queryVal;
 		throw FileFinderException(errorMessage);
 	}
 }
 
-bool FileFinder::PathExists(string path) {
+bool FileFinder::PathExists(const string &path, string *actualPath) {
 
 	bool exists = false;
-
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	try {
 		hFile = CreateFile(path.c_str(),					// DirName
-								GENERIC_READ,				// access mode
+								0/*GENERIC_READ*/,				// access mode
 								FILE_SHARE_READ,			// share mode
 								NULL,						// SD
 								OPEN_EXISTING,				// how to create
@@ -477,30 +469,31 @@ bool FileFinder::PathExists(string path) {
 					exists = true;
 				}
 			} else {
-				char errorCodeBuffer[33];
-				_ltoa(errorNum, errorCodeBuffer, 10);
-
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to open a handle to the file '");
-				errorMessage.append(path);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
+				string errorMessage =
+					"(FileProbe) Unable to open a handle to the file '" +
+					path +
+					"': " +
+					WindowsCommon::GetErrorMessage(errorNum);
 				throw FileFinderException(errorMessage);
 			}
 		} else {
 			exists = true;
+			CloseHandle(hFile); 
 		}
-		CloseHandle(hFile); 
+
+		if (exists && actualPath != NULL)
+			*actualPath = WindowsCommon::GetActualPathWithCase(path);
 
 	} catch(Exception ex) {
-
-		CloseHandle(hFile); 
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
 		throw;
 
 	} catch(...) {
 
-		CloseHandle(hFile); 
-		string errorMessage = "";
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
+		string errorMessage;
 		errorMessage.append("Error: ");
 		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
 		errorMessage.append(path);
@@ -510,21 +503,27 @@ bool FileFinder::PathExists(string path) {
 	return exists;
 }
 
-bool FileFinder::FileNameExists(string path, string fileName) {
+void FileFinder::PathExistsCaseInsensitive(const string &path, 
+	StringVector *pathsFound) {
 
+	// windows is natively case-insensitive, so we only need to do a plain
+	// existence check.
+	string tmpPath;
+	if (this->PathExists(path, &tmpPath))
+		pathsFound->push_back(tmpPath);
+}
+
+bool FileFinder::FileNameExists(string path, string fileName, string *actualFileName) {
 
 	bool exists = false;
 
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
-	string filePath = path + fileName;
+	string filePath = Common::BuildFilePath(path, fileName);
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	try {
 		hFile = CreateFile(filePath.c_str(),				// file name
-								GENERIC_READ,				// access mode
+								0/*GENERIC_READ*/,				// access mode
 								FILE_SHARE_READ,			// share mode
 								NULL,						// SD
 								OPEN_EXISTING,				// how to create
@@ -545,31 +544,36 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 			} else if (errorNum == ERROR_NOT_READY) {
 				// skip this the device is not ready.  This path may be a removable drive with the media removed.
 			} else {
-				char errorCodeBuffer[33];
-				_ltoa(errorNum, errorCodeBuffer, 10);
-
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to open a handle to the file '");
-				errorMessage.append(filePath);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
+				string errorMessage =
+					"Unable to open a handle to the file '" +
+					filePath +
+					"':  " + 
+					WindowsCommon::GetErrorMessage(errorNum);
 				throw FileFinderException(errorMessage);
 			}
 		} else {
 			exists = true;
+			CloseHandle(hFile); 
 		}
-		CloseHandle(hFile); 
+
+		if (exists && actualFileName != NULL) {
+			string actualFilepath = WindowsCommon::GetActualPathWithCase(filePath);
+			auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
+			*actualFileName = split->second;
+		}
 
 	} catch(Exception ex) {
-		CloseHandle(hFile); 
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
 		throw;
 
 	} catch(...) {
-		CloseHandle(hFile); 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
-		errorMessage.append(path);
+		if (hFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hFile); 
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: " +
+			path;
 		throw FileFinderException(errorMessage);
 	}
 
@@ -608,7 +612,7 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 
 			delete childDirs;
 
-			string errorMessage = "";
+			string errorMessage;
 			errorMessage.append("Error: Unable to get a valid handle in GetChildDirectories(). Directory: ");
 			errorMessage.append(path);
 			throw FileFinderException(errorMessage);
@@ -637,7 +641,7 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		if(!FindClose(hFind)) {
 			delete childDirs;
 
-			string errorMessage = "";
+			string errorMessage;
 			errorMessage.append("Error: Unable to close search handle while trying to get child directories. Parent directory: ");
 			errorMessage.append(path);
 			throw FileFinderException(errorMessage);	
@@ -653,7 +657,7 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 
 		delete childDirs;
 
-		string errorMessage = "";
+		string errorMessage;
 		errorMessage.append("Error: An unspecified error was encountered while trying to get child directories. Parent Directory: ");
 		errorMessage.append(path);
 		throw FileFinderException(errorMessage);

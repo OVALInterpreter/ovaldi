@@ -28,9 +28,32 @@
 //
 //****************************************************************************************//
 
+#include <cassert>
+#include <DirGuard.h>
 #include "FileFinder.h"
 
 using namespace std;
+
+namespace {
+	/**
+	 * This is applicable when op=case insensitive equals.  On unix systems,
+	 * this implies searching, since their file systems are case-sensitive.
+	 *
+	 * \param pathToCompare[in] the complete path we are trying to find
+	 * 	case-insensitive matches for.
+	 * \param currPath[in] an actual path in the filesystem to begin the
+	 * 	search.  This should correspond to \p pathToCompare or some ancestor
+	 * 	directory of it.
+	 * \param pathCompIdx[in] the index of the first character in the path
+	 * 	component of \p pathToCompare which corresponds to the current recursion
+	 * 	level.  This must not refer to a separator character.
+	 * \param pathsFound[out] accumulates matching paths.
+	 */
+	void FindPathsCaseInsensitive(const string &pathToCompare,
+								  const string &currPath,
+								  size_t pathCompIdx,
+								  StringVector *pathsFound);
+}
 
 FileFinder::FileFinder() {
 
@@ -98,7 +121,8 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 	return behaviorPaths;
 }
 
-void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
+void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op) {
+//void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -115,8 +139,8 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 
 	// This optimization only applies when the regex is anchored to
 	// the beginning of paths. (regex has to start with '^')
-	if (isRegex && !regex.empty() && regex[0] == '^') {		
-		this->fileMatcher->GetConstantPortion(regex, Common::fileSeperator, &patternOut, &constPortion);
+	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {
+		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes
 		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
 	}
@@ -125,14 +149,14 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 	if(constPortion.compare("") != 0 && patternOut.compare("") != 0) {
 
 		//	Call search function
-		this->GetPathsForPattern(constPortion, regex, paths, isRegex);
+		this->GetPathsForOperation(constPortion, queryVal, paths, op);
 
 		//	No constant portion.
 	} else if(constPortion.compare("") == 0) { 
 		
 		try  {
 
-			this->GetPathsForPattern(fileSeperatorStr, regex, paths, isRegex);
+			this->GetPathsForOperation(fileSeperatorStr, queryVal, paths, op);
 
 		} catch(REGEXException ex) {
 			if(ex.GetSeverity() == ERROR_WARN) {
@@ -156,12 +180,12 @@ void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 
 }
 
-void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *pathVector, bool isRegex) {
+void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVector* pathVector, OvalEnum::Operation op) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
 	//
-	//  This function gets all paths that match a given pattern.
+	//  This function gets all paths that match a given queryVal.
 	//	This does call itself recursively as it must search all sub directories of dirIn.
 	//	If a match is found the path is pushed on to a vector of strings.
 	//
@@ -171,40 +195,24 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 
 		struct stat statbuf;
 		struct dirent *dirp;
-		DIR *dp;
-		string tmp = "";
+		string tmp;
 
 		//	Call stat 
 		if(lstat(dirIn.c_str(), &statbuf) < 0) {
-			//if(errno == ENOTDIR) {
-			//	throw ProbeException("A component of the path prefix is not a directory.");
-			//} else if(errno == ENAMETOOLONG) {
-			//	throw ProbeException("A component of a pathname exceeded {NAME_MAX} characters, or an entire path name exceeded {PATH_MAX} characters.");		
-			//} else if(errno == EACCES) {
-			//	throw ProbeException("Search permission is denied for a component of the path prefix.");
-			//} else if(errno == ELOOP) {
-			//	throw ProbeException("Too many symbolic links were encountered in translating the pathname.");
-			//} else if(errno == EFAULT) {
-			//	throw ProbeException("Sb or name points to an invalid address.");
-			//} else if(errno == EIO) {	
-			//	throw ProbeException("An I/O error occurred while reading from or writing to the file system.");
-			//} else if(errno == ENOENT) {
-			//	// does not exist
-			//}
-
 			return; 
 		}
 
 		// only consider dirs
-		if(S_ISDIR(statbuf.st_mode) == 1) {
+		if(S_ISDIR(statbuf.st_mode)) {
 
 			// record it if it matches the regex.
-			if(this->IsMatch(pattern.c_str(), dirIn.c_str(), isRegex))
+			if (EntityComparator::CompareString(op, queryVal, dirIn) == OvalEnum::RESULT_TRUE)
 				pathVector->push_back(dirIn);
 
 			//	Open the directory
-			dp = opendir(dirIn.c_str());
-			if(dp == NULL) {
+			DirGuard dp(dirIn, false);
+
+			if(dp.isClosed()) {
 				//	Error opening directory
 				//	not sure this error matters
 				// cout << "Failed to open the directory" << endl;
@@ -228,12 +236,12 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 				tmp = dirIn + dirp->d_name;
 
 				// Nake recursive call
-				GetPathsForPattern(tmp, pattern, pathVector, isRegex);
+				GetPathsForOperation(tmp, queryVal, pathVector, op);
 			}
 
 
 			//	Close the directory
-			if(closedir(dp) < 0) {
+			if(dp.close() < 0) {
 				//	Error closing the directory
 				//	not sure this error matters
 				// cout << "Failed to close the directory" << endl;
@@ -247,37 +255,36 @@ void FileFinder::GetPathsForPattern(string dirIn, string pattern, StringVector *
 		throw;
 	} catch(...) {
 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
-		errorMessage.append(dirIn);
-		errorMessage.append("\n\tPattern: ");
-		errorMessage.append(pattern);
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: " +
+			dirIn +
+			"\n\tQuery: " +
+			queryVal +
+			"\n\tOperation: " +
+			OvalEnum::OperationToString(op);
+
 		throw FileFinderException(errorMessage);
 	}
 }
 
-void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* fileNames, bool isRegex, bool isFilePath) {
+void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
 	//
-	//  This function gets all file names that match a given pattern on the spaecified path.
+	//  This function gets all file names that match a given queryVal on the specified path.
 	//	If a match is found the filename is pushed on to a vector of strings.
 	//
 	// -----------------------------------------------------------------------
 
 	try {
 
-		// Verify that the path that was passed into this function ends with a slash.  If
-		// it doesn't, then add one.
-		if (path[path.length()-1] != Common::fileSeperator)
-			path.append(1, Common::fileSeperator);
-
 		//	Open the directory
-		DIR *dp = opendir(path.c_str());
-		if(dp == NULL) {
-			string errorMessage = "Error opening directory. Directory: " + path;
+		DirGuard dp(path, false);
+		if(dp.isClosed()) {
+			string errorMessage = "Error opening directory " + path + ": " +
+				strerror(errno);
 			throw FileFinderException(errorMessage);
 		}
 
@@ -290,43 +297,25 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 
 			//	Call stat 
 			struct stat statbuf;
-			string filepath = path;
-			filepath.append(dirp->d_name);
+			string filepath = Common::BuildFilePath(path, dirp->d_name);
 			if(lstat(filepath.c_str(), &statbuf) < 0) {
-				//if(errno == ENOTDIR) {
-				//	throw ProbeException("A component of the path prefix is not a directory.");
-				//} else if(errno == ENAMETOOLONG) {
-				//	throw ProbeException("A component of a pathname exceeded {NAME_MAX} characters, or an entire path name exceeded {PATH_MAX} characters.");		
-				//} else if(errno == EACCES) {
-				//	throw ProbeException("Search permission is denied for a component of the path prefix.");
-				//} else if(errno == ELOOP) {
-				//	throw ProbeException("Too many symbolic links were encountered in translating the pathname.");
-				//} else if(errno == EFAULT) {
-				//	throw ProbeException("Sb or name points to an invalid address.");
-				//} else if(errno == EIO) {	
-				//	throw ProbeException("An I/O error occurred while reading from or writing to the file system.");
-				//} else if(errno == ENOENT) {
-				//	throw ProbeException("Does not exist");
-				//}
-				// no errors to report
+				continue;
 			}
 
-			//	If not a directory check if a match
+			//	If a regular file, check if a match
 			if(S_ISREG(statbuf.st_mode)) {
-				string fileName = dirp->d_name;
 				if ( isFilePath ){
-					string filepath = Common::BuildFilePath(path,fileName);
-					if(this->IsMatch(pattern,filepath,isRegex))
+					if (EntityComparator::CompareString(op, queryVal, filepath) == OvalEnum::RESULT_TRUE)
 						fileNames->push_back(filepath);
-				}else{
-					if(this->IsMatch(pattern, fileName, isRegex))
-						fileNames->push_back(fileName);
+				} else {
+					if (EntityComparator::CompareString(op, queryVal, dirp->d_name) == OvalEnum::RESULT_TRUE)
+						fileNames->push_back(dirp->d_name);
 				}
 			}
 		}
 
 		//	Close the directory
-		if(closedir(dp) < 0) {
+		if(dp.close() < 0) {
 			//	Error closing the directory
 			//	not sure this error matters
 			// cout << "Failed to close the directory" << endl;
@@ -341,17 +330,20 @@ void FileFinder::GetFilesForPattern(string path, string pattern, StringVector* f
 
 	} catch(...) {
 
-		string errorMessage = "";
-		errorMessage.append("Error: ");
-		errorMessage.append("An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: ");
-		errorMessage.append(path);
-		errorMessage.append("\n\tPattern: ");
-		errorMessage.append(pattern);
+		string errorMessage =
+			"Error: "
+			"An unspecified error was encountered while trying to search for matching paths. \n\tDirectory: " +
+			path +
+			"\n\tQuery: " +
+			queryVal +
+			"\n\tOperation: " +
+			OvalEnum::OperationToString(op);
+
 		throw FileFinderException(errorMessage);
 	}
 }
 
-bool FileFinder::PathExists(string path) {
+bool FileFinder::PathExists(const string &path, string *actualPath) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -360,24 +352,39 @@ bool FileFinder::PathExists(string path) {
 	//
 	// -----------------------------------------------------------------------
 
-	bool exists = false;
+	struct stat st;
 
-	// Verify that the path that was passed into this function ends with a slash.  If
-	// it doesn't, then add one.
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
-	//	Open the directory
-	DIR *dp = opendir(path.c_str());
-	if(dp != NULL) {
-		exists = true;
-		closedir(dp);	
-	}
-
+	bool exists = lstat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
+	if (exists && actualPath != NULL)
+		*actualPath = path;
 	return exists;
 }
 
-bool FileFinder::FileNameExists(string path, string fileName) {
+void FileFinder::PathExistsCaseInsensitive(const string &path, StringVector *pathsFound) {
+	if (path.empty()) return;
+
+	// I am handling repeated separator chars here, for robustness' sake.
+	// Find the first non-sep char...
+	size_t i=0;
+	while (i < path.size() && path[i] == Common::fileSeperator)
+		++i;
+ 
+	// if path starts with a separator char, it's absolute, and we will start our
+	// search at the filesystem root.  Otherwise, start at the current
+	// directory.  If it consists of only sep chars, we only check for existence
+	// of the root directory (which should succeed, right?)
+	if (i >= path.size()) {
+		// they were all sep chars!
+		if (this->PathExists(Common::fileSeperatorStr))
+			pathsFound->push_back(Common::fileSeperatorStr);
+	} else {
+		string searchStartPath = (i==0) ? "." : Common::fileSeperatorStr;
+		FindPathsCaseInsensitive(path, searchStartPath, i, pathsFound);
+	}
+}
+
+bool FileFinder::FileNameExists(string path, string fileName, 
+								string *actualFileName) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -388,16 +395,13 @@ bool FileFinder::FileNameExists(string path, string fileName) {
 
 	bool exists = false;
 
-	// Verify that the path that was passed into this function ends with a slash.  If
-	// it doesn't, then add one.
-	if (path[path.length()-1] != Common::fileSeperator)
-		path.append(1, Common::fileSeperator);
-
 	//	Call stat 
 	struct stat statbuf;
-	string filepath = path + fileName;
-	if(stat(filepath.c_str(), &statbuf) == 0) {
+	string filepath = Common::BuildFilePath(path, fileName);
+	if(lstat(filepath.c_str(), &statbuf) == 0 && !S_ISDIR(statbuf.st_mode)) {
 		exists = true;
+		if (actualFileName)
+			*actualFileName = fileName;
 	}
 
 	return exists;
@@ -478,4 +482,69 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 	}
 
 	return childDirs;
+}
+
+namespace {
+
+	void FindPathsCaseInsensitive(const string &pathToCompare,
+								  const string &currPath,
+								  size_t pathCompIdx,
+								  StringVector *pathsFound) {
+
+		// make sure they didn't give us an invalid pathCompIdx...
+		assert(pathCompIdx < pathToCompare.size() &&
+			   pathToCompare[pathCompIdx] != Common::fileSeperator);
+
+		size_t nextSepIdx = pathToCompare.find(Common::fileSeperator, pathCompIdx);
+
+		// the path component we need to case insensitively match against
+		string pathComp(pathToCompare, pathCompIdx, 
+						nextSepIdx == string::npos ? 
+							string::npos : (nextSepIdx-pathCompIdx));
+
+		// I feel the need, for robustness' sake, to handle repeated separator
+		// chars.  So I will not assume there's only one.  I search for the next
+		// non-sep char (or end of string).
+		size_t nextPathCompIdx = nextSepIdx;
+		if (nextPathCompIdx != string::npos)
+			while (nextPathCompIdx < pathToCompare.size() &&
+				   pathToCompare[nextPathCompIdx] == Common::fileSeperator)
+				++nextPathCompIdx;
+
+		dirent *dirp;
+		struct stat st;
+		DirGuard dir(currPath, false);
+
+		// ignore dir open error.
+		if (dir.isClosed())
+			return;
+
+		while((dirp = readdir(dir)) != NULL) {
+			if (!strcmp(dirp->d_name, ".") || !strcmp(dirp->d_name, ".."))
+				continue;
+
+			if (Common::EqualsIgnoreCase(dirp->d_name, pathComp)) {
+				// ignore non-directories and stat() errors
+				string tmpPath = Common::BuildFilePath(currPath, dirp->d_name);
+				if (lstat(tmpPath.c_str(), &st) == -1 || !S_ISDIR(st.st_mode))
+					continue;
+
+				if (nextSepIdx == string::npos ||
+					nextPathCompIdx == string::npos || // technically not necessary
+					nextPathCompIdx >= pathToCompare.size()) {
+					// found a complete match.  The latter
+					// disjuncts above handle the case where
+					// the path ends with separator char(s).
+					pathsFound->push_back(tmpPath);
+				} else
+					// found a partial match.. need to continue
+					// recursing.
+					FindPathsCaseInsensitive(pathToCompare,
+											 tmpPath,
+											 nextPathCompIdx,
+											 pathsFound);
+			}
+		}
+	}
+
 }

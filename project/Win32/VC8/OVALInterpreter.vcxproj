@@ -124,7 +124,6 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -397,6 +396,7 @@
     <ClCompile Include="..\..\..\src\Exception.cpp" />
     <ClCompile Include="..\..\..\src\Log.cpp" />
     <ClCompile Include="..\..\..\src\REGEX.cpp" />
+    <ClCompile Include="..\..\..\src\windows\FindCloseGuard.cpp" />
     <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
     <ClCompile Include="..\..\..\src\XmlProcessor.cpp" />
     <ClCompile Include="..\..\..\src\XslCommon.cpp" />
@@ -444,6 +444,7 @@
     <ClInclude Include="..\..\..\src\AbsObjectCollector.h" />
     <ClInclude Include="..\..\..\src\AbsState.h" />
     <ClInclude Include="..\..\..\src\Analyzer.h" />
+    <ClInclude Include="..\..\..\src\ArrayGuard.h" />
     <ClInclude Include="..\..\..\src\Behavior.h" />
     <ClInclude Include="..\..\..\src\CollectedObject.h" />
     <ClInclude Include="..\..\..\src\CollectedSet.h" />
@@ -458,6 +459,7 @@
     <ClInclude Include="..\..\..\src\ItemEntity.h" />
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />
     <ClInclude Include="..\..\..\src\Main.h" />
+    <ClInclude Include="..\..\..\src\Noncopyable.h" />
     <ClInclude Include="..\..\..\src\Object.h" />
     <ClInclude Include="..\..\..\src\ObjectEntity.h" />
     <ClInclude Include="..\..\..\src\ObjectFactory.h" />
@@ -515,6 +517,7 @@ echo off
     <ClInclude Include="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.h" />
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.h" />
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h" />
+    <ClInclude Include="..\..\..\src\VectorPtrGuard.h" />
     <ClInclude Include="..\..\..\src\windows\FileFinder.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h" />
@@ -557,6 +560,7 @@ echo off
     <ClInclude Include="..\..\..\src\Exception.h" />
     <ClInclude Include="..\..\..\src\Log.h" />
     <ClInclude Include="..\..\..\src\REGEX.h" />
+    <ClInclude Include="..\..\..\src\windows\FindCloseGuard.h" />
     <ClInclude Include="..\..\..\src\XmlCommon.h" />
     <ClInclude Include="..\..\..\src\XmlProcessor.h" />
     <ClInclude Include="..\..\..\src\XslCommon.h" />

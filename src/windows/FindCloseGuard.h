@@ -28,46 +28,45 @@
 //
 //****************************************************************************************//
 
-#include <dirent.h>
-#include <cerrno>
-#include <cstring>
+#ifndef FINDCLOSEGUARD_H
+#define FINDCLOSEGUARD_H
 
-#include <Log.h>
-#include <IOException.h>
-#include "DirGuard.h"
+// all of Windows.h just for the HANDLE type??  Yeah,
+// it seems WinDef.h won't compile by itself since it
+// needs an arch macro (e.g. _X86_) to be defined, and that's
+// defined in windows.h.  Sighhhhhhh
+#include <Windows.h>
+#include <Noncopyable.h>
 
-using namespace std;
+/**
+ * Provides for exception safety when writing recursive filesystem search
+ * algorithms.  As the stack unwinds, we should try to close all their
+ * find handles.
+ */
+class FindCloseGuard : public Noncopyable {
+public:
+	explicit FindCloseGuard(HANDLE hFind);
+	~FindCloseGuard();
 
-DirGuard::DirGuard(const string &dirName, bool throwOnFailure) : closed(false) {
-	d = opendir(dirName.c_str());
+	/**
+	 * Closes the find handle, if it was not already closed.
+	 * This flags the handle as closed, whether or not the close
+	 * succeeded.  Not sure if this is the best way to do it...
+	 * If the close failed, would there ever be a reason to try
+	 * it again?  If the close failed, callers can call GetLastError()
+	 * to find out why.
+	 * <p>
+	 * This guard is manually closable to be compatible with existing
+	 * code which wants to close, and throw an exception if it failed.
+	 *
+	 * \return the return value of FindClose() if a close was attempted,
+	 *   or true if not (because it was already closed).
+	 */
+	bool close();
 
-	if (!d) {
-		this->closed = true;
-		if (throwOnFailure)
-			throw IOException(string("Couldn't open directory ") + dirName +
-							  ": " + strerror(errno));
-	}
-}
+private:
+	bool closed;
+	HANDLE findHandle;
+};
 
-DirGuard::~DirGuard() {
-	if (this->closed)
-		return;
-
-	if (closedir(d) < 0)
-		Log::Info(string("closedir() failed: ") + strerror(errno));
-	// closedir failure is ok, move on
-}
-
-DirGuard::operator DIR*() {
-	if (this->closed)
-		return NULL;
-	
-	return d;
-}
-
-int DirGuard::close() {
-	if (this->closed)
-		return 0;
-	this->closed = true;
-	return closedir(d);
-}
+#endif

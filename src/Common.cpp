@@ -802,7 +802,7 @@ StringPair* Common::SplitFilePath(const string filepath) {
 		fpComponents->first = filepath.substr(0,position);
 		fpComponents->second = filepath.substr(position+1,filepath.length());
 		// add a file separator at the end of the path.
-		(fpComponents->first).append(1, Common::fileSeperator);
+//		(fpComponents->first).append(1, Common::fileSeperator);
 	}
     
 	return fpComponents;

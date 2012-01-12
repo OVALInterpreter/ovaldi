@@ -28,46 +28,33 @@
 //
 //****************************************************************************************//
 
-#include <dirent.h>
-#include <cerrno>
-#include <cstring>
-
+#include <WindowsCommon.h>
 #include <Log.h>
-#include <IOException.h>
-#include "DirGuard.h"
 
-using namespace std;
+#include "FindCloseGuard.h"
 
-DirGuard::DirGuard(const string &dirName, bool throwOnFailure) : closed(false) {
-	d = opendir(dirName.c_str());
+FindCloseGuard::FindCloseGuard(HANDLE hFind) : 
+	findHandle(hFind),
+	closed(false) {
 
-	if (!d) {
+	// reset closed to true if we got an invalid handle,
+	// so we don't try to close it.
+	if (hFind == INVALID_HANDLE_VALUE)
 		this->closed = true;
-		if (throwOnFailure)
-			throw IOException(string("Couldn't open directory ") + dirName +
-							  ": " + strerror(errno));
+}
+
+FindCloseGuard::~FindCloseGuard() {
+	if (this->closed) return;
+
+	// do not throw, just log a message.
+	if (!FindClose(this->findHandle)) {
+		Log::Debug("FindClose() failed: "+ WindowsCommon::GetErrorMessage(GetLastError()));
 	}
 }
 
-DirGuard::~DirGuard() {
-	if (this->closed)
-		return;
-
-	if (closedir(d) < 0)
-		Log::Info(string("closedir() failed: ") + strerror(errno));
-	// closedir failure is ok, move on
-}
-
-DirGuard::operator DIR*() {
-	if (this->closed)
-		return NULL;
-	
-	return d;
-}
-
-int DirGuard::close() {
-	if (this->closed)
-		return 0;
+bool FindCloseGuard::close() {
+	if (this->closed) return true;
 	this->closed = true;
-	return closedir(d);
+	// '!= FALSE' to silence compiler warning C4800 (VS2010)
+	return FindClose(this->findHandle) != FALSE;
 }

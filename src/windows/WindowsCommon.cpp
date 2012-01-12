@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include <memory>
+#include <ArrayGuard.h>
 #include "WindowsCommon.h"
 
 StringSet* WindowsCommon::allLocalUserSIDs = NULL;
@@ -2552,4 +2553,48 @@ LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
 	}
 	
 	return (LPCWSTR)domainControllerName;
+}
+
+string WindowsCommon::GetActualPathWithCase(const string &path) {
+	DWORD sz = 100, sz2;
+	ArrayGuard<char> shortBuf(new char[sz]);
+
+	// This is hard-coded to use the 'A' versions of the functions... since we
+	// don't actually use wide-char strings anywhere do we?
+	sz2 = GetShortPathNameA(path.c_str(), shortBuf.get(), sz);
+	if (sz2 > sz) {
+		sz = sz2;
+		shortBuf.reset(new char[sz]);
+		sz2 = GetShortPathNameA(path.c_str(), shortBuf.get(), sz);
+		if (sz2 == 0)
+			throw Exception("GetShortPathName("+path+"): "+
+				WindowsCommon::GetErrorMessage(GetLastError()));
+		else if (sz2 > sz)
+			// really shouldn't happen right???
+			throw Exception("GetShortPathName("+path+
+				"): incorrectly predicted space requirements");
+	} else if (sz2 == 0)
+		throw Exception("GetShortPathName("+path+"): "+
+			WindowsCommon::GetErrorMessage(GetLastError()));
+
+	sz = 100;
+	ArrayGuard<char> longBuf(new char[sz]);
+
+	sz2 = GetLongPathNameA(shortBuf.get(), longBuf.get(), sz);
+	if (sz2 > sz) {
+		sz = sz2;
+		longBuf.reset(new char[sz]);
+		sz2 = GetLongPathNameA(shortBuf.get(), longBuf.get(), sz);
+		if (sz2 == 0)
+			throw Exception("GetLongPathName("+path+"): "+
+				WindowsCommon::GetErrorMessage(GetLastError()));
+		else if (sz2 > sz)
+			// really shouldn't happen right???
+			throw Exception("GetLongPathName("+path+
+				"): incorrectly predicted space requirements");
+	} else if (sz2 == 0)
+		throw Exception("GetLongPathName("+path+"): "+
+			WindowsCommon::GetErrorMessage(GetLastError()));
+
+	return string(longBuf.get());
 }
