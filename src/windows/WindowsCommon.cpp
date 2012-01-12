@@ -2558,6 +2558,10 @@ LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
 }
 
 string WindowsCommon::GetActualPathWithCase(const string &path) {
+
+	if (path.empty())
+		return path;
+
 	DWORD sz = 100, sz2;
 	ArrayGuard<char> shortBuf(new char[sz]);
 
