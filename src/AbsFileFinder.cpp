@@ -421,7 +421,8 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 
 	bool result = false;
 	
-	if(path->GetOperation() == OvalEnum::OPERATION_EQUALS) {		
+	if(path->GetOperation() == OvalEnum::OPERATION_EQUALS ||
+		path->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {		
 		
 		if(path->GetVarRef() == NULL) {
 //			if(!this->PathExists(path->GetValue())) {
@@ -447,7 +448,9 @@ bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileNa
 
 	bool result = false;
 	
-	if(fileName->GetOperation() == OvalEnum::OPERATION_EQUALS && !fileName->GetNil()) {		
+	if((fileName->GetOperation() == OvalEnum::OPERATION_EQUALS ||
+		fileName->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) &&
+		!fileName->GetNil()) {		
 		
 		if(fileName->GetVarRef() == NULL) {
 //			if(!this->FileNameExists(path, fileName->GetValue())) {
@@ -474,7 +477,8 @@ bool AbsFileFinder::ReportFilePathDoesNotExist(ObjectEntity *filePath, StringVec
 
 	bool result = false;
 	
-	if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS) {		
+	if(filePath->GetOperation() == OvalEnum::OPERATION_EQUALS ||
+		filePath->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {		
 		
 		if(filePath->GetVarRef() == NULL) {
 //			if(!this->FilePathExists(filePath->GetValue())) {
