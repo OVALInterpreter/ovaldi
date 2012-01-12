@@ -559,7 +559,8 @@ bool FileFinder::FileNameExists(string path, string fileName, string *actualFile
 		if (exists && actualFileName != NULL) {
 			string actualFilepath = WindowsCommon::GetActualPathWithCase(filePath);
 			auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
-			*actualFileName = split->second;
+			if (split.get())
+				*actualFileName = split->second;
 		}
 
 	} catch(Exception ex) {
