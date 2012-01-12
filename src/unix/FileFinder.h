@@ -57,6 +57,9 @@ private:
 	*/
 	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors);
 
+	/** Return true if the specified path exists.  \see AbsFileFinder::PathExists 
+	 * And make sure the param defaults are the same here as in AbsFileFinder... :-P
+	 */
 	virtual bool PathExists(const std::string &path, std::string *actualPath = NULL);
 
 	/**
