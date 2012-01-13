@@ -170,17 +170,16 @@ void AbsFileFinder::DownwardPathRecursion(StringVector* paths, string path, int 
 	for(childDirectory = childDirectories->begin(); childDirectory != childDirectories->end(); childDirectory++) {
 
 		// store child directory
-		(*childDirectory)+=Common::fileSeperator;
-		paths->push_back((*childDirectory));
+		paths->push_back(*childDirectory);
 		if(maxDepth == -1) {
 
 			// make recursive call 
-			this->DownwardPathRecursion(paths, (*childDirectory), maxDepth);
+			this->DownwardPathRecursion(paths, *childDirectory, maxDepth);
 
 		} else if(maxDepth > 0) {
 
 			// make recursive call
-			this->DownwardPathRecursion(paths, (*childDirectory), --maxDepth);
+			this->DownwardPathRecursion(paths, *childDirectory, maxDepth - 1);
 		}
 	}
 	delete childDirectories;
@@ -198,26 +197,25 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 	// get parent directory by parsing the string to find the last file seperator
 
 	// check if path is currently / or c:/ and stop 
-	string fileSeperatorStr = "";
-	fileSeperatorStr+=Common::fileSeperator;
+#ifdef WIN32
 	string regex = "^[A-Za-z]:\\\\$";
-	if(path.compare(fileSeperatorStr) == 0 || this->fileMatcher->IsMatch(regex.c_str(), path.c_str())) {
+#endif
+	if(path == Common::fileSeperatorStr
+#ifdef WIN32
+		|| this->fileMatcher->IsMatch(regex.c_str(), path.c_str())
+#endif
+		) {
 		return;
 	}
-	
-	// remove the trailing char if it is a file seperator
-	if (path[path.length()-1] == Common::fileSeperator) {
-		path = path.substr(0, (path.length()-1));
-	} 
 
 	// find the last file seperator
 	string::size_type index = path.find_last_of(Common::fileSeperator);
 
 	// if no path seperator is found stop recursing up.
-	if(index == string::npos) {
+	if(index == string::npos)
 		return;
-	} 
-	string parentDirectory = path.substr(0, index+1);
+
+	string parentDirectory = Common::StripTrailingSeparators(path.substr(0, index));
 
 	// store parent directory
 	paths->push_back(parentDirectory);
@@ -229,7 +227,7 @@ void AbsFileFinder::UpwardPathRecursion(StringVector* paths, string path, int ma
 	} else if(maxDepth > 0) {
 
 		// make recursive call
-		this->UpwardPathRecursion(paths, parentDirectory, --maxDepth);
+		this->UpwardPathRecursion(paths, parentDirectory, maxDepth - 1);
 	}
 }
 

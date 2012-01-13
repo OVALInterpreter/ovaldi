@@ -782,7 +782,7 @@ string Common::BuildFilePath(const string path, const string filename) {
         if(filename[0] != Common::fileSeperator) {
 			filePath.append(filename);
 		} else {
-			filePath.append(filename.substr(1, filename.length()-2));
+			filePath.append(filename.substr(1));
 		}
     }
 
@@ -790,21 +790,45 @@ string Common::BuildFilePath(const string path, const string filename) {
 }
 
 StringPair* Common::SplitFilePath(const string filepath) {
-	if(filepath.compare("") == 0 ){
+	if(filepath.empty() ){
         throw Exception("An empty-string filepath was specified when splitting a filepath.");
 	}
+
+	// filepaths that end in a sep char are not filepaths that refer to
+	// a file.  They consist of only a path to a directory.
+	// So return NULL in that case.
+	if (filepath[filepath.size()-1] == Common::fileSeperator)
+		return NULL;
+
+#ifdef WIN32
+	// Windows special case: check for "X:\".  If the filepath
+	// has that format, it's entirely a path, without a filename
+	// part.  If we don't do this, the dumb code below will
+	// split it into "X:" and "".
+	if (filepath.size() >= 3 &&
+		isalpha(filepath[0]) &&
+		filepath[1] == ':' &&
+		filepath.find_first_not_of(Common::fileSeperator, 2) == string::npos)
+		// find_first_not_of above handles multiple contiguous sep chars.
+		// NULL return indicates there is no filename component.  It was
+		// just a path.
+		return NULL;
+#endif
 
 	StringPair* fpComponents = NULL;
 	size_t position = filepath.rfind(Common::fileSeperator);
 	
 	if ( position != string::npos ){
 		fpComponents = new StringPair();
-		fpComponents->first = filepath.substr(0,position);
-		fpComponents->second = filepath.substr(position+1,filepath.length());
-		// add a file separator at the end of the path.
-//		(fpComponents->first).append(1, Common::fileSeperator);
+		// run the path part thru the stripper.  I left the sep
+		// char on the path part, because StripTrailingSeparators()
+		// will intelligently handle windows paths that look like "X:\",
+		// where the trailing separator should not in fact be stripped.
+		fpComponents->first = Common::StripTrailingSeparators(
+			filepath.substr(0, position + 1));
+		fpComponents->second = filepath.substr(position + 1);
 	}
-    
+
 	return fpComponents;
 }
 
@@ -900,6 +924,44 @@ bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
 	if (s1.size() != s2.size())
 		return false;
 	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
+}
+
+string Common::StripTrailingSeparators(const string &path) {
+	if (path.empty())
+		return path;
+
+#ifdef WIN32
+	// Special case for windows: Check if it looks like
+	// "X:\" where X is some drive letter, in which case
+	// we must leave the slash on.
+	if (path.size() >= 3 &&
+		isalpha(path[0]) &&
+		path[1]==':' &&
+		path.find_first_not_of(Common::fileSeperator, 2) == string::npos)
+		// substr in case there are multiple sep chars
+		return path.substr(0,3);
+#endif
+
+	// look for non-separator chars.  If there are none,
+	// leave the path as is.  (Actually, if the path consists
+	// of multiple sep chars, return a single sep char, effectively
+	// collapsing them down to one.)
+	if (path.find_first_not_of(Common::fileSeperator) == string::npos)
+		return Common::fileSeperatorStr;
+
+	// ok there are some non-sep chars in the string.  If the
+	// last char is a sep char, search for the last non-sep char
+	// before it, and strip that suffix of sep chars off.
+	if (path[path.size() - 1] == Common::fileSeperator) {
+		// search backward to find the first non-sep char 
+		// (which must exist, cause we already checked there
+		// was at least one).
+		size_t prevNonSepPos = path.find_last_not_of(Common::fileSeperator);
+		return path.substr(0, prevNonSepPos + 1);
+	}
+
+	// doesn't end with a sep, so return the path unchanged.
+	return path;
 }
 
 template<>

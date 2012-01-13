@@ -142,7 +142,8 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes
-		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+		constPortion = Common::StripTrailingSeparators(
+				this->fileMatcher->RemoveExtraSlashes(constPortion));
 	}
 	
 	// Found a constant portion
@@ -219,12 +220,6 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 				return;
 			}
 
-			//if the directory doesn't end in a file separator add it
-
-			if (dirIn.at(dirIn.length()-1) != Common::fileSeperator)
-			  dirIn.append(1, Common::fileSeperator);
-
-
 			//	Loop through all names in the directory and make recursive call
 			while((dirp = readdir(dp)) != NULL) {
 				//	Ignore dot and dot-dot
@@ -232,13 +227,11 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 					continue;
 
 				//	append the name
-			      
-				tmp = dirIn + dirp->d_name;
+				tmp = Common::BuildFilePath(dirIn, dirp->d_name);
 
 				// Nake recursive call
 				GetPathsForOperation(tmp, queryVal, pathVector, op);
 			}
-
 
 			//	Close the directory
 			if(dp.close() < 0) {
@@ -356,7 +349,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 
 	bool exists = lstat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
 	if (exists && actualPath != NULL)
-		*actualPath = path;
+		*actualPath = Common::StripTrailingSeparators(path);
 	return exists;
 }
 
@@ -433,10 +426,6 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		// only consider dirs
 		if(S_ISDIR(statbuf.st_mode) == 1) {
 
-			//	Append a '/'
-			if(path.at(path.length()-1) != Common::fileSeperator)
-				path.append("/");
-
 			//	Open the directory
 			dp = opendir(path.c_str());
 			if(dp == NULL) {
@@ -452,13 +441,8 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 				if(strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
 					continue;
 
-				//	append the name after the "/"
-				string childDir = path;	
-				childDir.append(dirp->d_name);
-				
-				childDirs->push_back(childDir);
+				childDirs->push_back(Common::BuildFilePath(path, dirp->d_name));
 			}
-
 
 			//	Close the directory
 			if(closedir(dp) < 0) {

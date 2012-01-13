@@ -265,6 +265,14 @@ class Common {
 		/** Returns whether the two strings are equal, ignoring case. */
 		static bool EqualsIgnoreCase(const std::string &s1, const std::string &s2);
 
+		/**
+		 * If the given path ends with a trailing path separator, this method
+		 * in most cases returns the path with that separator stripped off.  The exception
+		 * is if the path consists of only a separator char, e.g. unix "/", then it
+		 * must be left on, since the empty string would have a totally different meaning.
+		 */
+		static std::string StripTrailingSeparators(const std::string &path);
+
 		static char fileSeperator;
 		static std::string fileSeperatorStr;
 
