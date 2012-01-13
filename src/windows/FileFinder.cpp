@@ -65,7 +65,7 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 		string maxDepthStr = Behavior::GetBehaviorValue(behaviors, "max_depth");
 		int maxDepth = -1;
 		if(maxDepthStr.compare("") != 0) {
-			maxDepth = atoi(maxDepthStr.c_str());
+			Common::FromString(maxDepthStr, &maxDepth);
 			if(maxDepth < -1) 
 				maxDepth = -1;
 		}
@@ -99,8 +99,10 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	// the beginning of paths. (regex has to start with '^')
 	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
-		// Remove extra slashes
-		constPortion = this->fileMatcher->RemoveExtraSlashes(constPortion);
+		// Remove extra slashes and normalize
+		constPortion = Common::StripTrailingSeparators(
+			WindowsCommon::GetActualPathWithCase(
+				this->fileMatcher->RemoveExtraSlashes(constPortion)));
 	}
 
 	// Found a constant portion
@@ -117,9 +119,9 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 
 		StringVector::iterator drive;
 		for (drive=drives->begin(); drive!=drives->end(); drive++) {
+
 			//	Call search function
 			try  {
-
 				this->GetPathsForOperation((*drive), queryVal, paths, op);
 
 			} catch(REGEXException ex) {
@@ -147,8 +149,6 @@ StringVector* FileFinder::GetDrives() {
 
 	StringVector* drives = new StringVector();	
 	unsigned int index	= 0;
-	string tmp;
-	string drive;
 	string errMsg;
 	DWORD nBufferLength = 0;
 	DWORD dwResult		= 0;
@@ -203,17 +203,15 @@ StringVector* FileFinder::GetDrives() {
 	//	Process the list of drives
 	} else {
 		while(index < dwResult) {
-
-			tmp = lpBuffer[index];
-			index += 4;
-			drive.append(tmp);
-			drive.append(":\\");
 			
-			//	Only fixed drives
-			if(GetDriveType(drive.c_str()) == DRIVE_FIXED)
-				drives->push_back(drive);
+			const char *drive = lpBuffer + index;
 
-			drive = "";			
+			//	Only fixed drives
+			if(GetDriveType(drive) == DRIVE_FIXED) {
+				drives->push_back(WindowsCommon::GetActualPathWithCase(drive));
+			}
+
+			index += strlen(drive) + 1; // skip over the '\0' too
 		}	
 	}
 
@@ -482,7 +480,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 		}
 
 		if (exists && actualPath != NULL)
-			*actualPath = WindowsCommon::GetActualPathWithCase(path);
+			*actualPath = Common::StripTrailingSeparators(WindowsCommon::GetActualPathWithCase(path));
 
 	} catch(Exception ex) {
 		if (hFile != INVALID_HANDLE_VALUE)

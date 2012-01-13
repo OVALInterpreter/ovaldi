@@ -92,6 +92,13 @@ private:
 	  	and ".." files or accessing restricted direcoties.  
 	  	This does call itself recursively as it must search all sub directories of dirIn.
 	  	If a match is found the path is pushed on to a vector of strings.
+		The \p dirIn path, which is the directory being searched, should be capitalized
+		how it is in the filesystem.  Since FindFirst/NextFile() returns files
+		in the proper case, there is no need internally to pass all paths through 
+		WindowsCommon::GetActualPathWithCase() as this method recurses (and it is
+		more efficient not to), however the initial call to this method to start off
+		the recursive search should have dirIn capitalized properly.  Otherwise all
+		the found paths will have an incorrectly capitalized prefix.
 	*/
 	void GetPathsForOperation(string dirIn, string pattern, StringVector* pathVector, OvalEnum::Operation op);
 
