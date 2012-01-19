@@ -162,7 +162,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation 
 	}
 
     if(!myRegex.IsMatch("[0-9a-fA-F]", scValue.c_str())) {
-		throw Exception("Error: Invalid binary value on system characteristics item entity. " + defValue);
+		throw Exception("Error: Invalid binary value on system characteristics item entity. " + scValue);
 	}
 
     string tmpdefValue = Common::ToUpper(defValue);
@@ -236,8 +236,17 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareEvrString(OvalEnum::Operation op, string defValue, string scValue) {
-	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+	//EPOCH:VERSION-RELEASE, with datatypes of EPOCH=int, VERSION=version, release=string
+	// Validate the inputs align with the notion of an EVR string regex = "^(\d+):(\d+([\D]\d+)*?)-(.+)$"
+    REGEX myRegex;
+    if(!myRegex.IsMatch("^(\\d+):(\\d+([\\D]\\d+)*?)-(.+)$", defValue.c_str())) {
+		throw Exception("Error: Invalid EVR string value on definition entity. " + defValue);
+	}
+
+    if(!myRegex.IsMatch("^(\\d+):(\\d+([\\D]\\d+)*?)-(.+)$", scValue.c_str())) {
+		throw Exception("Error: Invalid EVR string value on system characteristics item entity. " + scValue);
+	}
 
 	string installedEpochStr = EntityComparator::GetEpochFromEVR(scValue);
 	string installedVersionStr = EntityComparator::GetVersionFromEVR(scValue);
@@ -421,6 +430,15 @@ int EntityComparator::xisupper(int c) {
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareFloat(OvalEnum::Operation op, string defValue, string scValue) {
+	// Validate the inputs align with the float regex = "^[-+]?\d*\.?\d+([eE][-+]?\d+)?$"
+    REGEX myRegex;
+    if(!myRegex.IsMatch("^[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?$", defValue.c_str())) {
+		throw Exception("Error: Invalid float value on definition entity. " + defValue);
+	}
+
+    if(!myRegex.IsMatch("^[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?$", scValue.c_str())) {
+		throw Exception("Error: Invalid float value on system characteristics item entity. " + scValue);
+	}
 
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
@@ -482,9 +500,16 @@ OvalEnum::ResultEnumeration EntityComparator::CompareIosVersion(OvalEnum::Operat
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation op, string defValue, string scValue) {
-	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-	
+	// Validate the inputs align with the integer regex = "^[-+]?\d+$"
+    REGEX myRegex;
+    if(!myRegex.IsMatch("^[-+]?\\d+$", defValue.c_str())) {
+		throw Exception("Error: Invalid integer value on definition entity. " + defValue);
+	}
+
+    if(!myRegex.IsMatch("^[-+]?\\d+$", scValue.c_str())) {
+		throw Exception("Error: Invalid integer value on system characteristics item entity. " + scValue);
+	}
 	try {
 		int base = 0;
 		long long defInt = 0;
@@ -604,7 +629,6 @@ OvalEnum::ResultEnumeration EntityComparator::CompareRecord(OvalEnum::Operation 
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation op, string defValue, string scValue) {
-	
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 
 	if(op == OvalEnum::OPERATION_EQUALS) {
@@ -656,9 +680,18 @@ OvalEnum::ResultEnumeration EntityComparator::CompareString(OvalEnum::Operation 
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation op, string defValue, string scValue) {
-
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-	
+	//ex: 1@2@31#5.3
+	//ex: 1.5.3
+	// Validate the inputs align with the version regex = "^\d+([\D]\d+)*?$"
+    REGEX myRegex;
+    if(!myRegex.IsMatch("^\\d+([\\D]\\d+)*?$", defValue.c_str())) {
+		throw Exception("Error: Invalid version value on definition entity. " + defValue);
+	}
+
+    if(!myRegex.IsMatch("^\\d+([\\D]\\d+)*?$", scValue.c_str())) {
+		throw Exception("Error: Invalid version value on system characteristics item entity. " + scValue);
+	}
 	// Invalid ops first
 	if(op == OvalEnum::OPERATION_PATTERN_MATCH || op == OvalEnum::OPERATION_BITWISE_AND || op == OvalEnum::OPERATION_BITWISE_OR) {
 		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));	
@@ -1021,9 +1054,16 @@ string EntityComparator::GetReleaseFromEVR(string evrStr) {
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareIpv4Address(OvalEnum::Operation op, string defValue, string scValue) {
-
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+	// Validate the inputs align with the IPV4 regex = "^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$"
+    REGEX myRegex;
+    if(!myRegex.IsMatch("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$", defValue.c_str())) {
+		throw Exception("Error: Invalid IPV4 value on definition entity. " + defValue);
+	}
 
+    if(!myRegex.IsMatch("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$", scValue.c_str())) {
+		throw Exception("Error: Invalid IPV4 value on system characteristics item entity. " + scValue);
+	}
 	Ipv4Address defAddr(defValue), scAddr(scValue);
 
 	switch (op) {
