@@ -35,7 +35,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---       Version 5.10.1 build 1    ---
 ---------------------------------------
 * Added support for the linux-def:rpmverifyfile_test.
-
+* Added support for the filepaths behavior in linux-def:rpminfo_test.
 
 ---------------------------------------
 ---        Version 5.10 build 2     ---
