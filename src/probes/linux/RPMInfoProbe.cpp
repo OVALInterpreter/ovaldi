@@ -272,7 +272,8 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items, BehaviorVector* be
 	/* Header object for the installed package. */
 	Header header;
 	/* Epoch, version, release and architecture data for output. */
-	string installed_epoch, installed_version, installed_release,installed_architecture, installed_evr, installed_signature_keyid;
+	string installed_epoch, installed_version, installed_release,installed_architecture, 
+		installed_evr, installed_signature_keyid, installed_extended_name;
 
 	/* Create an rpm database transaction set. */
 	RpmtsGuard ts;
@@ -313,6 +314,10 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items, BehaviorVector* be
 			(installed_version.empty() ? "0":installed_version) + '-' +
 			(installed_release.empty() ? "0":installed_release);
 
+		installed_extended_name = name + "-" + installedEpochEvr + ":" +
+			(installed_version.empty() ? "0":installed_version) + '-' +
+			(installed_release.empty() ? "0":installed_release) + "." + 
+			installed_architecture;
 		/* Put the data in a data object. */
 		auto_ptr<Item> item = ::CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
@@ -323,6 +328,7 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items, BehaviorVector* be
 		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, false, verStatus));
 		item->AppendElement(new ItemEntity("evr", installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("signature_keyid", installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, keyidStatus));
+		item->AppendElement(new ItemEntity("extended_name", installed_extended_name, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
 		if (Behavior::GetBehaviorValue(beh, "filepaths") == "true"){
 			RpmfiGuard fileInfo(ts, header, RPMTAG_BASENAMES, name);
