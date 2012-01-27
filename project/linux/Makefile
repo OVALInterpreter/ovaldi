@@ -67,6 +67,7 @@ else
 	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
 	CPP_FILES := $(filter-out %RPMVerifyProbe.cpp, $(CPP_FILES))
 	CPP_FILES := $(filter-out %RPMVerifyFileProbe.cpp, $(CPP_FILES))
+	CPP_FILES := $(filter-out %RPMVerifyPackageProbe.cpp, $(CPP_FILES))
 endif
 ifneq (${PACKAGE_DPKG}, )
 	LIBS += -lapt-pkg
