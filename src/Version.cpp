@@ -40,7 +40,6 @@ using namespace std;
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
 #define VERSION "5.10.1"
-#define UPDATE 1
 #define BUILD 1
 
 #define SCHEMA_VERSION "5.10.1"
@@ -82,15 +81,6 @@ string Version::GetBuildDate() {
 	buildDate.append(" ");
 	buildDate.append(__TIME__);
     return(buildDate);
-}
-
-string Version::GetUpdate() {
-	
-	string update;
-	ostringstream upd;
-	upd << UPDATE;
-	update.append(upd.str());
-    return(update);
 }
 
 string Version::GetSchemaVersion() {
