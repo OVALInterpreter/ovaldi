@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<axsl:stylesheet xmlns:axsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:schold="http://www.ascc.net/xml/schematron" xmlns:iso="http://purl.oclc.org/dsdl/schematron" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ind-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" xmlns:aix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix" xmlns:apache-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#apache" xmlns:catos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos" xmlns:esx-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx" xmlns:freebsd-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#freebsd" xmlns:hpux-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux" xmlns:ios-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios" xmlns:linux-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux" xmlns:macos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos" xmlns:pixos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#pixos" xmlns:sp-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint" xmlns:sol-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris" xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" version="1.0"><!--Implementers: please note that overriding process-prolog or process-root is 
+<axsl:stylesheet xmlns:axsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:sch="http://www.ascc.net/xml/schematron" xmlns:iso="http://purl.oclc.org/dsdl/schematron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" xmlns:ind-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#independent" xmlns:aix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#aix" xmlns:apache-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#apache" xmlns:catos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#catos" xmlns:esx-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#esx" xmlns:freebsd-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#freebsd" xmlns:hpux-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#hpux" xmlns:ios-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#ios" xmlns:linux-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#linux" xmlns:macos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#macos" xmlns:pixos-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#pixos" xmlns:sp-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#sharepoint" xmlns:sol-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#solaris" xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix" xmlns:win-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" version="1.0"><!--Implementers: please note that overriding process-prolog or process-root is 
     the preferred method for meta-stylesheets to use where possible. -->
 
    <axsl:param name="archiveDirParameter"/>
    <axsl:param name="archiveNameParameter"/>
    <axsl:param name="fileNameParameter"/>
    <axsl:param name="fileDirParameter"/>
-   <axsl:variable name="document-uri">
-      <axsl:value-of select="document-uri(/)"/>
-   </axsl:variable>
 
 <!--PHASES-->
 
@@ -16,10 +13,7 @@
 <!--PROLOG-->
 
 
-<!--XSD TYPES FOR XSLT2-->
-
-
-<!--KEYS AND FUNCTIONS-->
+<!--KEYS-->
 
 
 <!--DEFAULT RULES-->
@@ -47,6 +41,8 @@
          <axsl:otherwise>
             <axsl:text>*[local-name()='</axsl:text>
             <axsl:value-of select="local-name()"/>
+            <axsl:text>' and namespace-uri()='</axsl:text>
+            <axsl:value-of select="namespace-uri()"/>
             <axsl:text>']</axsl:text>
             <axsl:variable name="p_2" select="1+   count(preceding-sibling::*[local-name()=local-name(current())])"/>
             <axsl:if test="$p_2&gt;1 or following-sibling::*[local-name()=local-name(current())]">[<axsl:value-of select="$p_2"/>]</axsl:if>
@@ -84,23 +80,6 @@
       <axsl:if test="not(self::*)">
          <axsl:text/>/@<axsl:value-of select="name(.)"/>
       </axsl:if>
-   </axsl:template><!--MODE: SCHEMATRON-FULL-PATH-3-->
-<!--This mode can be used to generate prefixed XPath for humans 
-	(Top-level element has index)-->
-
-   <axsl:template match="node() | @*" mode="schematron-get-full-path-3">
-      <axsl:for-each select="ancestor-or-self::*">
-         <axsl:text>/</axsl:text>
-         <axsl:value-of select="name(.)"/>
-         <axsl:if test="parent::*">
-            <axsl:text>[</axsl:text>
-            <axsl:value-of select="count(preceding-sibling::*[name(.)=name(current())])+1"/>
-            <axsl:text>]</axsl:text>
-         </axsl:if>
-      </axsl:for-each>
-      <axsl:if test="not(self::*)">
-         <axsl:text/>/@<axsl:value-of select="name(.)"/>
-      </axsl:if>
    </axsl:template>
 
 <!--MODE: GENERATE-ID-FROM-PATH -->
@@ -126,6 +105,23 @@
       <axsl:apply-templates select="parent::*" mode="generate-id-from-path"/>
       <axsl:text>.</axsl:text>
       <axsl:value-of select="concat('.',name(),'-',1+count(preceding-sibling::*[name()=name(current())]),'-')"/>
+   </axsl:template><!--MODE: SCHEMATRON-FULL-PATH-3-->
+<!--This mode can be used to generate prefixed XPath for humans 
+	(Top-level element has index)-->
+
+   <axsl:template match="node() | @*" mode="schematron-get-full-path-3">
+      <axsl:for-each select="ancestor-or-self::*">
+         <axsl:text>/</axsl:text>
+         <axsl:value-of select="name(.)"/>
+         <axsl:if test="parent::*">
+            <axsl:text>[</axsl:text>
+            <axsl:value-of select="count(preceding-sibling::*[name(.)=name(current())])+1"/>
+            <axsl:text>]</axsl:text>
+         </axsl:if>
+      </axsl:for-each>
+      <axsl:if test="not(self::*)">
+         <axsl:text/>/@<axsl:value-of select="name(.)"/>
+      </axsl:if>
    </axsl:template>
 
 <!--MODE: GENERATE-ID-2 -->
@@ -151,7 +147,7 @@
    </axsl:template><!--Strip characters-->
    <axsl:template match="text()" priority="-1"/>
 
-<!--SCHEMA SETUP-->
+<!--SCHEMA METADATA-->
 
    <axsl:template match="/">
       <axsl:apply-templates select="/" mode="M32"/>
@@ -210,11 +206,11 @@
          <axsl:text/> ATTRIBUTE VALUE:
                                         <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M32"/>
+      <axsl:apply-templates select="@*|*" mode="M32"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M32"/>
    <axsl:template match="@*|node()" priority="-2" mode="M32">
-      <axsl:apply-templates select="*" mode="M32"/>
+      <axsl:apply-templates select="@*|*" mode="M32"/>
    </axsl:template>
 
 <!--PATTERN oval-sc_entity_rules-->
@@ -235,7 +231,7 @@
             <axsl:text/> entity should only be supplied if the status attribute is 'exists'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M33"/>
+      <axsl:apply-templates select="@*|*" mode="M33"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -255,11 +251,11 @@
             <axsl:text/> entity is 'int' but the value is not an integer.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M33"/>
+      <axsl:apply-templates select="@*|*" mode="M33"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M33"/>
    <axsl:template match="@*|node()" priority="-2" mode="M33">
-      <axsl:apply-templates select="*" mode="M33"/>
+      <axsl:apply-templates select="@*|*" mode="M33"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_filehash_item_dep-->
@@ -279,11 +275,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M34"/>
+      <axsl:apply-templates select="@*|*" mode="M34"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M34"/>
    <axsl:template match="@*|node()" priority="-2" mode="M34">
-      <axsl:apply-templates select="*" mode="M34"/>
+      <axsl:apply-templates select="@*|*" mode="M34"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_environmentvariable_item_dep-->
@@ -303,11 +299,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M35"/>
+      <axsl:apply-templates select="@*|*" mode="M35"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M35"/>
    <axsl:template match="@*|node()" priority="-2" mode="M35">
-      <axsl:apply-templates select="*" mode="M35"/>
+      <axsl:apply-templates select="@*|*" mode="M35"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_ldap57_itemvalue-->
@@ -328,11 +324,11 @@
             <axsl:text/> - datatype attribute for the value entity of a ldap57_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M36"/>
+      <axsl:apply-templates select="@*|*" mode="M36"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M36"/>
    <axsl:template match="@*|node()" priority="-2" mode="M36">
-      <axsl:apply-templates select="*" mode="M36"/>
+      <axsl:apply-templates select="@*|*" mode="M36"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_sql_item_dep-->
@@ -352,11 +348,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M37"/>
+      <axsl:apply-templates select="@*|*" mode="M37"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M37"/>
    <axsl:template match="@*|node()" priority="-2" mode="M37">
-      <axsl:apply-templates select="*" mode="M37"/>
+      <axsl:apply-templates select="@*|*" mode="M37"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_sql57_itemresult-->
@@ -377,11 +373,11 @@
             <axsl:text/> - datatype attribute for the result entity of a sql57_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M38"/>
+      <axsl:apply-templates select="@*|*" mode="M38"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M38"/>
    <axsl:template match="@*|node()" priority="-2" mode="M38">
-      <axsl:apply-templates select="*" mode="M38"/>
+      <axsl:apply-templates select="@*|*" mode="M38"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_txtitemline-->
@@ -401,11 +397,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M39"/>
+      <axsl:apply-templates select="@*|*" mode="M39"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M39"/>
    <axsl:template match="@*|node()" priority="-2" mode="M39">
-      <axsl:apply-templates select="*" mode="M39"/>
+      <axsl:apply-templates select="@*|*" mode="M39"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_ldaptype_timestamp_value_dep-->
@@ -424,11 +420,11 @@
                                              
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M40"/>
+      <axsl:apply-templates select="@*|*" mode="M40"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M40"/>
    <axsl:template match="@*|node()" priority="-2" mode="M40">
-      <axsl:apply-templates select="*" mode="M40"/>
+      <axsl:apply-templates select="@*|*" mode="M40"/>
    </axsl:template>
 
 <!--PATTERN ind-sc_ldaptype_email_value_dep-->
@@ -447,11 +443,11 @@
                                              
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M41"/>
+      <axsl:apply-templates select="@*|*" mode="M41"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M41"/>
    <axsl:template match="@*|node()" priority="-2" mode="M41">
-      <axsl:apply-templates select="*" mode="M41"/>
+      <axsl:apply-templates select="@*|*" mode="M41"/>
    </axsl:template>
 
 <!--PATTERN apache-sc_httpd_item_dep-->
@@ -471,11 +467,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M42"/>
+      <axsl:apply-templates select="@*|*" mode="M42"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M42"/>
    <axsl:template match="@*|node()" priority="-2" mode="M42">
-      <axsl:apply-templates select="*" mode="M42"/>
+      <axsl:apply-templates select="@*|*" mode="M42"/>
    </axsl:template>
 
 <!--PATTERN catos-sc_versionitemcatos_major_release-->
@@ -495,11 +491,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M43"/>
+      <axsl:apply-templates select="@*|*" mode="M43"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M43"/>
    <axsl:template match="@*|node()" priority="-2" mode="M43">
-      <axsl:apply-templates select="*" mode="M43"/>
+      <axsl:apply-templates select="@*|*" mode="M43"/>
    </axsl:template>
 
 <!--PATTERN catos-sc_versionitemcatos_individual_release-->
@@ -519,11 +515,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M44"/>
+      <axsl:apply-templates select="@*|*" mode="M44"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M44"/>
    <axsl:template match="@*|node()" priority="-2" mode="M44">
-      <axsl:apply-templates select="*" mode="M44"/>
+      <axsl:apply-templates select="@*|*" mode="M44"/>
    </axsl:template>
 
 <!--PATTERN catos-sc_versionitemcatos_version_id-->
@@ -543,11 +539,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M45"/>
+      <axsl:apply-templates select="@*|*" mode="M45"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M45"/>
    <axsl:template match="@*|node()" priority="-2" mode="M45">
-      <axsl:apply-templates select="*" mode="M45"/>
+      <axsl:apply-templates select="@*|*" mode="M45"/>
    </axsl:template>
 
 <!--PATTERN esx-sc_patchitempatch_number-->
@@ -567,11 +563,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M46"/>
+      <axsl:apply-templates select="@*|*" mode="M46"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M46"/>
    <axsl:template match="@*|node()" priority="-2" mode="M46">
-      <axsl:apply-templates select="*" mode="M46"/>
+      <axsl:apply-templates select="@*|*" mode="M46"/>
    </axsl:template>
 
 <!--PATTERN ios-sc_versionitemmajor_release-->
@@ -591,11 +587,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M47"/>
+      <axsl:apply-templates select="@*|*" mode="M47"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M47"/>
    <axsl:template match="@*|node()" priority="-2" mode="M47">
-      <axsl:apply-templates select="*" mode="M47"/>
+      <axsl:apply-templates select="@*|*" mode="M47"/>
    </axsl:template>
 
 <!--PATTERN ios-sc_versionitemtrain_number-->
@@ -615,11 +611,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M48"/>
+      <axsl:apply-templates select="@*|*" mode="M48"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M48"/>
    <axsl:template match="@*|node()" priority="-2" mode="M48">
-      <axsl:apply-templates select="*" mode="M48"/>
+      <axsl:apply-templates select="@*|*" mode="M48"/>
    </axsl:template>
 
 <!--PATTERN linux-sc_rpmverify_item_dep-->
@@ -639,11 +635,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M49"/>
+      <axsl:apply-templates select="@*|*" mode="M49"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M49"/>
    <axsl:template match="@*|node()" priority="-2" mode="M49">
-      <axsl:apply-templates select="*" mode="M49"/>
+      <axsl:apply-templates select="@*|*" mode="M49"/>
    </axsl:template>
 
 <!--PATTERN macos-sc_inetlisteningserveritem_dep-->
@@ -663,11 +659,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M50"/>
+      <axsl:apply-templates select="@*|*" mode="M50"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M50"/>
    <axsl:template match="@*|node()" priority="-2" mode="M50">
-      <axsl:apply-templates select="*" mode="M50"/>
+      <axsl:apply-templates select="@*|*" mode="M50"/>
    </axsl:template>
 
 <!--PATTERN macos-sc_pwpolicy_item_dep-->
@@ -687,11 +683,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M51"/>
+      <axsl:apply-templates select="@*|*" mode="M51"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M51"/>
    <axsl:template match="@*|node()" priority="-2" mode="M51">
-      <axsl:apply-templates select="*" mode="M51"/>
+      <axsl:apply-templates select="@*|*" mode="M51"/>
    </axsl:template>
 
 <!--PATTERN sp-sc_spjobdefinition_item_dep-->
@@ -711,11 +707,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M52"/>
+      <axsl:apply-templates select="@*|*" mode="M52"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M52"/>
    <axsl:template match="@*|node()" priority="-2" mode="M52">
-      <axsl:apply-templates select="*" mode="M52"/>
+      <axsl:apply-templates select="@*|*" mode="M52"/>
    </axsl:template>
 
 <!--PATTERN unix-sc_processitem_dep-->
@@ -735,11 +731,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M53"/>
+      <axsl:apply-templates select="@*|*" mode="M53"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M53"/>
    <axsl:template match="@*|node()" priority="-2" mode="M53">
-      <axsl:apply-templates select="*" mode="M53"/>
+      <axsl:apply-templates select="@*|*" mode="M53"/>
    </axsl:template>
 
 <!--PATTERN unix-sc_sccsitem_dep-->
@@ -759,11 +755,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M54"/>
+      <axsl:apply-templates select="@*|*" mode="M54"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M54"/>
    <axsl:template match="@*|node()" priority="-2" mode="M54">
-      <axsl:apply-templates select="*" mode="M54"/>
+      <axsl:apply-templates select="@*|*" mode="M54"/>
    </axsl:template>
 
 <!--PATTERN win-sc_activedirectory57_itemvalue-->
@@ -784,11 +780,11 @@
             <axsl:text/> - datatype attribute for the value entity of a activedirectory57_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M55"/>
+      <axsl:apply-templates select="@*|*" mode="M55"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M55"/>
    <axsl:template match="@*|node()" priority="-2" mode="M55">
-      <axsl:apply-templates select="*" mode="M55"/>
+      <axsl:apply-templates select="@*|*" mode="M55"/>
    </axsl:template>
 
 <!--PATTERN win-sc_cmdletitemparameters-->
@@ -809,11 +805,11 @@
             <axsl:text/> - datatype attribute for the parameters entity of a cmdlet_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M56"/>
+      <axsl:apply-templates select="@*|*" mode="M56"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M56"/>
    <axsl:template match="@*|node()" priority="-2" mode="M56">
-      <axsl:apply-templates select="*" mode="M56"/>
+      <axsl:apply-templates select="@*|*" mode="M56"/>
    </axsl:template>
 
 <!--PATTERN win-sc_cmdletitemselect-->
@@ -834,11 +830,11 @@
             <axsl:text/> - datatype attribute for the select entity of a cmdlet_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M57"/>
+      <axsl:apply-templates select="@*|*" mode="M57"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M57"/>
    <axsl:template match="@*|node()" priority="-2" mode="M57">
-      <axsl:apply-templates select="*" mode="M57"/>
+      <axsl:apply-templates select="@*|*" mode="M57"/>
    </axsl:template>
 
 <!--PATTERN win-sc_cmdletitemvalue-->
@@ -859,11 +855,11 @@
             <axsl:text/> - datatype attribute for the value entity of a cmdlet_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M58"/>
+      <axsl:apply-templates select="@*|*" mode="M58"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M58"/>
    <axsl:template match="@*|node()" priority="-2" mode="M58">
-      <axsl:apply-templates select="*" mode="M58"/>
+      <axsl:apply-templates select="@*|*" mode="M58"/>
    </axsl:template>
 
 <!--PATTERN win-sc_fileaudititemtrustee_name-->
@@ -883,11 +879,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M59"/>
+      <axsl:apply-templates select="@*|*" mode="M59"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M59"/>
    <axsl:template match="@*|node()" priority="-2" mode="M59">
-      <axsl:apply-templates select="*" mode="M59"/>
+      <axsl:apply-templates select="@*|*" mode="M59"/>
    </axsl:template>
 
 <!--PATTERN win-sc_feritemtrustee_name-->
@@ -907,11 +903,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M60"/>
+      <axsl:apply-templates select="@*|*" mode="M60"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M60"/>
    <axsl:template match="@*|node()" priority="-2" mode="M60">
-      <axsl:apply-templates select="*" mode="M60"/>
+      <axsl:apply-templates select="@*|*" mode="M60"/>
    </axsl:template>
 
 <!--PATTERN win-sc_regitemkey-->
@@ -932,11 +928,11 @@
             <axsl:text/> - name entity must be nil when key is nil<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M61"/>
+      <axsl:apply-templates select="@*|*" mode="M61"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M61"/>
    <axsl:template match="@*|node()" priority="-2" mode="M61">
-      <axsl:apply-templates select="*" mode="M61"/>
+      <axsl:apply-templates select="@*|*" mode="M61"/>
    </axsl:template>
 
 <!--PATTERN win-sc_rapitemtrustee_name-->
@@ -956,11 +952,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M62"/>
+      <axsl:apply-templates select="@*|*" mode="M62"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M62"/>
    <axsl:template match="@*|node()" priority="-2" mode="M62">
-      <axsl:apply-templates select="*" mode="M62"/>
+      <axsl:apply-templates select="@*|*" mode="M62"/>
    </axsl:template>
 
 <!--PATTERN win-sc_rapitemstandard_synchronize-->
@@ -980,11 +976,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M63"/>
+      <axsl:apply-templates select="@*|*" mode="M63"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M63"/>
    <axsl:template match="@*|node()" priority="-2" mode="M63">
-      <axsl:apply-templates select="*" mode="M63"/>
+      <axsl:apply-templates select="@*|*" mode="M63"/>
    </axsl:template>
 
 <!--PATTERN win-sc_reritemtrustee_name-->
@@ -1004,11 +1000,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M64"/>
+      <axsl:apply-templates select="@*|*" mode="M64"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M64"/>
    <axsl:template match="@*|node()" priority="-2" mode="M64">
-      <axsl:apply-templates select="*" mode="M64"/>
+      <axsl:apply-templates select="@*|*" mode="M64"/>
    </axsl:template>
 
 <!--PATTERN win-sc_reritemstandard_synchronize-->
@@ -1028,11 +1024,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M65"/>
+      <axsl:apply-templates select="@*|*" mode="M65"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M65"/>
    <axsl:template match="@*|node()" priority="-2" mode="M65">
-      <axsl:apply-templates select="*" mode="M65"/>
+      <axsl:apply-templates select="@*|*" mode="M65"/>
    </axsl:template>
 
 <!--PATTERN win-sc_wmi_item_dep-->
@@ -1052,11 +1048,11 @@
          
          <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M66"/>
+      <axsl:apply-templates select="@*|*" mode="M66"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M66"/>
    <axsl:template match="@*|node()" priority="-2" mode="M66">
-      <axsl:apply-templates select="*" mode="M66"/>
+      <axsl:apply-templates select="@*|*" mode="M66"/>
    </axsl:template>
 
 <!--PATTERN win-sc_wmi57_itemresult-->
@@ -1077,10 +1073,10 @@
             <axsl:text/> - datatype attribute for the result entity of a wmi57_item must be 'record'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M67"/>
+      <axsl:apply-templates select="@*|*" mode="M67"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M67"/>
    <axsl:template match="@*|node()" priority="-2" mode="M67">
-      <axsl:apply-templates select="*" mode="M67"/>
+      <axsl:apply-templates select="@*|*" mode="M67"/>
    </axsl:template>
 </axsl:stylesheet>
