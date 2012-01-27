@@ -356,8 +356,13 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 							}
 						}
 					}
-					item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,false,OvalEnum::STATUS_EXISTS));
-				}
+					// If we found values add them. Otherwise, make sure to report the result doesn't exist
+					if ( fieldEntityValues.size() ){
+						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,false,OvalEnum::STATUS_EXISTS));
+					}else{
+						item->AppendElement(new ItemEntity("result","",OvalEnum::DATATYPE_RECORD,false,OvalEnum::STATUS_DOES_NOT_EXIST));					}
+					}
+				
 				for (ULONG n=0; n<uReturn; n++) pclsObj[n]->Release();
 			}
 		}
