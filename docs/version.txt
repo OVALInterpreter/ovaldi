@@ -34,14 +34,18 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 ---       Version 5.10.1 build 1    ---
 ---------------------------------------
+* Updated to align with the new three-component version identifier.
+* Added support for loginuid, posix_capability, selinux_domain_label, and session_id entities on the unix-def:process58_test where applicable.
 * Added support for the linux-def:rpmverifyfile_test.
+* Added support for the linux-def:rpmverifypackage_test.
+* Added validation for entity values in EntityComparator.cpp.
+* Fixed a bug where an empty field was being written when a record entity did not exist.
+* Added support for case-insensitive operations in the file-based tests.
+* Eliminated the filepath separator inconsistency issue. Filepaths no longer output with a trailing path separator to follow best practices.
+* Fixed a bug so registry values, in the win-def:registry_test, of type reg_dword are treated as DWORDs.
+* Fixed a bug so the max_passwd_age entity in the win-def:passwordpolicy_test are treated as DWORDs.
 * Added support for the filepaths behavior in linux-def:rpminfo_test.
 * Added support for the extended_name entity in linux-def:rpminfo_test.
-
----------------------------------------
----        Version 5.10 build 2     ---
----------------------------------------
-
 * Added support for variables with an empty string as a value.
 * Fixed datatype of user_id entity in linux-def:iflisteners_test.
 * Removed enumeration restriction to fs_type entity in linux-def:partition_test.
