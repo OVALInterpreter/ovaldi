@@ -244,7 +244,9 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 		if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
 			((StringEntityValue*)*it)->Write(scFile,newItemEntityElem);
 		}else{
-			((ItemFieldEntityValue*)*it)->Write(scFile,newItemEntityElem);
+			// Don't add field entities unless the the entity exists
+			if ( this->GetStatus() == OvalEnum::STATUS_EXISTS )
+				((ItemFieldEntityValue*)*it)->Write(scFile,newItemEntityElem);
 		}
 	}
 }
