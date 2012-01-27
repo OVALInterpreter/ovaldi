@@ -4,7 +4,7 @@
 
 					Build Instructions - 64-bit Windows
 
-			Copyright (c) 2002-2011, The MITRE Corporation
+			Copyright (c) 2002-2012, The MITRE Corporation
 
 ****************************************************************
 
