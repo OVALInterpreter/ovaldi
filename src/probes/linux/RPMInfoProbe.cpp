@@ -85,13 +85,14 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 	}
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
+	BehaviorVector *beh = object->GetBehaviors();
 
 	StringVector names;
 	this->GetRPMNames(name, &names);
 	if(!names.empty()) {
 		StringVector::iterator iterator;
 		for(iterator = names.begin(); iterator != names.end(); iterator++) {
-			this->GetRPMInfo((*iterator), collectedItems.get());
+			GetRPMInfo((*iterator), collectedItems.get(), beh);
 		}
 	} else {
 
@@ -259,7 +260,7 @@ bool RPMInfoProbe::RPMExists(string name) {
 	return exists;
 }
 
-void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
+void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items, BehaviorVector* beh) {
 	//------------------------------------------------------------------------------------//
 	//
 	//  ABSTRACT
@@ -267,11 +268,12 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
 	//  Get the data for all packages that have the given name.
 	//
 	//------------------------------------------------------------------------------------//
-
+	
 	/* Header object for the installed package. */
 	Header header;
 	/* Epoch, version, release and architecture data for output. */
-	string installed_epoch, installed_version, installed_release,installed_architecture, installed_evr, installed_signature_keyid;
+	string installed_epoch, installed_version, installed_release,installed_architecture, 
+		installed_evr, installed_signature_keyid, installed_extended_name;
 
 	/* Create an rpm database transaction set. */
 	RpmtsGuard ts;
@@ -312,6 +314,10 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
 			(installed_version.empty() ? "0":installed_version) + '-' +
 			(installed_release.empty() ? "0":installed_release);
 
+		installed_extended_name = name + "-" + installedEpochEvr + ":" +
+			(installed_version.empty() ? "0":installed_version) + '-' +
+			(installed_release.empty() ? "0":installed_release) + "." + 
+			installed_architecture;
 		/* Put the data in a data object. */
 		auto_ptr<Item> item = ::CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
@@ -322,6 +328,18 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items) {
 		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, false, verStatus));
 		item->AppendElement(new ItemEntity("evr", installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("signature_keyid", installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, keyidStatus));
+		item->AppendElement(new ItemEntity("extended_name", installed_extended_name, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+
+		if (Behavior::GetBehaviorValue(beh, "filepaths") == "true"){
+			RpmfiGuard fileInfo(ts, header, RPMTAG_BASENAMES, name);
+			if (!rpmfiInit(fileInfo, 0))
+				throw ProbeException("Couldn't init file iterator on rpm '" + name + "'");
+
+			while(rpmfiNext(fileInfo) > -1) {
+				const char *fileName = rpmfiFN(fileInfo);
+				item->AppendElement(new ItemEntity("filepath", fileName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			}
+		}
 
 		/* add the new item to the vector. */
 		items->push_back(item.release());

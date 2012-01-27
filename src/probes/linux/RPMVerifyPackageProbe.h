@@ -27,65 +27,34 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
-//
 
-#include "Version.h"
+#ifndef RPMVERIFYPACKAGEPROBE_H
+#define RPMVERIFYPACKAGEPROBE_H
 
-using namespace std;
+#include "AbsProbe.h"
+#include <Item.h>
+#include <Object.h>
 
-// Define the version.  The build and date are automatically updated
-// prior to each build.
-//
-#define MAJOR_VERSION "5"
-#define MIN_COMPATIBLE_VERSION "5.0"
-#define VENDOR "The MITRE Corporation"
-#define VERSION "5.10.1"
-#define BUILD 1
+/**
+ * Implements the rpmverifypackage_test.  The following behaviors in rpmverifypackage_object
+ * are not implemented: nodigest and nosignature.  They are not implemented because they require
+ * comparison against a .rpm package file which is not specified in the object.
+ */
+class RPMVerifyPackageProbe : public AbsProbe {
+public:
+	virtual ~RPMVerifyPackageProbe();       
 
-#define SCHEMA_VERSION "5.10.1"
+	virtual ItemVector* CollectItems(Object* object);
 
-string Version::GetMinumumCompatibleVersion() {
+	/** Ensure that the RPMVerifyPackageProbe is a singleton. */
+	static AbsProbe* Instance();
 
-	string minVersion;
-	minVersion.append(MIN_COMPATIBLE_VERSION);
-    return(minVersion);
-}
+private:
+	RPMVerifyPackageProbe();
+    
+	virtual Item* CreateItem();
 
-string Version::GetVendor() {
+	static RPMVerifyPackageProbe *instance;
+};
 
-	string vendor;
-	vendor.append(VENDOR);
-    return(vendor);
-}
-
-string Version::GetVersion() {
-
-	string version;
-	version.append(VERSION);
-    return(version);
-}
-
-string Version::GetBuild() {
-	
-	string build;
-	ostringstream bld;
-	bld << BUILD;
-	build.append(bld.str());
-    return(build);
-}
-
-string Version::GetBuildDate() {
-
-	string buildDate;
-	buildDate.append(__DATE__);
-	buildDate.append(" ");
-	buildDate.append(__TIME__);
-    return(buildDate);
-}
-
-string Version::GetSchemaVersion() {
-
-	string schemaVersion;
-	schemaVersion.append(VERSION);
-    return(schemaVersion);
-}
+#endif

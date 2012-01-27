@@ -100,6 +100,10 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = RPMInfoProbe::Instance();
 	} else if (objectName.compare("rpmverify_object") == 0) {
 		probe = RPMVerifyProbe::Instance();
+	} else if (objectName.compare("rpmverifyfile_object") == 0) {
+		probe = RPMVerifyFileProbe::Instance();
+	} else if (objectName.compare("rpmverifypackage_object") == 0) {
+	        probe = RPMVerifyPackageProbe::Instance();
 #endif
 	} else if (objectName.compare("partition_object") == 0) {
 		probe = PartitionProbe::Instance();

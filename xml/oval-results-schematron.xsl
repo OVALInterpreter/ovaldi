@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<axsl:stylesheet xmlns:axsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:schold="http://www.ascc.net/xml/schematron" xmlns:iso="http://purl.oclc.org/dsdl/schematron" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" version="1.0"><!--Implementers: please note that overriding process-prolog or process-root is 
+<axsl:stylesheet xmlns:axsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:sch="http://www.ascc.net/xml/schematron" xmlns:iso="http://purl.oclc.org/dsdl/schematron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5" version="1.0"><!--Implementers: please note that overriding process-prolog or process-root is 
     the preferred method for meta-stylesheets to use where possible. -->
 
    <axsl:param name="archiveDirParameter"/>
    <axsl:param name="archiveNameParameter"/>
    <axsl:param name="fileNameParameter"/>
    <axsl:param name="fileDirParameter"/>
-   <axsl:variable name="document-uri">
-      <axsl:value-of select="document-uri(/)"/>
-   </axsl:variable>
 
 <!--PHASES-->
 
@@ -16,10 +13,7 @@
 <!--PROLOG-->
 
 
-<!--XSD TYPES FOR XSLT2-->
-
-
-<!--KEYS AND FUNCTIONS-->
+<!--KEYS-->
 
 
 <!--DEFAULT RULES-->
@@ -47,6 +41,8 @@
          <axsl:otherwise>
             <axsl:text>*[local-name()='</axsl:text>
             <axsl:value-of select="local-name()"/>
+            <axsl:text>' and namespace-uri()='</axsl:text>
+            <axsl:value-of select="namespace-uri()"/>
             <axsl:text>']</axsl:text>
             <axsl:variable name="p_2" select="1+   count(preceding-sibling::*[local-name()=local-name(current())])"/>
             <axsl:if test="$p_2&gt;1 or following-sibling::*[local-name()=local-name(current())]">[<axsl:value-of select="$p_2"/>]</axsl:if>
@@ -84,23 +80,6 @@
       <axsl:if test="not(self::*)">
          <axsl:text/>/@<axsl:value-of select="name(.)"/>
       </axsl:if>
-   </axsl:template><!--MODE: SCHEMATRON-FULL-PATH-3-->
-<!--This mode can be used to generate prefixed XPath for humans 
-	(Top-level element has index)-->
-
-   <axsl:template match="node() | @*" mode="schematron-get-full-path-3">
-      <axsl:for-each select="ancestor-or-self::*">
-         <axsl:text>/</axsl:text>
-         <axsl:value-of select="name(.)"/>
-         <axsl:if test="parent::*">
-            <axsl:text>[</axsl:text>
-            <axsl:value-of select="count(preceding-sibling::*[name(.)=name(current())])+1"/>
-            <axsl:text>]</axsl:text>
-         </axsl:if>
-      </axsl:for-each>
-      <axsl:if test="not(self::*)">
-         <axsl:text/>/@<axsl:value-of select="name(.)"/>
-      </axsl:if>
    </axsl:template>
 
 <!--MODE: GENERATE-ID-FROM-PATH -->
@@ -126,6 +105,23 @@
       <axsl:apply-templates select="parent::*" mode="generate-id-from-path"/>
       <axsl:text>.</axsl:text>
       <axsl:value-of select="concat('.',name(),'-',1+count(preceding-sibling::*[name()=name(current())]),'-')"/>
+   </axsl:template><!--MODE: SCHEMATRON-FULL-PATH-3-->
+<!--This mode can be used to generate prefixed XPath for humans 
+	(Top-level element has index)-->
+
+   <axsl:template match="node() | @*" mode="schematron-get-full-path-3">
+      <axsl:for-each select="ancestor-or-self::*">
+         <axsl:text>/</axsl:text>
+         <axsl:value-of select="name(.)"/>
+         <axsl:if test="parent::*">
+            <axsl:text>[</axsl:text>
+            <axsl:value-of select="count(preceding-sibling::*[name(.)=name(current())])+1"/>
+            <axsl:text>]</axsl:text>
+         </axsl:if>
+      </axsl:for-each>
+      <axsl:if test="not(self::*)">
+         <axsl:text/>/@<axsl:value-of select="name(.)"/>
+      </axsl:if>
    </axsl:template>
 
 <!--MODE: GENERATE-ID-2 -->
@@ -151,7 +147,7 @@
    </axsl:template><!--Strip characters-->
    <axsl:template match="text()" priority="-1"/>
 
-<!--SCHEMA SETUP-->
+<!--SCHEMA METADATA-->
 
    <axsl:template match="/">
       <axsl:apply-templates select="/" mode="M10"/>
@@ -198,11 +194,11 @@
          <axsl:text/> ATTRIBUTE VALUE:
                                         <axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M10"/>
+      <axsl:apply-templates select="@*|*" mode="M10"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M10"/>
    <axsl:template match="@*|node()" priority="-2" mode="M10">
-      <axsl:apply-templates select="*" mode="M10"/>
+      <axsl:apply-templates select="@*|*" mode="M10"/>
    </axsl:template>
 
 <!--PATTERN oval-res_directives_include_oval_definitions-->
@@ -221,7 +217,7 @@
                                              <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M11"/>
+      <axsl:apply-templates select="@*|*" mode="M11"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -237,11 +233,11 @@
                                              <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M11"/>
+      <axsl:apply-templates select="@*|*" mode="M11"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M11"/>
    <axsl:template match="@*|node()" priority="-2" mode="M11">
-      <axsl:apply-templates select="*" mode="M11"/>
+      <axsl:apply-templates select="@*|*" mode="M11"/>
    </axsl:template>
 
 <!--PATTERN oval-res_system-->
@@ -260,7 +256,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M12"/>
+      <axsl:apply-templates select="@*|*" mode="M12"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -276,11 +272,11 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M12"/>
+      <axsl:apply-templates select="@*|*" mode="M12"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M12"/>
    <axsl:template match="@*|node()" priority="-2" mode="M12">
-      <axsl:apply-templates select="*" mode="M12"/>
+      <axsl:apply-templates select="@*|*" mode="M12"/>
    </axsl:template>
 
 <!--PATTERN oval-res_mask_rule-->
@@ -301,11 +297,11 @@
             <axsl:text/> entity should only be supplied if the mask attribute is 'false'.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M13"/>
+      <axsl:apply-templates select="@*|*" mode="M13"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M13"/>
    <axsl:template match="@*|node()" priority="-2" mode="M13">
-      <axsl:apply-templates select="*" mode="M13"/>
+      <axsl:apply-templates select="@*|*" mode="M13"/>
    </axsl:template>
 
 <!--PATTERN oval-res_directives-->
@@ -340,7 +336,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -372,7 +368,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -404,7 +400,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -436,7 +432,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -468,7 +464,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -500,7 +496,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -532,7 +528,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -564,7 +560,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -596,7 +592,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -628,7 +624,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -660,7 +656,7 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -692,11 +688,11 @@
                               <axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M14"/>
    <axsl:template match="@*|node()" priority="-2" mode="M14">
-      <axsl:apply-templates select="*" mode="M14"/>
+      <axsl:apply-templates select="@*|*" mode="M14"/>
    </axsl:template>
 
 <!--PATTERN oval-res_testids-->
@@ -717,11 +713,11 @@
             <axsl:text/> - the specified test is not used in any definition's criteria<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M15"/>
+      <axsl:apply-templates select="@*|*" mode="M15"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M15"/>
    <axsl:template match="@*|node()" priority="-2" mode="M15">
-      <axsl:apply-templates select="*" mode="M15"/>
+      <axsl:apply-templates select="@*|*" mode="M15"/>
    </axsl:template>
 
 <!--PATTERN oval-def_empty_def_doc-->
@@ -738,11 +734,11 @@
          <axsl:otherwise>A valid OVAL Definition document must contain at least one definitions, tests, objects, states, or variables element. The optional definitions, tests, objects, states, and variables sections define the specific characteristics that should be evaluated on a system to determine the truth values of the OVAL Definition Document. To be valid though, at least one definitions, tests, objects, states, or variables element must be present.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M16"/>
+      <axsl:apply-templates select="@*|*" mode="M16"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M16"/>
    <axsl:template match="@*|node()" priority="-2" mode="M16">
-      <axsl:apply-templates select="*" mode="M16"/>
+      <axsl:apply-templates select="@*|*" mode="M16"/>
    </axsl:template>
 
 <!--PATTERN oval-def_required_criteria-->
@@ -759,11 +755,11 @@
          <axsl:otherwise>A valid OVAL Definition must contain a criteria unless the definition is a deprecated definition.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M17"/>
+      <axsl:apply-templates select="@*|*" mode="M17"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M17"/>
    <axsl:template match="@*|node()" priority="-2" mode="M17">
-      <axsl:apply-templates select="*" mode="M17"/>
+      <axsl:apply-templates select="@*|*" mode="M17"/>
    </axsl:template>
 
 <!--PATTERN oval-def_test_type-->
@@ -784,11 +780,11 @@
             <axsl:text/> - No state should be referenced when check_existence has a value of 'none_exist'.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M18"/>
+      <axsl:apply-templates select="@*|*" mode="M18"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M18"/>
    <axsl:template match="@*|node()" priority="-2" mode="M18">
-      <axsl:apply-templates select="*" mode="M18"/>
+      <axsl:apply-templates select="@*|*" mode="M18"/>
    </axsl:template>
 
 <!--PATTERN oval-def_setobjref-->
@@ -809,7 +805,7 @@
             <axsl:text/> - Each object referenced by the set must be of the same type as parent object<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M19"/>
+      <axsl:apply-templates select="@*|*" mode="M19"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -827,7 +823,7 @@
             <axsl:text/> - Each object referenced by the set must be of the same type as parent object<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M19"/>
+      <axsl:apply-templates select="@*|*" mode="M19"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -845,11 +841,11 @@
             <axsl:text/> - Each object referenced by the set must be of the same type as parent object<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M19"/>
+      <axsl:apply-templates select="@*|*" mode="M19"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M19"/>
    <axsl:template match="@*|node()" priority="-2" mode="M19">
-      <axsl:apply-templates select="*" mode="M19"/>
+      <axsl:apply-templates select="@*|*" mode="M19"/>
    </axsl:template>
 
 <!--PATTERN oval-def_literal_component-->
@@ -870,11 +866,11 @@
             <axsl:text/> - The 'record' datatype is prohibited on variables.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M20"/>
+      <axsl:apply-templates select="@*|*" mode="M20"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M20"/>
    <axsl:template match="@*|node()" priority="-2" mode="M20">
-      <axsl:apply-templates select="*" mode="M20"/>
+      <axsl:apply-templates select="@*|*" mode="M20"/>
    </axsl:template>
 
 <!--PATTERN oval-def_arithmeticfunctionrules-->
@@ -891,7 +887,7 @@
          <axsl:otherwise>A literal_component used by an arithmetic function must have a datatype of float or int.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M21"/>
+      <axsl:apply-templates select="@*|*" mode="M21"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -906,11 +902,11 @@
          <axsl:otherwise>The variable referenced by the arithmetic function must have a datatype of float or int.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M21"/>
+      <axsl:apply-templates select="@*|*" mode="M21"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M21"/>
    <axsl:template match="@*|node()" priority="-2" mode="M21">
-      <axsl:apply-templates select="*" mode="M21"/>
+      <axsl:apply-templates select="@*|*" mode="M21"/>
    </axsl:template>
 
 <!--PATTERN oval-def_beginfunctionrules-->
@@ -927,7 +923,7 @@
          <axsl:otherwise>A literal_component used by the begin function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M22"/>
+      <axsl:apply-templates select="@*|*" mode="M22"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -942,11 +938,11 @@
          <axsl:otherwise>The variable referenced by the begin function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M22"/>
+      <axsl:apply-templates select="@*|*" mode="M22"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M22"/>
    <axsl:template match="@*|node()" priority="-2" mode="M22">
-      <axsl:apply-templates select="*" mode="M22"/>
+      <axsl:apply-templates select="@*|*" mode="M22"/>
    </axsl:template>
 
 <!--PATTERN oval-def_concatfunctionrules-->
@@ -963,7 +959,7 @@
          <axsl:otherwise>A literal_component used by the concat function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M23"/>
+      <axsl:apply-templates select="@*|*" mode="M23"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -978,11 +974,11 @@
          <axsl:otherwise>The variable referenced by the concat function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M23"/>
+      <axsl:apply-templates select="@*|*" mode="M23"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M23"/>
    <axsl:template match="@*|node()" priority="-2" mode="M23">
-      <axsl:apply-templates select="*" mode="M23"/>
+      <axsl:apply-templates select="@*|*" mode="M23"/>
    </axsl:template>
 
 <!--PATTERN oval-def_endfunctionrules-->
@@ -999,7 +995,7 @@
          <axsl:otherwise>A literal_component used by the end function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M24"/>
+      <axsl:apply-templates select="@*|*" mode="M24"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1014,11 +1010,11 @@
          <axsl:otherwise>The variable referenced by the end function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M24"/>
+      <axsl:apply-templates select="@*|*" mode="M24"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M24"/>
    <axsl:template match="@*|node()" priority="-2" mode="M24">
-      <axsl:apply-templates select="*" mode="M24"/>
+      <axsl:apply-templates select="@*|*" mode="M24"/>
    </axsl:template>
 
 <!--PATTERN oval-def_escaperegexfunctionrules-->
@@ -1035,7 +1031,7 @@
          <axsl:otherwise>A literal_component used by the escape_regex function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M25"/>
+      <axsl:apply-templates select="@*|*" mode="M25"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1050,11 +1046,11 @@
          <axsl:otherwise>The variable referenced by the escape_regex function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M25"/>
+      <axsl:apply-templates select="@*|*" mode="M25"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M25"/>
    <axsl:template match="@*|node()" priority="-2" mode="M25">
-      <axsl:apply-templates select="*" mode="M25"/>
+      <axsl:apply-templates select="@*|*" mode="M25"/>
    </axsl:template>
 
 <!--PATTERN oval-def_splitfunctionrules-->
@@ -1071,7 +1067,7 @@
          <axsl:otherwise>A literal_component used by the split function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M26"/>
+      <axsl:apply-templates select="@*|*" mode="M26"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1086,11 +1082,11 @@
          <axsl:otherwise>The variable referenced by the split function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M26"/>
+      <axsl:apply-templates select="@*|*" mode="M26"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M26"/>
    <axsl:template match="@*|node()" priority="-2" mode="M26">
-      <axsl:apply-templates select="*" mode="M26"/>
+      <axsl:apply-templates select="@*|*" mode="M26"/>
    </axsl:template>
 
 <!--PATTERN oval-def_substringfunctionrules-->
@@ -1107,7 +1103,7 @@
          <axsl:otherwise>A literal_component used by the substring function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M27"/>
+      <axsl:apply-templates select="@*|*" mode="M27"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1122,11 +1118,11 @@
          <axsl:otherwise>The variable referenced by the substring function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M27"/>
+      <axsl:apply-templates select="@*|*" mode="M27"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M27"/>
    <axsl:template match="@*|node()" priority="-2" mode="M27">
-      <axsl:apply-templates select="*" mode="M27"/>
+      <axsl:apply-templates select="@*|*" mode="M27"/>
    </axsl:template>
 
 <!--PATTERN oval-def_timedifferencefunctionrules-->
@@ -1143,7 +1139,7 @@
          <axsl:otherwise>A literal_component used by the time_difference function must have a datatype of string or int.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M28"/>
+      <axsl:apply-templates select="@*|*" mode="M28"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1158,11 +1154,11 @@
          <axsl:otherwise>The variable referenced by the time_difference function must have a datatype of string or int.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M28"/>
+      <axsl:apply-templates select="@*|*" mode="M28"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M28"/>
    <axsl:template match="@*|node()" priority="-2" mode="M28">
-      <axsl:apply-templates select="*" mode="M28"/>
+      <axsl:apply-templates select="@*|*" mode="M28"/>
    </axsl:template>
 
 <!--PATTERN oval-def_regexcapturefunctionrules-->
@@ -1179,7 +1175,7 @@
          <axsl:otherwise>A literal_component used by the regex_capture function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M29"/>
+      <axsl:apply-templates select="@*|*" mode="M29"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1194,11 +1190,11 @@
          <axsl:otherwise>The variable referenced by the regex_capture function must have a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M29"/>
+      <axsl:apply-templates select="@*|*" mode="M29"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M29"/>
    <axsl:template match="@*|node()" priority="-2" mode="M29">
-      <axsl:apply-templates select="*" mode="M29"/>
+      <axsl:apply-templates select="@*|*" mode="M29"/>
    </axsl:template>
 
 <!--PATTERN oval-def_definition_entity_rules-->
@@ -1234,7 +1230,7 @@
             <axsl:text/> - inconsistent datatype between the variable and an associated var_ref<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1251,7 +1247,7 @@
          <axsl:value-of select="name()"/>
          <axsl:text/> entity so a var_check should also be provided<axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1271,7 +1267,7 @@
             <axsl:text/> entity so a var_ref must also be provided<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1288,7 +1284,7 @@
          <axsl:value-of select="name()"/>
          <axsl:text/> entity so a var_check should also be provided<axsl:value-of select="string('&#xA;')"/>
       </axsl:if>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1308,7 +1304,7 @@
             <axsl:text/> entity so a var_ref must also be provided<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1330,7 +1326,7 @@
             <axsl:text/> entity is not valid given the lack of a declared datatype (hence a default datatype of string).<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1352,7 +1348,7 @@
             <axsl:text/> entity is not valid given a datatype of binary.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1374,7 +1370,7 @@
             <axsl:text/> entity is not valid given a datatype of boolean.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1396,7 +1392,7 @@
             <axsl:text/> entity is not valid given a datatype of evr_string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1418,7 +1414,7 @@
             <axsl:text/> entity is not valid given a datatype of fileset_revision.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1440,7 +1436,7 @@
             <axsl:text/> entity is not valid given a datatype of float.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1462,7 +1458,7 @@
             <axsl:text/> entity is not valid given a datatype of ios_version.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1484,7 +1480,7 @@
             <axsl:text/> entity is not valid given a datatype of int.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1506,7 +1502,7 @@
             <axsl:text/> entity is not valid given a datatype of ipv4_address.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1528,7 +1524,7 @@
             <axsl:text/> entity is not valid given a datatype of ipv6_address.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1550,7 +1546,7 @@
             <axsl:text/> entity is not valid given a datatype of string.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1572,7 +1568,7 @@
             <axsl:text/> entity is not valid given a datatype of version.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1594,11 +1590,11 @@
             <axsl:text/> entity is not valid given a datatype of record.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M30"/>
    <axsl:template match="@*|node()" priority="-2" mode="M30">
-      <axsl:apply-templates select="*" mode="M30"/>
+      <axsl:apply-templates select="@*|*" mode="M30"/>
    </axsl:template>
 
 <!--PATTERN oval-def_no_var_ref_with_records-->
@@ -1619,11 +1615,11 @@
             <axsl:text/> - The use of var_ref is prohibited when the datatype is 'record'.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M31"/>
+      <axsl:apply-templates select="@*|*" mode="M31"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M31"/>
    <axsl:template match="@*|node()" priority="-2" mode="M31">
-      <axsl:apply-templates select="*" mode="M31"/>
+      <axsl:apply-templates select="@*|*" mode="M31"/>
    </axsl:template>
 
 <!--PATTERN oval-def_definition_entity_type_check_rules-->
@@ -1646,11 +1642,11 @@
             <axsl:text/> entity is 'int' but the value is not an integer.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M32"/>
+      <axsl:apply-templates select="@*|*" mode="M32"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M32"/>
    <axsl:template match="@*|node()" priority="-2" mode="M32">
-      <axsl:apply-templates select="*" mode="M32"/>
+      <axsl:apply-templates select="@*|*" mode="M32"/>
    </axsl:template>
 
 <!--PATTERN oval-sc_entity_rules-->
@@ -1671,7 +1667,7 @@
             <axsl:text/> entity should only be supplied if the status attribute is 'exists'<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M33"/>
+      <axsl:apply-templates select="@*|*" mode="M33"/>
    </axsl:template>
 
 	<!--RULE -->
@@ -1691,10 +1687,10 @@
             <axsl:text/> entity is 'int' but the value is not an integer.<axsl:value-of select="string('&#xA;')"/>
          </axsl:otherwise>
       </axsl:choose>
-      <axsl:apply-templates select="*" mode="M33"/>
+      <axsl:apply-templates select="@*|*" mode="M33"/>
    </axsl:template>
    <axsl:template match="text()" priority="-1" mode="M33"/>
    <axsl:template match="@*|node()" priority="-2" mode="M33">
-      <axsl:apply-templates select="*" mode="M33"/>
+      <axsl:apply-templates select="@*|*" mode="M33"/>
    </axsl:template>
 </axsl:stylesheet>

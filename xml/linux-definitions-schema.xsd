@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" elementFormDefault="qualified" version="5.10">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:sch="http://purl.oclc.org/dsdl/schematron" targetNamespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" elementFormDefault="qualified" version="5.10.1">
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5" schemaLocation="oval-definitions-schema.xsd"/>
      <xsd:import namespace="http://oval.mitre.org/XMLSchema/oval-common-5" schemaLocation="oval-common-schema.xsd"/>
      <xsd:annotation>
@@ -7,9 +7,9 @@
           <xsd:documentation>The OVAL Schema is maintained by The MITRE Corporation and developed by the public OVAL Community. For more information, including how to get involved in the project and how to submit change requests, please visit the OVAL website at http://oval.mitre.org.</xsd:documentation>
           <xsd:appinfo>
                <schema>Linux Definition</schema>
-               <version>5.10</version>
-               <date>9/14/2011 8:58:23 AM</date>
-                <terms_of_use>Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
+               <version>5.10.1</version>
+               <date>1/27/2012 1:22:32 PM</date>
+                <terms_of_use>Copyright (c) 2002-2012, The MITRE Corporation. All rights reserved.  The contents of this file are subject to the terms of the OVAL License located at http://oval.mitre.org/oval/about/termsofuse.html. See the OVAL License for the specific language governing permissions and limitations for use of this schema.  When distributing copies of the OVAL Schema, this license header must be included.</terms_of_use>
                <sch:ns prefix="oval-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
                <sch:ns prefix="linux-def" uri="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"/>
                <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -414,7 +414,7 @@
                               </xsd:element>
                               <xsd:element name="foreign_port" type="oval-def:EntityStateIntType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
-                                        <xsd:documentation>This is the TCP or UDP port to which the program communicates. In the case of a listening program accepting new connections, this is usually a *.</xsd:documentation>
+                                        <xsd:documentation>This is the TCP or UDP port to which the program communicates. In the case of a listening program accepting new connections, the value will be 0.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="foreign_full_address" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
@@ -1104,12 +1104,12 @@
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
                                         <xsd:element name="behaviors" type="linux-def:RpmVerifyFileBehaviors" minOccurs="0" maxOccurs="1"/>
-                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the package name to check.</xsd:documentation>
                                              </xsd:annotation>
                                         </xsd:element>
-                                        <xsd:element name="epoch" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="epoch">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) the string '(none)' should be used.. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
                                              </xsd:annotation>
@@ -1128,7 +1128,7 @@
                                                   </xsd:simpleContent>
                                              </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element name="version" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="version">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
                                              </xsd:annotation>
@@ -1147,7 +1147,7 @@
                                                   </xsd:simpleContent>
                                              </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element name="release" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="release">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
                                              </xsd:annotation>
@@ -1166,7 +1166,7 @@
                                                   </xsd:simpleContent>
                                              </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element name="arch" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="arch" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
                                              </xsd:annotation>
@@ -1460,12 +1460,12 @@
                                    <xsd:element ref="oval-def:set"/>
                                    <xsd:sequence>
                                         <xsd:element name="behaviors" type="linux-def:RpmVerifyPackageBehaviors" minOccurs="0" maxOccurs="1"/>
-                                        <xsd:element name="name" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="name" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the package name to check.</xsd:documentation>
                                              </xsd:annotation>
                                         </xsd:element>
-                                        <xsd:element name="epoch" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="epoch">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the epoch number of the RPM, this is used as a kludge for version-release comparisons where the vendor has done some kind of re-numbering or version forking. For a null epoch (or '(none)' as returned by rpm) the string '(none)' should be used.. This number is not revealed by a normal query of the RPM's information -- you must use a formatted rpm query command to gather this data from the command line, like so. For an already-installed RPM: rpm -q --qf '%{EPOCH}\n' installed_rpm For an RPM file that has not been installed: rpm -qp --qf '%{EPOCH}\n' rpm_file</xsd:documentation>
                                              </xsd:annotation>
@@ -1484,7 +1484,7 @@
                                                   </xsd:simpleContent>
                                              </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element name="version" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="version">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the version number of the build. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be 21.11.4.</xsd:documentation>
                                              </xsd:annotation>
@@ -1503,7 +1503,7 @@
                                                   </xsd:simpleContent>
                                              </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element name="release" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="release">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the release number of the build, changed by the vendor/builder.</xsd:documentation>
                                              </xsd:annotation>
@@ -1522,7 +1522,7 @@
                                                   </xsd:simpleContent>
                                              </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element name="arch" type="oval-def:EntityObjectStringType" minOccurs="0" maxOccurs="1">
+                                        <xsd:element name="arch" type="oval-def:EntityObjectStringType">
                                              <xsd:annotation>
                                                   <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
                                              </xsd:annotation>
@@ -1608,6 +1608,11 @@
                               <xsd:element name="arch" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
                                    <xsd:annotation>
                                         <xsd:documentation>This is the architecture for which the RPM was built, like : i386, ppc, sparc, noarch. In the case of an apache rpm named httpd-2.0.40-21.11.4.i686.rpm, this value would be i686.</xsd:documentation>
+                                   </xsd:annotation>
+                              </xsd:element>
+                              <xsd:element name="extended_name" type="oval-def:EntityStateStringType" minOccurs="0" maxOccurs="1">
+                                   <xsd:annotation>
+                                        <xsd:documentation>This represents the name, epoch, version, release, and architecture fields as a single version string. It has the form "NAME-EPOCH:VERSION-RELEASE.ARCHITECTURE". Note that a null epoch (or '(none)' as returned by rpm) is equivalent to '0' and would hence have the form NAME-0:VERSION-RELEASE.ARCHITECTURE.</xsd:documentation>
                                    </xsd:annotation>
                               </xsd:element>
                               <xsd:element name="dependency_check_passed" type="oval-def:EntityStateBoolType" minOccurs="0" maxOccurs="1">

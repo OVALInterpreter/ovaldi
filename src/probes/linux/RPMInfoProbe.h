@@ -90,8 +90,9 @@ private:
 		Get all the information for the named rpm.
 		@param[in] name a string representing the name of an rpm on the system.
 		@param[out] items The vector to which the item is appended.
+		@param[in] beh The list of behaviors associated with the rpm check.
 	*/
-	void GetRPMInfo(std::string name, ItemVector* items);
+	void GetRPMInfo(std::string name, ItemVector* items, BehaviorVector* beh);
 
 	/**
 	   Read readErrh and readh until there is no more data to be read. Wait for the 
@@ -114,3 +115,4 @@ private:
 };
 
 #endif
+

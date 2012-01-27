@@ -59,19 +59,21 @@ PACKAGE_DPKG = $(shell /usr/bin/env dpkg --version 2>/dev/null)
 SRC_DIRS = $(SRCDIR) $(LINUXDIR) $(UNIXPROBEDIR) $(LINUXPROBEDIR) $(INDEPENDENTPROBEDIR) $(UNIXDIR)
 CPP_FILES := $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
+# Selectively enable/disable packages rather than assume presence is mutually exclusive.
 ifneq (${PACKAGE_RPM}, )
 	LIBS += -lrpm -lrpmdb -lrpmio
 	CPPFLAGS += -DPACKAGE_RPM
-	CPP_FILES := $(filter-out %DPKGInfoProbe.cpp, $(CPP_FILES))
-else ifneq (${PACKAGE_DPKG}, )
+else
+	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
+	CPP_FILES := $(filter-out %RPMVerifyProbe.cpp, $(CPP_FILES))
+	CPP_FILES := $(filter-out %RPMVerifyFileProbe.cpp, $(CPP_FILES))
+	CPP_FILES := $(filter-out %RPMVerifyPackageProbe.cpp, $(CPP_FILES))
+endif
+ifneq (${PACKAGE_DPKG}, )
 	LIBS += -lapt-pkg
 	CPPFLAGS += -DPACKAGE_DPKG
-	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
-	CPP_FILES := $(filter-out %RPMVerifyProbe.cpp, $(CPP_FILES))
 else
 	CPP_FILES := $(filter-out %DPKGInfoProbe.cpp, $(CPP_FILES))
-	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
-	CPP_FILES := $(filter-out %RPMVerifyProbe.cpp, $(CPP_FILES))
 endif
 
 OBJ_FILES = $(CPP_FILES:.cpp=.o)

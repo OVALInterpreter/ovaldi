@@ -49,6 +49,8 @@
 #ifdef PACKAGE_RPM
  #include "RPMInfoProbe.h"
  #include "RPMVerifyProbe.h"
+ #include "RPMVerifyFileProbe.h" 
+ #include "RPMVerifyPackageProbe.h"
 #endif
 #ifdef PACKAGE_DPKG
  #include "DPKGInfoProbe.h"
