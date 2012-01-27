@@ -157,11 +157,11 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBinary(OvalEnum::Operation 
 
     // Validate the inputs align with the notion of binary regex = "[0-9a-fA-F]"
     REGEX myRegex;
-    if(!myRegex.IsMatch("[0-9a-fA-F]", defValue.c_str())) {
+    if(!myRegex.IsMatch("^[0-9a-fA-F]+$", defValue.c_str())) {
 		throw Exception("Error: Invalid binary value on definition entity. " + defValue);
 	}
 
-    if(!myRegex.IsMatch("[0-9a-fA-F]", scValue.c_str())) {
+    if(!myRegex.IsMatch("^[0-9a-fA-F]+$", scValue.c_str())) {
 		throw Exception("Error: Invalid binary value on system characteristics item entity. " + scValue);
 	}
 
