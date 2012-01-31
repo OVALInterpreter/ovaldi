@@ -165,13 +165,39 @@ namespace {
 	 * null for snapins.
 	 */
 	ref struct AvailableModule {
+		/**
+		 * Dunno if simply testing if Guid is null or not is sufficient...
+		 * it won't hurt to be explicit.  Turns out there is a whole
+		 * separate API for manipulating snapins, from the API for
+		 * modules.  So I gotta know which API to use.
+		 */
+		enum struct ModuleType {
+			MODULE,
+			SNAPIN
+		};
+
 		AvailableModule(String ^name, Guid ^guid, System::Version ^version)
 			: name(name), guid(guid), version(version) {
+				// safe to assume that null guid *always* means a snapin??
+				moduleType = guid == nullptr ? ModuleType::SNAPIN : 
+					ModuleType::MODULE;
+		}
+
+		AvailableModule(String ^name, System::Version ^version)
+			: name(name), guid(nullptr), version(version), 
+				moduleType(ModuleType::SNAPIN) {
+		}
+
+		virtual String ^ToString() override {
+			return moduleType.ToString()+":"+name+"/"+
+				(guid==nullptr?"":(guid+"/")) +
+				version;
 		}
 
 		String ^name;
 		Guid ^guid;
 		System::Version ^version;
+		ModuleType moduleType;
 	};
 
 	/**
@@ -244,7 +270,7 @@ namespace {
 	 * Attempts to import a module with the given name into the given
 	 * runspace.
 	 */
-	void ImportModule(Runspace ^runspace, String ^moduleName);
+	void ImportModule(Runspace ^runspace, AvailableModule ^module);
 
 	/**
 	 * Attempts to find the module or snapin which contains the given
@@ -430,8 +456,8 @@ ItemVector* CmdletProbe::CollectItems(::Object *object) {
 			nounIter != nouns.end();
 			++nounIter) {
 
-				if (Common::EqualsIgnoreCase(*verbIter, "Select") && 
-					Common::EqualsIgnoreCase(*nounIter, "Object")) {
+			if (Common::EqualsIgnoreCase(*verbIter, "Select") && 
+				Common::EqualsIgnoreCase(*nounIter, "Object")) {
 				Log::Info("Illegal cmdlet: Select-Object.  This is only usable indirectly via the select entity.  Ignoring...");
 				continue;
 			}
@@ -609,7 +635,8 @@ namespace {
 
 			// filter out the command if:
 			// - it's an alias
-			// -or- the verb is not allowed
+			// -or- the verb is not allowed (except if it is the Add-PSSnapin
+			//      cmdlet, which we need to support snapins)
 			//
 			// where "filter out" means just hiding it.  This allows legal
 			// cmdlets to call them as part of their implementation.
@@ -620,8 +647,14 @@ namespace {
 			// available modules as necessary.  Currently, all ought to be
 			// allowed automatically, since their verbs are legal, so no
 			// special action is necessary.
+			//
+			// Update: snapins require the use of totally separate commands: 
+			// Get-PSSnapin to list available snapins, and Add-PSSnapin to
+			// add them to our session.  "Add" is not one of our allowed
+			// verbs, but I will have to make an exception here so that we
+			// can support snapins.
 			if (cmd->CommandType == CommandTypes::Alias ||
-				!HasLegalVerb(cmd->Name))
+				(!HasLegalVerb(cmd->Name) && !cmd->Name->Equals("Add-PSSnapin")))
 				cmd->Visibility = SessionStateEntryVisibility::Private;
 /*			else
 				Log::Debug(marshal_as<string>(cmd->Name)+" passed");*/
@@ -642,7 +675,7 @@ namespace {
 			->AddCommand("Select-Object")->AddParameter("Property", 
 				gcnew array<String^> {"Name","Guid","Version"});
 
-		Collection<AvailableModule^> ^moduleNames = gcnew Collection<AvailableModule^>();
+		Collection<AvailableModule^> ^modules = gcnew Collection<AvailableModule^>();
 
 		try {
 			Collection<PSObject ^> ^results = ps->Invoke();
@@ -655,30 +688,81 @@ namespace {
 				Guid ^guid = guidObj == nullptr ? nullptr : safe_cast<Guid^>(guidObj);
 				System::Version ^version = safe_cast<System::Version^>(versionObj);
 
-				moduleNames->Add(gcnew AvailableModule(name, guid, version));
-
-				Log::Debug("Found module: " + marshal_as<string>(name) + "/"+
-					(guid==nullptr ? "(null)":marshal_as<string>(guid->ToString()))+
-					"/"+marshal_as<string>(version->ToString()));
+				modules->Add(gcnew AvailableModule(name, guid, version));
 			}
 		} catch(System::Exception ^e) {
 			Log::Info("Failed to get available powershell modules: " + 
 				marshal_as<string>(e->GetType()->FullName)+": " +
 				marshal_as<string>(e->Message));
 			Log::Info("No modules will be searched for commands.");
-			moduleNames->Clear();
+			modules->Clear();
 		} finally {
 			delete ps;
 		}
 
-		return moduleNames;
+		// run a separate command for getting snapins
+		ps = PowerShell::Create();
+		ps->Runspace = runspace;
+		ps->AddCommand("Get-PSSnapin")->AddParameter("Registered")
+			->AddCommand("Select-Object")->AddParameter("Property",
+				gcnew array<String^> {"Name", "Version"});
+
+		// capture into a 2nd collection, which we can clear on error.  So
+		// we'd lose the snapins, but not the modules, if getting the modules
+		// was successful.
+		Collection<AvailableModule^> ^snapins = gcnew Collection<AvailableModule^>();
+		try {
+			Collection<PSObject ^> ^results = ps->Invoke();
+			for each (PSObject ^result in results) {
+				System::Object ^nameObj = result->Properties["Name"]->Value;
+				System::Object ^versionObj = result->Properties["Version"]->Value;
+
+				String ^name = safe_cast<String^>(nameObj);
+				System::Version ^version = safe_cast<System::Version^>(versionObj);
+
+				snapins->Add(gcnew AvailableModule(name, version));
+			}
+
+			// No addAll() equivalent on collections???
+			for each (AvailableModule ^snapin in snapins)
+				modules->Add(snapin);
+
+		} catch(System::Exception ^e) {
+			Log::Info("Failed to get available powershell snapins: " + 
+				marshal_as<string>(e->GetType()->FullName)+": " +
+				marshal_as<string>(e->Message));
+			Log::Info("No snapins will be searched for commands.");
+		} finally {
+			delete ps;
+		}
+
+		for each (AvailableModule ^mod in modules)
+			Log::Debug("Found "+marshal_as<string>(mod->ToString()));
+
+		return modules;
 	}
 
-	void ImportModule(Runspace ^runspace, String ^moduleName) {
+	void ImportModule(Runspace ^runspace, AvailableModule ^module) {
+		Log::Debug("Importing "+marshal_as<string>(module->ToString()));
 		PowerShell ^ps = PowerShell::Create();
 		try {
 			ps->Runspace = runspace;
-			ps->AddCommand("Import-Module")->AddParameter("Name", moduleName);
+
+			switch (module->moduleType) {
+			case AvailableModule::ModuleType::MODULE:
+				ps->AddCommand("Import-Module")->AddParameter("Name", module->name);
+				break;
+			case AvailableModule::ModuleType::SNAPIN:
+				// we made special provisions to make sure this command with an
+				// otherwise-disallowed verb will run.
+				ps->AddCommand("Add-PSSnapin")->AddParameter("Name", module->name);
+				break;
+			default:
+				Log::Info("Unhandled module type; will not be imported: " +
+					marshal_as<string>(module->moduleType.ToString()));
+				return;
+			}
+
 			ps->Invoke();
 		} finally {
 			delete ps;
@@ -728,13 +812,10 @@ namespace {
 				dumbhack = availMod->name;
 				modNameIe.SetValue(marshal_as<string>(dumbhack));
 
-				if (availMod->guid != nullptr) {
-					dumbhack = availMod->guid->ToString();
-					modIdIe.SetValue(marshal_as<string>(dumbhack));
-				}
+				if (availMod->guid != nullptr)
+					modIdIe.SetValue(marshal_as<string>(availMod->guid->ToString()));
 
-				dumbhack = availMod->version->ToString();
-				modVersionIe.SetValue(marshal_as<string>(dumbhack));
+				modVersionIe.SetValue(marshal_as<string>(availMod->version->ToString()));
 
 				bool match =
 					(modNameObjEntity->GetNil() || 
@@ -744,11 +825,8 @@ namespace {
 					(modVersionObjEntity->GetNil() || 
 						(modVersionObjEntity->Analyze(&modVersionIe) == OvalEnum::RESULT_TRUE));
 
-				if (match) {
-					dumbhack = availMod->name;
-					Log::Debug("Importing module: "+marshal_as<string>(dumbhack));
-					ImportModule(runspace, availMod->name);
-				}
+				if (match)
+					ImportModule(runspace, availMod);
 			}
 
 			// after all matching modules are imported, try once again
