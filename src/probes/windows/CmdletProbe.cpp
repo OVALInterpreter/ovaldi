@@ -56,13 +56,23 @@ using namespace msclr::interop;
 // exceptions to unmanaged ones.
 #define MANAGED_EXCEPTION_GUARD_BEGIN \
 	try {
+
+// Exceptions of an unmanaged type automatically get wrapped in
+// SEHException, and if a catch clause of suitable unmanaged type
+// is encountered, the SEHException is automatically unwrapped again.
+// But if a matching managed-type catch clause is encountered, it gets
+// the raw SEHException.  We want to let unmanaged exceptions pass
+// through and let the automatic wrap/unwrap mechanism work, so we
+// can't let the base catch(System::Exception ^) clause catch
+// SEHExceptions.  So we have a special catch clause for SEHException.
 #define MANAGED_EXCEPTION_GUARD_END \
+	} catch(System::Runtime::InteropServices::SEHException ^) { \
+		throw; \
 	} catch (System::Exception ^e) { \
 		throw ::Exception("Managed exception " + \
 			marshal_as<string>(e->GetType()->FullName) + " occurred: " + \
 			marshal_as<string>(e->Message)); \
 	}
-
 
 namespace {
 	/**
@@ -232,18 +242,17 @@ namespace {
 	};
 
 	/**
-	 * Gets available modules (via the Get-Module cmdlet) and returns
-	 * info about them.  This function is called by the ManagedGlobals
-	 * static constructor.  Snapins are not looked up; there doesn't
-	 * seem to be an "Import-Snapin" command anyway.  Maybe they don't
-	 * need importing... I dunno how this stuff works :-P
+	 * Gets available modules (via the Get-Module cmdlet) and snapins
+	 * (via the Get-PSSnapin cmdlet) and returns info about them.
 	 */
 	Collection<AvailableModule^>^ GetAvailableModules(Runspace ^runspace);
 
 	/**
 	 * Creates a restricted runspace: all cmdlets which don't satisfy
 	 * certain criteria are removed.  This uses the white-list of
-	 * verbs, and filters out aliases.
+	 * verbs, and filters out aliases.  The Add-PSSnapin cmdlet is
+	 * allowed even though its verb is not allowed, to support
+	 * snapins.
 	 * <p>
 	 * Logic for this is mostly copied from sample code from Microsoft.
 	 *
@@ -260,6 +269,14 @@ namespace {
 	 * \return true if the cmdlet has a legal verb, false if not.
 	 */
 	bool HasLegalVerb(String ^cmdletName);
+
+	/**
+	 * Checks whether the given verb is in the white-list of allowed
+	 * verbs.  Comparisons are done case-insensitively.
+	 *
+	 * \return true if the verb is in the white-list, false if not.
+	 */
+	bool IsLegalVerb(String ^verb);
 
 	/**
 	 * Creates an item.
@@ -409,6 +426,17 @@ ItemVector* CmdletProbe::CollectItems(::Object *object) {
 		/*OvalEnum::Flag flag =*/ paramsObjEntity->GetEntityValues(params);
 	if (!selectObjEntity->GetNil())
 		/*OvalEnum::Flag flag =*/ selectObjEntity->GetEntityValues(selects);
+
+	// Before going any farther, make sure the given verbs are legal.  If we
+	// just let this go, the cmdlet will not be found due to the restricted
+	// runspace, which will result in a collected object flag of "does not exist".
+	// That's the wrong behavior; it should be error.  So we check it here
+	// and throw an exception, which will cause an error flag.
+	for (StringVector::iterator verbIter = verbs.begin();
+		verbIter != verbs.end();
+		++verbIter)
+		if (!IsLegalVerb(marshal_as<String^>(*verbIter)))
+			throw ProbeException("Illegal cmdlet verb encountered: "+*verbIter);
 
 	// I decided against reusing a global runspace, because the potential
 	// module importing that would be done could change collection behavior
@@ -613,6 +641,15 @@ namespace {
 		return false;
 	}
 
+	bool IsLegalVerb(String ^verb) {
+		for each (String ^legalVerb in ManagedGlobals::LEGAL_VERBS) {
+			if (verb->Equals(legalVerb, StringComparison::OrdinalIgnoreCase))
+				return true;
+		}
+
+		return false;
+	}
+
 	auto_ptr<Item> CreateItem() {
 		return auto_ptr<Item>(new Item(0, 
 							"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#windows", 
@@ -707,7 +744,7 @@ namespace {
 			->AddCommand("Select-Object")->AddParameter("Property",
 				gcnew array<String^> {"Name", "Version"});
 
-		// capture into a 2nd collection, which we can clear on error.  So
+		// capture into a 2nd collection, which we can drop/delete on error.  So
 		// we'd lose the snapins, but not the modules, if getting the modules
 		// was successful.
 		Collection<AvailableModule^> ^snapins = gcnew Collection<AvailableModule^>();
