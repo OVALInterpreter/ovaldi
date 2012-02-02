@@ -540,6 +540,45 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 				break;
 			}
+			
+		case REG_NONE:
+			{
+				item->AppendMessage(new OvalMessage("Values of type reg_none do not have a defined type. As a result, we are representing them as hexadecimal values."));
+				item->AppendElement(new ItemEntity("type",  "reg_none", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+
+				// The buffer must be three bytes long, two bytes for each hex charater in the
+				// binary data, and one byte for the terminating NULL character.
+				char binaryBuf[3];
+
+				// Loop through each hex character.  Make sure the buffer is NULL terminated.
+				// Also make sure 0 is in the form 00, and 1 is 01, etc.
+				string value = "";
+				for (DWORD x=0; x<valuelenIn; x++) {
+
+					ZeroMemory(binaryBuf, sizeof(binaryBuf));
+					_snprintf(binaryBuf, sizeof(binaryBuf)-1, "%x", valueIn[x]);
+					binaryBuf[sizeof(binaryBuf)-1] = '\0';
+					if (strlen(binaryBuf) == 1) 
+						value.append("0");
+					value.append(binaryBuf);
+				}
+				item->AppendElement(new ItemEntity("value",  value, OvalEnum::DATATYPE_BINARY, false, OvalEnum::STATUS_EXISTS));
+
+				break;
+			}
+
+		case REG_QWORD:
+			{
+				char dwordBuf[40];
+
+				ZeroMemory(dwordBuf, sizeof(dwordBuf));
+				_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%llu", *((ULONG64 *)valueIn));
+				dwordBuf[sizeof(dwordBuf)-1] = '\0';
+
+				item->AppendElement(new ItemEntity("type",  "reg_qword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value",  dwordBuf, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+				break;
+			}
 
 		default:
 			{
