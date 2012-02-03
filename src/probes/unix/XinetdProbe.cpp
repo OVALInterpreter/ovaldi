@@ -549,7 +549,7 @@ Item* XinetdProbe::Service2Item(const ServiceEntryMap& service,
 	this->AddItemEntity(item, service, "flags");
 	this->AddItemEntity(item, service, "no_access");
 	this->AddItemEntity(item, service, "only_from");
-	this->AddItemEntity(item, service, "port", NULL, OvalEnum::DATATYPE_INTEGER);
+	this->AddItemEntity(item, service, "port", OvalEnum::DATATYPE_INTEGER);
 	this->AddItemEntity(item, service, "server");
 	this->AddItemEntity(item, service, "server_args", "server_arguments");
 	this->AddItemEntity(item, service, "socket_type");
