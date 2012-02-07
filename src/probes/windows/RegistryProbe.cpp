@@ -462,7 +462,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 					expandBuf[sizeof(expandBuf)-1] = '\0';
 					strValue.append(expandBuf);
 				}
-				item->AppendElement(new ItemEntity("value",  strValue, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value",  strValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
 				break;
 			}
