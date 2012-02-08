@@ -833,24 +833,22 @@ StringPair* Common::SplitFilePath(const string filepath) {
 }
 
 StringPair* Common::SplitFilePathRegex(const string filepath) {
-	if(filepath.compare("") == 0 ){
+	if(filepath.empty() ){
         throw Exception("An empty-string filepath was specified when splitting a filepath.");
 	}
 
 	StringPair* fpComponents = NULL;
 	size_t position;
-		if(IsRegexChar(Common::fileSeperator)){ //check for escaped file seperators only if it matches a regex char
-			position = filepath.rfind("\\" + Common::fileSeperatorStr)+1; 
-		} else{
-			position = filepath.rfind(Common::fileSeperator); 
-		}
-	
+	string escapedDelim = IsRegexChar(Common::fileSeperator) ?
+		"\\"+Common::fileSeperatorStr :
+		Common::fileSeperatorStr;
+
+	position = filepath.rfind(escapedDelim);
+
 	if ( position != string::npos ){
 		fpComponents = new StringPair();
 		fpComponents->first = filepath.substr(0,position);
-		fpComponents->second = filepath.substr(position+1,filepath.length());
-		// add a file separator at the end of the path.
-		(fpComponents->first).append(1, Common::fileSeperator);
+		fpComponents->second = filepath.substr(position+escapedDelim.size());
 	}
     
 	return fpComponents;
