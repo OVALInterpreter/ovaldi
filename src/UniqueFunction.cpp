@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <memory>
 #include <set>
 #include "Common.h"
 #include "ComponentFactory.h"
