@@ -43,8 +43,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 /**
     This class provides a data structure for storing and accessing registry keys and values
     that are collected when using the AbsRegistryFinder class.
@@ -55,56 +53,81 @@ class RegKey {
         RegKey();
         
 		/** RegKey constructor. */
-        RegKey ( string hive, string key, string name );
+        RegKey (std::string hive,std::string key,std::string name );
 
         /** Return the hive value of the registry key item.
          *  @return A string representing the hive value of the registry key item.
          */
-        string GetHive();
+        std::string GetHive();
 
         /** Return the key value of the registry key item.
          *  @return A string representing the key value of the registry key item.
          */
-        string GetKey();
+        std::string GetKey();
 
         /** Return the name value of the registry key item.
          *  @return A string representing the name value of the registry key item.
          */
-        string GetName();
+        std::string GetName();
 
         /** Set the hive value of the registry key item.
          *  @param hive A string value representing the hive of the registry item.
          *  @return Void.
          */
-        void SetHive ( string hive );
+        void SetHive ( std::string hive );
 
         /** Set the key value of the registry key item.
          *  @param key A string value representing the key of the registry item.
          *  @return Void.
          */
-        void SetKey ( string key );
+        void SetKey ( std::string key );
 
         /** Set the name value of the registry key item.
          *  @param name A string value representing the name of the registry item.
          *  @return Void.
          */
-        void SetName ( string name );
+        void SetName ( std::string name );
 
     private:
-        string hive;
-        string key;
-        string name;
+        std::string hive;
+        std::string key;
+        std::string name;
 };
 
-typedef vector<RegKey*> RegKeyVector;
+typedef std::vector<RegKey*> RegKeyVector;
 
 /**
-    This class is the windows registry searching implementation used by this application
-*/
+ * This class provides access to Windows' registry.
+ *
+ * For safety's sake, it is a good idea to instantiate RegistryFinder
+ * with a particular bitness view (32 or 64-bit), and obtain all keys
+ * through that object.  That way you can be sure you're always
+ * looking at a correct and consistent view of the registry.
+ */
 class RegistryFinder {
     public:
-        /** RegistryFinder constructor. */
-        RegistryFinder();
+		/** Which "view" of the registry to search, on a 64-bit OS. */
+		enum BitnessView {
+			BIT_32, ///< well, 32_BIT isn't a valid identifier...
+			BIT_64
+		} bitnessView;
+
+        /**
+		 * Create a RegistryFinder for a given view of the registry.
+		 * The given view isn't necessarily honored.  E.g. you can't
+		 * query a 64-bit view from a 32-bit app running on 32-bit
+		 * windows.  Currently, 32-bit apps always query 32-bit views,
+		 * regardless of this setting.
+		 */
+        explicit RegistryFinder(BitnessView view);
+
+		/**
+		 * Create a RegistryFinder for a given view of the registry.  You
+		 * can use this ctor to initialize from a behavior value
+		 * (32_bit or 64_bit).
+		 * But see the caveat at RegistryFinder::RegistryFinder(BitnessView).
+		 */
+		explicit RegistryFinder(const std::string &viewStr);
 
         /** RegistryFinder destructor. */
         ~RegistryFinder();
@@ -130,7 +153,7 @@ class RegistryFinder {
          *  @param behaviors A BehaviorVector that represents the behaviors that should be applied to the registry keys.
          *  @return A StringSet that contains all of the keys specified in the ObjectEntity.
          */
-        StringSet* GetKeys ( string hiveStr, ObjectEntity* keyEntity, BehaviorVector* behaviors );
+        StringSet* GetKeys ( std::string hiveStr, ObjectEntity* keyEntity, BehaviorVector* behaviors );
 
         /** Get the set of all names on the system that match the object.
          *  @param hiveStr A string that contains the hive to be used during the matching process.
@@ -138,7 +161,7 @@ class RegistryFinder {
          *  @param nameEntity A ObjectEntity that represents the name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the names specified in the ObjectEntity.
          */
-        StringSet* GetNames ( string hiveStr, string keyStr, ObjectEntity* nameEntity );
+        StringSet* GetNames ( std::string hiveStr, std::string keyStr, ObjectEntity* nameEntity );
 
 		/** Return a StringSet of hives, if any, that do not exist on the system.
          *  @param hiveEntity A ObjectEntity that represents the hive entity in an Object as defined in the OVAL Definition Schema.
@@ -151,7 +174,7 @@ class RegistryFinder {
          *  @param keyEntity A ObjectEntity that represents the key entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the keys specified in the ObjectEntity that do not exist on the system.  If all of the keys exist on the system this method returns NULL.
          */
-        StringSet* ReportKeyDoesNotExist ( string hiveStr, ObjectEntity* keyEntity );
+        StringSet* ReportKeyDoesNotExist ( std::string hiveStr, ObjectEntity* keyEntity );
 
         /** Return a StringSet of names, if any, that do not exist on the system.
          *  @param hiveStr A string that contains the hive to be used during the matching process.
@@ -159,44 +182,68 @@ class RegistryFinder {
          *  @param nameEntity A ObjectEntity that represents the name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the names specified in the ObjectEntity that do not exist on the system.  If all of the names exist on the system this method returns NULL.
          */
-        StringSet* ReportNameDoesNotExist ( string hiveStr, string keyString, ObjectEntity* nameEntity );
+        StringSet* ReportNameDoesNotExist ( std::string hiveStr, std::string keyString, ObjectEntity* nameEntity );
 		
-		/** Retrieve the handle of a specified registry key under the specified handle. In order to retrieve the handle of a hive, simply pass the empty string as the value for keyStr.
-         *  @param hiveStr A string that contains the hive of the key whose handle you are trying to retrieve.
-         *  @param keyStr A string that contains the key whose handle you are trying to retrieve.
-         *  @return A handle to the registry entry with the specified hive and key.
+		/**
+		 * Retrieve the handle of a specified registry key under the 
+		 * specified handle. In order to retrieve the handle of a hive, 
+		 * simply pass the empty string as the value for \p keyStr.
+		 *
+		 * @param[out] keyHandle Receives the handle to the opened key, if 
+		 *	the open was successful.
+         * @param[in] hiveStr The hive name of the key whose handle you are 
+		 *	trying to retrieve.
+         * @param[in] keyStr The key name whose handle you are trying to
+		 *	retrieve.
+         * @return An error status, as returned from RegOpenKeyEx().  This
+		 *	will be ERROR_SUCCESS on success.  Docs imply that ERROR_SUCCESS
+		 *	is zero; so non-zero return value indicates error.
          */
-        static HKEY GetHKeyHandle ( string hiveStr, string keyStr );
-		
+		LONG GetHKeyHandle ( HKEY *keyHandle, std::string hiveStr, std::string keyStr = "");
+
+		/**
+		 * Retrieve the handle of a specified registry subkey under the 
+		 * specified superkey. In order to retrieve the handle of a hive, 
+		 * simply pass the empty string as the value for \p subKeyStr.  But
+		 * you'd have to pass the hive handle as \p superKey, which means
+		 * you already have it.  So that usage is unlikely.
+		 *
+		 * @param[out] keyHandle Receives the handle to the opened key, if 
+		 *	the open was successful.
+         * @param[in] superKey The super key under which the given subkey is
+		 *	located.
+		 * @param[in] subKeyStr A path, under \p superKey to the key to open.
+         * @return An error status, as returned from RegOpenKeyEx().  This
+		 *	will be ERROR_SUCCESS on success.  Docs imply that ERROR_SUCCESS
+		 *	is zero; so non-zero return value indicates error.
+         */
+		LONG GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, std::string subKeyStr = "");
+
 		/** Build a valid registry key out of the input hive and key. If the input key is empty or null the hive is returned.
 		 *	@param hiveStr A non-NULL string representing the hive portion of the registry key.
 		 *	@param keyStr A string representing the key portion of the registry key.
          *  @return A string representing the registry key.
 		 */
-		static string BuildRegistryKey(const string hiveStr, const string keyStr);
+		static std::string BuildRegistryKey(const std::string hiveStr, const std::string keyStr);
 				
 		/** Convert the hive name to the abbreviated hive name used by the Windows object for registry keys.
 		 *	@param hiveStr A string representing the hive portion of the registry key.
          *  @return A string representing the abbreviated hive name used by the Windows object for registry keys.
 		 */
-		static string ConvertHiveForWindowsObjectName( string hiveStr );
-		
-		/** Represents the '\' character which is used to separate different registry keys. */
-		static char keySeparator;
+		static std::string ConvertHiveForWindowsObjectName( std::string hiveStr );
 
-    private:
         /** Determine if the hive exists in the registry on the local system.
          *  @param hiveStr A string that contains the hive whose existence you would like to check. Possible values are HKEY_CLASSES_ROOT, HKEY_CURRENT_CONFIG, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, and HKEY_USERS.
          *  @return A boolean value indicating whether or not the specified hive exists.
          */
-        bool HiveExists ( string hiveStr );
+        bool HiveExists ( std::string hiveStr );
 
         /** Determine if the key exists in the registry on the local system under the specified hive.
          *  @param hiveStr A string that contains the hive of the key whose existence you would like to check.
          *  @param keyStr A string that contains the key whose existence you would like to check.
          *  @return A boolean value indicating whether or not the specified key exists in the specified hive.
          */
-        bool KeyExists ( string hiveStr, string keyStr );
+        bool KeyExists ( std::string hiveStr, std::string keyStr );
 
         /** Determine if the name exists in the registry on the local system under the specified hive and key.
          *  @param hiveStr A string that contains the hive of the name whose existence you would like to check.
@@ -204,15 +251,69 @@ class RegistryFinder {
          *  @param nameStr A string that contains the name of the registry entry whose existence you would like to check.
          *  @return A boolean value indicating whether or not the specified key exists in the specified hive.
          */
-        bool NameExists ( string hiveStr, string keyStr, string nameStr );
+        bool NameExists ( std::string hiveStr, std::string keyStr, std::string nameStr );
 
+		/** Returns the registry view this finder queries. */
+		BitnessView GetView() {
+			return bitnessView;
+		}
+
+		/**
+		 * There are a few places where security info is obtained via, e.g.,
+		 * GetNamedSecurityInfo(), which requires an "object type" to know what
+		 * type of thing is being referred to.  For registry keys, there are two
+		 * types, depending on which registry view should be examined.  This 
+		 * method returns an appropriate type, depending on the view this finder
+		 * is configured to query, the bittedness of this application, and 
+		 * someday, the bittedness of the OS the app is running on.  This is code
+		 * factored out to one place, so the decision can be centrally managed, which
+		 * is less error-prone.
+		 *
+		 * \return SE_REGISTRY_KEY or SE_REGISTRY_WOW64_32KEY
+		 */
+		SE_OBJECT_TYPE GetRegKeyObjectType() {
+			return regKeyObjectType;
+		}
+
+		/**
+		 * Convenience method that converts a behavior windows_view value to one of the
+		 * BitnessView enumerators.
+		 * <p>
+		 * This does not check the OS or app bitness to determine whether the view makes
+		 * sense, it's just a straight translation.  So callers will have to take those
+		 * factors into account to select the view, not just unconditionally use the
+		 * return value as the view to query.
+		 *
+		 * \throw RegistryFinderException if viewStr isn't recognized as a valid view.
+		 */
+		static BitnessView behavior2view(const std::string &viewStr);
+
+		/**
+		 * Convenience method that gets a BitnessView enumerator for the windows_view
+		 * behavior from the given behavior vector.  If \p bv is NULL or doesn't contain
+		 * the windows_view behavior, the default as specified in the schema is returned.
+		 * <p>
+		 * This does not check the OS or app bitness to determine whether the view makes
+		 * sense, it's just a straight translation.  So callers will have to take those
+		 * factors into account to select the view, not just unconditionally use the
+		 * return value as the view to query.
+		 *
+		 * \throw RegistryFinderException if \p bv contains the windows_view behavior,
+		 *	but its value isn't recognized as valid.
+		 */
+		static BitnessView behavior2view(BehaviorVector *bv);
+
+		/** Represents the '\' character which is used to separate different registry keys. */
+		static char keySeparator;
+
+    private:
 		/** Retrieve all of the hives that match the specified pattern.
          *  @param patternStr A string that contains the pattern to be matched.
          *  @param hives A StringSet that represents the set of matching hives.
          *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
          *  @return Void.
          */
-        void FindHives ( string patternStr, StringSet* hives, bool isRegex = true );
+        void FindHives ( std::string patternStr, StringSet* hives, bool isRegex = true );
 
         /** Retrieve all of the keys that match the specified hive and pattern.
          *  @param hiveStr A string that contains the hive to be matched.
@@ -221,7 +322,7 @@ class RegistryFinder {
          *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
          *  @return Void.
          */
-        void FindKeys ( string hiveStr, string regex, StringSet* keys, bool isRegex = true );
+        void FindKeys ( std::string hiveStr, std::string regex, StringSet* keys, bool isRegex = true );
 
         /** Retrieve all of the names that match the specified hive, key, and pattern.
          *  @param hiveStr A string that contains the hive to be matched.
@@ -231,7 +332,7 @@ class RegistryFinder {
          *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
          *  @return Void.
          */
-        void FindNames ( string hiveStr, string keyStr, string patternStr, StringSet* names, bool isRegex = true );
+        void FindNames ( std::string hiveStr, std::string keyStr, std::string patternStr, StringSet* names, bool isRegex = true );
 
         /** Retrieve all of the hives on the system.
          *  @return A pointer to a StringSet of values that contains all of the hives retrieved from the system.
@@ -243,21 +344,21 @@ class RegistryFinder {
          *  @param keyStr A string that contains the key whose sub-keys you are trying to retrieve.
          *  @return A pointer to a StringSet of keys that contain all of the sub-keys retrieved under the specified hive and key.
          */
-        StringSet* GetAllSubKeys ( string hiveStr, string keyStr );
+        StringSet* GetAllSubKeys ( std::string hiveStr, std::string keyStr );
 
         /** Retrieve all of the names under a specified registry hive and key.
          *  @param hiveStr A string that contains the hive of the key whose names you are trying to retrieve.
          *  @param keyStr A string that contains the key whose names you are trying to retrieve.
          *  @return A pointer to a StringSet of values that contains all of the names retrieved under the specified hive and key.
          */
-        StringSet* GetAllNames ( string hiveStr, string keyStr );
+        StringSet* GetAllNames ( std::string hiveStr, std::string keyStr );
 
         /** Retrieve the set of matching keys after applying the behaviors recurse_direction and max_depth.
          *  @param keys A pointer to a StringSet of keys which need to be iterated in the context of the behaviors.
          *  @param behaviors A pointer to a BehaviorVector that influences the collection of keys on the local system.
          *  @return A pointer to a StringVector of the keys that were found
          */
-        StringSet* ProcessKeyBehaviors ( string hiveStr, StringSet* keys, BehaviorVector* behaviors );
+        StringSet* ProcessKeyBehaviors ( std::string hiveStr, StringSet* keys, BehaviorVector* behaviors );
 
         /** Get the set of keys in the specified hive that match the specified pattern.
          *  @param hiveStr A string that contains the hive to be used during the matching process.
@@ -267,7 +368,7 @@ class RegistryFinder {
          *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
          *  @return Void.
          */
-        void GetRegistriesForPattern ( string hiveStr, string key, string regexStr, StringSet *keys, bool isRegex );
+        void GetRegistriesForPattern ( std::string hiveStr, std::string key, std::string regexStr, StringSet *keys, bool isRegex );
 
 		/** Return true if the specified value matches the specified pattern.
          *  If the isRegex flag is true the match is treated as a regex, otherwise
@@ -278,7 +379,7 @@ class RegistryFinder {
          *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
          *  @return A boolean value that indicates whether or not the value matches the pattern.
          */
-        bool IsMatch ( string patternStr, string valueStr, bool isRegex = true );
+        bool IsMatch ( std::string patternStr, std::string valueStr, bool isRegex = true );
 
         /** Do a recusive search down the registry until the specified maxDepth is hit.
          *  Each key traversed is added to the set of keys. If maxDepth is a positive
@@ -291,7 +392,7 @@ class RegistryFinder {
          *  @param maxDepth A integer value that represents the maximum depth to recurse.
          *  @return Void.
          */
-        void DownwardRegistryRecursion ( StringSet* keys, string hiveStr, string keyStr, int maxDepth );
+        void DownwardRegistryRecursion ( StringSet* keys, std::string hiveStr, std::string keyStr, int maxDepth );
 
         /** Do a recusive search up the registry until the specified maxDepth is hit.
          *  Each registry key traversed is added to the set of keys. If maxDepth is a positive
@@ -304,9 +405,16 @@ class RegistryFinder {
          *  @param maxDepth A integer value that represents the maximum depth to recurse.
          *  @return Void.
          */
-        void UpwardRegistryRecursion ( StringSet* keys, string hiveStr, string keyStr, int maxDepth );
+        void UpwardRegistryRecursion ( StringSet* keys, std::string hiveStr, std::string keyStr, int maxDepth );
 
         REGEX *registryMatcher;
+
+		/**
+		 * The registry key object type to use, which corresponds to the registry view
+		 * this finder is looking at.
+		 * \see GetRegKeyObjectType()
+		 */
+		SE_OBJECT_TYPE regKeyObjectType;
 };
 
 /**
@@ -314,7 +422,7 @@ class RegistryFinder {
 */
 class RegistryFinderException : public Exception {
     public:
-		RegistryFinderException ( string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL );
+		RegistryFinderException ( std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL );
 		~RegistryFinderException();
 };
 

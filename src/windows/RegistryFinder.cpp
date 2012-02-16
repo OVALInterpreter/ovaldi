@@ -76,15 +76,63 @@ void RegKey::SetName ( string name ) {
 //					                RegistryFinder Class	    						  //	
 //****************************************************************************************//
 
-RegistryFinder::RegistryFinder() {
+// 4100 is "unreferenced formal parameter".
+// As a 32-bit app, for now, the view is hard-coded
+// to the 32-bit view, so the view params are not
+// used, and causes the warning.  This can be removed
+// if/when the 32-bit app detects its OS environment
+// and can switch its view.
+#ifndef _WIN64
+#  pragma warning(push)
+#  pragma warning(disable:4100)
+#endif
+RegistryFinder::RegistryFinder(BitnessView view) {
 	registryMatcher = new REGEX();
+
+	bitnessView =
+#ifdef _WIN64
+		view;
+#else
+		BIT_32;
+#endif
+
+	regKeyObjectType =
+#ifdef _WIN64
+		(bitnessView == BIT_64 ?
+			SE_REGISTRY_KEY : SE_REGISTRY_WOW64_32KEY);
+#else
+		SE_REGISTRY_KEY;
+#endif
 }
+
+RegistryFinder::RegistryFinder(const string &viewStr) {
+	registryMatcher = new REGEX();
+
+	bitnessView =
+#ifdef _WIN64
+		behavior2view(viewStr);
+#else
+		BIT_32;
+#endif
+
+	regKeyObjectType =
+#ifdef _WIN64
+		(bitnessView == BIT_64 ?
+			SE_REGISTRY_KEY : SE_REGISTRY_WOW64_32KEY);
+#else
+		SE_REGISTRY_KEY;
+#endif
+}
+#ifndef _WIN64
+#  pragma warning(pop)
+#endif
 
 RegistryFinder::~RegistryFinder() {
 	delete registryMatcher;
 }
 
 RegKeyVector* RegistryFinder::SearchRegistries ( ObjectEntity* hiveEntity, ObjectEntity* keyEntity, ObjectEntity* nameEntity, BehaviorVector* behaviors ) {
+
     RegKeyVector* regKeyVector = new RegKeyVector();
     StringSet* hives = this->GetHives ( hiveEntity );
 	
@@ -413,9 +461,8 @@ StringSet* RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keySt
     return names;
 }
 
-HKEY RegistryFinder::GetHKeyHandle ( string hiveStr, string keyStr ) {
+LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string keyStr ) {
     HKEY hiveHandle;
-    HKEY keyHandle;
 
 	if (hiveStr.compare("HKEY_LOCAL_MACHINE") == 0) {
         hiveHandle = HKEY_LOCAL_MACHINE;
@@ -431,15 +478,44 @@ HKEY RegistryFinder::GetHKeyHandle ( string hiveStr, string keyStr ) {
 		return NULL;
     }
 
-    if ( keyStr.compare ( "" ) == 0 ) {
-        return hiveHandle;
+	// short-circuit optimization so we don't have to bother with
+	// doing a RegKeyOpenEx().  In my experiments, I found that
+	// if you open a hive key (with subkey ""), you just get that same
+	// hive key back again.  And you can RegCloseKey() that key without
+	// error, but it won't actually close (as it shouldn't, since those
+	// hive keys should always be available).  But it means we can
+	// treat the hive keys uniformly with respect to other types of keys,
+	// which makes for simpler code.  Btw, this is in conflict with the
+	// MSDN docs, which say you only get the same handle back if you
+	// opened hive HKEY_CLASSES_ROOT.  Otherwise, it says you get a
+	// *new* handle.  In my experiments, I always got the same handle
+	// back, i.e. they tested equal with the == operator, with any
+	// hive.
+    if (keyStr.empty()) {
+        *keyHandle = hiveHandle;
+		return ERROR_SUCCESS;
     }
 
-    if ( RegOpenKeyExW ( hiveHandle, WindowsCommon::StringToWide ( keyStr ), 0, KEY_READ, &keyHandle ) != ERROR_SUCCESS ) {
-        return NULL;
-    }
+	return GetHKeyHandle(keyHandle, hiveHandle, keyStr);
+}
 
-    return keyHandle;
+LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subKeyStr ) {
+
+	REGSAM view =
+#ifdef _WIN64
+	(bitnessView == BIT_32 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY);
+#else
+	// For now, don't OR any extra bits into the mask for 32-bit app.
+	// Which means it's getting the 32-bit view.  The constructors
+	// of this class also ensure that for now, when this app is built
+	// as 32-bit, this will have bitnessView == BIT_32, so is consistent
+	// with this behavior.  But the *_WOW64_* enumerators make no
+	// sense on 32-bit windows (in case we're running on that platform),
+	// since there is no WOW, so I don't want to use them.
+	0;
+#endif
+    return RegOpenKeyExW ( superKey, WindowsCommon::StringToWide ( subKeyStr ),
+		0, KEY_READ | view, keyHandle );
 }
 
 string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keyStr) {
@@ -487,7 +563,7 @@ string RegistryFinder::ConvertHiveForWindowsObjectName( string hiveStr ){
 bool RegistryFinder::HiveExists ( string hiveStr ) {
     HKEY keyHandle = NULL;
 
-    if ( ( keyHandle = GetHKeyHandle ( hiveStr, "" ) ) == NULL ) {
+    if ( GetHKeyHandle ( &keyHandle, hiveStr) ) {
         return false;
     }
 
@@ -501,7 +577,7 @@ bool RegistryFinder::HiveExists ( string hiveStr ) {
 bool RegistryFinder::KeyExists ( string hiveStr, string keyStr ) {
     HKEY keyHandle = NULL;
 
-    if ( ( keyHandle = GetHKeyHandle ( hiveStr, keyStr ) ) == NULL ) {
+    if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
 
@@ -513,9 +589,9 @@ bool RegistryFinder::KeyExists ( string hiveStr, string keyStr ) {
 }
 
 bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr ) {
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle; 
 
-    if ( keyHandle == NULL ) {
+    if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
 
@@ -589,11 +665,11 @@ StringSet* RegistryFinder::GetAllHives() {
 StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
     StringSet* subkeys = new StringSet();
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
-    if ( keyHandle != NULL ) {
+    if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             string nameStr = "";
             nameStr.append ( keyStr );
@@ -626,12 +702,12 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
 StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
     StringSet* names = new StringSet();
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
     string nameStr = "";
 
-    if ( keyHandle != NULL ) {
+    if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumValueW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             nameStr = WindowsCommon::UnicodeToAsciiString ( name );
             names->insert ( nameStr );
@@ -709,11 +785,11 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
     }
 
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
-    if ( keyHandle != NULL ) {
+    if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             string nameStr = WindowsCommon::UnicodeToAsciiString ( name );
             string newKeyStr = keyStr;
@@ -816,6 +892,28 @@ void RegistryFinder::UpwardRegistryRecursion ( StringSet* keys, string hiveStr, 
     }
 
     return;
+}
+
+RegistryFinder::BitnessView RegistryFinder::behavior2view(const string &viewStr) {
+	if (viewStr == "32_bit")
+		return BIT_32;
+	if (viewStr == "64_bit")
+		return BIT_64;
+	throw RegistryFinderException("Unrecognized view value: "+viewStr);
+}
+
+RegistryFinder::BitnessView RegistryFinder::behavior2view(BehaviorVector *bv) {
+	BitnessView schemaDefault = BIT_64;
+
+	if (!bv)
+		return schemaDefault;
+
+	string viewStr = Behavior::GetBehaviorValue(bv, "windows_view");
+
+	if (viewStr.empty())
+		return schemaDefault;
+
+	return behavior2view(viewStr);
 }
 
 //****************************************************************************************//

@@ -103,7 +103,7 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
     }
 
     ItemVector *collectedItems = new ItemVector();
-    RegistryFinder registryFinder;
+    RegistryFinder registryFinder(RegistryFinder::behavior2view(object->GetBehaviors()));
     // Create a name ObjectEntity to provide to the RegistryFinder as it expects one, however, have the ObjectEntity set to NIL as its value does not matter.
     // Only the hive and key are relevant for this probe.
     ObjectEntity* nameEntity = new ObjectEntity();
@@ -118,14 +118,14 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
 
             try {
                 string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );
-                StringSet* trusteeNames = this->GetTrusteesForWindowsObject ( SE_REGISTRY_KEY, registryKeyStr, trusteeNameEntity, false, resolveGroupBehavior, includeGroupBehavior );
+                StringSet* trusteeNames = this->GetTrusteesForWindowsObject ( registryFinder.GetRegKeyObjectType(), registryKeyStr, trusteeNameEntity, false, resolveGroupBehavior, includeGroupBehavior );
 
                 if ( !trusteeNames->empty() ) {
                     StringSet::iterator iterator;
 
                     for ( iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++ ) {
                         try {
-                            Item* item = this->GetAuditedPermissions ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ) );
+                            Item* item = this->GetAuditedPermissions ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ), registryFinder );
 
                             if ( item != NULL ) {
                                 collectedItems->push_back ( item );
@@ -246,7 +246,7 @@ Item* RegKeyAuditedPermissionsProbe::CreateItem() {
     return item;
 }
 
-Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, string keyStr, string trusteeNameStr ) {
+Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, string keyStr, string trusteeNameStr, RegistryFinder &registryFinder ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pSuccessfulAuditedRights = NULL;
@@ -257,7 +257,7 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
 
     try {
         // Verify that the registry key exists.
-        if ( RegistryFinder::GetHKeyHandle ( hiveStr, keyStr ) == NULL ) {
+        if (!registryFinder.KeyExists( hiveStr, keyStr )) {
             string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
             throw ProbeException ( baseErrMsg + " because the registry key does not exist. " + systemErrMsg );
         }
@@ -301,7 +301,7 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
 
         // Get the audited rights.
         Log::Debug ( "Getting audited permissions masks for registry key: " + hiveStr + " key: " + keyStr + " trustee_name: " + trusteeNameStr );
-        WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_REGISTRY_KEY, pSid, &registryKey, pSuccessfulAuditedRights, pFailedAuditRights );
+        WindowsCommon::GetAuditedPermissionsForWindowsObject ( registryFinder.GetRegKeyObjectType(), pSid, &registryKey, pSuccessfulAuditedRights, pFailedAuditRights );
         item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );

@@ -126,7 +126,7 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
     }
 
     ItemVector *collectedItems = new ItemVector();
-    RegistryFinder registryFinder;
+    RegistryFinder registryFinder(RegistryFinder::behavior2view(object->GetBehaviors()));
     // Create a name ObjectEntity to provide to the RegistryFinder as it expects one, however, have the ObjectEntity set to NIL as its value does not matter.
     // Only the hive and key are relevant for this probe.
     ObjectEntity* nameEntity = new ObjectEntity();
@@ -141,14 +141,14 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
 
             try {
                 string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );
-                StringSet* trusteeNames = this->GetTrusteesForWindowsObject ( SE_REGISTRY_KEY, registryKeyStr, trusteeNameEntity, false, resolveGroupBehavior, includeGroupBehavior );
+                StringSet* trusteeNames = this->GetTrusteesForWindowsObject ( registryFinder.GetRegKeyObjectType(), registryKeyStr, trusteeNameEntity, false, resolveGroupBehavior, includeGroupBehavior );
 
                 if ( !trusteeNames->empty() ) {
                     StringSet::iterator iterator;
 
                     for ( iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++ ) {
                         try {
-                            Item* item = this->GetEffectiveRights ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ) );
+                            Item* item = this->GetEffectiveRights ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ), registryFinder );
 
                             if ( item != NULL ) {
                                 collectedItems->push_back ( item );
@@ -264,7 +264,7 @@ Item* RegKeyEffectiveRightsProbe::CreateItem() {
     return item;
 }
 
-Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string keyStr, string trusteeNameStr ) {
+Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string keyStr, string trusteeNameStr, RegistryFinder &registryFinder ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pAccessRights = NULL;
@@ -273,7 +273,7 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
 
     try {
         // Verify that the registry key exists.
-        if ( RegistryFinder::GetHKeyHandle ( hiveStr, keyStr ) == NULL ) {
+        if ( !registryFinder.KeyExists( hiveStr, keyStr ) ) {
             string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
             throw ProbeException ( baseErrMsg + " because the registry key does not exist. " + systemErrMsg );
         }
@@ -299,7 +299,7 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
 
         // Get the rights
         Log::Debug ( "Getting rights mask for registry key: " + hiveStr + " key: " + keyStr + " trustee_name: " + trusteeNameStr );
-        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_REGISTRY_KEY, pSid, &registryKey, pAccessRights );
+        WindowsCommon::GetEffectiveRightsForWindowsObject ( registryFinder.GetRegKeyObjectType(), pSid, &registryKey, pAccessRights );
 
         if ( ( *pAccessRights ) & DELETE )
             item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
