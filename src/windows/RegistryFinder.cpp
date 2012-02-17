@@ -845,7 +845,7 @@ void RegistryFinder::DownwardRegistryRecursion ( StringSet* keys, string hiveStr
             this->DownwardRegistryRecursion ( keys, hiveStr, *it, maxDepth );
 
         } else if ( maxDepth > 0 ) {
-            this->DownwardRegistryRecursion ( keys, hiveStr, *it, --maxDepth );
+            this->DownwardRegistryRecursion ( keys, hiveStr, *it, maxDepth - 1);
         }
     }
 
