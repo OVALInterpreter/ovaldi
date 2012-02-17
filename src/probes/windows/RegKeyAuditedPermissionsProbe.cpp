@@ -94,7 +94,7 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
 
                 Log::Info ( "Deprecated behavior found when collecting " + object->GetId() + ". Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
 
-            } else if ( behavior->GetName().compare ( "max_depth" ) == 0 || behavior->GetName().compare ( "recurse_direction" ) == 0 ) {
+            } else if ( behavior->GetName() == "max_depth" || behavior->GetName() == "recurse_direction" || behavior->GetName() == "windows_view" ) {
                 // Skip these as they are supported in the RegistryFinder class.
             } else {
                 Log::Info ( "Unsupported behavior found when collecting " + object->GetId() + ". Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
@@ -156,6 +156,8 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                             item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
                             item->AppendElement ( new ItemEntity ( "key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
                             item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+							item->AppendElement(new ItemEntity("windows_view",
+								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
                         }
                     }
@@ -188,6 +190,8 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                 item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                 item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+				item->AppendElement(new ItemEntity("windows_view",
+					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
             }
 
@@ -210,6 +214,8 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
                         item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+						item->AppendElement(new ItemEntity("windows_view",
+							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
                 }
@@ -321,6 +327,8 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
         item->AppendElement ( new ItemEntity ( "key_wow64_64key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_64KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_64KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "key_wow64_32key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_32KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_32KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "key_wow64_res", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_RES ), ( ( *pFailedAuditRights ) & KEY_WOW64_RES ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
+		item->AppendElement(new ItemEntity("windows_view",
+			(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {
