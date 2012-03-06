@@ -50,6 +50,19 @@ public:
 	FileFinder();
 	~FileFinder();
 
+	/**
+	 * Gets a handle to a file, to be used for whatever you want.  \p access
+	 * is passed as the second parameter to CreateFile().  It defaults to
+	 * zero, which means you don't actually need access to the contents of the
+	 * file, just some other metadata about it (whatever access 0 allows).
+	 * If you need to read the contents of the file, specify a different 
+	 * access value.
+	 * <p>
+	 * On error, INVALID_HANDLE_VALUE is returned; call GetLastError() for an
+	 * error code.
+	 */
+	HANDLE GetFileHandle(const std::string &filepath, DWORD access = 0);
+
 private:
 
 	/** Return the set of matching paths after applying behaviors.
