@@ -219,7 +219,7 @@ protected:
 	 * exists, it will be added to the given vector, capitalized how it
 	 * actually is in the filesystem.
 	 */
-	void FilePathExistsCaseInsensitive(std::string filePath, StringVector *matchingFilePaths);
+	bool FilePathExistsCaseInsensitive(std::string filePath, StringVector *matchingFilePaths = NULL);
 
 	REGEX *fileMatcher;
 
