@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "ServiceEffectiveRightsProbe.h"
 
 //****************************************************************************************//
@@ -37,10 +38,22 @@ ServiceEffectiveRightsProbe* ServiceEffectiveRightsProbe::instance = NULL;
 
 ServiceEffectiveRightsProbe::ServiceEffectiveRightsProbe() {
     services = NULL;
+
+    SC_HANDLE serviceHandle = NULL;
+    serviceHandle = OpenSCManager ( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ENUMERATE_SERVICE );
+    if ( serviceHandle == NULL ) {
+        throw ProbeException ( "Error: The function OpenSCManager() was unable to retrieve the handle for the service control manager database. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+    }
+
+	this->serviceMgr.reset(
+		new AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)>(
+			serviceHandle, CloseServiceHandle, "service control manager"));
 }
 
 ServiceEffectiveRightsProbe::~ServiceEffectiveRightsProbe() {
     instance = NULL;
+	if (services)
+		delete services;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -115,10 +128,21 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
 
     for ( StringSet::iterator iterator1 = allServices->begin(); iterator1 != allServices->end(); iterator1++ ) {
         try {
-            StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject ( SE_SERVICE, *iterator1, trusteeSIDEntity, true, resolveGroupBehavior, includeGroupBehavior );
 
-            if ( !trusteeSIDs->empty() ) {
-                for ( StringSet::iterator iterator2 = trusteeSIDs->begin(); iterator2 != trusteeSIDs->end(); iterator2++ ) {
+			SC_HANDLE serviceHandle = OpenService(serviceMgr->get(), iterator1->c_str(), GENERIC_READ);
+			if (serviceHandle == NULL) {
+				Log::Message("Error opening service '" + *iterator1 +
+					"': " + WindowsCommon::GetErrorMessage(GetLastError()));
+				continue;
+			}
+			AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> serviceGuard(serviceHandle,
+				CloseServiceHandle, "service " + *iterator1);
+            StringSet trusteeSIDs = this->GetTrusteesForWindowsObject ( 
+				SE_SERVICE, serviceHandle, trusteeSIDEntity, true, 
+				resolveGroupBehavior, includeGroupBehavior );
+
+            if ( !trusteeSIDs.empty() ) {
+                for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                     try {
                         Item* item = this->GetEffectiveRights ( ( *iterator1 ) , ( *iterator2 ) );
 
@@ -133,15 +157,12 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
                         Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                     }
                 }
-
-                delete trusteeSIDs;
-
             } else {
                 Log::Debug ( "No matching SIDs found when getting the effective rights for object: " + object->GetId() );
-                StringSet* trusteeSIDs = new StringSet();
+                StringSet trusteeSIDs;
 
-                if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, trusteeSIDs, true ) ) {
-                    for ( StringSet::iterator iterator2 = trusteeSIDs->begin(); iterator2 != trusteeSIDs->end(); iterator2++ ) {
+                if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, &trusteeSIDs, true ) ) {
+                    for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "service_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
@@ -405,14 +426,8 @@ StringSet* ServiceEffectiveRightsProbe::GetAllServices() {
     DWORD serviceBufferSize = 0;
     DWORD serviceDataSize = 0;
     DWORD numberOfServices = 0;
-    SC_HANDLE serviceHandle = NULL;
-    serviceHandle = OpenSCManager ( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ENUMERATE_SERVICE );
 
-    if ( serviceHandle == NULL ) {
-        throw ProbeException ( "Error: The function OpenSCManager() was unable to retrieve the handle for the service control manager database. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-    }
-
-    if ( !EnumServicesStatusEx ( serviceHandle, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL, NULL, serviceBufferSize, &serviceDataSize, &numberOfServices, 0, NULL ) ) {
+    if ( !EnumServicesStatusEx ( serviceMgr->get(), SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL, NULL, serviceBufferSize, &serviceDataSize, &numberOfServices, 0, NULL ) ) {
         if ( serviceDataBuffer != NULL ) {
             free ( serviceDataBuffer );
             serviceDataBuffer = NULL;
@@ -423,7 +438,7 @@ StringSet* ServiceEffectiveRightsProbe::GetAllServices() {
         serviceDataSize = 0;
         numberOfServices = 0;
 
-        if ( !EnumServicesStatusEx ( serviceHandle, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL, ( LPBYTE ) serviceDataBuffer, serviceBufferSize, &serviceDataSize, &numberOfServices, 0, NULL ) ) {
+        if ( !EnumServicesStatusEx ( serviceMgr->get(), SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL, ( LPBYTE ) serviceDataBuffer, serviceBufferSize, &serviceDataSize, &numberOfServices, 0, NULL ) ) {
             throw ProbeException ( "ERROR: The function EnumServicesStatusEx() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
         }
     }

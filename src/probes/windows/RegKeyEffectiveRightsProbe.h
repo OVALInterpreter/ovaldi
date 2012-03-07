@@ -68,7 +68,7 @@ class RegKeyEffectiveRightsProbe : public AbsEffectiveRightsProbe {
          *  @param trusteeNameStr A string that contains the trustee name of the registry key that you want to get the effective rights of.
          *  @return The item that contains the registry key effective rights of the specified hive, key, and trustee name.
          */
-        Item* GetEffectiveRights ( std::string hiveStr, std::string keyStr, std::string trusteeNameStr, RegistryFinder &registryFinder );
+        Item* GetEffectiveRights ( HKEY keyHandle, std::string hiveStr, std::string keyStr, std::string trusteeNameStr, RegistryFinder &registryFinder );
 
         /** The static instance of the RegKeyEffectiveRightsProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.

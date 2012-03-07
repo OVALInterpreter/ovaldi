@@ -33,59 +33,9 @@
 char RegistryFinder::keySeparator = '\\';
 
 //****************************************************************************************//
-//					                   RegKey Class        	    						  //	
-//****************************************************************************************//
-
-RegKey::RegKey() {
-	this->hive = "";
-	this->key = "";
-	this->name = "";
-}
-
-RegKey::RegKey ( string hive, string key, string name ) {
-	this->hive = hive;
-	this->key = key;
-	this->name = name;
-}
-
-string RegKey::GetHive() {
-	return hive;
-}
-
-string RegKey::GetKey() {
-	return key;
-}
-
-string RegKey::GetName() {
-	return name;
-}
-
-void RegKey::SetHive ( string hive ) {
-	this->hive = hive;
-}
-
-void RegKey::SetKey ( string key ) {
-	this->key = key;
-}
-
-void RegKey::SetName ( string name ) {
-	this->name = name;
-}
-
-//****************************************************************************************//
 //					                RegistryFinder Class	    						  //	
 //****************************************************************************************//
 
-// 4100 is "unreferenced formal parameter".
-// As a 32-bit app, for now, the view is hard-coded
-// to the 32-bit view, so the view params are not
-// used, and causes the warning.  This can be removed
-// if/when the 32-bit app detects its OS environment
-// and can switch its view.
-#ifndef _WIN64
-#  pragma warning(push)
-#  pragma warning(disable:4100)
-#endif
 RegistryFinder::RegistryFinder(BitnessView view) {
 	registryMatcher = new REGEX();
 
@@ -93,15 +43,7 @@ RegistryFinder::RegistryFinder(BitnessView view) {
 #ifdef _WIN64
 		view;
 #else
-		BIT_32;
-#endif
-
-	regKeyObjectType =
-#ifdef _WIN64
-		(bitnessView == BIT_64 ?
-			SE_REGISTRY_KEY : SE_REGISTRY_WOW64_32KEY);
-#else
-		SE_REGISTRY_KEY;
+		WindowsCommon::Is64BitOS() ? view : BIT_32;
 #endif
 }
 
@@ -112,20 +54,9 @@ RegistryFinder::RegistryFinder(const string &viewStr) {
 #ifdef _WIN64
 		behavior2view(viewStr);
 #else
-		BIT_32;
-#endif
-
-	regKeyObjectType =
-#ifdef _WIN64
-		(bitnessView == BIT_64 ?
-			SE_REGISTRY_KEY : SE_REGISTRY_WOW64_32KEY);
-#else
-		SE_REGISTRY_KEY;
+		WindowsCommon::Is64BitOS() ? behavior2view(viewStr) : BIT_32;
 #endif
 }
-#ifndef _WIN64
-#  pragma warning(pop)
-#endif
 
 RegistryFinder::~RegistryFinder() {
 	delete registryMatcher;
@@ -503,17 +434,16 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
 
 	REGSAM view =
 #ifdef _WIN64
-	(bitnessView == BIT_32 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY);
+	bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY;
 #else
-	// For now, don't OR any extra bits into the mask for 32-bit app.
-	// Which means it's getting the 32-bit view.  The constructors
-	// of this class also ensure that for now, when this app is built
-	// as 32-bit, this will have bitnessView == BIT_32, so is consistent
-	// with this behavior.  But the *_WOW64_* enumerators make no
-	// sense on 32-bit windows (in case we're running on that platform),
-	// since there is no WOW, so I don't want to use them.
-	0;
+	// For now, don't OR any extra bits into the mask for 32-bit windows.
+	// The *_WOW64_* enumerators make no sense on 32-bit windows
+	// since there is no WOW, so it doesn't make sense to use them.
+	WindowsCommon::Is64BitOS() ?
+		bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY
+		: 0;
 #endif
+
     return RegOpenKeyExW ( superKey, WindowsCommon::StringToWide ( subKeyStr ),
 		0, KEY_READ | view, keyHandle );
 }
@@ -522,7 +452,7 @@ string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keySt
 
     if(hiveStr.compare("") == 0)
         throw RegistryFinderException("An empty hive was specified when building a registry key.");
-
+	 
 	string registryKey = hiveStr;
     if(keyStr.compare("") != 0) {
         // Verify that the hive that was passed into this function ends with a slash.  If
@@ -533,7 +463,7 @@ string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keySt
         if(keyStr[0] != RegistryFinder::keySeparator) {
 			registryKey.append(keyStr);
 		} else {
-			registryKey.append(keyStr.substr(1, keyStr.length()-2));
+			registryKey.append(keyStr.substr(1));//, keyStr.length()-2));
 		}
     }
 
@@ -671,6 +601,7 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
 
     if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
+
             string nameStr = "";
             nameStr.append ( keyStr );
 			if ( keyStr.compare ( "" ) != 0 ) nameStr.append ( 1, RegistryFinder::keySeparator );
@@ -914,6 +845,30 @@ RegistryFinder::BitnessView RegistryFinder::behavior2view(BehaviorVector *bv) {
 		return schemaDefault;
 
 	return behavior2view(viewStr);
+}
+
+string RegKey::ToString() const {
+	if (!hivePlusKey.empty())
+		return hivePlusKey;
+
+    if(hive.empty())
+        throw RegistryFinderException("Empty hive!");
+
+	hivePlusKey = hive;
+    if(!key.empty()) {
+        // Verify that the hive that was passed into this function ends with a slash.  If
+        // it doesn't, then add one.
+        if (hive[hive.length()-1] != RegistryFinder::keySeparator)
+	        hivePlusKey += RegistryFinder::keySeparator;
+
+        if(key[0] != RegistryFinder::keySeparator) {
+			hivePlusKey += key;
+		} else {
+			hivePlusKey += key.substr(1);//, keyStr.length()-2));
+		}
+    }
+
+    return hivePlusKey;
 }
 
 //****************************************************************************************//

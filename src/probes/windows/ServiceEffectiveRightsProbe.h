@@ -33,6 +33,8 @@
 
 #pragma warning(disable:4786)
 
+#include <memory>
+#include <AutoCloser.h>
 #include "AbsEffectiveRightsProbe.h"
 #include "WindowsCommon.h"
 
@@ -101,6 +103,13 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 
         /** The StringSet that holds the information about all of the Windows services on the local system. */
         StringSet* services;
+
+		/**
+		 * Holds a handle to the service control manager which we can use
+		 * to query info about services.  We open it once when the probe
+		 * singleton is created, and close it when the singleton is deleted.
+		 */
+		std::auto_ptr<AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> > serviceMgr;
 };
 
 #endif

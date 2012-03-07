@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "FileAuditedPermissions53Probe.h"
 
 //****************************************************************************************//
@@ -158,13 +159,28 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
             } else {
                 try {
                     // The file exists so lets get the trustees and then examine their audited permissions.
-                    string filePathStr = Common::BuildFilePath ( ( const string ) fp->first, ( const string ) fp->second );
-                    StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject ( SE_FILE_OBJECT, filePathStr, trusteeSID, true, resolveGroupBehavior, includeGroupBehavior );
+					string filePathStr = Common::BuildFilePath(fp->first, fp->second);
+					HANDLE fileHandle = fileFinder.GetFileHandle(filePathStr);
 
-                    if ( !trusteeSIDs->empty() ) {
-                        for ( StringSet::iterator iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++ ) {
+					if (!fileHandle || fileHandle == INVALID_HANDLE_VALUE) {
+						throw ProbeException("Error: unable to get trustees "
+							"for file: Error opening file: " + 
+							WindowsCommon::GetErrorMessage(GetLastError()));
+					}
+
+					// need the guard, cause I know at least GetTrusteesForWindowsObject()
+					// throws, so I feel safer with it.
+					AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> handleGuard(fileHandle, 
+						CloseHandle, "file "+filePathStr);
+
+					StringSet trusteeSIDs = GetTrusteesForWindowsObject(
+						SE_FILE_OBJECT, fileHandle, trusteeSID, true, 
+						resolveGroupBehavior, includeGroupBehavior);
+
+                    if ( !trusteeSIDs.empty() ) {
+                        for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
                             try {
-                                Item* item = this->GetAuditedPermissions ( fp->first, fp->second, ( *iterator ) );
+                                Item* item = this->GetAuditedPermissions ( fileHandle, fp->first, fp->second, ( *iterator ) );
 
                                 if ( item != NULL ) {
 									if (fileName->GetNil()) {
@@ -184,11 +200,6 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                                 Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                             }
                         }
-
-                        trusteeSIDs->clear();
-                        delete trusteeSIDs;
-                        trusteeSIDs = NULL;
-
                     } else {
                         Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
                         StringSet* trusteeSIDs = new StringSet();
@@ -299,22 +310,16 @@ Item* FileAuditedPermissions53Probe::CreateItem() {
     return item;
 }
 
-Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( string path, string fileName, string trusteeSID ) {
+Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( HANDLE fileHandle, string path, string fileName, string trusteeSID ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pSuccessfulAuditedRights = NULL;
     PACCESS_MASK pFailedAuditRights = NULL;
     // Build the path.
-    string filePath = Common::BuildFilePath ( ( const string ) path, ( const string ) fileName );
+    string filePath = Common::BuildFilePath ( path, fileName );
     string baseErrMsg = "Error unable to get audited permissions for trustee: " + trusteeSID + " from dacl for file: " + filePath;
 
     try {
-        // Verify that the file exists.
-        if ( GetFileAttributes ( filePath.c_str() ) == INVALID_FILE_ATTRIBUTES ) {
-            string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
-            throw ProbeException ( baseErrMsg + " File " + filePath + " doesn't exist. " + systemErrMsg );
-        }
-
         // Get the sid for the trustee name.
         pSid = WindowsCommon::GetSIDForTrusteeSID ( trusteeSID );
         // The file exists and trustee name seems good so we can create the new item now.
@@ -355,7 +360,7 @@ Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( string path, string
 
         // Get the audited rights.
         Log::Debug ( "Getting audited permissions masks for file: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID );
-        WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_FILE_OBJECT, pSid, &filePath, pSuccessfulAuditedRights, pFailedAuditRights );
+        WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_FILE_OBJECT, pSid, fileHandle, pSuccessfulAuditedRights, pFailedAuditRights );
         item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );

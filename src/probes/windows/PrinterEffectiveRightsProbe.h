@@ -91,6 +91,8 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 		 */
 		Item* GetEffectiveRights(string printerNameStr, string trusteeSIDStr);
 		
+		HANDLE GetHandleToPrinter(const std::string &printerName);
+
 		/** The static instance of the PrinterEffectiveRightsProbe.
 		 *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.
 		 */

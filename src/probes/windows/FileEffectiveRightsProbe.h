@@ -71,7 +71,7 @@ private:
      *  @param trusteeName A string that contains the trustee name of the file that you want to get the effective rights of.
      *  @return The item that contains the file effective rights of the specified path, filename, and trustee name.
      */
-	Item* GetEffectiveRights(string path, string fileName, string trusteeName);
+	Item* GetEffectiveRights(HANDLE fileHandle, string path, string fileName, string trusteeName);
 
 	/** The static instance of the FileEffectiveRightsProbe.
      *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.

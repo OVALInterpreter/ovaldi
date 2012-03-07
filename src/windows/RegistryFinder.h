@@ -49,49 +49,73 @@
 */
 class RegKey {
     public:
-        /** RegKey constructor. */
-        RegKey();
-        
+		RegKey(){}
+
 		/** RegKey constructor. */
-        RegKey (std::string hive,std::string key,std::string name );
+        RegKey (std::string hive,std::string key,std::string name ) :
+		  hive(hive), key(key), name(name)
+		{}
 
         /** Return the hive value of the registry key item.
          *  @return A string representing the hive value of the registry key item.
          */
-        std::string GetHive();
+        std::string GetHive() const {
+			return hive;
+		}
 
         /** Return the key value of the registry key item.
          *  @return A string representing the key value of the registry key item.
          */
-        std::string GetKey();
+        std::string GetKey() const {
+			return key;
+		}
 
         /** Return the name value of the registry key item.
          *  @return A string representing the name value of the registry key item.
          */
-        std::string GetName();
+        std::string GetName() const {
+			return name;
+		}
 
         /** Set the hive value of the registry key item.
          *  @param hive A string value representing the hive of the registry item.
          *  @return Void.
          */
-        void SetHive ( std::string hive );
+        void SetHive ( const std::string &hive ) {
+			this->hive = hive;
+		}
 
         /** Set the key value of the registry key item.
          *  @param key A string value representing the key of the registry item.
          *  @return Void.
          */
-        void SetKey ( std::string key );
+        void SetKey ( const std::string &key ) {
+			this->key = key;
+		}
 
         /** Set the name value of the registry key item.
          *  @param name A string value representing the name of the registry item.
          *  @return Void.
          */
-        void SetName ( std::string name );
+        void SetName ( const std::string &name ) {
+			this->name = name;
+		}
+
+		/** Returns a string representation of this registry key. */
+		std::string ToString() const;
 
     private:
         std::string hive;
         std::string key;
         std::string name;
+
+		/**
+		 * Concatenation of hive plus key, for debug messages.  Or
+		 * wherever else you might need it.  Delayed creation.
+		 */
+		mutable std::string hivePlusKey;
+		// have to make this mutable so it can spring into
+		// existence when needed, even on a const object...
 };
 
 typedef std::vector<RegKey*> RegKeyVector;
@@ -119,7 +143,7 @@ class RegistryFinder {
 		 * windows.  Currently, 32-bit apps always query 32-bit views,
 		 * regardless of this setting.
 		 */
-        explicit RegistryFinder(BitnessView view);
+		explicit RegistryFinder(BitnessView view);
 
 		/**
 		 * Create a RegistryFinder for a given view of the registry.  You
@@ -191,14 +215,14 @@ class RegistryFinder {
 		 *
 		 * @param[out] keyHandle Receives the handle to the opened key, if 
 		 *	the open was successful.
-         * @param[in] hiveStr The hive name of the key whose handle you are 
+		 * @param[in] hiveStr The hive name of the key whose handle you are 
 		 *	trying to retrieve.
-         * @param[in] keyStr The key name whose handle you are trying to
+		 * @param[in] keyStr The key name whose handle you are trying to
 		 *	retrieve.
-         * @return An error status, as returned from RegOpenKeyEx().  This
+		 * @return An error status, as returned from RegOpenKeyEx().  This
 		 *	will be ERROR_SUCCESS on success.  Docs imply that ERROR_SUCCESS
 		 *	is zero; so non-zero return value indicates error.
-         */
+		 */
 		LONG GetHKeyHandle ( HKEY *keyHandle, std::string hiveStr, std::string keyStr = "");
 
 		/**
@@ -210,13 +234,13 @@ class RegistryFinder {
 		 *
 		 * @param[out] keyHandle Receives the handle to the opened key, if 
 		 *	the open was successful.
-         * @param[in] superKey The super key under which the given subkey is
+		 * @param[in] superKey The super key under which the given subkey is
 		 *	located.
 		 * @param[in] subKeyStr A path, under \p superKey to the key to open.
-         * @return An error status, as returned from RegOpenKeyEx().  This
+		 * @return An error status, as returned from RegOpenKeyEx().  This
 		 *	will be ERROR_SUCCESS on success.  Docs imply that ERROR_SUCCESS
 		 *	is zero; so non-zero return value indicates error.
-         */
+		 */
 		LONG GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, std::string subKeyStr = "");
 
 		/** Build a valid registry key out of the input hive and key. If the input key is empty or null the hive is returned.
@@ -256,23 +280,6 @@ class RegistryFinder {
 		/** Returns the registry view this finder queries. */
 		BitnessView GetView() {
 			return bitnessView;
-		}
-
-		/**
-		 * There are a few places where security info is obtained via, e.g.,
-		 * GetNamedSecurityInfo(), which requires an "object type" to know what
-		 * type of thing is being referred to.  For registry keys, there are two
-		 * types, depending on which registry view should be examined.  This 
-		 * method returns an appropriate type, depending on the view this finder
-		 * is configured to query, the bittedness of this application, and 
-		 * someday, the bittedness of the OS the app is running on.  This is code
-		 * factored out to one place, so the decision can be centrally managed, which
-		 * is less error-prone.
-		 *
-		 * \return SE_REGISTRY_KEY or SE_REGISTRY_WOW64_32KEY
-		 */
-		SE_OBJECT_TYPE GetRegKeyObjectType() {
-			return regKeyObjectType;
 		}
 
 		/**
@@ -408,13 +415,6 @@ class RegistryFinder {
         void UpwardRegistryRecursion ( StringSet* keys, std::string hiveStr, std::string keyStr, int maxDepth );
 
         REGEX *registryMatcher;
-
-		/**
-		 * The registry key object type to use, which corresponds to the registry view
-		 * this finder is looking at.
-		 * \see GetRegKeyObjectType()
-		 */
-		SE_OBJECT_TYPE regKeyObjectType;
 };
 
 /**

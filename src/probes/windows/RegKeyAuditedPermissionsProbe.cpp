@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "RegKeyAuditedPermissionsProbe.h"
 
 //****************************************************************************************//
@@ -117,15 +118,32 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
             RegKey* registryKey = ( *iterator );
 
             try {
-                string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );
-                StringSet* trusteeNames = this->GetTrusteesForWindowsObject ( registryFinder.GetRegKeyObjectType(), registryKeyStr, trusteeNameEntity, false, resolveGroupBehavior, includeGroupBehavior );
+				HKEY keyHandle = NULL;
+				DWORD err;
 
-                if ( !trusteeNames->empty() ) {
+				if ((err = registryFinder.GetHKeyHandle(&keyHandle,
+					registryKey->GetHive(), registryKey->GetKey())) != ERROR_SUCCESS) {
+					if (keyHandle != NULL) // maybe this is paranoia...
+						RegCloseKey(keyHandle);
+					throw ProbeException("Error: unable to open registry key: " +
+						registryKey->ToString() + ": " +
+						WindowsCommon::GetErrorMessage(err));
+				}
+
+				AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+					"reg key " + registryKey->ToString());
+
+				StringSet trusteeNames = this->GetTrusteesForWindowsObject(
+					SE_REGISTRY_KEY, keyHandle, 
+					trusteeNameEntity, false, resolveGroupBehavior, 
+					includeGroupBehavior);
+
+                if ( !trusteeNames.empty() ) {
                     StringSet::iterator iterator;
 
-                    for ( iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++ ) {
+                    for ( iterator = trusteeNames.begin(); iterator != trusteeNames.end(); iterator++ ) {
                         try {
-                            Item* item = this->GetAuditedPermissions ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ), registryFinder );
+                            Item* item = this->GetAuditedPermissions ( keyHandle, registryKey, ( *iterator ), registryFinder );
 
                             if ( item != NULL ) {
                                 collectedItems->push_back ( item );
@@ -138,11 +156,6 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                             Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                         }
                     }
-
-                    trusteeNames->clear();
-                    delete trusteeNames;
-                    trusteeNames = NULL;
-
                 } else {
                     Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
                     StringSet* trusteeNames = new StringSet();
@@ -252,29 +265,24 @@ Item* RegKeyAuditedPermissionsProbe::CreateItem() {
     return item;
 }
 
-Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, string keyStr, string trusteeNameStr, RegistryFinder &registryFinder ) {
+Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, string trusteeNameStr, RegistryFinder &registryFinder ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pSuccessfulAuditedRights = NULL;
     PACCESS_MASK pFailedAuditRights = NULL;
     // Build the registry key.
-    string registryKey = RegistryFinder::BuildRegistryKey ( ( const string ) RegistryFinder::ConvertHiveForWindowsObjectName ( hiveStr ), ( const string ) keyStr );
-    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + trusteeNameStr + " from dacl for registry key: " + RegistryFinder::BuildRegistryKey ( ( const string ) hiveStr, ( const string ) keyStr );
+    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " +
+		trusteeNameStr + " from sacl for registry key: " +
+		regKey->ToString();
 
     try {
-        // Verify that the registry key exists.
-        if (!registryFinder.KeyExists( hiveStr, keyStr )) {
-            string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
-            throw ProbeException ( baseErrMsg + " because the registry key does not exist. " + systemErrMsg );
-        }
-
         // Get the sid for the trustee name.
         pSid = WindowsCommon::GetSIDForTrusteeName ( trusteeNameStr );
         // The registry key exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "hive", hiveStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "hive", regKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key", regKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "trustee_name", trusteeNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the successful audited rights.
         pSuccessfulAuditedRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
@@ -306,8 +314,9 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( string hiveStr, str
         }
 
         // Get the audited rights.
-        Log::Debug ( "Getting audited permissions masks for registry key: " + hiveStr + " key: " + keyStr + " trustee_name: " + trusteeNameStr );
-        WindowsCommon::GetAuditedPermissionsForWindowsObject ( registryFinder.GetRegKeyObjectType(), pSid, &registryKey, pSuccessfulAuditedRights, pFailedAuditRights );
+        Log::Debug ( "Getting audited permissions masks for registry key: " + 
+			regKey->ToString() + " trustee_name: " + trusteeNameStr );
+        WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_REGISTRY_KEY, pSid, keyHandle, pSuccessfulAuditedRights, pFailedAuditRights );
         item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );

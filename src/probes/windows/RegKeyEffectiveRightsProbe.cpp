@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "RegKeyEffectiveRightsProbe.h"
 
 
@@ -140,15 +141,32 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
             RegKey* registryKey = ( *iterator );
 
             try {
-                string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );
-                StringSet* trusteeNames = this->GetTrusteesForWindowsObject ( registryFinder.GetRegKeyObjectType(), registryKeyStr, trusteeNameEntity, false, resolveGroupBehavior, includeGroupBehavior );
+				HKEY keyHandle = NULL;
+				DWORD err;
 
-                if ( !trusteeNames->empty() ) {
+				if ((err = registryFinder.GetHKeyHandle(&keyHandle,
+					registryKey->GetHive(), registryKey->GetKey())) != ERROR_SUCCESS) {
+					if (keyHandle != NULL) // maybe this is paranoia...
+						RegCloseKey(keyHandle);
+					throw ProbeException("Error: unable to open registry key: " +
+						registryKey->ToString() + ": " +
+						WindowsCommon::GetErrorMessage(err));
+				}
+
+				AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+					"reg key " + registryKey->ToString());
+
+				StringSet trusteeNames = this->GetTrusteesForWindowsObject(
+					SE_REGISTRY_KEY, keyHandle, 
+					trusteeNameEntity, false, resolveGroupBehavior, 
+					includeGroupBehavior);
+
+                if ( !trusteeNames.empty() ) {
                     StringSet::iterator iterator;
 
-                    for ( iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++ ) {
+                    for ( iterator = trusteeNames.begin(); iterator != trusteeNames.end(); iterator++ ) {
                         try {
-                            Item* item = this->GetEffectiveRights ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ), registryFinder );
+                            Item* item = this->GetEffectiveRights ( keyHandle, registryKey->GetHive(), registryKey->GetKey(), ( *iterator ), registryFinder );
 
                             if ( item != NULL ) {
                                 collectedItems->push_back ( item );
@@ -161,10 +179,6 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                             Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                         }
                     }
-
-                    trusteeNames->clear();
-                    delete trusteeNames;
-
                 } else {
                     Log::Debug ( "No matching trustees found when getting effective rights for object: " + object->GetId() );
                     StringSet* trusteeNames = new StringSet();
@@ -270,7 +284,7 @@ Item* RegKeyEffectiveRightsProbe::CreateItem() {
     return item;
 }
 
-Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string keyStr, string trusteeNameStr, RegistryFinder &registryFinder ) {
+Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hiveStr, string keyStr, string trusteeNameStr, RegistryFinder &registryFinder ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pAccessRights = NULL;
@@ -278,13 +292,8 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
     string baseErrMsg = "Error unable to get effective rights for trustee: " + trusteeNameStr + " from dacl for registry key: " + RegistryFinder::BuildRegistryKey ( ( const string ) hiveStr, ( const string ) keyStr );
 
     try {
-        // Verify that the registry key exists.
-        if ( !registryFinder.KeyExists( hiveStr, keyStr ) ) {
-            string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
-            throw ProbeException ( baseErrMsg + " because the registry key does not exist. " + systemErrMsg );
-        }
 
-        // Get the sid for the trustee name
+		// Get the sid for the trustee name
         pSid = WindowsCommon::GetSIDForTrusteeName ( trusteeNameStr );
         // The registry key exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
@@ -305,7 +314,7 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( string hiveStr, string ke
 
         // Get the rights
         Log::Debug ( "Getting rights mask for registry key: " + hiveStr + " key: " + keyStr + " trustee_name: " + trusteeNameStr );
-        WindowsCommon::GetEffectiveRightsForWindowsObject ( registryFinder.GetRegKeyObjectType(), pSid, &registryKey, pAccessRights );
+        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_REGISTRY_KEY, pSid, keyHandle, pAccessRights );
 
         if ( ( *pAccessRights ) & DELETE )
             item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );

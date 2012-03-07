@@ -281,13 +281,13 @@ public:
     static bool TrusteeSIDExists(const string trusteeSIDIn);
 
 	/** Return the access mask for the Windows object for the specified SID. */
-	static void GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
+	static void GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights);
 
 	/** Return the access mask for the Windows object for the specified SID. */
-	static void GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
+	static void GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights);
 
 	/** Return the access mask for the Windows object for the specified SID. */
-	static void GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights);
+	static void GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights);
 
 	/** Return the successful and failure audit access masks for the Windows object for the specified SID. 
 	  * @param objectType A SE_OBJECT_TYPE that specifies the type of the Windows object.
@@ -296,7 +296,7 @@ public:
 	  * @param pSuccessfulAuditPermissions A pointer to an ACCESS_MASK that contains the successful audit permissions.
 	  * @param pFailedAuditPermissions A pointer to an ACCESS_MASK that contains the failure audit permissions.
 	  */
-	static void GetAuditedPermissionsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pSuccessfulAuditPermissions, PACCESS_MASK pFailedAuditPermissions);
+	static void GetAuditedPermissionsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pSuccessfulAuditPermissions, PACCESS_MASK pFailedAuditPermissions);
 
 	/** Get the string representation of a SE_OBJECT_TYPE.
 		@param objectType The SE_OBJECT_TYPE value that you want to get the string representation of.
@@ -308,7 +308,7 @@ public:
 	 * Windows (NTFS anyway, afaik) is case-insensitive, but case-aware.  We
 	 * should have in our items, filenames and paths as they actually are
 	 * in the filesystem, matching case.  This is especially important when
-	 * doing case-insensitive matching, since the values given in object
+	 * doing case-sensitive matching, since the values given in object
 	 * entities can be in all different cases, and on windows we need to treat
 	 * matches as all the same.
 	 * <p>
@@ -344,6 +344,16 @@ public:
 	 * compatible with XP.
 	 */
 	static std::string GetActualPathWithCase(const std::string &path);
+
+	/**
+	 * Returns true if this process is running under WoW64.
+	 */
+	static bool IsWow64Process();
+
+	/**
+	 * Detects whether this app is running on 64-bit windows.
+	 */
+	static bool Is64BitOS();
 
 private:
 	
