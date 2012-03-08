@@ -144,7 +144,7 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
             if ( !trusteeSIDs.empty() ) {
                 for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                     try {
-                        Item* item = this->GetEffectiveRights ( ( *iterator1 ) , ( *iterator2 ) );
+                        Item* item = this->GetEffectiveRights ( serviceHandle, ( *iterator1 ) , ( *iterator2 ) );
 
                         if ( item != NULL ) {
                             collectedItems->push_back ( item );
@@ -201,7 +201,7 @@ Item* ServiceEffectiveRightsProbe::CreateItem() {
     return item;
 }
 
-Item* ServiceEffectiveRightsProbe::GetEffectiveRights ( string serviceNameStr, string trusteeSIDStr ) {
+Item* ServiceEffectiveRightsProbe::GetEffectiveRights ( SC_HANDLE serviceHandle, string serviceNameStr, string trusteeSIDStr ) {
     Log::Debug ( "Collecting effective rights for service_name: " + serviceNameStr + " trustee_sid: " + trusteeSIDStr );
     Item* item = NULL;
     PSID pSid = NULL;
@@ -226,7 +226,7 @@ Item* ServiceEffectiveRightsProbe::GetEffectiveRights ( string serviceNameStr, s
 
         // Get the rights
         Log::Debug ( "Getting rights mask for service_name: " + serviceNameStr + " and trustee_sid: " + trusteeSIDStr );
-        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_SERVICE, pSid, &serviceNameStr, pAccessRights );
+        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_SERVICE, pSid, serviceHandle, pAccessRights );
 
         if ( ( *pAccessRights ) & DELETE )
             item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );

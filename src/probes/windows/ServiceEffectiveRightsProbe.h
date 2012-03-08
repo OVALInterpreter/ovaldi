@@ -70,7 +70,7 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
          *  @param trusteeSIDStr A string that contains the trusteeSID of the service that you want to get the effective rights of.
          *  @return The item that contains the service effective rights of the specified service and trustee SID.
          */
-        Item* GetEffectiveRights ( string serviceNameStr, string trusteeSID );
+        Item* GetEffectiveRights ( SC_HANDLE serviceHandle, string serviceNameStr, string trusteeSID );
 
         /** Get the set of all services on the system that match the object.
          *  @param serviceNameEntity A ObjectEntity that represents the service_name entity in an Object as defined in the OVAL Definition Schema.
