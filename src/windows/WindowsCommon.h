@@ -270,6 +270,11 @@ public:
     */
 	static string UnicodeToAsciiString ( wchar_t* unicodeCharStr );
 
+	/** Return true if a wide-character string of Unicode characters would convert into a string of ASCII characters.
+     *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that are checked for validity as ASCII characters.
+    */
+	static bool UnicodeIsValidASCII(wchar_t* unicodeCharStr);
+
     /** Return true if the specfied trustee name exists.		
 		@param trusteeNameIn The SID to look for.
 	*/

@@ -443,7 +443,7 @@ HKEY RegistryFinder::GetHKeyHandle ( string hiveStr, string keyStr ) {
 }
 
 string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keyStr) {
-
+	
     if(hiveStr.compare("") == 0)
         throw RegistryFinderException("An empty hive was specified when building a registry key.");
 
@@ -472,7 +472,19 @@ string RegistryFinder::ConvertHiveForWindowsObjectName( string hiveStr ){
 	}else if ( hiveStr.compare("HKEY_CURRENT_USER") == 0 ){	
 		return "CURRENT_USER";
 	}else if ( hiveStr.compare("HKEY_CURRENT_CONFIG") == 0 ){
-		return "CURRENT_CONFIG";
+		//HKEY_CURRENT_CONFIG not directly in enumeration of valid SE_REGISTRY_KEY values
+		// http://msdn.microsoft.com/en-us/library/windows/desktop/aa379593(v=vs.85).aspx
+		//uses HKEY_CURRENT_CONFIG equivalent
+		// http://msdn.microsoft.com/en-us/library/windows/desktop/ms724836(v=vs.85).aspx
+		//NOTE: uses hive + key, regular key to be appended later
+		//Additional information on HKEY_CURRENT_CONFIG
+		// http://technet.microsoft.com/en-us/library/286f12b7-265b-4632-a4e1-987d025023e6
+		string hiveName = "MACHINE\\System\\CurrentControlSet\\Hardware Profiles\\Current";
+		
+		//The following ensures OVAL uses the current file separator
+		string repChar = "";
+		repChar.append(1, RegistryFinder::keySeparator);
+		return Common::SwitchChar(hiveName, "\\",repChar);
 	}else if ( hiveStr.compare("HKEY_CLASSES_ROOT") == 0 ){
 		return "CLASSES_ROOT";		
 	}else{
@@ -715,7 +727,13 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
 
     if ( keyHandle != NULL ) {
         while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
-            string nameStr = WindowsCommon::UnicodeToAsciiString ( name );
+            if(!WindowsCommon::UnicodeIsValidASCII(name)){
+				Log::Info("Skipping registry key found with invalid Unicode values.");
+				size = MAX_PATH;
+				++index;
+				continue;
+			}
+			string nameStr = WindowsCommon::UnicodeToAsciiString ( name );
             string newKeyStr = keyStr;
             newKeyStr.append ( nameStr );
 			this->GetRegistriesForPattern( hiveStr, newKeyStr , regexStr, keys , isRegex );
