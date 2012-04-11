@@ -2355,11 +2355,7 @@ void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objec
     string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + WindowsCommon::ToString ( pSid ) + ".";
     DWORD res;
     PACL psacl;
-
-    // The SE_SECURITY_NAME privilege is needed to read the SACL.
-    if ( !WindowsCommon::EnablePrivilege ( SE_SECURITY_NAME ) ) {
-        throw Exception ( "Error: The SeSecurityPrivilege could not be enabled. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-    }
+	PSECURITY_DESCRIPTOR sd;
 
     res = GetSecurityInfo ( objHandle,                                        // object name
                             objectType,								          // object type
@@ -2370,10 +2366,10 @@ void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objec
                             NULL,                                             // primary group SID
                             NULL,                                             // DACL
                             &psacl,                                           // SACL
-                            NULL );                                           // Security Descriptor
+                            &sd );                                           // Security Descriptor
 
     if ( res != ERROR_SUCCESS ) {
-        throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
+        throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error (" + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
     }
 	
     ULONG size;
@@ -2402,10 +2398,6 @@ void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objec
     } else {
         string errMsg = WindowsCommon::GetErrorMessage ( res );
 		throw Exception ( baseErrMsg + " System error message: " + errMsg );
-    }
-
-    if ( !WindowsCommon::DisableAllPrivileges() ) {
-        throw Exception ( "Error: All of the privileges could not be disabled. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
     }
 
     Log::Debug ( "Finished calling the ACL API to get the audited permissions" );

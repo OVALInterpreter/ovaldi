@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include <AutoCloser.h>
+#include <PrivilegeGuard.h>
 #include "FileAuditedPermissions53Probe.h"
 
 //****************************************************************************************//
@@ -109,21 +110,17 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
     FileFinder fileFinder;
 	StringPairVector* filePaths = NULL;
 	
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
 	
-	if(filePath != NULL){
-		if ( (object->GetBehaviors())->size() > 0 ){
-			throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
+		if(filePath != NULL){
+			if ( (object->GetBehaviors())->size() > 0 ){
+				throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
+			}
+			filePaths = fileFinder.SearchFiles(filePath);	
+		}else{
+			filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
 		}
-		filePaths = fileFinder.SearchFiles(filePath);	
-	}else{
-		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
-	}
-
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
 	}
 
 	if(filePaths != NULL && filePaths->size() > 0) {
@@ -160,7 +157,19 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                 try {
                     // The file exists so lets get the trustees and then examine their audited permissions.
 					string filePathStr = Common::BuildFilePath(fp->first, fp->second);
-					HANDLE fileHandle = fileFinder.GetFileHandle(filePathStr);
+					HANDLE fileHandle;
+
+					// The SE_SECURITY_NAME privilege is needed to read the SACL
+					// (for ACCESS_SYSTEM_SECURITY access, specified below.)
+					{
+						PrivilegeGuard pg(SE_SECURITY_NAME);
+
+						fileHandle = fileFinder.GetFileHandle(filePathStr,
+							READ_CONTROL|ACCESS_SYSTEM_SECURITY, 
+							fileName && fileName->GetNil());
+
+						pg.disable();
+					}
 
 					if (!fileHandle || fileHandle == INVALID_HANDLE_VALUE) {
 						throw ProbeException("Error: unable to get trustees "

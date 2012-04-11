@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include <AutoCloser.h>
+#include <PrivilegeGuard.h>
 #include "FileAuditedPermissionsProbe.h"
 
 //****************************************************************************************//
@@ -114,7 +115,11 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
 	}
 
 	FileFinder fileFinder;
-	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+	StringPairVector *filePaths = NULL;
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+	}
 
 	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
 		Log::Message("Error: Unable to disable all privileges.");
@@ -151,7 +156,20 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
                 try {
 					// The file exists so lets get the trustees and then examine their audited permissions.
 					string filePathStr = Common::BuildFilePath(fp->first, fp->second);
-					HANDLE fileHandle = fileFinder.GetFileHandle(filePathStr);
+					HANDLE fileHandle;
+
+
+					// The SE_SECURITY_NAME privilege is needed to read the SACL
+					// (for ACCESS_SYSTEM_SECURITY access, specified below.)
+					{
+						PrivilegeGuard pg(SE_SECURITY_NAME);
+
+						fileHandle = fileFinder.GetFileHandle(filePathStr,
+							READ_CONTROL|ACCESS_SYSTEM_SECURITY, 
+							fileName && fileName->GetNil());
+
+						pg.disable();
+					}
 
 					if (!fileHandle || fileHandle == INVALID_HANDLE_VALUE) {
 						throw ProbeException("Error: unable to get trustees "

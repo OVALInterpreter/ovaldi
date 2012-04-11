@@ -193,7 +193,8 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 					// The file exists so lets get the sids to then examine effective rights
 					//
 					string filePathStr = Common::BuildFilePath(fp->first, fp->second);
-					HANDLE fileHandle = fileFinder.GetFileHandle(filePathStr);
+					HANDLE fileHandle = fileFinder.GetFileHandle(filePathStr,
+						READ_CONTROL, fileName && fileName->GetNil());
 
 					if (!fileHandle || fileHandle == INVALID_HANDLE_VALUE) {
 						throw ProbeException("Error: unable to get trustees "

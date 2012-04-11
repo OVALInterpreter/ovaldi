@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include <AutoCloser.h>
+#include <PrivilegeGuard.h>
 #include "RegKeyAuditedPermissionsProbe.h"
 
 //****************************************************************************************//
@@ -121,8 +122,19 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
 				HKEY keyHandle = NULL;
 				DWORD err;
 
+				/*
+				The GetSecurityInfo() docs say to access a SACL, enable SE_SECURITY_NAME priv,
+				get the handle, then disable the priv.  As far as I've been able to tell, 
+				*this is wrong*, at least when it comes to registry keys.  If you don't still
+				have the priv when GetSecurityInfo() is called, you will get error 1314,
+				"A required privilege is not held by the client."  So this priv escalation
+				cannot be scoped just to the acquisition of the handle.
+				*/
+				PrivilegeGuard pg(SE_SECURITY_NAME);
+
 				if ((err = registryFinder.GetHKeyHandle(&keyHandle,
-					registryKey->GetHive(), registryKey->GetKey())) != ERROR_SUCCESS) {
+					registryKey->GetHive(), registryKey->GetKey(), 
+					ACCESS_SYSTEM_SECURITY)) != ERROR_SUCCESS) {
 					if (keyHandle != NULL) // maybe this is paranoia...
 						RegCloseKey(keyHandle);
 					throw ProbeException("Error: unable to open registry key: " +
@@ -179,7 +191,6 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                     delete trusteeNames;
                     trusteeNames = NULL;
                 }
-
             } catch ( ProbeException ex ) {
                 Log::Message ( "ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
 

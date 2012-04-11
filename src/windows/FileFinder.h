@@ -51,17 +51,23 @@ public:
 	~FileFinder();
 
 	/**
-	 * Gets a handle to a file, to be used for whatever you want.  \p access
-	 * is passed as the second parameter to CreateFile().  It defaults to
-	 * zero, which means you don't actually need access to the contents of the
-	 * file, just some other metadata about it (whatever access 0 allows).
-	 * If you need to read the contents of the file, specify a different 
-	 * access value.
-	 * <p>
-	 * On error, INVALID_HANDLE_VALUE is returned; call GetLastError() for an
-	 * error code.
+	 * Gets a handle to a file or directory, to be used for whatever you want.
+	 * \p access is passed as the second parameter to CreateFile().  It
+	 * defaults to zero, which means you don't actually need access to the
+	 * contents of the file, just some other metadata about it (whatever
+	 * access 0 allows). If you need to read the contents of the file,
+	 * specify a different access value.  Access to the security descriptor
+	 * requires READ_CONTROL access.
+	 *
+	 * \param filepath the path to the file or directory to get a handle to
+	 * \param access the desired access
+	 * \param isDirectory set to true if filepath refers to a directory.  This
+	 *   is necessary because the API is slightly different for getting a
+	 *   directory handle, as opposed to a file handle.
+	 * \return A handle.  On error, INVALID_HANDLE_VALUE is returned; call
+	 *   GetLastError() for an error code.
 	 */
-	HANDLE GetFileHandle(const std::string &filepath, DWORD access = 0);
+	HANDLE GetFileHandle(const std::string &filepath, DWORD access = 0, bool isDirectory = false);
 
 private:
 

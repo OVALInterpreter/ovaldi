@@ -33,8 +33,9 @@
 
 #pragma warning(disable:4786)
 
+#include <Windows.h> // for HANDLE
 #include "AbsEffectiveRightsProbe.h"
-using namespace std;
+#include <string>
 
 
 /**
@@ -71,13 +72,13 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 		 *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
 		 *  @return A StringSet containing all of the matching printers.
 		 */
-		StringSet* GetMatchingPrinters ( string patternStr , bool isRegex );
+		StringSet* GetMatchingPrinters ( std::string patternStr , bool isRegex );
 
 		/** Determine if the printer exists on the system.
 		 *  @param printerNameStr A string that contains the name of the printer whose existenc you want to check.
 		 *  @return A boolean value that specifies whether or not the printer exists on the system.
 		 */
-		bool PrinterExists ( string printerNameStr );
+		bool PrinterExists ( std::string printerNameStr );
 
 		/** Retrieve all of the printers on the system.
 		 *  @return A pointer to a StringSet that contains all of the printers on the system.
@@ -89,7 +90,8 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 		 *  @param trusteeSIDStr A string that contains the trusteeSID of the printer that you want to get the effective rights of.
 		 *  @return The item that contains the printer effective rights of the specified printer and trustee SID.
 		 */
-		Item* GetEffectiveRights(string printerNameStr, string trusteeSIDStr);
+		Item* GetEffectiveRights(HANDLE printerHandle, 
+				const std::string &printerNameStr, string trusteeSIDStr);
 		
 		HANDLE GetHandleToPrinter(const std::string &printerName);
 

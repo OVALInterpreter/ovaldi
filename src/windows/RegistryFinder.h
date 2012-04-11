@@ -219,11 +219,13 @@ class RegistryFinder {
 		 *	trying to retrieve.
 		 * @param[in] keyStr The key name whose handle you are trying to
 		 *	retrieve.
+		 * @param[in] access The desired key access.  Defaults to KEY_READ.
 		 * @return An error status, as returned from RegOpenKeyEx().  This
 		 *	will be ERROR_SUCCESS on success.  Docs imply that ERROR_SUCCESS
 		 *	is zero; so non-zero return value indicates error.
 		 */
-		LONG GetHKeyHandle ( HKEY *keyHandle, std::string hiveStr, std::string keyStr = "");
+		LONG GetHKeyHandle ( HKEY *keyHandle, std::string hiveStr, 
+				std::string keyStr = "", REGSAM access = KEY_READ);
 
 		/**
 		 * Retrieve the handle of a specified registry subkey under the 
@@ -237,11 +239,13 @@ class RegistryFinder {
 		 * @param[in] superKey The super key under which the given subkey is
 		 *	located.
 		 * @param[in] subKeyStr A path, under \p superKey to the key to open.
+		 * @param[in] access The desired key access.  Defaults to KEY_READ.
 		 * @return An error status, as returned from RegOpenKeyEx().  This
 		 *	will be ERROR_SUCCESS on success.  Docs imply that ERROR_SUCCESS
 		 *	is zero; so non-zero return value indicates error.
 		 */
-		LONG GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, std::string subKeyStr = "");
+		LONG GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, 
+			std::string subKeyStr = "", REGSAM access = KEY_READ);
 
 		/** Build a valid registry key out of the input hive and key. If the input key is empty or null the hive is returned.
 		 *	@param hiveStr A non-NULL string representing the hive portion of the registry key.

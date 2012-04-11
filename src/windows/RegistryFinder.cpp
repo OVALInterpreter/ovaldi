@@ -392,7 +392,7 @@ StringSet* RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keySt
     return names;
 }
 
-LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string keyStr ) {
+LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string keyStr, REGSAM access ) {
     HKEY hiveHandle;
 
 	if (hiveStr.compare("HKEY_LOCAL_MACHINE") == 0) {
@@ -406,7 +406,8 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string key
     } else if (hiveStr.compare("HKEY_CLASSES_ROOT") == 0) {
         hiveHandle = HKEY_CLASSES_ROOT;
     } else {
-		return NULL;
+		*keyHandle = NULL;
+		return ERROR_BADKEY; // not sure what error to return for this...
     }
 
 	// short-circuit optimization so we don't have to bother with
@@ -427,10 +428,10 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string key
 		return ERROR_SUCCESS;
     }
 
-	return GetHKeyHandle(keyHandle, hiveHandle, keyStr);
+	return GetHKeyHandle(keyHandle, hiveHandle, keyStr, access);
 }
 
-LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subKeyStr ) {
+LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subKeyStr, REGSAM access ) {
 
 	REGSAM view =
 #ifdef _WIN64
@@ -445,7 +446,7 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
 #endif
 
     return RegOpenKeyExW ( superKey, WindowsCommon::StringToWide ( subKeyStr ),
-		0, KEY_READ | view, keyHandle );
+		0, access | view, keyHandle );
 }
 
 string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keyStr) {

@@ -665,16 +665,18 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 	return childDirs;
 }
 
-HANDLE FileFinder::GetFileHandle(const string &filepath, DWORD access) {
+HANDLE FileFinder::GetFileHandle(const string &filepath, DWORD access, bool isDirectory) {
+
+	DWORD dirBit = isDirectory ? FILE_FLAG_BACKUP_SEMANTICS : 0;
 
 	// When windows_view is supported for file-related tests, this will
 	// have to become more complicated to determine which file
 	// to actually open.  But for now, this is very simple.
-	return CreateFile(filepath.c_str(),				// file name
-						access,						// access mode
-						FILE_SHARE_READ,			// share mode
-						NULL,						// SD
-						OPEN_EXISTING,				// how to create
-						FILE_ATTRIBUTE_NORMAL,		// file attributes
-						NULL);						// handle to template file
+	return CreateFile(filepath.c_str(),				  // file name
+						access,						  // access mode
+						FILE_SHARE_READ,			  // share mode
+						NULL,						  // SD
+						OPEN_EXISTING,				  // how to create
+						FILE_ATTRIBUTE_NORMAL|dirBit, // file attributes
+						NULL);						  // handle to template file
 }
