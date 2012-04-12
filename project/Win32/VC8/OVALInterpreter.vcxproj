@@ -93,7 +93,7 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-	    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dhaynes\oval\libs\x64\libgpg-error-1.10\build\bin;C:\Users\dhaynes\oval\libs\x64\xalan-c-1.10\c\Build\Win64\VC7.1\Release\bin;C:\Users\dhaynes\oval\libs\x64\xerces-c-src_2.7.0\Build\Win32\VC7.1\Release\bin;C:\Users\dhaynes\oval\libs\x64\pcre-8.12\build\bin;C:\Users\dhaynes\oval\libs\x64\libgcrypt-1.4.6\build\bin;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dhaynes\oval\libs\x64\libgpg-error-1.10\build\bin;C:\Users\dhaynes\oval\libs\x64\xalan-c-1.10\c\Build\Win64\VC7.1\Release\bin;C:\Users\dhaynes\oval\libs\x64\xerces-c-src_2.7.0\Build\Win32\VC7.1\Release\bin;C:\Users\dhaynes\oval\libs\x64\pcre-8.12\build\bin;C:\Users\dhaynes\oval\libs\x64\libgcrypt-1.4.6\build\bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dhaynes\oval\libs\x64\libgpg-error-1.10\build\include;C:\Users\dhaynes\oval\libs\x64\libgcrypt-1.4.6\build\include;C:\Users\dhaynes\oval\libs\x64\pcre-8.12\build\include;C:\Users\dhaynes\oval\libs\x64\xerces-c-2.7.0\Build\Win32\VC7.1\Release\include;C:\Users\dhaynes\oval\libs\x64\xalan-c-1.10\c\Build\Win64\VC7.1\Release\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dhaynes\oval\libs\x64\libgpg-error-1.10\build\lib;C:\Users\dhaynes\oval\libs\x64\xml-xalan\c\Build\Win64\VC7.1\Release\lib;C:\Users\dhaynes\oval\libs\x64\xerces-c-src_2_7_0\Build\Win32\VC7.1\Release\lib;C:\Users\dhaynes\oval\libs\x64\pcre-8.12\build\lib;C:\Users\dhaynes\oval\libs\x64\libgcrypt-1.4.6\build\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\dhaynes\oval\libs\x86\xerces-c-2.7.0\bin;C:\Users\dhaynes\oval\libs\x86\xalan-c-1.10\bin;C:\Users\dhaynes\oval\libs\x86\pcre-7.0\bin;C:\Users\dhaynes\oval\libs\x86\libgcrypt-1.4.6\bin;$(ExecutablePath)</ExecutablePath>
@@ -409,6 +409,7 @@
     <ClCompile Include="..\..\..\src\Log.cpp" />
     <ClCompile Include="..\..\..\src\REGEX.cpp" />
     <ClCompile Include="..\..\..\src\windows\FindCloseGuard.cpp" />
+    <ClCompile Include="..\..\..\src\windows\PrivilegeGuard.cpp" />
     <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
     <ClCompile Include="..\..\..\src\XmlProcessor.cpp" />
     <ClCompile Include="..\..\..\src\XslCommon.cpp" />
@@ -530,6 +531,7 @@ echo off
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.h" />
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h" />
     <ClInclude Include="..\..\..\src\VectorPtrGuard.h" />
+    <ClInclude Include="..\..\..\src\windows\AutoCloser.h" />
     <ClInclude Include="..\..\..\src\windows\FileFinder.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h" />
@@ -573,6 +575,7 @@ echo off
     <ClInclude Include="..\..\..\src\Log.h" />
     <ClInclude Include="..\..\..\src\REGEX.h" />
     <ClInclude Include="..\..\..\src\windows\FindCloseGuard.h" />
+    <ClInclude Include="..\..\..\src\windows\PrivilegeGuard.h" />
     <ClInclude Include="..\..\..\src\XmlCommon.h" />
     <ClInclude Include="..\..\..\src\XmlProcessor.h" />
     <ClInclude Include="..\..\..\src\XslCommon.h" />
