@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <memory>
 #include <cstddef>
 #include "CountFunction.h"
 #include "ComponentFactory.h"

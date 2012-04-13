@@ -2505,6 +2505,14 @@ string WindowsCommon::UnicodeToAsciiString ( wchar_t* unicodeCharStr ) {
 
     return asciiStr;
 }
+bool WindowsCommon::UnicodeIsValidASCII(wchar_t* unicodeCharStr){
+	for(unsigned int wcharInd = 0; wcharInd < wcslen(unicodeCharStr); wcharInd++) {
+		if(!(iswascii(unicodeCharStr[wcharInd]))) {  //if not wide ASCII char
+			return false;
+		}
+	}
+	return true;
+}
 
 string WindowsCommon::GetObjectType ( SE_OBJECT_TYPE objectType ) {
     switch ( objectType ) {
