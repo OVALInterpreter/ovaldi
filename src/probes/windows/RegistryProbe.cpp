@@ -183,6 +183,8 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				} else {
 					Item* item = this->GetRegistryKey( registryKey->GetHive(), registryKey->GetKey(), registryKey->GetName(), registryFinder);
 					if(item != NULL) {
+						item->AppendElement(new ItemEntity("windows_view",
+							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 					item = NULL;
@@ -409,9 +411,6 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 			RegCloseKey(hkey);
 		} 
 	}
-
-	item->AppendElement(new ItemEntity("windows_view",
-		(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
 
 	return item;
 }

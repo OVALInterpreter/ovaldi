@@ -166,9 +166,11 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
 
                     for ( iterator = trusteeNames.begin(); iterator != trusteeNames.end(); iterator++ ) {
                         try {
-                            Item* item = this->GetEffectiveRights ( keyHandle, registryKey->GetHive(), registryKey->GetKey(), ( *iterator ), registryFinder );
+                            Item* item = this->GetEffectiveRights ( keyHandle, registryKey->GetHive(), registryKey->GetKey(), ( *iterator ) );
 
                             if ( item != NULL ) {
+								item->AppendElement(new ItemEntity("windows_view",
+									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                                 collectedItems->push_back ( item );
                             }
 
@@ -284,7 +286,7 @@ Item* RegKeyEffectiveRightsProbe::CreateItem() {
     return item;
 }
 
-Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hiveStr, string keyStr, string trusteeNameStr, RegistryFinder &registryFinder ) {
+Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hiveStr, string keyStr, string trusteeNameStr ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pAccessRights = NULL;
@@ -429,9 +431,6 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hi
 
         else
             item->AppendElement ( new ItemEntity ( "key_wow64_res", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
-
-		item->AppendElement(new ItemEntity("windows_view",
-			(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

@@ -155,9 +155,11 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
 
                     for ( iterator = trusteeNames.begin(); iterator != trusteeNames.end(); iterator++ ) {
                         try {
-                            Item* item = this->GetAuditedPermissions ( keyHandle, registryKey, ( *iterator ), registryFinder );
+                            Item* item = this->GetAuditedPermissions ( keyHandle, registryKey, ( *iterator ) );
 
                             if ( item != NULL ) {
+								item->AppendElement(new ItemEntity("windows_view",
+									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                                 collectedItems->push_back ( item );
                             }
 
@@ -276,7 +278,7 @@ Item* RegKeyAuditedPermissionsProbe::CreateItem() {
     return item;
 }
 
-Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, string trusteeNameStr, RegistryFinder &registryFinder ) {
+Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, string trusteeNameStr ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pSuccessfulAuditedRights = NULL;
@@ -347,8 +349,6 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, con
         item->AppendElement ( new ItemEntity ( "key_wow64_64key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_64KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_64KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "key_wow64_32key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_32KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_32KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "key_wow64_res", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_RES ), ( ( *pFailedAuditRights ) & KEY_WOW64_RES ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-		item->AppendElement(new ItemEntity("windows_view",
-			(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

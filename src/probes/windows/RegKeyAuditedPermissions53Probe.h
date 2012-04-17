@@ -65,7 +65,7 @@ class RegKeyAuditedPermissions53Probe : public AbsEffectiveRightsProbe {
          *  @param trusteeSIDStr A string that contains the trustee SID of the registry key that you want to get the audited permissions of.
          *  @return The item that contains the registry key audited permissions of the specified hive, key, and trustee name.
          */
-        Item* GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, std::string trusteeSIDStr, RegistryFinder &registryFinder );
+        Item* GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, std::string trusteeSIDStr );
 
         /** Get the string representation of the audited permissions.
          *  @param success An ACCESS_MASK that represents the successful audit permissions.
