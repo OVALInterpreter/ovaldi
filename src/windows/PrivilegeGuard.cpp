@@ -46,8 +46,12 @@ PrivilegeGuard::PrivilegeGuard(const std::string &privName, bool ctorThrow)
 
 		if (ctorThrow)
 			throw Exception(msg);
-		else
+		else {
+			// We couldn't enable the priv, so no point in trying to disable
+			// it later.
+			disabled = true;
 			Log::Message(msg);
+		}
 	}
 }
 
