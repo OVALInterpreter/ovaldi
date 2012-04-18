@@ -33,6 +33,8 @@
 
 #include "AbsProbe.h"
 #include "WindowsCommon.h"
+#include "RegistryFinder.h"
+#include <FileFinder.h>
 
 #include <aclapi.h>
 #include <windows.h>
@@ -57,16 +59,18 @@ class AbsEffectiveRightsProbe : public AbsProbe {
         /**
             Return a set of all of the trustees that match the specified trustee entity relative to the specified Windows object.
             @param windowsObjectType A SE_OBJECT_TYPE that specifies the type of the Windows object.
-            @param objectNameStr A string value that contains the name of the Windows object.
+            @param objectHandle A handle to a windows object
             @param trusteeEntity A pointer to the trustee ObjectEntity that will be used to create the set of matching trustees.
 			@param isSID A boolean value that specifies whether or not the trusteeEntity is a SID.
             @param resolveGroupBehavior A boolean value that specifies whether or not groups should be resolved.
             @param includeGroupBehavior A boolean value that specifies whether or not groups should be included in the resulting set of trustees.
             @return A pointer to a StringSet containing all of the trustees that match the specified trustee ObjectEntity.
         */
-        StringSet* GetTrusteesForWindowsObject ( SE_OBJECT_TYPE windowsObjectType, string objectNameStr, ObjectEntity* trusteeEntity, bool isSID, bool resolveGroupBehavior, bool includeGroupBehavior );
+		StringSet GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, 
+			HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,
+			bool resolveGroupBehavior, bool includeGroupBehavior );
 
-        /** Search the input vector of all trustees and return the set of trustees the match the specified criteria.
+		/** Search the input vector of all trustees and return the set of trustees the match the specified criteria.
             @param trusteePatternStr A string value that contains the trustee pattern to be matched.
             @param allTrustees A pointer to a StringSet that contains all of the trustees.
             @param trustees A pointer to a StringSet that is used to store all of the matching trustees.

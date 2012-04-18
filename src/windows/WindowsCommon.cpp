@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <tchar.h>
 #include <cctype>
 #include <cstring>
 #include <memory>
@@ -2151,18 +2152,18 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
     return enabled;
 }
 
-void WindowsCommon::GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights) {	
+void WindowsCommon::GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights) {	
 
 	if(WindowsCommon::IsXPOrLater()) {
-		WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(objectType, pSid, objectNameStr, pAccessRights);
+		WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(objectType, pSid, objHandle, pAccessRights);
 	} else {
-		WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(objectType, pSid, objectNameStr, pAccessRights);
+		WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(objectType, pSid, objHandle, pAccessRights);
 	}
 }
 
 
 
-void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights) {
+void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -2180,32 +2181,32 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectT
 	Log::Debug("Calling the acl api to get effective rights");
 
 
-	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid) + " from dacl for Windows object: " + (*objectNameStr);
+	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid);
 
 	DWORD res;
 	PACL pdacl;
 	PSECURITY_DESCRIPTOR pSD;
 
-	res = GetNamedSecurityInfo(const_cast<char*>((*objectNameStr).c_str()),	// object name
-							   objectType,							// object type
-							   DACL_SECURITY_INFORMATION |				// information type
-							   PROTECTED_DACL_SECURITY_INFORMATION |
-							   UNPROTECTED_DACL_SECURITY_INFORMATION, 			
-							   NULL,									// owner SID
-							   NULL,									// primary group SID
-							   &pdacl,									// DACL
-							   NULL,									// SACL
-							   &pSD);									// Security Descriptor
+	res = GetSecurityInfo(objHandle,							// object name
+						  objectType,							// object type
+						  DACL_SECURITY_INFORMATION |			// information type
+						  PROTECTED_DACL_SECURITY_INFORMATION |
+						  UNPROTECTED_DACL_SECURITY_INFORMATION, 			
+						  NULL,									// owner SID
+						  NULL,									// primary group SID
+						  &pdacl,								// DACL
+						  NULL,									// SACL
+						  &pSD);								// Security Descriptor
 
 	if (res != ERROR_SUCCESS) {	
-		throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		throw Exception( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
 	} 
 
 
 	// Check to see if a valid security descriptor was returned.  
     if ((IsValidSecurityDescriptor(pSD) == 0) || (IsValidAcl(pdacl) == 0)) {
 		LocalFree(pSD);
-		throw Exception(baseErrMsg + " Invalid data returned from call to GetNamedSecurityInfo().");
+		throw Exception(baseErrMsg + " Invalid data returned from call to GetSecurityInfo().");
 	}
 
 
@@ -2232,7 +2233,7 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectT
 	Log::Debug("Finished calling the acl api to get effective rights");
 }
 
-void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pAccessRights) {	
+void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights) {	
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -2256,25 +2257,25 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objec
 	AUTHZ_CLIENT_CONTEXT_HANDLE hClientContext = NULL;	
 	AUTHZ_RESOURCE_MANAGER_HANDLE hAuthzResourceManager = NULL;	
 
-	DWORD res = GetNamedSecurityInfo(const_cast<char*>((*objectNameStr).c_str()),// object name
-									 objectType,						// object type
-									 DACL_SECURITY_INFORMATION |			// information type
-									 GROUP_SECURITY_INFORMATION |
-									 OWNER_SECURITY_INFORMATION,
-									 NULL,								   // owner SID
-									 NULL,								   // primary group SID
-									 NULL,								   // DACL
-									 NULL,								   // SACL
-									 &pSD);								   // Security Descriptor
+	DWORD res = GetSecurityInfo(objHandle,// object name
+								objectType,						// object type
+								DACL_SECURITY_INFORMATION |			// information type
+								GROUP_SECURITY_INFORMATION |
+								OWNER_SECURITY_INFORMATION,
+								NULL,								   // owner SID
+								NULL,								   // primary group SID
+								NULL,								   // DACL
+								NULL,								   // SACL
+								&pSD);								   // Security Descriptor
 
 	if (res != ERROR_SUCCESS) {
-		throw Exception("Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		throw Exception("Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
 	} 
 
 	// Check to see if a valid security descriptor was returned.  
     if ((IsValidSecurityDescriptor(pSD) == 0)) {
 		LocalFree(pSD);
-		throw Exception("Invalid data returned from call to GetNamedSecurityInfo().");
+		throw Exception("Invalid data returned from call to GetSecurityInfo().");
 	}
 
 	try	{
@@ -2349,30 +2350,26 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objec
 	Log::Debug("Finished calling the authz api to get effective rights");
 }
 
-void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objectType, PSID pSid, string* objectNameStr, PACCESS_MASK pSuccessfulAuditedPermissions, PACCESS_MASK pFailedAuditPermissions ) {
+void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pSuccessfulAuditedPermissions, PACCESS_MASK pFailedAuditPermissions ) {
     Log::Debug ( "Calling the ACL API to get the audited permissions" );
-    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + WindowsCommon::ToString ( pSid ) + " from sacl for Windows object: " + ( *objectNameStr ) + ".";
+    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + WindowsCommon::ToString ( pSid ) + ".";
     DWORD res;
     PACL psacl;
+	PSECURITY_DESCRIPTOR sd;
 
-    // The SE_SECURITY_NAME privilege is needed to read the SACL.
-    if ( !WindowsCommon::EnablePrivilege ( SE_SECURITY_NAME ) ) {
-        throw Exception ( "Error: The SeSecurityPrivilege could not be enabled. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-    }
-	
-    res = GetNamedSecurityInfo ( const_cast<char*> ( ( *objectNameStr ).c_str() ), // object name
-                                 objectType,									   // object type
-                                 SACL_SECURITY_INFORMATION |					   // information type
-                                 PROTECTED_SACL_SECURITY_INFORMATION |
-                                 UNPROTECTED_SACL_SECURITY_INFORMATION,
-                                 NULL,                                             // owner SID
-                                 NULL,                                             // primary group SID
-                                 NULL,                                             // DACL
-                                 &psacl,                                           // SACL
-                                 NULL );                                           // Security Descriptor
+    res = GetSecurityInfo ( objHandle,                                        // object name
+                            objectType,								          // object type
+                            SACL_SECURITY_INFORMATION |					      // information type
+                            PROTECTED_SACL_SECURITY_INFORMATION |
+                            UNPROTECTED_SACL_SECURITY_INFORMATION,
+                            NULL,                                             // owner SID
+                            NULL,                                             // primary group SID
+                            NULL,                                             // DACL
+                            &psacl,                                           // SACL
+                            &sd );                                           // Security Descriptor
 
     if ( res != ERROR_SUCCESS ) {
-        throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+        throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error (" + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
     }
 	
     ULONG size;
@@ -2401,10 +2398,6 @@ void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objec
     } else {
         string errMsg = WindowsCommon::GetErrorMessage ( res );
 		throw Exception ( baseErrMsg + " System error message: " + errMsg );
-    }
-
-    if ( !WindowsCommon::DisableAllPrivileges() ) {
-        throw Exception ( "Error: All of the privileges could not be disabled. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
     }
 
     Log::Debug ( "Finished calling the ACL API to get the audited permissions" );
@@ -2618,4 +2611,50 @@ string WindowsCommon::GetActualPathWithCase(const string &path) {
 		longBuf[0] = static_cast<char>(toupper(longBuf[0]));
 
 	return string(longBuf.get());
+}
+
+bool WindowsCommon::IsWow64Process()
+{
+	typedef BOOL (WINAPI *WowFuncType)(HANDLE, PBOOL);
+	WowFuncType wowFunc = (WowFuncType)GetProcAddress(
+		GetModuleHandle(_T("kernel32")),
+		"IsWow64Process");
+
+	// treat unknown as false for now...
+	if (!wowFunc)
+	{
+		Log::Debug("Couldn't determine WoW64 status: IsWow64Process() not supported.  Assuming no WoW64.");
+		return false;
+	}
+
+	BOOL isWow64;
+	BOOL result = wowFunc(GetCurrentProcess(), &isWow64);
+
+	if (!result) {
+		Log::Debug("Couldn't determine WoW64 status: " + GetErrorMessage(GetLastError()));
+		return false;
+	}
+
+	return isWow64 != FALSE;
+}
+
+bool WindowsCommon::Is64BitOS()
+{
+#ifdef _WIN64
+	// 64-bit apps can't run on other than 64-bit OS's.
+	return true;
+#else
+	// lets cache this so I'm not computing it over and over...
+	// It will never change during a run of the program.
+	static bool cachedValue, valueCached = false;
+
+	if (!valueCached) {
+		// if we are running under WoW, this must be 64-bit OS.
+		// Otherwise, 32-bit app + no WoW => it is 32-bit OS.
+		cachedValue = IsWow64Process();
+		valueCached = true;
+	}
+
+	return cachedValue;
+#endif
 }

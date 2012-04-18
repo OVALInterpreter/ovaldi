@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "RegKeyEffectiveRights53Probe.h"
 
 
@@ -117,7 +118,7 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
 
                 Log::Info ( "Deprecated behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
 
-            } else if ( behavior->GetName().compare ( "max_depth" ) == 0 || behavior->GetName().compare ( "recurse_direction" ) == 0 ) {
+            } else if ( behavior->GetName() == "max_depth" || behavior->GetName() == "recurse_direction" || behavior->GetName() == "windows_view" ) {
                 // Skip these as they are supported in the RegistryFinder class.
             } else {
                 Log::Info ( "Unsupported behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
@@ -126,7 +127,7 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
     }
 
     ItemVector *collectedItems = new ItemVector();
-    RegistryFinder registryFinder;
+    RegistryFinder registryFinder(RegistryFinder::behavior2view(object->GetBehaviors()));
     // Create a name ObjectEntity to provide to the RegistryFinder as it expects one, however, have the ObjectEntity set to NIL as its value does not matter.
     // Only the hive and key are relevant for this probe.
     ObjectEntity* nameEntity = new ObjectEntity();
@@ -140,15 +141,32 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
             RegKey* registryKey = ( *iterator );
 
             try {
-                string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );
-                StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject ( SE_REGISTRY_KEY, registryKeyStr, trusteeSIDEntity, true, resolveGroupBehavior, includeGroupBehavior );
+				HKEY keyHandle = NULL;
+				DWORD err;
 
-                if ( !trusteeSIDs->empty() ) {
+				if ((err = registryFinder.GetHKeyHandle(&keyHandle,
+					registryKey->GetHive(), registryKey->GetKey())) != ERROR_SUCCESS) {
+					if (keyHandle != NULL) // maybe this is paranoia...
+						RegCloseKey(keyHandle);
+					throw ProbeException("Error: unable to open registry key: " +
+						registryKey->ToString() + ": " +
+						WindowsCommon::GetErrorMessage(err));
+				}
+
+				AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+					"reg key " + registryKey->ToString());
+
+				StringSet trusteeSIDs = this->GetTrusteesForWindowsObject(
+					SE_REGISTRY_KEY, keyHandle, 
+					trusteeSIDEntity, true, resolveGroupBehavior, 
+					includeGroupBehavior);
+
+                if ( !trusteeSIDs.empty() ) {
                     StringSet::iterator iterator;
 
-                    for ( iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++ ) {
+                    for ( iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
                         try {
-                            Item* item = this->GetEffectiveRights ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ) );
+                            Item* item = this->GetEffectiveRights ( keyHandle, registryKey, ( *iterator ));
 
                             if ( item != NULL ) {
 								if (keyEntity->GetNil()) {
@@ -158,7 +176,11 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
 										keyVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									}
 								}
-                                collectedItems->push_back ( item );
+
+								item->AppendElement(new ItemEntity("windows_view",
+									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+
+								collectedItems->push_back ( item );
                             }
 
                         } catch ( ProbeException ex ) {
@@ -168,10 +190,6 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
                             Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                         }
                     }
-
-                    trusteeSIDs->clear();
-                    delete trusteeSIDs;
-
                 } else {
                     Log::Debug ( "No matching trustees found when getting effective rights for object: " + object->GetId() );
                     StringSet* trusteeSIDs = new StringSet();
@@ -191,6 +209,8 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
 								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
 							}
                             item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+							item->AppendElement(new ItemEntity("windows_view",
+								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
                         }
                     }
@@ -221,6 +241,8 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
                 item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                 item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+				item->AppendElement(new ItemEntity("windows_view",
+					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
             }
 
@@ -243,6 +265,8 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
                         item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, keyEntity->GetNil() ) );
+						item->AppendElement(new ItemEntity("windows_view",
+							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
                 }
@@ -277,27 +301,21 @@ Item* RegKeyEffectiveRights53Probe::CreateItem() {
     return item;
 }
 
-Item* RegKeyEffectiveRights53Probe::GetEffectiveRights ( string hiveStr, string keyStr, string trusteeSIDStr ) {
+Item* RegKeyEffectiveRights53Probe::GetEffectiveRights ( HKEY keyHandle, const RegKey *regKey, string trusteeSIDStr ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pAccessRights = NULL;
-    string registryKey = RegistryFinder::BuildRegistryKey ( ( const string ) RegistryFinder::ConvertHiveForWindowsObjectName ( hiveStr ), ( const string ) keyStr );
-    string baseErrMsg = "Error unable to get effective rights for trustee: " + trusteeSIDStr + " from dacl for registry key: " + RegistryFinder::BuildRegistryKey ( ( const string ) hiveStr, ( const string ) keyStr );
+    string baseErrMsg = "Error unable to get effective rights for trustee: " +
+		trusteeSIDStr + " from dacl for registry key: " + regKey->ToString();
 
     try {
-        // Verify that the registry key exists.
-        if ( RegistryFinder::GetHKeyHandle ( hiveStr, keyStr ) == NULL ) {
-            string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
-            throw ProbeException ( baseErrMsg + " because the registry key does not exist. " + systemErrMsg );
-        }
-
         // Get the sid for the trustee name
         pSid = WindowsCommon::GetSIDForTrusteeSID ( trusteeSIDStr );
         // The registry key exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "hive", hiveStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "hive", regKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key", regKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSIDStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the rights
         pAccessRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
@@ -307,8 +325,8 @@ Item* RegKeyEffectiveRights53Probe::GetEffectiveRights ( string hiveStr, string 
         }
 
         // Get the rights
-        Log::Debug ( "Getting rights mask for registry key: " + hiveStr + " key: " + keyStr + " trustee_sid: " + trusteeSIDStr );
-        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_REGISTRY_KEY, pSid, &registryKey, pAccessRights );
+        Log::Debug ( "Getting rights mask for registry key: " + regKey->ToString() + " trustee_sid: " + trusteeSIDStr );
+        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_REGISTRY_KEY, pSid, keyHandle, pAccessRights );
 
         if ( ( *pAccessRights ) & DELETE )
             item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );

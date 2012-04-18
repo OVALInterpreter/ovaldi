@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
+#include <PrivilegeGuard.h>
 #include "RegKeyAuditedPermissions53Probe.h"
 
 //****************************************************************************************//
@@ -94,7 +96,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 
                 Log::Info ( "Deprecated behavior found when collecting " + object->GetId() + ". Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
 
-            } else if ( behavior->GetName().compare ( "max_depth" ) == 0 || behavior->GetName().compare ( "recurse_direction" ) == 0 ) {
+            } else if ( behavior->GetName() == "max_depth" || behavior->GetName() == "recurse_direction" || behavior->GetName() == "windows_view" ) {
                 // Skip these as they are supported in the RegistryFinder class.
             } else {
                 Log::Info ( "Unsupported behavior found when collecting " + object->GetId() + ". Found behavior: " + behavior->GetName() + " = " + behavior->GetValue() );
@@ -103,7 +105,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
     }
 
     ItemVector *collectedItems = new ItemVector();
-    RegistryFinder registryFinder;
+    RegistryFinder registryFinder(RegistryFinder::behavior2view(object->GetBehaviors()));
     // Create a name ObjectEntity to provide to the RegistryFinder as it expects one, however, have the ObjectEntity set to NIL as its value does not matter.
     // Only the hive and key are relevant for this probe.
     ObjectEntity* nameEntity = new ObjectEntity();
@@ -117,13 +119,42 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
             RegKey* registryKey = ( *iterator );
 
             try {
-                string registryKeyStr = RegistryFinder::BuildRegistryKey ( RegistryFinder::ConvertHiveForWindowsObjectName ( registryKey->GetHive() ), registryKey->GetKey() );
-                StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject ( SE_REGISTRY_KEY, registryKeyStr, trusteeSIDEntity, true, resolveGroupBehavior, includeGroupBehavior );
 
-                if ( !trusteeSIDs->empty() ) {
-                    for ( StringSet::iterator iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++ ) {
+				HKEY keyHandle = NULL;
+				DWORD err;
+
+				/*
+				The GetSecurityInfo() docs say to access a SACL, enable SE_SECURITY_NAME priv,
+				get the handle, then disable the priv.  As far as I've been able to tell, 
+				*this is wrong*, at least when it comes to registry keys.  If you don't still
+				have the priv when GetSecurityInfo() is called, you will get error 1314,
+				"A required privilege is not held by the client."  So this priv escalation
+				cannot be scoped just to the acquisition of the handle.
+				*/
+				PrivilegeGuard pg(SE_SECURITY_NAME);
+
+				if ((err = registryFinder.GetHKeyHandle(&keyHandle,
+					registryKey->GetHive(), registryKey->GetKey(),
+					ACCESS_SYSTEM_SECURITY)) != ERROR_SUCCESS) {
+					if (keyHandle != NULL) // maybe this is paranoia...
+						RegCloseKey(keyHandle);
+					throw ProbeException("Error: unable to open registry key: " +
+						 registryKey->ToString() + ": " +
+						WindowsCommon::GetErrorMessage(err));
+				}
+
+				AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+					"reg key " + registryKey->ToString());
+
+				StringSet trusteeSIDs = this->GetTrusteesForWindowsObject(
+					SE_REGISTRY_KEY, keyHandle,
+					trusteeSIDEntity, true, resolveGroupBehavior,
+					includeGroupBehavior);
+
+                if ( !trusteeSIDs.empty() ) {
+                    for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
                         try {
-                            Item* item = this->GetAuditedPermissions ( registryKey->GetHive(), registryKey->GetKey(), ( *iterator ) );
+                            Item* item = this->GetAuditedPermissions ( keyHandle, registryKey, ( *iterator ) );
 
                             if ( item != NULL ) {
 								if (keyEntity->GetNil()) {
@@ -133,9 +164,11 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 										keyVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									}
 								}
-                                collectedItems->push_back ( item );
-                            }
 
+								item->AppendElement(new ItemEntity("windows_view",
+									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+								collectedItems->push_back ( item );
+                            }
                         } catch ( ProbeException ex ) {
                             Log::Message ( "ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
 
@@ -143,17 +176,12 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                             Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                         }
                     }
-
-                    trusteeSIDs->clear();
-                    delete trusteeSIDs;
-                    trusteeSIDs = NULL;
-
                 } else {
                     Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
-                    StringSet* trusteeSIDs = new StringSet();
+                    StringSet trusteeSIDs;
 
-                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, trusteeSIDs, true ) ) {
-                        for ( StringSet::iterator iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++ ) {
+                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, &trusteeSIDs, true ) ) {
+                        for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
@@ -165,15 +193,12 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false));
 							}
                             item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+							item->AppendElement(new ItemEntity("windows_view",
+								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
                         }
                     }
-
-                    trusteeSIDs->clear();
-                    delete trusteeSIDs;
-                    trusteeSIDs = NULL;
                 }
-
             } catch ( ProbeException ex ) {
                 Log::Message ( "ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
 
@@ -197,6 +222,8 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                 item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                 item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+				item->AppendElement(new ItemEntity("windows_view",
+					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
             }
 
@@ -219,6 +246,8 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
                         item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, keyEntity->GetNil() ) );
+						item->AppendElement(new ItemEntity("windows_view",
+							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
                 }
@@ -255,29 +284,24 @@ Item* RegKeyAuditedPermissions53Probe::CreateItem() {
     return item;
 }
 
-Item* RegKeyAuditedPermissions53Probe::GetAuditedPermissions ( string hiveStr, string keyStr, string trusteeSIDStr ) {
+Item* RegKeyAuditedPermissions53Probe::GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, string trusteeSIDStr ) {
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pSuccessfulAuditedRights = NULL;
     PACCESS_MASK pFailedAuditRights = NULL;
-    // Build the registry key.
-    string registryKey = RegistryFinder::BuildRegistryKey ( ( const string ) RegistryFinder::ConvertHiveForWindowsObjectName ( hiveStr ), ( const string ) keyStr );
-    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + trusteeSIDStr + " from sacl for registry key: " + RegistryFinder::BuildRegistryKey ( ( const string ) hiveStr, ( const string ) keyStr );
+
+	string baseErrMsg = "Error: Unable to get audited permissions for trustee: " +
+		trusteeSIDStr + " from sacl for registry key: " +
+		regKey->ToString();
 
     try {
-        // Verify that the registry key exists.
-        if ( RegistryFinder::GetHKeyHandle ( hiveStr, keyStr ) == NULL ) {
-            string systemErrMsg = WindowsCommon::GetErrorMessage ( GetLastError() );
-            throw ProbeException ( baseErrMsg + " because the registry key does not exist. " + systemErrMsg );
-        }
-
         // Get the sid for the trustee.
         pSid = WindowsCommon::GetSIDForTrusteeSID ( trusteeSIDStr );
         // The registry key exists and trustee SID seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "hive", hiveStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "hive", regKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key", regKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSIDStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the successful audited rights.
         pSuccessfulAuditedRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
@@ -309,8 +333,9 @@ Item* RegKeyAuditedPermissions53Probe::GetAuditedPermissions ( string hiveStr, s
         }
 
         // Get the audited rights.
-        Log::Debug ( "Getting audited permissions masks for registry key: " + hiveStr + " key: " + keyStr + " trustee_sid: " + trusteeSIDStr );
-        WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_REGISTRY_KEY, pSid, &registryKey, pSuccessfulAuditedRights, pFailedAuditRights );
+        Log::Debug ( "Getting audited permissions masks for registry key: " +
+			regKey->ToString() + " trustee_sid: " + trusteeSIDStr );
+        WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_REGISTRY_KEY, pSid, keyHandle, pSuccessfulAuditedRights, pFailedAuditRights );
         item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
         item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );

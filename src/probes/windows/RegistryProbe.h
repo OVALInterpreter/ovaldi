@@ -65,7 +65,7 @@ private:
      *  @param name A string that contains the name of the registry key value that you want to obtain.
      *  @return The item that represents the registry key that uses the specified hive, key, and name.
      */
-	Item* GetRegistryKey(string hive, string key, string name);
+	Item *GetRegistryKey(string hive, string key, string name, RegistryFinder &registryFinder);
 
 	/** Convert the registry data to string representations and add to the provided Item.
 	 *  @param hiveIn A string that contains the hive of the registry key that you want to obtain information for.

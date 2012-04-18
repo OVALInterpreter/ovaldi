@@ -67,7 +67,7 @@ class FileAuditedPermissions53Probe : public AbsEffectiveRightsProbe {
          *  @param trusteeSID A string that contains the trustee SID of the file that you want to get the audited permissions of.
          *  @return The item that contains the file audited permissions of the specified path, filename, and trustee SID.
          */
-        Item* GetAuditedPermissions ( string path, string fileName, string trusteeSID );
+        Item* GetAuditedPermissions ( HANDLE fileHandle, string path, string fileName, string trusteeSID );
 
         /** Get the string representation of the audited permissions.
          *  @param success An ACCESS_MASK that represents the successful audit permissions.

@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "PrinterEffectiveRightsProbe.h"
 
 //****************************************************************************************//
@@ -118,13 +119,22 @@ ItemVector* PrinterEffectiveRightsProbe::CollectItems ( Object* object ) {
 	for ( StringSet::iterator iterator1 = allPrinters->begin(); iterator1 != allPrinters->end(); iterator1++ ) {
 	
 		try {
-			StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject( SE_PRINTER, *iterator1, trusteeSIDEntity, true, resolveGroupBehavior, includeGroupBehavior );
+			AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> printerHandle(
+				GetHandleToPrinter(*iterator1), ClosePrinter, "printer "+*iterator1);
+			if (printerHandle.get() == INVALID_HANDLE_VALUE) {
+				Log::Message("Couldn't open printer "+*iterator1+": "+WindowsCommon::GetErrorMessage(GetLastError()));
+				continue;
+			}
 
-            if ( !trusteeSIDs->empty() ) {
+			StringSet trusteeSIDs = this->GetTrusteesForWindowsObject( 
+				SE_PRINTER, printerHandle.get(), trusteeSIDEntity, 
+				true, resolveGroupBehavior, includeGroupBehavior );
 
-				for ( StringSet::iterator iterator2 = trusteeSIDs->begin(); iterator2 != trusteeSIDs->end(); iterator2++ ) {
+            if ( !trusteeSIDs.empty() ) {
+
+				for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                     try {
-                        Item* item = this->GetEffectiveRights ( ( *iterator1 ) , ( *iterator2 ) );
+                        Item* item = this->GetEffectiveRights ( printerHandle.get() , *iterator1, ( *iterator2 ) );
 
                         if ( item != NULL ) {
                             collectedItems->push_back ( item );
@@ -137,9 +147,6 @@ ItemVector* PrinterEffectiveRightsProbe::CollectItems ( Object* object ) {
                         Log::Message ( "Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
                     }
                 }
-
-                delete trusteeSIDs;
-
             } else {
                 Log::Debug ( "No matching SIDs found when getting the effective rights for object: " + object->GetId() );
                 StringSet* trusteeSIDs = new StringSet();
@@ -185,9 +192,9 @@ Item* PrinterEffectiveRightsProbe::CreateItem() {
     return item;
 }
 
-Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( string printerNameStr, string trusteeSIDStr ) {
+Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( HANDLE printerHandle,
+		const string &printerNameStr, string trusteeSIDStr ) {
 
-	Log::Debug ( "Collecting effective rights for printer_name: " + printerNameStr + " trustee_sid: " + trusteeSIDStr );
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pAccessRights = NULL;
@@ -198,7 +205,6 @@ Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( string printerNameStr, s
         pSid = WindowsCommon::GetSIDForTrusteeSID ( trusteeSIDStr );
         
 		// The printer exists and the trustee_sid looks valid so we can create the new item now.
-        Log::Debug ( "Creating an item to hold the printer effective rights for printer_name: " + printerNameStr + " and trustee_sid: " + trusteeSIDStr );
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
 		item->AppendMessage(new OvalMessage("The job_access_administer and job_access_read rights are not collected because they are associated with Windows job objects.",OvalEnum::LEVEL_INFO));
@@ -214,7 +220,7 @@ Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( string printerNameStr, s
 		
         // Get the rights
         Log::Debug ( "Getting rights mask for printer_name: " + printerNameStr + " and trustee_sid: " + trusteeSIDStr );
-        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_PRINTER, pSid, &printerNameStr, pAccessRights );
+        WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_PRINTER, pSid, printerHandle, pAccessRights );
 		
         if ( ( *pAccessRights ) & DELETE )
             item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
@@ -307,7 +313,7 @@ Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( string printerNameStr, s
                 pSid = NULL;
             }
 
-            throw ex;
+            throw;
         }
     }
 
@@ -437,4 +443,15 @@ StringSet* PrinterEffectiveRightsProbe::GetAllPrinters() {
 	}
 
     return printers;
+}
+
+HANDLE PrinterEffectiveRightsProbe::GetHandleToPrinter(const string &printerName) {
+	HANDLE printerHandle = INVALID_HANDLE_VALUE;
+	// I'm not sure what access I should request...
+	PRINTER_DEFAULTS defs = {NULL, NULL, PRINTER_ALL_ACCESS};
+
+	//lame-o API only takes non-const char strings?!?!?
+	BOOL res = OpenPrinter(const_cast<char*>(printerName.c_str()), &printerHandle, &defs);
+	if (!res) printerHandle = INVALID_HANDLE_VALUE; // cause I'm paranoid.....
+	return printerHandle;
 }

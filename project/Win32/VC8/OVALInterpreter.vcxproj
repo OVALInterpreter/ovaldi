@@ -93,7 +93,7 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-	    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ExecutablePath)</ExecutablePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LibraryPath)</LibraryPath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ExecutablePath)</ExecutablePath>
@@ -409,6 +409,7 @@
     <ClCompile Include="..\..\..\src\Log.cpp" />
     <ClCompile Include="..\..\..\src\REGEX.cpp" />
     <ClCompile Include="..\..\..\src\windows\FindCloseGuard.cpp" />
+    <ClCompile Include="..\..\..\src\windows\PrivilegeGuard.cpp" />
     <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
     <ClCompile Include="..\..\..\src\XmlProcessor.cpp" />
     <ClCompile Include="..\..\..\src\XslCommon.cpp" />
@@ -530,6 +531,7 @@ echo off
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.h" />
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h" />
     <ClInclude Include="..\..\..\src\VectorPtrGuard.h" />
+    <ClInclude Include="..\..\..\src\windows\AutoCloser.h" />
     <ClInclude Include="..\..\..\src\windows\FileFinder.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h" />
@@ -573,6 +575,7 @@ echo off
     <ClInclude Include="..\..\..\src\Log.h" />
     <ClInclude Include="..\..\..\src\REGEX.h" />
     <ClInclude Include="..\..\..\src\windows\FindCloseGuard.h" />
+    <ClInclude Include="..\..\..\src\windows\PrivilegeGuard.h" />
     <ClInclude Include="..\..\..\src\XmlCommon.h" />
     <ClInclude Include="..\..\..\src\XmlProcessor.h" />
     <ClInclude Include="..\..\..\src\XslCommon.h" />

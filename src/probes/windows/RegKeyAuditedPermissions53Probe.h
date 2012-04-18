@@ -33,11 +33,9 @@
 
 #pragma warning(disable:4786)
 
+#include <string>
 #include "RegistryFinder.h"
 #include "AbsEffectiveRightsProbe.h"
-
-using namespace std;
-
 
 /**
     This class is responsible for collecting registry key information for windows regkeyauditedpermissions53_objects.
@@ -67,14 +65,14 @@ class RegKeyAuditedPermissions53Probe : public AbsEffectiveRightsProbe {
          *  @param trusteeSIDStr A string that contains the trustee SID of the registry key that you want to get the audited permissions of.
          *  @return The item that contains the registry key audited permissions of the specified hive, key, and trustee name.
          */
-        Item* GetAuditedPermissions ( string hiveStr, string keyStr, string trusteeSIDStr );
+        Item* GetAuditedPermissions ( HKEY keyHandle, const RegKey *regKey, std::string trusteeSIDStr );
 
         /** Get the string representation of the audited permissions.
          *  @param success An ACCESS_MASK that represents the successful audit permissions.
          *  @param failure An ACCESS_MASK that represents the failure audit permissions.
          *  @return The string representation of the audited permissions.
          */
-        string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
+        std::string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
 
 
         /** The static instance of the RegKeyAuditedPermissions53Probe.

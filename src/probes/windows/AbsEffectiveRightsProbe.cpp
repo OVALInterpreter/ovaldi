@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
 #include "AbsEffectiveRightsProbe.h"
 
 //****************************************************************************************//
@@ -44,45 +45,44 @@ AbsEffectiveRightsProbe::~AbsEffectiveRightsProbe() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, string objectNameStr, ObjectEntity* trusteeEntity, bool isSID,  bool resolveGroupBehavior, bool includeGroupBehavior ) {
+StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,  bool resolveGroupBehavior, bool includeGroupBehavior ) {
     PACL pdacl = NULL;
     PSID owner;
     PSID primaryGroup;
     PSECURITY_DESCRIPTOR pSD = NULL;
-    StringSet* allTrustees = new StringSet();
-    StringSet* workingTrustees = new StringSet();
-    StringSet* resultingTrustees = new StringSet();
+    StringSet allTrustees;
+    StringSet workingTrustees;
+    StringSet resultingTrustees;
 
     try {
         // Start by getting the sids from the dacl, owner, and primary group off the object's security descriptor
-        string baseErrMsg = "Error: unable to get trustees for " + WindowsCommon::GetObjectType ( objectType ) + " " + objectNameStr + ".";
-        DWORD res = GetNamedSecurityInfo ( const_cast<char*> ( objectNameStr.c_str() ), // Object name
-                                           objectType,                                  // Object type
-                                           DACL_SECURITY_INFORMATION |                  // Information type
-                                           GROUP_SECURITY_INFORMATION |
-                                           OWNER_SECURITY_INFORMATION,
-                                           &owner,                                      // Owner
-                                           &primaryGroup,                               // Primary group
-                                           &pdacl,                                      // DACL
-                                           NULL,                                        // SACL
-                                           &pSD );                                      // Security Descriptor
-
+        string baseErrMsg = "Error: unable to get trustees for " + WindowsCommon::GetObjectType ( objectType ) + ".";
+        DWORD res = GetSecurityInfo ( objectHandle,                                // Object name
+                                      objectType,                                  // Object type
+                                      DACL_SECURITY_INFORMATION |                  // Information type
+                                      GROUP_SECURITY_INFORMATION |
+                                      OWNER_SECURITY_INFORMATION,
+                                      &owner,                                      // Owner
+                                      &primaryGroup,                               // Primary group
+                                      &pdacl,                                      // DACL
+                                      NULL,                                        // SACL
+                                      &pSD );                                      // Security Descriptor
         if ( res != ERROR_SUCCESS ) {
             throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error (" + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
         }
 
         // Get sids from the dacl and insert the owner and primary group sids
 		if ( isSID ){
-			WindowsCommon::GetSidsFromPACL ( pdacl, allTrustees );
-			allTrustees->insert ( WindowsCommon::ToString ( owner ) );
-			allTrustees->insert ( WindowsCommon::ToString ( primaryGroup ) );
+			WindowsCommon::GetSidsFromPACL ( pdacl, &allTrustees );
+			allTrustees.insert ( WindowsCommon::ToString ( owner ) );
+			allTrustees.insert ( WindowsCommon::ToString ( primaryGroup ) );
 		}else{
-			WindowsCommon::GetTrusteeNamesFromPACL(pdacl, allTrustees);
-			allTrustees->insert(WindowsCommon::GetFormattedTrusteeName(owner));
-			allTrustees->insert(WindowsCommon::GetFormattedTrusteeName(primaryGroup));
+			WindowsCommon::GetTrusteeNamesFromPACL(pdacl, &allTrustees);
+			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(owner));
+			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(primaryGroup));
 		}
 		
-        Log::Debug ( "Found " + Common::ToString ( allTrustees->size() ) + " trustee SIDs when searching for all SIDs on the security descriptor of: " + objectNameStr );
+        Log::Debug ( "Found " + Common::ToString ( allTrustees.size() ) + " trustee SIDs when searching for all SIDs on the security descriptor" );
 
         // Does this trusteeSIDEntity use variables?
         if ( trusteeEntity->GetVarRef() == NULL ) {
@@ -90,13 +90,13 @@ StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE
             if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
                 // Check that the trustee SID exists
                 if ( ( isSID && WindowsCommon::TrusteeSIDExists ( trusteeEntity->GetValue() )) || (!isSID && WindowsCommon::TrusteeNameExists ( trusteeEntity->GetValue() )) ) {
-                    workingTrustees->insert ( trusteeEntity->GetValue() );
+                    workingTrustees.insert ( trusteeEntity->GetValue() );
                 }
 
             } else if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                this->GetMatchingTrustees ( trusteeEntity->GetValue(), allTrustees, workingTrustees, false );
+                this->GetMatchingTrustees ( trusteeEntity->GetValue(), &allTrustees, &workingTrustees, false );
             } else if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
-                this->GetMatchingTrustees ( trusteeEntity->GetValue(), allTrustees, workingTrustees, true );
+                this->GetMatchingTrustees ( trusteeEntity->GetValue(), &allTrustees, &workingTrustees, true );
 			}
 
         } else {
@@ -104,7 +104,7 @@ StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE
                 // In the case of equals simply loop through all the variable values and add them to the set of all sids if they exist on the system
                 for ( VariableValueVector::iterator iterator = trusteeEntity->GetVarRef()->GetValues()->begin(); iterator != trusteeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
 					if ( ( isSID && WindowsCommon::TrusteeSIDExists ( ( *iterator )->GetValue() ) ) || ( !isSID && WindowsCommon::TrusteeNameExists ( ( *iterator )->GetValue() ) ) ) {
-                        allTrustees->insert ( ( *iterator )->GetValue() );
+                        allTrustees.insert ( ( *iterator )->GetValue() );
                     }
                 }
             }
@@ -112,20 +112,17 @@ StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE
             // Loop through all of the trustee SIDs on the Security Descriptor and only keep those that match operation, value, and var check
             ItemEntity* tmp = this->CreateItemEntity ( trusteeEntity );
 
-            for ( StringSet::iterator it = allTrustees->begin(); it != allTrustees->end(); it++ ) {
+            for ( StringSet::iterator it = allTrustees.begin(); it != allTrustees.end(); it++ ) {
                 tmp->SetValue ( ( *it ) );
 
                 if ( trusteeEntity->Analyze ( tmp ) == OvalEnum::RESULT_TRUE ) {
-                    workingTrustees->insert ( ( *it ) );
+                    workingTrustees.insert ( ( *it ) );
                 }
             }
         }
 
-        //allTrustees->clear();
-        //delete allTrustees;
-
         // Apply the behaviors
-        for ( StringSet::iterator it = workingTrustees->begin(); it != workingTrustees->end(); it++ ) {
+        for ( StringSet::iterator it = workingTrustees.begin(); it != workingTrustees.end(); it++ ) {
             // Is this a group
             bool isGroup;
 
@@ -134,42 +131,25 @@ StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE
 
             if ( isGroup && resolveGroupBehavior ) {
                 if ( includeGroupBehavior ) {
-                    resultingTrustees->insert ( ( *it ) );
+                    resultingTrustees.insert ( ( *it ) );
                 }
 
                 // Get the group members and add them to the set
-                StringSet* groupMembers = new StringSet();
-                if ( isSID ) WindowsCommon::ExpandGroupBySID ( ( *it ), groupMembers, includeGroupBehavior, resolveGroupBehavior );
-				else  WindowsCommon::ExpandGroup ( ( *it ), groupMembers, includeGroupBehavior, resolveGroupBehavior );
-                for ( StringSet::iterator iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++ ) {
-                    resultingTrustees->insert ( ( *iterator ) );
+                StringSet groupMembers;
+                if ( isSID ) WindowsCommon::ExpandGroupBySID ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
+				else  WindowsCommon::ExpandGroup ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
+                for ( StringSet::iterator iterator = groupMembers.begin(); iterator != groupMembers.end(); iterator++ ) {
+                    resultingTrustees.insert ( ( *iterator ) );
                 }
 
-                delete groupMembers;
-
             } else {
-                resultingTrustees->insert ( ( *it ) );
+                resultingTrustees.insert ( ( *it ) );
             }
         }
 
 	} catch ( ... ) {
         if ( pSD != NULL ) {
             LocalFree ( pSD );
-        }
-
-        if ( allTrustees != NULL ) {
-            delete allTrustees;
-            allTrustees = NULL;
-        }
-
-        if ( workingTrustees != NULL ) {
-            delete workingTrustees;
-            workingTrustees = NULL;
-        }
-
-        if ( resultingTrustees != NULL ) {
-            delete resultingTrustees;
-            resultingTrustees = NULL;
         }
 
         throw;
@@ -179,17 +159,7 @@ StringSet* AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE
         LocalFree ( pSD );
     }
 
-	if ( allTrustees != NULL ) {
-		delete allTrustees;
-		allTrustees = NULL;
-	}
-
-    if ( workingTrustees != NULL ) {
-        delete workingTrustees;
-        workingTrustees = NULL;
-    }
-
-    Log::Debug ( "Found " + Common::ToString ( resultingTrustees->size() ) + " matching SIDs after applying behaviors on the security descriptor of: " + objectNameStr );
+    Log::Debug ( "Found " + Common::ToString ( resultingTrustees.size() ) + " matching SIDs after applying behaviors on the security descriptor" );
     return resultingTrustees;
 }
 

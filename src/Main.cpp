@@ -985,15 +985,7 @@ namespace {
 
 #ifdef WIN32
 	void CheckWow64() {
-		BOOL isWow64;
-		BOOL result = IsWow64Process(GetCurrentProcess(), &isWow64);
-
-		if (!result) {
-			Log::Info("Couldn't determine Wow64 status: " + WindowsCommon::GetErrorMessage(GetLastError()));
-			return;
-		}
-
-		if (isWow64)
+		if (WindowsCommon::IsWow64Process())
 			Log::Info("Warning: you are running the interpreter as a 32-bit process on 64-bit Windows.  "
 						"Be aware that you may get different results as compared to a 64-bit process.");
 	}

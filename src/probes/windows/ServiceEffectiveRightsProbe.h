@@ -33,6 +33,8 @@
 
 #pragma warning(disable:4786)
 
+#include <memory>
+#include <AutoCloser.h>
 #include "AbsEffectiveRightsProbe.h"
 #include "WindowsCommon.h"
 
@@ -68,7 +70,7 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
          *  @param trusteeSIDStr A string that contains the trusteeSID of the service that you want to get the effective rights of.
          *  @return The item that contains the service effective rights of the specified service and trustee SID.
          */
-        Item* GetEffectiveRights ( string serviceNameStr, string trusteeSID );
+        Item* GetEffectiveRights ( SC_HANDLE serviceHandle, string serviceNameStr, string trusteeSID );
 
         /** Get the set of all services on the system that match the object.
          *  @param serviceNameEntity A ObjectEntity that represents the service_name entity in an Object as defined in the OVAL Definition Schema.
@@ -101,6 +103,13 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 
         /** The StringSet that holds the information about all of the Windows services on the local system. */
         StringSet* services;
+
+		/**
+		 * Holds a handle to the service control manager which we can use
+		 * to query info about services.  We open it once when the probe
+		 * singleton is created, and close it when the singleton is deleted.
+		 */
+		std::auto_ptr<AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> > serviceMgr;
 };
 
 #endif

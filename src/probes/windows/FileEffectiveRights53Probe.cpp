@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <AutoCloser.h>
 #include "FileEffectiveRights53Probe.h"
 
 
@@ -190,16 +192,33 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 					//
 					// The file exists so lets get the sids to then examine effective rights
 					//
-					string filePathStr = Common::BuildFilePath((const string)fp->first, (const string)fp->second);
-                    StringSet* trusteeSIDs = this->GetTrusteesForWindowsObject(SE_FILE_OBJECT, filePathStr, trusteeSID, true, resolveGroupBehavior, includeGroupBehavior);
-					if(!trusteeSIDs->empty()) {
+					string filePathStr = Common::BuildFilePath(fp->first, fp->second);
+					HANDLE fileHandle = fileFinder.GetFileHandle(filePathStr,
+						READ_CONTROL, fileName && fileName->GetNil());
+
+					if (!fileHandle || fileHandle == INVALID_HANDLE_VALUE) {
+						throw ProbeException("Error: unable to get trustees "
+							"for file: Error opening file: " + 
+							WindowsCommon::GetErrorMessage(GetLastError()));
+					}
+
+					// need the guard, cause I know at least GetTrusteesForWindowsObject()
+					// throws, so I feel safer with it.
+					AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> handleGuard(fileHandle, 
+						CloseHandle, "file "+filePathStr);
+
+					StringSet trusteeSIDs = GetTrusteesForWindowsObject(
+						SE_FILE_OBJECT, fileHandle, trusteeSID, true, 
+						resolveGroupBehavior, includeGroupBehavior);
+
+					if(!trusteeSIDs.empty()) {
 						StringSet::iterator iterator;
-						for(iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++) {
+						for(iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++) {
 							try {
-								Item* item = this->GetEffectiveRights(fp->first, fp->second, (*iterator));
+								Item *item = this->GetEffectiveRights(fileHandle, fp->first, fp->second, (*iterator));
 								if(item != NULL) {
 									if (fileName->GetNil()) {
-										ItemEntityVector* fileNameVector = item->GetElementsByName("filename");
+										auto_ptr<ItemEntityVector> fileNameVector(item->GetElementsByName("filename"));
 										if (fileNameVector->size() > 0) {
 											fileNameVector->at(0)->SetNil(true);
 											fileNameVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
@@ -213,8 +232,6 @@ ItemVector* FileEffectiveRights53Probe::CollectItems(Object* object) {
 								Log::Message("Exception caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage());
 							}
 						}
-						delete trusteeSIDs;
-
 					} else {
 
 						Log::Debug("No matching SIDs found when getting effective rights for object: " + object->GetId());
@@ -324,32 +341,24 @@ Item* FileEffectiveRights53Probe::CreateItem() {
 	return item;
 }
 
-Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileName, string trusteeSID) {
+Item *FileEffectiveRights53Probe::GetEffectiveRights(HANDLE fileHandle, string path, string fileName, string trusteeSID) {
 	
 	Log::Debug("Collecting effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
 
-	Item* item = NULL;
+	Item *item = NULL;
 	PSID pSid = NULL;
 	PACCESS_MASK pAccessRights = NULL;
 
 	// build the path
-    string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
+    string filePath = Common::BuildFilePath(path, fileName);
 
 	string baseErrMsg = "Error unable to get effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID;
 
 
 	try {
 
-		// verify that the file exists.
-		if(GetFileAttributes(filePath.c_str()) == INVALID_FILE_ATTRIBUTES) {
-			string systemErrMsg = WindowsCommon::GetErrorMessage(GetLastError());
-			throw ProbeException(baseErrMsg + " File " + filePath + " doesn't exist. " + systemErrMsg);
-		}
-
-
 		// Get the sid for the trustee name
 		pSid = WindowsCommon::GetSIDForTrusteeSID(trusteeSID);
-
 		
 		// the file exists and the trustee_sid looks valid so we can create the new item now.
 		Log::Debug("Creating item to hold file effective rights for: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
@@ -360,7 +369,6 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("trustee_sid", trusteeSID, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
-
 		// build structure to hold the rights
 		pAccessRights = reinterpret_cast<PACCESS_MASK>(::LocalAlloc(LPTR, sizeof(PACCESS_MASK) + sizeof(ACCESS_MASK)));
 		if(pAccessRights == NULL) {
@@ -369,7 +377,7 @@ Item* FileEffectiveRights53Probe::GetEffectiveRights(string path, string fileNam
 
 		// get the rights
 		Log::Debug("Getting rights mask for file: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID);
-		WindowsCommon::GetEffectiveRightsForWindowsObject(SE_FILE_OBJECT, pSid, &filePath, pAccessRights);
+		WindowsCommon::GetEffectiveRightsForWindowsObject(SE_FILE_OBJECT, pSid, fileHandle, pAccessRights);
 	
         if((*pAccessRights) & DELETE)
             item->AppendElement(new ItemEntity("standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));

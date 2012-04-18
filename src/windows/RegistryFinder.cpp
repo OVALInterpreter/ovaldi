@@ -33,51 +33,29 @@
 char RegistryFinder::keySeparator = '\\';
 
 //****************************************************************************************//
-//					                   RegKey Class        	    						  //	
-//****************************************************************************************//
-
-RegKey::RegKey() {
-	this->hive = "";
-	this->key = "";
-	this->name = "";
-}
-
-RegKey::RegKey ( string hive, string key, string name ) {
-	this->hive = hive;
-	this->key = key;
-	this->name = name;
-}
-
-string RegKey::GetHive() {
-	return hive;
-}
-
-string RegKey::GetKey() {
-	return key;
-}
-
-string RegKey::GetName() {
-	return name;
-}
-
-void RegKey::SetHive ( string hive ) {
-	this->hive = hive;
-}
-
-void RegKey::SetKey ( string key ) {
-	this->key = key;
-}
-
-void RegKey::SetName ( string name ) {
-	this->name = name;
-}
-
-//****************************************************************************************//
 //					                RegistryFinder Class	    						  //	
 //****************************************************************************************//
 
-RegistryFinder::RegistryFinder() {
+RegistryFinder::RegistryFinder(BitnessView view) {
 	registryMatcher = new REGEX();
+
+	bitnessView =
+#ifdef _WIN64
+		view;
+#else
+		WindowsCommon::Is64BitOS() ? view : BIT_32;
+#endif
+}
+
+RegistryFinder::RegistryFinder(const string &viewStr) {
+	registryMatcher = new REGEX();
+
+	bitnessView =
+#ifdef _WIN64
+		behavior2view(viewStr);
+#else
+		WindowsCommon::Is64BitOS() ? behavior2view(viewStr) : BIT_32;
+#endif
 }
 
 RegistryFinder::~RegistryFinder() {
@@ -85,6 +63,7 @@ RegistryFinder::~RegistryFinder() {
 }
 
 RegKeyVector* RegistryFinder::SearchRegistries ( ObjectEntity* hiveEntity, ObjectEntity* keyEntity, ObjectEntity* nameEntity, BehaviorVector* behaviors ) {
+
     RegKeyVector* regKeyVector = new RegKeyVector();
     StringSet* hives = this->GetHives ( hiveEntity );
 	
@@ -413,9 +392,8 @@ StringSet* RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keySt
     return names;
 }
 
-HKEY RegistryFinder::GetHKeyHandle ( string hiveStr, string keyStr ) {
+LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string keyStr, REGSAM access ) {
     HKEY hiveHandle;
-    HKEY keyHandle;
 
 	if (hiveStr.compare("HKEY_LOCAL_MACHINE") == 0) {
         hiveHandle = HKEY_LOCAL_MACHINE;
@@ -428,25 +406,54 @@ HKEY RegistryFinder::GetHKeyHandle ( string hiveStr, string keyStr ) {
     } else if (hiveStr.compare("HKEY_CLASSES_ROOT") == 0) {
         hiveHandle = HKEY_CLASSES_ROOT;
     } else {
-		return NULL;
+		*keyHandle = NULL;
+		return ERROR_BADKEY; // not sure what error to return for this...
     }
 
-    if ( keyStr.compare ( "" ) == 0 ) {
-        return hiveHandle;
+	// short-circuit optimization so we don't have to bother with
+	// doing a RegKeyOpenEx().  In my experiments, I found that
+	// if you open a hive key (with subkey ""), you just get that same
+	// hive key back again.  And you can RegCloseKey() that key without
+	// error, but it won't actually close (as it shouldn't, since those
+	// hive keys should always be available).  But it means we can
+	// treat the hive keys uniformly with respect to other types of keys,
+	// which makes for simpler code.  Btw, this is in conflict with the
+	// MSDN docs, which say you only get the same handle back if you
+	// opened hive HKEY_CLASSES_ROOT.  Otherwise, it says you get a
+	// *new* handle.  In my experiments, I always got the same handle
+	// back, i.e. they tested equal with the == operator, with any
+	// hive.
+    if (keyStr.empty()) {
+        *keyHandle = hiveHandle;
+		return ERROR_SUCCESS;
     }
 
-    if ( RegOpenKeyExW ( hiveHandle, WindowsCommon::StringToWide ( keyStr ), 0, KEY_READ, &keyHandle ) != ERROR_SUCCESS ) {
-        return NULL;
-    }
+	return GetHKeyHandle(keyHandle, hiveHandle, keyStr, access);
+}
 
-    return keyHandle;
+LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subKeyStr, REGSAM access ) {
+
+	REGSAM view =
+#ifdef _WIN64
+	bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY;
+#else
+	// For now, don't OR any extra bits into the mask for 32-bit windows.
+	// The *_WOW64_* enumerators make no sense on 32-bit windows
+	// since there is no WOW, so it doesn't make sense to use them.
+	WindowsCommon::Is64BitOS() ?
+		bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY
+		: 0;
+#endif
+
+    return RegOpenKeyExW ( superKey, WindowsCommon::StringToWide ( subKeyStr ),
+		0, access | view, keyHandle );
 }
 
 string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keyStr) {
 	
     if(hiveStr.compare("") == 0)
         throw RegistryFinderException("An empty hive was specified when building a registry key.");
-
+	 
 	string registryKey = hiveStr;
     if(keyStr.compare("") != 0) {
         // Verify that the hive that was passed into this function ends with a slash.  If
@@ -457,7 +464,7 @@ string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keySt
         if(keyStr[0] != RegistryFinder::keySeparator) {
 			registryKey.append(keyStr);
 		} else {
-			registryKey.append(keyStr.substr(1, keyStr.length()-2));
+			registryKey.append(keyStr.substr(1));//, keyStr.length()-2));
 		}
     }
 
@@ -499,7 +506,7 @@ string RegistryFinder::ConvertHiveForWindowsObjectName( string hiveStr ){
 bool RegistryFinder::HiveExists ( string hiveStr ) {
     HKEY keyHandle = NULL;
 
-    if ( ( keyHandle = GetHKeyHandle ( hiveStr, "" ) ) == NULL ) {
+    if ( GetHKeyHandle ( &keyHandle, hiveStr) ) {
         return false;
     }
 
@@ -513,7 +520,7 @@ bool RegistryFinder::HiveExists ( string hiveStr ) {
 bool RegistryFinder::KeyExists ( string hiveStr, string keyStr ) {
     HKEY keyHandle = NULL;
 
-    if ( ( keyHandle = GetHKeyHandle ( hiveStr, keyStr ) ) == NULL ) {
+    if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
 
@@ -525,9 +532,9 @@ bool RegistryFinder::KeyExists ( string hiveStr, string keyStr ) {
 }
 
 bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr ) {
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle; 
 
-    if ( keyHandle == NULL ) {
+    if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
 
@@ -601,12 +608,13 @@ StringSet* RegistryFinder::GetAllHives() {
 StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
     StringSet* subkeys = new StringSet();
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
-    if ( keyHandle != NULL ) {
+    if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
+
             string nameStr = "";
             nameStr.append ( keyStr );
 			if ( keyStr.compare ( "" ) != 0 ) nameStr.append ( 1, RegistryFinder::keySeparator );
@@ -638,12 +646,12 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
 StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
     StringSet* names = new StringSet();
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
     string nameStr = "";
 
-    if ( keyHandle != NULL ) {
+    if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumValueW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             nameStr = WindowsCommon::UnicodeToAsciiString ( name );
             names->insert ( nameStr );
@@ -721,11 +729,11 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
     }
 
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
-    HKEY keyHandle = GetHKeyHandle ( hiveStr, keyStr );
+    HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
-    if ( keyHandle != NULL ) {
+    if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             if(!WindowsCommon::UnicodeIsValidASCII(name)){
 				Log::Info("Skipping registry key found with invalid Unicode values.");
@@ -787,7 +795,7 @@ void RegistryFinder::DownwardRegistryRecursion ( StringSet* keys, string hiveStr
             this->DownwardRegistryRecursion ( keys, hiveStr, *it, maxDepth );
 
         } else if ( maxDepth > 0 ) {
-            this->DownwardRegistryRecursion ( keys, hiveStr, *it, --maxDepth );
+            this->DownwardRegistryRecursion ( keys, hiveStr, *it, maxDepth - 1);
         }
     }
 
@@ -834,6 +842,52 @@ void RegistryFinder::UpwardRegistryRecursion ( StringSet* keys, string hiveStr, 
     }
 
     return;
+}
+
+RegistryFinder::BitnessView RegistryFinder::behavior2view(const string &viewStr) {
+	if (viewStr == "32_bit")
+		return BIT_32;
+	if (viewStr == "64_bit")
+		return BIT_64;
+	throw RegistryFinderException("Unrecognized view value: "+viewStr);
+}
+
+RegistryFinder::BitnessView RegistryFinder::behavior2view(BehaviorVector *bv) {
+	BitnessView schemaDefault = BIT_64;
+
+	if (!bv)
+		return schemaDefault;
+
+	string viewStr = Behavior::GetBehaviorValue(bv, "windows_view");
+
+	if (viewStr.empty())
+		return schemaDefault;
+
+	return behavior2view(viewStr);
+}
+
+string RegKey::ToString() const {
+	if (!hivePlusKey.empty())
+		return hivePlusKey;
+
+    if(hive.empty())
+        throw RegistryFinderException("Empty hive!");
+
+	hivePlusKey = hive;
+    if(!key.empty()) {
+        // Verify that the hive that was passed into this function ends with a slash.  If
+        // it doesn't, then add one.
+        if (hive[hive.length()-1] != RegistryFinder::keySeparator)
+	        hivePlusKey += RegistryFinder::keySeparator;
+
+        if(key[0] != RegistryFinder::keySeparator) {
+			hivePlusKey += key;
+		} else {
+			hivePlusKey += key.substr(1);//, keyStr.length()-2));
+		}
+    }
+
+    return hivePlusKey;
 }
 
 //****************************************************************************************//

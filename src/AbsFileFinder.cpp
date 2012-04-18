@@ -270,8 +270,22 @@ bool AbsFileFinder::FilePathExists(string filePath, string *actualFilePath) {
 	return exists;
 }
 
-void AbsFileFinder::FilePathExistsCaseInsensitive(string filePath, StringVector *matchingFilePaths) {
+bool AbsFileFinder::FilePathExistsCaseInsensitive(string filePath, StringVector *matchingFilePaths) {
+
+#ifdef WIN32
+	// on windows, delegate to FilePathExists, since on that platform, the case-sensitive
+	// and case-insensitive methods should behave identically.  And the case-sensitive
+	// version does no searching, which is faster.
+	string tmpFilepath;
+	bool found = FilePathExists(filePath, &tmpFilepath);
+	if (found && matchingFilePaths)
+			matchingFilePaths->push_back(tmpFilepath);
+
+	return found;
+#else
+
 	auto_ptr<StringPair> fpComponents(Common::SplitFilePath(filePath));
+	bool found;
 
 	if ( fpComponents.get() != NULL ) {
 		StringVector matchingPaths;
@@ -281,10 +295,29 @@ void AbsFileFinder::FilePathExistsCaseInsensitive(string filePath, StringVector 
 		for (StringVector::iterator iter = matchingPaths.begin();
 			 iter != matchingPaths.end();
 			 ++iter)
-			 this->GetFilesForOperation(*iter, filePath, matchingFilePaths,
-										OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS,
-										true);
+			if (matchingFilePaths) {
+				// I guess we shouldn't assume the vector started out empty!
+				size_t sizeBefore = matchingFilePaths->size();
+				this->GetFilesForOperation(*iter, filePath, matchingFilePaths,
+								OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS,
+								true);
+				found = matchingFilePaths->size() > sizeBefore;
+			} else {
+				// in theory, since in this case the caller indicated he 
+				// didn't care what files matched, just whether there was a
+				// match, we don't need to find all matches... but for
+				// simplicity's sake, for now, I'll just go through the
+				// regular search process.
+				StringVector tmp;
+				this->GetFilesForOperation(*iter, filePath, matchingFilePaths,
+								OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS,
+								true);
+				found = !tmp.empty();
+			}
 	}
+
+	return found;
+#endif
 }
 
 StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
@@ -381,7 +414,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 		iter != filePathsToSearch.end();
 		++iter) {
 
-		switch (filePath->GetOperation()) {
+		switch (tmpFilePath.GetOperation()) {
 
 		case OvalEnum::OPERATION_EQUALS:
 			// Windows: due to the op change above, this won't be executed.
