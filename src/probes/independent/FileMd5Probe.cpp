@@ -28,6 +28,17 @@
 //
 //****************************************************************************************//
 
+#ifdef WIN32
+#  include <FsRedirectionGuard.h>
+#  include <PrivilegeGuard.h>
+// macro this so it can disappear on non-windows OSs.
+#  define ADD_WINDOWS_VIEW_ENTITY \
+	item->AppendElement(new ItemEntity("windows_view", \
+		(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+#else
+#  define ADD_WINDOWS_VIEW_ENTITY
+#endif
+
 #include "FileMd5Probe.h"
 
 using namespace std;
@@ -68,20 +79,23 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
     if(filePath != NULL)
         throw ProbeException("The filepath entity is not currently supported.");
 
-	#ifdef WIN32
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
-	#endif
-
+#ifdef WIN32
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
+#else
 	FileFinder fileFinder;
-	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+#endif
 
-	#ifdef WIN32
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
+	StringPairVector* filePaths = NULL;
+#ifdef WIN32
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+#endif
+
+		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+
+#ifdef WIN32
 	}
-	#endif
+#endif
 
 	if(filePaths->size() > 0) {
 		// Loop through all file paths
@@ -104,6 +118,7 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
 					
@@ -112,14 +127,18 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 
 				}
 
 			} else {
-
-				Item* item = this->GetMd5(fp->first, fp->second);
+				Item *item;
+				FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView());
+				item = this->GetMd5(fp->first, fp->second);
+				FS_REDIRECT_GUARD_END
 				if(item != NULL) {
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 				}
 				item = NULL;
@@ -141,6 +160,7 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 				item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				ADD_WINDOWS_VIEW_ENTITY
 				collectedItems->push_back(item);
 			}
 		}
@@ -210,9 +230,6 @@ Item* FileMd5Probe::GetMd5(string path, string fileName) {
 			item->AppendElement(md5Entity);
 		
 		} else {
-			// Create the md5 hash.  This constructor creates a new md5 object, updates the hash,
-			// finalizes the hash, and closes the FILE object.
-
 			string digestVal = this->digest.digest(in, Digest::MD5);
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
 			item->AppendElement(new ItemEntity("md5", digestVal));

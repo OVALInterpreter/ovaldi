@@ -71,12 +71,12 @@ private:
 	virtual Item* CreateItem();
 
 	/** Collectect all file attributes for the specified file on the specified path. */
-	Item* GetFileAttributes(string path, string fileName);
+	Item* GetFileAttributes(string path, string fileName, FileFinder &fileFinder);
 
 	/** Get the version of the file. */
 	void GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemEntity* version);
 	/** Get the type of the file. */
-	void GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type);
+	void GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder);
 	/** Get the developement class of the file. */
 	void GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass);
 	/** Get the company of the file. */

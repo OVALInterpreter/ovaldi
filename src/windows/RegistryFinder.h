@@ -130,11 +130,6 @@ typedef std::vector<RegKey*> RegKeyVector;
  */
 class RegistryFinder {
     public:
-		/** Which "view" of the registry to search, on a 64-bit OS. */
-		enum BitnessView {
-			BIT_32, ///< well, 32_BIT isn't a valid identifier...
-			BIT_64
-		} bitnessView;
 
         /**
 		 * Create a RegistryFinder for a given view of the registry.
@@ -144,14 +139,6 @@ class RegistryFinder {
 		 * regardless of this setting.
 		 */
 		explicit RegistryFinder(BitnessView view);
-
-		/**
-		 * Create a RegistryFinder for a given view of the registry.  You
-		 * can use this ctor to initialize from a behavior value
-		 * (32_bit or 64_bit).
-		 * But see the caveat at RegistryFinder::RegistryFinder(BitnessView).
-		 */
-		explicit RegistryFinder(const std::string &viewStr);
 
         /** RegistryFinder destructor. */
         ~RegistryFinder();
@@ -282,37 +269,9 @@ class RegistryFinder {
         bool NameExists ( std::string hiveStr, std::string keyStr, std::string nameStr );
 
 		/** Returns the registry view this finder queries. */
-		BitnessView GetView() {
+		BitnessView GetView() const {
 			return bitnessView;
 		}
-
-		/**
-		 * Convenience method that converts a behavior windows_view value to one of the
-		 * BitnessView enumerators.
-		 * <p>
-		 * This does not check the OS or app bitness to determine whether the view makes
-		 * sense, it's just a straight translation.  So callers will have to take those
-		 * factors into account to select the view, not just unconditionally use the
-		 * return value as the view to query.
-		 *
-		 * \throw RegistryFinderException if viewStr isn't recognized as a valid view.
-		 */
-		static BitnessView behavior2view(const std::string &viewStr);
-
-		/**
-		 * Convenience method that gets a BitnessView enumerator for the windows_view
-		 * behavior from the given behavior vector.  If \p bv is NULL or doesn't contain
-		 * the windows_view behavior, the default as specified in the schema is returned.
-		 * <p>
-		 * This does not check the OS or app bitness to determine whether the view makes
-		 * sense, it's just a straight translation.  So callers will have to take those
-		 * factors into account to select the view, not just unconditionally use the
-		 * return value as the view to query.
-		 *
-		 * \throw RegistryFinderException if \p bv contains the windows_view behavior,
-		 *	but its value isn't recognized as valid.
-		 */
-		static BitnessView behavior2view(BehaviorVector *bv);
 
 		/** Represents the '\' character which is used to separate different registry keys. */
 		static char keySeparator;
@@ -419,6 +378,8 @@ class RegistryFinder {
         void UpwardRegistryRecursion ( StringSet* keys, std::string hiveStr, std::string keyStr, int maxDepth );
 
         REGEX *registryMatcher;
+
+		BitnessView bitnessView;
 };
 
 /**

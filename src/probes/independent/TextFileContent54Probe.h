@@ -31,6 +31,7 @@
 #ifndef TEXTFILECONTENT54PROBE_H
 #define TEXTFILECONTENT54PROBE_H
 
+#include "FileFinder.h"
 #include "AbsProbe.h"
 
 
@@ -65,6 +66,7 @@ private:
 				ObjectEntity *patternEntity,
 				ObjectEntity *instanceEntity,
 				int matchOptions,
+				FileFinder &fileFinder,
 				ItemVector* collectedItems);
 
 	/**
@@ -77,6 +79,7 @@ private:
 					ObjectEntity *patternEntity,
 					ObjectEntity *instanceEntity,
 					int matchOptions,
+					FileFinder &fileFinder,
 					ItemVector *collectedItems);
 
 	/**

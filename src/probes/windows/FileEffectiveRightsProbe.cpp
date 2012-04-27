@@ -30,6 +30,7 @@
 
 #include <memory>
 #include <AutoCloser.h>
+#include <PrivilegeGuard.h>
 #include "FileEffectiveRightsProbe.h"
 
 
@@ -123,7 +124,7 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 				    resolveGroupBehavior = true;
                 }
                 Log::Info("Deprecated behavior found when collecting " + object->GetId() + " Found behavior: " + behavior->GetName() + " = " + behavior->GetValue());
-            } else if(behavior->GetName().compare("max_depth") == 0 || behavior->GetName().compare("recurse_direction") == 0) {
+            } else if(behavior->GetName() == "max_depth" || behavior->GetName() == "recurse_direction" || behavior->GetName() == "windows_view") {
                 // skip these they are supported in the file finder class.
 
 			} else {
@@ -132,15 +133,13 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 		}		
 	}
 
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
 
-	FileFinder fileFinder;
-	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
+	StringPairVector *filePaths = NULL;
 
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
 	}
 
 	if(filePaths->size() > 0) {
@@ -165,6 +164,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil()));
+						item->AppendElement(new ItemEntity("windows_view",
+							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 					
@@ -173,6 +174,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
 
 				}
@@ -216,6 +219,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 											fileNameVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 										}
 									}
+									item->AppendElement(new ItemEntity("windows_view",
+										(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 									collectedItems->push_back(item);
 								}
 							} catch (ProbeException ex) {
@@ -239,6 +244,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 								item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 								item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, true,  ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
 								item->AppendElement(new ItemEntity("trustee_name", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+								item->AppendElement(new ItemEntity("windows_view",
+									(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 								collectedItems->push_back(item);
 							}
 						}
@@ -268,6 +275,8 @@ ItemVector* FileEffectiveRightsProbe::CollectItems(Object* object) {
 				item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("windows_view",
+					(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 				collectedItems->push_back(item);
 			}
 		}

@@ -30,6 +30,17 @@
 //
 //****************************************************************************************//
 
+#ifdef WIN32
+#  include <FsRedirectionGuard.h>
+#  include <PrivilegeGuard.h>
+// macro this so it can disappear on non-windows OSs.
+#  define ADD_WINDOWS_VIEW_ENTITY \
+	item->AppendElement(new ItemEntity("windows_view", \
+		(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+#else
+#  define ADD_WINDOWS_VIEW_ENTITY
+#endif
+
 #include "TextFileContentProbe.h"
 
 using namespace std;
@@ -66,6 +77,7 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
     ObjectEntity* filePath = object->GetElementByName("filepath");
+
     if(filePath != NULL)
         throw ProbeException("The filepath entity is not currently supported.");
 
@@ -80,20 +92,22 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 
 	ItemVector *collectedItems = new ItemVector();
 
-	#ifdef WIN32
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
-	#endif
-
+#ifdef WIN32
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
+#else
 	FileFinder fileFinder;
-	StringPairVector* filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+#endif
 
-	#ifdef WIN32
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
+	StringPairVector *filePaths;
+#ifdef WIN32
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+#endif
+		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+
+#ifdef WIN32
 	}
-	#endif
+#endif
 
 	if(filePaths->size() > 0) {
 		// Loop through all file paths
@@ -116,6 +130,7 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
 					
@@ -124,13 +139,16 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 
 				}
 
 			} else {
 
-				this->GetLines(fp->first, fp->second, line, collectedItems);
+				FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+				this->GetLines(fp->first, fp->second, line, collectedItems, fileFinder);
+				FS_REDIRECT_GUARD_END
 			}
 
 			delete fp;
@@ -149,6 +167,7 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 				item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				ADD_WINDOWS_VIEW_ENTITY
 				collectedItems->push_back(item);
 			}
 		}
@@ -173,7 +192,8 @@ Item* TextFileContentProbe::CreateItem() {
 	return item;
 }
 
-void TextFileContentProbe::GetLines(string path, string fileName, ObjectEntity* line, ItemVector* collectedItems) {
+void TextFileContentProbe::GetLines(string path, string fileName, 
+	ObjectEntity* line, ItemVector* collectedItems, FileFinder &fileFinder) {
 
 	Item *item = NULL;
 
@@ -207,6 +227,8 @@ void TextFileContentProbe::GetLines(string path, string fileName, ObjectEntity* 
 					// add a line for each matching subexpression
 					item->AppendElement(new ItemEntity("subexpression", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));					
 				}
+
+				ADD_WINDOWS_VIEW_ENTITY
 			} 
 		}
 		infile.close();

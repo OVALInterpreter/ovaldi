@@ -84,7 +84,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 	}
 
 	ItemVector *collectedItems = new ItemVector();
-	RegistryFinder registryFinder(RegistryFinder::behavior2view(object->GetBehaviors()));
+	RegistryFinder registryFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
 
 	RegKeyVector* registryKeys = registryFinder.SearchRegistries(hive, key, name, object->GetBehaviors());
 
@@ -105,7 +105,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("key", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));
 						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 				} else {
@@ -127,7 +127,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
 					}
 					item->AppendElement(new ItemEntity("windows_view",
-						(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+						(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
 				}
 
@@ -156,7 +156,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 							}
 							item->AppendElement(new ItemEntity("name", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, true));
 							item->AppendElement(new ItemEntity("windows_view",
-								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+								(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 							collectedItems->push_back(item);
 						}
 					} else {
@@ -172,7 +172,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 						}
 						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true as checked above
 						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 					if ( names != NULL ){
@@ -184,7 +184,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					Item* item = this->GetRegistryKey( registryKey->GetHive(), registryKey->GetKey(), registryKey->GetName(), registryFinder);
 					if(item != NULL) {
 						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 					item = NULL;
@@ -202,7 +202,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 				item->AppendElement(new ItemEntity("windows_view",
-					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+					(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 				collectedItems->push_back(item);
 			}
 			if ( hives != NULL ){
@@ -222,7 +222,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 						item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));	
 						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 				} else {
@@ -237,7 +237,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 								item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, key->GetNil()));
 								item->AppendElement(new ItemEntity("name", (*iterator3), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, name->GetNil()));
 								item->AppendElement(new ItemEntity("windows_view",
-									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+									(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 								collectedItems->push_back(item);
 							}
 						}

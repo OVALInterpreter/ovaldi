@@ -47,7 +47,8 @@ class  AbsFileFinder;
 */
 class FileFinder : public AbsFileFinder {
 public:
-	FileFinder();
+
+	explicit FileFinder(BitnessView view);
 	~FileFinder();
 
 	/**
@@ -68,6 +69,11 @@ public:
 	 *   GetLastError() for an error code.
 	 */
 	HANDLE GetFileHandle(const std::string &filepath, DWORD access = 0, bool isDirectory = false);
+
+	/** Returns the filesystem view this finder queries. */
+	BitnessView GetView() const {
+		return bitnessView;
+	}
 
 private:
 
@@ -125,6 +131,8 @@ private:
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/
 	virtual StringVector* GetChildDirectories(string path);
+
+	BitnessView bitnessView;
 };
 
 #endif
