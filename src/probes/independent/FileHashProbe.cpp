@@ -42,6 +42,8 @@
 		(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 #else
 #  define ADD_WINDOWS_VIEW_ENTITY
+#  define FS_REDIRECT_GUARD_BEGIN(x)
+#  define FS_REDIRECT_GUARD_END
 #endif
 
 #include "FileHashProbe.h"
