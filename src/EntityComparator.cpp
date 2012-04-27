@@ -237,14 +237,14 @@ OvalEnum::ResultEnumeration EntityComparator::CompareBoolean(OvalEnum::Operation
 
 OvalEnum::ResultEnumeration EntityComparator::CompareEvrString(OvalEnum::Operation op, string defValue, string scValue) {
 	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-	//EPOCH:VERSION-RELEASE, with datatypes of EPOCH=int, VERSION=version, release=string
-	// Validate the inputs align with the notion of an EVR string regex = "^(\d+):(\d+([\D]\d+)*?)-(.+)$"
+	//EPOCH:VERSION-RELEASE, represented as found here: http://www.rpm.org/wiki/PackagerDocs/Dependencies#RequiringPackages
+	// Validate the inputs align with the notion of an EVR string regex = "^(\d+):([^-]+)-([^-]+)$"
     REGEX myRegex;
-    if(!myRegex.IsMatch("^(\\d+):(\\d+([\\D]\\d+)*?)-(.+)$", defValue.c_str())) {
+    if(!myRegex.IsMatch("^(\\d+):([^-]+)-([^-]+)$", defValue.c_str())) {
 		throw Exception("Error: Invalid EVR string value on definition entity. " + defValue);
 	}
 
-    if(!myRegex.IsMatch("^(\\d+):(\\d+([\\D]\\d+)*?)-(.+)$", scValue.c_str())) {
+    if(!myRegex.IsMatch("^(\\d+):([^-]+)-([^-]+)$", scValue.c_str())) {
 		throw Exception("Error: Invalid EVR string value on system characteristics item entity. " + scValue);
 	}
 
