@@ -1,0 +1,836 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{adb0448c-c56d-4ee2-b526-e0e273fe51f5}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\probes">
+      <UniqueIdentifier>{d24852ab-5964-400b-b629-c498a217f73c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{9bda0dc7-dd74-440c-98fa-40143070034b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\variables">
+      <UniqueIdentifier>{5633d360-9b3c-4185-871b-6e6642cd1c21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\windows">
+      <UniqueIdentifier>{1cf84747-09d8-4fec-ae26-d0ab0f09f460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e2d97826-91f8-4812-ac88-5680344c917c}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\probes">
+      <UniqueIdentifier>{193b54f7-8f25-4442-85b4-cf2286595d2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{86de9d2c-e8f0-46cf-97db-a635b7d08694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\variables">
+      <UniqueIdentifier>{94f93a4c-fd2a-4985-894a-d476d467410a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\windows">
+      <UniqueIdentifier>{3eeb32a7-e4b2-4c30-aa81-aaa4ab6a31a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{34c4ddf5-973d-4721-a77d-a6ae471cfa05}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\AbsCriteria.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsDataCollector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsEntityValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsObjectCollector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Analyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Behavior.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\CollectedObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\CollectedSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Criteria.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Criterion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Definition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Directive.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\EntityComparator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ExtendedDefinition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Item.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ItemEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ItemFieldEntityValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ObjectEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ObjectFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ObjectReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\OvalEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\OvalMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\SetObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\State.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\StateEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\StateOrObjectFieldEntityValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\StringEntityValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TestedItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\AbsEffectiveRightsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsFileFinder.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\AccessTokenProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\ActiveDirectoryProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\AuditEventPolicyProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\CmdletProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\DNSCacheProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\EnvironmentVariableProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\FamilyProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\FileAuditedPermissions53Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\FileFinder.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\FileHash58Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\FileHashProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\FileMd5Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\FileProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\GroupProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\GroupSidProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\InterfaceProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\LDAPProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\LockoutPolicyProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\MetabaseProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\PasswordPolicyProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\PortProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\Process58Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\ProcessProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\RegistryProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyAuditedPermissions53Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyAuditedPermissionsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyEffectiveRights53Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\RegKeyEffectiveRightsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\SharedResourceProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\SidProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\SidSidProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\TextFileContent54Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\TextFileContentProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\UserProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\UserSid55Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\UserSidProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\VariableProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\VolumeProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\WMI57Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\WMIProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\WUAUpdateSearcherProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\XmlFileContentProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Common.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Digest.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\DocumentManager.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Exception.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Log.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\REGEX.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\XmlCommon.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\XmlProcessor.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\XslCommon.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsComponent.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsFunctionComponent.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\AbsVariable.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ArithmeticFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BeginFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ComponentFactory.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ComponentValue.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ConcatFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ConstantVariable.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\CountFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\EndFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\EscapeRegexFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ExternalVariable.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\LiteralComponent.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\LocalVariable.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ObjectComponent.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\PossibleRestrictionType.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\PossibleValueType.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RegexCaptureFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RestrictionType.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\SplitFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\SubstringFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TimeDifferenceFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\UniqueFunction.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\VariableComponent.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\VariableFactory.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\VariableValue.cpp">
+      <Filter>Source Files\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\DataCollector.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\ObjectCollector.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\ProbeFactory.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\RegistryFinder.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\SystemInfo.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\WindowsCommon.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\WMIUtil.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\AbsCriteria.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsDataCollector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsEntityValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsObjectCollector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Analyzer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Behavior.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\CollectedObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\CollectedSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Criteria.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Criterion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Definition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Directive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\EntityComparator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ExtendedDefinition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ItemEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ObjectEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ObjectFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ObjectReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\OvalEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\OvalMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SetObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\State.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\StateEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\StateOrObjectFieldEntityValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\StringEntityValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TestedItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\AbsEffectiveRightsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsFileFinder.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\AccessTokenProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\ActiveDirectoryProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\AuditEventPolicyProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\AuditEventPolicySubcategoriesProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\CmdletProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\DNSCacheProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\EnvironmentVariableProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\FamilyProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\FileAuditedPermissions53Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\FileAuditedPermissionsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRights53Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\FileFinder.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\FileMd5Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\FileProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\GroupProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\GroupSidProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\InterfaceProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\LDAPProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\LockoutPolicyProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\MetabaseProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\PasswordPolicyProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\PortProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\PrinterEffectiveRightsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\Process58Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\ProcessProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\RegistryProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyAuditedPermissions53Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyAuditedPermissionsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyEffectiveRights53Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\RegKeyEffectiveRightsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\ServiceEffectiveRightsProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\SharedResourceProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\SidProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\SidSidProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\TextFileContent54Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\TextFileContentProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\UserProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\UserSid55Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\UserSidProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\VariableProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\VolumeProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\WMI57Probe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\WMIProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\WUAUpdateSearcherProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\XmlFileContentProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Common.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Digest.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\DocumentManager.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Exception.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Log.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\REGEX.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\XmlCommon.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\XmlProcessor.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\XslCommon.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsComponent.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsFunctionComponent.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\AbsVariable.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ArithmeticFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\BeginFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ComponentFactory.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ComponentValue.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ConcatFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ConstantVariable.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\CountFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\EndFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\EscapeRegexFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ExternalVariable.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\LiteralComponent.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\LocalVariable.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ObjectComponent.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\PossibleRestrictionType.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\PossibleValueType.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RegexCaptureFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RestrictionType.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SplitFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SubstringFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TimeDifferenceFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\UniqueFunction.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\VariableComponent.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\VariableFactory.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\VariableValue.h">
+      <Filter>Header Files\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\DataCollector.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\ObjectCollector.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\ProbeFactory.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\RegistryFinder.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\SystemInfo.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\WindowsCommon.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\WMIItem.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\WMIUtil.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\Version.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
