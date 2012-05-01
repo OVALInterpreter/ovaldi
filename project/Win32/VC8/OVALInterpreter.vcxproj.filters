@@ -432,6 +432,12 @@
     <ClCompile Include="..\..\..\src\windows\WMIUtil.cpp">
       <Filter>Source Files\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\FindCloseGuard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\windows\PrivilegeGuard.cpp">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\AbsCriteria.h">
@@ -825,6 +831,24 @@
       <Filter>Header Files\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\windows\WMIUtil.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ArrayGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Noncopyable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\VectorPtrGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\AutoCloser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\FindCloseGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\PrivilegeGuard.h">
       <Filter>Header Files\windows</Filter>
     </ClInclude>
   </ItemGroup>
