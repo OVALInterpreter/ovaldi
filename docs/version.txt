@@ -34,7 +34,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 ---       Version 5.10.1 build 2    ---
 ---------------------------------------
-
+* Fixed validation for evr string values in EntityComparator.cpp.
+* Fixed error in handling of Unicode characters found in Windows registry while performing regular expression matching.
 ---------------------------------------
 ---       Version 5.10.1 build 1    ---
 ---------------------------------------
