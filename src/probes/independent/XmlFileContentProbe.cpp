@@ -41,6 +41,9 @@
 #  define FS_REDIRECT_GUARD_END
 #endif
 
+#include <xercesc/sax/SAXException.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
+
 #include "XmlFileContentProbe.h"
 
 using namespace std;
@@ -261,6 +264,14 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 		XalanDocument* theDocument = NULL;
 		try {
 			theDocument = theLiaison.parseXMLStream(theInputSource);
+		} catch (SAXParseException &e) {
+			throw ProbeException("SAXParseException parsing " + filePath +
+								 ": " + XmlCommon::ToString(e.getMessage()) + 
+								 "  Line=" + Common::ToString(e.getLineNumber()) +
+								 ", Col=" + Common::ToString(e.getColumnNumber()));
+		} catch (SAXException &e) {
+			throw ProbeException("SAXException parsing " + filePath + ": " +
+								 XmlCommon::ToString(e.getMessage()));
 		} catch(...) {
 			theDocument = NULL;
 			// this should never happen at this point only documents that exist should get here
