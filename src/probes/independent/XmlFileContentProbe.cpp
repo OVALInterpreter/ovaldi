@@ -399,14 +399,14 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 		XPathEvaluator::terminate();
 		XMLPlatformUtils::Terminate();
 
-		throw ex;
+		throw;
 
 	} catch(Exception ex) {
 
 		XPathEvaluator::terminate();
 		XMLPlatformUtils::Terminate();
 
-		throw ex;
+		throw;
 
 	} catch(...) {
 
