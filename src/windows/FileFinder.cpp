@@ -628,11 +628,19 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 			
 			// Found a dir
 			} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-
-				string childDir = path;					
-				childDir.append(FindFileData.cFileName);
+				//Prevent following junctions until this case is better understood
+				if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+					string reparseError;
+					reparseError.append("Skipping directory reparse point: ");
+					reparseError.append(FindFileData.cFileName);
+					Log::Info(reparseError);
+				}
+				else {
+					string childDir = path;					
+					childDir.append(FindFileData.cFileName);
 				
-				childDirs->push_back(childDir);			
+					childDirs->push_back(childDir);
+				}
 			}
 		} while (FindNextFile(hFind, &FindFileData));
 
