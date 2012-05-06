@@ -1,5 +1,3 @@
-
-
 ****************************************************
 
                   OVAL Interpreter
@@ -155,7 +153,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
        Libraries:
        xerces-c_2_7_0.dll - Xerces XML library
-       msvcr71.dll - Microsoft C Runtime Library
+       msvcr100.dll - Microsoft C Runtime Library
        pcre.dll - Perl-compatible regular-expression library
        Xalan-C_1_10.dll - Xalan XSLT library
        XalanMessages_1_10.dll - Xalan XSLT library
