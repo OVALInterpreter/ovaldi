@@ -180,7 +180,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
        To run the OVAL Interpreter, run:
 
-       ovaldi.exe -m -o definitions.xml 
+       ovaldi.exe -m -o <OVAL Definitions document> 
 
        A result summary will be output to the screen, and a detailed OVAL System
        Characteristics and OVAL Results document will be output to the current
@@ -197,11 +197,15 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        This error message occurs when the run-time components of Visual Studio,
        that are required to run an application developed with Visual Studio, are
        not installed. If you receive this error message while executing the OVAL
-       Interpreter, please install the VC++ redistributable package that can be
-       obtained at the following link. 
+       Interpreter, please install the appropriate VC++ redistributable package 
+	   that can be obtained at the following links. 
 
-         http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+		 Visual Studio C++ 2010 Redistributable Package (x86)
+         http://www.microsoft.com/en-us/download/details.aspx?id=5555
 
+		 Visual Studio C++ 2010 Redistributable Package (x64)
+         http://www.microsoft.com/en-us/download/details.aspx?id=14632
+		 
        The VC++ redistributable package will install the required run-time
        components. 
 
