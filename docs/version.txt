@@ -34,8 +34,17 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---------------------------------------
 ---       Version 5.10.1 build 2    ---
 ---------------------------------------
-* Fixed validation for evr string values in EntityComparator.cpp.
+* Updated to no longer follow Windows junctions until the OVAL Language better defines how to handle them.
+* Fixed validation for evr_string values in EntityComparator.cpp.
+* Added support for the windows_view behavior in the Windows registry-based tests.
 * Fixed error in handling of Unicode characters found in Windows registry while performing regular expression matching.
+* The Windows registry-based tests now support the collection of keys from the HKEY_CURRENT_CONFIG hive.
+* Fixed a bug in the win-def:registry_test where it was incorrectly assigning reg_expand_sz values as ints instead of strings.
+* Fixed a bug in the unix-def:xinetd_test that was causing it to encounter an unknown error.
+* Added support for the REG_NONE and REG_QWORD types in the win-def:registry_test. Since REG_NONE has no associated data type, it is treated as binary data.
+* Improved error handling in the win-def:cmdlet_test.
+* Added snapin support in the win-def:cmdlet_test.
+
 ---------------------------------------
 ---       Version 5.10.1 build 1    ---
 ---------------------------------------
