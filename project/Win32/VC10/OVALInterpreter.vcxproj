@@ -502,7 +502,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">echo on
 cd ..\..\..\src
 perl updateversion.pl
-cd ..\project\Win32\VC8
+cd ..\project\Win32\VC10
 echo off
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MITRE;%(Outputs)</Outputs>
@@ -510,7 +510,7 @@ echo off
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">echo on
 cd ..\..\..\src
 perl updateversion.pl
-cd ..\project\Win32\VC8
+cd ..\project\Win32\VC10
 echo off
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MITRE;%(Outputs)</Outputs>
