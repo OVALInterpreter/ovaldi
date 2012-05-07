@@ -454,14 +454,19 @@ void REGEX::GetAllMatchingSubstrings(const string& pattern, const string& search
 }
 
 string REGEX::RemoveExtraSlashes(string strIn) {
-
-	string doubleSlash ="\\\\";
-
-	size_t pos = strIn.find(doubleSlash, 0);
-	while (pos != string::npos)
-	{
-		strIn.erase(pos++, 1);
-		pos = strIn.find(doubleSlash, pos);
+	// This code works on the "constant portion" of a regex.
+	// It *assumes* that the value passed in is a valid regex
+	// with all regex metacharacters already escaped.
+	//
+	// It finds all escaping backslashes and removes them.  (We
+	// don't remove all backslashes because a backslash may be
+	// escaping another backslash that should be left in.)  The
+	// result is a plain non-regex string.
+	size_t pos = strIn.find('\\');
+	while (pos != string::npos && pos < strIn.size() - 1) {
+		strIn.erase(pos, 1);
+		if (pos < strIn.size() - 1)
+			pos = strIn.find('\\', pos + 1);
 	}
 
 	return strIn;	

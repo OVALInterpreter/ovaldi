@@ -99,17 +99,23 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	// the beginning of paths. (regex has to start with '^')
 	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
-		// Remove extra slashes and normalize
+		// Remove extra slashes.
 		constPortion = Common::StripTrailingSeparators(
-			WindowsCommon::GetActualPathWithCase(
-				this->fileMatcher->RemoveExtraSlashes(constPortion)));
+			this->fileMatcher->RemoveExtraSlashes(constPortion));
 	}
 
 	// Found a constant portion
 	if(!constPortion.empty() && !patternOut.empty()) {
 
-		//	Call search function
-		this->GetPathsForOperation(constPortion, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
+		// We are going to look for the path now... I want
+		// the starting directory cased properly if it exists,
+		// because it makes searching more efficient: I only 
+		// have to do it once and the search results will be 
+		// cased right automatically.
+		string casedPath;
+		if (PathExists(constPortion, &casedPath))
+			//	Call search function
+			this->GetPathsForOperation(casedPath, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
 
 	//	No constant portion.
 	} else if(constPortion.empty()) { 
@@ -137,11 +143,10 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 			}
 		}
 	} else if(patternOut.empty()) {
-
 		//	There are no pattern matching chars treat this as a normal path 
-		if(this->PathExists(constPortion)) {
-			paths->push_back(constPortion);
-		}
+		string casedPath;
+		if(this->PathExists(constPortion, &casedPath))
+			paths->push_back(casedPath);
 	}
 }
 
