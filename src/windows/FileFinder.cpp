@@ -112,10 +112,10 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 		// because it makes searching more efficient: I only 
 		// have to do it once and the search results will be 
 		// cased right automatically.
-		string casedPath;
-		if (PathExists(constPortion, &casedPath))
+		string normPath;
+		if (PathExists(constPortion, &normPath))
 			//	Call search function
-			this->GetPathsForOperation(casedPath, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
+			this->GetPathsForOperation(normPath, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
 
 	//	No constant portion.
 	} else if(constPortion.empty()) { 
@@ -144,9 +144,12 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 		}
 	} else if(patternOut.empty()) {
 		//	There are no pattern matching chars treat this as a normal path 
-		string casedPath;
-		if(this->PathExists(constPortion, &casedPath))
-			paths->push_back(casedPath);
+		string normPath;
+		if(this->PathExists(constPortion, &normPath)) {
+			if (EntityComparator::CompareString(op, queryVal, normPath) ==
+				OvalEnum::RESULT_TRUE)
+				paths->push_back(normPath);
+		}
 	}
 }
 
