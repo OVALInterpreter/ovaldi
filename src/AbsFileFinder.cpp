@@ -64,16 +64,10 @@ StringPairVector* AbsFileFinder::SearchFiles(ObjectEntity* path, ObjectEntity* f
 		} else {
 
 			StringVector* fileNames = this->GetFileNames((*pathIt), fileName);
-			if(!fileNames->empty()) {
-				StringVector::iterator fileNameIt;
-				for(fileNameIt = fileNames->begin(); fileNameIt != fileNames->end(); fileNameIt++) {
-					StringPair* filePath = new StringPair((*pathIt), (*fileNameIt));
-					filePaths->push_back(filePath);
-				}
-			}
-			else {	//path exists, file name given but not found
-					StringPair* filePath = new StringPair((*pathIt), "");
-					filePaths->push_back(filePath);
+			StringVector::iterator fileNameIt;
+			for(fileNameIt = fileNames->begin(); fileNameIt != fileNames->end(); fileNameIt++) {
+				StringPair* filePath = new StringPair((*pathIt), (*fileNameIt));
+				filePaths->push_back(filePath);
 			}
 			delete fileNames;
 		}
