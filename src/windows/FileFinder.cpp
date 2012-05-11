@@ -294,9 +294,18 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 				{
 				
 				// Found a dir
-				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-					GetPathsForOperation(dirIn + FindFileData.cFileName, queryVal, pathVector, op);
-
+				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					//Prevent following junctions until this case is better understood
+					if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+						string reparseError;
+						reparseError.append("Skipping directory reparse point: ");
+						reparseError.append(FindFileData.cFileName);
+						Log::Info(reparseError);
+					}
+					else {
+						GetPathsForOperation(dirIn + FindFileData.cFileName, queryVal, pathVector, op);
+					}
+				}
 			} while (FindNextFile(hFind, &FindFileData));
 
 			//	Close the handle to the file search object.
