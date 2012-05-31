@@ -185,6 +185,18 @@ void Test::SetResult(OvalEnum::ResultEnumeration result) {
 	this->result = result;
 }
 
+
+OvalMessageVector* Test::GetMessages() {
+	return &this->testMessages;
+}
+
+
+void Test::AppendMessage(OvalMessage* message) {
+	this->GetMessages()->push_back(message);
+}
+
+
+
 int Test::GetVariableInstance() {
 
 	return this->variableInstance;
@@ -288,6 +300,15 @@ void Test::Write(DOMElement* parentElm) {
 			(*iterator1)->WriteTestedVariable(testElm);
 		}
 
+		OvalMessage* currentMessage = NULL;
+		while(this->GetMessages()->size() != 0) {
+			currentMessage = this->GetMessages()->at(this->GetMessages()->size()-1);
+			this->GetMessages()->pop_back();
+			currentMessage->Write(resultDoc,testElm,"oval");	  		
+			delete currentMessage;
+			currentMessage = NULL;
+		}
+
 		// loop through all vars in the states
         for(StringSet::iterator it = this->GetStateIds()->begin(); it != this->GetStateIds()->end(); it++) {
 	    
@@ -323,6 +344,7 @@ void Test::Parse(DOMElement* testElm) {
 		Log::Info("Converting deprected check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'. The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
 		this->SetCheckExistence(OvalEnum::EXISTENCE_NONE_EXIST);
 		this->SetCheck(OvalEnum::CHECK_NONE_SATISFY);
+		this->AppendMessage(new OvalMessage("Converting deprecated check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'. The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here."));
 	}
 
 	// get the object element and the object id if it exists
