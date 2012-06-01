@@ -285,7 +285,7 @@ bool AbsFileFinder::FilePathExistsCaseInsensitive(string filePath, StringVector 
 #else
 
 	auto_ptr<StringPair> fpComponents(Common::SplitFilePath(filePath));
-	bool found;
+	bool found = false;
 
 	if ( fpComponents.get() != NULL ) {
 		StringVector matchingPaths;
