@@ -64,7 +64,7 @@ StateOrObjectFieldEntityValue::~StateOrObjectFieldEntityValue() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-bool StateOrObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
+/*bool StateOrObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
 	StateOrObjectFieldEntityValue* fieldEntityValue = (StateOrObjectFieldEntityValue*)entityValue;
 	bool isEqual = false;
 
@@ -83,7 +83,7 @@ bool StateOrObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
 	}
 	return isEqual;
 }
-
+*/
 void StateOrObjectFieldEntityValue::Parse(DOMElement* objectEntityElm) {
 
 	this->SetName(XmlCommon::GetAttributeByName(objectEntityElm,"name"));

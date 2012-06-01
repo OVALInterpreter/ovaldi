@@ -174,68 +174,6 @@ void Item::AppendMessage(OvalMessage* msg) {
 	this->messages.push_back(msg);
 }
 
-bool Item::Equals(Item* item) {
-
-	bool isEqual = false;
-
-	try {
-		// compare name
-		if(this->GetName().compare(item->GetName()) == 0) {
-			// compare xmlns
-			if(this->GetXmlns().compare(item->GetXmlns()) == 0) {
-				// get the object elements for each item
-				ItemEntityVector* myObjElms = this->GetObjectElements();
-				ItemEntityVector* itemObjElms = item->GetObjectElements();
-				
-				// both the same number of object elements keep checking otherwise not equal
-				if(myObjElms->size() == itemObjElms->size()) {
-
-					// compare all object elements
-					unsigned int myElementCount = myObjElms->size();
-					if(myElementCount == 0) {
-						isEqual = true;
-					} else {
-						unsigned int i = 0;
-						bool finished = false;
-						while(i < myElementCount && !finished) {
-							ItemEntity* myElement = (ItemEntity*)myObjElms->at(i++);
-							
-							string elmName = myElement->GetName();
-							// loop over itemObjElms to find the element with the same name
-							ItemEntityVector::iterator it;
-							for(it = itemObjElms->begin(); it != itemObjElms->end(); it++) {
-								if((*it)->GetName().compare(elmName) == 0) {
-									if(myElement->Equals((*it))) {
-										isEqual = true;
-										finished = false;
-										break;
-									} else {
-										isEqual = false;
-										finished = true;
-										break;
-									}
-								}
-							}
-						}
-					}
-
-				} else {
-					isEqual = false;
-				}
-
-				delete myObjElms;
-				delete itemObjElms;
-			} 
-		}
-	} catch (Exception ex) {
-		throw Exception("Error: An error occured with comparing two Items", ERROR_FATAL, &ex);
-	} catch(...) {
-		throw Exception("Error: An unknown error occured with comparing two Items", ERROR_FATAL);
-	}
-
-	return isEqual;
-}
-
 ItemEntityVector* Item::GetObjectElements() {
 
 	ItemEntityVector* objElms = new ItemEntityVector();

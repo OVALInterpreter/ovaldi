@@ -77,30 +77,6 @@ ObjectEntity::~ObjectEntity() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-bool ObjectEntity::Equals(AbsEntity* entity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return true if this ObjectEntity is equal to the provided ObjectEntity
-	// -----------------------------------------------------------------------
-	ObjectEntity* objectEntity = (ObjectEntity*)entity;
-	bool isEqual = false;
-
-	if(this->GetDatatype() == objectEntity->GetDatatype()) {
-		if(this->GetOperation() == objectEntity->GetOperation()) {
-			if(this->GetName().compare(objectEntity->GetName()) == 0) {
-				if(this->GetValue().compare(objectEntity->GetValue()) == 0) {
-					if(this->GetVarCheck() == objectEntity->GetVarCheck()) {
-						isEqual = true;
-					}
-				}
-			}
-		}
-	}
-
-	return isEqual;
-}
-
 void ObjectEntity::Parse(DOMElement* objectEntityElm) {
 
 	this->SetName(XmlCommon::GetElementName(objectEntityElm));

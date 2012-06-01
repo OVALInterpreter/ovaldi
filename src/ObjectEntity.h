@@ -56,13 +56,6 @@ public:
 	/** ObjectEntity destructor. */
 	~ObjectEntity();
 
-	/**
-	 *  Return true if the specified entity is equal to the current entity. Otherwise return false.
-	 *	@param entity an AbsEntity* to compare against.
-	 *	@return The result of the comparison.
-	 */
-	bool Equals(AbsEntity* entity);
-
 	/** Parse the XML representation of a ObjectEntity.
 	 *	@param entityElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.

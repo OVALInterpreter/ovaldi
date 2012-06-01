@@ -94,7 +94,7 @@ public:
 		@param entityValue the AbsEntityValue that you would like to see if the current ItemFieldEntityValue is equal to.
 		@return a boolean value indicating whether or not the two ItemFieldEntityValues are equal.
 	*/
-	virtual bool Equals(AbsEntityValue* entityValue);
+	//virtual bool Equals(AbsEntityValue* entityValue);
 
 	/** Write this ItemFieldEntityValue as the value of the specified entity in the specified systems-characteristics file. 
 	 *  @param scFile A pointer to a DOMDocument that specifies the system-characteristics file where the data should be written to.

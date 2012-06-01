@@ -47,7 +47,7 @@ StringEntityValue::StringEntityValue(string value) : AbsEntityValue(value) {
 StringEntityValue::~StringEntityValue(){
 
 }
-
+/*
 bool StringEntityValue::Equals(AbsEntityValue *entityValue){
 	StringEntityValue* stringEntityValue = (StringEntityValue*)entityValue;
 	bool isEqual = false;
@@ -58,7 +58,7 @@ bool StringEntityValue::Equals(AbsEntityValue *entityValue){
 
 	return isEqual;
 }
-
+*/
 void StringEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm){
 	DOMText* newItemEntityElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
 	entityElm->appendChild(newItemEntityElemValue);

@@ -54,20 +54,6 @@ public:
 	/** StateEntity destructor. */
 	~StateEntity();
 
-	/**
-	 *  Return true if the specified entity is equal to the current entity. Otherwise return false.
- 	 *  @param entity an AbsEntity* to compare against.
-	 *  @return The result of the comparison.
-	 */
-	bool Equals(AbsEntity* entity);
-
-	/** Return true if the specified entity value exists in the entity value vector.
-	 *  @param entityValueVector the entity value vector for which you want to see if the specified entity value exists.
-	 *	@param entityValue the entity value whose existence you would like to check in the specified entity value vector.
-	 * 	@return A boolean value indicating whether or not the specified entity value exists in the specified entity values vector.
-	 */
-	bool ValueExistsInStateEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue);
-
 	/** Parse the XML representation of a StateEntity.
 	 *	@param entitiyElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.

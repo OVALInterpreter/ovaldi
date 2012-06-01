@@ -54,7 +54,7 @@ public:
 	 *  @param entityValue A pointer to a AbsEntityValue that specifies the string entity value that should be comapred to this string entity value.
 	 *  @return A boolean indicating if the two values entity values are equal. If they are equal, the value returned is 'true'.
 	 */
-	bool Equals(AbsEntityValue* entityValue);
+	//bool Equals(AbsEntityValue* entityValue);
 
 	/** Write this StringEntityValue as the value of the specified entity in the specified systems-characteristics file. 
 	 *  @param scFile A pointer to a DOMDocument that specifies the system-characteristics file where the data should be written to.

@@ -99,55 +99,6 @@ void StateEntity::SetEntityCheck(OvalEnum::Check entityCheck) {
 	this->entityCheck = entityCheck;
 }
 
-bool StateEntity::Equals(AbsEntity* entity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return true if this StateEntity is equal to the provided StateEntity
-	// -----------------------------------------------------------------------
-	StateEntity* stateEntity = (StateEntity*)entity;
-	bool isEqual = false;
-
-	if(this->GetDatatype() == stateEntity->GetDatatype()) {
-		if(this->GetOperation() == stateEntity->GetOperation()) {
-			if(this->GetName().compare(stateEntity->GetName()) == 0) {
-				if (this->GetEntityCheck() == stateEntity->GetEntityCheck()){
-					if (this->GetVarCheck() == stateEntity->GetVarCheck()){
-						if (this->GetValues().size() == stateEntity->GetValues().size() ){
-							// Unlike item entities, we only need to check one vector against the other
-							// because the vectors must be unique so there will not be the possibility for
-							// duplicates that may cause false positives that they are equal.
-							for(AbsEntityValueVector::iterator it = this->GetValues().begin() ; it != this->GetValues().end() ; it++){
-								if ( !this->ValueExistsInStateEntity(stateEntity->GetValues(),*it) ){
-									isEqual = false; // Short-circuit out. There is no need to do anything else because they are not equal.
-								}
-							}
-							isEqual = true;
-						}
-					}
-				}
-			
-			}
-		}
-	}
-
-	return isEqual;
-}
-
-bool StateEntity::ValueExistsInStateEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue) {
-
-	bool exists = false;
-	
-	for(AbsEntityValueVector::iterator iterator = entityValueVector.begin(); iterator != entityValueVector.end(); iterator++) {
-		if(entityValue->Equals(*iterator)) {
-			exists = true;
-			break;
-		}
-	}	
-
-	return exists;
-}
-
 void StateEntity::Parse(DOMElement* stateEntityElm) {
 
 	this->SetName(XmlCommon::GetElementName(stateEntityElm));

@@ -71,13 +71,6 @@ public:
 	virtual ~AbsEntity();
 
 	/**
-		Return true if the specified entity is equal to the current entity. Otherwise return false.
-		@param entity an AbsEntity* to compare against.
-		@return The result of the comparison.
-	*/
-	virtual bool Equals(AbsEntity* entity) = 0;
-
-	/**
 		Parse the specified DOMElement* into an AbsEntity.
 		@param entitiyElm a DOMElement* that represents the xml version of an entity.
 	*/
