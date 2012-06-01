@@ -1054,16 +1054,8 @@ string EntityComparator::GetReleaseFromEVR(string evrStr) {
 }
 
 OvalEnum::ResultEnumeration EntityComparator::CompareIpv4Address(OvalEnum::Operation op, string defValue, string scValue) {
-	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
-	// Validate the inputs align with the IPV4 regex = "^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$"
-    REGEX myRegex;
-    if(!myRegex.IsMatch("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$", defValue.c_str())) {
-		throw Exception("Error: Invalid IPV4 value on definition entity. " + defValue);
-	}
 
-    if(!myRegex.IsMatch("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$", scValue.c_str())) {
-		throw Exception("Error: Invalid IPV4 value on system characteristics item entity. " + scValue);
-	}
+	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
 	Ipv4Address defAddr(defValue), scAddr(scValue);
 
 	switch (op) {
