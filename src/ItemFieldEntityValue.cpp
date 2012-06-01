@@ -85,22 +85,7 @@ void ItemFieldEntityValue::SetStatus(OvalEnum::SCStatus scStatus) {
 	
 	this->scStatus = scStatus;
 }
-/*
-bool ItemFieldEntityValue::Equals(AbsEntityValue* entityValue){
-	ItemFieldEntityValue* fieldEntityValue = (ItemFieldEntityValue*)entityValue;
-	bool isEqual = false;
 
-	if(this->GetDatatype() == fieldEntityValue->GetDatatype()) {
-		if(this->GetName().compare(fieldEntityValue->GetName()) == 0) {
-			if(this->GetValue().compare(fieldEntityValue->GetValue()) == 0) {
-				isEqual = true;	
-			}
-		}
-	}
-
-	return isEqual;
-}
-*/
 void ItemFieldEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemEntityElm) {
 	// Create new field element
 	DOMElement* newEntityValueElem = scFile->createElement(XMLString::transcode("oval-sc:field"));

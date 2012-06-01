@@ -50,12 +50,6 @@ public:
     /** Destructor for a StringEntityValue.*/
 	virtual ~StringEntityValue();
 
-	/** Determine if the StringEntityValue is equal to the specified StringEntityValue. This is determined by comparing the value of each entity value.  
-	 *  @param entityValue A pointer to a AbsEntityValue that specifies the string entity value that should be comapred to this string entity value.
-	 *  @return A boolean indicating if the two values entity values are equal. If they are equal, the value returned is 'true'.
-	 */
-	//bool Equals(AbsEntityValue* entityValue);
-
 	/** Write this StringEntityValue as the value of the specified entity in the specified systems-characteristics file. 
 	 *  @param scFile A pointer to a DOMDocument that specifies the system-characteristics file where the data should be written to.
 	 *  @param entityElm A pointer to a DOMDocument that specifies the entity for which the StringEntityValue should be written to.
