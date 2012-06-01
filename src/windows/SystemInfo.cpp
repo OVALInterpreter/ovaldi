@@ -185,13 +185,13 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 			// Test for the specific product.
 			if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && osvi.wProductType == VER_NT_WORKSTATION) {
 				sysInfo->os_name = "Microsoft Windows 7";	
-			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && osvi.wProductType == VER_NT_SERVER) {
+			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
 				sysInfo->os_name = "Microsoft Server 2008 R2";	
-			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && osvi.wProductType == VER_NT_SERVER) {
+			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
 				sysInfo->os_name = "Microsoft Server 2008";	
 			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && osvi.wProductType == VER_NT_WORKSTATION) {
 				sysInfo->os_name = "Microsoft Windows Vista";	
-			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 && osvi.wProductType == VER_NT_SERVER) {
+			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
 				sysInfo->os_name = "Microsoft Windows Server 2003";	
 			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
 				sysInfo->os_name = "Microsoft Windows XP";
