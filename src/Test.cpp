@@ -60,6 +60,14 @@ Test::~Test() {
 	  	item = NULL;
 	}
 
+	OvalMessage* currentMessage = NULL;
+	while(this->GetMessages()->size() != 0) {
+		currentMessage = this->GetMessages()->at(this->GetMessages()->size()-1);
+		this->GetMessages()->pop_back();
+		delete currentMessage;
+		currentMessage = NULL;
+	}
+
     this->stateIds.clear();
 }
 
@@ -286,12 +294,12 @@ void Test::Write(DOMElement* parentElm) {
 		}	
 
 		TestedItem* currentElement = NULL;
-		while(this->GetTestedItems()->size() != 0) {
-			currentElement = this->GetTestedItems()->at(this->GetTestedItems()->size()-1);
-			this->GetTestedItems()->pop_back();
+		unsigned int sizeOfItemList = this->GetMessages()->size();
+		unsigned int itemCounter = 0;
+		while(itemCounter < sizeOfItemList) {
+			currentElement = this->GetTestedItems()->at(itemCounter);
 			currentElement->Write(testElm);	  		
-	  		delete currentElement;
-	  		currentElement = NULL;
+	  		itemCounter++;
 		}
 
 		// loop through all variable values and call write method
@@ -301,12 +309,12 @@ void Test::Write(DOMElement* parentElm) {
 		}
 
 		OvalMessage* currentMessage = NULL;
-		while(this->GetMessages()->size() != 0) {
-			currentMessage = this->GetMessages()->at(this->GetMessages()->size()-1);
-			this->GetMessages()->pop_back();
-			currentMessage->Write(resultDoc,testElm,"oval");	  		
-			delete currentMessage;
-			currentMessage = NULL;
+		unsigned int sizeOfMessageList = this->GetMessages()->size();
+		unsigned int msgCounter = 0;
+		while(msgCounter < sizeOfMessageList) {
+			currentMessage = this->GetMessages()->at(msgCounter);
+			currentMessage->Write(resultDoc,testElm,"oval");	 
+			msgCounter++;
 		}
 
 		// loop through all vars in the states
