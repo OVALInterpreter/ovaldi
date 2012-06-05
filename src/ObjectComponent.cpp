@@ -196,8 +196,10 @@ ComponentValue* ObjectComponent::ComputeValue() {
 	} else {
 
 		if(errorMsg.compare("") != 0) {
+			result->SetFlag(OvalEnum::FLAG_ERROR);
 			result->AppendMessage("ObjectComponent::ComputeValue() - Unable to compute variable value. No items found for the specified object_component id: " + this->GetObjectId() + errorMsg);			
 		} else {
+			result->SetFlag(OvalEnum::FLAG_ERROR);
 			result->AppendMessage("ObjectComponent::ComputeValue() - Unable to compute variable value. No items found for the specified object_component id: " + this->GetObjectId());
 		}
 	}
