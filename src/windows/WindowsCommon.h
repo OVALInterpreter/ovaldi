@@ -197,7 +197,7 @@ public:
 	static StringSet* GetAllLocalUserSids();
 
 	/** Retrieves the last login time from a local username */
-	static string GetLastLogonTimeStamp(string username);
+	static int GetLastLogonTimeStamp(string username);
 
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);

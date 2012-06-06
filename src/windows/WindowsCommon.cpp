@@ -1035,7 +1035,7 @@ StringSet* WindowsCommon::GetAllLocalUserSids() {
 	return WindowsCommon::allLocalUserSIDs;
 }
 
-string WindowsCommon::GetLastLogonTimeStamp(string username){
+int WindowsCommon::GetLastLogonTimeStamp(string username){
 	LPUSER_INFO_2 uBuf = NULL;
 	NET_API_STATUS nStatus;
 	size_t found;
@@ -1055,24 +1055,12 @@ string WindowsCommon::GetLastLogonTimeStamp(string username){
 	nStatus = NetUserGetInfo(NULL,ws,2,(LPBYTE *)& uBuf);
 	delete[] ws;
 
-	DWORD lastLogon = uBuf->usri2_last_logon;
-
-	if(lastLogon == 0){
-		return "";
+	if(nStatus == NERR_Success){
+		DWORD lastLogon = uBuf->usri2_last_logon;
+		return (int)lastLogon;
+	}else{
+		return 0;
 	}
-
-	const time_t  llTime = lastLogon;
-	tm * timeResult = localtime( &llTime );
-	string timeStamp = asctime (timeResult);
-
-	//int len = timeStamp.length();
-	//if(timeStamp[len-1] == '\n'){
-	//	timeStamp[len-1] = 0;
-	//}
-
-	timeStamp.erase(std::remove(timeStamp.begin(), timeStamp.end(), '\n'), timeStamp.end()); 
-
-	return timeStamp;
 }
 
 void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
