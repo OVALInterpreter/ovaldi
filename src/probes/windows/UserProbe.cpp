@@ -113,6 +113,9 @@ Item* UserProbe::GetUserInfo(string userName) {
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		item->AppendElement(new ItemEntity("user", userName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 
+		//string timeStamp = WindowsCommon::GetLastLogonTimeStamp(userName);
+		//item->AppendElement(new ItemEntity("last_logon", timeStamp, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		
 		// get the enabled flag
 		try {
 			bool enabled = WindowsCommon::GetEnabledFlagForUser(userName);
@@ -131,6 +134,14 @@ Item* UserProbe::GetUserInfo(string userName) {
 			item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 		delete groups;
+
+		string timeStamp = WindowsCommon::GetLastLogonTimeStamp(userName);
+		if(timeStamp.length() > 0){
+			item->AppendElement(new ItemEntity("last_logon", timeStamp, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		}else{
+			item->AppendElement(new ItemEntity("last_logon", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
 	} else {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);

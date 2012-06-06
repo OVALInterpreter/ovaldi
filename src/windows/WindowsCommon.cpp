@@ -33,6 +33,7 @@
 #include <cstring>
 #include <memory>
 #include <ArrayGuard.h>
+#include <time.h>
 #include "WindowsCommon.h"
 
 StringSet* WindowsCommon::allLocalUserSIDs = NULL;
@@ -1034,6 +1035,44 @@ StringSet* WindowsCommon::GetAllLocalUserSids() {
 	return WindowsCommon::allLocalUserSIDs;
 }
 
+string WindowsCommon::GetLastLogonTimeStamp(string username){
+	LPUSER_INFO_2 uBuf = NULL;
+	NET_API_STATUS nStatus;
+	size_t found;
+	int position = 0;
+
+	found = username.find("\\");
+	position = (int)found;
+
+	if(position > 0){
+		username = username.substr(position+1);
+	}
+
+	LPWSTR ws = new wchar_t[username.size()+1]; // +1 for zero at the end 
+	copy( username.begin(), username.end(), ws ); 
+	ws[username.size()] = 0; // zero at the end 
+	
+	nStatus = NetUserGetInfo(NULL,ws,2,(LPBYTE *)& uBuf);
+	delete(ws);
+
+	DWORD lastLogon = uBuf->usri2_last_logon;
+
+	if(lastLogon == 0){
+		return "";
+	}
+
+	const time_t  llTime = lastLogon;
+	tm * timeResult = localtime( &llTime );
+	string timeStamp = asctime (timeResult);
+
+	int len = strlen(timeStamp.c_str());
+	if(timeStamp[len-1] == '\n'){
+		timeStamp[len-1] = 0;
+	}
+
+	return timeStamp;
+}
+
 void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 
 	NTSTATUS nts;
@@ -1053,6 +1092,7 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
     DWORD recordsEnumerated = 0;
     DWORD totalRecords = 0;
     USER_INFO_0* userInfo = NULL;
+	
 	DWORD resumeHandle = 0;
 
 	do {
@@ -1062,16 +1102,16 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 		// will need to make multiple calls to NetUserEnum().
 		//
 		// NOTE: NetUserEnum() requires us to link to Netapi32.lib.
-
+		
 		nas = NetUserEnum(NULL,
 						  0,			// need to us this to get the name
-						  0,			// FILTER_NORMAL_ACCOUNT
+						  0,			// filter 
 						  (unsigned char**) &userInfo,
 						  MAX_PREFERRED_LENGTH,
 						  &recordsEnumerated,
 						  &totalRecords,
 						  &resumeHandle);
-
+		
 		if ((nas == NERR_Success) || (nas == ERROR_MORE_DATA)) {
 
 			// User account names are limited to 20 characters.
@@ -1092,6 +1132,8 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 				// get formatted trustee name
 				userName = WindowsCommon::GetFormattedTrusteeName(pSid);
 				allUsers->insert(userName);
+			
+				
 			}
 
 		} else {
@@ -1111,6 +1153,7 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 			NetApiBufferFree(userInfo);
 			userInfo = NULL;
 		}
+		
 
 	} while (nas==ERROR_MORE_DATA); 
 

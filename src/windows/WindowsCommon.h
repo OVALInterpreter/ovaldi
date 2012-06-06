@@ -196,6 +196,9 @@ public:
 	/** Retrieves list of sids for all local users */
 	static StringSet* GetAllLocalUserSids();
 
+	/** Retrieves the last login time from a local username */
+	static string GetLastLogonTimeStamp(string username);
+
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
 
