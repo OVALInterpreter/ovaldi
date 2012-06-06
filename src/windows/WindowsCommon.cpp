@@ -1053,7 +1053,7 @@ string WindowsCommon::GetLastLogonTimeStamp(string username){
 	ws[username.size()] = 0; // zero at the end 
 	
 	nStatus = NetUserGetInfo(NULL,ws,2,(LPBYTE *)& uBuf);
-	delete(ws);
+	delete[] ws;
 
 	DWORD lastLogon = uBuf->usri2_last_logon;
 
@@ -1065,10 +1065,12 @@ string WindowsCommon::GetLastLogonTimeStamp(string username){
 	tm * timeResult = localtime( &llTime );
 	string timeStamp = asctime (timeResult);
 
-	int len = strlen(timeStamp.c_str());
-	if(timeStamp[len-1] == '\n'){
-		timeStamp[len-1] = 0;
-	}
+	//int len = timeStamp.length();
+	//if(timeStamp[len-1] == '\n'){
+	//	timeStamp[len-1] = 0;
+	//}
+
+	timeStamp.erase(std::remove(timeStamp.begin(), timeStamp.end(), '\n'), timeStamp.end()); 
 
 	return timeStamp;
 }
