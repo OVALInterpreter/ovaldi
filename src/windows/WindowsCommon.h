@@ -197,7 +197,10 @@ public:
 	static StringSet* GetAllLocalUserSids();
 
 	/** Retrieves the last login time from a local username */
-	static int GetLastLogonTimeStamp(string username);
+	static DWORD GetLastLogonTimeStamp(string username);
+
+	/** Retrieves the last registry write time for a given key */
+	static int GetLastRegistryKeyWriteTimeStamp(string keyName);
 
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);

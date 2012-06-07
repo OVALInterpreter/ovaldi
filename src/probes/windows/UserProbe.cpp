@@ -132,11 +132,9 @@ Item* UserProbe::GetUserInfo(string userName) {
 		}
 		delete groups;
 
-		int timeStamp = WindowsCommon::GetLastLogonTimeStamp(userName);
+		DWORD timeStamp = WindowsCommon::GetLastLogonTimeStamp(userName);
 		if(timeStamp > 0){
-			stringstream ss;
-			ss << timeStamp;
-			item->AppendElement(new ItemEntity("last_logon", ss.str(), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("last_logon", Common::ToString(timeStamp), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 		}else{
 			item->AppendElement(new ItemEntity("last_logon", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}

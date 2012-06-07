@@ -1035,7 +1035,7 @@ StringSet* WindowsCommon::GetAllLocalUserSids() {
 	return WindowsCommon::allLocalUserSIDs;
 }
 
-int WindowsCommon::GetLastLogonTimeStamp(string username){
+DWORD WindowsCommon::GetLastLogonTimeStamp(string username){
 	LPUSER_INFO_2 uBuf = NULL;
 	NET_API_STATUS nStatus;
 	size_t found;
@@ -1061,6 +1061,19 @@ int WindowsCommon::GetLastLogonTimeStamp(string username){
 	}else{
 		return 0;
 	}
+}
+
+int WindowsCommon::GetLastRegistryKeyWriteTimeStamp(string keyName) {
+	//FILETIME keyInfo = NULL;
+
+
+
+	//if(keyInfo != NULL){
+	//	return (int)keyInfo->dwLowDateTime;
+	//}else{
+	//	return 0;
+	//}
+	return 0;
 }
 
 void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
