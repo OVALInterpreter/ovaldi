@@ -768,9 +768,9 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
         pathNameStr.append ( "/" );
         pathNameStr.append ( distinguishedNameStr );
     }
-
-    hResult = ADsOpenObject ( WindowsCommon::StringToWide ( pathNameStr ) , NULL , NULL , ADS_SECURE_AUTHENTICATION , IID_IDirectorySearch, ( void ** ) & adsiSearch );
-
+	LPWSTR wPathNameStr = WindowsCommon::StringToWide ( pathNameStr );
+    hResult = ADsOpenObject (wPathNameStr , NULL , NULL , ADS_SECURE_AUTHENTICATION , IID_IDirectorySearch, ( void ** ) & adsiSearch );
+	delete wPathNameStr;
     if ( SUCCEEDED ( hResult ) ) {
         if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::GET_ALL_ATTRIBUTES ) == 0 ) {
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_PAGESIZE;
@@ -819,6 +819,7 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                     }
                 }
             }
+			delete distinguishedNameAttributeStr;
 
         } else if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::OBJECT_EXISTS ) == 0 ) {
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
@@ -849,6 +850,8 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                 attributeArray[1] = WindowsCommon::StringToWide ( activeDirectoryOperationStr );
                 hResult = adsiSearch->ExecuteSearch ( NULL , attributeArray , 2 , &hSearch );
             }
+			delete attributeArray[0];
+			delete attributeArray[1];
 
             if ( SUCCEEDED ( hResult ) ) {
                 while ( adsiSearch->GetNextRow ( hSearch ) != S_ADS_NOMORE_ROWS ) {

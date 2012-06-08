@@ -125,14 +125,16 @@ XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 
 XmlProcessor::~XmlProcessor() {
 
+    XmlProcessor::instance = NULL;
 	//  Delete the parser itself.  Must be done prior to calling Terminate, below.
 
-	if(parser != NULL)
+	if(parser != NULL){
 		parser->release();
+    }
 
-	if (parserWithCallerAdoption != NULL)
+	if (parserWithCallerAdoption != NULL){
 		parserWithCallerAdoption->release();
-
+    }
 	XMLPlatformUtils::Terminate();
 
 }

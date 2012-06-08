@@ -520,6 +520,11 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 				variableValue->Write(newCollectedObjectElem);
 			}
 		}
+
+        for(StringPairVector::iterator varIdIterator = varIdValuePairs.begin(); varIdIterator != varIdValuePairs.end(); varIdIterator++)
+            delete (*varIdIterator);
+
+        varIdValuePairs.clear();
 	}
 
 	// Add each reference - ensure that each reference is only written once.

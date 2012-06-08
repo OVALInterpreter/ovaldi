@@ -50,12 +50,25 @@ void Directive::SetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::Res
 void Directive::LoadDirectives() {
 	// Load the configuration XML.  If it can not be loaded, load defaults and return.
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* config;
+
+    if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE] != NULL)
+        delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE];
+    if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_FALSE] != NULL)
+        delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_FALSE];
+    if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_UNKNOWN] != NULL)
+        delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_UNKNOWN];
+    if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_ERROR] != NULL)
+        delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_ERROR];
+    if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_NOT_EVALUATED] != NULL)
+        delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_NOT_EVALUATED];
+    if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_NOT_APPLICABLE] != NULL)
+        delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_NOT_APPLICABLE];
+    directives.clear();
 	try {
 		config = DocumentManager::GetDirectivesConfigDocument();
 	} catch (Exception e) {
 		// If it fails to load the configuration document, load default directives
 		Log::Debug("Unable to load directives configuration file.  Using default directives.");
-		directives.clear();
 		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE] = new Directive(OvalEnum::RESULT_TRUE);
 		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_FALSE] = new Directive(OvalEnum::RESULT_FALSE);
 		directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_UNKNOWN] = new Directive(OvalEnum::RESULT_UNKNOWN);

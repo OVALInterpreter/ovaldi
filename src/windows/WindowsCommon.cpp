@@ -2001,7 +2001,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 									dwPrefMaxLen,
 									&dwEntriesRead,
 									&dwTotalEntries);
-
+	
 	// If the call succeeds
 	if (nStatus == NERR_Success) {
 		userExists = true;
@@ -2128,6 +2128,8 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		pBuf = NULL;
 	}
 
+	delete userNameApi;
+
 	return userExists;
 }
 
@@ -2194,6 +2196,8 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	// Free the allocated memory.
 	if (pBuf != NULL)
 		NetApiBufferFree(pBuf);
+
+	delete userNameApi;
 
     return enabled;
 }
@@ -2596,11 +2600,12 @@ string WindowsCommon::GetObjectType ( SE_OBJECT_TYPE objectType ) {
 LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
 
 	LPBYTE domainControllerName = NULL;
-	
-	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, WindowsCommon::StringToWide(domainName), &domainControllerName) != NERR_Success) {
+	LPWSTR wDomainName = WindowsCommon::StringToWide(domainName);
+	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, wDomainName, &domainControllerName) != NERR_Success) {
 		domainControllerName = NULL;
 	}
-	
+	delete wDomainName;
+
 	return (LPCWSTR)domainControllerName;
 }
 

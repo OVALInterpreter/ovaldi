@@ -247,12 +247,13 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 							names = NULL;
 						}
 					}
-					if ( keys != NULL ){
-						keys->clear();
-						delete keys;
-						keys = NULL;
-					}
-				}	
+				}
+
+                if ( keys != NULL ){
+					keys->clear();
+					delete keys;
+					keys = NULL;
+				}
 			}
 		}
 	}

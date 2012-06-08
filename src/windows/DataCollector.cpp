@@ -56,4 +56,5 @@ void DataCollector::WriteSystemInfo() {
 
 	SystemInfo* systemInfo = SystemInfoCollector::CollectSystemInfo();
 	systemInfo->Write(DocumentManager::GetSystemCharacteristicsDocument());
+    delete systemInfo;
 }

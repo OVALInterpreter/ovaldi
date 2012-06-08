@@ -294,7 +294,7 @@ void Test::Write(DOMElement* parentElm) {
 		}	
 
 		TestedItem* currentElement = NULL;
-		unsigned int sizeOfItemList = this->GetMessages()->size();
+		unsigned int sizeOfItemList = this->GetTestedItems()->size();
 		unsigned int itemCounter = 0;
 		while(itemCounter < sizeOfItemList) {
 			currentElement = this->GetTestedItems()->at(itemCounter);
@@ -327,6 +327,8 @@ void Test::Write(DOMElement* parentElm) {
 			    for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
 				    (*iterator2)->WriteTestedVariable(testElm);
 			    }
+                stateVars->clear();
+                delete stateVars;
 		    }		    
         }
 	}

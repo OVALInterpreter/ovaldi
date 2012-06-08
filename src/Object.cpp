@@ -63,6 +63,10 @@ Object::~Object() {
 		 filterIter != this->filters.end();
 		 ++filterIter)
 		delete *filterIter;
+
+    for(BehaviorVector::iterator behaviorIterator = this->behaviors.begin();
+        behaviorIterator != this->behaviors.end(); behaviorIterator++)
+        delete *behaviorIterator;
 }
 
 // ***************************************************************************************	//

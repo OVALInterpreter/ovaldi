@@ -49,10 +49,39 @@ StringPairVector Analyzer::notApplicableResults;
 //****************************************************************************************//
 
 Analyzer::Analyzer() {
-
+    this->trueResults.clear();
+    this->falseResults.clear();
+    this->errorResults.clear();
+    this->notEvaluatedResults.clear();
+    this->notApplicableResults.clear();
+    definitionsElm = NULL;
+    testsElm = NULL;
+    resultsSystemElm = NULL;
+    resultsElm = NULL;
 }
 
 Analyzer::~Analyzer() {
+
+    StringPairVector::iterator iterator;
+    for(iterator = trueResults.begin(); iterator != this->trueResults.end(); iterator++)
+        delete (*iterator); 
+    this->trueResults.clear();
+
+    for(iterator = falseResults.begin(); iterator != falseResults.end(); iterator++)
+        delete (*iterator);
+    this->falseResults.clear();
+
+    for(iterator = errorResults.begin(); iterator != errorResults.end(); iterator++)
+        delete (*iterator);
+    this->errorResults.clear();
+
+    for(iterator = notEvaluatedResults.begin(); iterator != notEvaluatedResults.end(); iterator++)
+        delete (*iterator);
+    this->notEvaluatedResults.clear();
+
+    for(iterator = notApplicableResults.begin(); iterator != notApplicableResults.end(); iterator++)
+        delete (*iterator);
+    this->notApplicableResults.clear();
 }
 
 // ***************************************************************************************	//

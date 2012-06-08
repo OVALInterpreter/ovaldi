@@ -165,7 +165,9 @@ void ItemEntity::SetStatus(OvalEnum::SCStatus scStatus) {
 void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm) {
 
 	// Create new item element
-	DOMElement* newItemEntityElem = scFile->createElement(XMLString::transcode(this->GetName().c_str()));
+	XMLCh* nameValue = XMLString::transcode(this->GetName().c_str());
+	DOMElement* newItemEntityElem = scFile->createElement(nameValue);
+	XMLString::release(&nameValue);
 	itemElm->appendChild(newItemEntityElem);
 
 	// Add the attributes

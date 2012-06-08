@@ -210,8 +210,8 @@ bool MetabaseProbe::KeyExists ( string keyStr ) {
 	HRESULT hResult;
 	METADATA_HANDLE handle;
 	bool exists = false;
-
-	if ( ( hResult = metabase->OpenKey ( METADATA_MASTER_ROOT_HANDLE, WindowsCommon::StringToWide ( keyStr ), METADATA_PERMISSION_READ, 10000, &handle ) ) == S_OK ) {
+	LPWSTR wKeyStr = WindowsCommon::StringToWide ( keyStr );
+	if ( ( hResult = metabase->OpenKey ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, METADATA_PERMISSION_READ, 10000, &handle ) ) == S_OK ) {
 		exists = true;
 	} else if ( hResult == HRESULT_FROM_WIN32 ( ERROR_PATH_NOT_FOUND ) ) {
 		// Do nothing since the key was not found.
@@ -224,7 +224,7 @@ bool MetabaseProbe::KeyExists ( string keyStr ) {
 			Log::Message ( "Error: The method IMSAdminBase->OpenKey() failed because of an invalid parameter for key '"+keyStr+"'." );
 		}
 	}
-
+	delete wKeyStr;
 	metabase->CloseKey ( handle );
 	return exists;
 }
@@ -245,15 +245,15 @@ void MetabaseProbe::GetKeysForPattern ( string keyStr, string regexStr, StringSe
 	HRESULT hResult;
 	LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
 	DWORD index = 0;
-
-	while ( ( hResult=metabase->EnumKeys ( METADATA_MASTER_ROOT_HANDLE, WindowsCommon::StringToWide ( keyStr ), name, index ) ) == S_OK ) {
+	LPWSTR wKeyStr = WindowsCommon::StringToWide ( keyStr );
+	while ( ( hResult=metabase->EnumKeys ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, name, index ) ) == S_OK ) {
 		string nameStr = WindowsCommon::UnicodeToAsciiString ( name );
 		string newKeyStr = keyStr;
 		newKeyStr.append ( nameStr );
 		this->GetKeysForPattern ( newKeyStr, regexStr, keys, isRegex );
 		++index;
 	}
-
+	delete wKeyStr;
 	if ( hResult == E_ACCESSDENIED ) {
 		Log::Message ( "Error: Access to the key '"+keyStr+"' has been denied.  Please make sure that the interpreter is being run with Administrator privileges." );
 	}
@@ -318,13 +318,13 @@ StringSet* MetabaseProbe::GetAllIds ( string keyStr ) {
 	DWORD required = 0;
 	unsigned char* buffer = NULL;
 	StringSet* ids = new StringSet();
-
-	if ( ( hResult = metabase->GetAllData ( METADATA_MASTER_ROOT_HANDLE, WindowsCommon::StringToWide ( keyStr ), METADATA_NO_ATTRIBUTES, ALL_METADATA, ALL_METADATA, &count, &set, size, buffer, &required ) ) == HRESULT_FROM_WIN32 ( ERROR_INSUFFICIENT_BUFFER ) ) {
+	LPWSTR wKeyStr = WindowsCommon::StringToWide ( keyStr );
+	if ( ( hResult = metabase->GetAllData ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, METADATA_NO_ATTRIBUTES, ALL_METADATA, ALL_METADATA, &count, &set, size, buffer, &required ) ) == HRESULT_FROM_WIN32 ( ERROR_INSUFFICIENT_BUFFER ) ) {
 		size = required;
 		required = 0;
 		buffer = ( unsigned char* ) malloc ( size );
 
-		if ( ( hResult = metabase->GetAllData ( METADATA_MASTER_ROOT_HANDLE, WindowsCommon::StringToWide ( keyStr ), METADATA_NO_ATTRIBUTES, ALL_METADATA, ALL_METADATA, &count, &set, size, buffer, &required ) ) == S_OK ) {
+		if ( ( hResult = metabase->GetAllData ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, METADATA_NO_ATTRIBUTES, ALL_METADATA, ALL_METADATA, &count, &set, size, buffer, &required ) ) == S_OK ) {
 			METADATA_GETALL_RECORD* records = ( METADATA_GETALL_RECORD* ) buffer;
 
 			for ( unsigned int i = 0 ; i < count ; i++ ) {
@@ -365,6 +365,7 @@ StringSet* MetabaseProbe::GetAllIds ( string keyStr ) {
 			Log::Message ( "Error: The key '"+keyStr+"' could not be found." );
 		}
 	}
+	delete wKeyStr;
 
 	return ids;
 }
@@ -380,12 +381,12 @@ Item* MetabaseProbe::GetMetabaseItem ( string keyStr, string idStr ) {
 	record.dwMDDataType = ALL_METADATA;
 	record.dwMDDataLen = 0;
 	record.pbMDData = NULL;
-
-	if ( ( hResult = metabase->GetData ( METADATA_MASTER_ROOT_HANDLE, WindowsCommon::StringToWide ( keyStr ), &record, &size ) ) == HRESULT_FROM_WIN32 ( ERROR_INSUFFICIENT_BUFFER ) ) {
+	LPWSTR wKeyStr = WindowsCommon::StringToWide ( keyStr );
+	if ( ( hResult = metabase->GetData ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, &record, &size ) ) == HRESULT_FROM_WIN32 ( ERROR_INSUFFICIENT_BUFFER ) ) {
 		record.dwMDDataLen = size;
 		record.pbMDData = ( unsigned char* ) malloc ( record.dwMDDataLen );
 
-		if ( ( hResult = metabase->GetData ( METADATA_MASTER_ROOT_HANDLE, WindowsCommon::StringToWide ( keyStr ), &record, &size ) ) == S_OK ) {
+		if ( ( hResult = metabase->GetData ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, &record, &size ) ) == S_OK ) {
 			item = this->CreateItem();
 			item->SetStatus ( OvalEnum::STATUS_EXISTS );
 			item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
@@ -448,6 +449,7 @@ Item* MetabaseProbe::GetMetabaseItem ( string keyStr, string idStr ) {
 			Log::Message ( "Error: The key '"+keyStr+"' could not be found." );
 		}
 	}
+	delete wKeyStr;
 
 	return item;
 }

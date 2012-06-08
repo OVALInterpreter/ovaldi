@@ -123,6 +123,8 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 				Log::Debug("An unknown error occured while collecting data for object: " + collectedObject->GetId());
 			} 				
 		}
+        if(absObject != NULL)
+            delete absObject;
 	}
 
 	return collectedObject;
@@ -238,7 +240,7 @@ CollectedObject* AbsObjectCollector::ProcessSetObject(SetObject* setObject) {
 	collectedObject->SetReferences(collectedSet->GetItems());
 	collectedObject->SetFlag(collectedSet->GetFlag());
 	collectedObject->AppendVariableValues(collectedSet->GetVariableValues());
-
+    delete collectedSet;
 	return collectedObject;
 }
 

@@ -49,6 +49,7 @@ void XslCommon::ApplyXSL(string xmlIn, string xslIn, string xmlOut) {
 	int theResult = 0;
 	theResult = XalanTransformToFile(xmlIn.c_str(),xslIn.c_str(), xmlOut.c_str(), xalan);
 
+    DeleteXalanTransformer(xalan);
 	// 5. Shut down Xalan
 	XalanTerminate(false);
 }
@@ -75,6 +76,7 @@ string XslCommon::ApplyXSL(string xmlIn, string xslIn) {
 		XalanFreeData(theData);
 	}
 
+    DeleteXalanTransformer(xalan);
 	// 5. Shut down Xalan
 	XalanTerminate(false);
 
