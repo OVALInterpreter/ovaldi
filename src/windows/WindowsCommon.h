@@ -200,7 +200,7 @@ public:
 	static DWORD GetLastLogonTimeStamp(string username);
 
 	/** Retrieves the last registry write time for a given key */
-	static int GetLastRegistryKeyWriteTimeStamp(string keyName);
+	static FILETIME GetLastRegistryKeyWriteTimeStamp(string hiveStr, string keyStr);
 
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
