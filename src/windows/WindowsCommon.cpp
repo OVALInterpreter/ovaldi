@@ -1066,7 +1066,7 @@ DWORD WindowsCommon::GetLastLogonTimeStamp(string username){
 FILETIME WindowsCommon::GetLastRegistryKeyWriteTimeStamp(string hiveStr, string keyStr){
 	HKEY theKey;
 	LONG res = 0L;
-	FILETIME lastWriteTime;
+	FILETIME lastWriteTime = {0};
 
 	if (hiveStr.compare("HKEY_LOCAL_MACHINE") == 0) {
 		theKey = HKEY_LOCAL_MACHINE;
@@ -1084,16 +1084,10 @@ FILETIME WindowsCommon::GetLastRegistryKeyWriteTimeStamp(string hiveStr, string 
 
 	res = RegOpenKeyEx(theKey, keyStr.c_str(), 0, KEY_QUERY_VALUE , &theKey);
 	if(res == ERROR_SUCCESS){
-
 		res = RegQueryInfoKey(theKey, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, &lastWriteTime);
-		if(res == ERROR_SUCCESS){	
-			return lastWriteTime;
-		}else{
-			return lastWriteTime;
-		}
-	}else{
-		return lastWriteTime;
 	}
+
+	return lastWriteTime;
 }
 
 

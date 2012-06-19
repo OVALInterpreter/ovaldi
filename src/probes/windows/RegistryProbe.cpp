@@ -247,8 +247,6 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
 				
-				item->AppendElement(new ItemEntity("last_write_time", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_DOES_NOT_EXIST));
-				
 				item->AppendElement(new ItemEntity("windows_view",
 					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
 				collectedItems->push_back(item);
