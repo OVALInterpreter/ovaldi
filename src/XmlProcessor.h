@@ -135,7 +135,7 @@ private:
 	/**
 	 * Has the common code for creating an XML parser.
 	 */
-	xercesc::DOMBuilder *makeParser();
+	xercesc::DOMBuilder *makeParser(const std::string &schemaLocation = "");
 
 	static XmlProcessor* instance;
 

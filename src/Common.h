@@ -102,6 +102,9 @@ typedef std::vector < StringPair* > StringPairVector;
 #define DEFAULT_RESULTS_SCHEMATRON_FILENAME "oval-results-schematron.xsl"
 #define DEFAULT_RESULTS_XFORM_FILENAME "results_to_html.xsl"
 
+// fixed filename for the schemaLocation data
+#define SCHEMALOCATION_CONFIG_FILENAME "schemaLocation.conf"
+
 /**
 	This class provides a set of common fuctions used through out the application.
 	All functions are static.
