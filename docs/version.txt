@@ -32,6 +32,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 3    ---
+---------------------------------------
+
+* Added a config file, the contents of which is used as the value of the
+  schemaLocation attribute in XML instance documents.  This relieves XML
+  authors from having to remember to set it, and from errors and omissions
+  in its value.  If the file is readable, its value is used in place of the 
+  value in instance documents, if any.  If the file is not readable, the 
+  attribute value in the instance document is used.
+
+---------------------------------------
 ---       Version 5.10.1 build 2    ---
 ---------------------------------------
 * Updated to no longer follow Windows junctions until the OVAL Language better defines how to handle them.
