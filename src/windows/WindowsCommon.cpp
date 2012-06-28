@@ -1063,32 +1063,6 @@ DWORD WindowsCommon::GetLastLogonTimeStamp(string username){
 	}
 }
 
-FILETIME WindowsCommon::GetLastRegistryKeyWriteTimeStamp(string hiveStr, string keyStr){
-	HKEY theKey;
-	LONG res = 0L;
-	FILETIME lastWriteTime = {0};
-
-	if (hiveStr.compare("HKEY_LOCAL_MACHINE") == 0) {
-		theKey = HKEY_LOCAL_MACHINE;
-	} else if (hiveStr.compare("HKEY_USERS") == 0) {
-		theKey = HKEY_USERS;
-	} else if (hiveStr.compare("HKEY_CURRENT_USER") == 0) {
-		theKey = HKEY_CURRENT_USER;
-	} else if (hiveStr.compare("HKEY_CURRENT_CONFIG") == 0) {
-		theKey = HKEY_CURRENT_CONFIG;
-	} else if (hiveStr.compare("HKEY_CLASSES_ROOT") == 0) {
-		theKey = HKEY_CLASSES_ROOT;
-	} else {
-		return lastWriteTime;
-	}
-
-	res = RegOpenKeyEx(theKey, keyStr.c_str(), 0, KEY_QUERY_VALUE , &theKey);
-	if(res == ERROR_SUCCESS){
-		res = RegQueryInfoKey(theKey, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, &lastWriteTime);
-	}
-
-	return lastWriteTime;
-}
 
 
 void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {

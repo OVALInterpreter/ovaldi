@@ -51,7 +51,6 @@ public:
 	/** Ensure that the RegistryProbe is a singleton. */
 	static AbsProbe* Instance();
 	
-
 private:
 	/** RegistryProbe constructor. */
 	RegistryProbe();

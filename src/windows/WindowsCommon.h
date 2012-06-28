@@ -199,9 +199,7 @@ public:
 	/** Retrieves the last login time from a local username */
 	static DWORD GetLastLogonTimeStamp(string username);
 
-	/** Retrieves the last registry write time for a given key */
-	static FILETIME GetLastRegistryKeyWriteTimeStamp(string hiveStr, string keyStr);
-
+	
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
 
