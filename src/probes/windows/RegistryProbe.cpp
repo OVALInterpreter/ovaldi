@@ -414,17 +414,16 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
 
-				HKEY theKey = NULL;
 				FILETIME lastWriteTime = {0};				
-				LONG status = registryFinder.GetHKeyHandle(&theKey, hive, key, KEY_READ);
-
+				long status = RegQueryInfoKey(hkey, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, &lastWriteTime);
+					
 				if(status == ERROR_SUCCESS){
-					RegQueryInfoKey(theKey, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, &lastWriteTime);
-					RegCloseKey(theKey);
-
 					item->AppendElement(new ItemEntity("last_write_time", WindowsCommon::ToString(lastWriteTime), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS));
+				}else{
+					item->AppendElement(new ItemEntity("last_write_time", WindowsCommon::ToString(lastWriteTime), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_ERROR));
+					item->SetStatus(OvalEnum::STATUS_ERROR);
 				}
-				
+
 				// We now have all the info we need.
 				this->RetrieveInfo(hive, key, name, type, value, valuelen, item);
 			}
