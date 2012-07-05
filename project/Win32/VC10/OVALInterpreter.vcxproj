@@ -468,6 +468,7 @@
     <ClInclude Include="..\..\..\src\EntityComparator.h" />
     <ClInclude Include="..\..\..\src\ExtendedDefinition.h" />
     <ClInclude Include="..\..\..\src\Filter.h" />
+    <ClInclude Include="..\..\..\src\FreeGuard.h" />
     <ClInclude Include="..\..\..\src\Item.h" />
     <ClInclude Include="..\..\..\src\ItemEntity.h" />
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />

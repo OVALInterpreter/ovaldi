@@ -27,6 +27,7 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+#include <Common.h>
 #include "LockoutPolicyProbe.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -73,7 +74,7 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object* /*object*/) {
 
 	if (nStatus == NERR_Success) {
 		if (pBufM0 != NULL) {
-			string forceLogoff = WindowsCommon::ToString(pBufM0->usrmod0_force_logoff);
+			string forceLogoff = Common::ToString(pBufM0->usrmod0_force_logoff);
 
 			// create a new passwordpolicy item
 			item = this->CreateItem();
@@ -112,9 +113,9 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object* /*object*/) {
 	if (nStatus == NERR_Success) {
 		if (pBufM3 != NULL) {
 
-			string lockoutDuration = WindowsCommon::ToString(pBufM3->usrmod3_lockout_duration);
-			string lockoutObservation = WindowsCommon::ToString(pBufM3->usrmod3_lockout_observation_window);
-			string lockoutThreshold = WindowsCommon::ToString(pBufM3->usrmod3_lockout_threshold);
+			string lockoutDuration = Common::ToString(pBufM3->usrmod3_lockout_duration);
+			string lockoutObservation = Common::ToString(pBufM3->usrmod3_lockout_observation_window);
+			string lockoutThreshold = Common::ToString(pBufM3->usrmod3_lockout_threshold);
 
 
 			// create a new passwordpolicy item

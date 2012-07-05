@@ -27,6 +27,8 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <Common.h>
 #include "AuditEventPolicyProbe.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -83,7 +85,7 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object* /*object*/) {
 	if (ntsResult != ERROR_SUCCESS) {
 		DWORD errorCode = LsaNtStatusToWinError(ntsResult);
 		if(errorCode == ERROR_MR_MID_NOT_FOUND) {
-			throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::ToString(LsaNtStatusToWinError(ntsResult)));
+			throw ProbeException("Error obtaining audit event policy information - (win32) " + Common::ToString(LsaNtStatusToWinError(ntsResult)));
 		} else {
 			throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
 		}
@@ -197,7 +199,7 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object* /*object*/) {
 
 		DWORD errorCode = LsaNtStatusToWinError(ntsResult);
 		if(errorCode == ERROR_MR_MID_NOT_FOUND) {
-			throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::ToString(LsaNtStatusToWinError(ntsResult)));
+			throw ProbeException("Error obtaining audit event policy information - (win32) " + Common::ToString(LsaNtStatusToWinError(ntsResult)));
 		} else {
 			throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
 		}

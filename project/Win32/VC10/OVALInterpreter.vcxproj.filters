@@ -851,6 +851,9 @@
     <ClInclude Include="..\..\..\src\windows\PrivilegeGuard.h">
       <Filter>Header Files\windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\FreeGuard.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Version.h">

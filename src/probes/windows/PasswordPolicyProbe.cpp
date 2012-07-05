@@ -27,6 +27,8 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <Common.h>
 #include "PasswordPolicyProbe.h"
 #include "WMIItem.h"
 #include "WMIUtil.h"
@@ -69,13 +71,13 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 
 	if (nStatus == NERR_Success) {
 		if (pBuf != NULL) {
-			string minPasswordLen = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_len);
+			string minPasswordLen = Common::ToString(pBuf->usrmod0_min_passwd_len);
 
-			string maxPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_max_passwd_age);
+			string maxPasswordAge = Common::ToString(pBuf->usrmod0_max_passwd_age);
 			
-			string minPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_age);
+			string minPasswordAge = Common::ToString(pBuf->usrmod0_min_passwd_age);
 
-			string passwordHistoryLen = WindowsCommon::ToString(pBuf->usrmod0_password_hist_len);
+			string passwordHistoryLen = Common::ToString(pBuf->usrmod0_password_hist_len);
 
 			// create a new passwordpolicy item
 			Item* item = this->CreateItem();
