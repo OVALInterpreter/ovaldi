@@ -58,7 +58,7 @@ protected:
 
 public:
 	/**
-	 * Resets the guard to project the given memory block.  Any memory
+	 * Resets the guard to protect the given memory block.  Any memory
 	 * block previously protected is first freed.
 	 */
 	void reset(T *newPtr) {
@@ -214,6 +214,19 @@ public:
 	 * This does it for you.
 	 */
 	explicit FreeGuard(void *ptr) : base_type(static_cast<T*>(ptr)) {
+	}
+
+	/**
+	 * Resets the guard to protect the given memory block.  Any memory
+	 * block previously protected is first freed.  This is a convenience
+	 * overload which does casting from void* to T* for you.
+	 */
+	void reset(void *newPtr) {
+		if (ptr != newPtr) {
+			if (ptr)
+				std::free(ptr);
+			ptr = static_cast<T*>(newPtr);
+		}
 	}
 
 	/** Only use if an array is being guarded! */
