@@ -30,13 +30,11 @@
 #ifndef INTERFACEPROBE_H
 #define INTERFACEPROBE_H
 
+#include <string>
 #include "AbsProbe.h"
 #include "WindowsCommon.h"
-#include <iphlpapi.h>
-#include <iomanip>
 
 /** This class is responsible for collecting Windows Interface data. */
-
 class InterfaceProbe : public AbsProbe {
     public:
 
@@ -59,7 +57,7 @@ class InterfaceProbe : public AbsProbe {
          *  @param nameStr A string that contains the name of a Windows interface.
          *  @return The Item object whose name matches the specified value.
          */
-        Item* GetInterface ( string nameStr );
+        Item* GetInterface ( std::string nameStr );
 
         /** Retrieve all of the Windows interfaces on the local system.
          *  @return Void.
@@ -77,15 +75,6 @@ class InterfaceProbe : public AbsProbe {
          *  @return A string representing the type of the Windows interface address.
          */
         StringVector * GetInterfaceAddressType ( DWORD addressType );
-
-        /** Calculate the broadcast address manually because Microsoft's documentation for the MIB_IPADDRROW structure states
-         *  "The proper value for this member is not returned by the GetIpAddrTable() function". Please consult Microsoft's documentation
-         *  at http://msdn.microsoft.com/en-us/library/aa366845(VS.85).aspx for more information.
-         *  @param ipAddrStr A string representing the IP address of the interface in dotted-quad notation.
-         *  @param netMaskStr A string representing the subnet mask of the interface's IP address in dotted-quad notation.
-         *  @return A string representing the interface's broadcast address in dotted-quad notation.
-         */
-        string CalculateBroadcastAddress ( string ipAddr , string netMask );
 
         /** Delete all of the Items in the ItemVector interfaces.
          *  @return Void.
