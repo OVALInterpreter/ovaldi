@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <sstream>
+#include <iomanip>
+
 #include "LDAPProbe.h"
 
 using namespace std;
@@ -685,21 +688,11 @@ StringVector* LDAPProbe::GetValues ( string suffixStr, string relativeDnStr, str
 }
 
 string LDAPProbe::ConvertToBinary(char* data, unsigned long length){
-	string value = "";
-	for (unsigned long i = 0 ; i < length ; i++ ) {
-			// The buffer must be three bytes long, two bytes for each hex character in the
-			// binary data, and one byte for the terminating NULL character.
-			char binaryBuf[3];
-			memset(binaryBuf,0,sizeof(binaryBuf));
-			sprintf(binaryBuf, "%x", data[i]);
-			binaryBuf[sizeof(binaryBuf)-1] = '\0';
-			if (strlen(binaryBuf) == 1){ 
-				value.append("0");
-			}
-			value.append(binaryBuf);
-	}
-
-	return value;
+	ostringstream oss;
+	oss << hex << setfill('0');
+	for (unsigned long i = 0 ; i < length ; i++ )
+		oss << setw(2) << (int)data[i];
+	return oss.str();
 }
 
 string LDAPProbe::RemoveQuotes ( string str ) {

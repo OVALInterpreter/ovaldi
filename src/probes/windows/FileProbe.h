@@ -44,8 +44,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <windows.h>
-
-using namespace std;
+#include <string>
 
 /**
 	This class is responsible for collecting file information for windows file_objects.
@@ -71,26 +70,12 @@ private:
 	virtual Item* CreateItem();
 
 	/** Collectect all file attributes for the specified file on the specified path. */
-	Item* GetFileAttributes(string path, string fileName);
+	Item* GetFileAttributes(std::string path, std::string fileName);
 
 	/** Get the version of the file. */
-	void GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemEntity* version);
+	void GetVersion(LPVOID versionbuf, std::string filePath, Item *item, ItemEntity* version);
 	/** Get the type of the file. */
-	void GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type);
-	/** Get the developement class of the file. */
-	void GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass);
-	/** Get the company of the file. */
-	void GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemEntity* company);
-	/** Get the internal name of the file. */
-	void GetInternalName(LPVOID versionbuf, string filePath, Item *item, ItemEntity* internalName);
-	/** Get the language of the file. NOT YET SUPPORTED */
-	void GetLanguage(LPVOID versionbuf, string filePath, Item *item, ItemEntity* language);
-	/** Get the original file name of the file. */
-	void GetOriginalFilename(LPVOID versionbuf, string filePath, Item *item, ItemEntity* originalFilename);
-	/** Get the product name of the file. */
-	void GetProductName(LPVOID versionbuf, string filePath, Item *item, ItemEntity* productName);
-	/** Get the product version of the file. */
-	void GetProductVersion(LPVOID versionbuf, string filePath, Item *item, ItemEntity* productVersion);	
+	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type);
 };
 
 #endif

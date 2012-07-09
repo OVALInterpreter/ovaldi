@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <sstream>
+#include <iomanip>
+
 #include "SystemInfo.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -553,34 +556,16 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 				*/
 
 				// Here I am using the description value as the name
-				char *descStr = (char*)malloc(pMibIfRow->dwDescrLen+1);
-				if(descStr == NULL) {
-					free(pIPAddrTable);
-					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
-				}
-				ZeroMemory(descStr, sizeof(pMibIfRow->dwDescrLen+1));
-				for (unsigned int j=0;j<pMibIfRow->dwDescrLen;j++) {
-					descStr[j] = (char)pMibIfRow->bDescr[j];
-					//sprintf(&descStr[j],"%s",pMibIfRow->bDescr[j]);
-				}
-				curIf->ifName = descStr;
-				free(descStr);
+				curIf->ifName = string((char*)&pMibIfRow->bDescr[0], pMibIfRow->dwDescrLen);
 
+				ostringstream macOss;
+				macOss << hex << uppercase << setfill('0');
+				if (pMibIfRow->dwPhysAddrLen > 0)
+					macOss << setw(2) << (int)pMibIfRow->bPhysAddr[0];
+				for (DWORD i = 1; i < pMibIfRow->dwPhysAddrLen; ++i)
+					macOss << '-' << setw(2) << (int)pMibIfRow->bPhysAddr[i];
 
-				// Format MAC Address
-				char *macStr = (char*)malloc(sizeof(char)*30);				
-				if(macStr == NULL) {
-					free(pIPAddrTable);
-					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
-				}
-				ZeroMemory(macStr, 30);
-				for (unsigned int i=0;i<pMibIfRow->dwPhysAddrLen;i++) {
-					sprintf(&macStr[i*3],"%02X-",pMibIfRow->bPhysAddr[i]);
-				}
-				curIf->macAddress = macStr;
-				curIf->macAddress = curIf->macAddress.substr(0, curIf->macAddress.length()-1);
-				free(macStr);
-
+				curIf->macAddress = macOss.str();
 			} else {
 
 				curIf->ifName = "unknown";

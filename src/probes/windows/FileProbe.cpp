@@ -28,7 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <iomanip>
+#include <sstream>
 #include "FileProbe.h"
+
+using namespace std;
+
+namespace {
+	/**
+	 * This code was originally written to be (sort of) both narrow and wide-char capable,
+	 * so I am preserving that by using basic_string<TCHAR>...
+	 */
+	void GetFromVerInfo(LPVOID versionbuf, string filePath, Item *item,
+		ItemEntity *entity, const basic_string<TCHAR> &fieldName);
+}
 
 //****************************************************************************************//
 //								FileProbe Class											  //	
@@ -216,7 +229,6 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 	HANDLE hFile;
 	DWORD res;
-	char buf[512];
 
 	Item *item = NULL;
 
@@ -414,12 +426,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			item->AppendMessage(new OvalMessage(errorMessage));
 			
 		} else {
-
-			// Add file size.
-			ZeroMemory(buf, sizeof(buf));
-			_snprintf(buf, sizeof(buf)-1, "%ld", statusBuffer.st_size);
-			buf[sizeof(buf)-1] = '\0';
-			item->AppendElement(new ItemEntity("size", buf, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 		}
 
 
@@ -485,10 +492,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			item->AppendMessage(new OvalMessage(errorMessage));
 
 		} else {
-			ZeroMemory(buf, sizeof(buf));
-			_snprintf(buf, sizeof(buf)-1, "%d", checksum);
-			buf[sizeof(buf)-1] = '\0';
-			item->AppendElement(new ItemEntity("ms_checksum", buf, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ms_checksum", Common::ToString(checksum), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 		}
 
 		// initialize remaining version information entities...
@@ -532,43 +536,58 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 				///////////////  development_class  //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetDevelopmentClass(versionbuf, filePath, item, devClass);
+				GetFromVerInfo(versionbuf, filePath, item, devClass, "FileVersion");
 
 				//////////////////////////////////////////////////////
 				///////////////       company       //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetCompany(versionbuf, filePath, item, company);
+				GetFromVerInfo(versionbuf, filePath, item, company, "CompanyName");
 
 				//////////////////////////////////////////////////////
 				///////////////    internal_name    //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetInternalName(versionbuf, filePath, item, internalName);
+				GetFromVerInfo(versionbuf, filePath, item, internalName, "InternalName");
 
 				//////////////////////////////////////////////////////
 				///////////////       language      //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetLanguage(versionbuf, filePath, item, language);
+				language->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 
 				//////////////////////////////////////////////////////
 				///////////////  original_filename  //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetOriginalFilename(versionbuf, filePath, item, originalFilename);
+				GetFromVerInfo(versionbuf, filePath, item, originalFilename, "OriginalFilename");
 
 				//////////////////////////////////////////////////////
 				///////////////     product_name    //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetProductName(versionbuf, filePath, item, productName);
+				GetFromVerInfo(versionbuf, filePath, item, productName, "ProductName");
 
 				//////////////////////////////////////////////////////
 				///////////////   product_version   //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetProductVersion(versionbuf, filePath, item, productVersion);
+				GetFromVerInfo(versionbuf, filePath, item, productVersion, "ProductVersion");
+
+
+				// Post-processing for development_class:
+				// for dev class, there is a parenthesized part at the end we need
+				// to pull out and use.
+				REGEX verMatcher;
+				if(devClass->GetStatus() == OvalEnum::STATUS_EXISTS &&
+					verMatcher.IsMatch(".+\\([^\\)].+\\)", devClass->GetValue().c_str())) {
+					string verStr = devClass->GetValue();
+					verStr = verStr.substr(verStr.find("(") + 1);
+					devClass->SetValue(verStr.substr(0, verStr.find(".")));
+				} else {
+					devClass->SetValue("");
+					devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				}
 
 			} else {
 				// we got a size from GetFileVersionInfoSize(), but then getting the
@@ -657,31 +676,12 @@ void FileProbe::GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemE
 
 	} else {
 
-		char ver1[16];
-		char ver2[16];
-		char ver3[16];
-		char ver4[16];
-
-		// get the file version data 
-		ZeroMemory(ver1, sizeof(ver1));
-		ZeroMemory(ver2, sizeof(ver2));
-		ZeroMemory(ver3, sizeof(ver3));
-		ZeroMemory(ver4, sizeof(ver4));
-
-		_snprintf(ver1, sizeof(ver1)-1, "%d", (HIWORD(pFFI->dwFileVersionMS)));
-		_snprintf(ver2, sizeof(ver2)-1, "%d", (LOWORD(pFFI->dwFileVersionMS)));
-		_snprintf(ver3, sizeof(ver3)-1, "%d", (HIWORD(pFFI->dwFileVersionLS)));
-		_snprintf(ver4, sizeof(ver4)-1, "%d", (LOWORD(pFFI->dwFileVersionLS)));
-
-		string versionStr = "";
-		versionStr.append(ver1);
-		versionStr.append(".");
-		versionStr.append(ver2);
-		versionStr.append(".");
-		versionStr.append(ver3);
-		versionStr.append(".");
-		versionStr.append(ver4);
-		version->SetValue(versionStr);
+		ostringstream oss;
+		oss << HIWORD(pFFI->dwFileVersionMS) << '.'
+			<< LOWORD(pFFI->dwFileVersionMS) << '.'
+			<< HIWORD(pFFI->dwFileVersionLS) << '.'
+			<< LOWORD(pFFI->dwFileVersionLS);
+		version->SetValue(oss.str());
 		version->SetStatus(OvalEnum::STATUS_EXISTS);
 	}
 }
@@ -748,50 +748,66 @@ void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* t
 	}
 }
 
-void FileProbe::GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass) {
+namespace {
 
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
+	void GetFromVerInfo(LPVOID versionbuf, string filePath, Item *item,
+		ItemEntity *itemEntity, const basic_string<TCHAR> &fieldName) {
 
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("FileVersion"));
+		//	Get the language-code page and construct the string for file version request
+		UINT vdatalen;
+		DWORD *lpTransArray;
 
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
+		BOOL retVal = VerQueryValue(versionbuf,  
+					  TEXT("\\VarFileInfo\\Translation"),
+					  (LPVOID*)&lpTransArray,
+					  &vdatalen);
+
 		if(retVal != 0) {
+		
+			// I guess to be TCHAR-correct, we gotta use the basic_* templates
+			// directly so we can specify the char type...
+			basic_ostringstream<TCHAR> oss;
+			oss << TEXT("\\StringFileInfo\\")
+				<< uppercase << hex << setfill(TEXT('0'))
+				<< setw(4) << LOWORD(lpTransArray[0])
+				<< setw(4) << HIWORD(lpTransArray[0])
+				<< nouppercase
+				<< TEXT('\\') << fieldName;
 
-			//	Check to see if the version string has a developement path string in it
-			string verStr = lpszValue;
-			REGEX verMatcher;
-			if(verMatcher.IsMatch(".+\\([^\\)].+\\)", verStr.c_str())) {
+			LPTSTR lpszValue;
+			retVal = VerQueryValue(versionbuf,
+									oss.str().c_str(),
+									(LPVOID *)&lpszValue, 
+									&vdatalen);
 
-				//	Parse the version string
-				verStr = verStr.substr(verStr.find("(") + 1);
-				devClass->SetValue(verStr.substr(0, verStr.find(".")));
-				devClass->SetStatus(OvalEnum::STATUS_EXISTS);
-				
+			if(retVal != 0) {
+				if (_tcsclen(lpszValue) > 0) {
+					// except here we assume we are not in unicode mode...
+					itemEntity->SetValue(lpszValue);
+					itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+				}
+			} else if(vdatalen == 0) {
+
+				string errorMessage = "";
+				errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". No value is available for the specified version-information name, \""+fieldName+",\" for file: ");
+				errorMessage.append(filePath);
+				errorMessage.append("'");
+				item->AppendMessage(new OvalMessage(errorMessage));
+
+			} else {
+
+				string errorMessage = "";
+				errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". Either specified name, \""+fieldName+",\" does not exist or the specified resource is not valid for file: ");
+				errorMessage.append(filePath);
+				errorMessage.append("'");
+				item->AppendMessage(new OvalMessage(errorMessage));
+
 			}
 
 		} else if(vdatalen == 0) {
 
 			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get development_class. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
+			errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". No value is available for the specified version-information name, \""+fieldName+",\" for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
@@ -799,387 +815,11 @@ void FileProbe::GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *it
 		} else {
 
 			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get development_class. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
+			errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". Either specified name, \""+fieldName+",\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
 
 		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get development_class. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get development_class. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemEntity* company) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("CompanyName"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string companyNameStr = lpszValue;
-			if(companyNameStr.compare("") != 0) {
-				company->SetValue(companyNameStr);
-				company->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get company. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get company. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get company. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get company. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetInternalName(LPVOID versionbuf, string filePath, Item *item, ItemEntity* internalName) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("InternalName"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string internalNameStr = lpszValue;
-			if(internalNameStr.compare("") != 0) {
-				internalName->SetValue(internalNameStr);
-				internalName->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get internal_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get internal_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get internal_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get internal_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetLanguage(LPVOID /*versionbuf*/, string filePath, Item* /*item*/, ItemEntity* language) {
-	language->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
-}
-
-void FileProbe::GetOriginalFilename(LPVOID versionbuf, string filePath, Item *item, ItemEntity* originalFilename) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("OriginalFilename"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string originalFilenameStr = lpszValue;
-			if(originalFilenameStr.compare("") != 0) {
-				originalFilename->SetValue(originalFilenameStr);
-				originalFilename->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get original_filename. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get original_filename. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get original_filename. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get original_filename. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetProductName(LPVOID versionbuf, string filePath, Item *item, ItemEntity* productName) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("ProductName"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string productNameStr = lpszValue;
-			if(productNameStr.compare("") != 0) {
-				productName->SetValue(productNameStr);
-				productName->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetProductVersion(LPVOID versionbuf, string filePath, Item *item, ItemEntity* productVersion) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("ProductVersion"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string productVersionStr = lpszValue;
-			if(productVersionStr.compare("") != 0) {
-				productVersion->SetValue(productVersionStr);
-				productVersion->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_version. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_version. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_version. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_version. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
 	}
 }

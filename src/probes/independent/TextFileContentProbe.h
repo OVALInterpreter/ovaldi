@@ -35,12 +35,6 @@
 #include "AbsProbe.h"
 #include <fstream>
 
-#ifdef WIN32
-	#define SNPRINTF _snprintf
-#else
-	#define SNPRINTF snprintf
-#endif
-
 /**
 	This class is responsible for collecting data for the ind-sc:textfilecontent_item defined OVAL System Characteristics Schema.
 	This class should be platform independent.
