@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include <cassert>
+#include <memory>
 #include <typeinfo>
 #include <ostream>
 
@@ -43,6 +44,7 @@
 #  include <arpa/inet.h>
 #endif
 
+#include "REGEX.h"
 #include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "ItemFieldEntityValue.h"
@@ -511,18 +513,22 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 		throw Exception("Error: Invalid integer value on system characteristics item entity. " + scValue);
 	}
 	try {
-		int base = 0;
+		//int base = 0;
 		long long defInt = 0;
 		long long scInt = 0;
-		char * e1 = NULL;
-		char * e2 = NULL;
+		//char * e1 = NULL;
+		//char * e2 = NULL;
 
 		// Convert the string defValue to a long long intege
-		defInt = Common::StringToLongLong( ( char* ) defValue.c_str() , &e1 , base );
+		if (!Common::FromString(defValue, &defInt))
+			throw Exception("Error: Invalid integer value on definition entity. " + defValue);
+//		defInt = Common::StringToLongLong( ( char* ) defValue.c_str() , &e1 , base );
 	
 		// Convert the string scValue to a long long integer
-		scInt = Common::StringToLongLong( ( char* ) scValue.c_str() , &e2 , base );
-
+		if (!Common::FromString(scValue, &scInt))
+			throw Exception("Error: Invalid integer value on system characteristics item entity. " + scValue);
+		//scInt = Common::StringToLongLong( ( char* ) scValue.c_str() , &e2 , base );
+		/*
 		if ( e1 != NULL ){
 			*e1 = (char) NULL;
 		}
@@ -530,7 +536,7 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 		if ( e2 != NULL ){
 			*e2 = (char) NULL;
 		}
-
+		*/
 		if(op == OvalEnum::OPERATION_EQUALS) {
 			if(scInt == defInt) {
 				result = OvalEnum::RESULT_TRUE;
@@ -804,234 +810,20 @@ OvalEnum::ResultEnumeration EntityComparator::CompareVersion(OvalEnum::Operation
 }
 
 LongLongVector* EntityComparator::ParseVersionStr(string versionStr) {
-	
-	if(versionStr.compare("") == 0) {
-		throw Exception("Unable to parse version string. An empty string was provided.");
+	auto_ptr<LongLongVector> tokens(new LongLongVector());
+	REGEX re;
+	vector<StringVector> matches;
+	re.GetAllMatchingSubstrings("\\d+", versionStr, matches);
+	// convert the string matches to long longs
+	for (vector<StringVector>::iterator iter = matches.begin();
+		iter != matches.end(); ++iter) {
+		long long val;
+		// should always succeed since the string matched regex \d+
+		Common::FromString((*iter)[0], &val);
+		tokens->push_back(val);
 	}
-	
-	LongLongVector* tokens = new LongLongVector();
 
-    long long tokenInt;
-    char* endptr = NULL;
-	int base = 10;
-	
-    // Get index of first delimiter
-	size_t index = versionStr.find_first_not_of("0123456789"); 
-	
-	// Get index of last delimiter
-	size_t lastindex = versionStr.find_last_not_of("0123456789");
-	
-	if(index == string::npos) {
-        
-		// No delmiter found and not an empty string.
-		// Simply try to convert the versionStr to a long long integer and return it as the only token.
-        try {
-            tokenInt = Common::StringToLongLong( ( char* ) versionStr.c_str() , &endptr , base );
-        }catch (string errorMessage){
-            cout << errorMessage;	
-        }
-
-		if ( endptr != NULL ){
-			*endptr = (char) NULL;
-		}
-
-		tokens->push_back(tokenInt);
-
-	} else {
-	
-		char delm = versionStr.at(index);
-		char* delimiter = (char*)malloc(sizeof(char)*2);
-		delimiter[0] = delm;
-		delimiter[1] = '\0';
-
-		char* theString = (char*)malloc(sizeof(char)*(versionStr.length()+1));
-		theString = strcpy(theString, versionStr.c_str());
-		char* token = strtok(theString, delimiter);
-		
-		
-		if(token == NULL) {
-
-			if(theString != NULL) {
-				free(theString);
-				theString = NULL;
-			}
-			if(tokens != NULL) {
-				delete tokens;
-				tokens = NULL;
-			}
-			if(delimiter != NULL) {
-				free(delimiter);
-				delimiter = NULL;
-			}
-
-			throw Exception("Error parsing version string. A delimiter was found, but no other components to the version were found. Input version string: \'" + versionStr + "\' delimiter detected: \'" + delm + "\'");
-		} else {
-			
-			// If index is zero that means the version starts with a delimiter which is an invalid version value
-			if ( index == 0 ){
-
-				if(theString != NULL) {
-					free(theString);
-					theString = NULL;
-				}
-				if(tokens != NULL) {
-					delete tokens;
-					tokens = NULL;
-				}
-				if(delimiter != NULL) {
-					free(delimiter);
-					delimiter = NULL;
-				}
-
-				throw Exception("Error parsing version string. Version string: \'" + versionStr + "\' begins with a delimiter. Please consult the version datatype definition.");
-			}
-
-			// If index of last delimiter is equal to the length of the version string - 1 that means the version ends with a delimiter which is an invalid version value
-			if ( lastindex == (versionStr.length() - 1) ){
-				
-				if(theString != NULL) {
-					free(theString);
-					theString = NULL;
-				}
-				if(tokens != NULL) {
-					delete tokens;
-					tokens = NULL;
-				}
-				if(delimiter != NULL) {
-					free(delimiter);
-					delimiter = NULL;
-				}
-				
-				throw Exception("Error parsing version string. Version string: \'" + versionStr + "\' ends with a delimiter. Please consult the version datatype definition.");
-			}
-
-			// Create temporary copy of the version string so that the original is not destroyed
-			string versionTempStr = versionStr;
-
-			// Flag to determine if the previous token was a non-int
-			bool prevTokenNonInt = false;
-
-			// Keeps track of the total length of all the characters seen that make up an int token plus a extra character after each int token seen to account for a delimiter character
-			// Note by doing so when you see the last int token it will add on an extra delimiter character which means the total length of all characters seen that make
-			// up a version number will be equivalent to the totalTokenLength - 1
-			int totalTokenLength = 0;
-
-			while(token != NULL) {
-	
-				//	Get the first token as a string
-				string tokenStr = token;
-	
-				// Check that the token is an integer
-				size_t nonInt = tokenStr.find_first_not_of("0123456789");
-	
-				// If a non-int then the delimiter is different than the previous one
-				if(nonInt != string::npos) {
-
-					// Get the index of the new delimiter
-					index = versionTempStr.find_first_not_of("0123456789");
-
-					// Get new delimiter character
-					delm = versionTempStr.at(index);
-					
-					// Put the delimiter character in a null terminated string
-					delimiter[0] = delm;
-					delimiter[1] = '\0';
-
-					// Copy the current version string into a C string
-					theString = strcpy(theString,versionTempStr.c_str());
-					
-					// Get the next token
-					token = strtok(theString,delimiter);
-					
-					// If previous token was a non-int that means there were consecutive delimiters which is invalid
-					if ( prevTokenNonInt ){
-			
-						if(theString != NULL) {
-							free(theString);
-							theString = NULL;
-						}
-						if(tokens != NULL) {
-							delete tokens;
-							tokens = NULL;
-						}
-						if(delimiter != NULL) {
-							free(delimiter);
-							delimiter = NULL;
-						}
-
-						throw Exception("Error parsing version string. Multiple consecutive delimiters found in version string: \'" + versionStr + "\'. Please consult the version datatype definition.");
-					}
-
-					// Last token was a non-int set flag to true
-					prevTokenNonInt = true;
-
-				}else{
-
-					// Found an int so add the length of the token to the totalTokenLength + 1 to account for the delimiter
-					totalTokenLength = totalTokenLength + strlen(token) + 1;
-
-					// Convert the token to a long long integer
-					try {
-                        tokenInt = Common::StringToLongLong( ( char* ) token , &endptr , base );
-                    }catch (string errorMessage){
-                        cout << errorMessage;	
-                    }
-
-					if ( endptr != NULL ){
-						*endptr = (char) NULL;
-					}
-
-					// Add it to the vector
-					tokens->push_back(tokenInt);
-
-					// Get the next token
-					token = strtok(NULL, delimiter);
-					
-					// If token is not null update the temp string to reflect the remaining version data
-					if ( token != NULL ){ 	
-						versionTempStr = versionTempStr.substr(versionTempStr.find(token));					
-					}
-
-					// Last token was an int set flag to false
-					prevTokenNonInt = false;
-
-				}
-			}
-
-			// Check for multiple consecutive delimiters in a version string
-			// Compare the length of the original version string to the totalTokenLength - 1 to remove the extra delimiter that was added when the last int token was found
-			if ( ((int)strlen(versionStr.c_str())) != (totalTokenLength-1) ){
-				
-				if(theString != NULL) {
-					free(theString);
-					theString = NULL;
-				}
-				if(tokens != NULL) {
-					delete tokens;
-					tokens = NULL;
-				}
-				if(delimiter != NULL) {
-					free(delimiter);
-					delimiter = NULL;
-				}
-				
-				throw Exception("Error parsing version string. Multiple consecutive delimiters found in version string: \'" + versionStr + "\'. Please consult the version datatype definition.");
-			}
-
-		}
-	
-		if(delimiter != NULL) {
-			free(delimiter);
-			delimiter = NULL;
-		}
-
-		if(theString != NULL) {
-			free(theString);
-			theString = NULL;
-		}
-	}
-	
-	return tokens;
+	return tokens.release();
 }
 
 string EntityComparator::GetEpochFromEVR(string evrStr) {
