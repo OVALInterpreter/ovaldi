@@ -513,30 +513,17 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 		throw Exception("Error: Invalid integer value on system characteristics item entity. " + scValue);
 	}
 	try {
-		//int base = 0;
 		long long defInt = 0;
 		long long scInt = 0;
-		//char * e1 = NULL;
-		//char * e2 = NULL;
 
 		// Convert the string defValue to a long long intege
 		if (!Common::FromString(defValue, &defInt))
 			throw Exception("Error: Invalid integer value on definition entity. " + defValue);
-//		defInt = Common::StringToLongLong( ( char* ) defValue.c_str() , &e1 , base );
 	
 		// Convert the string scValue to a long long integer
 		if (!Common::FromString(scValue, &scInt))
 			throw Exception("Error: Invalid integer value on system characteristics item entity. " + scValue);
-		//scInt = Common::StringToLongLong( ( char* ) scValue.c_str() , &e2 , base );
-		/*
-		if ( e1 != NULL ){
-			*e1 = (char) NULL;
-		}
 
-		if ( e2 != NULL ){
-			*e2 = (char) NULL;
-		}
-		*/
 		if(op == OvalEnum::OPERATION_EQUALS) {
 			if(scInt == defInt) {
 				result = OvalEnum::RESULT_TRUE;
