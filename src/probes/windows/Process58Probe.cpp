@@ -168,6 +168,7 @@ BOOL CALLBACK Process58Probe::EnumWindowsProc(HWND hwnd,LPARAM lParam)
 		return TRUE; 
 
 	GetWindowThreadProcessId(hwnd,procIdPtr);
+
 	if(processID == pairing->first){
 		GetWindowText(hwnd,WinText,sizeof(WinText));
 		pairing->second = WinText;
@@ -218,23 +219,20 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 				if(GetProcessTimes(openProcessHandle,&createTime,&time2,&time3,&time4) > 0){
 					item->AppendElement(new ItemEntity ("creation_time",WindowsCommon::ToString(createTime),OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 				}else{
-						item->AppendElement(new ItemEntity ("creation_time", "" ,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity ("creation_time", "" ,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 				}
 
 				DWORD procID = GetProcessId(openProcessHandle);	
 				std::pair<DWORD,string> pairing (procID,"");
-				if(EnumWindows(&Process58Probe::EnumWindowsProc, reinterpret_cast<LPARAM>(&pairing))){
-					string primaryWindowText = pairing.second;
+				EnumWindows(&Process58Probe::EnumWindowsProc, reinterpret_cast<LPARAM>(&pairing));
+				string primaryWindowText = pairing.second;
 
-					if(primaryWindowText.length() > 0){
-						item->AppendElement(new ItemEntity ("primary_window_text", primaryWindowText,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-					}else{
-						item->AppendElement(new ItemEntity ("primary_window_text", "",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
-					}
+				if(primaryWindowText.length() > 0){
+					item->AppendElement(new ItemEntity ("primary_window_text", primaryWindowText,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 				}else{
-					item->AppendElement(new ItemEntity ("primary_window_text", "" ,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity ("primary_window_text", "",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
 				}
-
+				
 				DWORD depResult = 0;
 				BOOL perm = FALSE;
 
