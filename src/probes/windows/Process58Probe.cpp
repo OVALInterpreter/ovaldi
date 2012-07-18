@@ -170,10 +170,16 @@ BOOL CALLBACK Process58Probe::EnumWindowsProc(HWND hwnd,LPARAM lParam)
 	GetWindowThreadProcessId(hwnd,procIdPtr);
 
 	if(processID == pairing->first){
-		GetWindowText(hwnd,WinText,sizeof(WinText));
-		pairing->second = WinText;
-	
-		return FALSE;
+		LONG ExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);		
+		HWND parentHwnd = GetWindow(hwnd, GW_OWNER);
+		if(parentHwnd == NULL){
+
+			if(!(ExStyle & WS_EX_NOACTIVATE)){
+				GetWindowText(hwnd,WinText,sizeof(WinText));
+				pairing->second = WinText;
+				return FALSE;
+			}		
+		}
 	}
  
     return TRUE; 
@@ -222,7 +228,8 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 					item->AppendElement(new ItemEntity ("creation_time", "" ,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 				}
 
-				DWORD procID = GetProcessId(openProcessHandle);	
+				DWORD procID = GetProcessId(openProcessHandle);
+
 				std::pair<DWORD,string> pairing (procID,"");
 				EnumWindows(&Process58Probe::EnumWindowsProc, reinterpret_cast<LPARAM>(&pairing));
 				string primaryWindowText = pairing.second;
