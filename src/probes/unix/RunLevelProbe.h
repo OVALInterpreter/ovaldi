@@ -33,15 +33,9 @@
 
 #include "../../AbsProbe.h"
 
-#include <iostream>
-#include <cstring>
+#include <string>
 #include <set>
 #include <map>
-#include <iterator>
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #ifndef RC_DIR
 #  ifdef LINUX
@@ -84,7 +78,7 @@ struct ltrunlevel_item_comparator
 {
   bool operator() ( const runlevel_item &r1, const runlevel_item &r2 )
   {
-    return ( strcmp( r1.service_name.c_str(), r2.service_name.c_str() ) < 0 );
+    return r1.service_name.compare(r2.service_name) < 0;
   }
 
 };
@@ -169,13 +163,6 @@ class RunLevelProbe : public AbsProbe {
       @param runlevel the runlevel being analyzed [0,1,2,3,4,5,6,s,S] 
     */
     void          _analyzeRunlevelDir( const char * dir, const char runlevel ); 
-
-    /**
-      Creates a string representing the appropriate runlevel directory designated by the given runlevel 
-      @param runlevel [0,1,2,3,4,5,6,s,S]
-      @return a pointer to the new directory string.  This must be deleted after using.
-    */
-    char *        _generateRunlevelDir( const char runlevel ) const;
 
     /**
       Generates a map (_runlevels) of runlevel information for the system.
