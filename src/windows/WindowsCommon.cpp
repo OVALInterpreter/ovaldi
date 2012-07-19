@@ -533,16 +533,10 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 			// was there an error?
 			if(res == NERR_Success) {
 
-				char tmpUserName[512];
-
 				// Loop through each user.
 				for (unsigned int i=0; i<entriesread; i++) {
-					ZeroMemory(tmpUserName, sizeof(tmpUserName));
-					_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].grui0_name);
-					tmpUserName[sizeof(tmpUserName)-1] = '\0';
-
 					// Get the account information.
-					string trusteeName = tmpUserName;
+					string trusteeName = UnicodeToAsciiString(userInfo[i].grui0_name);
 
 					// get sid for trustee name
 					PSID pSid = WindowsCommon::GetSIDForTrusteeName(trusteeName);
@@ -804,15 +798,9 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 		if ((nas == NERR_Success) || (nas==ERROR_MORE_DATA)) {
 			// Group account names are limited to 256 characters.
 
-			char tmpGroupName[257];
-
 			// Loop through each group.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpGroupName, sizeof(tmpGroupName));
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", localGroupInfo[i].lgrpi0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-
-				string groupName = tmpGroupName;
+				string groupName = UnicodeToAsciiString(localGroupInfo[i].lgrpi0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
 				// get formatted trustee name
@@ -900,15 +888,9 @@ StringSet* WindowsCommon::GetAllGlobalGroups() {
 		if ((nas == NERR_Success) || (nas==ERROR_MORE_DATA)) {
 			// Group account names are limited to 256 characters.
 
-			char tmpGroupName[257];
-
 			// Loop through each group.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpGroupName, sizeof(tmpGroupName));
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", globalGroupInfo[i].grpi0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-
-				string groupName = tmpGroupName;
+				string groupName = UnicodeToAsciiString(globalGroupInfo[i].grpi0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
 				// get formatted trustee name
@@ -1051,19 +1033,12 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 		
 		if ((nas == NERR_Success) || (nas == ERROR_MORE_DATA)) {
 
-			// User account names are limited to 20 characters.
-			char tmpUserName[21];
-
 			Log::Debug("Found " + Common::ToString(recordsEnumerated) + " local users.");
 
 			// Loop through each user.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpUserName, sizeof(tmpUserName));
-				_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].usri0_name);
-				tmpUserName[sizeof(tmpUserName)-1] = '\0';
-
 				// Get the account information.
-				string userName = tmpUserName;
+				string userName = UnicodeToAsciiString(userInfo[i].usri0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(userName);
 				// get formatted trustee name
@@ -1698,7 +1673,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		LPGROUP_USERS_INFO_0 pTmpBuf;
 		DWORD i;
 		DWORD dwTotalCount = 0;
-		char tmpGroupName[512];
 
 		if ((pTmpBuf = pBuf) != NULL) {
 
@@ -1717,11 +1691,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 					throw Exception("An access violation has occurred while getting groups for user: " + userName);
 				}
 
-				ZeroMemory(tmpGroupName, 21);
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pTmpBuf->grui0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-				groups->insert(tmpGroupName);
-
+				groups->insert(UnicodeToAsciiString(pTmpBuf->grui0_name));
 				pTmpBuf++;
 				dwTotalCount++;
 			}
@@ -1833,7 +1803,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		LPLOCALGROUP_USERS_INFO_0 pLocalTmpBuf;
 		DWORD i;
 		DWORD dwTotalCount = 0;
-		char tmpGroupName[512];
 
 		if ((pLocalTmpBuf = pLocalBuf) != NULL) {
 
@@ -1859,11 +1828,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 					throw Exception("An access violation has occurred while getting local groups for user: " + userName);
 				}
 
-				ZeroMemory(tmpGroupName, 21);
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pLocalTmpBuf->lgrui0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-				groups->insert(tmpGroupName);
-
+				groups->insert(UnicodeToAsciiString(pLocalTmpBuf->lgrui0_name));
 				pLocalTmpBuf++;
 				dwTotalCount++;
 			}
