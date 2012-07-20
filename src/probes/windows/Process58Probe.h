@@ -48,6 +48,7 @@
  */
 
 typedef multimap<string, string> StringStringMultiMap;
+typedef multimap<DWORD, string> DwordStringMultiMap;
 
 class Process58Probe : public AbsProbe {
 
@@ -72,6 +73,8 @@ class Process58Probe : public AbsProbe {
          *  @return Void.
          */
         void GetAllProcesses();
+
+		static BOOL CALLBACK EnumWindowsProc(HWND hwnd,LPARAM lParam);
 
 
         /** Retrieve a particular Item from the ItemVector processes using the process' command line as the key.
@@ -101,6 +104,7 @@ class Process58Probe : public AbsProbe {
          */
         void DeleteCommandLineMap();
 
+	
         /** Delete the StringStringMultiMap pathMap.
          *  @return Void.
          */
