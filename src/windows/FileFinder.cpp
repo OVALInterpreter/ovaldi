@@ -30,6 +30,7 @@
 
 #include <memory>
 #include <FindCloseGuard.h>
+#include <AutoCloser.h>
 #include "FileFinder.h"
 
 using namespace std;
@@ -284,7 +285,8 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 			//	Loop through each file in the directory.  
 			//	If a sub-directory is found, make a recursive call to GetFilePathsForOperation to search its contents.
 			//	If a file is found get the file path and check it against the queryVal
-			FindCloseGuard fcg(hFind);
+			AutoCloser<HANDLE,BOOL(WINAPI&)(HANDLE)> fcg(hFind, FindClose,
+				"FindFirstFile("+findDir+')');
 			do {
 
 				// Skip ., .., and System Volume 
@@ -307,19 +309,6 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 					}
 				}
 			} while (FindNextFile(hFind, &FindFileData));
-
-			//	Close the handle to the file search object.
-			if(!fcg.close()) {
-				string errorMessage =
-					"Error: Unable to close search handle while trying to search for matching paths. " + 
-					WindowsCommon::GetErrorMessage(GetLastError()) +
-					" Directory: " +
-					dirIn +
-					" Pattern: " +
-					queryVal;
-				throw FileFinderException(errorMessage);	
-			}
-
 		}
 	//	Just need to ensure that all exceptions have a nice message. 
 	//	So rethrow the exceptions I created catch the others and format them.
@@ -385,7 +374,8 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 
 		//	Loop through each file in the directory.  
 		//	If a file is found get the file path and check it against the queryVal
-		FindCloseGuard fcg(hFind);
+		AutoCloser<HANDLE,BOOL(WINAPI&)(HANDLE)> fcg(hFind, FindClose,
+			"FindFirstFile("+findDir+')');
 		do {
 
 			// Skip ., .., and System Volume 
@@ -416,19 +406,6 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 				}
 			}
 		} while (FindNextFile(hFind, &FindFileData));
-
-		//	Close the handle to the file search object.
-		if(!fcg.close()) {
-
-			string errorMessage =
-				"Error: Unable to close search handle while trying to search for matching files. " +
-				WindowsCommon::GetErrorMessage(GetLastError()) +
-				" Directory: " +
-				path +
-				" Pattern: " +
-				queryVal;
-			throw FileFinderException(errorMessage);
-		}
 
 	//	Just need to ensure that all exceptions have a nice message. 
 	//	So rethrow the exceptions I created catch the others and format them.
