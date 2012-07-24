@@ -29,7 +29,6 @@
 //****************************************************************************************//
 
 #include <memory>
-#include <FindCloseGuard.h>
 #include <AutoCloser.h>
 #include "FileFinder.h"
 
