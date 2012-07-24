@@ -408,7 +408,6 @@
     <ClCompile Include="..\..\..\src\Exception.cpp" />
     <ClCompile Include="..\..\..\src\Log.cpp" />
     <ClCompile Include="..\..\..\src\REGEX.cpp" />
-    <ClCompile Include="..\..\..\src\windows\FindCloseGuard.cpp" />
     <ClCompile Include="..\..\..\src\windows\PrivilegeGuard.cpp" />
     <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
     <ClCompile Include="..\..\..\src\XmlProcessor.cpp" />
@@ -575,7 +574,6 @@ echo off
     <ClInclude Include="..\..\..\src\Exception.h" />
     <ClInclude Include="..\..\..\src\Log.h" />
     <ClInclude Include="..\..\..\src\REGEX.h" />
-    <ClInclude Include="..\..\..\src\windows\FindCloseGuard.h" />
     <ClInclude Include="..\..\..\src\windows\PrivilegeGuard.h" />
     <ClInclude Include="..\..\..\src\XmlCommon.h" />
     <ClInclude Include="..\..\..\src\XmlProcessor.h" />
