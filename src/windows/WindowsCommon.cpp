@@ -2336,7 +2336,7 @@ bool WindowsCommon::IsXPOrLater() {
 	}
 }
 
-string WindowsCommon::UnicodeToAsciiString ( wchar_t* unicodeCharStr ) {
+string WindowsCommon::UnicodeToAsciiString ( const wchar_t* unicodeCharStr ) {
     string asciiStr;
     size_t length = wcslen ( unicodeCharStr ) + 1;
     char* buffer = ( char* ) malloc ( sizeof ( char ) * length );

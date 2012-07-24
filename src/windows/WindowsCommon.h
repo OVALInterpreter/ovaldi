@@ -263,7 +263,7 @@ public:
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
      *  @return A string of ASCII characters.
     */
-	static string UnicodeToAsciiString ( wchar_t* unicodeCharStr );
+	static string UnicodeToAsciiString ( const wchar_t* unicodeCharStr );
 
 	/** Return true if a wide-character string of Unicode characters would convert into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that are checked for validity as ASCII characters.
