@@ -32,8 +32,10 @@
 #include <cctype>
 #include <cstring>
 #include <memory>
-#include <ArrayGuard.h>
 #include <time.h>
+
+#include <ArrayGuard.h>
+#include <Common.h>
 #include "WindowsCommon.h"
 
 StringSet* WindowsCommon::allLocalUserSIDs = NULL;
@@ -195,8 +197,7 @@ string WindowsCommon::GetErrorMessage(DWORD dwLastError) {
         FreeLibrary(hModule);
 
     // make sure there is no trailing new line
-    while(errMsg.at(errMsg.length()-1) == '\n' || errMsg.at(errMsg.length()-1) == '\r')
-        errMsg = errMsg.substr(0, errMsg.length()-1);
+	Common::TrimEnd(errMsg);
 
 	return errMsg;
 }
