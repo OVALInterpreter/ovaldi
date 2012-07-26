@@ -204,10 +204,6 @@ string WindowsCommon::GetErrorMessage(DWORD dwLastError) {
 
 bool WindowsCommon::GetTextualSid(PSID pSid, string* TextualSid) { 
 
-    // Validate the binary SID.
-
-	if(!IsValidSid(pSid)) return false;
-
 	LPTSTR sidCStr;
 	if (ConvertSidToStringSid(pSid, &sidCStr)) {
 #ifdef _UNICODE
@@ -1529,16 +1525,7 @@ string WindowsCommon::ToString(FILETIME fTime) {
 	ULONGLONG fTimeResult = (((ULONGLONG)fTime.dwHighDateTime)<<32) + fTime.dwLowDateTime;
 	return Common::ToString(fTimeResult);
 }
-/*
-string WindowsCommon::ToString(PSID pSID) {
 
-	string tmp;
-	if (!WindowsCommon::GetTextualSid(pSID, &tmp))
-		throw Exception("Error converting SID to string: " + GetErrorMessage(GetLastError()));
-
-	return tmp;
-}
-*/
 bool WindowsCommon::TrusteeNameExists(const string trusteeNameIn) {
 
     bool trusteeNameExists = false;
@@ -2025,7 +2012,7 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectT
 			GetErrorMessage(GetLastError()));
 		sidStr = "(could not convert sid)";
 	}
-	//string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid);
+
 	string baseErrMsg = "Error unable to get effective rights for trustee: " + sidStr;
 
 	DWORD res;
@@ -2203,7 +2190,7 @@ void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objec
 			GetErrorMessage(GetLastError()));
 		sidStr = "(could not convert sid)";
 	}
-    //string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + WindowsCommon::ToString ( pSid ) + ".";
+
 	string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + sidStr + ".";
     DWORD res;
     PACL psacl;

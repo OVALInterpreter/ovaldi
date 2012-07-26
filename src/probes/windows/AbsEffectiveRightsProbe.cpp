@@ -76,13 +76,13 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 			WindowsCommon::GetSidsFromPACL ( pdacl, &allTrustees );
 			string sidStr;
 			if (!WindowsCommon::GetTextualSid(owner, &sidStr))
-				throw Exception("GetTrusteesForWindowsObject: Couldn't convert SID to string");
+				throw Exception("GetTrusteesForWindowsObject: Couldn't convert SID to string: "+
+					WindowsCommon::GetErrorMessage(GetLastError()));
 			allTrustees.insert(sidStr);
 			if (!WindowsCommon::GetTextualSid(primaryGroup, &sidStr))
-				throw Exception("GetTrusteesForWindowsObject: Couldn't convert SID to string");
+				throw Exception("GetTrusteesForWindowsObject: Couldn't convert SID to string: "+
+					WindowsCommon::GetErrorMessage(GetLastError()));
 			allTrustees.insert(sidStr);
-			//allTrustees.insert ( WindowsCommon::ToString ( owner ) );
-			//allTrustees.insert ( WindowsCommon::ToString ( primaryGroup ) );
 		}else{
 			WindowsCommon::GetTrusteeNamesFromPACL(pdacl, &allTrustees);
 			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(owner));
