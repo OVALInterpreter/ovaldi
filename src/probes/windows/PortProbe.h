@@ -31,9 +31,10 @@
 #ifndef PORTPROBE_H
 #define PORTPROBE_H
 
+#include <string>
+
+#include <OvalEnum.h>
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include <Iphlpapi.h>
 
 /** This class is responsible for collecting Windows port data. */
 
@@ -63,7 +64,7 @@ class PortProbe : public AbsProbe {
          *  @param pid A unsigned long integer that contains the pid value of a Windows port.
          *  @return A Item representing a Windows port.
          */
-        Item* BuildPortItem ( string localAddressStr , unsigned long localPort , string remoteAddressStr , unsigned long remotePort , string protocolStr , unsigned long pid );
+        Item* BuildPortItem ( std::string localAddressStr , unsigned long localPort , std::string remoteAddressStr , unsigned long remotePort , std::string protocolStr , unsigned long pid );
 
         /** Retrieve a particular port from the instance of the ItemVector using the port's local address, port value, and protocol as the key.
          *  @param localAddressStr A string that contains the local address of a Windows port in dotted-quad notation.
@@ -71,7 +72,7 @@ class PortProbe : public AbsProbe {
          *  @param protocolStr A string that contains the protocol of a Windows port.
          *  @return The Item representing a Windows port whose local address, local port, and protocol match the specified values.
          */
-        Item* GetPort ( string localAddressStr , long long localPort , string protocolStr );
+        Item* GetPort ( std::string localAddressStr , long long localPort , std::string protocolStr );
 
         /** Get the set of all protocols on the system that match the object.
          *  @param protocol A ObjectEntity that represents the protocol entity in an Object as defined in the OVAL Definition Schema.
@@ -84,20 +85,20 @@ class PortProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching protocols.
          */
-        StringSet* GetMatchingProtocols ( string pattern , bool isRegex );
+        StringSet* GetMatchingProtocols ( std::string pattern , bool isRegex );
 
         /** Determine if the specified protocol value exists.
          *  @param protocolStr A string that contains the protocol of the Windows port whose existence you are checking.
          *  @return A boolean value indicating whether or not a Windows port with the specified protocol exists.
          */
-        bool ProtocolExists ( string protocolStr );
+        bool ProtocolExists ( std::string protocolStr );
 
         /** Get the set of all local addresses on the system that match the object.
          *  @param protocolStr A string that contains the protocol to be used during the matching process.
          *  @param localAddress A ObjectEntity that represents the local_address entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the local addresses specified in the ObjectEntity that also match the specified protocol.
          */
-        StringSet* GetLocalAddresses ( string protocolStr , ObjectEntity* localAddress );
+        StringSet* GetLocalAddresses ( std::string protocolStr , ObjectEntity* localAddress );
 
         /** Retrieve all of the matching local addresses.
          *  @param protocolStr A string that contains the protocol to be used during the matching process.
@@ -105,14 +106,14 @@ class PortProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching local addresses that also match the specified protocol.
          */
-        StringSet* GetMatchingLocalAddresses ( string protocolStr , string pattern , bool isRegex );
+        StringSet* GetMatchingLocalAddresses ( std::string protocolStr , std::string pattern , bool isRegex );
 
         /** Deterimine if the specified local address value exists.
          *  @param protocolStr A string that contains the protocol of the Windows port whose existence you are checking.
          *  @param localAddressStr A string that contains the local address of the Windows port whose existence you are checking.
          *  @return A boolean value indicating whether or not a Windows port with the specified protocol and local address exists.
          */
-        bool LocalAddressExists ( string protocolStr , string localAddressStr );
+        bool LocalAddressExists ( std::string protocolStr , std::string localAddressStr );
 
         /** Get the set of all local ports on the system that match the object.
          *  @param protocolStr A string that contains the protocol to be used during the matching process.
@@ -120,7 +121,7 @@ class PortProbe : public AbsProbe {
          *  @param localPort A ObjectEntity that represents the local_port entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the local ports specified in the ObjectEntity that also match the specified protocol and local address.
          */
-        StringSet* GetLocalPorts ( string protocolStr , string localAddressStr , ObjectEntity* localPort );
+        StringSet* GetLocalPorts ( std::string protocolStr , std::string localAddressStr , ObjectEntity* localPort );
 
         /** Retrieve all of the matching local ports.
          *  @param protocolStr A string that contains the protocol to be used during the matching process.
@@ -129,7 +130,7 @@ class PortProbe : public AbsProbe {
          *  @param loopThroughAllVariables A boolean value that specifies whether or not to loop through all of the variables in the specified ObjectEntity.
          *  @return A StringSet containing all of the matching local ports that also match the specified protocol and local address.
          */
-        StringSet* GetMatchingLocalPorts ( string protocolStr , string localAddressStr , ObjectEntity* localPort , bool loopThroughAllVariables );
+        StringSet* GetMatchingLocalPorts ( std::string protocolStr , std::string localAddressStr , ObjectEntity* localPort , bool loopThroughAllVariables );
 
         /** Deterimine if the specified local port value exists.
          *  @param protocolStr A string that contains the protocol of the Windows port whose existence you are checking.
@@ -137,7 +138,7 @@ class PortProbe : public AbsProbe {
          *  @param localPortStr A string that contains the local port of the Windows port whose existence you are checking.
          *  @return A boolean value indicating whether or not a Windows port with the specified protocol, local address, and local port exists.
          */
-        bool LocalPortExists ( string protocolStr , string localAddressStr , string localPortStr );
+        bool LocalPortExists ( std::string protocolStr , std::string localAddressStr , std::string localPortStr );
 
         /** Determine if the operation and value are valid for the integer datatype.
          *  @param op A OvalEnum::Operation that contains the operation whose validity you would like to check.
@@ -152,12 +153,6 @@ class PortProbe : public AbsProbe {
          */
         void GetAllPorts();
 
-        /** Convert a string representation of a port number into a long long integer using the Common::StringToLongLong() method.
-         *  @param portStr A string that contains the port value that you would like to convert to a long long integer.
-         *  @return The long long integer value of the specified string.
-         */
-        long long StringToPortValue ( string portStr );
-
         /** Delete all Items in the ports ItemVector.
          *  @return Void.
          */
@@ -169,10 +164,10 @@ class PortProbe : public AbsProbe {
         static PortProbe* instance;
 
         /** String constant representing the TCP protocol */
-        static const string PROTOCOL_TCP;
+        static const std::string PROTOCOL_TCP;
 
         /** String constant representing the UDP protocol */
-        static const string PROTOCOL_UDP;
+        static const std::string PROTOCOL_UDP;
 
         /** The ItemVector that holds the information about all of the Windows ports on the local system */
         ItemVector* ports;

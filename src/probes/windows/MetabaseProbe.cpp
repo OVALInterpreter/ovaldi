@@ -28,7 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <iomanip>
+#include <sstream>
 #include "MetabaseProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								MetabaseProbe Class									      //
@@ -503,61 +507,49 @@ StringVector* MetabaseProbe::GetDataValues ( unsigned char* data, unsigned long 
 
 	switch ( type ) {
 		case BINARY_METADATA: {
-				char buffer[3];
+				ostringstream oss;
+				oss << hex << setfill('0');
+				for (DWORD i = 0; i<length; ++i)
+					oss << setw(2) << (int)data[i];
 
-				for ( unsigned int i = 0 ; i < length; i++ ) {
-					ZeroMemory ( buffer, 3 );
-					_snprintf ( buffer, 2, "%02x", ( unsigned long * ) ( * ( data+i ) ) );
-					value.append ( buffer );
-				}
-
-				values->push_back ( value );
+				values->push_back(oss.str());
 				break;
 			}
 		case DWORD_METADATA: {
-				char buffer[12];
-				ZeroMemory ( buffer, sizeof ( buffer ) );
-				_snprintf ( buffer, sizeof ( buffer )-1, "%u", * ( unsigned long * ) data );
-				buffer[sizeof ( buffer )-1] = '\0';
-				values->push_back ( buffer );
+				values->push_back ( Common::ToString(*(DWORD*)data) );
 				break;
 			}
 		case EXPANDSZ_METADATA: {
-				for ( unsigned int i = 0 ; i < length ; i++ ) {
-					if ( ( * ( data+i ) ) != '\0' ) {
-						value.push_back ( ( char ) ( * ( data+i ) ) );
-					}
-				}
-
-				values->push_back ( value );
+			values->push_back(
+				WindowsCommon::UnicodeToAsciiString(
+					wstring((const wchar_t*)data, length/sizeof(wchar_t)).c_str()));
 				break;
 			}
 		case MULTISZ_METADATA: {
-				char buffer[3];
-
-				for ( unsigned int i = 0 ; i < length-2; i=i+2 ) {
-					ZeroMemory ( buffer, sizeof ( buffer ) );
-					_snprintf ( buffer, sizeof ( buffer )-1, "%C", ( unsigned long * ) ( * ( data+i ) ) );
-					buffer[sizeof ( buffer )-1] = '\0';
-
-					if ( buffer[0] == '\0' ) {
-						values->push_back ( value );
-						value.clear();
-					} else {
-						value.append ( buffer );
-					}
+				// Pasted & modified from RegistryProbe for REG_MULTI_SZ data.
+				// This version uses wide chars.  Nothing is added to 'values' if
+				// there are no strings in the sequence.
+				LPCWCH beg = (LPCWCH)data, end = beg + length/sizeof(WCHAR);
+				LPCWCH substrEnd;
+				while (beg < end && *beg) { // while not an empty string
+					// don't trust we have null termination... find the real end!
+					substrEnd = beg;
+					while (substrEnd < end && *substrEnd) ++substrEnd;
+					values->push_back(
+						WindowsCommon::UnicodeToAsciiString(
+							wstring(beg, substrEnd - beg).c_str()));
+					// if we found end-of-string instead of end-of-buffer, skip
+					// to the beginning of the next string.
+					if (substrEnd < end) ++substrEnd;
+					beg = substrEnd;
 				}
 
 				break;
 			}
 		case STRING_METADATA: {
-				for ( unsigned int i = 0 ; i < length ; i++ ) {
-					if ( ( * ( data+i ) ) != '\0' ) {
-						value.push_back ( ( char ) ( * ( data+i ) ) );
-					}
-				}
-
-				values->push_back ( value );
+			values->push_back(
+				WindowsCommon::UnicodeToAsciiString(
+					wstring((const wchar_t*)data, length/sizeof(wchar_t)).c_str()));
 				break;
 			}
 		default: {

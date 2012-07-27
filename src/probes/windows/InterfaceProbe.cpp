@@ -28,7 +28,25 @@
 //
 //****************************************************************************************//
 
+#include <Winsock2.h>
+#include <iphlpapi.h>
+#include <memory>
+#include <iomanip>
+
+#include <FreeGuard.h>
+#include <VectorPtrGuard.h>
+
 #include "InterfaceProbe.h"
+
+using namespace std;
+
+namespace {
+	/**
+	 * A simple helper function to convert ipv4 addresses as
+	 * DWORD's in network byte order, to a string.
+	 */
+	string dwordIpToString(DWORD addr);
+}
 
 //****************************************************************************************//
 //                              InterfaceProbe Class                                  //
@@ -41,7 +59,7 @@ InterfaceProbe::InterfaceProbe() {
 
 InterfaceProbe::~InterfaceProbe() {
     instance = NULL;
-    InterfaceProbe::DeleteInterfaces();
+    this->DeleteInterfaces();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -178,210 +196,117 @@ Item* InterfaceProbe::GetInterface ( string nameStr ) {
 }
 
 void InterfaceProbe::GetAllInterfaces() {
-    InterfaceProbe::interfaces = new ItemVector();
-    PMIB_IPADDRTABLE ipAddrTable = ( PMIB_IPADDRTABLE ) malloc ( sizeof ( MIB_IPADDRTABLE ) );
-    PMIB_IFTABLE ifTable = ( PMIB_IFTABLE ) malloc ( sizeof ( MIB_IFTABLE ) );
-    PMIB_IFROW ifRow = ( PMIB_IFROW ) malloc ( sizeof ( MIB_IFROW ) );
-    DWORD addrSize = 0;
-    DWORD ifSize = 0;
-    DWORD errorIpAddrTable;
-    DWORD errorIfTable = 0;
+	VectorPtrGuard<Item> interfaces(new ItemVector());
 
-    if ( GetIpAddrTable ( ipAddrTable , &addrSize , 0 ) == ERROR_INSUFFICIENT_BUFFER ) {
-        free ( ipAddrTable );
-        ipAddrTable = ( PMIB_IPADDRTABLE ) malloc ( addrSize );
-    }
+	// These won't hold exactly 1 of the specified type...
+	// There is typical C wishywashyness with typing going
+	// on here... but at least the first part of the memory
+	// block ought to hold a struct of the given type.
+	FreeGuard<MIB_IFTABLE> ifTable;
+	FreeGuard<MIB_IPADDRTABLE> ipTable;
+	DWORD ifSize = 0, ipSize = 0;
+	DWORD err;
 
-    if ( GetIfTable ( ifTable , &ifSize , FALSE ) == ERROR_INSUFFICIENT_BUFFER ) {
-        free ( ifTable );
-        ifTable = ( PMIB_IFTABLE ) malloc ( ifSize );
-    }
+	// get buffer sizes first, then make the "real" call to get the data.
+    if ((err = GetIpAddrTable(NULL, &ipSize, FALSE)) == ERROR_INSUFFICIENT_BUFFER) {
+        ipTable.reset(malloc(ipSize));
+		if (!ipTable.get())
+			throw ProbeException("malloc(" + Common::ToString(ipSize) + 
+				"): " + strerror(errno));
+    } else
+		throw ProbeException("GetIpAddrTable() error: " +
+			WindowsCommon::GetErrorMessage(err));
 
-    if ( ipAddrTable == NULL || ifTable == NULL ) {
-        InterfaceProbe::DeleteInterfaces();
+	if ((err = GetIpAddrTable(ipTable.get(), &ipSize, FALSE)) != NO_ERROR)
+		throw ProbeException("GetIpAddrTable() error: " +
+			WindowsCommon::GetErrorMessage(err));
 
-        if ( ipAddrTable != NULL ) {
-            free ( ipAddrTable );
-            ipAddrTable = NULL;
-        }
+    if ((err = GetIfTable(NULL, &ifSize, FALSE)) == ERROR_INSUFFICIENT_BUFFER) {
+        ifTable.reset(malloc(ifSize));
+		if (!ifTable.get())
+			throw ProbeException("malloc(" + Common::ToString(ifSize) + 
+				"): " + strerror(errno));
+    } else
+		throw ProbeException("GetIfTable() error: " +
+			WindowsCommon::GetErrorMessage(err));
 
-        if ( ifTable != NULL ) {
-            free ( ifTable );
-            ifTable = NULL;
-        }
+	if ((err = GetIfTable(ifTable.get(), &ifSize, FALSE)) != NO_ERROR)
+		throw ProbeException("GetIfTable() error: " +
+			WindowsCommon::GetErrorMessage(err));
 
-        if ( ifRow != NULL ) {
-            free ( ifRow );
-            ifRow = NULL;
-        }
+	for (DWORD ifIdx = 0; ifIdx < ifTable->dwNumEntries; ++ifIdx) {
+		// for each interface, try to find a matching entry in ipTable.
+		DWORD ipIdx;
+		for (ipIdx = 0; ipIdx < ipTable->dwNumEntries; ++ipIdx)
+			if (ipTable->table[ipIdx].dwIndex == ifTable->table[ifIdx].dwIndex)
+				break;
 
-        string errorMessage = "";
+		Item *item = CreateItem();
+		interfaces->push_back(item);
 
-        if ( ipAddrTable == NULL ) {
-            errorMessage.append ( "Error: Unable to allocate memory for the MIB_IPADDRTABLE data structure. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
+		PMIB_IFROW ifRow = &ifTable->table[ifIdx];
+		item->AppendElement(new ItemEntity("name",
+			string((char*)&ifRow->bDescr[0], ifRow->dwDescrLen)));
+		item->AppendElement(new ItemEntity("index", 
+			Common::ToString(ifRow->dwIndex), OvalEnum::DATATYPE_INTEGER));
+		item->AppendElement(new ItemEntity("type", 
+			InterfaceProbe::GetInterfaceType(ifRow->dwType)));
 
-        if ( ifTable == NULL ) {
-            errorMessage.append ( "Error: Unable to allocate memory for the MIB_IFTABLE data structure. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
+		// MAC addresses don't apply to non-ethernet interfaces.
+		if (ifRow->dwType == IF_TYPE_ETHERNET_CSMACD) {
+			ostringstream macOss;
+			macOss << hex << uppercase << setfill('0');
+			if (ifRow->dwPhysAddrLen > 0)
+				macOss << setw(2) << (int)ifRow->bPhysAddr[0];
+			for (DWORD i = 1; i < ifRow->dwPhysAddrLen; ++i)
+				macOss << '-' << setw(2) << (int)ifRow->bPhysAddr[i];
 
-        throw ProbeException ( errorMessage );
-    }
+			item->AppendElement(new ItemEntity("hardware_addr", macOss.str()));
+		} else
+			item->AppendElement(new ItemEntity("hardware_addr", "",
+				OvalEnum::DATATYPE_STRING, false, 
+				OvalEnum::STATUS_DOES_NOT_EXIST));
 
-    if ( ( ( errorIpAddrTable = GetIpAddrTable ( ipAddrTable , &addrSize , 0 ) ) == NO_ERROR ) && ( ( errorIfTable = GetIfTable ( ifTable , &ifSize , 0 ) ) == NO_ERROR ) ) {
-        DWORD ifTableLength = ifTable->dwNumEntries;
-        Item* item;
+		// Not all interfaces have IPv4 addresses.  So
+		// set status="does not exist" on all the IP-related
+		// entities if we don't have one.  (This probe
+		// doesn't yet support IPv6.)
+		if (ipIdx < ipTable->dwNumEntries) {
+			PMIB_IPADDRROW ipRow = &ipTable->table[ipIdx];
+			item->AppendElement(new ItemEntity("inet_addr",
+				dwordIpToString(ipRow->dwAddr)));
+			item->AppendElement(new ItemEntity("broadcast_addr",
+				dwordIpToString(ipRow->dwAddr | ~ipRow->dwMask)));
+			item->AppendElement(new ItemEntity("netmask",
+				dwordIpToString(ipRow->dwMask)));
+			auto_ptr<StringVector> addrType(
+				InterfaceProbe::GetInterfaceAddressType(ipRow->wType));
+			if (addrType->empty())
+				item->AppendElement(new ItemEntity("addr_type", "",
+				OvalEnum::DATATYPE_STRING, false, 
+				OvalEnum::STATUS_DOES_NOT_EXIST));
+			else
+				for (StringVector::iterator it = addrType->begin();
+					it != addrType->end();
+					it++)
+					item->AppendElement(new ItemEntity("addr_type", *it));
+		} else {
+			item->AppendElement(new ItemEntity("inet_addr", "",
+				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("broadcast_addr", "",
+				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("netmask", "",
+				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("addr_type", "",
+				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+	}
 
-        for ( unsigned int i = 0 ; i < ifTableLength ; i++ ) {
-            item = this->CreateItem();			
-			item->SetStatus ( OvalEnum::STATUS_EXISTS );
-
-            ifRow->dwIndex = ipAddrTable->table[i].dwIndex;
-
-            if ( GetIfEntry ( ifRow ) == NO_ERROR ) {
-                
-                char *desc = ( char* ) malloc ( ifRow->dwDescrLen + 1 );
-
-                if ( desc == NULL ) {
-                    InterfaceProbe::DeleteInterfaces();
-
-                    if ( ipAddrTable != NULL ) {
-                        free ( ipAddrTable );
-                        ipAddrTable = NULL;
-                    }
-
-                    if ( ifTable != NULL ) {
-                        free ( ifTable );
-                        ifTable = NULL;
-                    }
-
-                    if ( ifRow != NULL ) {
-                        free ( ifRow );
-                        ifRow = NULL;
-                    }
-
-                    throw ProbeException ( "Error: Unable to allocate memory for the interface's name.  Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-                }
-
-                ZeroMemory ( desc , sizeof ( ifRow->dwDescrLen + 1 ) );
-
-                for ( unsigned int k = 0 ; k < ifRow->dwDescrLen ; k++ ) {
-                    desc[k] = ( char ) ifRow->bDescr[k];
-                }
-
-                item->AppendElement ( new ItemEntity ( "name" , desc , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-				item->AppendElement ( new ItemEntity ( "index" , Common::ToString ( ipAddrTable->table[i].dwIndex ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
-
-				// Format MAC Address
-                char *mac = ( char* ) malloc ( sizeof ( char ) * 30 );
-
-                if ( mac == NULL ) {
-                    InterfaceProbe::DeleteInterfaces();
-
-                    if ( ipAddrTable != NULL ) {
-                        free ( ipAddrTable );
-                        ipAddrTable = NULL;
-                    }
-
-                    if ( ifTable != NULL ) {
-                        free ( ifTable );
-                        ifTable = NULL;
-                    }
-
-                    if ( ifRow != NULL ) {
-                        free ( ifRow );
-                        ifRow = NULL;
-                    }
-
-                    throw ProbeException ( "Error: Unable to allocate memory for the interface's MAC address. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-                }
-
-                ZeroMemory ( mac , 30 );
-
-                for ( unsigned int j = 0 ; j < ifRow->dwPhysAddrLen ; j++ ) {
-                    sprintf ( &mac[j*3] , "%02X-" , ifRow->bPhysAddr[j] );
-                }
-
-                string macStr = mac;
-				item->AppendElement ( new ItemEntity ( "type" , InterfaceProbe::GetInterfaceType ( ifRow->dwType ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-                item->AppendElement ( new ItemEntity ( "hardware_addr" , macStr.substr ( 0, macStr.length() - 1 ), OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-
-				in_addr addr;
-				string inetAddr;
-				string subnetMask;
-	            
-				addr.S_un.S_addr = ipAddrTable->table[i].dwAddr;
-				item->AppendElement ( new ItemEntity ( "inet_addr" , inetAddr = inet_ntoa ( addr ) , OvalEnum::DATATYPE_STRING, false , OvalEnum::STATUS_EXISTS ) );
-				addr.S_un.S_addr = ipAddrTable->table[i].dwMask;
-				subnetMask = inet_ntoa ( addr );
-				item->AppendElement ( new ItemEntity ( "broadcast_addr" , InterfaceProbe::CalculateBroadcastAddress ( inetAddr , subnetMask ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-				item->AppendElement ( new ItemEntity ( "netmask" , subnetMask, OvalEnum::DATATYPE_STRING, false , OvalEnum::STATUS_EXISTS ) );
-
-				StringVector* addrType = InterfaceProbe::GetInterfaceAddressType ( ipAddrTable->table[i].wType );				
-				for ( StringVector::iterator it = addrType->begin(); it != addrType->end(); it++ ) {
-					item->AppendElement ( new ItemEntity ( "addr_type" , *it , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-				}
-
-				if ( addrType != NULL ) {
-					addrType->clear();
-					delete addrType;
-					addrType = NULL;
-				}
-
-                InterfaceProbe::interfaces->push_back ( item );
-
-            } else {
-                InterfaceProbe::DeleteInterfaces();
-
-                if ( ipAddrTable != NULL ) {
-                    free ( ipAddrTable );
-                    ipAddrTable = NULL;
-                }
-
-                if ( ifTable != NULL ) {
-                    free ( ifTable );
-                    ifTable = NULL;
-                }
-
-                if ( ifRow != NULL ) {
-                    free ( ifRow );
-                    ifRow = NULL;
-                }
-
-                throw ProbeException ( "Error: The was an error retrieving the MIB_IFROW data structure using the GetIfEntry() function. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-            }
-        }
-
-    } else {
-        InterfaceProbe::DeleteInterfaces();
-
-        if ( ipAddrTable != NULL ) {
-            free ( ipAddrTable );
-            ipAddrTable = NULL;
-        }
-
-        if ( ifTable != NULL ) {
-            free ( ifTable );
-            ifTable = NULL;
-        }
-
-        if ( ifRow != NULL ) {
-            free ( ifRow );
-            ifRow = NULL;
-        }
-
-        string errorMessage = "";
-
-        if ( errorIpAddrTable != NO_ERROR ) {
-            errorMessage.append ( "Error: Unable to retrieve the MIB_IPADDRTABLE data structure using the GetIpAddrTable() function. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
-
-        if ( errorIfTable != NO_ERROR ) {
-            errorMessage.append ( "Error: Unable to retrieve the MIB_IFTABLE data structure using the GetIfTable() function. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
-
-        throw ProbeException ( errorMessage );
-    }
+	this->interfaces = interfaces.release();
 }
 
 string InterfaceProbe::GetInterfaceType ( DWORD type ) {
@@ -397,9 +322,6 @@ string InterfaceProbe::GetInterfaceType ( DWORD type ) {
         case MIB_IF_TYPE_LOOPBACK:
             interfaceType = "MIB_IF_TYPE_LOOPBACK";
             break;
-        case MIB_IF_TYPE_OTHER:
-            interfaceType = "MIB_IF_TYPE_OTHER";
-            break;
         case MIB_IF_TYPE_PPP:
             interfaceType = "MIB_IF_TYPE_PPP";
             break;
@@ -409,8 +331,9 @@ string InterfaceProbe::GetInterfaceType ( DWORD type ) {
         case MIB_IF_TYPE_TOKENRING:
             interfaceType = "MIB_IF_TYPE_TOKENRING";
             break;
+        case MIB_IF_TYPE_OTHER:
         default:
-            interfaceType = "";
+            interfaceType = "MIB_IF_TYPE_OTHER";
             break;
     }
 
@@ -443,55 +366,28 @@ StringVector * InterfaceProbe::GetInterfaceAddressType ( DWORD type ) {
     return addressType;
 }
 
-string InterfaceProbe::CalculateBroadcastAddress ( string ipAddrStr , string netMaskStr ) {
-    // Restrict values to 8 bits
-    union bits {
-
-        unsigned int value;
-        unsigned int bytevalue: 8;
-
-    };
-    bits b;
-    string bcastaddrStr = "";
-    unsigned int ip;
-    unsigned int net;
-    string temp1 = ipAddrStr.c_str();
-    string temp2 = netMaskStr.c_str();
-
-    // Loop through all four bytes of a IPv4 address and perform the OR operation on the IP address and the 1's complement of the subnet mask
-    for ( int i = 0 ; i < 4 ; i++ ) {
-        // Get first byte of the IPv4 IP address
-        ip = atoi ( temp1.substr ( 0 , temp1.find_first_of ( "." ) ).c_str() );
-        // Advance to the next byte in the IPv4 IP address
-        temp1 = temp1.substr ( temp1.find_first_of ( "." ) + 1 ).c_str();
-        // Get the 1's complement of the IPv4 subnet mask
-        b.value = ~ atoi ( temp2.substr ( 0 , temp2.find_first_of ( "." ) ).c_str() );
-        net = b.bytevalue;
-        // Advance to the next byte in the IPv4 subnet mask
-        temp2 = temp2.substr ( temp2.find_first_of ( "." ) + 1 ).c_str();
-        // Add the bitwise OR result and the '.' character to the string representing the IPv4 broadcast address
-        bcastaddrStr.append ( Common::ToString ( ip | net ) + "." );
-    }
-
-    // Remove the extra '.'
-    bcastaddrStr = bcastaddrStr.substr ( 0 , bcastaddrStr.length() - 1 );
-    return bcastaddrStr;
-}
-
 void InterfaceProbe::DeleteInterfaces() {
-    if ( InterfaceProbe::interfaces != NULL ) {
+    if ( this->interfaces != NULL ) {
         ItemVector::iterator it;
 
-        for ( it = InterfaceProbe::interfaces->begin() ; it != InterfaceProbe::interfaces->end() ; it++ ) {
+        for ( it = this->interfaces->begin() ; it != this->interfaces->end() ; it++ ) {
             if ( ( *it ) != NULL ) {
                 delete ( *it );
                 ( *it ) = NULL;
             }
         }
 
-        delete InterfaceProbe::interfaces;
-        InterfaceProbe::interfaces = NULL;
+        delete this->interfaces;
+        this->interfaces = NULL;
     }
 
     return;
+}
+
+namespace {
+	string dwordIpToString(DWORD addr) {
+		in_addr inaddr;
+		inaddr.s_addr = addr;
+		return inet_ntoa(inaddr);
+	}
 }

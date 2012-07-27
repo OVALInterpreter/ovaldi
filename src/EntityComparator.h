@@ -32,7 +32,6 @@
 #define ENTITYCOMPARATOR_H
 
 #include "OvalEnum.h"
-#include "REGEX.h"
 #include "AbsEntityValue.h"
 
 /**

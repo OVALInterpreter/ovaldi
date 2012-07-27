@@ -107,7 +107,7 @@ public:
 	  @param the string to populate with the string representation of the SID.
 	  @return true if the conversion was successful. otherwise return false.
 	*/
-	static bool GetTextualSid(PSID pSid, LPTSTR* TextualSid);
+	static bool GetTextualSid(PSID pSid, std::string* TextualSid);
 
 	/** Return the string error massge for the specified error code. */
 	static string GetErrorMessage(DWORD dwLastError);
@@ -233,17 +233,11 @@ public:
 	/** Convert the FILETIME structure to an integer. */
 	static string ToString(FILETIME fTime);
 
-	/** Return a string representation of the DWORD */
-	static string ToString(DWORD dw);
-
 	/** Convert the PSID to a string. 
 		Attempts to return a string representation of the input PSID. If
 		the PSID can not be converted to a string an empty string is returned.
 	*/
-	static string ToString(PSID pSid);
-
-	/** Return a string representation of the ULONGLONG */
-	static string ToString(ULONGLONG ul);
+	//static string ToString(PSID pSid);
 
 	/** Return true if the current os is Vista or later. 
 		The return value is calculated once and the result is stored in a static private variable.
@@ -269,7 +263,7 @@ public:
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
      *  @return A string of ASCII characters.
     */
-	static string UnicodeToAsciiString ( wchar_t* unicodeCharStr );
+	static string UnicodeToAsciiString ( const wchar_t* unicodeCharStr );
 
 	/** Return true if a wide-character string of Unicode characters would convert into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that are checked for validity as ASCII characters.

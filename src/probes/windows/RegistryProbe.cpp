@@ -28,7 +28,12 @@
 //
 //****************************************************************************************//
 
+#include <iomanip>
+#include <sstream>
+
 #include "RegistryProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								RegistryProbe Class										  //	
@@ -327,22 +332,15 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 				// I chose to make this an item returned with an error because at a minimum the 
-				// hive was found. Note that the other option is to throw and exception which 
+				// hive was found. Note that the other option is to throw an exception which 
 				// would result in an error on the collected object.
 
 			} else {
 				
 				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
 
-				char errorCodeBuffer[20];
-				_ltoa(res, errorCodeBuffer, 20);
-
-				string errorMessage = "";
-				errorMessage.append("(RegistryProbe) Unable to get values for registry key '");
-				errorMessage.append(key);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
-				errorMessage.append(" - " + systemErrMsg);
+				string errorMessage = "(RegistryProbe) Unable to get values for registry key '" +
+					key + "'.  Error Code - " + Common::ToString(res) + " - " + systemErrMsg;
 				
 				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
 				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
@@ -391,16 +389,9 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 
 				string systemErrMsg = WindowsCommon::GetErrorMessage(res);
 
-				char errorCodeBuffer[20];
-				_ltoa(res, errorCodeBuffer, 20);
-				
-				string errorMessage = "";
-				errorMessage.append("Unable to get type and value for the specified name: '");
-				errorMessage.append(name);
-				errorMessage.append("'.  Error Code - ");
-				errorMessage.append(errorCodeBuffer);
-				errorMessage.append(" - " + systemErrMsg);
-				
+				string errorMessage = "Unable to get type and value for the specified name: '" +
+					name + "'.  Error Code - " + Common::ToString(res) + " - " + systemErrMsg;
+
 				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
 				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
@@ -442,183 +433,107 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 	switch (typeIn) {
 
 		case REG_BINARY:
-				{
-				item->AppendElement(new ItemEntity("type",  "reg_binary", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			{
+				item->AppendElement(new ItemEntity("type", "reg_binary", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
-				// The buffer must be three bytes long, two bytes for each hex charater in the
-				// binary data, and one byte for the terminating NULL character.
-				char binaryBuf[3];
-
-				// Loop through each hex character.  Make sure the buffer is NULL terminated.
-				// Also make sure 0 is in the form 00, and 1 is 01, etc.
-				string value = "";
-				for (DWORD x=0; x<valuelenIn; x++) {
-
-					ZeroMemory(binaryBuf, sizeof(binaryBuf));
-					_snprintf(binaryBuf, sizeof(binaryBuf)-1, "%x", valueIn[x]);
-					binaryBuf[sizeof(binaryBuf)-1] = '\0';
-					if (strlen(binaryBuf) == 1) 
-						value.append("0");
-					value.append(binaryBuf);
-				}
-				item->AppendElement(new ItemEntity("value",  value, OvalEnum::DATATYPE_BINARY, false, OvalEnum::STATUS_EXISTS));
-
+				ostringstream oss;
+				oss << hex << setfill('0');
+				for (DWORD i = 0; i<valuelenIn; ++i)
+					oss << setw(2) << (int)valueIn[i];
+				item->AppendElement(new ItemEntity("value", oss.str(), OvalEnum::DATATYPE_BINARY));
 				break;
 			}
 
 		case REG_DWORD:
 			{
-				item->AppendElement(new ItemEntity("type",  "reg_dword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
-				// The dwordBuf is 12 bytes since the max DWORD (2,147,483,647) is 10 characters
-				// long.  Also add a byte for a possible negative sign and a byte for the
-				// terminating NULL character.
-				char dwordBuf[12];
-
-				ZeroMemory(dwordBuf, sizeof(dwordBuf));
-				_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%u", *((DWORD *)valueIn));
-				dwordBuf[sizeof(dwordBuf)-1] = '\0';
-				item->AppendElement(new ItemEntity("value",  dwordBuf, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-
+				item->AppendElement(new ItemEntity("type", "reg_dword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value", Common::ToString(*(DWORD*)valueIn),
+					OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 				break;
 			}
 
 		case REG_EXPAND_SZ:
 			{
-				item->AppendElement(new ItemEntity("type",  "reg_expand_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
-				char expandBuf[3];
-				string strValue = "";
-				for (DWORD x=0; x<(valuelenIn); x++) {
-
-					ZeroMemory(expandBuf, sizeof(expandBuf));
-					_snprintf(expandBuf, sizeof(expandBuf)-1, "%C", valueIn[x]);
-					expandBuf[sizeof(expandBuf)-1] = '\0';
-					strValue.append(expandBuf);
-				}
-				item->AppendElement(new ItemEntity("value",  strValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
+				item->AppendElement(new ItemEntity("type", "reg_expand_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				// don't trust there is a terminal null...
+				// Use the value length.
+				item->AppendElement(new ItemEntity("value", string((const char*)valueIn, valuelenIn)));
 				break;
 			}
 
 		case REG_MULTI_SZ:
 			{
-				item->AppendElement(new ItemEntity("type",  "reg_multi_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_multi_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
-				char multiszBuf[3];
-
-				// Loop through each character.  Make sure the buffer is NULL terminated.
-				// MULTISZ data is an array of null-terminated strings, terminated by two null
-				// characters.  Therefore, the loop goes to (valuelenIn - 2) since we can skip
-				// the last two characters.  This keeps an extra bar from beeing added to the
-				// end of the valueString.  A terminating NULL charater and will be
-				// automatically replaced during the append method.
-
-				// NOTE: valuelenIn can be less than 2.  When this is the case, (valuelenIn-2)
-				// becomes a very high DWORD.  This is because there are no negative numbers
-				// for DWORDS.  Make sure we guard against this by setting valuelenIn = 2 so
-				// (valuelenIn-2) = 0 and the loop never runs.
-
-				if (valuelenIn < 2) 
-					valuelenIn = 2;
-
-				string strValue = "";
+				// The following loop stops when an empty string is encountered.
+				// This means if there are embedded empty strings, anything
+				// following will be skipped.  MSDN docs say it is not possible
+				// to include an empty string within the sequence
+				// (http://msdn.microsoft.com/en-us/library/windows/desktop/ms724884%28v=vs.85%29.aspx)
+				// so nothing should be skipped unless the REG_MULTI_SZ value is
+				// malformed.  This could have been coded more simply, but
+				// I wanted to make sure there was no overrun if the string
+				// wasn't null-terminated.
+				LPBYTE beg = valueIn, end = valueIn + valuelenIn;
+				LPBYTE substrEnd;
 				bool addedValue = false;
-				for (DWORD x=0; x<=(valuelenIn-2); x++) {
-
-					ZeroMemory(multiszBuf, sizeof(multiszBuf));
-					_snprintf(multiszBuf, sizeof(multiszBuf)-1, "%C", valueIn[x]);
-					multiszBuf[sizeof(multiszBuf)-1] = '\0';
-					if (multiszBuf[0] == '\0') {
-						item->AppendElement(new ItemEntity("value",  strValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-						strValue = "";
-						addedValue = true;
-					} else {
-						strValue.append(multiszBuf);
-					}
+				while (beg < end && *beg) { // while not an empty string
+					addedValue = true;
+					// don't trust we have null termination... find the real end!
+					substrEnd = beg;
+					while (substrEnd < end && *substrEnd) ++substrEnd;
+					item->AppendElement(new ItemEntity("value", 
+						string((const char*)beg, substrEnd - beg)));
+					// if we found end-of-string instead of end-of-buffer, skip
+					// to the beginning of the next string.
+					if (substrEnd < end) ++substrEnd;
+					beg = substrEnd;
 				}
 
-				if(!addedValue) {
-					item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				}
+				// Safety check: make sure to add a value entity with
+				// status="does not exist" in case we didn't find any values.
+				if (!addedValue)
+					item->AppendElement(new ItemEntity("value", "", 
+						OvalEnum::DATATYPE_STRING, false,
+						OvalEnum::STATUS_DOES_NOT_EXIST));
 
 				break;
 			}
 
 		case REG_SZ:
 			{
-				item->AppendElement(new ItemEntity("type",  "reg_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
-				/*
-				if the string is empty, sometimes the valuelenIn returned by RegQueryValueEx
-				when used to get the data size returns 3 for an empty string, where valueIn[2]
-				is a ? mark. 
-				*/
-
-				if (valuelenIn > 2) {
-					if ((valueIn[0] == 0x0) && (valueIn[1] == 0x0)) {
-						for (DWORD x=2; x<(valuelenIn); x++) valueIn[x] = 0x0;
-					}
-				}
-
-				char strBuf[3];
-				string strValue = "";
-				for (DWORD x=0; x<(valuelenIn); x++) {
-
-					ZeroMemory(strBuf, sizeof(strBuf));
-					_snprintf(strBuf, sizeof(strBuf)-1, "%C", valueIn[x]);
-					strBuf[sizeof(strBuf)-1] = '\0';
-					strValue.append(strBuf);
-				}
-				item->AppendElement(new ItemEntity("value",  strValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-
+				item->AppendElement(new ItemEntity("type", "reg_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value", string((const char*)valueIn, valuelenIn)));
 				break;
 			}
 			
 		case REG_NONE:
 			{
 				item->AppendMessage(new OvalMessage("Values of type reg_none do not have a defined type. As a result, we are representing them as hexadecimal values."));
-				item->AppendElement(new ItemEntity("type",  "reg_none", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_none", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
 
-				// The buffer must be three bytes long, two bytes for each hex charater in the
-				// binary data, and one byte for the terminating NULL character.
-				char binaryBuf[3];
-
-				// Loop through each hex character.  Make sure the buffer is NULL terminated.
-				// Also make sure 0 is in the form 00, and 1 is 01, etc.
-				string value = "";
-				for (DWORD x=0; x<valuelenIn; x++) {
-
-					ZeroMemory(binaryBuf, sizeof(binaryBuf));
-					_snprintf(binaryBuf, sizeof(binaryBuf)-1, "%x", valueIn[x]);
-					binaryBuf[sizeof(binaryBuf)-1] = '\0';
-					if (strlen(binaryBuf) == 1) 
-						value.append("0");
-					value.append(binaryBuf);
-				}
-				item->AppendElement(new ItemEntity("value",  value, OvalEnum::DATATYPE_BINARY, false, OvalEnum::STATUS_EXISTS));
+				ostringstream oss;
+				oss << hex << setfill('0');
+				for (DWORD i = 0; i<valuelenIn; ++i)
+					oss << setw(2) << (int)valueIn[i];
+				item->AppendElement(new ItemEntity("value", oss.str(), OvalEnum::DATATYPE_BINARY));
 
 				break;
 			}
 
 		case REG_QWORD:
 			{
-				char dwordBuf[40];
-
-				ZeroMemory(dwordBuf, sizeof(dwordBuf));
-				_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%llu", *((ULONG64 *)valueIn));
-				dwordBuf[sizeof(dwordBuf)-1] = '\0';
-
-				item->AppendElement(new ItemEntity("type",  "reg_qword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("value",  dwordBuf, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_qword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value", Common::ToString(*(ULONG64*)valueIn),
+					OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
 				break;
 			}
 
 		default:
 			{
 				item->AppendMessage(new OvalMessage("Error: Unable to determine the type and value of the registry key.", OvalEnum::LEVEL_ERROR));
-				item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-				item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("value", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
 				
 				break;
 			}

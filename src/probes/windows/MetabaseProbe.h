@@ -41,8 +41,6 @@
 #include <iadmw.h>
 #include <iiscnfg.h>
 
-using namespace std;
-
 /**
 	This class is responsible for collecting metabase information for windows metabase_objects.
 */
@@ -85,7 +83,7 @@ class MetabaseProbe : public AbsProbe {
 		 *  @param keyStr A string that contains the key of a metabase item.
 		 *  @return A boolean value indicating whether or not a metabase item with the specified key exists.
 		 */
-		bool KeyExists ( string keyStr );
+		bool KeyExists ( std::string keyStr );
 
 		/** Get the set of keys that match the specified pattern.
 		 *  @param keyStr A string that contains the key to be used during the matching process.
@@ -94,46 +92,46 @@ class MetabaseProbe : public AbsProbe {
 		 *  @param isRegex A boolean value indicating whether or not the pattern represents a regular expression.
 		 *  @return Void.
 		 */
-		void GetKeysForPattern ( string keyStr, string regexStr, StringSet *keys, bool isRegex );
+		void GetKeysForPattern ( std::string keyStr, std::string regexStr, StringSet *keys, bool isRegex );
 
 		/** Get the set of all ids on the system that match the object.
 		 *  @param keyStr A string that contains the key to be used during the matching process.
 		 *  @param idEntity A ObjectEntity that represents the id entity in an Object as defined in the OVAL Definition Schema.
 		 *  @return A StringSet that contains all of the ids specified in the ObjectEntity that also match the specified key.
 		 */
-		StringSet* GetIds ( string keyStr, ObjectEntity* idEntity );
+		StringSet* GetIds ( std::string keyStr, ObjectEntity* idEntity );
 
 		/** Determine if the specified id exists.
 		 *  @param keyStr A string that contains the key of a metabase item.
 		 *  @param idStr A string that contains the id of a metabase item.
 		 *  @return A boolean value indicating whether or not a metabase item with the specified key and id exists.
 		 */
-		bool IdExists ( string keyStr, string idStr );
+		bool IdExists ( std::string keyStr, std::string idStr );
 
 		/** Retrieve all of the ids for a specified key.
 		 *  @param keyStr A string that contains the key of a metabase item.
 		 *  @return A StringSet that contains all of the ids for the specified key.
 		 */
-		StringSet* GetAllIds ( string keyStr );
+		StringSet* GetAllIds ( std::string keyStr );
 
 		/** Create a metabase item from specified key and id.
 		 *  @param keyStr A string that contains the key of a metabase item.
 		 *  @param idStr A string that contains the id of a metabase item.
 		 *  @return The Item representing a metabase item whose key and id match the specified values.
 		 */
-		Item* GetMetabaseItem ( string keyStr, string idStr );
+		Item* GetMetabaseItem ( std::string keyStr, std::string idStr );
 
 		/** Convert a metabase value datatype to its string representation.
 		 *  @param type A unsigned long value that contains the datatype of the value associated with a metabase id.
 		 *  @return A string value that represents a metabase value datatype.
 		 */
-		string GetDataType ( unsigned long type );
+		std::string GetDataType ( unsigned long type );
 
 		/** Convert a metabase value usertype to its string representation.
 		 *  @param type A unsigned long value that contains the usertype of the value associated with a metabase id.
 		 *  @return A string value that represents a metabase value usertype.
 		 */
-		string GetUserType ( unsigned long type );
+		std::string GetUserType ( unsigned long type );
 
 		/** Retrieves the value of the metabase item with the specified key and id.
 		 *  @param keyStr A string that contains the naming context of the Active Directory item.
@@ -156,7 +154,7 @@ class MetabaseProbe : public AbsProbe {
 		 *  @param idsDne A StringVector that will be used to contain all of the relative distinguished names specified in the ObjectEntity that do not exist on the system.
 		 *  @return A boolean value that indicates whether or not there are relative distinguished names that do not exist that need to be reported.
 		 */
-		bool ReportIdDoesNotExist ( string keyStr, ObjectEntity *idEntity, StringVector* idsDne );
+		bool ReportIdDoesNotExist ( std::string keyStr, ObjectEntity *idEntity, StringVector* idsDne );
 
 		/** The static Singleton instance of the MetabaseProbe. */
 		static MetabaseProbe* instance;
@@ -165,7 +163,7 @@ class MetabaseProbe : public AbsProbe {
 		static const char MetabaseSeparator;
 
 		/** A string that represents the '/' character which is used to separate different levels of metabase keys. */
-		static const string MetabaseSeparatorStr;
+		static const std::string MetabaseSeparatorStr;
 
 		/** IMSAdminBase interface that is used to query the metabase. */
 		IMSAdminBase* metabase;

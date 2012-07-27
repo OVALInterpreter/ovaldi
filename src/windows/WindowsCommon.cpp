@@ -35,6 +35,7 @@
 #include <time.h>
 
 #include <ArrayGuard.h>
+#include <FreeGuard.h>
 #include <Common.h>
 #include "WindowsCommon.h"
 
@@ -202,76 +203,20 @@ string WindowsCommon::GetErrorMessage(DWORD dwLastError) {
 	return errMsg;
 }
 
-bool WindowsCommon::GetTextualSid(PSID pSid, LPTSTR* TextualSid) { 
+bool WindowsCommon::GetTextualSid(PSID pSid, string* TextualSid) { 
 
-    PSID_IDENTIFIER_AUTHORITY psia;
-    DWORD dwSubAuthorities;
-    DWORD dwSidRev = SID_REVISION;
-    DWORD dwCounter;
-    DWORD dwSidSize;
-
-    // Validate the binary SID.
-
-	if(!IsValidSid(pSid)) return false;
-
-    // Get the identifier authority value from the SID.
-	
-	psia = GetSidIdentifierAuthority(pSid);
-
-	// Get the number of subauthorities in the SID.
-
-    dwSubAuthorities = *GetSidSubAuthorityCount(pSid);
-
-    // compute buffer length
-    // S-SID_REVISION- + identifierauthority- + subauthorities- + NULL
-
-    dwSidSize=(15 + 12 + (12 * dwSubAuthorities) + 1) * sizeof(TCHAR);
-
-    // allocate memory
- 
-	*TextualSid = (LPTSTR)malloc(dwSidSize);
-	if(*TextualSid == NULL)
-	{
-		return false;
+	LPTSTR sidCStr;
+	if (ConvertSidToStringSid(pSid, &sidCStr)) {
+#ifdef _UNICODE
+		*TextualSid = UnicodeToAsciiString(sidCStr);
+#else
+		*TextualSid = sidCStr;
+#endif
+		LocalFree(sidCStr);
+		return true;
 	}
 
-    // Add 'S' prefix and revision number to the string.
-
-    dwSidSize = wsprintf(*TextualSid, TEXT("S-%lu-"), dwSidRev);
-
-    // Add SID identifier authority to the string.
- 
-    if ((psia->Value[0] != 0) || (psia->Value[1] != 0))
-    {
-        dwSidSize += wsprintf(*TextualSid + lstrlen(*TextualSid),
-							  TEXT("0x%02hx%02hx%02hx%02hx%02hx%02hx"),
-							  (USHORT)psia->Value[0],
-							  (USHORT)psia->Value[1],
-							  (USHORT)psia->Value[2],
-							  (USHORT)psia->Value[3],
-							  (USHORT)psia->Value[4],
-							  (USHORT)psia->Value[5]);
-    }
-    else
-    {
-        dwSidSize += wsprintf(*TextualSid + lstrlen(*TextualSid),
-							  TEXT("%lu"),
-							  (ULONG)(psia->Value[5]) +
-							  (ULONG)(psia->Value[4] << 8) +
-							  (ULONG)(psia->Value[3] << 16) +
-							  (ULONG)(psia->Value[2] << 24));
-    }
-
-    // Loop through SidSubAuthorities and add them to the string.
-
-    for (dwCounter=0; dwCounter<dwSubAuthorities; dwCounter++)
-    {
-        dwSidSize += wsprintf(*TextualSid + dwSidSize,
-							  TEXT("-%lu"),
-			                  *GetSidSubAuthority(pSid, dwCounter));
-    }
-
-    return true;
+	return false;
 }
 
 bool WindowsCommon::ExpandGroup(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
@@ -316,9 +261,8 @@ bool WindowsCommon::ExpandGroupBySID(string groupSidStr, StringSet* memberSids, 
 		} 
 
 		delete memberNames;
+		LocalFree(pSid);
 	}
-
-	LocalFree(pSid);
 
 	return groupExists;
 }
@@ -376,43 +320,31 @@ StringSet* WindowsCommon::GetAllGroups() {
 bool WindowsCommon::IsGroup(string trusteeName) {
 	DWORD sidSize = 128;
 	DWORD domainSize = 128;
+	//DWORD zero = 0;
 	SID_NAME_USE sidUse;
 	BOOL retVal = FALSE;
-	PSID psid = NULL;
-	LPTSTR domain = NULL;
+	FreeGuard<> psid;
+	FreeGuard<TCHAR> domain;
 	bool isGroup = false;
 
 	do {
 		// Initial memory allocations for the SID and DOMAIN.
-		psid = (PSID)realloc(psid, sidSize);
-		if (psid == NULL) {
-			retVal = FALSE;
-			break;
-		}
+		if (!psid.realloc(sidSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
-		domain = (LPTSTR)realloc(domain, domainSize);
-		if (domain == NULL) {
-			retVal = FALSE;
-			break;
-		}
+		if (!domain.realloc(domainSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
 		// Call LookupAccountName to get the SID.
 		retVal = LookupAccountName(NULL,								// system name NULL == localhost
-								const_cast<char*>(trusteeName.c_str()),	// account name
-								psid,									// security identifier
+								trusteeName.c_str(),	// account name
+								psid.get(),									// security identifier
 								&sidSize,								// size of security identifier
-								domain,									// domain name
+								domain.get(),									// domain name
 								&domainSize,							// size of domain name
 								&sidUse);								// SID-type indicator
-		
-		if(retVal != FALSE) {
-			isGroup = WindowsCommon::IsAccountGroup(sidUse, trusteeName);
-			break;
-		}
-	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
-	free(psid);
-	free(domain);
+	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
 	if(retVal == FALSE) {	
 		DWORD error = GetLastError();
@@ -422,6 +354,8 @@ bool WindowsCommon::IsGroup(string trusteeName) {
 			throw Exception("Error failed to look up account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(error));
 		}
 	}
+		
+	isGroup = WindowsCommon::IsAccountGroup(sidUse, trusteeName);
 
 	return isGroup;
 }
@@ -596,16 +530,10 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 			// was there an error?
 			if(res == NERR_Success) {
 
-				char tmpUserName[512];
-
 				// Loop through each user.
 				for (unsigned int i=0; i<entriesread; i++) {
-					ZeroMemory(tmpUserName, sizeof(tmpUserName));
-					_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].grui0_name);
-					tmpUserName[sizeof(tmpUserName)-1] = '\0';
-
 					// Get the account information.
-					string trusteeName = tmpUserName;
+					string trusteeName = UnicodeToAsciiString(userInfo[i].grui0_name);
 
 					// get sid for trustee name
 					PSID pSid = WindowsCommon::GetSIDForTrusteeName(trusteeName);
@@ -754,10 +682,14 @@ StringSet* WindowsCommon::GetAllTrusteeSIDs() {
 		for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 		
 			PSID pSid = WindowsCommon::GetSIDForTrusteeName((*iterator));
-			LPTSTR sidString;
-			WindowsCommon::GetTextualSid(pSid, &sidString);
-			string sidStr = sidString;
-			WindowsCommon::allTrusteeSIDs->insert(sidStr);
+			string sidStr;
+			if (WindowsCommon::GetTextualSid(pSid, &sidStr))
+				WindowsCommon::allTrusteeSIDs->insert(sidStr);
+			else {
+				delete WindowsCommon::allTrusteeSIDs;
+				WindowsCommon::allTrusteeSIDs = NULL;
+				throw Exception("Couldn't convert SID to string: " + GetErrorMessage(GetLastError()));
+			}
 		}
 	}
 
@@ -863,15 +795,9 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 		if ((nas == NERR_Success) || (nas==ERROR_MORE_DATA)) {
 			// Group account names are limited to 256 characters.
 
-			char tmpGroupName[257];
-
 			// Loop through each group.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpGroupName, sizeof(tmpGroupName));
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", localGroupInfo[i].lgrpi0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-
-				string groupName = tmpGroupName;
+				string groupName = UnicodeToAsciiString(localGroupInfo[i].lgrpi0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
 				// get formatted trustee name
@@ -959,15 +885,9 @@ StringSet* WindowsCommon::GetAllGlobalGroups() {
 		if ((nas == NERR_Success) || (nas==ERROR_MORE_DATA)) {
 			// Group account names are limited to 256 characters.
 
-			char tmpGroupName[257];
-
 			// Loop through each group.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpGroupName, sizeof(tmpGroupName));
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", globalGroupInfo[i].grpi0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-
-				string groupName = tmpGroupName;
+				string groupName = UnicodeToAsciiString(globalGroupInfo[i].grpi0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
 				// get formatted trustee name
@@ -1010,11 +930,14 @@ void WindowsCommon::ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, Str
 	StringSet::iterator iterator;
 	for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 	
-		PSID pSid = WindowsCommon::GetSIDForTrusteeName(*iterator);
-		LPTSTR sidString;
+		FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName(*iterator));
+		string sidStr;
 
-		WindowsCommon::GetTextualSid(pSid, &sidString);
-		string sidStr = sidString;
+		if (!WindowsCommon::GetTextualSid(pSid.get(), &sidStr)) {
+			Log::Info("Error converting SID to string: " + GetErrorMessage(GetLastError()));
+			continue;
+		}
+
 		sidStrings->insert(sidStr);
 	}
 }
@@ -1107,19 +1030,12 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 		
 		if ((nas == NERR_Success) || (nas == ERROR_MORE_DATA)) {
 
-			// User account names are limited to 20 characters.
-			char tmpUserName[21];
-
-			Log::Debug("Found " + WindowsCommon::ToString(recordsEnumerated) + " local users.");
+			Log::Debug("Found " + Common::ToString(recordsEnumerated) + " local users.");
 
 			// Loop through each user.
 			for (unsigned int i=0; i<recordsEnumerated; i++) {
-				ZeroMemory(tmpUserName, sizeof(tmpUserName));
-				_snprintf(tmpUserName, sizeof(tmpUserName) - 1, "%S", userInfo[i].usri0_name);
-				tmpUserName[sizeof(tmpUserName)-1] = '\0';
-
 				// Get the account information.
-				string userName = tmpUserName;
+				string userName = UnicodeToAsciiString(userInfo[i].usri0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(userName);
 				// get formatted trustee name
@@ -1205,15 +1121,15 @@ string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
 						&sid_type) == 0)		// SID type
 	{
 		string errMsg = WindowsCommon::GetErrorMessage(GetLastError());
-		LPTSTR sidString;
-		WindowsCommon::GetTextualSid(pSid, &sidString);
-		string sidStr = sidString;
-		free(sidString);
-		sidString = NULL;
+		string sidStr;
+		if (!WindowsCommon::GetTextualSid(pSid, &sidStr)) {
+			Log::Info("Error converting a SID to a string: " + GetErrorMessage(GetLastError()));
+			sidStr = "(could not convert sid)";
+		}
 
-		// all occurances of this that i have seen are for the domain admins sid and the domain user's sid
+		// all occurrences of this that i have seen are for the domain admins sid and the domain user's sid
 		// I should be able to ignore these.
-		Log::Info("Unable to look up account name for sid: " + sidStr + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
+		Log::Info("Unable to look up account name for sid: " + sidStr + ". " + errMsg);
 
 	} else {
 		trusteeDomain = domain_name;
@@ -1236,65 +1152,36 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 	DWORD domainSize = 128;
 	SID_NAME_USE sidUse;
 	BOOL retVal = FALSE;
-	PSID pSid = NULL;
-	LPTSTR domain = NULL;
+	FreeGuard<> pSid; // PSID is actually void*...
+	FreeGuard<TCHAR> domain;
+	
+	do {
+		// Initial memory allocations for the SID and DOMAIN.
+		if (!pSid.realloc(sidSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
-	try {
-		do {
-			// Initial memory allocations for the SID and DOMAIN.
-			pSid = (PSID)realloc(pSid, sidSize);
-			if (pSid == NULL) {
-				retVal = FALSE;
-				break;
-			}
+		if (!domain.realloc(domainSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
-			domain = (LPTSTR)realloc(domain, domainSize);
-			if (domain == NULL) {
-				retVal = FALSE;
-				break;
-			}
+		// Call LookupAccountName to get the SID.
+		retVal = LookupAccountName(NULL,								// system name NULL == localhost
+								trusteeName.c_str(),	// account name
+								pSid.get(),									// security identifier
+								&sidSize,								// size of security identifier
+								domain.get(),									// domain name
+								&domainSize,							// size of domain name
+								&sidUse);								// SID-type indicator
 
-			// Call LookupAccountName to get the SID.
-			retVal = LookupAccountName(NULL,								// system name NULL == localhost
-									const_cast<char*>(trusteeName.c_str()),	// account name
-									pSid,									// security identifier
-									&sidSize,								// size of security identifier
-									domain,									// domain name
-									&domainSize,							// size of domain name
-									&sidUse);								// SID-type indicator
+	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
-			if ( retVal )
-				break;
-
-		} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
-
-		if (domain != NULL)
-			free(domain);
-
-	} catch(...) {
-		if (pSid != NULL)
-			free(pSid);
-		
-		if (domain != NULL)
-			free(domain);
-
-		Log::Debug("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
-		throw Exception("Error looking up sid for account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(GetLastError()));
-	}
+	if (!retVal)
+		throw Exception("LookupAccountName failed: " + GetErrorMessage(GetLastError()));
 
 	// check the sid
-	if(!IsValidSid(pSid)) {
-		
-		if(pSid != NULL)
-			free(pSid);
+	if (!IsValidSid(pSid.get()))
+		throw Exception("A sid was found for " + trusteeName + " but it was invalid!");
 
-		if (domain != NULL)
-			free(domain);
-
-		throw Exception("Error looking up sid for account: " + trusteeName + ". Invalid sid found.");
-	}
-
-	return pSid;
+	return pSid.release();
 }
 
 PSID WindowsCommon::GetSIDForTrusteeSID(string trusteeSID) {
@@ -1464,8 +1351,8 @@ void WindowsCommon::GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames) 
 
 bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr) {
 
-	PSID psid = NULL;
-	LPTSTR domain = NULL;
+	FreeGuard<> psid;
+	FreeGuard<TCHAR> domain;
 	DWORD sidSize = 128;
 	DWORD domainSize = 128;
 	SID_NAME_USE sid_type = SidTypeUnknown;
@@ -1473,45 +1360,24 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 
 	do {
 		// Initial memory allocations for the SID and DOMAIN.
-		psid = (PSID)realloc(psid, sidSize);
-		if (psid == NULL) {
-			retVal = FALSE;
-			break;
-		}
+		if (!psid.realloc(sidSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
-		domain = (LPTSTR)realloc(domain, domainSize);
-		if (domain == NULL) {
-			free(psid);
-			retVal = FALSE;
-			break;
-		}
+		if (!domain.realloc(domainSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
 		// Call LookupAccountName to get the SID.
 		retVal = LookupAccountName(NULL,										// system name
-								   const_cast<char*>((*accountNameStr).c_str()),	// account name
-								   psid,										// security identifier
+								   accountNameStr->c_str(),	// account name
+								   psid.get(),										// security identifier
 								   &sidSize,									// size of security identifier
-								   domain,										// domain name
+								   domain.get(),										// domain name
 								   &domainSize,									// size of domain name
 								   &sid_type);									// SID-type indicator
 
-		if ( retVal )
-			break;
+	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
-	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
-
-	if(retVal == TRUE) {
-
-		LPTSTR sidString;
-		WindowsCommon::GetTextualSid(psid, &sidString);
-		(*sidStr) = sidString;
-		(*domainStr) = domain;
-		free(sidString);
-		free(psid);
-		free(domain);	
-	} else {
-		free(psid);
-		free(domain);	
+	if(!retVal) {
 		DWORD error = GetLastError();
 		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
 			throw Exception("Unable to locate account: " + (*accountNameStr) + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
@@ -1519,6 +1385,11 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 			throw Exception("Error failed to look up account: " + (*accountNameStr) + ". " + WindowsCommon::GetErrorMessage(error));
 		}
 	}
+
+	(*domainStr) = domain.get();
+
+	if (!WindowsCommon::GetTextualSid(psid.get(), sidStr))
+		throw Exception("Error converting SID to string: " + GetErrorMessage(GetLastError()));
 
 	// determin if this is a group
 	bool isGroup = false;
@@ -1561,62 +1432,43 @@ bool WindowsCommon::IsAccountGroup(SID_NAME_USE sidType, string accountName) {
 bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr) {
 
 	PSID pSid = NULL;
-	LPTSTR pDomain = NULL;
-	LPTSTR pAccountName = NULL;
+	//LPTSTR pDomain = NULL;
+	FreeGuard<TCHAR> pDomain;
+	//LPTSTR pAccountName = NULL;
+	FreeGuard<TCHAR> pAccountName;
 	DWORD accountNameSize = 128;
 	DWORD domainSize = 128;
 	SID_NAME_USE sid_type = SidTypeUnknown;
 	BOOL retVal = FALSE;
 
+	if(ConvertStringSidToSid(sidStr.c_str(), &pSid) == 0)
+		throw Exception("Error encountered converting SID string to a SID.");
+
 	do {
 		// Initial memory allocations for the ACCOUNT and DOMAIN.
-		pAccountName = (LPTSTR)realloc(pAccountName, accountNameSize);
-		if (pAccountName == NULL) {
-			retVal = FALSE;
-			break;
+		if (!pAccountName.realloc(accountNameSize)) {
+			LocalFree(pSid);
+			throw Exception(string("realloc: ")+strerror(errno));
 		}
 
-		pDomain = (LPTSTR)realloc(pDomain, domainSize);
-		if (pDomain == NULL) {
-			retVal = FALSE;
-			break;
-		}
-
-		if(pSid == NULL) {
-			if(ConvertStringSidToSid(sidStr.c_str(), &pSid) == 0) {
-				throw Exception("Error encountered converting SID string to a SID.");
-			}
+		if (!pDomain.realloc(domainSize)) {
+			LocalFree(pSid);
+			throw Exception(string("realloc: ")+strerror(errno));
 		}
 
 		// Call LookupAccountSid to get the account name and domain.
 		retVal = LookupAccountSid(NULL,							// system name
 								  pSid,							// security identifier
-								  pAccountName,					// account name
+								  pAccountName.get(),					// account name
 								  &accountNameSize,				// security identifier
-								  pDomain,						// domain name
+								  pDomain.get(),						// domain name
 								  &domainSize,					// size of domain name
 								  &sid_type);					// SID-type indicator
 
-		if ( retVal )
-			break;
-
-	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
 	LocalFree(pSid);
-	if(retVal == TRUE) {
-		(*pAccountNameStr) = pAccountName;
-		(*pDomainStr) = pDomain;
-		free(pAccountName);
-		free(pDomain);	
-	} else {
-		if(pAccountName != NULL){
-			free(pAccountName);
-		}
-
-		if(pDomain != NULL){
-			free(pDomain);
-		}
-	
+	if(!retVal) {
 		DWORD error = GetLastError();
 		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
 			throw Exception("Unable to locate account: " + sidStr + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
@@ -1624,6 +1476,9 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 			throw Exception("Error failed to look up account: " + sidStr + ". " + WindowsCommon::GetErrorMessage(error));
 		}
 	}
+
+	(*pAccountNameStr) = pAccountName.get();
+	(*pDomainStr) = pDomain.get();
 
 	// make sure account names are consistantly formated
 	if(sid_type == SidTypeUser) {
@@ -1669,49 +1524,15 @@ string WindowsCommon::LookUpLocalSystemName() {
 
 string WindowsCommon::ToString(FILETIME fTime) {
 	ULONGLONG fTimeResult = (((ULONGLONG)fTime.dwHighDateTime)<<32) + fTime.dwLowDateTime;
-	return WindowsCommon::ToString(fTimeResult);
+	return Common::ToString(fTimeResult);
 }
-
-string WindowsCommon::ToString(DWORD dw) {
-
-	char dwordBuf[12];
-	ZeroMemory(dwordBuf, sizeof(dwordBuf));
-	_snprintf(dwordBuf, sizeof(dwordBuf)-1, "%lu", dw);
-	dwordBuf[sizeof(dwordBuf)-1] = '\0';
-
-	string dwStr = dwordBuf;
-	return dwStr;
-}
-
-string WindowsCommon::ToString(ULONGLONG ul){
-	//ULONGLONG (unsigned long long) 0 to 18,446,744,073,709,551,615 => 20 characters + null byte => 21 characters
-	char ulonglongBuf[21];
-	ZeroMemory(ulonglongBuf,sizeof(ulonglongBuf));
-	_snprintf(ulonglongBuf,sizeof(ulonglongBuf)-1,"%llu",ul);
-	ulonglongBuf[sizeof(ulonglongBuf)-1] = '\0';
-	
-	string ulStr = ulonglongBuf;
-	return ulStr;
-}
-
-string WindowsCommon::ToString(PSID pSID) {
-
-	LPTSTR sidString;
-	WindowsCommon::GetTextualSid(pSID, &sidString);
-	string sidStr = sidString;
-	free(sidString);
-	sidString = NULL;
-
-	return sidStr;
-}
-
 
 bool WindowsCommon::TrusteeNameExists(const string trusteeNameIn) {
 
     bool trusteeNameExists = false;
 
-    PSID psid = NULL;
-	LPTSTR domain = NULL;
+	FreeGuard<> psid;
+	FreeGuard<TCHAR> domain;
 	DWORD sidSize = 128;
 	DWORD domainSize = 128;
 	SID_NAME_USE sid_type;
@@ -1719,36 +1540,22 @@ bool WindowsCommon::TrusteeNameExists(const string trusteeNameIn) {
 
 	do {
 		// Initial memory allocations for the SID and DOMAIN.
-		psid = (PSID)realloc(psid, sidSize);
-		if (psid == NULL) {
-			retVal = FALSE;
-			break;
-		}
+		if (!psid.realloc(sidSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
-		domain = (LPTSTR)realloc(domain, domainSize);
-		if (domain == NULL) {
-			free(psid);
-			retVal = FALSE;
-			break;
-		}
+		if (!domain.realloc(domainSize))
+			throw Exception(string("realloc: ")+strerror(errno));
 
 		// Call LookupAccountName to get the SID.
 		retVal = LookupAccountName(NULL,										// system name
-								   const_cast<char*>(trusteeNameIn.c_str()),	// account name
-								   psid,										// security identifier
+								   trusteeNameIn.c_str(),	// account name
+								   psid.get(),										// security identifier
 								   &sidSize,									// size of security identifier
-								   domain,										// domain name
+								   domain.get(),										// domain name
 								   &domainSize,									// size of domain name
 								   &sid_type);									// SID-type indicator
 		
-		if ( retVal )
-			break;
-
-	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
-
-   	free(psid);
-    free(domain);
-
+	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
 	if(retVal == TRUE) {
 	    trusteeNameExists = true;
@@ -1773,44 +1580,34 @@ bool WindowsCommon::TrusteeSIDExists(const string trusteeSIDIn) {
     bool sidExists = false;
 
     PSID pSid = NULL;
-	LPTSTR pAccountName = NULL;
+	FreeGuard<TCHAR> pAccountName;
 	DWORD accountNameSize = 128;
 	DWORD domainSize = 128;
 	SID_NAME_USE sid_type;
 	BOOL retVal = FALSE;
 
+	if(ConvertStringSidToSid(trusteeSIDIn.c_str(), &pSid) == 0)
+		throw Exception("Error encountered converting SID string to a SID.");
+
 	do {
 		// Initial memory allocations for the ACCOUNT and DOMAIN.
-		pAccountName = (LPTSTR)realloc(pAccountName, accountNameSize);
-		if (pAccountName == NULL) {
-			retVal = FALSE;
-			break;
-		}
-
-		if(pSid == NULL) {
-			if(ConvertStringSidToSid(trusteeSIDIn.c_str(), &pSid) == 0) {
-				throw Exception("Error encountered converting SID string to a SID.");
-			}
+		if (!pAccountName.realloc(accountNameSize)) {
+			LocalFree(pSid);
+			throw Exception(string("realloc: ")+strerror(errno));
 		}
 
 		// Call LookupAccountSid to get the account name and domain.
 		retVal = LookupAccountSid(NULL,							// system name
 								  pSid,							// security identifier
-								  pAccountName,					// account name
+								  pAccountName.get(),					// account name
 								  &accountNameSize,				// security identifier
 								  NULL,						// domain name
 								  &domainSize,					// size of domain name
 								  &sid_type);					// SID-type indicator
-	
-		if ( retVal )
-			break;
 
-	} while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
 	LocalFree(pSid);
-    if(pAccountName != NULL){
-		free(pAccountName);
-	}
 
 	if(retVal == TRUE) {
         sidExists = true;
@@ -1864,7 +1661,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		LPGROUP_USERS_INFO_0 pTmpBuf;
 		DWORD i;
 		DWORD dwTotalCount = 0;
-		char tmpGroupName[512];
 
 		if ((pTmpBuf = pBuf) != NULL) {
 
@@ -1883,11 +1679,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 					throw Exception("An access violation has occurred while getting groups for user: " + userName);
 				}
 
-				ZeroMemory(tmpGroupName, 21);
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pTmpBuf->grui0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-				groups->insert(tmpGroupName);
-
+				groups->insert(UnicodeToAsciiString(pTmpBuf->grui0_name));
 				pTmpBuf++;
 				dwTotalCount++;
 			}
@@ -1999,7 +1791,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		LPLOCALGROUP_USERS_INFO_0 pLocalTmpBuf;
 		DWORD i;
 		DWORD dwTotalCount = 0;
-		char tmpGroupName[512];
 
 		if ((pLocalTmpBuf = pLocalBuf) != NULL) {
 
@@ -2025,11 +1816,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 					throw Exception("An access violation has occurred while getting local groups for user: " + userName);
 				}
 
-				ZeroMemory(tmpGroupName, 21);
-				_snprintf(tmpGroupName, sizeof(tmpGroupName) - 1, "%S", pLocalTmpBuf->lgrui0_name);
-				tmpGroupName[sizeof(tmpGroupName)-1] = '\0';
-				groups->insert(tmpGroupName);
-
+				groups->insert(UnicodeToAsciiString(pLocalTmpBuf->lgrui0_name));
 				pLocalTmpBuf++;
 				dwTotalCount++;
 			}
@@ -2220,8 +2007,14 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAcl(SE_OBJECT_TYPE objectT
 
 	Log::Debug("Calling the acl api to get effective rights");
 
+	string sidStr;
+	if (!GetTextualSid(pSid, &sidStr)) {
+		Log::Message("GetEffectiveRightsForWindowsObjectAcl: Couldn't convert SID to string: " + 
+			GetErrorMessage(GetLastError()));
+		sidStr = "(could not convert sid)";
+	}
 
-	string baseErrMsg = "Error unable to get effective rights for trustee: " + WindowsCommon::ToString(pSid);
+	string baseErrMsg = "Error unable to get effective rights for trustee: " + sidStr;
 
 	DWORD res;
 	PACL pdacl;
@@ -2392,7 +2185,14 @@ void WindowsCommon::GetEffectiveRightsForWindowsObjectAuthz(SE_OBJECT_TYPE objec
 
 void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pSuccessfulAuditedPermissions, PACCESS_MASK pFailedAuditPermissions ) {
     Log::Debug ( "Calling the ACL API to get the audited permissions" );
-    string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + WindowsCommon::ToString ( pSid ) + ".";
+	string sidStr;
+	if (!GetTextualSid(pSid, &sidStr)) {
+		Log::Message("GetAuditedPermissionsForWindowsObject: Couldn't convert SID to string: " + 
+			GetErrorMessage(GetLastError()));
+		sidStr = "(could not convert sid)";
+	}
+
+	string baseErrMsg = "Error: Unable to get audited permissions for trustee: " + sidStr + ".";
     DWORD res;
     PACL psacl;
 	PSECURITY_DESCRIPTOR sd;
@@ -2416,12 +2216,11 @@ void WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_OBJECT_TYPE objec
     EXPLICIT_ACCESS* entries = NULL;
 
     if ( ( res = GetExplicitEntriesFromAcl ( psacl, &size, &entries ) ) == ERROR_SUCCESS ) {
-        string pSidStr = WindowsCommon::ToString ( pSid );
 
         for ( unsigned int i = 0 ; i < size ; i++ ) {
             PSID sid = entries[i].Trustee.ptstrName;
 
-            if ( pSidStr.compare ( WindowsCommon::ToString ( sid ) ) == 0 ) {
+			if ( entries[i].Trustee.TrusteeForm == TRUSTEE_IS_SID && EqualSid(pSid, sid) ) {
                 if ( entries[i].grfAccessMode == SET_AUDIT_SUCCESS ) {
                     *pSuccessfulAuditedPermissions = entries[i].grfAccessPermissions;
                 }
@@ -2525,7 +2324,7 @@ bool WindowsCommon::IsXPOrLater() {
 	}
 }
 
-string WindowsCommon::UnicodeToAsciiString ( wchar_t* unicodeCharStr ) {
+string WindowsCommon::UnicodeToAsciiString ( const wchar_t* unicodeCharStr ) {
     string asciiStr;
     size_t length = wcslen ( unicodeCharStr ) + 1;
     char* buffer = ( char* ) malloc ( sizeof ( char ) * length );

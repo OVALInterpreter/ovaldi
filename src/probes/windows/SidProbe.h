@@ -67,12 +67,6 @@ private:
 	*/
 	bool GetAccountInformation(string accountName,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
 
-	/** Look up the specified trustee name. 
-		Get the domain and the SID string.
-		Return true if the account is a group.
-	*/
-	bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
-
 };
 
 #endif
