@@ -776,9 +776,9 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_PAGESIZE;
             searchPreferences[0].vValue.dwType = ADSTYPE_INTEGER;
             searchPreferences[0].vValue.Integer = MAXDWORD;
-            searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
-            searchPreferences[0].vValue.dwType = ADSTYPE_INTEGER;
-            searchPreferences[0].vValue.Integer = ADS_SCOPE_BASE;
+            searchPreferences[1].dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
+            searchPreferences[1].vValue.dwType = ADSTYPE_INTEGER;
+            searchPreferences[1].vValue.Integer = ADS_SCOPE_BASE;
             hResult = adsiSearch->SetSearchPreference ( searchPreferences, 2 );
             hResult = adsiSearch->ExecuteSearch ( NULL, NULL, 0xFFFFFFFF, &hSearch );
 
