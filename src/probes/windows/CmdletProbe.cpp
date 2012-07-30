@@ -849,8 +849,12 @@ namespace {
 				dumbhack = availMod->name;
 				modNameIe.SetValue(marshal_as<string>(dumbhack));
 
-				if (availMod->guid != nullptr)
+				modIdIe.SetValue("");
+				modIdIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				if (availMod->guid != nullptr) {
+					modIdIe.SetStatus(OvalEnum::STATUS_EXISTS);
 					modIdIe.SetValue(marshal_as<string>(availMod->guid->ToString()));
+				}
 
 				modVersionIe.SetValue(marshal_as<string>(availMod->version->ToString()));
 
@@ -906,13 +910,26 @@ namespace {
 			return nullptr;
 
 		// for those non-nil'd entities, a final check against the actual
-		// module info.
-		if (modGuid != nullptr) 
+		// module info.  Reset the entities to make sure there aren't old
+		// values dangling in there...
+		modIdIe.SetValue("");
+		modIdIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		modNameIe.SetValue("");
+		modNameIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		modVersionIe.SetValue("");
+		modVersionIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		if (modGuid != nullptr) { 
 			modIdIe.SetValue(marshal_as<string>(modGuid->ToString()));
-		if (modName != nullptr)
+			modIdIe.SetStatus(OvalEnum::STATUS_EXISTS);
+		}
+		if (modName != nullptr) {
 			modNameIe.SetValue(marshal_as<string>(modName));
-		if (modVersion != nullptr)
+			modNameIe.SetStatus(OvalEnum::STATUS_EXISTS);
+		}
+		if (modVersion != nullptr) {
 			modVersionIe.SetValue(marshal_as<string>(modVersion->ToString()));
+			modVersionIe.SetStatus(OvalEnum::STATUS_EXISTS);
+		}
 
 		bool match =
 			(modNameObjEntity->GetNil() || 
