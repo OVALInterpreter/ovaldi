@@ -180,9 +180,9 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                         for ( iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                            item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                            item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                            item->AppendElement ( new ItemEntity ( "key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                            item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 							item->AppendElement(new ItemEntity("windows_view",
 								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
@@ -215,7 +215,7 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                 Item* item = NULL;
                 item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 				item->AppendElement(new ItemEntity("windows_view",
 					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
@@ -238,8 +238,8 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                     for ( StringSet::iterator iterator2 = keys->begin(); iterator2 != keys->end(); iterator2++ ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
@@ -294,9 +294,9 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, con
         // The registry key exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "hive", regKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key", regKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "trustee_name", trusteeNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "hive", regKey->GetHive(), OvalEnum::DATATYPE_STRING,  OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key", regKey->GetKey(), OvalEnum::DATATYPE_STRING,  OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "trustee_name", trusteeNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the successful audited rights.
         pSuccessfulAuditedRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
 
@@ -330,25 +330,25 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, con
         Log::Debug ( "Getting audited permissions masks for registry key: " + 
 			regKey->ToString() + " trustee_name: " + trusteeNameStr );
         WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_REGISTRY_KEY, pSid, keyHandle, pSuccessfulAuditedRights, pFailedAuditRights );
-        item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_write_owner", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_OWNER ), ( ( *pFailedAuditRights ) & WRITE_OWNER ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_synchronize", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & SYNCHRONIZE ), ( ( *pFailedAuditRights ) & SYNCHRONIZE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "access_system_security", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & ACCESS_SYSTEM_SECURITY ), ( ( *pFailedAuditRights ) & ACCESS_SYSTEM_SECURITY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_read", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_READ ), ( ( *pFailedAuditRights ) & GENERIC_READ ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_write", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_WRITE ), ( ( *pFailedAuditRights ) & GENERIC_WRITE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_execute", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_EXECUTE ), ( ( *pFailedAuditRights ) & GENERIC_EXECUTE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_all", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_ALL ), ( ( *pFailedAuditRights ) & GENERIC_ALL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_query_value", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_QUERY_VALUE ), ( ( *pFailedAuditRights ) & FILE_READ_DATA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_set_value", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_SET_VALUE ), ( ( *pFailedAuditRights ) & KEY_SET_VALUE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_create_sub_key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_CREATE_SUB_KEY ), ( ( *pFailedAuditRights ) & KEY_CREATE_SUB_KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_enumerate_sub_keys", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_ENUMERATE_SUB_KEYS ), ( ( *pFailedAuditRights ) & KEY_ENUMERATE_SUB_KEYS ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_notify", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_NOTIFY ), ( ( *pFailedAuditRights ) & KEY_NOTIFY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_create_link", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_CREATE_LINK ), ( ( *pFailedAuditRights ) & KEY_CREATE_LINK ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_wow64_64key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_64KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_64KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_wow64_32key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_32KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_32KEY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key_wow64_res", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_RES ), ( ( *pFailedAuditRights ) & KEY_WOW64_RES ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_write_owner", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_OWNER ), ( ( *pFailedAuditRights ) & WRITE_OWNER ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_synchronize", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & SYNCHRONIZE ), ( ( *pFailedAuditRights ) & SYNCHRONIZE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "access_system_security", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & ACCESS_SYSTEM_SECURITY ), ( ( *pFailedAuditRights ) & ACCESS_SYSTEM_SECURITY ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_read", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_READ ), ( ( *pFailedAuditRights ) & GENERIC_READ ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_write", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_WRITE ), ( ( *pFailedAuditRights ) & GENERIC_WRITE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_execute", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_EXECUTE ), ( ( *pFailedAuditRights ) & GENERIC_EXECUTE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_all", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & GENERIC_ALL ), ( ( *pFailedAuditRights ) & GENERIC_ALL ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_query_value", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_QUERY_VALUE ), ( ( *pFailedAuditRights ) & FILE_READ_DATA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_set_value", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_SET_VALUE ), ( ( *pFailedAuditRights ) & KEY_SET_VALUE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_create_sub_key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_CREATE_SUB_KEY ), ( ( *pFailedAuditRights ) & KEY_CREATE_SUB_KEY ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_enumerate_sub_keys", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_ENUMERATE_SUB_KEYS ), ( ( *pFailedAuditRights ) & KEY_ENUMERATE_SUB_KEYS ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_notify", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_NOTIFY ), ( ( *pFailedAuditRights ) & KEY_NOTIFY ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_create_link", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_CREATE_LINK ), ( ( *pFailedAuditRights ) & KEY_CREATE_LINK ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_wow64_64key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_64KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_64KEY ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_wow64_32key", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_32KEY ), ( ( *pFailedAuditRights ) & KEY_WOW64_32KEY ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key_wow64_res", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & KEY_WOW64_RES ), ( ( *pFailedAuditRights ) & KEY_WOW64_RES ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

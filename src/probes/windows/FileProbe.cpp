@@ -117,9 +117,9 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath",Common::BuildFilePath(fp->first,*iterator),OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath",Common::BuildFilePath(fp->first,*iterator),OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						collectedItems->push_back(item);
 					}
 					
@@ -127,13 +127,13 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					if (fileName->GetNil()){
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
 					}
 					else
 					{
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
+						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
 					}
 					collectedItems->push_back(item);
 
@@ -167,9 +167,9 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){
@@ -195,7 +195,7 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -287,10 +287,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		// add the path and file name
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		ItemEntity* owner = new ItemEntity("owner", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		ItemEntity* owner = new ItemEntity("owner", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 		item->AppendElement(owner);
 
 		//////////////////////////////////////////////////////
@@ -422,11 +422,11 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			errorMessage.append(filePath);
 			errorMessage.append("'.");
 			
-			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(errorMessage));
 			
 		} else {
-			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 		}
 
 
@@ -444,11 +444,11 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 		if(!timeRes) {
 
-			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
 			item->AppendElement(aTime);
-            ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+            ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(cTime);
-			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(mTime);
 			string lastError = WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
@@ -458,19 +458,19 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			//////////////////////////////////////////////////////
 			/////////////////////  Accessed  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(aTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Created  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(cTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Modified  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(mTime);
 
 		}
@@ -488,31 +488,31 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			errorMessage.append("(FileProbe) Unable to get ms_checksum information for the file: '");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
-			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(errorMessage));
 
 		} else {
-			item->AppendElement(new ItemEntity("ms_checksum", Common::ToString(checksum), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ms_checksum", Common::ToString(checksum), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 
 		// initialize remaining version information entities...
-		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(version);
-		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(type);
-		ItemEntity* devClass = new ItemEntity("development_class", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* devClass = new ItemEntity("development_class", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(devClass);
-		ItemEntity* company = new ItemEntity("company", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);	
+		ItemEntity* company = new ItemEntity("company", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
 		item->AppendElement(company);
-		ItemEntity* internalName = new ItemEntity("internal_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* internalName = new ItemEntity("internal_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(internalName);
-		ItemEntity* language = new ItemEntity("language", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* language = new ItemEntity("language", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(language);
-		ItemEntity* originalFilename = new ItemEntity("original_filename", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* originalFilename = new ItemEntity("original_filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(originalFilename);
-		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productName);
-		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productVersion);
 		
 		DWORD junk;

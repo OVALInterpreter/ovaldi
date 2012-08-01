@@ -233,13 +233,13 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 
 			if(item == NULL){
 				item = this->CreateItem();
-				item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
 			}
 
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
-				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				break;
 			} else {
 				// We have a result.  Create an ItemEntity for it and add it to the
@@ -255,7 +255,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					errorMessage.append("(WMIProbe) There was an error retrieving one of the results.");
 
 					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 
 				} else {
 
@@ -296,16 +296,16 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									szChar[size] = NULL;
 									wcstombs(szChar, vtProp.bstrVal, size);
 									strFieldValue = szChar;
-									item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+									item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
                                     delete szChar;
 								} else {
-									item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+									item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 								}
 
 							} else if ((V_VT(&vtProp) == VT_UINT)) {
 								int value = V_INT(&vtProp);
 								strFieldValue = Common::ToString(value);
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_BOOL)) {
 								bool value;								
 								if ( V_BOOL(&vtProp) == VARIANT_TRUE ){
@@ -314,7 +314,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									value = false;
 								}
 								strFieldValue = Common::ToString(value);
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_DATE)) {
 								errorMsg = "Unsupported datatype VT_DATE found.";
 							} else if ((V_VT(&vtProp) == VT_DECIMAL)) {
@@ -324,23 +324,23 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 							} else if ((V_VT(&vtProp) == VT_INT)) {
 								int value = V_INT(&vtProp);
 								strFieldValue = Common::ToString(value);
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I1)) {
 								char value = V_I1(&vtProp);
 								strFieldValue += value;
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I2)) {
 								int value = V_I2(&vtProp);
 								strFieldValue = Common::ToString(value);
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I4)) {
 								long value = V_I4(&vtProp);
 								strFieldValue = Common::ToString(value);
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else if ((V_VT(&vtProp) == VT_I8)) {
 								errorMsg = "Unsupported datatype VT_I8 found.";
 							} else if ((V_VT(&vtProp) == VT_NULL)) {
-								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("result", strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							} else {
 								errorMsg = "Unsupported datatype found.";
 							}
@@ -361,7 +361,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 						errorMessage.append("ERROR MESSAGE - " + fieldName);
 
 						item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-						item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+						item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 					}
 
 					VariantClear(&vtProp);

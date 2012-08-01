@@ -227,9 +227,9 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 			if(includeGroupBehavior) {
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				items->push_back(item);
 			} 
 			
@@ -251,9 +251,9 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 		} else {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			items->push_back(item);
 		}
 
@@ -264,7 +264,7 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 		if(ex.GetSeverity() == ERROR_NOTICE) {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 			items->push_back(item);
 		} else {
 			throw ex;

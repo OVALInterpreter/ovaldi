@@ -212,20 +212,20 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 
             Item * item = this->CreateItem();
             item->SetStatus ( OvalEnum::STATUS_EXISTS );
-            ( commandLineStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( processEntry.th32ProcessID ) , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "ppid" , Common::ToString ( processEntry.th32ParentProcessID ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "priority" , Common::ToString ( processEntry.pcPriClassBase ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "image_path" , processEntry.szExeFile , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            ( deviceProcessImageNameStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+            ( commandLineStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( processEntry.th32ProcessID ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "ppid" , Common::ToString ( processEntry.th32ParentProcessID ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "priority" , Common::ToString ( processEntry.pcPriClassBase ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "image_path" , processEntry.szExeFile , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            ( deviceProcessImageNameStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
             
 			try{
 
 				FILETIME createTime, time2, time3, time4;
 				if(GetProcessTimes(openProcessHandle,&createTime,&time2,&time3,&time4) > 0){
-					item->AppendElement(new ItemEntity ("creation_time",WindowsCommon::ToString(createTime),OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity ("creation_time",WindowsCommon::ToString(createTime),OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				}else{
-					item->AppendElement(new ItemEntity ("creation_time", "" ,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity ("creation_time", "" ,OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 				}
 
 				DWORD procID = GetProcessId(openProcessHandle);
@@ -235,9 +235,9 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 				string primaryWindowText = pairing.second;
 
 				if(primaryWindowText.length() > 0){
-					item->AppendElement(new ItemEntity ("primary_window_text", primaryWindowText,OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity ("primary_window_text", primaryWindowText,OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				}else{
-					item->AppendElement(new ItemEntity ("primary_window_text", "",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity ("primary_window_text", "",OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				}
 				
 				DWORD depResult = 0;
@@ -245,12 +245,12 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 
 				if(GetProcessDEPPolicy(openProcessHandle,&depResult,&perm)){
 					if(depResult == PROCESS_DEP_ENABLE){
-						item->AppendElement(new ItemEntity ("dep_enabled", "1" ,OvalEnum::DATATYPE_BOOLEAN,false, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity ("dep_enabled", "1" ,OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 					}else if(depResult == 0){
-						item->AppendElement(new ItemEntity ("dep_enabled", "0" ,OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity ("dep_enabled", "0" ,OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 					}
 				}else{
-					item->AppendElement(new ItemEntity ("dep_enabled", "" ,OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity ("dep_enabled", "" ,OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
 				}
 
 			}catch(Exception ex) {

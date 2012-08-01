@@ -208,7 +208,7 @@ Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
         // passed connection initialization and search call so create the item
         //
         item = this->CreateItem();
-        item->AppendElement(new ItemEntity("search_criteria", search_criteria->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+        item->AppendElement(new ItemEntity("search_criteria", search_criteria->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 
         // examine the result code on the pISearchResult
@@ -298,7 +298,7 @@ Item* WUAUpdateSearcherProbe::DoWUASearch(ItemEntity* search_criteria) {
 				    std::string buffer = _bstr_t(updateID);
     					
                     item->SetStatus(OvalEnum::STATUS_EXISTS);
-				    item->AppendElement(new ItemEntity("update_id", buffer, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));				
+				    item->AppendElement(new ItemEntity("update_id", buffer, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));				
 			    }		
 		    }
         }

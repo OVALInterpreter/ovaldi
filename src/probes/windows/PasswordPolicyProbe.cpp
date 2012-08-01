@@ -85,10 +85,10 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 			collectedItems = new ItemVector();
 			collectedItems->push_back(item);
 
-			item->AppendElement(new ItemEntity("max_passwd_age",  maxPasswordAge, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("max_passwd_age",  maxPasswordAge, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 
 			std::string passwordComplexity;
 			std::string reversibleEncryption;
@@ -98,8 +98,8 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
              */
 			ArePasswordComplexityReverseEncryptionSet(passwordComplexity, reversibleEncryption);
 
-			item->AppendElement(new ItemEntity("password_complexity",  passwordComplexity, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("reversible_encryption",  reversibleEncryption, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("password_complexity",  passwordComplexity, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("reversible_encryption",  reversibleEncryption, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 
 			// Free the allocated memory.
 			NetApiBufferFree(pBuf);

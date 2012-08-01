@@ -41,20 +41,18 @@ using namespace std;
 //****************************************************************************************//
 //								ItemEntity Class										  //	
 //****************************************************************************************//
-ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status, bool isNil) {
+ItemEntity::ItemEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::SCStatus status, bool isNil) {
 	this->name = name;
 	this->value.push_back(new StringEntityValue(value));
 	this->datatype = datatype;
-	this->isObjectEntity = isObjectEntity;
 	this->scStatus = status;
 	this->nil = isNil;
 }
 
-ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::SCStatus status, bool isNil) {
+ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Datatype datatype, OvalEnum::SCStatus status, bool isNil) {
 	this->name = name;
 	this->value = value;
 	this->datatype = datatype;
-	this->isObjectEntity = isObjectEntity;
 	this->scStatus = status;
 	this->nil = isNil;
 }
@@ -62,7 +60,6 @@ ItemEntity::ItemEntity(string name, AbsEntityValueVector value, OvalEnum::Dataty
 ItemEntity::ItemEntity(const ItemEntity& itemEntity){
     this->name = itemEntity.name;
     this->datatype = itemEntity.datatype;
-    this->isObjectEntity = itemEntity.isObjectEntity;
 	this->scStatus = itemEntity.scStatus;
 	this->nil = itemEntity.nil;
 
@@ -140,16 +137,6 @@ OvalEnum::Datatype ItemEntity::GetDatatype() {
 void ItemEntity::SetDatatype(OvalEnum::Datatype datatype) {
 
 	this->datatype = datatype;
-}
-
-bool ItemEntity::GetIsObjectEntity() {
-
-	return this->isObjectEntity;
-}
-
-void ItemEntity::SetIsObjectEntity(bool isObjectEntity) {
-
-	this->isObjectEntity = isObjectEntity;
 }
 
 OvalEnum::SCStatus ItemEntity::GetStatus() {

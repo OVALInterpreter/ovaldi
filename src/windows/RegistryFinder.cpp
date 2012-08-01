@@ -141,7 +141,7 @@ StringSet* RegistryFinder::GetHives ( ObjectEntity* hiveEntity ) {
         }
 
         // only keep hives that match operation and value and var check
-        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS );
 
         for ( StringSet::iterator it = allHives->begin(); it != allHives->end(); it++ ) {
             tmp->SetValue ( ( *it ) );
@@ -213,7 +213,7 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
         }
 
         // only keep keys that match operation and value and var check
-        ItemEntity* tmp = new ItemEntity ( "key", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+        ItemEntity* tmp = new ItemEntity ( "key", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS );
 
         for ( StringSet::iterator it = allKeys->begin(); it != allKeys->end(); it++ ) {
             tmp->SetValue ( ( *it ) );
@@ -296,7 +296,7 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
         }
 
         // only keep names that match operation and value and var check
-        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS );
 
         for ( StringSet::iterator it = allNames->begin(); it != allNames->end(); it++ ) {
             tmp->SetValue ( ( *it ) );

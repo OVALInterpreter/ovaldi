@@ -102,7 +102,7 @@ ItemVector* InterfaceProbe::CollectItems ( Object* object ) {
             } else {
                 aInterface = this->CreateItem();
                 aInterface->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                aInterface->AppendElement ( new ItemEntity ( "name" , name->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                aInterface->AppendElement ( new ItemEntity ( "name" , name->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( aInterface );
             }
 
@@ -264,7 +264,7 @@ void InterfaceProbe::GetAllInterfaces() {
 			item->AppendElement(new ItemEntity("hardware_addr", macOss.str()));
 		} else
 			item->AppendElement(new ItemEntity("hardware_addr", "",
-				OvalEnum::DATATYPE_STRING, false, 
+				OvalEnum::DATATYPE_STRING,
 				OvalEnum::STATUS_DOES_NOT_EXIST));
 
 		// Not all interfaces have IPv4 addresses.  So
@@ -283,7 +283,7 @@ void InterfaceProbe::GetAllInterfaces() {
 				InterfaceProbe::GetInterfaceAddressType(ipRow->wType));
 			if (addrType->empty())
 				item->AppendElement(new ItemEntity("addr_type", "",
-				OvalEnum::DATATYPE_STRING, false, 
+				OvalEnum::DATATYPE_STRING,
 				OvalEnum::STATUS_DOES_NOT_EXIST));
 			else
 				for (StringVector::iterator it = addrType->begin();
@@ -292,16 +292,16 @@ void InterfaceProbe::GetAllInterfaces() {
 					item->AppendElement(new ItemEntity("addr_type", *it));
 		} else {
 			item->AppendElement(new ItemEntity("inet_addr", "",
-				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::DATATYPE_STRING,
 				OvalEnum::STATUS_DOES_NOT_EXIST));
 			item->AppendElement(new ItemEntity("broadcast_addr", "",
-				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::DATATYPE_STRING,
 				OvalEnum::STATUS_DOES_NOT_EXIST));
 			item->AppendElement(new ItemEntity("netmask", "",
-				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::DATATYPE_STRING,
 				OvalEnum::STATUS_DOES_NOT_EXIST));
 			item->AppendElement(new ItemEntity("addr_type", "",
-				OvalEnum::DATATYPE_STRING, false,
+				OvalEnum::DATATYPE_STRING,
 				OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 	}

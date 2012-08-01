@@ -43,13 +43,13 @@ class ItemEntity {
 public:
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
+	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
 	/**
 	 * Create a complete ItemEntity object.  This ItemEntity takes ownership of
 	 * the given entity values, so don't delete them yourself.
 	 */
-	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
+	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
@@ -128,17 +128,6 @@ public:
 	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
-	/** Return whether or not the ItemEntity is an object entity.
-	 *  @return A boolean value indicating whether or not the ItemEntity is an object entity.
-	 */
-	bool GetIsObjectEntity();
-
-	/** Set the boolean value indicating whether or not the ItemEntity is an object entity.
-	 *  @param isObjectEntity A boolean value indicating whether or not the ItemEntity is an object entity.
-	 *  @return Void.
-	 */
-	void SetIsObjectEntity(bool isObjectEntity);
-
 	/** Set the nil field's value.
 	 *  @param nil The boolean value indicating whether or not the entity has a nil value.
 	 *  @return void
@@ -155,7 +144,6 @@ private:
 	std::string name;
 	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
-	bool isObjectEntity;
 	bool nil;
 };
 

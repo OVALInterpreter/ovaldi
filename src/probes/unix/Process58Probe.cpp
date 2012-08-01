@@ -183,7 +183,7 @@ ItemVector* Process58Probe::CollectItems(Object* object) {
 
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("command_line",  command->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("command_line",  command->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				collectedItems->push_back(item);
 
 			} else {
@@ -193,7 +193,7 @@ ItemVector* Process58Probe::CollectItems(Object* object) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("command_line",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("command_line",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -358,7 +358,7 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 
 	auto_ptr<Item> item(this->CreateItem());
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("command_line",  command, OvalEnum::DATATYPE_STRING, true));
+	item->AppendElement(new ItemEntity("command_line",  command, OvalEnum::DATATYPE_STRING));
 
 	// Below, I try to get everything, but behave correctly if the /proc/<pid>
 	// directory unexpectedly goes away (just ignore that process, because it
@@ -443,24 +443,24 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 		adjustedStartTimeStr = this->FormatStartTime(adjustedStartTime);
 		item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING));
 	} else
-		item->AppendElement(new ItemEntity("exec_time",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("exec_time",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 
-	item->AppendElement(new ItemEntity("pid", pidStr, OvalEnum::DATATYPE_INTEGER, true));
+	item->AppendElement(new ItemEntity("pid", pidStr, OvalEnum::DATATYPE_INTEGER));
 
 	if (statStatus == PROC_OK) {
 		item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
 		item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER));
 	} else {
-		item->AppendElement(new ItemEntity("ppid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
-		item->AppendElement(new ItemEntity("priority", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("ppid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("priority", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 	}
 
 	if (statusStatus == PROC_OK && ruidp) {
 		item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER));
 	} else
-		item->AppendElement(new ItemEntity("ruid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("ruid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 
-	item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
 
 	if (statStatus == PROC_OK)
 		item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr));
@@ -471,17 +471,17 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	item->AppendElement(new ItemEntity("tty", ttyName));
 
 	if (statusStatus == PROC_OK && euidp)
-		item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 	else
-		item->AppendElement(new ItemEntity("user_id", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("user_id", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 
 	// for now...
-	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
 
 	if (loginuidStatus == PROC_OK)
 		item->AppendElement(new ItemEntity("loginuid", Common::ToString(loginuid), OvalEnum::DATATYPE_INTEGER));
 	else
-		item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 
 	if (statusStatus == PROC_OK && effCapp)
 		this->AddCapabilities(item.get(), effCap);
@@ -489,17 +489,17 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 		// I add an entity with error status here, so consumers know that posix
 		// capabilities couldn't be determined due to error, not that there just
 		// aren't any.
-		item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 
 	if (selinuxDomainLabel.empty())
-		item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 	else
 		item->AppendElement(new ItemEntity("selinux_domain_label", selinuxDomainLabel));
 
 	if (statStatus == PROC_OK)
 		item->AppendElement(new ItemEntity("session_id", Common::ToString(sessionId), OvalEnum::DATATYPE_INTEGER));
 	else
-		item->AppendElement(new ItemEntity("session_id", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+		item->AppendElement(new ItemEntity("session_id", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 
 	items->push_back(item.release());
 }
@@ -782,9 +782,9 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("command_line", command, OvalEnum::DATATYPE_STRING, true));
+	item->AppendElement(new ItemEntity("command_line", command, OvalEnum::DATATYPE_STRING));
 	item->AppendElement(new ItemEntity("exec_time", formattedExecTime));
-	item->AppendElement(new ItemEntity("pid", pidStr, OvalEnum::DATATYPE_INTEGER, true));
+	item->AppendElement(new ItemEntity("pid", pidStr, OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("ruid", Common::ToString(rUserId), OvalEnum::DATATYPE_INTEGER));
@@ -792,14 +792,14 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	item->AppendElement(new ItemEntity("start_time", formattedStartTime));
 	if (devicePath.empty())
 		item->AppendElement(new ItemEntity("tty", "", OvalEnum::DATATYPE_STRING,
-										   false, OvalEnum::STATUS_DOES_NOT_EXIST));
+										   OvalEnum::STATUS_DOES_NOT_EXIST));
 	else
 		item->AppendElement(new ItemEntity("tty", devicePath));
 	item->AppendElement(new ItemEntity("user_id", Common::ToString(eUserId), OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
-	item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_NOT_COLLECTED));
- 	item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
- 	item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_NOT_COLLECTED));
+ 	item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+ 	item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
 	item->AppendElement(new ItemEntity("session_id", Common::ToString(info.pr_sid), OvalEnum::DATATYPE_INTEGER));
 
 	items->push_back(item);
@@ -941,24 +941,24 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
     item = this->CreateItem();
     item->SetStatus(OvalEnum::STATUS_EXISTS);
     item->AppendMessage(new OvalMessage("The unix-def:process_probe for OSX currently only collects the command of the process and not the command line arguments.  Note that this may cause the number of processes collected to be inaccurate"));
-    item->AppendElement(new ItemEntity("command_line", procdata[i].kp_proc.p_comm, OvalEnum::DATATYPE_STRING, true));
-    item->AppendElement(new ItemEntity("exec_time", formattedExecTime, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-    item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER, true));
+    item->AppendElement(new ItemEntity("command_line", procdata[i].kp_proc.p_comm, OvalEnum::DATATYPE_STRING));
+    item->AppendElement(new ItemEntity("exec_time", formattedExecTime, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+    item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("ppid", Common::ToString(procdata[i].kp_eproc.e_ppid), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("priority", Common::ToString((int)procdata[i].kp_proc.p_priority), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("ruid", Common::ToString(procdata[i].kp_eproc.e_pcred.p_ruid), OvalEnum::DATATYPE_INTEGER));
-    item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+    item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
     item->AppendElement(new ItemEntity("start_time", formattedStartTime));
-    item->AppendElement(new ItemEntity("tty", ttyStr, OvalEnum::DATATYPE_STRING, false, (ttyStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+    item->AppendElement(new ItemEntity("tty", ttyStr, OvalEnum::DATATYPE_STRING, (ttyStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
     item->AppendElement(new ItemEntity("user_id", Common::ToString(procdata[i].kp_eproc.e_ucred.cr_uid), OvalEnum::DATATYPE_INTEGER));
 
 	// the rest of these are either not applicable, or it's not clear what to
 	// get or how to get it.
-	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
-	item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_NOT_COLLECTED));
-	item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-	item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-	item->AppendElement(new ItemEntity("session_id", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("exec_shield", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("loginuid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("posix_capability", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("selinux_domain_label", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+	item->AppendElement(new ItemEntity("session_id", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_NOT_COLLECTED));
     
     items->push_back(item);
   }

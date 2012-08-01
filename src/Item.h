@@ -191,7 +191,7 @@ public:
 	void AppendMessage(OvalMessage* msg);
 
     /** Return all object elements. */
-	ItemEntityVector* GetObjectElements();
+	//ItemEntityVector* GetObjectElements();
 
 	/** Delete all items in the cache. */
 	static void ClearCache();

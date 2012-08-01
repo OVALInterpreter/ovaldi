@@ -69,13 +69,13 @@ ItemVector* UnameProbe::CollectItems(Object *object) {
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		collectedItems->push_back(item);
 
-		item->AppendElement(new ItemEntity("machine_class",  tmpName.machine, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("node_name",  tmpName.nodename, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("os_name",  tmpName.sysname, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("os_release",  tmpName.release, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("os_version",  tmpName.version, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("machine_class",  tmpName.machine, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("node_name",  tmpName.nodename, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("os_name",  tmpName.sysname, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("os_release",  tmpName.release, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("os_version",  tmpName.version, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		// These two appear to be the same on a Linux system
-		item->AppendElement(new ItemEntity("processor_type",  tmpName.machine, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("processor_type",  tmpName.machine, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 	} else {
 		throw ProbeException("Error: UnameProbe() unable to get uname information");

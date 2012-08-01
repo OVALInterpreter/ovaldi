@@ -230,8 +230,8 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 				
 		// create item
 		item = this->CreateItem();
-		item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("wql", wmi_wql->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 	
 		// iterate through each instance returned and create a result entity for it.
@@ -242,7 +242,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 			// probe to return an empty item vector which will mean the collected
 			// object in the sc file will have a does not exist flag.
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
-				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
 				break;
 			} else {
 				// We have a result.  Create an ItemEntity for it and add it to the
@@ -258,7 +258,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					errorMessage.append("(WMI57Probe) There was an error retrieving one of the results.");
 
 					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, false, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_ERROR));
 
 				} else {
 
@@ -358,9 +358,9 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					}
 					// If we found values add them. Otherwise, make sure to report the result doesn't exist
 					if ( fieldEntityValues.size() ){
-						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,false,OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_EXISTS));
 					}else{
-						item->AppendElement(new ItemEntity("result","",OvalEnum::DATATYPE_RECORD,false,OvalEnum::STATUS_DOES_NOT_EXIST));					}
+						item->AppendElement(new ItemEntity("result","",OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));					}
 					}
 				
 				for (ULONG n=0; n<uReturn; n++) pclsObj[n]->Release();

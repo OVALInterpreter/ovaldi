@@ -134,7 +134,7 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
 										relativednVector->at(0)->SetNil(true);
 										relativednVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									} else if (relativednVector->size() == 0) {
-										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "relative_dn" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_NOT_COLLECTED, true ));
+										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "relative_dn" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_NOT_COLLECTED, true ));
 									}
 								}
 								// Increment the index so that future items are inserted after the relative_dn item.
@@ -146,7 +146,7 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
 										attributeVector->at(0)->SetNil(true);
 										attributeVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									} else if (attributeVector->size() == 0) {
-										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "attribute" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_NOT_COLLECTED, true ));
+										itemVector->insert(itemVector->begin() + index, new ItemEntity ( "attribute" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_NOT_COLLECTED, true ));
 									}
 								}
 
@@ -161,15 +161,15 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                             if ( attributeEntity->GetVarRef() == NULL ) {
                                 Item* item = this->CreateItem();
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
-								item->AppendElement ( new ItemEntity ( "attribute" , attributeEntity->GetValue()  , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
+                                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
+								item->AppendElement ( new ItemEntity ( "attribute" , attributeEntity->GetValue()  , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
 
                                 if ( objectClassStr.compare ( "" ) == 0 ) {
-                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
                                 } else {
-                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                 }
 
                                 collectedItems->push_back ( new Item ( *item ) );
@@ -178,15 +178,15 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                                 for ( VariableValueVector::iterator iterator = attributeEntity->GetVarRef()->GetValues()->begin() ; iterator != attributeEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
                                     Item* item = this->CreateItem();
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                                    item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
-                                    item->AppendElement ( new ItemEntity ( "attribute" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
+                                    item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
+                                    item->AppendElement ( new ItemEntity ( "attribute" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
 
                                     if ( objectClassStr.compare ( "" ) == 0 ) {
-                                        item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                        item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
                                     } else {
-                                        item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                                        item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                     }
 
                                     collectedItems->push_back ( new Item ( *item ) );
@@ -204,16 +204,16 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                     if ( relativeDnEntity->GetVarRef() == NULL ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnEntity->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
+                        item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnEntity->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
                         collectedItems->push_back ( item );
 
                     } else {
                         for ( VariableValueVector::iterator iterator = relativeDnEntity->GetVarRef()->GetValues()->begin() ; iterator != relativeDnEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                            item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "relative_dn" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
+                            item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                            item->AppendElement ( new ItemEntity ( "relative_dn" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
                             collectedItems->push_back ( item );
                         }
                     }
@@ -229,14 +229,14 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
             if ( namingContextEntity->GetVarRef() == NULL ) {
                 Item* item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextEntity->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextEntity->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( item );
 
             } else {
                 for ( VariableValueVector::iterator iterator = namingContextEntity->GetVarRef()->GetValues()->begin() ; iterator != namingContextEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
                     Item* item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                    item->AppendElement ( new ItemEntity ( "naming_context" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                    item->AppendElement ( new ItemEntity ( "naming_context" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                     collectedItems->push_back ( item );
                 }
             }
@@ -1036,23 +1036,23 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                             if ( attributeStr.compare ( OBJECT_CLASS_ATTRIBUTE ) != 0 || activeDirectoryOperationStr.compare ( OBJECT_CLASS_ATTRIBUTE ) == 0 || activeDirectoryOperationStr.compare ( "" ) == 0 ) {
                                 Item* item = this->CreateItem();
                                 item->SetStatus ( OvalEnum::STATUS_EXISTS );
-                                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
+                                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
 
                                 if ( ! ( relativeDnStr.compare ( "" ) == 0 ) ) {
-                                    item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                 }
 
                                 if ( activeDirectoryOperationStr.compare ( "" ) == 0 ) {
-                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassValue , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassValue , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                     attributeStr = "";
 
                                 } else {
-                                    item->AppendElement ( new ItemEntity ( "attribute" , attributeStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassValue , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "adstype" , attributeAdsTypeStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "attribute" , attributeStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassValue , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "adstype" , attributeAdsTypeStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
 
                                     for ( StringVector::iterator it = values->begin(); it != values->end(); it++ ) {
-                                        item->AppendElement ( new ItemEntity ( "value" , *it , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+                                        item->AppendElement ( new ItemEntity ( "value" , *it , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                     }
                                 }
 

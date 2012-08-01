@@ -133,7 +133,7 @@ StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behavi
 
 	if (tmpPath.GetVarRef() != NULL) {
 		// only keep paths that match operation and value and var check
-		ItemEntity tmp("path","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		ItemEntity tmp("path","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);
 		StringVector::iterator it;
 		for(it = pathsFound->begin(); it != pathsFound->end(); ) {
 			tmp.SetValue(*it);
@@ -374,7 +374,7 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
 
 	if (tmpFileName.GetVarRef() != NULL) {
 		// only keep filenames that match operation and value and var check
-		ItemEntity tmp("filename","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		ItemEntity tmp("filename","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);
 		StringVector::iterator it;
 		for(it = fileNamesFound->begin(); it != fileNamesFound->end(); ) {
 			tmp.SetValue(*it);
@@ -435,7 +435,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 
 	if (tmpFilePath.GetVarRef() != NULL) {
 		// only keep filepaths that match operation and value and var check
-		ItemEntity tmp("filepath","", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+		ItemEntity tmp("filepath","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);
 		StringVector::iterator it;
 		for(it = filePathsFound->begin(); it != filePathsFound->end(); ) {
 			tmp.SetValue(*it);

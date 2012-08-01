@@ -46,7 +46,6 @@ ObjectEntity::ObjectEntity(ObjectEntity* orig) : AbsEntity() {
 	// -----------------------------------------------------------------------
 
 	this->SetDatatype(orig->GetDatatype());
-	this->SetIsObjectEntity(true);
 	this->SetName(orig->GetName());
 	this->SetNil(orig->GetNil());
 	this->SetOperation(orig->GetOperation());
@@ -56,7 +55,7 @@ ObjectEntity::ObjectEntity(ObjectEntity* orig) : AbsEntity() {
 }
 
 ObjectEntity::ObjectEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check varCheck, bool nil)
-									: AbsEntity(name, value, datatype, true, operation, varRef, varCheck, nil) {
+									: AbsEntity(name, value, datatype, operation, varRef, varCheck, nil) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//

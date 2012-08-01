@@ -115,7 +115,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 
 			//pre-populate a sorted version of the auditeventpolicysubcategories_item entities
 			for(vector<GuidString>::iterator it = _guidItemElementNameVector.begin(); it != _guidItemElementNameVector.end(); ++it) {
-					ItemEntity *pSortedItemEntity = new ItemEntity(it->second,  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+					ItemEntity *pSortedItemEntity = new ItemEntity(it->second,  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 					item->AppendElement(pSortedItemEntity);
 			}
 

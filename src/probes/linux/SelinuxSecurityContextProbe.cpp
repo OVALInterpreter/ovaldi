@@ -192,7 +192,7 @@ namespace {
 			VectorPtrGuard<ItemEntity> itemEntities(new ItemEntityVector());
 
 			itemEntities->push_back(new ItemEntity("pid", Common::ToString(currentPid), 
-												   OvalEnum::DATATYPE_INTEGER, true));
+												   OvalEnum::DATATYPE_INTEGER));
 			auto_ptr<Item> item;
 			try {
 				CompletePidItem(itemEntities.get(), currentPid);
@@ -226,7 +226,7 @@ namespace {
 				 ++pidIter) {
 
 				auto_ptr<ItemEntity> pidItemEntity(new ItemEntity("pid", *pidIter, 
-																  OvalEnum::DATATYPE_INTEGER, true));
+																  OvalEnum::DATATYPE_INTEGER));
 				if (pidObjEntity->Analyze(pidItemEntity.get()) != OvalEnum::RESULT_TRUE)
 					continue;
 
@@ -280,7 +280,7 @@ namespace {
 					continue;
 
 				auto_ptr<ItemEntity> pidItemEntity(new ItemEntity("pid", d->d_name, 
-																  OvalEnum::DATATYPE_INTEGER, true));
+																  OvalEnum::DATATYPE_INTEGER));
 				if (pidObjEntity->Analyze(pidItemEntity.get()) != OvalEnum::RESULT_TRUE)
 					continue;
 
@@ -326,13 +326,13 @@ namespace {
 		// the file entities with status=not collected?
 		itemEntities->insert(itemEntities->begin(),
 							 new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING,
-											true, OvalEnum::STATUS_NOT_COLLECTED));
+											OvalEnum::STATUS_NOT_COLLECTED));
 		itemEntities->insert(itemEntities->begin(),
 							 new ItemEntity("path", "", OvalEnum::DATATYPE_STRING,
-											true, OvalEnum::STATUS_NOT_COLLECTED));
+											OvalEnum::STATUS_NOT_COLLECTED));
 		itemEntities->insert(itemEntities->begin(),
 							 new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING,
-											true, OvalEnum::STATUS_NOT_COLLECTED));
+											OvalEnum::STATUS_NOT_COLLECTED));
 
 		// get raw and non-raw security_context_t for the pid
 		security_context_t pidSc;
@@ -384,10 +384,10 @@ namespace {
 
 							auto_ptr<Item> item = CreateItem();
 							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-							item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-							item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-							item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-							item->AppendElement(new ItemEntity("pid", "", OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_NOT_COLLECTED));
+							item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+							item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+							item->AppendElement(new ItemEntity("pid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_NOT_COLLECTED));
 							items->push_back(item.release());
 						}
 					
@@ -422,9 +422,9 @@ namespace {
 						fpComponents = Common::SplitFilePath(*iterator);
 						pathStatus->SetValue(fpComponents->first);
 						fileNameStatus->SetValue(fpComponents->second);
-						item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 						items->push_back(item.release());
 					
 						if ( fpComponents != NULL ){
@@ -449,7 +449,7 @@ namespace {
 					for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 						auto_ptr<Item> item = CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						items->push_back(item.release());
 					}
 				}
@@ -462,18 +462,18 @@ namespace {
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		
 		if (fileName.empty())
-			item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED));
+			item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
 		else
-			item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(dir, fileName), OvalEnum::DATATYPE_STRING, true));
+			item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(dir, fileName), OvalEnum::DATATYPE_STRING));
 		
-		item->AppendElement(new ItemEntity("path", dir, OvalEnum::DATATYPE_STRING, true));
+		item->AppendElement(new ItemEntity("path", dir, OvalEnum::DATATYPE_STRING));
 		
 		if (fileName.empty())
-			item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true));
+			item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
 		else
-			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true));
+			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING));
 
-		item->AppendElement(new ItemEntity("pid", "", OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_NOT_COLLECTED));
+		item->AppendElement(new ItemEntity("pid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_NOT_COLLECTED));
 
 		string filePath;
 		if (fileName.empty())
@@ -514,7 +514,7 @@ namespace {
 		if ((_var).empty())												\
 			itemEntities->push_back(new ItemEntity((_entityName), "",	\
 												   OvalEnum::DATATYPE_STRING, \
-												   false, OvalEnum::STATUS_DOES_NOT_EXIST)); \
+												   OvalEnum::STATUS_DOES_NOT_EXIST)); \
 		else 															\
 			itemEntities->push_back(new ItemEntity((_entityName), (_var)))
 

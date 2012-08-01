@@ -71,7 +71,7 @@ ItemVector* GroupProbe::CollectItems(Object *object) {
 	}else{
 		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
 		StringSet* groups = WindowsCommon::GetAllLocalGroups();
-		ItemEntity* groupItemEntity = new ItemEntity("group","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		ItemEntity* groupItemEntity = new ItemEntity("group","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = groups->begin(); it != groups->end(); it++){
 			groupItemEntity->SetValue(*it);
 			if ( group->Analyze(groupItemEntity) == OvalEnum::RESULT_TRUE ){
@@ -117,27 +117,27 @@ Item* GroupProbe::GetGroupMembers(string groupName) {
 		for(StringSet::iterator iterator = members->begin(); iterator != members->end(); iterator++) {
 			if ( WindowsCommon::IsGroup(*iterator) ){
 				// put subgroup entities at the back of the ItemEntityVector
-				entityVector->push_back(new ItemEntity("subgroup", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				entityVector->push_back(new ItemEntity("subgroup", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				++subgroupsCount;
 			}else{
 				// put user entities at the beginning of the ItemEntityVector
-				entityVector->insert(entityVector->begin(),new ItemEntity("user", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				entityVector->insert(entityVector->begin(),new ItemEntity("user", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				++usersCount;
 			}
 		}
 
 		// if there are no user members add an user entity with a status of 'does not exist'
 		if ( usersCount == 0 ){
-			entityVector->insert(entityVector->begin(),new ItemEntity("user", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			entityVector->insert(entityVector->begin(),new ItemEntity("user", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 
 		// if there are no subgroup members add an subgroup entity with a status of 'does not exist'
 		if ( subgroupsCount == 0 ){
-			entityVector->push_back(new ItemEntity("subgroup", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			entityVector->push_back(new ItemEntity("subgroup", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 
 		// add the group item entity to the beginning of the group_item
-		entityVector->insert(entityVector->begin(),new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		entityVector->insert(entityVector->begin(),new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		item->SetElements(entityVector);
 		entityVector->clear();
@@ -148,7 +148,7 @@ Item* GroupProbe::GetGroupMembers(string groupName) {
 		// create an item to report that a group was looked up and it did not exist
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
 	delete members;

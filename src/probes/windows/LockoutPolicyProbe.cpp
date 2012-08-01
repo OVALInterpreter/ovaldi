@@ -82,7 +82,7 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object* /*object*/) {
 			collectedItems = new ItemVector();
 			collectedItems->push_back(item);
 
-			item->AppendElement(new ItemEntity("force_logoff",  forceLogoff, OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("force_logoff",  forceLogoff, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 
 			// Free the allocated memory.
 			NetApiBufferFree(pBufM0);
@@ -126,9 +126,9 @@ ItemVector* LockoutPolicyProbe::CollectItems(Object* /*object*/) {
 			collectedItems = new ItemVector();
 			collectedItems->push_back(item);
 
-			item->AppendElement(new ItemEntity("lockout_duration",  lockoutDuration, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("lockout_observation_window",  lockoutObservation, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("lockout_threshold",  lockoutThreshold, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("lockout_duration",  lockoutDuration, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("lockout_observation_window",  lockoutObservation, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("lockout_threshold",  lockoutThreshold, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 
 			// Free the allocated memory.
 			NetApiBufferFree(pBufM3);

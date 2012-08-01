@@ -191,9 +191,9 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                         for ( iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                            item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                            item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                            item->AppendElement ( new ItemEntity ( "key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                            item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 							item->AppendElement(new ItemEntity("windows_view",
 								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
@@ -225,7 +225,7 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                 Item* item = NULL;
                 item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 				item->AppendElement(new ItemEntity("windows_view",
 					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
@@ -248,8 +248,8 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                     for ( StringSet::iterator iterator2 = keys->begin(); iterator2 != keys->end(); iterator2++ ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
@@ -300,9 +300,9 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hi
         // The registry key exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "hive", hiveStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "trustee_name", trusteeNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "hive", hiveStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "trustee_name", trusteeNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the rights
         pAccessRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
 
@@ -319,118 +319,118 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hi
         WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_REGISTRY_KEY, pSid, keyHandle, pAccessRights );
 
         if ( ( *pAccessRights ) & DELETE )
-            item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_delete", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_delete", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & READ_CONTROL )
-            item->AppendElement ( new ItemEntity ( "standard_read_control", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_read_control", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_read_control", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_read_control", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & WRITE_DAC )
-            item->AppendElement ( new ItemEntity ( "standard_write_dac", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_dac", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_write_dac", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_dac", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & WRITE_OWNER )
-            item->AppendElement ( new ItemEntity ( "standard_write_owner", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_owner", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_write_owner", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_owner", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SYNCHRONIZE )
-            item->AppendElement ( new ItemEntity ( "standard_synchronize", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_synchronize", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_synchronize", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_synchronize", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & ACCESS_SYSTEM_SECURITY )
-            item->AppendElement ( new ItemEntity ( "access_system_security", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "access_system_security", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "access_system_security", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "access_system_security", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & GENERIC_READ )
-            item->AppendElement ( new ItemEntity ( "generic_read", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_read", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_read", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_read", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & GENERIC_WRITE )
-            item->AppendElement ( new ItemEntity ( "generic_write", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_write", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_write", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_write", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & GENERIC_EXECUTE )
-            item->AppendElement ( new ItemEntity ( "generic_execute", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_execute", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & GENERIC_ALL )
-            item->AppendElement ( new ItemEntity ( "generic_all", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_all", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_all", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_all", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_QUERY_VALUE )
-            item->AppendElement ( new ItemEntity ( "key_query_value", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_query_value", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_query_value", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_query_value", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_SET_VALUE )
-            item->AppendElement ( new ItemEntity ( "key_set_value", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_set_value", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_set_value", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_set_value", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_CREATE_SUB_KEY )
-            item->AppendElement ( new ItemEntity ( "key_create_sub_key", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_create_sub_key", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_create_sub_key", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_create_sub_key", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_ENUMERATE_SUB_KEYS )
-            item->AppendElement ( new ItemEntity ( "key_enumerate_sub_keys", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_enumerate_sub_keys", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_enumerate_sub_keys", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_enumerate_sub_keys", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_NOTIFY )
-            item->AppendElement ( new ItemEntity ( "key_notify", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_notify", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_notify", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_notify", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_CREATE_LINK )
-            item->AppendElement ( new ItemEntity ( "key_create_link", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_create_link", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_create_link", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_create_link", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_WOW64_64KEY )
-            item->AppendElement ( new ItemEntity ( "key_wow64_64key", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_wow64_64key", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_wow64_64key", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_wow64_64key", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_WOW64_32KEY )
-            item->AppendElement ( new ItemEntity ( "key_wow64_32key", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_wow64_32key", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_wow64_32key", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_wow64_32key", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & KEY_WOW64_RES )
-            item->AppendElement ( new ItemEntity ( "key_wow64_res", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_wow64_res", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "key_wow64_res", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "key_wow64_res", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

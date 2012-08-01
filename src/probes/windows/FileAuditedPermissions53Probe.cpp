@@ -140,16 +140,16 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                     for ( iterator = fileNames.begin(); iterator != fileNames.end(); iterator++ ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-                        item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
+						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+                        item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
                         collectedItems->push_back ( item );
                     }
 
                 } else {
                     item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_EXISTS );
-                    item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+                    item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
                     collectedItems->push_back ( item );
                 }
 
@@ -217,10 +217,10 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                             for ( StringSet::iterator iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++ ) {
                                 Item* item = this->CreateItem();
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-                                item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-								item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, true,  ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
-                                item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+                                item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+								item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
+                                item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
                             }
                         }
@@ -264,9 +264,9 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){
@@ -292,7 +292,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -334,10 +334,10 @@ Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( HANDLE fileHandle, 
         // The file exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-        item->AppendElement ( new ItemEntity ( "path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSID, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+        item->AppendElement ( new ItemEntity ( "path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSID, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the successful audited rights.
         pSuccessfulAuditedRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
 
@@ -370,25 +370,25 @@ Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( HANDLE fileHandle, 
         // Get the audited rights.
         Log::Debug ( "Getting audited permissions masks for file: " + path + " filename: " + fileName + " trustee_sid: " + trusteeSID );
         WindowsCommon::GetAuditedPermissionsForWindowsObject ( SE_FILE_OBJECT, pSid, fileHandle, pSuccessfulAuditedRights, pFailedAuditRights );
-        item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_write_owner", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_OWNER ), ( ( *pFailedAuditRights ) & WRITE_OWNER ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "standard_synchronize", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & SYNCHRONIZE ), ( ( *pFailedAuditRights ) & SYNCHRONIZE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "access_system_security", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & ACCESS_SYSTEM_SECURITY ), ( ( *pFailedAuditRights ) & ACCESS_SYSTEM_SECURITY ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_read", ConvertPermissionsToStringValue ( ( ( ( *pSuccessfulAuditedRights ) & FILE_GENERIC_READ ) == FILE_GENERIC_READ ), ( ( ( *pFailedAuditRights ) & FILE_GENERIC_READ ) == FILE_GENERIC_READ ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_write", ConvertPermissionsToStringValue ( ( ( ( *pSuccessfulAuditedRights ) & FILE_GENERIC_WRITE ) == FILE_GENERIC_WRITE ), ( ( ( *pFailedAuditRights ) & FILE_GENERIC_WRITE ) == FILE_GENERIC_WRITE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_execute", ConvertPermissionsToStringValue ( ( ( ( *pSuccessfulAuditedRights ) & FILE_GENERIC_EXECUTE ) == FILE_GENERIC_EXECUTE ), ( ( ( *pFailedAuditRights ) & FILE_GENERIC_EXECUTE ) == FILE_GENERIC_EXECUTE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "generic_all", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_DATA ), ( ( *pFailedAuditRights ) & FILE_READ_DATA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_read_data", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_DATA ), ( ( *pFailedAuditRights ) & FILE_READ_DATA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_write_data", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_WRITE_DATA ), ( ( *pFailedAuditRights ) & FILE_WRITE_DATA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_append_data", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_APPEND_DATA ), ( ( *pFailedAuditRights ) & FILE_APPEND_DATA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_read_ea", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_EA ), ( ( *pFailedAuditRights ) & FILE_READ_EA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_write_ea", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_WRITE_EA ), ( ( *pFailedAuditRights ) & FILE_WRITE_EA ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_execute", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_EXECUTE ), ( ( *pFailedAuditRights ) & FILE_EXECUTE ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_delete_child", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_DELETE_CHILD ), ( ( *pFailedAuditRights ) & FILE_DELETE_CHILD ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_read_attributes", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_ATTRIBUTES ), ( ( *pFailedAuditRights ) & FILE_READ_ATTRIBUTES ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "file_write_attributes", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_WRITE_ATTRIBUTES ), ( ( *pFailedAuditRights ) & FILE_WRITE_ATTRIBUTES ) ), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_delete", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & DELETE ), ( ( *pFailedAuditRights ) & DELETE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_read_control", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & READ_CONTROL ), ( ( *pFailedAuditRights ) & READ_CONTROL ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_write_dac", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_DAC ), ( ( *pFailedAuditRights ) & WRITE_DAC ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_write_owner", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & WRITE_OWNER ), ( ( *pFailedAuditRights ) & WRITE_OWNER ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "standard_synchronize", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & SYNCHRONIZE ), ( ( *pFailedAuditRights ) & SYNCHRONIZE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "access_system_security", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & ACCESS_SYSTEM_SECURITY ), ( ( *pFailedAuditRights ) & ACCESS_SYSTEM_SECURITY ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_read", ConvertPermissionsToStringValue ( ( ( ( *pSuccessfulAuditedRights ) & FILE_GENERIC_READ ) == FILE_GENERIC_READ ), ( ( ( *pFailedAuditRights ) & FILE_GENERIC_READ ) == FILE_GENERIC_READ ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_write", ConvertPermissionsToStringValue ( ( ( ( *pSuccessfulAuditedRights ) & FILE_GENERIC_WRITE ) == FILE_GENERIC_WRITE ), ( ( ( *pFailedAuditRights ) & FILE_GENERIC_WRITE ) == FILE_GENERIC_WRITE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_execute", ConvertPermissionsToStringValue ( ( ( ( *pSuccessfulAuditedRights ) & FILE_GENERIC_EXECUTE ) == FILE_GENERIC_EXECUTE ), ( ( ( *pFailedAuditRights ) & FILE_GENERIC_EXECUTE ) == FILE_GENERIC_EXECUTE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "generic_all", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_DATA ), ( ( *pFailedAuditRights ) & FILE_READ_DATA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_read_data", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_DATA ), ( ( *pFailedAuditRights ) & FILE_READ_DATA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_write_data", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_WRITE_DATA ), ( ( *pFailedAuditRights ) & FILE_WRITE_DATA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_append_data", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_APPEND_DATA ), ( ( *pFailedAuditRights ) & FILE_APPEND_DATA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_read_ea", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_EA ), ( ( *pFailedAuditRights ) & FILE_READ_EA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_write_ea", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_WRITE_EA ), ( ( *pFailedAuditRights ) & FILE_WRITE_EA ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_execute", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_EXECUTE ), ( ( *pFailedAuditRights ) & FILE_EXECUTE ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_delete_child", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_DELETE_CHILD ), ( ( *pFailedAuditRights ) & FILE_DELETE_CHILD ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_read_attributes", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_READ_ATTRIBUTES ), ( ( *pFailedAuditRights ) & FILE_READ_ATTRIBUTES ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "file_write_attributes", ConvertPermissionsToStringValue ( ( ( *pSuccessfulAuditedRights ) & FILE_WRITE_ATTRIBUTES ), ( ( *pFailedAuditRights ) & FILE_WRITE_ATTRIBUTES ) ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

@@ -257,12 +257,12 @@ namespace {
 			Item item(CreateItem());
 			item.SetStatus(OvalEnum::STATUS_EXISTS);
 			item.AppendElement(new ItemEntity("interface_name", ifName, 
-											  OvalEnum::DATATYPE_STRING, true));
+											  OvalEnum::DATATYPE_STRING));
 
 			if (protoName.empty()) {
 				item.AppendElement(new ItemEntity("protocol", "", 
 												  OvalEnum::DATATYPE_STRING, 
-												  false, OvalEnum::STATUS_ERROR));
+												  OvalEnum::STATUS_ERROR));
 				item.AppendMessage(new OvalMessage("Unrecognized protocol value: " +
 												   Common::ToString(proto),
 												   OvalEnum::LEVEL_ERROR));
@@ -278,7 +278,7 @@ namespace {
 			} catch(Exception &e) {
 				item.AppendElement(new ItemEntity("hw_address", "", 
 												  OvalEnum::DATATYPE_STRING, 
-												  false, OvalEnum::STATUS_ERROR));
+												  OvalEnum::STATUS_ERROR));
 				item.AppendMessage(new OvalMessage("Error getting hardware address: "+
 												   e.GetErrorMessage(), 
 												   OvalEnum::LEVEL_ERROR));

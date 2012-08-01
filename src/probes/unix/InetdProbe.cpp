@@ -180,13 +180,13 @@ Item* InetdProbe::Line2Item(const string& line, ObjectEntity *nameEntity, Object
 	} else
 		return NULL;
 
-	ItemEntity* nameItemEntity = new ItemEntity("service_name", serviceName, OvalEnum::DATATYPE_STRING, true);
+	ItemEntity* nameItemEntity = new ItemEntity("service_name", serviceName, OvalEnum::DATATYPE_STRING);
 	if (nameEntity->Analyze(nameItemEntity) != OvalEnum::RESULT_TRUE) {
 		delete nameItemEntity;
 		return NULL;
 	}
 
-	ItemEntity* protItemEntity = new ItemEntity("protocol", protocol, OvalEnum::DATATYPE_STRING, true);
+	ItemEntity* protItemEntity = new ItemEntity("protocol", protocol, OvalEnum::DATATYPE_STRING);
 	if (protocolEntity->Analyze(protItemEntity) != OvalEnum::RESULT_TRUE) {
 		delete nameItemEntity;
 		delete protItemEntity;
@@ -202,7 +202,7 @@ Item* InetdProbe::Line2Item(const string& line, ObjectEntity *nameEntity, Object
 
 	ItemEntity *endPointTypeEntity;
 	if (allowedEndpointTypes.find(socketType) == allowedEndpointTypes.end()) {
-		endPointTypeEntity = new ItemEntity("endpoint_type", "", OvalEnum::DATATYPE_STRING, false, 
+		endPointTypeEntity = new ItemEntity("endpoint_type", "", OvalEnum::DATATYPE_STRING, 
 											OvalEnum::STATUS_NOT_COLLECTED);
 		item->AppendMessage(new OvalMessage(string("endpoint_type '") + socketType +
 											"' is not one of the enumerated legal values."));
@@ -214,7 +214,7 @@ Item* InetdProbe::Line2Item(const string& line, ObjectEntity *nameEntity, Object
 
 	ItemEntity *waitEntity;
 	if (allowedWaitValues.find(wait) == allowedWaitValues.end()) {
-		waitEntity = new ItemEntity("wait_status", "", OvalEnum::DATATYPE_STRING, false, 
+		waitEntity = new ItemEntity("wait_status", "", OvalEnum::DATATYPE_STRING, 
 									OvalEnum::STATUS_NOT_COLLECTED);
 		item->AppendMessage(new OvalMessage(string("wait_status '") + wait +
 											"' is not one of the enumerated legal values."));

@@ -170,7 +170,7 @@ void PartitionProbe::CachePartitions() {
 
 		Item *item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("mount_point", mountPoint, OvalEnum::DATATYPE_STRING, true));
+		item->AppendElement(new ItemEntity("mount_point", mountPoint, OvalEnum::DATATYPE_STRING));
 		item->AppendElement(new ItemEntity("device", device));
 
 		if (blkidCache.wasCacheOpenSuccessful()) {
@@ -181,9 +181,9 @@ void PartitionProbe::CachePartitions() {
 				// malloc'd, so I am gonna free() them.
 				free(uuid);
 			} else
-				item->AppendElement(new ItemEntity("uuid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("uuid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		} else {
-			item->AppendElement(new ItemEntity("uuid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("uuid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage("Couldn't open blkid cache", OvalEnum::LEVEL_ERROR));
 		}
 
@@ -191,7 +191,7 @@ void PartitionProbe::CachePartitions() {
 
 		if (mountOptMatches.empty()) // I don't think this should happen unless
 									 // the line is malformed...
-			item->AppendElement(new ItemEntity("mount_options", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("mount_options", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		else {
 			for (vector<StringVector>::iterator iter = mountOptMatches.begin();
 				 iter != mountOptMatches.end();

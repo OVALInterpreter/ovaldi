@@ -89,8 +89,8 @@ ItemVector* MetabaseProbe::CollectItems ( Object* object ) {
 							for ( StringVector::iterator iterator = dneIds.begin(); iterator != dneIds.end(); iterator++ ) {
 								item = this->CreateItem();
 								item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-								item->AppendElement ( new ItemEntity ( "key",*key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-								item->AppendElement ( new ItemEntity ( "id", ( *iterator ), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_DOES_NOT_EXIST, false)); //idEntity checked above
+								item->AppendElement ( new ItemEntity ( "key",*key, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+								item->AppendElement ( new ItemEntity ( "id", ( *iterator ), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST, false)); //idEntity checked above
 								collectedItems->push_back ( item );
 							}
 						}
@@ -101,8 +101,8 @@ ItemVector* MetabaseProbe::CollectItems ( Object* object ) {
 					Item* item = NULL;
 					item = this->CreateItem();
 					item->SetStatus ( OvalEnum::STATUS_EXISTS );
-					item->AppendElement ( new ItemEntity ( "key", *key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-					item->AppendElement ( new ItemEntity ( "id", "", OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_NOT_COLLECTED, true));
+					item->AppendElement ( new ItemEntity ( "key", *key, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+					item->AppendElement ( new ItemEntity ( "id", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_NOT_COLLECTED, true));
 					collectedItems->push_back ( item );
 				}
 			}
@@ -117,7 +117,7 @@ ItemVector* MetabaseProbe::CollectItems ( Object* object ) {
 			for ( iterator = dneKeys.begin(); iterator != dneKeys.end(); iterator++ ) {
 				item = this->CreateItem();
 				item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-				item->AppendElement ( new ItemEntity ( "key", ( *iterator ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+				item->AppendElement ( new ItemEntity ( "key", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 				collectedItems->push_back ( item );
 			}
 		}
@@ -393,31 +393,31 @@ Item* MetabaseProbe::GetMetabaseItem ( string keyStr, string idStr ) {
 		if ( ( hResult = metabase->GetData ( METADATA_MASTER_ROOT_HANDLE, wKeyStr, &record, &size ) ) == S_OK ) {
 			item = this->CreateItem();
 			item->SetStatus ( OvalEnum::STATUS_EXISTS );
-			item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-			item->AppendElement ( new ItemEntity ( "id", idStr, OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS ) );
-			item->AppendElement ( new ItemEntity ( "name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED ) );
+			item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "id", idStr, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED ) );
 			string userType = MetabaseProbe::GetUserType ( record.dwMDUserType );
 			string dataType = MetabaseProbe::GetDataType ( record.dwMDDataType );
-			item->AppendElement ( new ItemEntity ( "user_type", userType, OvalEnum::DATATYPE_STRING, false, ( userType.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
-			item->AppendElement ( new ItemEntity ( "data_type", dataType, OvalEnum::DATATYPE_STRING, false, ( dataType.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "user_type", userType, OvalEnum::DATATYPE_STRING, ( userType.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "data_type", dataType, OvalEnum::DATATYPE_STRING, ( dataType.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 			StringVector* data = MetabaseProbe::GetDataValues ( record.pbMDData, record.dwMDDataType, record.dwMDDataLen );
 
 			if ( data->size() > 0 ) {
 				for ( StringVector::iterator it = data->begin() ; it != data->end() ; it++ ) {
-					item->AppendElement ( new ItemEntity ( "data", *it, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS ) );
+					item->AppendElement ( new ItemEntity ( "data", *it, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 				}
 			} else {
-				item->AppendElement ( new ItemEntity ( "data", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+				item->AppendElement ( new ItemEntity ( "data", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 			}
 
 			delete data;
 		} else if ( hResult == MD_ERROR_DATA_NOT_FOUND ) {
 			item = this->CreateItem();
 			item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-			item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-			item->AppendElement ( new ItemEntity ( "id", idStr, OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS ) );
-			item->AppendElement ( new ItemEntity ( "name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED ) );
-			item->AppendElement ( new ItemEntity ( "data", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+			item->AppendElement ( new ItemEntity ( "key", keyStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "id", idStr, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED ) );
+			item->AppendElement ( new ItemEntity ( "data", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 		} else {
 			if ( hResult == HRESULT_FROM_WIN32 ( ERROR_INSUFFICIENT_BUFFER ) ) {
 				Log::Message ( "Error: The method IMSAdminBase->GetAllData() failed because a insufficient buffer was provided for key '"+keyStr+"'." );

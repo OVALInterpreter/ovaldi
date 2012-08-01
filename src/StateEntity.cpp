@@ -49,7 +49,6 @@ StateEntity::StateEntity(StateEntity* orig) : AbsEntity() {
 
 	this->SetDatatype(orig->GetDatatype());
 	this->SetEntityCheck(orig->GetEntityCheck());
-	this->SetIsObjectEntity(orig->GetIsObjectEntity());
 	this->SetName(orig->GetName());
 	this->SetNil(orig->GetNil());
 	this->SetOperation(orig->GetOperation());
@@ -59,7 +58,7 @@ StateEntity::StateEntity(StateEntity* orig) : AbsEntity() {
 }
 
 StateEntity::StateEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check entityCheck, OvalEnum::Check varCheck, bool nil)
-									: AbsEntity(name, value, datatype, false, operation, varRef, varCheck, nil) {
+									: AbsEntity(name, value, datatype, operation, varRef, varCheck, nil) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//

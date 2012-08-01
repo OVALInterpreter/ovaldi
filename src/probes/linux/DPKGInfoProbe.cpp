@@ -87,7 +87,7 @@ ItemVector* DPKGInfoProbe::CollectItems(Object* object) {
 
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("name",  name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("name",  name->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				collectedItems->push_back(item);
 
 			} else {
@@ -97,7 +97,7 @@ ItemVector* DPKGInfoProbe::CollectItems(Object* object) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("name",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("name",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -361,12 +361,12 @@ void DPKGInfoProbe::GetDPKGInfo(string name, ItemVector* items) {
 			    /* Put the data in a data object. */
 			    item = this->CreateItem();
 			    item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("name",  name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("arch",  installed_architecture, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("epoch",  installed_epoch, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("release",  installed_release, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("version",  installed_version, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("evr",  installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("name",  name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("arch",  installed_architecture, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("epoch",  installed_epoch, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("release",  installed_release, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("version",  installed_version, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("evr",  installed_evr, OvalEnum::DATATYPE_EVR_STRING, OvalEnum::STATUS_EXISTS));
 
 			    /* add the new item to the vector. */
 			    items->push_back(item);

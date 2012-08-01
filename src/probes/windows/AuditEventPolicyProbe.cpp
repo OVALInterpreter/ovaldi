@@ -123,23 +123,23 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object* /*object*/) {
 		if(pPAEInfo->AuditingMode) {
 
 			// initialize the item with all of its fields
-			ItemEntity *accountLogonItem = new ItemEntity("account_logon",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *accountLogonItem = new ItemEntity("account_logon",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(accountLogonItem);
-			ItemEntity *accountManagementItem = new ItemEntity("account_management",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *accountManagementItem = new ItemEntity("account_management",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(accountManagementItem);
-			ItemEntity *detailedTrackingItem = new ItemEntity("detailed_tracking",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *detailedTrackingItem = new ItemEntity("detailed_tracking",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(detailedTrackingItem);
-			ItemEntity *directoryServiceAccessItem = new ItemEntity("directory_service_access",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *directoryServiceAccessItem = new ItemEntity("directory_service_access",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(directoryServiceAccessItem);
-			ItemEntity *logonItem = new ItemEntity("logon",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *logonItem = new ItemEntity("logon",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(logonItem);
-			ItemEntity *objectAccessItem = new ItemEntity("object_access",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *objectAccessItem = new ItemEntity("object_access",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(objectAccessItem);
-			ItemEntity *policyChangeItem = new ItemEntity("policy_change",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *policyChangeItem = new ItemEntity("policy_change",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(policyChangeItem);
-			ItemEntity *privilegeUseItem = new ItemEntity("privilege_use",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *privilegeUseItem = new ItemEntity("privilege_use",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(privilegeUseItem);
-			ItemEntity *systemItem = new ItemEntity("system",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity *systemItem = new ItemEntity("system",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(systemItem);
 
 			
@@ -185,15 +185,15 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object* /*object*/) {
 
 		} else {
 			// auditing is off so set all items to no auditing
-			item->AppendElement(new ItemEntity("account_logon",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("account_management",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("detailed_tracking",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("directory_service_access",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("logon",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("object_access",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("policy_change",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("privilege_use",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("system",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("account_logon",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("account_management",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("detailed_tracking",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("directory_service_access",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("logon",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("object_access",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("policy_change",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("privilege_use",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("system",  "AUDIT_NONE", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 	} else {
 

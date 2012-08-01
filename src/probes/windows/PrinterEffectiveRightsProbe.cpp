@@ -155,8 +155,8 @@ ItemVector* PrinterEffectiveRightsProbe::CollectItems ( Object* object ) {
                     for ( StringSet::iterator iterator2 = trusteeSIDs->begin(); iterator2 != trusteeSIDs->end(); iterator2++ ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "printer_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "printer_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                         collectedItems->push_back ( item );
                     }
                 }
@@ -208,8 +208,8 @@ Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( HANDLE printerHandle,
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
 		item->AppendMessage(new OvalMessage("The job_access_administer and job_access_read rights are not collected because they are associated with Windows job objects.",OvalEnum::LEVEL_INFO));
-        item->AppendElement ( new ItemEntity ( "printer_name", printerNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSIDStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "printer_name", printerNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSIDStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
         
 		// Build structure to hold the rights
         pAccessRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
@@ -223,79 +223,79 @@ Item* PrinterEffectiveRightsProbe::GetEffectiveRights ( HANDLE printerHandle,
         WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_PRINTER, pSid, printerHandle, pAccessRights );
 		
         if ( ( *pAccessRights ) & DELETE )
-            item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_delete", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_delete", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & READ_CONTROL )
-            item->AppendElement ( new ItemEntity ( "standard_read_control", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_read_control", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_read_control", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_read_control", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & WRITE_DAC )
-            item->AppendElement ( new ItemEntity ( "standard_write_dac", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_dac", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_write_dac", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_dac", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & WRITE_OWNER )
-            item->AppendElement ( new ItemEntity ( "standard_write_owner", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_owner", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_write_owner", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_owner", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SYNCHRONIZE )
-            item->AppendElement ( new ItemEntity ( "standard_synchronize", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_synchronize", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "standard_synchronize", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_synchronize", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & ACCESS_SYSTEM_SECURITY )
-            item->AppendElement ( new ItemEntity ( "access_system_security", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "access_system_security", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "access_system_security", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "access_system_security", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & PRINTER_READ )
-            item->AppendElement ( new ItemEntity ( "generic_read", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_read", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_read", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_read", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & PRINTER_WRITE )
-            item->AppendElement ( new ItemEntity ( "generic_write", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_write", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_write", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_write", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & PRINTER_EXECUTE )
-            item->AppendElement ( new ItemEntity ( "generic_execute", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_execute", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & PRINTER_ALL_ACCESS )
-            item->AppendElement ( new ItemEntity ( "generic_all", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_all", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "generic_all", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_all", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & PRINTER_ACCESS_ADMINISTER )
-            item->AppendElement ( new ItemEntity ( "printer_access_administer", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "printer_access_administer", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "printer_access_administer", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "printer_access_administer", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & PRINTER_ACCESS_USE    )
-            item->AppendElement ( new ItemEntity ( "printer_access_use", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "printer_access_use", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         else
-            item->AppendElement ( new ItemEntity ( "printer_access_use", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "printer_access_use", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
-		item->AppendElement ( new ItemEntity ( "job_access_administer", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED ) );
-        item->AppendElement ( new ItemEntity ( "job_access_read", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED ) );
+		item->AppendElement ( new ItemEntity ( "job_access_administer", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED ) );
+        item->AppendElement ( new ItemEntity ( "job_access_read", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED ) );
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

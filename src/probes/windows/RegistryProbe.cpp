@@ -107,8 +107,8 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					for(StringSet::iterator iterator = keys->begin(); iterator != keys->end(); iterator++) {
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("key", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));
+						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("key", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));
 						
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
@@ -117,20 +117,20 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				} else {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					if (key->GetNil()){
-						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
 					}
 					else
 					{
-						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
 					}
 					if (name->GetNil()){
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
 					}
 					else
 					{
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
+						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
 					}
 
 					item->AppendElement(new ItemEntity("windows_view",
@@ -154,15 +154,15 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 						for(StringSet::iterator iterator = names->begin(); iterator != names->end(); iterator++) {
 							item = this->CreateItem();
 							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-							item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							if (key->GetNil()){
-								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
 							}
 							else
 							{
-								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
 							}
-							item->AppendElement(new ItemEntity("name", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, true));
+							item->AppendElement(new ItemEntity("name", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, true));
 							
 							item->AppendElement(new ItemEntity("windows_view",
 								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
@@ -171,15 +171,15 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					} else {
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_EXISTS);
-						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						if (key->GetNil()){
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
 						}
 						else
 						{
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
 						}
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true as checked above
+						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true as checked above
 						
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
@@ -210,7 +210,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 				Item* item = NULL;
 				item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				
 				item->AppendElement(new ItemEntity("windows_view",
 					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
@@ -230,8 +230,8 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					for(StringSet::iterator iterator2 = keys->begin(); iterator2 != keys->end(); iterator2++) {
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));	
+						item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));	
 					
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
@@ -245,9 +245,9 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 							for(StringSet::iterator iterator3 = names->begin(); iterator3 != names->end(); iterator3++) {
 								item = this->CreateItem();
 								item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-								item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-								item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, key->GetNil()));
-								item->AppendElement(new ItemEntity("name", (*iterator3), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST, name->GetNil()));
+								item->AppendElement(new ItemEntity("hive", (*iterator1), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+								item->AppendElement(new ItemEntity("key", (*iterator2), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, key->GetNil()));
+								item->AppendElement(new ItemEntity("name", (*iterator3), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, name->GetNil()));
 								
 								item->AppendElement(new ItemEntity("windows_view",
 									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
@@ -304,21 +304,21 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 	res = registryFinder.GetHKeyHandle(&rootKey, hive, "");		
 	if(res) {
 	
-		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 		return item;
 
 	} else {
 
 		item = this->CreateItem();
-		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("hive", hive, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		res = registryFinder.GetHKeyHandle(&hkey, rootKey, key);
 
 		if (res != ERROR_SUCCESS) {
 			if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
 
-				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 
 			} else if (res == ERROR_INVALID_HANDLE) {
@@ -329,7 +329,7 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 				errorMessage.append("' is not valid.");
 						
 				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 				// I chose to make this an item returned with an error because at a minimum the 
 				// hive was found. Note that the other option is to throw an exception which 
@@ -343,7 +343,7 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 					key + "'.  Error Code - " + Common::ToString(res) + " - " + systemErrMsg;
 				
 				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 				// I chose to make this an item returned with an error because at a minimum the 
 				// hive was found. Note that the other option is to throw and exception which 
@@ -354,7 +354,7 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 		} else {
 
 			// Add the key to the result item
-			item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("key", key, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			
 			DWORD type = 0;
 			DWORD valuelen = 0;
@@ -383,7 +383,7 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 
 			if (res == ERROR_FILE_NOT_FOUND || res == ERROR_BAD_PATHNAME) {
 				
-				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 			} else if (res != ERROR_SUCCESS) {
 
@@ -393,25 +393,25 @@ Item* RegistryProbe::GetRegistryKey(string hive, string key, string name, Regist
 					name + "'.  Error Code - " + Common::ToString(res) + " - " + systemErrMsg;
 
 				item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-				item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("value",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 
 			//	Only call RetrieveInfo() if res == ERROR_SUCCESS
 			} else {
 
 				// Now add the name entity.
-				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
 
 				FILETIME lastWriteTime = {0};				
 				long status = RegQueryInfoKey(hkey, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, &lastWriteTime);
 					
 				if(status == ERROR_SUCCESS){
-					item->AppendElement(new ItemEntity("last_write_time", WindowsCommon::ToString(lastWriteTime), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("last_write_time", WindowsCommon::ToString(lastWriteTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 				}else{
-					item->AppendElement(new ItemEntity("last_write_time", WindowsCommon::ToString(lastWriteTime), OvalEnum::DATATYPE_INTEGER, true, OvalEnum::STATUS_ERROR));
+					item->AppendElement(new ItemEntity("last_write_time", WindowsCommon::ToString(lastWriteTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 					item->SetStatus(OvalEnum::STATUS_ERROR);
 				}
 
@@ -434,7 +434,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 		case REG_BINARY:
 			{
-				item->AppendElement(new ItemEntity("type", "reg_binary", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_binary", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 				ostringstream oss;
 				oss << hex << setfill('0');
@@ -446,15 +446,15 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 		case REG_DWORD:
 			{
-				item->AppendElement(new ItemEntity("type", "reg_dword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_dword", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("value", Common::ToString(*(DWORD*)valueIn),
-					OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+					OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 				break;
 			}
 
 		case REG_EXPAND_SZ:
 			{
-				item->AppendElement(new ItemEntity("type", "reg_expand_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_expand_sz", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				// don't trust there is a terminal null...
 				// Use the value length.
 				item->AppendElement(new ItemEntity("value", string((const char*)valueIn, valuelenIn)));
@@ -463,7 +463,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 		case REG_MULTI_SZ:
 			{
-				item->AppendElement(new ItemEntity("type", "reg_multi_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_multi_sz", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 				// The following loop stops when an empty string is encountered.
 				// This means if there are embedded empty strings, anything
@@ -494,7 +494,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 				// status="does not exist" in case we didn't find any values.
 				if (!addedValue)
 					item->AppendElement(new ItemEntity("value", "", 
-						OvalEnum::DATATYPE_STRING, false,
+						OvalEnum::DATATYPE_STRING,
 						OvalEnum::STATUS_DOES_NOT_EXIST));
 
 				break;
@@ -502,7 +502,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 		case REG_SZ:
 			{
-				item->AppendElement(new ItemEntity("type", "reg_sz", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_sz", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("value", string((const char*)valueIn, valuelenIn)));
 				break;
 			}
@@ -510,7 +510,7 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 		case REG_NONE:
 			{
 				item->AppendMessage(new OvalMessage("Values of type reg_none do not have a defined type. As a result, we are representing them as hexadecimal values."));
-				item->AppendElement(new ItemEntity("type", "reg_none", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_none", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 				ostringstream oss;
 				oss << hex << setfill('0');
@@ -523,17 +523,17 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 
 		case REG_QWORD:
 			{
-				item->AppendElement(new ItemEntity("type", "reg_qword", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("type", "reg_qword", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("value", Common::ToString(*(ULONG64*)valueIn),
-					OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+					OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 				break;
 			}
 
 		default:
 			{
 				item->AppendMessage(new OvalMessage("Error: Unable to determine the type and value of the registry key.", OvalEnum::LEVEL_ERROR));
-				item->AppendElement(new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
-				item->AppendElement(new ItemEntity("value", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+				item->AppendElement(new ItemEntity("value", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 				
 				break;
 			}

@@ -103,19 +103,19 @@ ItemVector* IsainfoProbe::CollectItems(Object *object) {
 		item->AppendElement(new ItemEntity("bits", Common::ToString(bits), OvalEnum::DATATYPE_INTEGER));
 	else
 		item->AppendElement(new ItemEntity("bits", "0", OvalEnum::DATATYPE_INTEGER,
-										   false, OvalEnum::STATUS_ERROR));
+										   OvalEnum::STATUS_ERROR));
 
 	if (kernel_isa)
 		item->AppendElement(new ItemEntity("kernel_isa", kernel_isa));
 	else
 		item->AppendElement(new ItemEntity("kernel_isa", "", OvalEnum::DATATYPE_STRING,
-										   false, OvalEnum::STATUS_ERROR));
+										   OvalEnum::STATUS_ERROR));
 
 	if (application_isa)
 		item->AppendElement(new ItemEntity("application_isa", application_isa));
 	else
 		item->AppendElement(new ItemEntity("application_isa", "", OvalEnum::DATATYPE_STRING,
-										   false, OvalEnum::STATUS_ERROR));
+										   OvalEnum::STATUS_ERROR));
 
 	if (kernel_isa)
 		free(kernel_isa);
