@@ -220,7 +220,7 @@ Item *ShadowProbe::GetSingleItem(const string& username) {
 
 	if (pwInfo == NULL) {
 		item = this->CreateItem();
-		ItemEntity *nameEntity = new ItemEntity("username", username, OvalEnum::DATATYPE_STRING, true);
+		ItemEntity *nameEntity = new ItemEntity("username", username, OvalEnum::DATATYPE_STRING);
 		item->AppendElement(nameEntity);
 
 		if (errno == 0) {
