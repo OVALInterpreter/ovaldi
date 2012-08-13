@@ -668,11 +668,18 @@ TD.text {font: 10pt/12pt "Arial"}
 			<td class="text" align="center">
 				<xsl:for-each select="key('definition-index', @definition_id)">
 					<xsl:for-each select="oval-def:metadata/oval-def:reference">
-						<a>
-							<xsl:attribute name="target">_blank</xsl:attribute>
-							<xsl:attribute name="href"><xsl:value-of select="@ref_url"/></xsl:attribute>
-							<xsl:value-of select="@ref_id"/>
-						</a>
+						<xsl:choose>
+							<xsl:when test="@ref_url and not(@ref_url='')">
+								<a>
+									<xsl:attribute name="target">_blank</xsl:attribute>
+									<xsl:attribute name="href"><xsl:value-of select="@ref_url"/></xsl:attribute>
+									<xsl:value-of select="@ref_id"/>
+								</a>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="@ref_url"/>
+							</xsl:otherwise>
+						</xsl:choose>
 					</xsl:for-each>&#160;
 				</xsl:for-each>&#160;
 			</td>
