@@ -80,5 +80,5 @@ update:
 clean :
 	-rm -rf $(OUTDIR) $(OBJ_FILES)
 
-debug: CPPFLAGS = -Wall -O -static-libgcc -ggdb
+debug: CPPFLAGS = -Wall -DDARWIN -O $(INCDIRS) -static-libgcc -ggdb 
 debug: all
