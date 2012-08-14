@@ -97,5 +97,5 @@ update:
 clean :
 	-rm -rf $(OUTDIR) $(OBJ_FILES)
 
-debug: CPPFLAGS = -Wall -O -static-libgcc -ggdb
+debug: CPPFLAGS = -Wall -O -DLINUX -static-libgcc -ggdb $(INCDIRS)
 debug: all
