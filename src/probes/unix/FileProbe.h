@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/acl.h>
 #include <time.h>
 #include <cerrno>
 
