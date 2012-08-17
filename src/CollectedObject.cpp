@@ -89,7 +89,7 @@ CollectedObject* CollectedObject::Create(AbsObject* absObject) {
 	return collectedObject;
 }
 
-CollectedObject* CollectedObject::CreateError(string objectId) {
+CollectedObject* CollectedObject::CreateError(string objectId, int version) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -100,7 +100,22 @@ CollectedObject* CollectedObject::CreateError(string objectId) {
 
 	CollectedObject* collectedObject = new CollectedObject(objectId);
 	collectedObject->SetFlag(OvalEnum::FLAG_ERROR);
+	collectedObject->SetVersion(version);
 	CollectedObject::Cache(collectedObject);
+	return collectedObject;
+}
+
+CollectedObject* CollectedObject::CreateError(AbsObject *absObject) {
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Create a new CollectedObject based on the specified AbsObject
+	//	Set it up with flag=error.
+	//
+	// -----------------------------------------------------------------------
+
+	CollectedObject* collectedObject = Create(absObject);
+	collectedObject->SetFlag(OvalEnum::FLAG_ERROR);
 	return collectedObject;
 }
 

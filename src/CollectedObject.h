@@ -85,7 +85,8 @@ public:
 
 	static CollectedObject* CreateNotApplicable(AbsObject* absObject);
 	static CollectedObject* CreateNotSupported(AbsObject* absObject);
-	static CollectedObject* CreateError(std::string objectId);
+	static CollectedObject* CreateError(std::string objectId, int version);
+	static CollectedObject* CreateError(AbsObject *absObject);
 	static CollectedObject* Create(AbsObject* absObject);
 
 	static CollectedObject* GetCollectedObject(std::string objectId);
