@@ -423,10 +423,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	aclp = acl_get_file(filePath.c_str(),acl_type);
 	if(aclp == (acl_t)NULL){
 	  if(errno == EOPNOTSUPP){
-	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_NOT_COLLECTED,0));
+	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_DOES_NOT_EXIST,0));
 	  }else{
-	    cout << "errno = " << errno << "\n";
 	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_ERROR,0));
+	    item->AppendMessage(new OvalMessage(string("Error reading ACL data: ") + strerror(errno)));
 	  }
 	}else{
 	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("1"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_EXISTS,0));
