@@ -76,6 +76,10 @@ private:
 	void GetVersion(LPVOID versionbuf, std::string filePath, Item *item, ItemEntity* version);
 	/** Get the type of the file. */
 	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type);
+
+	/* holds the language mappings for the file language data */
+	static std::map<WORD,string> langMap;
+	
 };
 
 #endif
