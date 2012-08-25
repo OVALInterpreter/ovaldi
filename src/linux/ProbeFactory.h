@@ -64,9 +64,7 @@
 #include "InterfaceProbe.h"
 #include "PasswordProbe.h"
 #include "EnvironmentVariableProbe.h"
-#if defined LINUX || defined WIN32
-#  include "EnvironmentVariable58Probe.h"
-#endif
+#include "EnvironmentVariable58Probe.h"
 #include "XmlFileContentProbe.h"
 #include "TextFileContentProbe.h"
 #include "TextFileContent54Probe.h"
