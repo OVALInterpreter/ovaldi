@@ -2344,6 +2344,16 @@ string WindowsCommon::UnicodeToAsciiString ( const wchar_t* unicodeCharStr ) {
 
     return asciiStr;
 }
+
+string WindowsCommon::UnicodeToAsciiString ( const wstring &wstr ) {
+	return UnicodeToAsciiString(wstr.c_str());
+}
+
+string WindowsCommon::UnicodeToAsciiString ( const string &str ) {
+	return str;
+}
+
+
 bool WindowsCommon::UnicodeIsValidASCII(wchar_t* unicodeCharStr){
 	for(unsigned int wcharInd = 0; wcharInd < wcslen(unicodeCharStr); wcharInd++) {
 		if(!(iswascii(unicodeCharStr[wcharInd]))) {  //if not wide ASCII char

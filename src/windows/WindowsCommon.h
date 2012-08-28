@@ -265,6 +265,23 @@ public:
     */
 	static string UnicodeToAsciiString ( const wchar_t* unicodeCharStr );
 
+	/**
+	 * Provided for symmetry with UnicodeToAsciiString(const string &).
+	 * Having this also makes your code cleaner, so you don't have to
+	 * call c_str() all the time.....
+	 */
+	static string UnicodeToAsciiString ( const wstring &wstr );
+
+	/**
+	 * This seems like a pointless method to have, but it's helpful when
+	 * writing templates where you don't have a fixed char type.  It allows
+	 * you to always be able to call UnicodeToAsciiString() regardless of
+	 * which type of string you have, and obtain a narrow char string.
+	 * <p>
+	 * This method just returns \p str.
+	 */
+	static string UnicodeToAsciiString ( const string &str );
+
 	/** Return true if a wide-character string of Unicode characters would convert into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that are checked for validity as ASCII characters.
     */
