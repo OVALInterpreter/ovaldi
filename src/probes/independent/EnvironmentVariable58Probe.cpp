@@ -370,10 +370,6 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 				item->AppendElement(new ItemEntity(pidIe));
 				item->AppendMessage(new OvalMessage(errMsg));
-					/*(
-										"Error reading " PROC_DIR "/"+
-										*pidIter+"/environ: "+strerror(errno),
-										OvalEnum::LEVEL_ERROR));*/
 				collectedItems->push_back(item.release());
 				continue;
 			}
