@@ -35,10 +35,19 @@
 #  include <unistd.h>
 #  include <cerrno>
 #  include <cstring>
+#  include <string>
 #  include <map>
 #  include <memory>
 
+#  include <Log.h>
 #  include <DirGuard.h>
+#  include <VectorPtrGuard.h>
+#elif defined SUNOS
+#  include <map>
+#  include <memory>
+#  include <string>
+
+#  include <Log.h>
 #  include <VectorPtrGuard.h>
 #elif defined WIN32
 #  include <Windows.h>
@@ -48,6 +57,7 @@
 #  include <iomanip>
 #  include <map>
 #  include <memory>
+#  include <string>
 
 #  include <AutoCloser.h>
 #  include <VectorPtrGuard.h>
@@ -84,10 +94,9 @@ using namespace std;
 #endif
 
 
-#if defined WIN32 || defined LINUX
 namespace {
 
-#  ifdef WIN32
+#ifdef WIN32
 	/** type of NtQueryInformationProcess(). */
 	typedef NTSTATUS (NTAPI *NtQIPType)(
 		HANDLE,  ///< ProcessHandle
@@ -154,7 +163,9 @@ namespace {
 	void appendToMemoryBlock(ArrayGuard<wchar_t> &block, 
 		size_t blockSizeChars, const wchar_t *data, size_t lenChars);
 
-#  endif
+#endif
+
+#if defined WIN32 || defined LINUX
 
 	/**
 	 * The idea of being robust to process termination originated in
@@ -166,15 +177,6 @@ namespace {
 		PROC_TERMINATED, ///< the process terminated
 		PROC_ERROR ///< some other error occurred
 	};
-
-	auto_ptr<Item> CreateItem();
-
-	/**
-	 * Gets the environment map for this process.
-	 * Windows: uses GetEnvironmentStrings().
-	 * Linux: uses the 'environ' global var.
-	 */
-	map<string, string> GetEnvForThisProcess();
 
 	/**
 	 * Gets all PIDs on this system.  Originally written to
@@ -199,8 +201,23 @@ namespace {
 	 *   the environment data.
 	 */
 	ProcStatus GetEnvForPid(const string &pid, map<string, string> *env, string *errMsg);
-}
+
 #endif
+
+#ifndef MACOS
+
+	auto_ptr<Item> CreateItem();
+
+	/**
+	 * Gets the environment map for this process.
+	 * Windows: uses GetEnvironmentStrings().
+	 * Linux: uses the 'environ' global var.
+	 */
+	map<string, string> GetEnvForThisProcess();
+
+#endif
+
+}
 
 //****************************************************************************************//
 //								EnvironmentVariableProbe Class							  //	
@@ -213,9 +230,12 @@ EnvironmentVariable58Probe::EnvironmentVariable58Probe() {
 
 #  ifndef _WIN64
 	// We only support collecting info about 32-bit processes
-	// from 32-bit ovaldi.  Maybe we should warn about this...
-	Log::Message("Warning: this is a 32-bit build; environment information "
-		"from 64-bit processes will not be collected!");
+	// from 32-bit ovaldi.  Maybe we should warn about this in a
+	// 64-bit environment...
+	if (WindowsCommon::Is64BitOS())
+		Log::Message("Warning: this is a 32-bit build running on a "
+			"64-bit OS; environment information from 64-bit processes "
+			"will not be collected!");
 #  endif
 
 	// We get function pointers dynamically because (a)
@@ -299,7 +319,7 @@ AbsProbe* EnvironmentVariable58Probe::Instance() {
 
 ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 
-#if defined LINUX || defined WIN32
+#ifndef MACOS
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
@@ -313,11 +333,11 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 		map<string, string> env = GetEnvForThisProcess();
 
 		string pidStr = Common::ToString(
-#ifdef WIN32
+#  ifdef WIN32
 				GetCurrentProcessId()
-#else
+#  else
 				getpid()
-#endif
+#  endif
 		);
 
 		for (map<string,string>::const_iterator it = env.begin();
@@ -338,13 +358,16 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 		return collectedItems.release();
 	}
 
-#ifdef WIN32
+#  if defined WIN32 || defined LINUX
+
+
+#    ifdef WIN32
 	
 	// Giving ourselves this privilege seems to gain us access
 	// to a lot more processes.
 	PrivilegeGuard pg(SE_DEBUG_NAME, false);
 
-#endif
+#    endif
 	
 	StringVector pidsToCheck;
 	if (pid->GetOperation() == OvalEnum::OPERATION_EQUALS)
@@ -394,14 +417,21 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 
 	return collectedItems.release();
 
+#  else
+
+	throw ProbeException("Only collection of the environment of the current "
+						 "process is currently supported on this platform.");
+
+#  endif // #if defined WIN32 || defined LINUX
+
 #else
 
 	// this should never be executed because ProbeFactory
-	// doesn't create an instance of this probe on other
-	// than windows and linux, but... may as well be safe?
+	// doesn't create an instance of this probe on a
+	// mac, but... may as well be safe?
 	throw ProbeException("environmentvariable58 test is not supported on this platform.");
 
-#endif
+#endif // #ifndef MACOS
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -415,7 +445,7 @@ Item* EnvironmentVariable58Probe::CreateItem() {
 
 namespace {
 
-#if defined WIN32 || defined LINUX
+#ifndef MACOS
 	auto_ptr<Item> CreateItem() {
 
 		auto_ptr<Item> item(new Item(0, 
@@ -430,19 +460,19 @@ namespace {
 
 #endif
 
-#ifdef LINUX
+#if !defined MACOS && !defined WIN32
 
 	map<string, string> GetEnvForThisProcess() {
 		map<string, string> env;
 		int i = 0;
-		while (environ[i]) {
-			char *eq = environ[i];
+		while (_environ[i]) {
+			char *eq = _environ[i];
 			while (*eq && *eq != '=') ++eq;
 			if (*eq)
-				env[string(environ[i],eq)] = string(eq+1);
+				env[string(_environ[i],eq)] = string(eq+1);
 			else
 				Log::Debug(string("Found an env entry without an '=' sign: ") +
-						   environ[i]);
+						   _environ[i]);
 
 			++i;
 		}
@@ -450,6 +480,9 @@ namespace {
 		return env;
 	}
 
+#endif
+
+#ifdef LINUX
 	StringVector GetAllPids() {
 		StringVector pids;
 		DirGuard procDir(PROC_DIR);
