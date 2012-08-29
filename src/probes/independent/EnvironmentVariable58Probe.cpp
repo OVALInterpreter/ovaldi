@@ -674,6 +674,16 @@ namespace {
 
 			string pidStr = Common::ToString(procEntry.th32ProcessID);
 
+			// This pid is the "System" process and seems to be always
+			// there but never openable.  So just add it regardless...
+			// There will be a failure later, but I want it to get into
+			// the list of pids.  Is there some better way of checking for
+			// "special" processes??
+			if (procEntry.th32ProcessID == 4) {
+				pids.push_back(pidStr);
+				continue;
+			}
+
 #  ifndef _WIN64
 				// If this is a 32-bit build, only return PIDs of 32-bit
 				// processes.  Getting the environment of a 64-bit
