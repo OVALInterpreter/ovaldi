@@ -684,36 +684,42 @@ namespace {
 				continue;
 			}
 
-#  ifndef _WIN64
-			// If this is a 32-bit build, only return PIDs of 32-bit
-			// processes.  Getting the environment of a 64-bit
-			// process from a 32-bit app is too hard... And always
-			// be ok if the process wasn't found.  Processes
-			// will be continually coming and going, and a process
-			// with a given pid can disappear any time.
-			AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> procHandle(
-				OpenProcess(PROCESS_QUERY_INFORMATION,
-					FALSE, procEntry.th32ProcessID),
-				CloseHandle,
-				"Process "+pidStr);
-
-			if (procHandle.get() == NULL) {
-				DWORD err = GetLastError();
-				// this seems to be what you get if the pid
-				// didn't exist... I would have expected
-				// ERROR_FILE_NOT_FOUND or something.
-				if (err == ERROR_INVALID_PARAMETER)
-					continue;
-				else
-					throw ProbeException("Couldn't get a complete list "
-						"of 32-bit processes:  Couldn't open pid " + 
-						pidStr + " to check its bitness:  " + 
-						WindowsCommon::GetErrorMessage(err));
-			}
-
-			if (is32BitProcess(procHandle.get(), procEntry.th32ProcessID))
-#  endif
+#  ifdef _WIN64
 			pids.push_back(pidStr);
+#  else
+			if (WindowsCommon::Is64BitOS()) {
+				// If this is a 32-bit build on 64-bit OS, only return PIDs
+				// of 32-bit processes.  Getting the environment of a 64-bit
+				// process from a 32-bit app is too hard... And always
+				// be ok if the process wasn't found.  Processes
+				// will be continually coming and going, and a process
+				// with a given pid can disappear any time.
+				AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> procHandle(
+					OpenProcess(PROCESS_QUERY_INFORMATION,
+						FALSE, procEntry.th32ProcessID),
+					CloseHandle,
+					"Process "+pidStr);
+
+				if (procHandle.get() == NULL) {
+					DWORD err = GetLastError();
+					// this seems to be what you get if the pid
+					// didn't exist... I would have expected
+					// ERROR_FILE_NOT_FOUND or something.
+					if (err == ERROR_INVALID_PARAMETER)
+						continue;
+					else
+						throw ProbeException("Couldn't get a complete list "
+							"of 32-bit processes:  Couldn't open pid " + 
+							pidStr + " to check its bitness:  " + 
+							WindowsCommon::GetErrorMessage(err));
+				}
+
+				if (is32BitProcess(procHandle.get(), procEntry.th32ProcessID))
+					pids.push_back(pidStr);
+			} else
+				// 32-bit build on 32-bit OS... just add all the PIDs.
+				pids.push_back(pidStr);
+#  endif
 
 		}
 
