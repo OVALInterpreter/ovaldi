@@ -204,7 +204,7 @@ namespace {
 
 #endif
 
-#ifndef MACOS
+#ifndef DARWIN
 
 	auto_ptr<Item> CreateItem();
 
@@ -319,7 +319,7 @@ AbsProbe* EnvironmentVariable58Probe::Instance() {
 
 ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 
-#ifndef MACOS
+#ifndef DARWIN
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
@@ -431,7 +431,7 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 	// mac, but... may as well be safe?
 	throw ProbeException("environmentvariable58 test is not supported on this platform.");
 
-#endif // #ifndef MACOS
+#endif // #ifndef DARWIN
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -445,7 +445,7 @@ Item* EnvironmentVariable58Probe::CreateItem() {
 
 namespace {
 
-#ifndef MACOS
+#ifndef DARWIN
 	auto_ptr<Item> CreateItem() {
 
 		auto_ptr<Item> item(new Item(0, 
@@ -460,7 +460,7 @@ namespace {
 
 #endif
 
-#if !defined MACOS && !defined WIN32
+#if !defined DARWIN && !defined WIN32
 
 	map<string, string> GetEnvForThisProcess() {
 		map<string, string> env;
