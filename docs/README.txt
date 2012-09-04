@@ -217,7 +217,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
 -- III -- USING THE OVAL INTERPRETER --
 
-  A. Required Privileges -- IMPORTANT NOTE:
+  A. Requirements -- IMPORTANT NOTE:
 
      In order to collect all of the system configuration data required to 
      correctly evaluate OVAL Definitions, the OVAL Interpreter MUST BE RUN WITH
@@ -230,6 +230,12 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
      Interpreter as a non-privileged user, the results of the analysis may not
      convey the true state of the system.
 
+     On 64-bit operating systems, the same information may not be available to
+     both 32 and 64-bit processes, and some may need to be accessed in a
+     different way.  This is particularly true on 64-bit Windows, where the OS
+     presents different views of the system to 32 and 64-bit processes.  To
+     ensure that all information is available, it is recommended to use 64-bit
+     builds on 64-bit systems.
 
   B. Data Protection -- IMPORTANT NOTE:
 
