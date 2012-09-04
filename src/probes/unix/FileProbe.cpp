@@ -417,6 +417,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	///////////////////////  ACL  ////////////////////////
 	//////////////////////////////////////////////////////
 
+# if defined (LINUX)
 	acl_t aclp;
 	acl_type_t acl_type = ACL_TYPE_ACCESS;
        
@@ -432,6 +433,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("1"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_EXISTS,0));
          acl_free(aclp);
         }
+# else
+	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_NOT_COLLECTED,0));
+	
+# endif
 
       return item;
 }
