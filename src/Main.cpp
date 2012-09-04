@@ -987,7 +987,8 @@ namespace {
 	void CheckWow64() {
 		if (WindowsCommon::IsWow64Process())
 			Log::Info("Warning: you are running the interpreter as a 32-bit process on 64-bit Windows.  "
-						"Be aware that you may get different results as compared to a 64-bit process.");
+						"Be aware that you may get different results as compared to a 64-bit process.  "
+						"We recommend running 64-bit builds on 64-bit systems.");
 	}
 #endif
 
