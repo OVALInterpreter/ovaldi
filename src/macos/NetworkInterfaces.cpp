@@ -98,24 +98,20 @@ namespace NetworkInterfaces {
 		char *macbuf;
 		unsigned char *macptr = NULL;
 		string macstr;
-		int mac_length;
+		size_t mac_length = 0;
 		int mib[6];
 		struct sockaddr ipAddr;
 		struct sockaddr broadAddr;
 		struct sockaddr netmask;
-
 		Log::Debug("Querying interface: "+name+"...");		
 
 		SocketGuard socketfd(AF_INET, SOCK_DGRAM, 0);
-
 		// error messages below will have this common prefix.
 		string errorMsgPrefix = "Error querying network interface "+name+": ";
-
 		// if I set the last char to '\0' and then always
 		// copy no more than IFNAMSIZ-1 chars, I should be
 		// guaranteed to have a null-terminated string.
 		ifr.ifr_name[IFNAMSIZ-1] = '\0';
-
 		strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ-1);
 		if ( ioctl(socketfd,SIOCGIFFLAGS,&ifr) < 0 ){
 			throw IOException(errorMsgPrefix + "ioctl SIOCGIFFLAGS: " + strerror(errno));
@@ -123,31 +119,26 @@ namespace NetworkInterfaces {
 			flags = ifr.ifr_flags;
 		}
 
-		mac_length = 0;
-
 		mib[0] = CTL_NET;
 		mib[1] = AF_ROUTE;
 		mib[2] = 0;
 		mib[3] = AF_LINK;
 		mib[4] = NET_RT_IFLIST;
 		mib[5] = if_nametoindex(name.c_str());
-
+		
 		if (mib[5] == 0){
 			throw IOException(errorMsgPrefix + "if_nametoindex: " + strerror(errno));
 		}
-
-		if (sysctl(mib, 6, NULL, (size_t*)&mac_length, NULL, 0) < 0){
+		
+		if (sysctl(mib, (sizeof(mib)/sizeof(*mib)), NULL, &mac_length, NULL, 0) < 0){
 			throw IOException(errorMsgPrefix + "sysctl error retrieving data length: " +
 							  strerror(errno));
 		}
-
 		macbuf = (char*) malloc(mac_length);
-
 		if ( macbuf == NULL ){
 			throw OutOfMemoryException("Error: couldn't allocate memory");
 		}
-
-		if (sysctl(mib, 6, macbuf, (size_t*)&mac_length, NULL, 0) < 0){
+		if (sysctl(mib, (sizeof(mib)/sizeof(*mib)), macbuf, &mac_length, NULL, 0) < 0){
 			throw IOException(errorMsgPrefix + "sysctl error retrieving data: " +
 							  strerror(errno));
 		}
@@ -158,8 +149,8 @@ namespace NetworkInterfaces {
 		linkType = GetLinkType(sdl->sdl_type);
 
 		macptr = (unsigned char *)LLADDR(sdl);
+		
 		macstr = FormatMACAddress(macptr);
-
 		if ( ioctl(socketfd, SIOCGIFADDR, &ifr) < 0) {
 			free(macbuf);
 			throw IOException(errorMsgPrefix + "ioctl SIOCGIFADDR: " + strerror(errno));
@@ -209,8 +200,9 @@ namespace NetworkInterfaces {
 		for (list<IfNameAndAf>::iterator nameIter = ifNames.begin();
 			 nameIter != ifNames.end();
 			 ++nameIter)
-			if (nameIter->af == AF_INET)
+			if (nameIter->af == AF_INET) {
 				interfaces.push_back(GetInterface(nameIter->name));
+			}
 
 		return interfaces;
 	}
@@ -224,11 +216,11 @@ namespace {
 		struct ifreq *ifr = NULL;
 		char *ptr;
 		int length = 10 * sizeof(struct ifreq);
+		
 		int prev_length = 0;
 		int addr_length;
 
 		SocketGuard socketfd(AF_INET, SOCK_DGRAM, 0);
-
 		while(true){
 			ifc.ifc_buf= (char*)malloc(length);
 			ifc.ifc_len = length;
@@ -241,11 +233,10 @@ namespace {
 					throw IOException("Error: SIOCGIFCONF ioctl error");
 				}else{
 					if ( ifc.ifc_len == prev_length){
-						ifc.ifc_len = length;
 						break;
 					}else{
 						prev_length = ifc.ifc_len;
-						length = length + 10 * sizeof(struct ifreq);
+						length += 10 * sizeof(struct ifreq);
 						free(ifc.ifc_buf);
 					}
 				}
@@ -253,16 +244,15 @@ namespace {
 				throw OutOfMemoryException("Error: couldn't allocate memory");
 			}
 		}
-
 		if (ioctl(socketfd, SIOCGIFCONF, &ifc) < 0)
 			throw IOException("Error: SIOCGIFCONF ioctl error");
 
 		for (ptr = ifc.ifc_buf; ptr <ifc.ifc_buf + ifc.ifc_len;) {
 			ifr = (struct ifreq *) ptr;
+			
 			names.push_back(IfNameAndAf(ifr->ifr_name, ifr->ifr_addr.sa_family));
 // 			Log::Debug(string("Got intf ")+ifr->ifr_name+", af="+
 // 					   Common::ToString((int)ifr->ifr_addr.sa_family));
-			
 
 			addr_length = sizeof(struct sockaddr);
 
@@ -311,9 +301,9 @@ namespace {
 
 		oss << setfill('0') << hex << uppercase;
 		oss << setw(2) << ((int)macptr[0] & 0xFF);
-		for (int i=1; i<6; ++i)
+		for (int i=1; i<6; ++i){
 			oss << '-' << setw(2) << ((int)macptr[i] & 0xFF);
-
+		}
 		return oss.str();
 	}
 }
