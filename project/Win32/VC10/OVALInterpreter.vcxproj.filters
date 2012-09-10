@@ -848,6 +848,9 @@
     <ClInclude Include="..\..\..\src\FreeGuard.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Meta.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Version.h">

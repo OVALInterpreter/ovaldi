@@ -42,6 +42,7 @@
 	#include <aclapi.h>
 	#include <windows.h>
 	#include <lmerr.h>
+	#include <Meta.h>
 #endif
 
 #include "Exception.h"
@@ -189,6 +190,21 @@ class Common {
 			return result.str();
 		}
 
+#ifdef WIN32
+		/**
+		 * A custom condition for our sfinae for FromString(): we want
+		 * a special overload for the unsigned integral types, except
+		 * for character types (which are considered integral by
+		 * std::numeric_limits).
+		 */
+		template<typename T>
+		struct IsUnsignedNonChar {
+			static const bool value =
+				std::numeric_limits<T>::is_integer &&
+				!std::numeric_limits<T>::is_signed &&
+				!IsChar<T>::value;
+		};
+
 		/**
 		 * "Casts" from a string to type T.  The result is placed at the address
 		 * pointed to by \p to.  T must be a type such that 'in >> val'
@@ -201,8 +217,87 @@ class Common {
 		 * @return false on failure, true on success
 		 */
 		template<typename T>
-		static bool FromString(const std::string &str, T *to);
+		static typename DisableIf<Common::IsUnsignedNonChar<T>::value, bool>::type
+		FromString(const std::string &str, T *to) {
+			std::istringstream iss(str);
+			iss >> *to;
+			if (!iss)
+				return false;
+			return true;
+		}
 
+		/**
+		 * A special overload for unsigned non-char types, to hack around
+		 * MS's buggy conversion code... Their standard library impl doesn't
+		 * handle conversion to unsigned integral types properly.  It will
+		 * wrap negatives around to positive and not set the fail flag on
+		 * the stream.  So we have to go to a lot of extra trouble.... :(
+		 */
+		template<typename T>
+		static typename EnableIf<Common::IsUnsignedNonChar<T>::value, bool>::type
+		FromString(const std::string &str, T *to) {
+
+			// For unsigned integral types, check if the string begins
+			// with '-' (possibly after whitespace).  If so, check for
+			// -0 or equiv (which is convertible to 0).  If str starts
+			// with '-' but doesn't appear to be -0, then we fail the
+			// conversion.  Otherwise, we conclude str doesn't represent
+			// a negative number, and we drop down to the standard
+			// conversion code.
+
+			if (str.empty())
+				return false;
+
+			// be robust to leading spaces...
+			size_t i = 0;
+			while (i < str.size() && std::isspace(str[i])) ++i;
+			if (i >= str.size())
+				return false; // it was all spaces!
+	
+			// strings that start with '-' for unsigned types
+			// can only be converted if the value is "-0" or
+			// equiv, so let's allow that.
+			if (str[i] == '-') {
+				++i;
+				if (i >= str.size())
+					return false; // str ended with '-'.
+
+				if (str[i] != '0')
+					return false; // require at least one '0'
+				++i;
+
+				// allow repeated 0's...
+				while (i < str.size() && str[i] == '0') ++i;
+
+				// methinks I should allow a trailing whitespace
+				// char as well (ignoring whatever comes after)...
+				if (i >= str.size() || isspace(str[i])) {
+					*to = T(0);
+					return true;
+				}
+
+				return false;
+			}
+
+			// Otherwise, we know str doesn't represent a negative
+			// number, so the standard operator>>() ought to behave
+			// correctly.
+			std::istringstream iss(str);
+			iss >> *to;
+			if (!iss)
+				return false;
+			return true;
+		}
+#else
+		template<typename T>
+		static bool FromString(const std::string &str, T *to) {
+			std::istringstream iss(str);
+			iss >> *to;
+			if (!iss)
+				return false;
+			return true;
+		}
+#endif
 		/** Converts a string into a string of all uppercase characters.
 		 *	@param s The string that you would like to convert into all uppercase characters.
 		 *	@return A string of uppercase characters.
@@ -311,14 +406,6 @@ class Common {
 
 };
 
-template<typename T>
-bool Common::FromString(const std::string &str, T *to) {
-	std::istringstream iss(str);
-	iss >> *to;
-	if (!iss)
-		return false;
-	return true;
-}
 
 template<>
 bool Common::FromString<bool>(const std::string &str, bool *to);

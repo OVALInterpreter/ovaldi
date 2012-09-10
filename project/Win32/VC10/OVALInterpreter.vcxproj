@@ -472,6 +472,7 @@
     <ClInclude Include="..\..\..\src\ItemEntity.h" />
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />
     <ClInclude Include="..\..\..\src\Main.h" />
+    <ClInclude Include="..\..\..\src\Meta.h" />
     <ClInclude Include="..\..\..\src\Noncopyable.h" />
     <ClInclude Include="..\..\..\src\Object.h" />
     <ClInclude Include="..\..\..\src\ObjectEntity.h" />
