@@ -72,18 +72,21 @@
 #  define _NTDEF_
 #  include <WindowsCommon.h>
 #  undef _NTDEF_
+#elif defined DARWIN
+#  include <map>
+#  include <memory>
+#  include <string>
 
+#  include <Log.h>
+#  include <VectorPtrGuard.h>
 #endif
 
-/*
 #ifdef DARWIN
-#include <crt_externs.h>
-#define _environ (*_NSGetEnviron())
-#elif*/
-#ifndef WIN32
+#  include <crt_externs.h>
+#  define _environ (*_NSGetEnviron())
+#elif !defined WIN32
 extern char ** _environ; 
 #endif
-
 
 #include "EnvironmentVariable58Probe.h"
 
@@ -204,18 +207,15 @@ namespace {
 
 #endif
 
-#ifndef DARWIN
-
 	auto_ptr<Item> CreateItem();
 
 	/**
 	 * Gets the environment map for this process.
 	 * Windows: uses GetEnvironmentStrings().
-	 * Linux: uses the 'environ' global var.
+	 * Linux/Solaris: uses the 'environ' global var.
+	 * MacOSX: does the _NSGetEnviron() thing...
 	 */
 	map<string, string> GetEnvForThisProcess();
-
-#endif
 
 }
 
@@ -319,8 +319,6 @@ AbsProbe* EnvironmentVariable58Probe::Instance() {
 
 ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 
-#ifndef DARWIN
-
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	// get the name from the provided object
@@ -333,11 +331,11 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 		map<string, string> env = GetEnvForThisProcess();
 
 		string pidStr = Common::ToString(
-#  ifdef WIN32
+#ifdef WIN32
 				GetCurrentProcessId()
-#  else
+#else
 				getpid()
-#  endif
+#endif
 		);
 
 		for (map<string,string>::const_iterator it = env.begin();
@@ -358,16 +356,16 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 		return collectedItems.release();
 	}
 
-#  if defined WIN32 || defined LINUX
+#if defined WIN32 || defined LINUX
 
 
-#    ifdef WIN32
+#  ifdef WIN32
 	
 	// Giving ourselves this privilege seems to gain us access
 	// to a lot more processes.
 	PrivilegeGuard pg(SE_DEBUG_NAME, false);
 
-#    endif
+#  endif
 	
 	StringVector pidsToCheck;
 	if (pid->GetOperation() == OvalEnum::OPERATION_EQUALS)
@@ -417,21 +415,13 @@ ItemVector* EnvironmentVariable58Probe::CollectItems(Object *object) {
 
 	return collectedItems.release();
 
-#  else
+#else
 
 	throw ProbeException("Only collection of the environment of the current "
 						 "process is currently supported on this platform.");
 
-#  endif // #if defined WIN32 || defined LINUX
+#endif // #if defined WIN32 || defined LINUX
 
-#else
-
-	// this should never be executed because ProbeFactory
-	// doesn't create an instance of this probe on a
-	// mac, but... may as well be safe?
-	throw ProbeException("environmentvariable58 test is not supported on this platform.");
-
-#endif // #ifndef DARWIN
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -445,7 +435,6 @@ Item* EnvironmentVariable58Probe::CreateItem() {
 
 namespace {
 
-#ifndef DARWIN
 	auto_ptr<Item> CreateItem() {
 
 		auto_ptr<Item> item(new Item(0, 
@@ -458,9 +447,8 @@ namespace {
 		return item;
 	}
 
-#endif
 
-#if !defined DARWIN && !defined WIN32
+#if !defined WIN32
 
 	map<string, string> GetEnvForThisProcess() {
 		map<string, string> env;
@@ -929,7 +917,7 @@ namespace {
 		block.reset(newBlock.release());
 	}
 
-#endif
+#endif // #elif defined WIN32
 
 }
 
