@@ -40,15 +40,14 @@ UNIXPROBEDIR = ${SRCDIR}/probes/unix
 MACOSPROBEDIR = ${SRCDIR}/probes/macos
 INDEPENDENTPROBEDIR = ${SRCDIR}/probes/independent
 
-MYLIBDIR := $(HOME)/oval/ovaldi_libs
-INCDIRS = -I${MACOSDIR} -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I$(UNIXDIR) -I$(MYLIBDIR)/xerces/xerces-2.8/include -I$(MYLIBDIR)/xalan/xalan-1.10/include -I/opt/local/include -I/usr/local/include -I/usr/include
+INCDIRS = -I${MACOSDIR} -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${INDEPENDENTPROBEDIR} -I$(UNIXDIR) -I/opt/local/include -I/usr/local/include -I/usr/include
 
 EXECUTABLE = $(OUTDIR)/ovaldi
 
 # General options that should be used by g++.
 CPPFLAGS = -Wall -DDARWIN $(INCDIRS)
 
-LIBDIR = -L/usr/lib -L/usr/local/lib -L$(MYLIBDIR)/xerces/xerces-2.8/lib -L$(MYLIBDIR)/xalan/xalan-1.10/lib -L/opt/local/lib
+LIBDIR = -L/usr/lib -L/usr/local/lib -L/opt/local/lib
 
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -llber
