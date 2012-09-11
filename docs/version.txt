@@ -35,12 +35,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---       Version 5.10.1 build 3    ---
 ---------------------------------------
 
-* Added a config file, the contents of which is used as the value of the
-  schemaLocation attribute in XML instance documents.  This relieves XML
-  authors from having to remember to set it, and from errors and omissions
-  in its value.  If the file is readable, its value is used in place of the 
-  value in instance documents, if any.  If the file is not readable, the 
-  attribute value in the instance document is used.
+* Fixed collection of the command_line entity in unix-def:process58_test and unix-def:process_test by removing trailing spaces.
+* Added a config file, the contents of which is used as the value of the schemaLocation attribute in XML instance documents.  This relieves XML authors from having to remember to set it, and from errors and omissions in its value.  If the file is readable, its value is used in place of the value in instance documents, if any. If the file is not readable, the attribute value in the instance document is used.
 * Added support for collecting the last login time of a Windows user in the win-def:user_test. 
 * Added support for last write time in the win-def:registry_test.
 * Fixed a bug to properly display the Operating System name on Windows 7 systems in the system_info element of the OVAL System Characteristics file.
