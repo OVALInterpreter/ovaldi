@@ -1192,8 +1192,8 @@ int Process58Probe::RetrieveCommandLine(const char *process, char *cmdline, stri
 #ifdef LINUX
 	FILE *cmdlineFile = NULL;
 	int i = 0;
-	int bytes = 0;
-
+	int bytes = 0;	
+	
 	cmdlinePath.append("/cmdline");
 
 	// Open the file for reading
@@ -1208,13 +1208,20 @@ int Process58Probe::RetrieveCommandLine(const char *process, char *cmdline, stri
 		// separating the args to spaces.
 		//
 		bytes = fread(cmdline, sizeof(char), CMDLINE_LEN, cmdlineFile);
-	    
+		
 		// Remember to leave the trailing NULL (bytes - 1).
 		for(i = 0; i < bytes - 1; i++) {
 			if(cmdline[i] == '\0') {
 				cmdline[i] = ' ';
 			}
 		}
+		//Clean up excess trailing spaces
+		string cmdlinestr = Common::ToString(cmdline);
+		size_t found=cmdlinestr.find_last_not_of(" ");
+		if (found!=string::npos){
+			cmdlinestr.erase(found+1);
+		}
+		strcpy (cmdline, cmdlinestr.c_str());
 	}
 
 	fclose(cmdlineFile); 

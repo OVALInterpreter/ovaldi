@@ -867,6 +867,13 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 				cmdline[i] = ' ';
 			}
 		}
+		//Clean up excess trailing spaces
+		string cmdlinestr = Common::ToString(cmdline);
+		size_t found=cmdlinestr.find_last_not_of(" ");
+		if (found!=string::npos){
+			cmdlinestr.erase(found+1);
+		}
+		strcpy (cmdline, cmdlinestr.c_str());
 	}
 
 	fclose(cmdlineFile); 
