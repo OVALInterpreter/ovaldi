@@ -215,60 +215,52 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 	bool isComplete = true;
 
 	// lookup the trustee name
-	try {
-		string accountNameStr = "";
-		string domainStr = "";		
-		bool isGroup = WindowsCommon::LookUpTrusteeSid(sidStr, &accountNameStr, &domainStr);
-		
-		// if a group
-		// handle behaviors
-		if(isGroup && resolveGroupBehavior) {
+	string accountNameStr = "";
+	string domainStr = "";		
+	bool isGroup;
+	if (!WindowsCommon::LookUpTrusteeSid(sidStr, &accountNameStr, &domainStr, &isGroup)) {
+		Item* item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		items->push_back(item);
+		return false;
+	}
 
-			if(includeGroupBehavior) {
-				Item* item = this->CreateItem();
-				item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-				items->push_back(item);
-			} 
-			
-			// Get all the accounts in the group
-			StringSet* groupMemberSids = new StringSet();
-			WindowsCommon::ExpandGroupBySID(sidStr, groupMemberSids, includeGroupBehavior, resolveGroupBehavior);
-			StringSet::iterator iterator;
-			for(iterator = groupMemberSids->begin(); iterator != groupMemberSids->end(); iterator++) {
-				// make recursive call...
-				try {
-					isComplete = this->GetAccountInformation((*iterator), resolveGroupBehavior, includeGroupBehavior, items);
-				} catch (Exception ex) {
-					isComplete = false;
-					Log::Debug(ex.GetErrorMessage());
-				}
-			}
-			delete groupMemberSids;
+	// if a group
+	// handle behaviors
+	if(isGroup && resolveGroupBehavior) {
 
-		} else {
+		if(includeGroupBehavior) {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
 			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			items->push_back(item);
+		} 
+			
+		// Get all the accounts in the group
+		StringSet* groupMemberSids = new StringSet();
+		WindowsCommon::ExpandGroupBySID(sidStr, groupMemberSids, includeGroupBehavior, resolveGroupBehavior);
+		StringSet::iterator iterator;
+		for(iterator = groupMemberSids->begin(); iterator != groupMemberSids->end(); iterator++) {
+			// make recursive call...
+			try {
+				isComplete = this->GetAccountInformation((*iterator), resolveGroupBehavior, includeGroupBehavior, items);
+			} catch (Exception ex) {
+				isComplete = false;
+				Log::Debug(ex.GetErrorMessage());
+			}
 		}
+		delete groupMemberSids;
 
-	} catch(ProbeException ex) {
-		// only way to have a notice level exception thrown here 
-		// is for the account to not be found. In that case return an 
-		// item with a status of does not exist.
-		if(ex.GetSeverity() == ERROR_NOTICE) {
-			Item* item = this->CreateItem();
-			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-			items->push_back(item);
-		} else {
-			throw ex;
-		}
+	} else {
+		Item* item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("trustee_name", accountNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		items->push_back(item);
 	}
 
 	return isComplete;
