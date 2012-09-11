@@ -47,6 +47,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a crash bug in MacOS network interface detection code, that surfaced on OSX 10.7.
 * Fixed bug #3558996: when object collection fails, the version on the resulting collected object will now match the failed object.
 * Fixed serious issues with probe for win-def:interface_object, which could cause it to create garbage items.
+* Fixed bug 3446470: For certain probes, if a account/sid is not found, it 
+  results in an item with status=does not exist, rather than an error.  This
+  affected accesstoken, sid, sidsid, usersid55, usersid probes.
 
 ---------------------------------------
 ---       Version 5.10.1 build 2    ---
