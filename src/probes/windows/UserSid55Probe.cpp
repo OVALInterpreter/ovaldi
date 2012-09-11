@@ -107,8 +107,14 @@ Item* UserSid55Probe::GetUserSidInfo(string userSid) {
 
 	string userName;
 	string domain;
+	bool isGroup;
 
-	WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain);
+	if (!WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain, &isGroup)) {
+		item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		return item;
+	}
 
 	// User is ?always? from local box so be sure to remove the "\" separation character
 	size_t idx = userName.rfind('\\', 0);

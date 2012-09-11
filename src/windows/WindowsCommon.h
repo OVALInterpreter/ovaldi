@@ -181,11 +181,25 @@ public:
 	*/
     static void GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames);
 
-	/** Get the domain and sid string for the specifeid trustee name. Return true if the trustee is a group. */
-	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
+	/**
+	 * Get the domain and sid string for the specified trustee name.
+	 * \param[in] accountNameStr the account name to look up
+	 * \param[out] sidStr the SID for \p accountNameStr, as a string
+	 * \param[out] domainStr the domain of \p accountNameStr
+	 * \param[out] isGroup receives true if the \p accountNameStr refers to a group, false otherwise
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr, bool *isGroup);
 
-	/** Get the account and domain string for the specified trustee sid. Return true if the trustee is a group. */
-	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr);
+	/**
+	 * Get the account and domain string for the specified trustee sid.
+	 * \param[in] sidStr the SID to look up, as a string
+	 * \param[out] pAccountNameStr the account name for \p sidStr
+	 * \param[out] pDomainStr the domain name for \p sidStr
+	 * \param[out] isGroup receives true if the \p sidStr refers to a group, false otherwise
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr, bool *isGroup);
 
 	/** Convert a vector of trustee names to a vector of corresponding SID strings */
 	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);

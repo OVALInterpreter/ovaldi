@@ -107,8 +107,14 @@ Item* UserSidProbe::GetUserSidInfo(string userSid) {
 
 	string userName;
 	string domain;
+	bool isGroup;
 
-	WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain);
+	if (!WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain, &isGroup)) {
+		item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		return item;
+	}
 
 	StringSet* groups = new StringSet();
 	

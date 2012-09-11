@@ -163,7 +163,14 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 	// is this a group
 	string domainStr = "";
 	string sidStr = "";
-	bool isGroup = WindowsCommon::LookUpTrusteeName(&accountNameIn, &sidStr, &domainStr);
+	bool isGroup;
+	if (!WindowsCommon::LookUpTrusteeName(&accountNameIn, &sidStr, &domainStr, &isGroup)) {
+		Item* item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(new ItemEntity("security_principle", accountNameIn, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		items->push_back(item);
+		return false;
+	}
 
 	if(isGroup && resolveGroupBehavior) {
 

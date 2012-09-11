@@ -1349,7 +1349,7 @@ void WindowsCommon::GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames) 
 	}
 }
 
-bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr) {
+bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr, bool *isGroup) {
 
 	FreeGuard<> psid;
 	FreeGuard<TCHAR> domain;
@@ -1379,6 +1379,8 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 
 	if(!retVal) {
 		DWORD error = GetLastError();
+		if (error == ERROR_NONE_MAPPED)
+			return false;
 		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
 			throw Exception("Unable to locate account: " + (*accountNameStr) + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
 		} else {
@@ -1392,12 +1394,12 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 		throw Exception("Error converting SID to string: " + GetErrorMessage(GetLastError()));
 
 	// determin if this is a group
-	bool isGroup = false;
+	*isGroup = false;
 	if(sid_type == SidTypeGroup || sid_type == SidTypeWellKnownGroup || sid_type == SidTypeAlias) {
 		if((*accountNameStr).compare("SYSTEM") != 0) // special case...
-			isGroup = true;
+			*isGroup = true;
 	} 
-	// make sure account names are consistantly formated
+	// make sure account names are consistently formated
 	if(sid_type == SidTypeUser) {
 		// make sure all user accounts are prefixed by their domain or the local system name.
 		if((*accountNameStr).find("\\") == string::npos && (*domainStr).compare("") != 0)
@@ -1415,7 +1417,7 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 		}
 	}
 
-	return isGroup;
+	return true;
 }
 
 bool WindowsCommon::IsAccountGroup(SID_NAME_USE sidType, string accountName) {
@@ -1429,12 +1431,10 @@ bool WindowsCommon::IsAccountGroup(SID_NAME_USE sidType, string accountName) {
 	return false;
 }
 
-bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr) {
+bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr, bool *isGroup) {
 
 	PSID pSid = NULL;
-	//LPTSTR pDomain = NULL;
 	FreeGuard<TCHAR> pDomain;
-	//LPTSTR pAccountName = NULL;
 	FreeGuard<TCHAR> pAccountName;
 	DWORD accountNameSize = 128;
 	DWORD domainSize = 128;
@@ -1470,6 +1470,8 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 	LocalFree(pSid);
 	if(!retVal) {
 		DWORD error = GetLastError();
+		if (error == ERROR_NONE_MAPPED)
+			return false;
 		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
 			throw Exception("Unable to locate account: " + sidStr + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
 		} else {
@@ -1480,7 +1482,7 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 	(*pAccountNameStr) = pAccountName.get();
 	(*pDomainStr) = pDomain.get();
 
-	// make sure account names are consistantly formated
+	// make sure account names are consistently formated
 	if(sid_type == SidTypeUser) {
 		// make sure all user accounts are prefixed by their domain or the local system name.
 		if((*pAccountNameStr).find("\\") == string::npos && (*pDomainStr).compare("") != 0)
@@ -1498,7 +1500,8 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 		}
 	}
 
-	return IsAccountGroup(sid_type, *pAccountNameStr);
+	*isGroup = IsAccountGroup(sid_type, *pAccountNameStr);
+	return true;
 }
 
 string WindowsCommon::LookUpLocalSystemName() {

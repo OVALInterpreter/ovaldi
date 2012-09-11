@@ -218,8 +218,16 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 	try {
 		string domainStr = "";
 		string sidStr = "";
-		bool isGroup = WindowsCommon::LookUpTrusteeName(&accountName, &sidStr, &domainStr);
+		bool isGroup;
 		
+		if (!WindowsCommon::LookUpTrusteeName(&accountName, &sidStr, &domainStr, &isGroup)) {
+			Item* item = this->CreateItem();
+			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+			item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+			items->push_back(item);
+			return false;
+		}
+
 		// if a group
 		// handle behaviors
 		if(isGroup && resolveGroupBehavior) {
