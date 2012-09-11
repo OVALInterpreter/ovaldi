@@ -868,11 +868,8 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 			}
 		}
 		//Clean up excess trailing spaces
-		string cmdlinestr = Common::ToString(cmdline);
-		size_t found=cmdlinestr.find_last_not_of(" ");
-		if (found!=string::npos){
-			cmdlinestr.erase(found+1);
-		}
+		string cmdlinestr = cmdline;
+		Common::TrimEnd(cmdlinestr);
 		strcpy (cmdline, cmdlinestr.c_str());
 	}
 
