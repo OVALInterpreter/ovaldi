@@ -435,6 +435,9 @@
     <ClCompile Include="..\..\..\src\windows\PrivilegeGuard.cpp">
       <Filter>Source Files\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\independent\EnvironmentVariable58Probe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\AbsCriteria.h">
@@ -850,6 +853,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Meta.h">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\independent\EnvironmentVariable58Probe.h">
+      <Filter>Header Files\probes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
