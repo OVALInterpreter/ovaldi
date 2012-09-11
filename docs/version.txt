@@ -41,7 +41,9 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Added support for last write time in the win-def:registry_test.
 * Fixed a bug to properly display the Operating System name on Windows 7 systems in the system_info element of the OVAL System Characteristics file.
 * Added a message to the test results indicating the conversion of pre-OVAL 5.3 check='none exist' to OVAL 5.3+ format.
-* Added support for environmentvariable58 objects.  It is fully supported only on Linux and Windows.
+* Added support for environmentvariable58 objects.  It is fully supported only 
+  on Linux and Windows.  Partial support, for the current process only, is
+  implemented on Solaris and OSX.
 * Fixed a crash bug in MacOS network interface detection code, that surfaced on OSX 10.7.
 * Fixed bug #3558996: when object collection fails, the version on the resulting collected object will now match the failed object.
 * Fixed serious issues with probe for win-def:interface_object, which could cause it to create garbage items.
