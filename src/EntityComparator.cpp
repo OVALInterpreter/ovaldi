@@ -148,7 +148,10 @@ namespace {
 	};
 
 	in_addr dottedQuadToInAddr(const string &addrStr);
-
+	
+	template<typename T>
+	OvalEnum::ResultEnumeration CompareIntOperation(T defInt, T scInt, OvalEnum::Operation op);
+	
 	ostream &operator<<(ostream &out, const Ipv4Address &addr);
 }
 
@@ -515,70 +518,97 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 	try {
 		long long defInt = 0;
 		long long scInt = 0;
+		unsigned long long udefInt = 0;
+		unsigned long long uscInt = 0;
 
-		// Convert the string defValue to a long long intege
-		if (!Common::FromString(defValue, &defInt))
-			throw Exception("Error: Invalid integer value on definition entity. " + defValue);
-	
-		// Convert the string scValue to a long long integer
-		if (!Common::FromString(scValue, &scInt))
-			throw Exception("Error: Invalid integer value on system characteristics item entity. " + scValue);
-
-		if(op == OvalEnum::OPERATION_EQUALS) {
-			if(scInt == defInt) {
-				result = OvalEnum::RESULT_TRUE;
-			} else {
-				result = OvalEnum::RESULT_FALSE;
-			}
-		} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
-			if(scInt != defInt) {
-				result = OvalEnum::RESULT_TRUE;
-			} else {
-				result = OvalEnum::RESULT_FALSE;
-			}
-		} else if(op == OvalEnum::OPERATION_LESS_THAN) {
+		//Find out what datatype to use for comparisons
+		if(Common::FromString(defValue, &defInt) && Common::FromString(scValue, &scInt)){
+			result = CompareIntOperation(defInt,scInt, op);
+		} else if(Common::FromString(defValue, &udefInt) && Common::FromString(scValue, &uscInt)){
+			result = CompareIntOperation(udefInt,uscInt, op);
+		}else if((Common::FromString(defValue, &defInt) && Common::FromString(scValue, &uscInt)) || (Common::FromString(defValue, &udefInt) && Common::FromString(scValue, &scInt))){
+			//check op
+			bool defSigned = Common::FromString(defValue, &defInt);
+			bool scSigned = Common::FromString(scValue, &scInt);
 			
-			if(scInt < defInt) {
-				result = OvalEnum::RESULT_TRUE;
-			} else {
-				result = OvalEnum::RESULT_FALSE;
+			switch(op){
+				case OvalEnum::OPERATION_EQUALS:
+				{
+					result = OvalEnum::RESULT_FALSE;
+					break;
+				} 
+				case OvalEnum::OPERATION_NOT_EQUAL:
+				{
+					result = OvalEnum::RESULT_TRUE;
+					break;
+				}
+				case OvalEnum::OPERATION_LESS_THAN:
+				case OvalEnum::OPERATION_LESS_THAN_OR_EQUAL:
+				{
+					//if sc value is uncastable to unsigned, then it must be negative. def value was castable to unsigned, therefore it is the larger int.
+					if(scSigned){
+						result = OvalEnum::RESULT_TRUE;
+					} else {
+						result = OvalEnum::RESULT_FALSE;
+					}
+					break;
+				}
+				case OvalEnum::OPERATION_GREATER_THAN:
+				case OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL:
+				{
+					//if sc value is uncastable to signed, then it must be a large positive integer. def value was castable to signed, therefore it is the smaller int.
+					if(scSigned){
+						result = OvalEnum::RESULT_FALSE;
+					} else {
+						result = OvalEnum::RESULT_TRUE;
+					}
+					break;
+				}
+				case OvalEnum::OPERATION_BITWISE_AND:
+				{
+					if(scSigned){
+						uscInt = (unsigned long long)scInt;
+					}
+					else{
+						udefInt = (unsigned long long)defInt;
+					}
+					if (( udefInt&uscInt) == udefInt){
+						result = OvalEnum::RESULT_TRUE;
+					}else{
+						result = OvalEnum::RESULT_FALSE;
+					}
+					break;
+				}
+				case OvalEnum::OPERATION_BITWISE_OR:
+				{
+					if(scSigned){
+						uscInt = (unsigned long long)scInt;
+					}
+					else{
+						udefInt = (unsigned long long)defInt;
+					}
+					if (( udefInt|uscInt) == udefInt){
+						result = OvalEnum::RESULT_TRUE;
+					}else{
+						result = OvalEnum::RESULT_FALSE;
+					}
+					break;
+				}
+				default:
+				{
+					throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
+					break;
+				}
 			}
-		} else if(op == OvalEnum::OPERATION_LESS_THAN_OR_EQUAL) {
-			
-			if(scInt <= defInt) {
-				result = OvalEnum::RESULT_TRUE;
-			} else {
-				result = OvalEnum::RESULT_FALSE;
+		}else{
+			//Error in converting to an integer, but passed integer regular expression.
+			if (!Common::FromString(defValue, &udefInt)){
+				throw Exception("Error: Integer value outside usable range on definition entity. " + defValue);
 			}
-		} else if(op == OvalEnum::OPERATION_GREATER_THAN) {
-			
-			if(scInt > defInt) {
-				result = OvalEnum::RESULT_TRUE;
-			} else {
-				result = OvalEnum::RESULT_FALSE;
+			if (!Common::FromString(scValue, &uscInt)){
+				throw Exception("Error: Integer value outside usable range on system characteristics item entity. " + scValue);
 			}
-		} else if(op == OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL) {
-			
-			if(scInt >= defInt) {
-				result = OvalEnum::RESULT_TRUE;
-			} else {
-				result = OvalEnum::RESULT_FALSE;
-			}
-		} else if(op == OvalEnum::OPERATION_BITWISE_AND) {
-			if ( ( defInt & scInt ) == defInt ){
-				result = OvalEnum::RESULT_TRUE;
-			}else{
-				result = OvalEnum::RESULT_FALSE;
-			}	
-		} else if(op == OvalEnum::OPERATION_BITWISE_OR) {		
-			if ( ( defInt | scInt ) == defInt ){
-				result = OvalEnum::RESULT_TRUE;
-			}else{
-				result = OvalEnum::RESULT_FALSE;
-			}
-		} else {
-			throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
-		} 
+		}
 	}catch (string errorMessage){
 		cout << errorMessage;	
 	}
@@ -894,6 +924,66 @@ OvalEnum::ResultEnumeration EntityComparator::CompareIpv4Address(OvalEnum::Opera
 }
 
 namespace {
+
+	template<typename T>
+	OvalEnum::ResultEnumeration CompareIntOperation(T defInt, T scInt, OvalEnum::Operation op) {
+		OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+		if(op == OvalEnum::OPERATION_EQUALS) {
+			if(scInt == defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_NOT_EQUAL) {
+			if(scInt != defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_LESS_THAN) {
+			
+			if(scInt < defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_LESS_THAN_OR_EQUAL) {
+			
+			if(scInt <= defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_GREATER_THAN) {
+			if(scInt > defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL) {
+			
+			if(scInt >= defInt) {
+				result = OvalEnum::RESULT_TRUE;
+			} else {
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else if(op == OvalEnum::OPERATION_BITWISE_AND) {
+			if (( defInt&scInt) == defInt){
+				result = OvalEnum::RESULT_TRUE;
+			}else{
+				result = OvalEnum::RESULT_FALSE;
+			}	
+		} else if(op == OvalEnum::OPERATION_BITWISE_OR) {		
+			if (( defInt|scInt) == defInt){
+				result = OvalEnum::RESULT_TRUE;
+			}else{
+				result = OvalEnum::RESULT_FALSE;
+			}
+		} else {
+			throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
+		} 
+		return result;
+	}
 
 	bool Ipv4Address::subsetOf(const Ipv4Address &otherAddr) const {
 		if (getPrefixSize() < otherAddr.getPrefixSize())
