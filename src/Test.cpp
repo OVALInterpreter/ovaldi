@@ -60,6 +60,14 @@ Test::~Test() {
 	  	item = NULL;
 	}
 
+	OvalMessage* currentMessage = NULL;
+	while(this->GetMessages()->size() != 0) {
+		currentMessage = this->GetMessages()->at(this->GetMessages()->size()-1);
+		this->GetMessages()->pop_back();
+		delete currentMessage;
+		currentMessage = NULL;
+	}
+
     this->stateIds.clear();
 }
 
@@ -185,6 +193,18 @@ void Test::SetResult(OvalEnum::ResultEnumeration result) {
 	this->result = result;
 }
 
+
+OvalMessageVector* Test::GetMessages() {
+	return &this->testMessages;
+}
+
+
+void Test::AppendMessage(OvalMessage* message) {
+	this->GetMessages()->push_back(message);
+}
+
+
+
 int Test::GetVariableInstance() {
 
 	return this->variableInstance;
@@ -274,18 +294,27 @@ void Test::Write(DOMElement* parentElm) {
 		}	
 
 		TestedItem* currentElement = NULL;
-		while(this->GetTestedItems()->size() != 0) {
-			currentElement = this->GetTestedItems()->at(this->GetTestedItems()->size()-1);
-			this->GetTestedItems()->pop_back();
+		unsigned int sizeOfItemList = this->GetTestedItems()->size();
+		unsigned int itemCounter = 0;
+		while(itemCounter < sizeOfItemList) {
+			currentElement = this->GetTestedItems()->at(itemCounter);
 			currentElement->Write(testElm);	  		
-	  		delete currentElement;
-	  		currentElement = NULL;
+	  		itemCounter++;
 		}
 
 		// loop through all variable values and call write method
 		VariableValueVector::iterator iterator1;
 		for(iterator1 = this->GetTestedVariables()->begin(); iterator1 != this->GetTestedVariables()->end(); iterator1++) {
 			(*iterator1)->WriteTestedVariable(testElm);
+		}
+
+		OvalMessage* currentMessage = NULL;
+		unsigned int sizeOfMessageList = this->GetMessages()->size();
+		unsigned int msgCounter = 0;
+		while(msgCounter < sizeOfMessageList) {
+			currentMessage = this->GetMessages()->at(msgCounter);
+			currentMessage->Write(resultDoc,testElm,"oval");	 
+			msgCounter++;
 		}
 
 		// loop through all vars in the states
@@ -298,6 +327,8 @@ void Test::Write(DOMElement* parentElm) {
 			    for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
 				    (*iterator2)->WriteTestedVariable(testElm);
 			    }
+                stateVars->clear();
+                delete stateVars;
 		    }		    
         }
 	}
@@ -323,6 +354,7 @@ void Test::Parse(DOMElement* testElm) {
 		Log::Info("Converting deprected check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'. The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here.");
 		this->SetCheckExistence(OvalEnum::EXISTENCE_NONE_EXIST);
 		this->SetCheck(OvalEnum::CHECK_NONE_SATISFY);
+		this->AppendMessage(new OvalMessage("Converting deprecated check=\'none exist\' attribute value to check_existence=\'none_exist\' and check=\'none satisfy\'. The \'none exist\' CheckEnumeration value has been deprecated and will be removed with the next major version of the language. One should use the other possible values in addition to the existence attributes instead of the \'none exist\' value here."));
 	}
 
 	// get the object element and the object id if it exists

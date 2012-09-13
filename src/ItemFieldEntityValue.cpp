@@ -86,24 +86,11 @@ void ItemFieldEntityValue::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-bool ItemFieldEntityValue::Equals(AbsEntityValue* entityValue){
-	ItemFieldEntityValue* fieldEntityValue = (ItemFieldEntityValue*)entityValue;
-	bool isEqual = false;
-
-	if(this->GetDatatype() == fieldEntityValue->GetDatatype()) {
-		if(this->GetName().compare(fieldEntityValue->GetName()) == 0) {
-			if(this->GetValue().compare(fieldEntityValue->GetValue()) == 0) {
-				isEqual = true;	
-			}
-		}
-	}
-
-	return isEqual;
-}
-
 void ItemFieldEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemEntityElm) {
 	// Create new field element
-	DOMElement* newEntityValueElem = scFile->createElement(XMLString::transcode("oval-sc:field"));
+	XMLCh* scField = XMLString::transcode("oval-sc:field");
+	DOMElement* newEntityValueElem = scFile->createElement(scField);
+	XMLString::release(&scField);
 	itemEntityElm->appendChild(newEntityValueElem);
 
 	// Add the attributes
@@ -119,7 +106,9 @@ void ItemFieldEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scF
         XmlCommon::AddAttribute(newEntityValueElem, "status", strStatus);
 
 	// Add the value
-	DOMText* newEntityValueElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
+	XMLCh* entityValue = XMLString::transcode(this->GetValue().c_str());
+	DOMText* newEntityValueElemValue = scFile->createTextNode(entityValue);
+	XMLString::release(&entityValue);
 	newEntityValueElem->appendChild(newEntityValueElemValue);
 }
 

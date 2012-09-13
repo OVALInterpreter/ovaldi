@@ -163,7 +163,14 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 	// is this a group
 	string domainStr = "";
 	string sidStr = "";
-	bool isGroup = WindowsCommon::LookUpTrusteeName(&accountNameIn, &sidStr, &domainStr);
+	bool isGroup;
+	if (!WindowsCommon::LookUpTrusteeName(&accountNameIn, &sidStr, &domainStr, &isGroup)) {
+		Item* item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(new ItemEntity("security_principle", accountNameIn, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		items->push_back(item);
+		return false;
+	}
 
 	if(isGroup && resolveGroupBehavior) {
 
@@ -214,99 +221,99 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 			// Create the item
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("security_principle", currentAccountName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("security_principle", currentAccountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			items->push_back(item);
 
 			// init all the rights
-			ItemEntity* seassignprimarytokenprivilege = new ItemEntity("seassignprimarytokenprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seassignprimarytokenprivilege = new ItemEntity("seassignprimarytokenprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seassignprimarytokenprivilege);
-			ItemEntity* seauditprivilege = new ItemEntity("seauditprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seauditprivilege = new ItemEntity("seauditprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seauditprivilege);
-			ItemEntity* sebackupprivilege = new ItemEntity("sebackupprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sebackupprivilege = new ItemEntity("sebackupprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sebackupprivilege);
-			ItemEntity* sechangenotifyprivilege = new ItemEntity("sechangenotifyprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sechangenotifyprivilege = new ItemEntity("sechangenotifyprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sechangenotifyprivilege);
-			ItemEntity* secreateglobalprivilege = new ItemEntity("secreateglobalprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* secreateglobalprivilege = new ItemEntity("secreateglobalprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(secreateglobalprivilege);
-			ItemEntity* secreatepagefileprivilege = new ItemEntity("secreatepagefileprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* secreatepagefileprivilege = new ItemEntity("secreatepagefileprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(secreatepagefileprivilege);
-			ItemEntity* secreatepermanentprivilege = new ItemEntity("secreatepermanentprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* secreatepermanentprivilege = new ItemEntity("secreatepermanentprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(secreatepermanentprivilege);
-			ItemEntity* secreatesymboliclinkprivilege = new ItemEntity("secreatesymboliclinkprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* secreatesymboliclinkprivilege = new ItemEntity("secreatesymboliclinkprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(secreatesymboliclinkprivilege);
-			ItemEntity* secreatetokenprivilege = new ItemEntity("secreatetokenprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* secreatetokenprivilege = new ItemEntity("secreatetokenprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(secreatetokenprivilege);
-			ItemEntity* sedebugprivilege = new ItemEntity("sedebugprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sedebugprivilege = new ItemEntity("sedebugprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedebugprivilege);
-			ItemEntity* seenabledelegationprivilege = new ItemEntity("seenabledelegationprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seenabledelegationprivilege = new ItemEntity("seenabledelegationprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seenabledelegationprivilege);
-			ItemEntity* seimpersonateprivilege = new ItemEntity("seimpersonateprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seimpersonateprivilege = new ItemEntity("seimpersonateprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seimpersonateprivilege);
-			ItemEntity* seincreasebasepriorityprivilege = new ItemEntity("seincreasebasepriorityprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seincreasebasepriorityprivilege = new ItemEntity("seincreasebasepriorityprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seincreasebasepriorityprivilege);
-			ItemEntity* seincreasequotaprivilege = new ItemEntity("seincreasequotaprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seincreasequotaprivilege = new ItemEntity("seincreasequotaprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seincreasequotaprivilege);
-			ItemEntity* seincreaseworkingsetprivilege = new ItemEntity("seincreaseworkingsetprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seincreaseworkingsetprivilege = new ItemEntity("seincreaseworkingsetprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seincreaseworkingsetprivilege);
-			ItemEntity* seloaddriverprivilege = new ItemEntity("seloaddriverprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seloaddriverprivilege = new ItemEntity("seloaddriverprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seloaddriverprivilege);
-			ItemEntity* selockmemoryprivilege = new ItemEntity("selockmemoryprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* selockmemoryprivilege = new ItemEntity("selockmemoryprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(selockmemoryprivilege);
-			ItemEntity* semachineaccountprivilege = new ItemEntity("semachineaccountprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* semachineaccountprivilege = new ItemEntity("semachineaccountprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(semachineaccountprivilege);
-			ItemEntity* semanagevolumeprivilege = new ItemEntity("semanagevolumeprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* semanagevolumeprivilege = new ItemEntity("semanagevolumeprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(semanagevolumeprivilege);
-			ItemEntity* seprofilesingleprocessprivilege = new ItemEntity("seprofilesingleprocessprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seprofilesingleprocessprivilege = new ItemEntity("seprofilesingleprocessprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seprofilesingleprocessprivilege);
-			ItemEntity* serelabelprivilege = new ItemEntity("serelabelprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* serelabelprivilege = new ItemEntity("serelabelprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(serelabelprivilege);
-			ItemEntity* seremoteshutdownprivilege = new ItemEntity("seremoteshutdownprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seremoteshutdownprivilege = new ItemEntity("seremoteshutdownprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seremoteshutdownprivilege);
-			ItemEntity* serestoreprivilege = new ItemEntity("serestoreprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* serestoreprivilege = new ItemEntity("serestoreprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(serestoreprivilege);
-			ItemEntity* sesecurityprivilege = new ItemEntity("sesecurityprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sesecurityprivilege = new ItemEntity("sesecurityprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sesecurityprivilege);
-			ItemEntity* seshutdownprivilege = new ItemEntity("seshutdownprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seshutdownprivilege = new ItemEntity("seshutdownprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seshutdownprivilege);
-			ItemEntity* sesyncagentprivilege = new ItemEntity("sesyncagentprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sesyncagentprivilege = new ItemEntity("sesyncagentprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sesyncagentprivilege);
-			ItemEntity* sesystemenvironmentprivilege = new ItemEntity("sesystemenvironmentprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sesystemenvironmentprivilege = new ItemEntity("sesystemenvironmentprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sesystemenvironmentprivilege);
-			ItemEntity* sesystemprofileprivilege = new ItemEntity("sesystemprofileprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sesystemprofileprivilege = new ItemEntity("sesystemprofileprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sesystemprofileprivilege);
-			ItemEntity* sesystemtimeprivilege = new ItemEntity("sesystemtimeprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sesystemtimeprivilege = new ItemEntity("sesystemtimeprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sesystemtimeprivilege);
-			ItemEntity* setakeownershipprivilege = new ItemEntity("setakeownershipprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* setakeownershipprivilege = new ItemEntity("setakeownershipprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(setakeownershipprivilege);
-			ItemEntity* setcbprivilege = new ItemEntity("setcbprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* setcbprivilege = new ItemEntity("setcbprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(setcbprivilege);
-			ItemEntity* setimezoneprivilege = new ItemEntity("setimezoneprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* setimezoneprivilege = new ItemEntity("setimezoneprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(setimezoneprivilege);
-			ItemEntity* seundockprivilege = new ItemEntity("seundockprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seundockprivilege = new ItemEntity("seundockprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seundockprivilege);
-			ItemEntity* seunsolicitedinputprivilege = new ItemEntity("seunsolicitedinputprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seunsolicitedinputprivilege = new ItemEntity("seunsolicitedinputprivilege", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seunsolicitedinputprivilege);
-			ItemEntity* sebatchlogonright = new ItemEntity("sebatchlogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sebatchlogonright = new ItemEntity("sebatchlogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sebatchlogonright);
-			ItemEntity* seinteractivelogonright = new ItemEntity("seinteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seinteractivelogonright = new ItemEntity("seinteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seinteractivelogonright);
-			ItemEntity* senetworklogonright = new ItemEntity("senetworklogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* senetworklogonright = new ItemEntity("senetworklogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(senetworklogonright);
-			ItemEntity* seremoteinteractivelogonright = new ItemEntity("seremoteinteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seremoteinteractivelogonright = new ItemEntity("seremoteinteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seremoteinteractivelogonright);
-			ItemEntity* seservicelogonright = new ItemEntity("seservicelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* seservicelogonright = new ItemEntity("seservicelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(seservicelogonright);
-			ItemEntity* sedenybatchLogonright = new ItemEntity("sedenybatchLogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sedenybatchLogonright = new ItemEntity("sedenybatchLogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedenybatchLogonright);
-			ItemEntity* sedenyinteractivelogonright = new ItemEntity("sedenyinteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sedenyinteractivelogonright = new ItemEntity("sedenyinteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedenyinteractivelogonright);
-			ItemEntity* sedenynetworklogonright = new ItemEntity("sedenynetworklogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sedenynetworklogonright = new ItemEntity("sedenynetworklogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedenynetworklogonright);
-			ItemEntity* sedenyremoteInteractivelogonright = new ItemEntity("sedenyremoteInteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sedenyremoteInteractivelogonright = new ItemEntity("sedenyremoteInteractivelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedenyremoteInteractivelogonright);
-			ItemEntity* sedenyservicelogonright = new ItemEntity("sedenyservicelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* sedenyservicelogonright = new ItemEntity("sedenyservicelogonright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(sedenyservicelogonright);
-			ItemEntity* setrustedcredmanaccessnameright = new ItemEntity("setrustedcredmanaccessnameright", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* setrustedcredmanaccessnameright = new ItemEntity("setrustedcredmanaccessnameright", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(setrustedcredmanaccessnameright);
 
 			// Alter the access mask to show the correct rights.
@@ -438,7 +445,7 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 
 		Item* item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("security_principle", accountNameIn, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("security_principle", accountNameIn, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		items->push_back(item);
 
 	}

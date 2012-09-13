@@ -121,7 +121,7 @@
       <Optimization>Disabled</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../../src;../../../src/windows;../../../src/probes/independent;../../../src/probes/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -342,6 +342,7 @@
     <ClCompile Include="..\..\..\src\ObjectReader.cpp" />
     <ClCompile Include="..\..\..\src\OvalEnum.cpp" />
     <ClCompile Include="..\..\..\src\OvalMessage.cpp" />
+    <ClCompile Include="..\..\..\src\probes\independent\EnvironmentVariable58Probe.cpp" />
     <ClCompile Include="..\..\..\src\Set.cpp" />
     <ClCompile Include="..\..\..\src\SetObject.cpp" />
     <ClCompile Include="..\..\..\src\State.cpp" />
@@ -408,7 +409,6 @@
     <ClCompile Include="..\..\..\src\Exception.cpp" />
     <ClCompile Include="..\..\..\src\Log.cpp" />
     <ClCompile Include="..\..\..\src\REGEX.cpp" />
-    <ClCompile Include="..\..\..\src\windows\FindCloseGuard.cpp" />
     <ClCompile Include="..\..\..\src\windows\FsRedirectionGuard.cpp" />
     <ClCompile Include="..\..\..\src\windows\PrivilegeGuard.cpp" />
     <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
@@ -469,10 +469,12 @@
     <ClInclude Include="..\..\..\src\EntityComparator.h" />
     <ClInclude Include="..\..\..\src\ExtendedDefinition.h" />
     <ClInclude Include="..\..\..\src\Filter.h" />
+    <ClInclude Include="..\..\..\src\FreeGuard.h" />
     <ClInclude Include="..\..\..\src\Item.h" />
     <ClInclude Include="..\..\..\src\ItemEntity.h" />
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />
     <ClInclude Include="..\..\..\src\Main.h" />
+    <ClInclude Include="..\..\..\src\Meta.h" />
     <ClInclude Include="..\..\..\src\Noncopyable.h" />
     <ClInclude Include="..\..\..\src\Object.h" />
     <ClInclude Include="..\..\..\src\ObjectEntity.h" />
@@ -480,6 +482,7 @@
     <ClInclude Include="..\..\..\src\ObjectReader.h" />
     <ClInclude Include="..\..\..\src\OvalEnum.h" />
     <ClInclude Include="..\..\..\src\OvalMessage.h" />
+    <ClInclude Include="..\..\..\src\probes\independent\EnvironmentVariable58Probe.h" />
     <ClInclude Include="..\..\..\src\Set.h" />
     <ClInclude Include="..\..\..\src\SetObject.h" />
     <ClInclude Include="..\..\..\src\State.h" />
@@ -503,7 +506,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">echo on
 cd ..\..\..\src
 perl updateversion.pl
-cd ..\project\Win32\VC8
+cd ..\project\Win32\VC10
 echo off
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MITRE;%(Outputs)</Outputs>
@@ -511,7 +514,7 @@ echo off
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">echo on
 cd ..\..\..\src
 perl updateversion.pl
-cd ..\project\Win32\VC8
+cd ..\project\Win32\VC10
 echo off
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MITRE;%(Outputs)</Outputs>
@@ -575,7 +578,6 @@ echo off
     <ClInclude Include="..\..\..\src\Exception.h" />
     <ClInclude Include="..\..\..\src\Log.h" />
     <ClInclude Include="..\..\..\src\REGEX.h" />
-    <ClInclude Include="..\..\..\src\windows\FindCloseGuard.h" />
     <ClInclude Include="..\..\..\src\windows\FsRedirectionGuard.h" />
     <ClInclude Include="..\..\..\src\windows\PrivilegeGuard.h" />
     <ClInclude Include="..\..\..\src\XmlCommon.h" />

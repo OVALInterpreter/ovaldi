@@ -28,45 +28,71 @@
 //
 //****************************************************************************************//
 
-#ifndef FINDCLOSEGUARD_H
-#define FINDCLOSEGUARD_H
-
-// all of Windows.h just for the HANDLE type??  Yeah,
-// it seems WinDef.h won't compile by itself since it
-// needs an arch macro (e.g. _X86_) to be defined, and that's
-// defined in windows.h.  Sighhhhhhh
-#include <Windows.h>
-#include <Noncopyable.h>
+#ifndef META_H
+#define META_H
 
 /**
- * Provides for exception safety when writing recursive filesystem search
- * algorithms.  As the stack unwinds, we should try to close all their
- * find handles.
+ * \file
+ * This header implements some metaprogramming tools we had a need for.
+ * We bumped into the need to overload a function template based on whether
+ * the argument was an unsigned integral type.  The latest C++ standard
+ * library has an implementation of enable_if and other metaprogramming
+ * tools which allow you to do that sort of thing, but ovaldi needs to
+ * build using much older toolchains, so we have to assume it won't be
+ * available.  So we need to write our own.  
  */
-class FindCloseGuard : public Noncopyable {
-public:
-	explicit FindCloseGuard(HANDLE hFind);
-	~FindCloseGuard();
 
-	/**
-	 * Closes the find handle, if it was not already closed.
-	 * This flags the handle as closed, whether or not the close
-	 * succeeded.  Not sure if this is the best way to do it...
-	 * If the close failed, would there ever be a reason to try
-	 * it again?  If the close failed, callers can call GetLastError()
-	 * to find out why.
-	 * <p>
-	 * This guard is manually closable to be compatible with existing
-	 * code which wants to close, and throw an exception if it failed.
-	 *
-	 * \return the return value of FindClose() if a close was attempted,
-	 *   or true if not (because it was already closed).
-	 */
-	bool close();
+/**
+ * Base template for a SFINAE mechanism to enable/disable template
+ * overloads based on a boolean condition.
+ */
+template<bool, typename = void>
+struct EnableIf {};
 
-private:
-	bool closed;
-	HANDLE findHandle;
+template<typename T>
+struct EnableIf<true, T> {
+	typedef T type;
+};
+
+/**
+ * Base template for a SFINAE mechanism to enable/disable template
+ * overloads based on a boolean condition.  This does the opposite
+ * if EnableIf.  I thought it would be clearer that two overloads
+ * should be enabled under exactly opposite conditions, if you
+ * used EnableIf and DisableIf with the exact same condition.
+ * But you could also just stick with EnableIf and use 
+ * !(original_condition).
+ */
+template<bool, typename = void>
+struct DisableIf {};
+
+template<typename T>
+struct DisableIf<false, T> {
+	typedef T type;
+};
+
+/**
+ * A way to determine whether a type is a character type
+ * (unsigned char, signed char, or wchar_t).
+ */
+template<typename>
+struct IsChar {
+	static const bool value = false;
+};
+
+template<>
+struct IsChar<signed char> {
+	static const bool value = true;
+};
+
+template<>
+struct IsChar<unsigned char> {
+	static const bool value = true;
+};
+
+template<>
+struct IsChar<wchar_t> {
+	static const bool value = true;
 };
 
 #endif

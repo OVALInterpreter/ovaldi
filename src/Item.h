@@ -88,9 +88,9 @@ typedef std::pair < StringKeyedItemMap::iterator, bool > ItemCacheResult;
 	This class represents an Item in a system characteristics document.
 
 	Items are created and populated by probes during data collection. During
-	data collection Items must be unique. The Item::Equals() method and the 
-	caching methods provided in this class should be utilized to ensure uniqueness.
-	This class also provides static methods for assigning Item ids.
+	data collection Items must be unique. The caching methods provided in this 
+	class should be utilized to ensure uniqueness.  This class also provides 
+	static methods for assigning Item ids.
 
 	Items are also created during analysis by parsing them from a system-characteristics 
 	document.
@@ -109,16 +109,6 @@ public:
 
 	/** Assign a new Item Id. */
 	static int AssignId();
-
-    /**
-        Return true if this item is equal to the specified item.
-        NOTE: id and status are not compared
-        NOTE: Assumes that an object element will only ever occure once.
-	    NOTE: Looks at only object elements
-        @param Item A pointer to the item to compare to.
-        @return true if this item is equal to the specified item.
-    */
-	bool Equals(Item* Item);
 
 	/** Return all elements with the specified name.
 		@return Returns a vector of elements with a matching name. If no mathes are found the vector is empty. The caller should delete the returned vector but not its contents.
@@ -201,7 +191,7 @@ public:
 	void AppendMessage(OvalMessage* msg);
 
     /** Return all object elements. */
-	ItemEntityVector* GetObjectElements();
+	//ItemEntityVector* GetObjectElements();
 
 	/** Delete all items in the cache. */
 	static void ClearCache();

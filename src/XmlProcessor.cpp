@@ -102,11 +102,29 @@ XmlProcessor* XmlProcessor::Instance() {
 
 XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 
+	string schemaLocationPath = Common::BuildFilePath(
+		Common::GetSchemaPath(),
+		SCHEMALOCATION_CONFIG_FILENAME);
+
+	ifstream in(schemaLocationPath.c_str());
+	string schemaLocation;
+	if (in) {
+		string line;
+
+		// read the whole thing in directly as a schemaLocation value.
+		while (getline(in, line))
+			schemaLocation += line + "\n";
+	} else {
+		Log::Message("Could not open schemaLocation config file: " + 
+			schemaLocationPath + ".  Validation will rely on the "
+			"schemaLocation attribute of instance documents.");
+	}
+
     try  {
         XMLPlatformUtils::Initialize();
 
-		parser = makeParser();
-		parserWithCallerAdoption = makeParser();
+		parser = makeParser(schemaLocation);
+		parserWithCallerAdoption = makeParser(schemaLocation);
 		// add one extra feature on this parser to prevent it from
 		// taking ownership of its documents.
 		parserWithCallerAdoption->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
@@ -125,19 +143,20 @@ XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 
 XmlProcessor::~XmlProcessor() {
 
+    XmlProcessor::instance = NULL;
 	//  Delete the parser itself.  Must be done prior to calling Terminate, below.
 
-	if(parser != NULL)
+	if(parser != NULL){
 		parser->release();
+    }
 
-	if (parserWithCallerAdoption != NULL)
+	if (parserWithCallerAdoption != NULL){
 		parserWithCallerAdoption->release();
-
+    }
 	XMLPlatformUtils::Terminate();
-
 }
 
-DOMBuilder *XmlProcessor::makeParser() {
+DOMBuilder *XmlProcessor::makeParser(const string &schemaLocation) {
     // Instantiate the DOM parser.
 	static const XMLCh gLS[] = { chLatin_L, chLatin_S, chNull };
 	DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(gLS);
@@ -171,6 +190,16 @@ DOMBuilder *XmlProcessor::makeParser() {
 	//	Add an Error Handler
 	///////////////////////////////////////////////////////
 	parser->setErrorHandler(&errHandler);
+
+	// Fix a schema location if possible, so instance documents don't
+	// have to set the schemaLocation attribute.  And if they do, this
+	// will actually cause it to be ignored.  So this is a hard
+	// overriding of the value in instance documents.
+	if (!schemaLocation.empty()) {
+		XMLCh *schemaLocationCstr = XMLString::transcode(schemaLocation.c_str());
+		parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation, schemaLocationCstr);
+		XMLString::release(&schemaLocationCstr);
+	}
 
 	return parser;
 }

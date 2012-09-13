@@ -69,7 +69,7 @@ ItemVector* GroupSidProbe::CollectItems ( Object *object ) {
 	}else{
 		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
 		StringSet* groupSids = WindowsCommon::GetAllLocalGroupSids();
-		ItemEntity* groupItemEntity = new ItemEntity("group","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		ItemEntity* groupItemEntity = new ItemEntity("group","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = groupSids->begin(); it != groupSids->end(); it++){
 			groupItemEntity->SetValue(*it);
 			if ( groupSid->Analyze(groupItemEntity) == OvalEnum::RESULT_TRUE ){
@@ -109,27 +109,27 @@ Item* GroupSidProbe::GetGroupSidInfo ( string groupSidStr ) {
 		for ( StringSet::iterator iterator = userSids->begin() ; iterator != userSids->end() ; iterator++ ) {
 			if ( WindowsCommon::IsGroupSID(*iterator) ){
 				// put subgroup_sid entities at the back of the ItemEntityVector
-				entityVector->push_back(new ItemEntity("subgroup_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				entityVector->push_back(new ItemEntity("subgroup_sid", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				++subgroupsCount;			
 			}else{
 				// put user_sid entities at the beginning of the ItemEntityVector
-				entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				++usersCount;
 			}
         }
 
 		// if there are no user members add an user entity with a status of 'does not exist'
 		if ( usersCount == 0 ){
-			entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			entityVector->insert(entityVector->begin(),new ItemEntity("user_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 
 		// if there are no subgroup members add an subgroup entity with a status of 'does not exist'
 		if ( subgroupsCount == 0 ){
-			entityVector->push_back(new ItemEntity("subgroup_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			entityVector->push_back(new ItemEntity("subgroup_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 
 		// add the group_sid item entity to the beginning of the group_sid_item
-		entityVector->insert(entityVector->begin(), new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+		entityVector->insert(entityVector->begin(), new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 
 		item->SetElements(entityVector);
 		entityVector->clear();
@@ -137,7 +137,7 @@ Item* GroupSidProbe::GetGroupSidInfo ( string groupSidStr ) {
 
     } else {
         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-        item->AppendElement ( new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+        item->AppendElement ( new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
         if ( WindowsCommon::IsGroupSID ( groupSidStr ) == 0 ) {
             item->AppendMessage ( new OvalMessage ( "The specified SID is not a group SID." ) );

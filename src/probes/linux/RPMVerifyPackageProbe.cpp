@@ -261,12 +261,12 @@ namespace {
 
 		auto_ptr<Item> item = CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("name", pkgName, OvalEnum::DATATYPE_STRING, true));
-		item->AppendElement(new ItemEntity("epoch", installed_epoch, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, true, verStatus));
-		item->AppendElement(new ItemEntity("release", installed_release, OvalEnum::DATATYPE_STRING, true, relStatus));
-		item->AppendElement(new ItemEntity("arch", installed_architecture, OvalEnum::DATATYPE_STRING, true, archStatus));
-		item->AppendElement(new ItemEntity("extended_name", installed_extended_name, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("name", pkgName, OvalEnum::DATATYPE_STRING));
+		item->AppendElement(new ItemEntity("epoch", installed_epoch, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, verStatus));
+		item->AppendElement(new ItemEntity("release", installed_release, OvalEnum::DATATYPE_STRING, relStatus));
+		item->AppendElement(new ItemEntity("arch", installed_architecture, OvalEnum::DATATYPE_STRING, archStatus));
+		item->AppendElement(new ItemEntity("extended_name", installed_extended_name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			
 		// check it for a match with the object and if so verify it.
 		if (obj->Analyze(item.get())){
@@ -289,27 +289,27 @@ namespace {
 		  item->AppendMessage(new OvalMessage("NOTE: the showVerifyPackage() function used to collect the dependency_check_passed entity prints a message to stdout if it fails. The message looks like 'Unsatisfied dependencies for (rpm): (dependency_1),...,(dependency_n).",OvalEnum::LEVEL_INFO));
 
 		  item->AppendElement(new ItemEntity("dependency_check_passed", (!verifyPkgResult)?"true":"false",
-						   OvalEnum::DATATYPE_BOOLEAN, false,OvalEnum::STATUS_EXISTS));
+						   OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 		}else{
 		  // Otherwise don't collect it
-		  item->AppendElement(new ItemEntity("dependency_check_passed","",OvalEnum::DATATYPE_BOOLEAN, false,OvalEnum::STATUS_NOT_COLLECTED));
+		  item->AppendElement(new ItemEntity("dependency_check_passed","",OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
 		}
 
 		// Check the rpm's digest. This is not collected because you need to check it against the digest in the 
 		// .rpm file which is not supported in the object.
 		item->AppendMessage(new OvalMessage("The digest_check_passed entity is not collected because you need to check it against the digest in the .rpm file which is not supported in the object.",OvalEnum::LEVEL_INFO));
 		item->AppendElement(new ItemEntity("digest_check_passed", "",
-						   OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
+						   OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
 
 		if ( omitAttrs & VERIFY_SCRIPT ){
 		// Check the rpm's verification script
 	        qva->qva_flags = (rpmQueryFlags) VERIFY_SCRIPT;
 		verifyPkgResult = showVerifyPackage(qva, ts, hdr);
 		item->AppendElement(new ItemEntity("verification_script_successful", (!verifyPkgResult)?"true":"false",
-						   OvalEnum::DATATYPE_BOOLEAN, false,OvalEnum::STATUS_EXISTS));
+						   OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 		}else{
                   // Otherwise don't collect it
-                  item->AppendElement(new ItemEntity("verification_script_successful","",OvalEnum::DATATYPE_BOOLEAN, false,OvalEnum::STATUS_NOT_COLLECTED));
+                  item->AppendElement(new ItemEntity("verification_script_successful","",OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
                 }
 
 		// Check the rpm's signature. This is not collected because you need to check it against the signature in the 
@@ -317,7 +317,7 @@ namespace {
                 item->AppendMessage(new OvalMessage("The signature_check_passed entity is not collected because you need to check it against the digest in the .rpm file which is not supported in the object.",OvalEnum::LEVEL_INFO));
 
 		item->AppendElement(new ItemEntity("signature_check_passed", "",
-						   OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_NOT_COLLECTED));
+						   OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_NOT_COLLECTED));
 	}
 
 	VerifyBehaviors GetBehaviors(Object *obj) {

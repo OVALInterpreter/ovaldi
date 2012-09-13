@@ -64,25 +64,6 @@ StateOrObjectFieldEntityValue::~StateOrObjectFieldEntityValue() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-bool StateOrObjectFieldEntityValue::Equals(AbsEntityValue* entityValue){
-	StateOrObjectFieldEntityValue* fieldEntityValue = (StateOrObjectFieldEntityValue*)entityValue;
-	bool isEqual = false;
-
-	if(this->GetDatatype() == fieldEntityValue->GetDatatype()) {
-		if(this->GetOperation() == fieldEntityValue->GetOperation()) {
-			if(this->GetName().compare(fieldEntityValue->GetName()) == 0) {
-				if(this->GetValue().compare(fieldEntityValue->GetValue()) == 0) {
-					if(this->GetEntityCheck() == fieldEntityValue->GetEntityCheck()) {
-						if(this->GetVarCheck() == fieldEntityValue->GetVarCheck()) {
-							isEqual = true;
-						}
-					}
-				}
-			}
-		}
-	}
-	return isEqual;
-}
 
 void StateOrObjectFieldEntityValue::Parse(DOMElement* objectEntityElm) {
 

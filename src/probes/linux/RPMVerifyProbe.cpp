@@ -331,8 +331,8 @@ namespace {
 			// check it for a match with the object.
 			auto_ptr<Item> item = CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("name", pkgName, OvalEnum::DATATYPE_STRING, true));
-			item->AppendElement(new ItemEntity("filepath", fileName, OvalEnum::DATATYPE_STRING, true));
+			item->AppendElement(new ItemEntity("name", pkgName, OvalEnum::DATATYPE_STRING));
+			item->AppendElement(new ItemEntity("filepath", fileName, OvalEnum::DATATYPE_STRING));
 			if (!obj->Analyze(item.get()))
 				continue;
 
@@ -431,7 +431,7 @@ namespace {
 		// this test is not supported on the version of 'rpm' which comes with
 		// RHEL5, so it's hard-coded to always have status=not collected.
 		item->AppendElement(new ItemEntity("capabilities_differ", "", 
-										   OvalEnum::DATATYPE_STRING, false, 
+										   OvalEnum::DATATYPE_STRING, 
 										   OvalEnum::STATUS_NOT_COLLECTED));
 
 		item->AppendElement(new ItemEntity("configuration_file", 

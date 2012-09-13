@@ -82,7 +82,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 
 The following instructions describe how to build the OVAL Interpreter 
 on a Windows system.  The OVAL Interpreter has been built and tested on 
-the 32-bit version of Windows XP Pro using VC8 and the Windows 7 SDK. The 
+the 32-bit version of Windows XP Pro using VC10 and the Windows 7 SDK. The 
 source distribution includes a project file that can be used to build 
 the OVAL Interpreter. Before the OVAL Interpreter can be built, the 
 supporting libraries must be installed. Follow the instruction below 
@@ -157,8 +157,8 @@ to setup and install the supporting libraries.
       After setting up the PCRE, Xerces, and Xalan libraries open the provided project
       for the OVAL Interpreter. The project is in:
 
-         Visual C++ 8:
-         <path to ovaldi directory>\project\Win32\VC8\OVALInterpreter.vcproj
+         Visual C++ 10:
+         <path to ovaldi directory>\project\Win32\VC10\OVALInterpreter.vcxproj
 
       From the build menu simply select "build" to build the OVAL Interpreter.
       Note that a "Debug" and a "Release" build configuration is provided.

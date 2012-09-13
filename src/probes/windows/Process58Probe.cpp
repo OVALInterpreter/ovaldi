@@ -156,6 +156,36 @@ Item* Process58Probe::GetProcess ( string commandLineStr ) {
     return NULL;
 }
 
+
+BOOL CALLBACK Process58Probe::EnumWindowsProc(HWND hwnd,LPARAM lParam)
+{
+	DWORD processID = 0;
+	LPDWORD procIdPtr = &processID;
+    char WinText[256] = {NULL};
+	std::pair<DWORD,string> * pairing = reinterpret_cast<std::pair<DWORD,string>*>(lParam); 
+
+    if(!hwnd) 
+		return TRUE; 
+
+	GetWindowThreadProcessId(hwnd,procIdPtr);
+
+	if(processID == pairing->first){
+		LONG ExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);		
+		HWND parentHwnd = GetWindow(hwnd, GW_OWNER);
+		if(parentHwnd == NULL){
+
+			if(!(ExStyle & WS_EX_NOACTIVATE)){
+				GetWindowText(hwnd,WinText,sizeof(WinText));
+				pairing->second = WinText;
+				return FALSE;
+			}		
+		}
+	}
+ 
+    return TRUE; 
+}
+
+
 void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
     HANDLE openProcessHandle = OpenProcess ( PROCESS_ALL_ACCESS, false, processEntry.th32ProcessID );
 
@@ -182,13 +212,52 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 
             Item * item = this->CreateItem();
             item->SetStatus ( OvalEnum::STATUS_EXISTS );
-            ( commandLineStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( processEntry.th32ProcessID ) , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "ppid" , Common::ToString ( processEntry.th32ParentProcessID ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "priority" , Common::ToString ( processEntry.pcPriClassBase ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "image_path" , processEntry.szExeFile , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            ( deviceProcessImageNameStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            Process58Probe::processes->push_back ( item );
+            ( commandLineStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "command_line" , commandLineStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( processEntry.th32ProcessID ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "ppid" , Common::ToString ( processEntry.th32ParentProcessID ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "priority" , Common::ToString ( processEntry.pcPriClassBase ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "image_path" , processEntry.szExeFile , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            ( deviceProcessImageNameStr.compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) ) : item->AppendElement ( new ItemEntity ( "current_dir" , deviceProcessImageNameStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            
+			try{
+
+				FILETIME createTime, time2, time3, time4;
+				if(GetProcessTimes(openProcessHandle,&createTime,&time2,&time3,&time4) > 0){
+					item->AppendElement(new ItemEntity ("creation_time",WindowsCommon::ToString(createTime),OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				}else{
+					item->AppendElement(new ItemEntity ("creation_time", "" ,OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+				}
+
+				DWORD procID = GetProcessId(openProcessHandle);
+
+				std::pair<DWORD,string> pairing (procID,"");
+				EnumWindows(&Process58Probe::EnumWindowsProc, reinterpret_cast<LPARAM>(&pairing));
+				string primaryWindowText = pairing.second;
+
+				if(primaryWindowText.length() > 0){
+					item->AppendElement(new ItemEntity ("primary_window_text", primaryWindowText,OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				}else{
+					item->AppendElement(new ItemEntity ("primary_window_text", "",OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				}
+				
+				DWORD depResult = 0;
+				BOOL perm = FALSE;
+
+				if(GetProcessDEPPolicy(openProcessHandle,&depResult,&perm)){
+					if(depResult == PROCESS_DEP_ENABLE){
+						item->AppendElement(new ItemEntity ("dep_enabled", "1" ,OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
+					}else if(depResult == 0){
+						item->AppendElement(new ItemEntity ("dep_enabled", "0" ,OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
+					}
+				}else{
+					item->AppendElement(new ItemEntity ("dep_enabled", "" ,OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
+				}
+
+			}catch(Exception ex) {
+				Log::Message("Error: Unable to access process information.");
+			}
+
+			Process58Probe::processes->push_back ( item );
 		}
 
         if ( deviceProcessImageName != NULL ) {
@@ -201,6 +270,8 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
         }
     }
 }
+
+
 
 void Process58Probe::GetLogicalPathToDevicePath() {
     string deviceDriveStr;
@@ -248,6 +319,7 @@ void Process58Probe::DeleteCommandLineMap() {
         delete Process58Probe::commandLineMap;
     }
 }
+
 
 void Process58Probe::DeletePathMap() {
     if ( Process58Probe::pathMap != NULL ) {

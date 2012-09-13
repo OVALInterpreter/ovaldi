@@ -118,8 +118,8 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
@@ -128,7 +128,7 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 
@@ -161,7 +161,7 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 
 				item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				ADD_WINDOWS_VIEW_ENTITY
 				collectedItems->push_back(item);
 			}
@@ -216,8 +216,8 @@ Item* FileMd5Probe::GetMd5(string path, string fileName) {
 		//////////////////////////////////////////////////////
 
 		item = this->CreateItem();
-		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		ifstream in(filePath.c_str(), ios::in|ios::binary);
 
@@ -228,7 +228,7 @@ Item* FileMd5Probe::GetMd5(string path, string fileName) {
 							"' \n";
 			item->SetStatus(OvalEnum::STATUS_ERROR);
 			item->AppendMessage(new OvalMessage(errorMessage));
-			ItemEntity* md5Entity = new ItemEntity("md5", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* md5Entity = new ItemEntity("md5", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 			item->AppendElement(md5Entity);
 		
 		} else {

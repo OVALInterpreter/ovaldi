@@ -130,8 +130,8 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
@@ -140,7 +140,7 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 
@@ -168,7 +168,7 @@ ItemVector* TextFileContentProbe::CollectItems(Object* object) {
 
 				item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				ADD_WINDOWS_VIEW_ENTITY
 				collectedItems->push_back(item);
 			}
@@ -220,14 +220,14 @@ void TextFileContentProbe::GetLines(string path, string fileName,
 				item = this->CreateItem();
 				collectedItems->push_back(item);
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("line", buffer, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("line", buffer, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 				StringVector::iterator iterator;
 				for (iterator = results->begin(); iterator != results->end(); iterator++) {
 					// add a line for each matching subexpression
-					item->AppendElement(new ItemEntity("subexpression", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));					
+					item->AppendElement(new ItemEntity("subexpression", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));					
 				}
 
 				ADD_WINDOWS_VIEW_ENTITY

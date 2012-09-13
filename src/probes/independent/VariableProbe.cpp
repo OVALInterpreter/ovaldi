@@ -124,7 +124,7 @@ ItemVector* VariableProbe::CollectItems(Object *object) {
 		// only keep varIds that match operation and value and var check
 		StringVector::iterator it;
 		for(it = varIds->begin(); it != varIds->end(); it++) {
-			ItemEntity* tmp = new ItemEntity("var_ref", (*it), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+			ItemEntity* tmp = new ItemEntity("var_ref", (*it), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);
 			if(varRef->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
 				Item* item = this->GetItemForVarId((*it));
 				if(item != NULL) {
@@ -198,7 +198,7 @@ Item* VariableProbe::GetItemForVarId(string varId) {
 	Item* item = NULL;
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("var_ref", varId, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("var_ref", varId, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		
 	AbsVariable* var = VariableFactory::GetVariable(varId);
 
@@ -208,7 +208,7 @@ Item* VariableProbe::GetItemForVarId(string varId) {
 	VariableValueVector::iterator iterator;
 	for(iterator = varValues->begin(); iterator != varValues->end(); iterator++) { 		
 		string value = (*iterator)->GetValue();	
-		item->AppendElement(new ItemEntity("value", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("value", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}
 
 	return item;

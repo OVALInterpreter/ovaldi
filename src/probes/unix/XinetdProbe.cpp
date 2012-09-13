@@ -519,7 +519,7 @@ Item* XinetdProbe::Service2Item(const ServiceEntryMap& service,
 	}
 	
 	ItemEntity* nameItemEntity = new ItemEntity("service_name", paramIter->second[0].str(),
-												OvalEnum::DATATYPE_STRING, true);
+												OvalEnum::DATATYPE_STRING);
 	if (nameEntity->Analyze(nameItemEntity) != OvalEnum::RESULT_TRUE) {
 		delete nameItemEntity;
 		return NULL;
@@ -533,7 +533,7 @@ Item* XinetdProbe::Service2Item(const ServiceEntryMap& service,
 	}
 
 	ItemEntity* protItemEntity = new ItemEntity("protocol", paramIter->second[0].str(),
-												OvalEnum::DATATYPE_STRING, true);
+												OvalEnum::DATATYPE_STRING);
 	if (protocolEntity->Analyze(protItemEntity) != OvalEnum::RESULT_TRUE) {
 		delete nameItemEntity;
 		delete protItemEntity;
@@ -564,7 +564,7 @@ Item* XinetdProbe::Service2Item(const ServiceEntryMap& service,
 		if (allowedTypes.find(type) == allowedTypes.end()) {
 
 			typeEntity = new ItemEntity("type", "", 
-										OvalEnum::DATATYPE_STRING, false,
+										OvalEnum::DATATYPE_STRING,
 										OvalEnum::STATUS_NOT_COLLECTED);
 			item->AppendMessage(new OvalMessage(string("type '")+type+
 													   "' is not one of the enumerated legal values."));
@@ -675,7 +675,7 @@ void XinetdProbe::AddItemEntity(Item *item,
 	ServiceEntryMap::const_iterator iter;
 	if ((iter = service.find(paramName)) != service.end())
 		item->AppendElement(new ItemEntity(entityName.c_str(), iter->second[0].str(),
-										   dataType, false));
+										   dataType));
 }
 
 void XinetdProbe::ReadFileToString(const string& fileName, string &contents) {

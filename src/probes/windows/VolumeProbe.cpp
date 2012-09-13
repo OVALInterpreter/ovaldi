@@ -71,7 +71,7 @@ ItemVector* VolumeProbe::CollectItems ( Object *object ) {
 	}else{
 		StringSet volumes;
 		this->GetAllVolumes(volumes);
-		ItemEntity* volumeItemEntity = new ItemEntity("rootpath","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		ItemEntity* volumeItemEntity = new ItemEntity("rootpath","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = volumes.begin(); it != volumes.end(); it++){
 			volumeItemEntity->SetValue(*it);
 			if ( rootpath->Analyze(volumeItemEntity) == OvalEnum::RESULT_TRUE ){
@@ -130,10 +130,10 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
 			
 			if ( error == ERROR_PATH_NOT_FOUND ){
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST));				
+				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST));				
 			}else{
 				item->SetStatus(OvalEnum::STATUS_ERROR);
-				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ));
+				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ));
 				item->AppendMessage(new OvalMessage("Error: GetVolumeInformation() was unable to retrieve all of the requested information regarding this volume. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) ));
 			}
 			
@@ -216,26 +216,26 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
 			driveType = GetDriveType(rootPathStr.c_str());
 
             item->SetStatus ( OvalEnum::STATUS_EXISTS );
-			( rootPathStr.compare("") == 0 ) ? item->AppendElement ( new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "rootpath" , rootPathStr, OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS )  );
-            ( fileSystemNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "file_system" , "" , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "file_system" , fileSystemNameBuffer , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS )  );
-            ( volumeNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "name" , "" , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "name" , volumeNameBuffer , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS )  );
-			item->AppendElement ( new ItemEntity ( "drive_type" , this->DriveTypeToString ( driveType ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "volume_max_component_length" , Common::ToString ( maximumComponentLength ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "serial_number" , Common::ToString ( volumeSerialNumber ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_case_sensitive_search" , Common::ToString ( fileCaseSensistiveSearch ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_case_preserved_names" , Common::ToString ( fileCasePreservedNames ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_unicode_on_disk" , Common::ToString ( fileUnicodeOnDisk ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_persistent_acls" , Common::ToString ( filePersistentAcls ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_file_compression" , Common::ToString ( fileFileCompression ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_volume_quotas" , Common::ToString ( fileVolumeQuotas ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_supports_sparse_files" , Common::ToString ( fileSupportsSparseFiles ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_supports_reparse_points" , Common::ToString ( fileSupportsReparsePoints ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_supports_remote_storage" , Common::ToString ( fileSupportsRemoteStorage ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_volume_is_compressed" , Common::ToString ( fileVolumeIsCompressed ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_supports_object_ids" , Common::ToString ( fileSupportsObjectIds ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_supports_encryption" , Common::ToString ( fileSupportsEncryption ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_named_streams" , Common::ToString ( fileNamedStreams ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
-            item->AppendElement ( new ItemEntity ( "file_read_only_volume" , Common::ToString ( fileReadOnlyVolume ) , OvalEnum::DATATYPE_BOOLEAN , false , OvalEnum::STATUS_EXISTS ) );
+			( rootPathStr.compare("") == 0 ) ? item->AppendElement ( new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "rootpath" , rootPathStr, OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS )  );
+            ( fileSystemNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "file_system" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "file_system" , fileSystemNameBuffer , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS )  );
+            ( volumeNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "name" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "name" , volumeNameBuffer , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS )  );
+			item->AppendElement ( new ItemEntity ( "drive_type" , this->DriveTypeToString ( driveType ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "volume_max_component_length" , Common::ToString ( maximumComponentLength ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "serial_number" , Common::ToString ( volumeSerialNumber ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_case_sensitive_search" , Common::ToString ( fileCaseSensistiveSearch ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_case_preserved_names" , Common::ToString ( fileCasePreservedNames ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_unicode_on_disk" , Common::ToString ( fileUnicodeOnDisk ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_persistent_acls" , Common::ToString ( filePersistentAcls ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_file_compression" , Common::ToString ( fileFileCompression ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_volume_quotas" , Common::ToString ( fileVolumeQuotas ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_supports_sparse_files" , Common::ToString ( fileSupportsSparseFiles ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_supports_reparse_points" , Common::ToString ( fileSupportsReparsePoints ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_supports_remote_storage" , Common::ToString ( fileSupportsRemoteStorage ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_volume_is_compressed" , Common::ToString ( fileVolumeIsCompressed ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_supports_object_ids" , Common::ToString ( fileSupportsObjectIds ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_supports_encryption" , Common::ToString ( fileSupportsEncryption ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_named_streams" , Common::ToString ( fileNamedStreams ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "file_read_only_volume" , Common::ToString ( fileReadOnlyVolume ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
 
             if ( volumeNameBuffer != NULL ) {
                 free ( volumeNameBuffer );

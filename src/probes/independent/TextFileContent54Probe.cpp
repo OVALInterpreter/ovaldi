@@ -127,9 +127,9 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
@@ -162,9 +162,9 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 					
@@ -191,7 +191,7 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 				}
@@ -294,7 +294,7 @@ void TextFileContent54Probe::GetMatches(const string& path,
 			}
 
 			// make sure this is one of the instances the object actually calls for
-			ItemEntity *instanceItemEntity = new ItemEntity("instance", Common::ToString(instance), OvalEnum::DATATYPE_INTEGER, true);
+			ItemEntity *instanceItemEntity = new ItemEntity("instance", Common::ToString(instance), OvalEnum::DATATYPE_INTEGER);
 			if (instanceEntity->Analyze(instanceItemEntity) != OvalEnum::RESULT_TRUE) {
 				delete instanceItemEntity;
 				continue;
@@ -302,10 +302,10 @@ void TextFileContent54Probe::GetMatches(const string& path,
 
 			Item *item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(path, fileName), OvalEnum::DATATYPE_STRING, true));
-			item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true));
-			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true));
-			item->AppendElement(new ItemEntity("pattern", *patternIter, OvalEnum::DATATYPE_STRING, true));
+			item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(path, fileName), OvalEnum::DATATYPE_STRING));
+			item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING));
+			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING));
+			item->AppendElement(new ItemEntity("pattern", *patternIter, OvalEnum::DATATYPE_STRING));
 			item->AppendElement(instanceItemEntity);
 
 			// first element is the overall match... subsequent elements are the captures

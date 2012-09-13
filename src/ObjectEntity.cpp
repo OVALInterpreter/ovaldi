@@ -46,7 +46,6 @@ ObjectEntity::ObjectEntity(ObjectEntity* orig) : AbsEntity() {
 	// -----------------------------------------------------------------------
 
 	this->SetDatatype(orig->GetDatatype());
-	this->SetIsObjectEntity(true);
 	this->SetName(orig->GetName());
 	this->SetNil(orig->GetNil());
 	this->SetOperation(orig->GetOperation());
@@ -56,7 +55,7 @@ ObjectEntity::ObjectEntity(ObjectEntity* orig) : AbsEntity() {
 }
 
 ObjectEntity::ObjectEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check varCheck, bool nil)
-									: AbsEntity(name, value, datatype, true, operation, varRef, varCheck, nil) {
+									: AbsEntity(name, value, datatype, operation, varRef, varCheck, nil) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -77,30 +76,6 @@ ObjectEntity::~ObjectEntity() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-bool ObjectEntity::Equals(AbsEntity* entity) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return true if this ObjectEntity is equal to the provided ObjectEntity
-	// -----------------------------------------------------------------------
-	ObjectEntity* objectEntity = (ObjectEntity*)entity;
-	bool isEqual = false;
-
-	if(this->GetDatatype() == objectEntity->GetDatatype()) {
-		if(this->GetOperation() == objectEntity->GetOperation()) {
-			if(this->GetName().compare(objectEntity->GetName()) == 0) {
-				if(this->GetValue().compare(objectEntity->GetValue()) == 0) {
-					if(this->GetVarCheck() == objectEntity->GetVarCheck()) {
-						isEqual = true;
-					}
-				}
-			}
-		}
-	}
-
-	return isEqual;
-}
-
 void ObjectEntity::Parse(DOMElement* objectEntityElm) {
 
 	this->SetName(XmlCommon::GetElementName(objectEntityElm));

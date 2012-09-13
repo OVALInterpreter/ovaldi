@@ -102,7 +102,7 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 
 				auto_ptr<Item> item = ::CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				collectedItems->push_back(item.release());
 
 			} else {
@@ -112,7 +112,7 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 
 					auto_ptr<Item> item = ::CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("name", (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("name", (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item.release());
 				}
 			}
@@ -321,14 +321,14 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items, BehaviorVector* be
 		/* Put the data in a data object. */
 		auto_ptr<Item> item = ::CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("arch", installed_architecture, OvalEnum::DATATYPE_STRING, false, archStatus));
-		item->AppendElement(new ItemEntity("epoch", installed_epoch, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("release", installed_release, OvalEnum::DATATYPE_STRING, false, relStatus));
-		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, false, verStatus));
-		item->AppendElement(new ItemEntity("evr", installed_evr, OvalEnum::DATATYPE_EVR_STRING, false, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("signature_keyid", installed_signature_keyid, OvalEnum::DATATYPE_STRING, false, keyidStatus));
-		item->AppendElement(new ItemEntity("extended_name", installed_extended_name, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("name", name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("arch", installed_architecture, OvalEnum::DATATYPE_STRING, archStatus));
+		item->AppendElement(new ItemEntity("epoch", installed_epoch, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("release", installed_release, OvalEnum::DATATYPE_STRING, relStatus));
+		item->AppendElement(new ItemEntity("version", installed_version, OvalEnum::DATATYPE_STRING, verStatus));
+		item->AppendElement(new ItemEntity("evr", installed_evr, OvalEnum::DATATYPE_EVR_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("signature_keyid", installed_signature_keyid, OvalEnum::DATATYPE_STRING, keyidStatus));
+		item->AppendElement(new ItemEntity("extended_name", installed_extended_name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		if (Behavior::GetBehaviorValue(beh, "filepaths") == "true"){
 			RpmfiGuard fileInfo(ts, header, RPMTAG_BASENAMES, name);
@@ -337,7 +337,7 @@ void RPMInfoProbe::GetRPMInfo(string name, ItemVector* items, BehaviorVector* be
 
 			while(rpmfiNext(fileInfo) > -1) {
 				const char *fileName = rpmfiFN(fileInfo);
-				item->AppendElement(new ItemEntity("filepath", fileName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("filepath", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			}
 		}
 

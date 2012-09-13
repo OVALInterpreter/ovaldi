@@ -27,6 +27,8 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <Common.h>
 #include "PasswordPolicyProbe.h"
 #include "WMIItem.h"
 #include "WMIUtil.h"
@@ -69,13 +71,13 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 
 	if (nStatus == NERR_Success) {
 		if (pBuf != NULL) {
-			string minPasswordLen = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_len);
+			string minPasswordLen = Common::ToString(pBuf->usrmod0_min_passwd_len);
 
-			string maxPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_max_passwd_age);
+			string maxPasswordAge = Common::ToString(pBuf->usrmod0_max_passwd_age);
 			
-			string minPasswordAge = WindowsCommon::ToString(pBuf->usrmod0_min_passwd_age);
+			string minPasswordAge = Common::ToString(pBuf->usrmod0_min_passwd_age);
 
-			string passwordHistoryLen = WindowsCommon::ToString(pBuf->usrmod0_password_hist_len);
+			string passwordHistoryLen = Common::ToString(pBuf->usrmod0_password_hist_len);
 
 			// create a new passwordpolicy item
 			Item* item = this->CreateItem();
@@ -83,10 +85,10 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
 			collectedItems = new ItemVector();
 			collectedItems->push_back(item);
 
-			item->AppendElement(new ItemEntity("max_passwd_age",  maxPasswordAge, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("max_passwd_age",  maxPasswordAge, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("min_passwd_age",  minPasswordAge, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("min_passwd_len",  minPasswordLen, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("password_hist_len",  passwordHistoryLen, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 
 			std::string passwordComplexity;
 			std::string reversibleEncryption;
@@ -96,8 +98,8 @@ ItemVector* PasswordPolicyProbe::CollectItems(Object* /*object*/) {
              */
 			ArePasswordComplexityReverseEncryptionSet(passwordComplexity, reversibleEncryption);
 
-			item->AppendElement(new ItemEntity("password_complexity",  passwordComplexity, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("reversible_encryption",  reversibleEncryption, OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("password_complexity",  passwordComplexity, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("reversible_encryption",  reversibleEncryption, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 
 			// Free the allocated memory.
 			NetApiBufferFree(pBuf);

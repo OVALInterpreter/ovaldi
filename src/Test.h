@@ -38,6 +38,7 @@
 #include "Log.h"
 #include "State.h"
 #include "Object.h"
+#include "OvalMessage.h"
 
 
 XERCES_CPP_NAMESPACE_USE
@@ -202,12 +203,18 @@ public:
 	*/
 	static Test* GetTestById(std::string testId);
 
+	/** Return the test's message vector. */
+	OvalMessageVector* GetMessages();
+	/** Add the specified message to the test's vector of messages **/
+	void AppendMessage(OvalMessage* message);
+
+
 private:
 
 	/** Create a complete Test object **/
 	Test();
 
-	/** Parse the Test elmement into a Test object. 
+	/** Parse the Test element into a Test object. 
 		The resulting object is cached.
 	*/
 	void Parse(DOMElement* testElm);
@@ -232,6 +239,7 @@ private:
 	std::string objectId;
 	StringSet stateIds;
 	std::string name;
+	OvalMessageVector testMessages;
 
 	static TestMap processedTestsMap;
 };

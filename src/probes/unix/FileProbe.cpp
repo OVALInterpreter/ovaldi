@@ -94,9 +94,9 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 
 						Item* item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						collectedItems->push_back(item);
 					}
 					
@@ -111,7 +111,7 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 								fileNameVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 							} else if (fileNameVector->size() == 0) {
 								ItemEntityVector* itemVector = item->GetElements();
-								itemVector->insert(itemVector->begin() + item->GetElementsByName("path")->size() + item->GetElementsByName("filepath")->size(), new ItemEntity ( "filename" , "" , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_NOT_COLLECTED, true ));
+								itemVector->insert(itemVector->begin() + item->GetElementsByName("path")->size() + item->GetElementsByName("filepath")->size(), new ItemEntity ( "filename" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_NOT_COLLECTED, true ));
 							}
 						}
 						
@@ -153,9 +153,9 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){
@@ -181,7 +181,7 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -246,15 +246,15 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	// Set the status of the file to exists
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	if(fileName.compare("") != 0) {
-		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}
 
 	mode_t mode;
 	mode = sbuf.st_mode;
-	ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS);
+	ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);
 
 	if ((mode & 0xF000) == S_IFIFO) type->SetValue("fifo");
 	else if ((mode & 0xF000) == S_IFCHR) type->SetValue("character");
@@ -413,5 +413,30 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 	item->AppendElement(new ItemEntity("oexec", Common::ToString(oexec), OvalEnum::DATATYPE_BOOLEAN));
 
-	return item;
+	//////////////////////////////////////////////////////
+	///////////////////////  ACL  ////////////////////////
+	//////////////////////////////////////////////////////
+
+# if defined (LINUX)
+	acl_t aclp;
+	acl_type_t acl_type = ACL_TYPE_ACCESS;
+       
+	aclp = acl_get_file(filePath.c_str(),acl_type);
+	if(aclp == (acl_t)NULL){
+	  if(errno == EOPNOTSUPP){
+	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_DOES_NOT_EXIST,0));
+	  }else{
+	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_ERROR,0));
+	    item->AppendMessage(new OvalMessage(string("Error reading ACL data: ") + strerror(errno)));
+	  }
+	}else{
+	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("1"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_EXISTS,0));
+         acl_free(aclp);
+        }
+# else
+	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_NOT_COLLECTED,0));
+	
+# endif
+
+      return item;
 }

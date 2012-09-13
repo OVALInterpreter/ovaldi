@@ -155,7 +155,7 @@ Item *ShadowProbe::CreateItemFromPasswd(const struct spwd *pwInfo) {
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
 	
 	ItemEntity *nameEntity = new ItemEntity("username", pwInfo->sp_namp,
-											OvalEnum::DATATYPE_STRING, true);
+											OvalEnum::DATATYPE_STRING);
 	ItemEntity *passwordEntity = new ItemEntity("password", pwInfo->sp_pwdp);
 	ItemEntity *lastChangedEntity = new ItemEntity("chg_lst", Common::ToString(pwInfo->sp_lstchg), OvalEnum::DATATYPE_INTEGER);
 	ItemEntity *changeAllowedEntity = new ItemEntity("chg_allow", Common::ToString(pwInfo->sp_min), OvalEnum::DATATYPE_INTEGER);
@@ -180,7 +180,7 @@ Item *ShadowProbe::CreateItemFromPasswd(const struct spwd *pwInfo) {
 	if (method.empty()) {
 		item->AppendMessage(new OvalMessage("Couldn't determine password encryption method"));
 		encryptMethodEntity = new ItemEntity("encrypt_method", "", OvalEnum::DATATYPE_STRING,
-											 false, OvalEnum::STATUS_ERROR);
+											 OvalEnum::STATUS_ERROR);
 	} else
 		encryptMethodEntity = new ItemEntity("encrypt_method", method);
 
@@ -220,7 +220,7 @@ Item *ShadowProbe::GetSingleItem(const string& username) {
 
 	if (pwInfo == NULL) {
 		item = this->CreateItem();
-		ItemEntity *nameEntity = new ItemEntity("username", username, OvalEnum::DATATYPE_STRING, true);
+		ItemEntity *nameEntity = new ItemEntity("username", username, OvalEnum::DATATYPE_STRING);
 		item->AppendElement(nameEntity);
 
 		if (errno == 0) {

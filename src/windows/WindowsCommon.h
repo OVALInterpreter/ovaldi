@@ -42,9 +42,6 @@
 #include <lm.h>
 #include <Ntsecapi.h>
 #include <windows.h>
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
-#endif
 #include <Sddl.h>
 #include <Authz.h>
 #undef __DOMDocument_FWD_DEFINED__
@@ -120,7 +117,7 @@ public:
 	  @param the string to populate with the string representation of the SID.
 	  @return true if the conversion was successful. otherwise return false.
 	*/
-	static bool GetTextualSid(PSID pSid, LPTSTR* TextualSid);
+	static bool GetTextualSid(PSID pSid, std::string* TextualSid);
 
 	/** Return the string error massge for the specified error code. */
 	static string GetErrorMessage(DWORD dwLastError);
@@ -194,11 +191,25 @@ public:
 	*/
     static void GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames);
 
-	/** Get the domain and sid string for the specifeid trustee name. Return true if the trustee is a group. */
-	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
+	/**
+	 * Get the domain and sid string for the specified trustee name.
+	 * \param[in] accountNameStr the account name to look up
+	 * \param[out] sidStr the SID for \p accountNameStr, as a string
+	 * \param[out] domainStr the domain of \p accountNameStr
+	 * \param[out] isGroup receives true if the \p accountNameStr refers to a group, false otherwise
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr, bool *isGroup);
 
-	/** Get the account and domain string for the specified trustee sid. Return true if the trustee is a group. */
-	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr);
+	/**
+	 * Get the account and domain string for the specified trustee sid.
+	 * \param[in] sidStr the SID to look up, as a string
+	 * \param[out] pAccountNameStr the account name for \p sidStr
+	 * \param[out] pDomainStr the domain name for \p sidStr
+	 * \param[out] isGroup receives true if the \p sidStr refers to a group, false otherwise
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr, bool *isGroup);
 
 	/** Convert a vector of trustee names to a vector of corresponding SID strings */
 	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);
@@ -206,6 +217,10 @@ public:
 	/** Retrieves list of sids for all local users */
 	static StringSet* GetAllLocalUserSids();
 
+	/** Retrieves the last login time from a local username */
+	static DWORD GetLastLogonTimeStamp(string username);
+
+	
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(string sid);
 
@@ -242,17 +257,11 @@ public:
 	/** Convert the FILETIME structure to an integer. */
 	static string ToString(FILETIME fTime);
 
-	/** Return a string representation of the DWORD */
-	static string ToString(DWORD dw);
-
 	/** Convert the PSID to a string. 
 		Attempts to return a string representation of the input PSID. If
 		the PSID can not be converted to a string an empty string is returned.
 	*/
-	static string ToString(PSID pSid);
-
-	/** Return a string representation of the ULONGLONG */
-	static string ToString(ULONGLONG ul);
+	//static string ToString(PSID pSid);
 
 	/** Return true if the current os is Vista or later. 
 		The return value is calculated once and the result is stored in a static private variable.
@@ -278,7 +287,24 @@ public:
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
      *  @return A string of ASCII characters.
     */
-	static string UnicodeToAsciiString ( wchar_t* unicodeCharStr );
+	static string UnicodeToAsciiString ( const wchar_t* unicodeCharStr );
+
+	/**
+	 * Provided for symmetry with UnicodeToAsciiString(const string &).
+	 * Having this also makes your code cleaner, so you don't have to
+	 * call c_str() all the time.....
+	 */
+	static string UnicodeToAsciiString ( const wstring &wstr );
+
+	/**
+	 * This seems like a pointless method to have, but it's helpful when
+	 * writing templates where you don't have a fixed char type.  It allows
+	 * you to always be able to call UnicodeToAsciiString() regardless of
+	 * which type of string you have, and obtain a narrow char string.
+	 * <p>
+	 * This method just returns \p str.
+	 */
+	static string UnicodeToAsciiString ( const string &str );
 
 	/** Return true if a wide-character string of Unicode characters would convert into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that are checked for validity as ASCII characters.

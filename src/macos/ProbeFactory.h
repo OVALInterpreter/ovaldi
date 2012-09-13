@@ -63,6 +63,7 @@
 #include "InterfaceProbe.h"
 #include "PasswordProbe.h"
 #include "EnvironmentVariableProbe.h"
+#include "EnvironmentVariable58Probe.h"
 #include "XmlFileContentProbe.h"
 #include "TextFileContentProbe.h"
 #include "TextFileContent54Probe.h"

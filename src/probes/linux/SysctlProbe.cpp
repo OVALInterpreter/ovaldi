@@ -261,7 +261,7 @@ namespace {
 			 ++nameIter) {
 
 			auto_ptr<Item> item(CreateItem());
-			item->AppendElement(new ItemEntity("name", *nameIter, OvalEnum::DATATYPE_STRING, true));
+			item->AppendElement(new ItemEntity("name", *nameIter, OvalEnum::DATATYPE_STRING));
 
 			string procSysPath(SysctlName2Path(*nameIter));
 			ReadIntoItem(procSysPath, item.get());
@@ -291,7 +291,7 @@ namespace {
 			return 0;
 
 		string sysctlName = Path2SysctlName(fpath);
-		auto_ptr<ItemEntity> ie(new ItemEntity("name", sysctlName, OvalEnum::DATATYPE_STRING, true));
+		auto_ptr<ItemEntity> ie(new ItemEntity("name", sysctlName, OvalEnum::DATATYPE_STRING));
 		if (this->nameObjEntity->Analyze(ie.get()) == OvalEnum::RESULT_TRUE) {
 
 			auto_ptr<Item> item(CreateItem());

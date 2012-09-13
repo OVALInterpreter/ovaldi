@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <Common.h>
 #include "AuditEventPolicySubcategoriesProbe.h"
 
 typedef pair<GUID, string> GuidString;
@@ -88,7 +89,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 		if (ntsResult != ERROR_SUCCESS) {
 			DWORD errorCode = LsaNtStatusToWinError(ntsResult);
 			if(errorCode == ERROR_MR_MID_NOT_FOUND) {
-				throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::ToString(LsaNtStatusToWinError(ntsResult)));
+				throw ProbeException("Error obtaining audit event policy information - (win32) " + Common::ToString(LsaNtStatusToWinError(ntsResult)));
 			} else {
 				throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
 			}
@@ -114,7 +115,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 
 			//pre-populate a sorted version of the auditeventpolicysubcategories_item entities
 			for(vector<GuidString>::iterator it = _guidItemElementNameVector.begin(); it != _guidItemElementNameVector.end(); ++it) {
-					ItemEntity *pSortedItemEntity = new ItemEntity(it->second,  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+					ItemEntity *pSortedItemEntity = new ItemEntity(it->second,  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 					item->AppendElement(pSortedItemEntity);
 			}
 
@@ -131,20 +132,20 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 
 					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditLookupCategoryGuidFromCategoryId()");
 					if(AuditLookupCategoryGuidFromCategoryId((POLICY_AUDIT_EVENT_TYPE)policyAuditEventType, &auditCategoryId) == FALSE) {
-						throw ProbeException("Error retrieving category GUID.  ErrorCode:" + WindowsCommon::ToString(GetLastError()));
+						throw ProbeException("Error retrieving category GUID.  ErrorCode:" + Common::ToString(GetLastError()));
 					}
 
 					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditLookupCategoryGuidFromCategoryId()");
 					if(AuditEnumerateSubCategories(&auditCategoryId, FALSE, &pAuditSubCategoryGuids, &subCategoryCount) == FALSE) {
-						throw ProbeException("Error enumerating audit event policy subcategories.  Error Code:" + WindowsCommon::ToString(GetLastError()));
+						throw ProbeException("Error enumerating audit event policy subcategories.  Error Code:" + Common::ToString(GetLastError()));
 					}
 
 					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditQuerySystemPolicy()");
 					if(AuditQuerySystemPolicy(pAuditSubCategoryGuids, subCategoryCount, &pAuditPolicies) == FALSE) {
-						throw ProbeException("Error retrieving policy information for audit event policy subcategories.  Error Code:" + WindowsCommon::ToString(GetLastError()));
+						throw ProbeException("Error retrieving policy information for audit event policy subcategories.  Error Code:" + Common::ToString(GetLastError()));
 					}
 
-					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before subcategories loop.  Count=" + WindowsCommon::ToString(subCategoryCount));
+					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before subcategories loop.  Count=" + Common::ToString(subCategoryCount));
 
 					// Probe each subcategory in the category
 					for(ULONG subcategoryIndex = 0; subcategoryIndex < subCategoryCount; subcategoryIndex++) {
@@ -191,7 +192,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 
 			DWORD errorCode = LsaNtStatusToWinError(ntsResult);
 			if(errorCode == ERROR_MR_MID_NOT_FOUND) {
-				throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::ToString(LsaNtStatusToWinError(ntsResult)));
+				throw ProbeException("Error obtaining audit event policy information - (win32) " + Common::ToString(LsaNtStatusToWinError(ntsResult)));
 			} else {
 				throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
 			}

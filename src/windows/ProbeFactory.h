@@ -87,6 +87,7 @@
 #include "MetabaseProbe.h"
 #include "LDAPProbe.h"
 #include "CmdletProbe.h"
+#include "EnvironmentVariable58Probe.h"
 
 using namespace std;
 

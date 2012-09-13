@@ -73,7 +73,7 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
 		StringSet users;
 		WindowsCommon::GetAllLocalUsers(&users);
-		ItemEntity* userItemEntity = new ItemEntity("user","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		ItemEntity* userItemEntity = new ItemEntity("user","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = users.begin(); it != users.end(); it++){
 			userItemEntity->SetValue(*it);
 			if ( user->Analyze(userItemEntity) == OvalEnum::RESULT_TRUE ){
@@ -111,30 +111,38 @@ Item* UserProbe::GetUserInfo(string userName) {
 	if(userExists) {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("user", userName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("user", userName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		// get the enabled flag
 		try {
 			bool enabled = WindowsCommon::GetEnabledFlagForUser(userName);
-			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 		} catch (Exception ex) {
-			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
 		}
 
 		StringSet::iterator iterator;
 		if(groups->size() > 0) {
 			for(iterator = groups->begin(); iterator != groups->end(); iterator++) {
-				item->AppendElement(new ItemEntity("group", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("group", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			}
 		} else {
-			item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 		delete groups;
+
+		DWORD timeStamp = WindowsCommon::GetLastLogonTimeStamp(userName);
+		if(timeStamp > 0){
+			item->AppendElement(new ItemEntity("last_logon", Common::ToString(timeStamp), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+		}else{
+			item->AppendElement(new ItemEntity("last_logon", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST));
+		}
+
 	} else {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user", userName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("user", userName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
 	return item;

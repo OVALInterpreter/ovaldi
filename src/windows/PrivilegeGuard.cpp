@@ -36,9 +36,9 @@
 
 using namespace std;
 
-PrivilegeGuard::PrivilegeGuard(const std::string &privName, bool ctorThrow)
+PrivilegeGuard::PrivilegeGuard(const string &privName, bool ctorThrow)
 	: disabled(false) {
-	if ( !WindowsCommon::EnablePrivilege ( SE_SECURITY_NAME ) ) {
+	if ( !WindowsCommon::EnablePrivilege ( privName ) ) {
 		string msg = "Error: Security privilege " + privName +
 			" could not be enabled. Microsoft System Error " +
 			Common::ToString ( GetLastError() ) + " - " + 
@@ -65,6 +65,8 @@ PrivilegeGuard::~PrivilegeGuard() {
 }
 
 void PrivilegeGuard::disable() {
+	if (disabled) return;
+
 	disabled = true;
 
 	if ( !WindowsCommon::DisableAllPrivileges() ) {

@@ -77,12 +77,6 @@ public:
 	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
-	/** Determine if the specified ItemFieldEntityValue is equal to this ItemFieldEntityValue.
-		@param entityValue the AbsEntityValue that you would like to see if the current ItemFieldEntityValue is equal to.
-		@return a boolean value indicating whether or not the two ItemFieldEntityValues are equal.
-	*/
-	virtual bool Equals(AbsEntityValue* entityValue);
-
 	/** Return the operation of the field.
  	 *  @return A value from the OvalEnum::Operation enumeration representing the operation of the field.
 	 */

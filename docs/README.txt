@@ -1,5 +1,3 @@
-
-
 ****************************************************
 
                   OVAL Interpreter
@@ -155,7 +153,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
        Libraries:
        xerces-c_2_7_0.dll - Xerces XML library
-       msvcr71.dll - Microsoft C Runtime Library
+       msvcr100.dll - Microsoft C Runtime Library
        pcre.dll - Perl-compatible regular-expression library
        Xalan-C_1_10.dll - Xalan XSLT library
        XalanMessages_1_10.dll - Xalan XSLT library
@@ -182,7 +180,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
        To run the OVAL Interpreter, run:
 
-       ovaldi.exe -m -o definitions.xml 
+       ovaldi.exe -m -o <OVAL Definitions document> 
 
        A result summary will be output to the screen, and a detailed OVAL System
        Characteristics and OVAL Results document will be output to the current
@@ -199,11 +197,15 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        This error message occurs when the run-time components of Visual Studio,
        that are required to run an application developed with Visual Studio, are
        not installed. If you receive this error message while executing the OVAL
-       Interpreter, please install the VC++ redistributable package that can be
-       obtained at the following link. 
+       Interpreter, please install the appropriate VC++ redistributable package 
+	   that can be obtained at the following links. 
 
-         http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+		 Visual Studio C++ 2010 Redistributable Package (x86)
+         http://www.microsoft.com/en-us/download/details.aspx?id=5555
 
+		 Visual Studio C++ 2010 Redistributable Package (x64)
+         http://www.microsoft.com/en-us/download/details.aspx?id=14632
+		 
        The VC++ redistributable package will install the required run-time
        components. 
 
@@ -215,7 +217,7 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
 
 -- III -- USING THE OVAL INTERPRETER --
 
-  A. Required Privileges -- IMPORTANT NOTE:
+  A. Requirements -- IMPORTANT NOTE:
 
      In order to collect all of the system configuration data required to 
      correctly evaluate OVAL Definitions, the OVAL Interpreter MUST BE RUN WITH
@@ -228,6 +230,12 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
      Interpreter as a non-privileged user, the results of the analysis may not
      convey the true state of the system.
 
+     On 64-bit operating systems, the same information may not be available to
+     both 32 and 64-bit processes, and some may need to be accessed in a
+     different way.  This is particularly true on 64-bit Windows, where the OS
+     presents different views of the system to 32 and 64-bit processes.  To
+     ensure that all information is available, it is recommended to use 64-bit
+     builds on 64-bit systems.
 
   B. Data Protection -- IMPORTANT NOTE:
 

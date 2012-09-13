@@ -63,12 +63,24 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 
 		//Log::Debug("AbsObjectCollector::Run processing object id: " + objectId);				
 
+		// get the specified object element
+		DOMElement* objectsElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(), "objects");
+		DOMElement* objectElm = XmlCommon::FindElementByAttribute(objectsElm, "id", objectId);
+		string versionStr = XmlCommon::GetAttributeByName(objectElm, "version");
+
+		int version;
+		if(versionStr.empty()) {
+			version = 1;
+		} else {
+			version = atoi(versionStr.c_str());
+		}
+
 		// Parse this object
 		AbsObject* absObject = NULL;
 		try {
 			absObject = ObjectFactory::GetObjectById(objectId);
 		} catch (VariableFactoryException ex) {
-			collectedObject = CollectedObject::CreateError(objectId);
+			collectedObject = CollectedObject::CreateError(objectId, version);
 			collectedObject->SetFlag(ex.GetVariable()->GetFlag());
 			
 			// add all the messages reported with the AbsVariable
@@ -79,11 +91,11 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 			
 		} catch(Exception ex) {
 			Log::Info("AbsObjectCollector::Run() - Error while parsing object: " + objectId + " " + ex.GetErrorMessage());
-			collectedObject = CollectedObject::CreateError(objectId);
+			collectedObject = CollectedObject::CreateError(objectId, version);
 			collectedObject->AppendOvalMessage(new OvalMessage("AbsObjectCollector::Run() - Error while parsing object: " + objectId + " " + ex.GetErrorMessage()));
 		} catch(...) {
 			Log::Info("AbsObjectCollector::Run() - Error while parsing object: " + objectId + " Unkown error.");
-			collectedObject = CollectedObject::CreateError(objectId);
+			collectedObject = CollectedObject::CreateError(objectId, version);
 			collectedObject->AppendOvalMessage(new OvalMessage("AbsObjectCollector::Run() - Error while parsing object: " + objectId + " Unkown error."));
 		}
 
@@ -102,7 +114,7 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 
 			} catch(Exception ex) {
 				if(collectedObject == NULL) 
-					collectedObject = CollectedObject::CreateError(objectId);
+					collectedObject = CollectedObject::CreateError(absObject);
 
 				collectedObject->AppendOvalMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_FATAL));
 				collectedObject->SetFlag(OvalEnum::FLAG_ERROR);
@@ -113,7 +125,7 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 				Log::Debug("Error while collecting data for object: " + collectedObject->GetId() + " " + ex.GetErrorMessage());
 			} catch(...) {
 				if(collectedObject == NULL) 
-					collectedObject = CollectedObject::CreateError(objectId);
+					collectedObject = CollectedObject::CreateError(absObject);
 
 				collectedObject->AppendOvalMessage(new OvalMessage("An unknown error occured while collecting data." , OvalEnum::LEVEL_FATAL));
 				if(absObject != NULL) {
@@ -123,6 +135,8 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 				Log::Debug("An unknown error occured while collecting data for object: " + collectedObject->GetId());
 			} 				
 		}
+        if(absObject != NULL)
+            delete absObject;
 	}
 
 	return collectedObject;
@@ -238,7 +252,7 @@ CollectedObject* AbsObjectCollector::ProcessSetObject(SetObject* setObject) {
 	collectedObject->SetReferences(collectedSet->GetItems());
 	collectedObject->SetFlag(collectedSet->GetFlag());
 	collectedObject->AppendVariableValues(collectedSet->GetVariableValues());
-
+    delete collectedSet;
 	return collectedObject;
 }
 

@@ -72,7 +72,7 @@ ItemVector* UserSid55Probe::CollectItems(Object *object) {
 	}else{
 		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
 		StringSet* userSids = WindowsCommon::GetAllLocalUserSids();
-		ItemEntity* userSidItemEntity = new ItemEntity("user_sid","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		ItemEntity* userSidItemEntity = new ItemEntity("user_sid","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 
 		for(StringSet::iterator it = userSids->begin(); it != userSids->end(); it++){
 			userSidItemEntity->SetValue(*it);
@@ -107,8 +107,14 @@ Item* UserSid55Probe::GetUserSidInfo(string userSid) {
 
 	string userName;
 	string domain;
+	bool isGroup;
 
-	WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain);
+	if (!WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain, &isGroup)) {
+		item = this->CreateItem();
+		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		return item;
+	}
 
 	// User is ?always? from local box so be sure to remove the "\" separation character
 	size_t idx = userName.rfind('\\', 0);
@@ -129,31 +135,31 @@ Item* UserSid55Probe::GetUserSidInfo(string userSid) {
 
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		// get the enabled flag
 		try {
 			bool enabled = WindowsCommon::GetEnabledFlagForUser(userName);
-			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 		} catch (Exception ex) {
-			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
 		}
 
 		StringSet::iterator iterator;
 		if(groupSids->size() > 0) {
 			for(iterator = groupSids->begin(); iterator != groupSids->end(); iterator++) {
-				item->AppendElement(new ItemEntity("group_sid", (*iterator), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("group_sid", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			}
 		} else {
-			item->AppendElement(new ItemEntity("group_sid", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("group_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		}
 
 		delete groupSids;
 	} else {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 		
 	delete groups;

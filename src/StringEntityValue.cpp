@@ -48,20 +48,12 @@ StringEntityValue::~StringEntityValue(){
 
 }
 
-bool StringEntityValue::Equals(AbsEntityValue *entityValue){
-	StringEntityValue* stringEntityValue = (StringEntityValue*)entityValue;
-	bool isEqual = false;
-
-	if(this->GetValue().compare(stringEntityValue->GetValue()) == 0) {
-		isEqual = true;
-	}
-
-	return isEqual;
-}
-
 void StringEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm){
-	DOMText* newItemEntityElemValue = scFile->createTextNode(XMLString::transcode(this->GetValue().c_str()));
+    XMLCh *name = XMLString::transcode(this->GetValue().c_str());
+	DOMText* newItemEntityElemValue = scFile->createTextNode(name);
 	entityElm->appendChild(newItemEntityElemValue);
+    //Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&name);
 }
 
 void StringEntityValue::Parse(DOMElement* stringEntityElm) {

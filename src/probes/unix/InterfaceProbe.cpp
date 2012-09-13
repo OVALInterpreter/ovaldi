@@ -143,14 +143,14 @@ void InterfaceProbe::GetAllInterfaces() {
 		Item *item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		item->AppendElement(new ItemEntity("name", iter->GetName(), 
-										   OvalEnum::DATATYPE_STRING, true));
+										   OvalEnum::DATATYPE_STRING));
 		item->AppendElement(new ItemEntity("type", type));
 
 		if (iter->GetType() == Interface::ETHERNET)
 			item->AppendElement(new ItemEntity("hardware_addr", iter->GetHwAddr()));
 		else
 			item->AppendElement(new ItemEntity("hardware_addr", "", 
-											   OvalEnum::DATATYPE_STRING, false,
+											   OvalEnum::DATATYPE_STRING,
 											   OvalEnum::STATUS_DOES_NOT_EXIST));
 
 		item->AppendElement(new ItemEntity("inet_addr", inet_ntoa(iter->GetIPAddr())));
@@ -161,7 +161,7 @@ void InterfaceProbe::GetAllInterfaces() {
 											   inet_ntoa(iter->GetBroadAddr())));
 		else
 			item->AppendElement(new ItemEntity("broadcast_addr", "", 
-											   OvalEnum::DATATYPE_STRING, false,
+											   OvalEnum::DATATYPE_STRING,
 											   OvalEnum::STATUS_DOES_NOT_EXIST));
 
 		item->AppendElement(new ItemEntity("netmask", inet_ntoa(iter->GetNetmask())));

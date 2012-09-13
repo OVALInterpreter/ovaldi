@@ -114,7 +114,7 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("command",  command->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("command",  command->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				collectedItems->push_back(item);
 
 			} else {
@@ -124,7 +124,7 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("command",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("command",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -276,7 +276,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 		Item* item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		// Read the 'stat' and 'status' files for the remaining process parameters
 		status = RetrieveStatFile(pidStr.c_str(), &pid, &ppid, &priority, &starttime, &errMsg);
@@ -308,15 +308,15 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 				item->AppendMessage(new OvalMessage(errMsg));
 			}
 
-			item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
-			item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("exec_time",  execTimeStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+			item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 		}
 
 		items->push_back(item); 
@@ -491,7 +491,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("command", command, OvalEnum::DATATYPE_STRING, true));
+	item->AppendElement(new ItemEntity("command", command, OvalEnum::DATATYPE_STRING));
 	item->AppendElement(new ItemEntity("exec_time", formattedExecTime));
 	item->AppendElement(new ItemEntity("pid", Common::ToString(pid), OvalEnum::DATATYPE_INTEGER));
 	item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER));
@@ -501,7 +501,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 	item->AppendElement(new ItemEntity("start_time", formattedStartTime));
 	if (devicePath.empty())
 		item->AppendElement(new ItemEntity("tty", "", OvalEnum::DATATYPE_STRING,
-										   false, OvalEnum::STATUS_DOES_NOT_EXIST));
+										   OvalEnum::STATUS_DOES_NOT_EXIST));
 	else
 		item->AppendElement(new ItemEntity("tty", devicePath));
 	item->AppendElement(new ItemEntity("user_id", Common::ToString(eUserId), OvalEnum::DATATYPE_INTEGER));
@@ -645,15 +645,15 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
     item = this->CreateItem();
     item->SetStatus(OvalEnum::STATUS_EXISTS);
     item->AppendMessage(new OvalMessage("The unix-def:process_probe for OSX currently only collects the command of the process and not the command line arguments.  Note that this may cause the number of processes collected to be inaccurate"));
-    item->AppendElement(new ItemEntity("command", procdata[i].kp_proc.p_comm, OvalEnum::DATATYPE_STRING, true));
-    item->AppendElement(new ItemEntity("exec_time", formattedExecTime, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+    item->AppendElement(new ItemEntity("command", procdata[i].kp_proc.p_comm, OvalEnum::DATATYPE_STRING));
+    item->AppendElement(new ItemEntity("exec_time", formattedExecTime, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
     item->AppendElement(new ItemEntity("pid", Common::ToString(procdata[i].kp_proc.p_pid), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("ppid", Common::ToString(procdata[i].kp_eproc.e_ppid), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("priority", Common::ToString(procdata[i].kp_proc.p_priority), OvalEnum::DATATYPE_INTEGER));
     item->AppendElement(new ItemEntity("ruid", Common::ToString(procdata[i].kp_eproc.e_pcred.p_ruid), OvalEnum::DATATYPE_INTEGER));
-    item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_NOT_COLLECTED));
+    item->AppendElement(new ItemEntity("scheduling_class","",OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
     item->AppendElement(new ItemEntity("start_time", formattedStartTime));
-    item->AppendElement(new ItemEntity("tty", ttyStr, OvalEnum::DATATYPE_STRING, false, (ttyStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+    item->AppendElement(new ItemEntity("tty", ttyStr, OvalEnum::DATATYPE_STRING, (ttyStr.compare("") == 0)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
     item->AppendElement(new ItemEntity("user_id", Common::ToString(procdata[i].kp_eproc.e_ucred.cr_uid), OvalEnum::DATATYPE_INTEGER));
     
     items->push_back(item);
@@ -867,6 +867,10 @@ int ProcessProbe::RetrieveCommandLine(const char *process, char *cmdline, string
 				cmdline[i] = ' ';
 			}
 		}
+		//Clean up excess trailing spaces
+		string cmdlinestr = cmdline;
+		Common::TrimEnd(cmdlinestr);
+		strcpy (cmdline, cmdlinestr.c_str());
 	}
 
 	fclose(cmdlineFile); 

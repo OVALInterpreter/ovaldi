@@ -29,7 +29,7 @@
 //****************************************************************************************//
 
 #include <memory>
-#include <FindCloseGuard.h>
+#include <AutoCloser.h>
 // need this in both 32 and 64-bit builds for the FS_REDIRECT_* macros
 #include <FsRedirectionGuard.h>
 
@@ -132,7 +132,7 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	// the beginning of paths. (regex has to start with '^')
 	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
-		// Remove extra slashes and normalize
+		// Remove extra slashes.
 		constPortion = Common::StripTrailingSeparators(
 			GetActualPathWithCase(
 				this->fileMatcher->RemoveExtraSlashes(constPortion),
@@ -142,8 +142,15 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	// Found a constant portion
 	if(!constPortion.empty() && !patternOut.empty()) {
 
-		//	Call search function
-		this->GetPathsForOperation(constPortion, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
+		// We are going to look for the path now... I want
+		// the starting directory cased properly if it exists,
+		// because it makes searching more efficient: I only 
+		// have to do it once and the search results will be 
+		// cased right automatically.
+		string normPath;
+		if (PathExists(constPortion, &normPath))
+			//	Call search function
+			this->GetPathsForOperation(normPath, queryVal, paths, OvalEnum::OPERATION_PATTERN_MATCH);
 
 	//	No constant portion.
 	} else if(constPortion.empty()) { 
@@ -171,10 +178,12 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 			}
 		}
 	} else if(patternOut.empty()) {
-
 		//	There are no pattern matching chars treat this as a normal path 
-		if(this->PathExists(constPortion)) {
-			paths->push_back(constPortion);
+		string normPath;
+		if(this->PathExists(constPortion, &normPath)) {
+			if (EntityComparator::CompareString(op, queryVal, normPath) ==
+				OvalEnum::RESULT_TRUE)
+				paths->push_back(normPath);
 		}
 	}
 }
@@ -315,7 +324,8 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 			//	Loop through each file in the directory.  
 			//	If a sub-directory is found, make a recursive call to GetFilePathsForOperation to search its contents.
 			//	If a file is found get the file path and check it against the queryVal
-			FindCloseGuard fcg(hFind);
+			AutoCloser<HANDLE,BOOL(WINAPI&)(HANDLE)> fcg(hFind, FindClose,
+				"FindFirstFile("+findDir+')');
 			do {
 
 				// Skip ., .., and System Volume 
@@ -325,23 +335,19 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 				{
 				
 				// Found a dir
-				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-					GetPathsForOperation(dirIn + FindFileData.cFileName, queryVal, pathVector, op);
-
+				} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					//Prevent following junctions until this case is better understood
+					if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+						string reparseError;
+						reparseError.append("Skipping directory reparse point: ");
+						reparseError.append(FindFileData.cFileName);
+						Log::Info(reparseError);
+					}
+					else {
+						GetPathsForOperation(dirIn + FindFileData.cFileName, queryVal, pathVector, op);
+					}
+				}
 			} while (FindNextFile(hFind, &FindFileData));
-
-			//	Close the handle to the file search object.
-			if(!fcg.close()) {
-				string errorMessage =
-					"Error: Unable to close search handle while trying to search for matching paths. " + 
-					WindowsCommon::GetErrorMessage(GetLastError()) +
-					" Directory: " +
-					dirIn +
-					" Pattern: " +
-					queryVal;
-				throw FileFinderException(errorMessage);	
-			}
-
 		}
 	//	Just need to ensure that all exceptions have a nice message. 
 	//	So rethrow the exceptions I created catch the others and format them.
@@ -410,7 +416,8 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 
 		//	Loop through each file in the directory.  
 		//	If a file is found get the file path and check it against the queryVal
-		FindCloseGuard fcg(hFind);
+		AutoCloser<HANDLE,BOOL(WINAPI&)(HANDLE)> fcg(hFind, FindClose,
+			"FindFirstFile("+findDir+')');
 		do {
 
 			// Skip ., .., and System Volume 
@@ -441,19 +448,6 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 				}
 			}
 		} while (FindNextFile(hFind, &FindFileData));
-
-		//	Close the handle to the file search object.
-		if(!fcg.close()) {
-
-			string errorMessage =
-				"Error: Unable to close search handle while trying to search for matching files. " +
-				WindowsCommon::GetErrorMessage(GetLastError()) +
-				" Directory: " +
-				path +
-				" Pattern: " +
-				queryVal;
-			throw FileFinderException(errorMessage);
-		}
 
 	//	Just need to ensure that all exceptions have a nice message. 
 	//	So rethrow the exceptions I created catch the others and format them.
@@ -678,11 +672,19 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 			
 			// Found a dir
 			} else if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-
-				string childDir = path;					
-				childDir.append(FindFileData.cFileName);
+				//Prevent following junctions until this case is better understood
+				if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+					string reparseError;
+					reparseError.append("Skipping directory reparse point: ");
+					reparseError.append(FindFileData.cFileName);
+					Log::Info(reparseError);
+				}
+				else {
+					string childDir = path;					
+					childDir.append(FindFileData.cFileName);
 				
-				childDirs->push_back(childDir);			
+					childDirs->push_back(childDir);
+				}
 			}
 		} while (FindNextFile(hFind, &FindFileData));
 

@@ -39,12 +39,11 @@ using namespace std;
 //****************************************************************************************//
 //								AbsEntity Class											  //	
 //****************************************************************************************//
-AbsEntity::AbsEntity(string name, string value, OvalEnum::Datatype datatype, bool isObjectEntity, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check varCheck, bool nil) {
+AbsEntity::AbsEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check varCheck, bool nil) {
 
 	this->SetName(name);
 	this->SetValue(value);
 	this->SetDatatype(datatype);
-	this->SetIsObjectEntity(isObjectEntity);
 	this->SetOperation(operation);
 	this->SetVarCheck(varCheck);
 	this->SetVarRef(varRef);
@@ -101,16 +100,6 @@ OvalEnum::Datatype AbsEntity::GetDatatype() {
 void AbsEntity::SetDatatype(OvalEnum::Datatype datatype) {
 
 	this->datatype = datatype;
-}
-
-bool AbsEntity::GetIsObjectEntity() {
-
-	return this->isObjectEntity;
-}
-
-void AbsEntity::SetIsObjectEntity(bool isObjectEntity) {
-
-	this->isObjectEntity = isObjectEntity;
 }
 
 OvalEnum::Check AbsEntity::GetVarCheck() {

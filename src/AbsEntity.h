@@ -62,20 +62,13 @@ public:
 		@param varCheck an OvalEnum::Check that represents the var_check attribute for the entity.
 		@param nil a bool that represents the xsi:nil attribute for the entity.
 	*/
-	AbsEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
+	AbsEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, 
 		AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
 
 	/**
 		This destructor takes no special action. All dynamically allocated memory is freed by other classes.
 	*/
 	virtual ~AbsEntity();
-
-	/**
-		Return true if the specified entity is equal to the current entity. Otherwise return false.
-		@param entity an AbsEntity* to compare against.
-		@return The result of the comparison.
-	*/
-	virtual bool Equals(AbsEntity* entity) = 0;
 
 	/**
 		Parse the specified DOMElement* into an AbsEntity.
@@ -179,17 +172,6 @@ public:
 	 *  @return Void.
 	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
-
-	/** Get the isObjectEntity field's value.
-	 *  @return A boolean value indicating whether or not the entity is an ObjectEntity.	
-	 */
-	bool GetIsObjectEntity();
-
-	/** Set the isObjectEntity field's value.
-	 *  @param isObjectAbsEntity A boolean value indicating whether or not the entity is an ObjectEntity.
-	 *  @return Void.
-	 */
-	void SetIsObjectEntity(bool isObjectAbsEntity);
 
 	/** Return true if the xsi:nil is set to true.
 	 *  @return A boolean value indicating whether or not the entity has a nil value.

@@ -66,7 +66,7 @@ ItemVector* DNSCacheProbe::CollectItems(Object *object) {
 		}
 	}else{
 		StringSet* domainNames = this->GetAllCachedDomainNames();
-		ItemEntity* tmpDomainName = new ItemEntity("domain_name","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS);
+		ItemEntity* tmpDomainName = new ItemEntity("domain_name","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = domainNames->begin(); it != domainNames->end(); it++){
 			tmpDomainName->SetValue(*it);
 			if ( domainName->Analyze(tmpDomainName) == OvalEnum::RESULT_TRUE ){
@@ -137,8 +137,8 @@ Item* DNSCacheProbe::GetDnsCacheItem(string domainName){
 	//We are only interested in DNS_TYPE_A records
 	if ((dnsStatus = DnsQuery(domainName.c_str(), DNS_TYPE_A, DNS_QUERY_CACHE_ONLY, NULL, &dnsRecords, NULL)) == ERROR_SUCCESS ){
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("domain_name",domainName,OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("ttl",Common::ToString(dnsRecords->dwTtl),OvalEnum::DATATYPE_INTEGER,false,OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("domain_name",domainName,OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("ttl",Common::ToString(dnsRecords->dwTtl),OvalEnum::DATATYPE_INTEGER,OvalEnum::STATUS_EXISTS));
 		if ( dnsRecords != NULL ){
 			//Retrieve every IP address associated with this domain name. 
 			while ( dnsRecords != NULL ){
@@ -146,7 +146,7 @@ Item* DNSCacheProbe::GetDnsCacheItem(string domainName){
 				ipAddress.S_un.S_addr = dnsRecords->Data.A.IpAddress;
 				char* ipAddressStr = inet_ntoa(ipAddress);
 				if ( ipAddressStr != NULL ){
-					item->AppendElement(new ItemEntity("ip_address",ipAddressStr,OvalEnum::DATATYPE_STRING,false,OvalEnum::STATUS_EXISTS));	
+					item->AppendElement(new ItemEntity("ip_address",ipAddressStr,OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS));	
 				}else{
 					//Free allocated memory
 					delete item;
@@ -156,16 +156,16 @@ Item* DNSCacheProbe::GetDnsCacheItem(string domainName){
 				dnsRecords = dnsRecords->pNext;
 			}
 		}else{
-			item->AppendElement(new ItemEntity("ip_address","",OvalEnum::DATATYPE_STRING,false,OvalEnum::STATUS_DOES_NOT_EXIST));	
+			item->AppendElement(new ItemEntity("ip_address","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));	
 		}
 	}else{
 		if ( dnsStatus == DNS_ERROR_RECORD_DOES_NOT_EXIST ){
 			//If the domain name cannot be found report that it does not exist.
 			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);	
-			item->AppendElement(new ItemEntity("domain_name",domainName,OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("domain_name",domainName,OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
 		}else{
 			//Otherwise an error has occurred report error for entity and item.
-			item->AppendElement(new ItemEntity("domain_name","",OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("domain_name","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage("ERROR: There was an error while retrieving the domain_name: '"+domainName+"'.  Microsoft System Error (" + Common::ToString ( dnsStatus ) + ") - " + WindowsCommon::GetErrorMessage (GetLastError())));
 		}
 	}

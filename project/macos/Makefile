@@ -45,9 +45,9 @@ INCDIRS = -I${MACOSDIR} -I${SRCDIR} -I${UNIXPROBEDIR} -I${MACOSPROBEDIR} -I${IND
 EXECUTABLE = $(OUTDIR)/ovaldi
 
 # General options that should be used by g++.
-CPPFLAGS = -Wall -DDARWIN -O $(INCDIRS)
+CPPFLAGS = -Wall -DDARWIN $(INCDIRS)
 
-LIBDIR = -L/usr/lib -L/usr/local/lib
+LIBDIR = -L/usr/lib -L/usr/local/lib -L/opt/local/lib
 
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -llber
@@ -65,7 +65,15 @@ OBJ_FILES = $(CPP_FILES:.cpp=.o)
 #                            Rules
 # *******************************************************************
 
-all: create-dir update $(EXECUTABLE)
+# adds opts specific to a optimized release build
+all: CPPFLAGS += -O
+all: main
+
+# adds opts specific to a unoptimized debug build
+debug: CPPFLAGS += -O0 -g
+debug: main
+
+main: create-dir update $(EXECUTABLE)
 
 create-dir:
 	@install -d $(OUTDIR)
@@ -79,6 +87,3 @@ update:
 
 clean :
 	-rm -rf $(OUTDIR) $(OBJ_FILES)
-
-debug: CPPFLAGS = -Wall -O -static-libgcc -ggdb
-debug: all

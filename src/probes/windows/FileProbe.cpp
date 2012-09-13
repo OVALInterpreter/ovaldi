@@ -31,15 +31,219 @@
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
 #include <FsRedirectionGuard.h>
+#include <iomanip>
+#include <sstream>
+
 #include "FileProbe.h"
+
+using namespace std;
+
+namespace {
+	/**
+	 * This code was originally written to be (sort of) both narrow and wide-char capable,
+	 * so I am preserving that by using basic_string<TCHAR>...
+	 */
+	void GetFromVerInfo(LPVOID versionbuf, string filePath, Item *item,
+		ItemEntity *entity, const basic_string<TCHAR> &fieldName);
+}
 
 //****************************************************************************************//
 //								FileProbe Class											  //	
 //****************************************************************************************//
 FileProbe* FileProbe::instance = NULL;
+map<WORD,string> FileProbe::langMap;
 
 FileProbe::FileProbe() {
+	if(langMap.size() == 0){
+		langMap[1078] = "Afrikaans";
+		langMap[1052] = "Albanian";
+		langMap[1118] = "Amharic";
+		langMap[5121] = "Arabic - Algeria";
+		langMap[15361] = "Arabic - Bahrain";
+		langMap[3073] = "Arabic - Egypt";
+		langMap[2049] = "Arabic - Iraq";
+		langMap[11265] = "Arabic - Jordan";
+		langMap[13313] = "Arabic - Kuwait";
+		langMap[12289] = "Arabic - Lebanon";
+		langMap[4097] = "Arabic - Libya";
+		langMap[6145] = "Arabic - Morocco";
+		langMap[8193] = "Arabic - Oman";
+		langMap[16385] = "Arabic - Qatar";
+		langMap[1025] = "Arabic - Saudi Arabia";
+		langMap[10241] = "Arabic - Syria";
+		langMap[7169] = "Arabic - Tunisia";
+		langMap[14337] = "Arabic - United Arab Emirates";
+		langMap[9217] = "Arabic - Yemen";
+		langMap[1067] = "Armenian";
+		langMap[1101] = "Assamese";
+		langMap[2092] = "Azeri - Cyrillic";
+		langMap[1068] = "Azeri - Latin";
+		langMap[1069] = "Basque";
+		langMap[1059] = "Belarusian";
+		langMap[2117] = "Bengali - Bangladesh";
+		langMap[1093] = "Bengali - India";
+		langMap[5146] = "Bosnian";
+		langMap[1026] = "Bulgarian";
+		langMap[1109] = "Burmese";
+		langMap[1027] = "Catalan";
+		langMap[2052] = "Chinese - China";
+		langMap[3076] = "Chinese - Hong Kong SAR";
+		langMap[5124] = "Chinese - Macau SAR";
+		langMap[4100] = "Chinese - Singapore";
+		langMap[1028] = "Chinese - Taiwan";
+		langMap[1050] = "Croatian";
+		langMap[1029] = "Czech";
+		langMap[1030] = "Danish";
+		langMap[1125] = "Divehi";
+		langMap[2067] = "Dutch - Belgium";
+		langMap[1043] = "Dutch - Netherlands";
+		langMap[1126] = "Edo";
+		langMap[3081] = "English - Australia";
+		langMap[10249] = "English - Belize";
+		langMap[4105] = "English - Canada";
+		langMap[9225] = "English - Caribbean";
+		langMap[2057] = "English - Great Britain";
+		langMap[16393] = "English - India";
+		langMap[6153] = "English - Ireland";
+		langMap[8201] = "English - Jamaica";
+		langMap[5129] = "English - New Zealand";
+		langMap[13321] = "English - Phillippines";
+		langMap[7177] = "English - Southern Africa";
+		langMap[11273] = "English - Trinidad";
+		langMap[1033] = "English - United States";
+		langMap[12297] = "English - Zimbabwe";
+		langMap[1061] = "Estonian";
+		langMap[1080] = "Faroese";
+		langMap[1065] = "Farsi - Persian";
+		langMap[1124] = "Filipino";
+		langMap[1035] = "Finnish";
+		langMap[2060] = "French - Belgium";
+		langMap[11276] = "French - Cameroon";
+		langMap[3084] = "French - Canada";
+		langMap[9228] = "French - Congo";
+		langMap[12300] = "French - Cote d'Ivoire";
+		langMap[1036] = "French - France";
+		langMap[5132] = "French - Luxembourg";
+		langMap[13324] = "French - Mali";
+		langMap[6156] = "French - Monaco";
+		langMap[14348] = "French - Morocco";
+		langMap[10252] = "French - Senegal";
+		langMap[4108] = "French - Switzerland";
+		langMap[7180] = "French - West Indies";
+		langMap[1122] = "Frisian - Netherlands";
+		langMap[1071] = "FYRO Macedonia";
+		langMap[2108] = "Gaelic - Ireland";
+		langMap[1084] = "Gaelic - Scotland";
+		langMap[1110] = "Galician";
+		langMap[1079] = "Georgian";
+		langMap[3079] = "German - Austria";
+		langMap[1031] = "German - Germany";
+		langMap[5127] = "German - Liechtenstein";
+		langMap[4103] = "German - Luxembourg";
+		langMap[2055] = "German - Switzerland";
+		langMap[1032] = "Greek";
+		langMap[1140] = "Guarani - Paraguay";
+		langMap[1095] = "Gujarati";
+		langMap[1037] = "Hebrew";
+		langMap[1279] = "HID (Human Interface Device)";
+		langMap[1081] = "Hindi";
+		langMap[1038] = "Hungarian";
+		langMap[1039] = "Icelandic";
+		langMap[1136] = "Igbo - Nigeria";
+		langMap[1057] = "Indonesian";
+		langMap[1040] = "Italian - Italy";
+		langMap[2064] = "Italian - Switzerland";
+		langMap[1041] = "Japanese";
+		langMap[1099] = "Kannada";
+		langMap[1120] = "Kashmiri";
+		langMap[1087] = "Kazakh";
+		langMap[1107] = "Khmer";
+		langMap[1111] = "Konkani";
+		langMap[1042] = "Korean";
+		langMap[1088] = "Kyrgyz - Cyrillic";
+		langMap[1108] = "Lao";
+		langMap[1142] = "Latin";
+		langMap[1062] = "Latvian";
+		langMap[1063] = "Lithuanian";
+		langMap[2110] = "Malay - Brunei";
+		langMap[1086] = "Malay - Malaysia";
+		langMap[1100] = "Malayalam";
+		langMap[1082] = "Maltese";
+		langMap[1112] = "Manipuri";
+		langMap[1153] = "Maori";
+		langMap[1102] = "Marathi";
+		langMap[2128] = "Mongolian";
+		langMap[1104] = "Mongolian";
+		langMap[1121] = "Nepali";
+		langMap[1044] = "Norwegian - Bokml";
+		langMap[2068] = "Norwegian - Nynorsk";
+		langMap[1096] = "Oriya";
+		langMap[1045] = "Polish";
+		langMap[1046] = "Portuguese - Brazil";
+		langMap[2070] = "Portuguese - Portugal";
+		langMap[1094] = "Punjabi";
+		langMap[1047] = "Raeto-Romance";
+		langMap[2072] = "Romanian - Moldova";
+		langMap[1048] = "Romanian - Romania";
+		langMap[1049] = "Russian";
+		langMap[2073] = "Russian - Moldova";
+		langMap[1083] = "Sami Lappish";
+		langMap[1103] = "Sanskrit";
+		langMap[3098] = "Serbian - Cyrillic";
+		langMap[2074] = "Serbian - Latin";
+		langMap[1072] = "Sesotho (Sutu)";
+		langMap[1074] = "Setsuana";
+		langMap[1113] = "Sindhi";
+		langMap[1115] = "Sinhala";
+		langMap[1051] = "Slovak";
+		langMap[1060] = "Slovenian";
+		langMap[1143] = "Somali";
+		langMap[1070] = "Sorbian";
+		langMap[11274] = "Spanish - Argentina";
+		langMap[16394] = "Spanish - Bolivia";
+		langMap[13322] = "Spanish - Chile";
+		langMap[9226] = "Spanish - Colombia";
+		langMap[5130] = "Spanish - Costa Rica";
+		langMap[7178] = "Spanish - Dominican Republic";
+		langMap[12298] = "Spanish - Ecuador";
+		langMap[17418] = "Spanish - El Salvador";
+		langMap[4106] = "Spanish - Guatemala";
+		langMap[18442] = "Spanish - Honduras";
+		langMap[2058] = "Spanish - Mexico";
+		langMap[19466] = "Spanish - Nicaragua";
+		langMap[6154] = "Spanish - Panama";
+		langMap[15370] = "Spanish - Paraguay";
+		langMap[10250] = "Spanish - Peru";
+		langMap[20490] = "Spanish - Puerto Rico";
+		langMap[1034] = "Spanish - Spain (Traditional)";
+		langMap[14346] = "Spanish - Uruguay";
+		langMap[8202] = "Spanish - Venezuela";
+		langMap[1089] = "Swahili";
+		langMap[2077] = "Swedish - Finland";
+		langMap[1053] = "Swedish - Sweden";
+		langMap[1114] = "Syriac";
+		langMap[1064] = "Tajik";
+		langMap[1097] = "Tamil";
+		langMap[1092] = "Tatar";
+		langMap[1098] = "Telugu";
+		langMap[1054] = "Thai";
+		langMap[1105] = "Tibetan";
+		langMap[1073] = "Tsonga";
+		langMap[1055] = "Turkish";
+		langMap[1090] = "Turkmen";
+		langMap[1058] = "Ukrainian";
+		langMap[0] = "Unicode";
+		langMap[1056] = "Urdu";
+		langMap[2115] = "Uzbek - Cyrillic";
+		langMap[1091] = "Uzbek - Latin";
+		langMap[1075] = "Venda";
+		langMap[1066] = "Vietnamese";
+		langMap[1106] = "Welsh";
+		langMap[1076] = "Xhosa";
+		langMap[1085] = "Yiddish";
+		langMap[1077] = "Zulu";
 
+	}
 }
 
 FileProbe::~FileProbe() {
@@ -100,9 +304,9 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath",Common::BuildFilePath(fp->first,*iterator),OvalEnum::DATATYPE_STRING,true,OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath",Common::BuildFilePath(fp->first,*iterator),OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->AppendElement(new ItemEntity("windows_view",
 							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
@@ -112,13 +316,13 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					if (fileName->GetNil()){
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
 					}
 					else
 					{
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
+						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
 					}
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
@@ -156,9 +360,9 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
@@ -186,7 +390,7 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
@@ -258,10 +462,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		// add the path and file name
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-		ItemEntity* owner = new ItemEntity("owner", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR);
+		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		ItemEntity* owner = new ItemEntity("owner", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 		item->AppendElement(owner);
 
 		//////////////////////////////////////////////////////
@@ -400,11 +604,11 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 			errorMessage.append(filePath);
 			errorMessage.append("'.");
 			
-			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(errorMessage));
 			
 		} else {
-			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 		}
 
 
@@ -422,11 +626,11 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 
 		if(!timeRes) {
 
-			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
 			item->AppendElement(aTime);
-            ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+            ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(cTime);
-			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_ERROR);
+			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(mTime);
 			string lastError = WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
@@ -436,19 +640,19 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 			//////////////////////////////////////////////////////
 			/////////////////////  Accessed  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(aTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Created  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(cTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Modified  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, false, OvalEnum::STATUS_EXISTS);
+			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(mTime);
 
 		}
@@ -468,31 +672,31 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 			errorMessage.append("(FileProbe) Unable to get ms_checksum information for the file: '");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
-			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_ERROR));
+			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
 			item->AppendMessage(new OvalMessage(errorMessage));
 
 		} else {
-			item->AppendElement(new ItemEntity("ms_checksum", Common::ToString(checksum), OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("ms_checksum", Common::ToString(checksum), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 
 		// initialize remaining version information entities...
-		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(version);
-		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(type);
-		ItemEntity* devClass = new ItemEntity("development_class", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* devClass = new ItemEntity("development_class", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(devClass);
-		ItemEntity* company = new ItemEntity("company", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);	
+		ItemEntity* company = new ItemEntity("company", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
 		item->AppendElement(company);
-		ItemEntity* internalName = new ItemEntity("internal_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* internalName = new ItemEntity("internal_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(internalName);
-		ItemEntity* language = new ItemEntity("language", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* language = new ItemEntity("language", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(language);
-		ItemEntity* originalFilename = new ItemEntity("original_filename", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* originalFilename = new ItemEntity("original_filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(originalFilename);
-		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* productName = new ItemEntity("product_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productName);
-		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, false, OvalEnum::STATUS_DOES_NOT_EXIST);
+		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productVersion);
 		
 		DWORD junk;
@@ -521,43 +725,66 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 				///////////////  development_class  //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetDevelopmentClass(versionbuf, filePath, item, devClass);
+				GetFromVerInfo(versionbuf, filePath, item, devClass, "FileVersion");
 
 				//////////////////////////////////////////////////////
 				///////////////       company       //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetCompany(versionbuf, filePath, item, company);
+				GetFromVerInfo(versionbuf, filePath, item, company, "CompanyName");
 
 				//////////////////////////////////////////////////////
 				///////////////    internal_name    //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetInternalName(versionbuf, filePath, item, internalName);
+				GetFromVerInfo(versionbuf, filePath, item, internalName, "InternalName");
 
 				//////////////////////////////////////////////////////
 				///////////////       language      //////////////////
 				//////////////////////////////////////////////////////
-
-				this->GetLanguage(versionbuf, filePath, item, language);
+				WORD* langInfo;        
+				UINT cbLang;
+				VerQueryValue(versionbuf, _T("\\VarFileInfo\\Translation"),(LPVOID*)&langInfo, &cbLang);  
+				
+				if(langMap.count(langInfo[0]) > 0){
+					language->SetValue(langMap[langInfo[0]]);
+					language->SetStatus(OvalEnum::STATUS_EXISTS);
+				}else{
+					language->SetStatus(OvalEnum::STATUS_ERROR);
+				}
 
 				//////////////////////////////////////////////////////
 				///////////////  original_filename  //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetOriginalFilename(versionbuf, filePath, item, originalFilename);
+				GetFromVerInfo(versionbuf, filePath, item, originalFilename, "OriginalFilename");
 
 				//////////////////////////////////////////////////////
 				///////////////     product_name    //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetProductName(versionbuf, filePath, item, productName);
+				GetFromVerInfo(versionbuf, filePath, item, productName, "ProductName");
 
 				//////////////////////////////////////////////////////
 				///////////////   product_version   //////////////////
 				//////////////////////////////////////////////////////
 
-				this->GetProductVersion(versionbuf, filePath, item, productVersion);
+				GetFromVerInfo(versionbuf, filePath, item, productVersion, "ProductVersion");
+
+
+				// Post-processing for development_class:
+				// for dev class, there is a parenthesized part at the end we need
+				// to pull out and use.
+				REGEX verMatcher;
+				if(devClass->GetStatus() == OvalEnum::STATUS_EXISTS &&
+					verMatcher.IsMatch(".+\\([^\\)].+\\)", devClass->GetValue().c_str())) {
+					string verStr = devClass->GetValue();
+					verStr = verStr.substr(verStr.find("(") + 1);
+					devClass->SetValue(verStr.substr(0, verStr.find(".")));
+				} else {
+					devClass->SetValue("");
+					devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				}
 
 			} else {
 				// we got a size from GetFileVersionInfoSize(), but then getting the
@@ -637,31 +864,12 @@ void FileProbe::GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemE
 
 	} else {
 
-		char ver1[16];
-		char ver2[16];
-		char ver3[16];
-		char ver4[16];
-
-		// get the file version data 
-		ZeroMemory(ver1, sizeof(ver1));
-		ZeroMemory(ver2, sizeof(ver2));
-		ZeroMemory(ver3, sizeof(ver3));
-		ZeroMemory(ver4, sizeof(ver4));
-
-		_snprintf(ver1, sizeof(ver1)-1, "%d", (HIWORD(pFFI->dwFileVersionMS)));
-		_snprintf(ver2, sizeof(ver2)-1, "%d", (LOWORD(pFFI->dwFileVersionMS)));
-		_snprintf(ver3, sizeof(ver3)-1, "%d", (HIWORD(pFFI->dwFileVersionLS)));
-		_snprintf(ver4, sizeof(ver4)-1, "%d", (LOWORD(pFFI->dwFileVersionLS)));
-
-		string versionStr = "";
-		versionStr.append(ver1);
-		versionStr.append(".");
-		versionStr.append(ver2);
-		versionStr.append(".");
-		versionStr.append(ver3);
-		versionStr.append(".");
-		versionStr.append(ver4);
-		version->SetValue(versionStr);
+		ostringstream oss;
+		oss << HIWORD(pFFI->dwFileVersionMS) << '.'
+			<< LOWORD(pFFI->dwFileVersionMS) << '.'
+			<< HIWORD(pFFI->dwFileVersionLS) << '.'
+			<< LOWORD(pFFI->dwFileVersionLS);
+		version->SetValue(oss.str());
 		version->SetStatus(OvalEnum::STATUS_EXISTS);
 	}
 }
@@ -730,50 +938,67 @@ void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* t
 	}
 }
 
-void FileProbe::GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *item, ItemEntity* devClass) {
+namespace {
 
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
+	void GetFromVerInfo(LPVOID versionbuf, string filePath, Item *item,
+		ItemEntity *itemEntity, const basic_string<TCHAR> &fieldName) {
 
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("FileVersion"));
+		//	Get the language-code page and construct the string for file version request
+		UINT vdatalen;
+		DWORD *lpTransArray;
 
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
+		BOOL retVal = VerQueryValue(versionbuf,  
+					  TEXT("\\VarFileInfo\\Translation"),
+					  (LPVOID*)&lpTransArray,
+					  &vdatalen);
+
 		if(retVal != 0) {
+		
+			// I guess to be TCHAR-correct, we gotta use the basic_* templates
+			// directly so we can specify the char type...
+			basic_ostringstream<TCHAR> oss;
+			oss << TEXT("\\StringFileInfo\\")
+				<< uppercase << hex << setfill(TEXT('0'))
+				<< setw(4) << LOWORD(lpTransArray[0])
+				<< setw(4) << HIWORD(lpTransArray[0])
+				<< nouppercase
+				<< TEXT('\\') << fieldName;
+		
+			
+			LPTSTR lpszValue;
+			retVal = VerQueryValue(versionbuf,
+									oss.str().c_str(),
+									(LPVOID *)&lpszValue, 
+									&vdatalen);
 
-			//	Check to see if the version string has a developement path string in it
-			string verStr = lpszValue;
-			REGEX verMatcher;
-			if(verMatcher.IsMatch(".+\\([^\\)].+\\)", verStr.c_str())) {
+			if(retVal != 0) {
+				if (_tcsclen(lpszValue) > 0) {
+					// except here we assume we are not in unicode mode...
+					itemEntity->SetValue(lpszValue);
+					itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+				}
+			} else if(vdatalen == 0) {
 
-				//	Parse the version string
-				verStr = verStr.substr(verStr.find("(") + 1);
-				devClass->SetValue(verStr.substr(0, verStr.find(".")));
-				devClass->SetStatus(OvalEnum::STATUS_EXISTS);
-				
+				string errorMessage = "";
+				errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". No value is available for the specified version-information name, \""+fieldName+",\" for file: ");
+				errorMessage.append(filePath);
+				errorMessage.append("'");
+				item->AppendMessage(new OvalMessage(errorMessage));
+
+			} else {
+
+				string errorMessage = "";
+				errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". Either specified name, \""+fieldName+",\" does not exist or the specified resource is not valid for file: ");
+				errorMessage.append(filePath);
+				errorMessage.append("'");
+				item->AppendMessage(new OvalMessage(errorMessage));
+
 			}
 
 		} else if(vdatalen == 0) {
 
 			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get development_class. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
+			errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". No value is available for the specified version-information name, \""+fieldName+",\" for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
@@ -781,387 +1006,11 @@ void FileProbe::GetDevelopmentClass(LPVOID versionbuf, string filePath, Item *it
 		} else {
 
 			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get development_class. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
+			errorMessage.append("(FileProbe) Unable to get "+itemEntity->GetName()+". Either specified name, \""+fieldName+",\" does not exist or the specified resource is not valid for file: ");
 			errorMessage.append(filePath);
 			errorMessage.append("'");
 			item->AppendMessage(new OvalMessage(errorMessage));
 
 		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get development_class. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get development_class. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetCompany(LPVOID versionbuf, string filePath, Item *item, ItemEntity* company) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("CompanyName"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string companyNameStr = lpszValue;
-			if(companyNameStr.compare("") != 0) {
-				company->SetValue(companyNameStr);
-				company->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get company. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get company. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get company. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get company. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetInternalName(LPVOID versionbuf, string filePath, Item *item, ItemEntity* internalName) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("InternalName"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string internalNameStr = lpszValue;
-			if(internalNameStr.compare("") != 0) {
-				internalName->SetValue(internalNameStr);
-				internalName->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get internal_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get internal_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get internal_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get internal_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetLanguage(LPVOID /*versionbuf*/, string filePath, Item* /*item*/, ItemEntity* language) {
-	language->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
-}
-
-void FileProbe::GetOriginalFilename(LPVOID versionbuf, string filePath, Item *item, ItemEntity* originalFilename) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("OriginalFilename"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string originalFilenameStr = lpszValue;
-			if(originalFilenameStr.compare("") != 0) {
-				originalFilename->SetValue(originalFilenameStr);
-				originalFilename->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get original_filename. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get original_filename. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get original_filename. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get original_filename. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetProductName(LPVOID versionbuf, string filePath, Item *item, ItemEntity* productName) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("ProductName"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string productNameStr = lpszValue;
-			if(productNameStr.compare("") != 0) {
-				productName->SetValue(productNameStr);
-				productName->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_name. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_name. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	}
-}
-
-void FileProbe::GetProductVersion(LPVOID versionbuf, string filePath, Item *item, ItemEntity* productVersion) {
-
-	//	Get the language-code page and construct the string for file version request
-	UINT vdatalen;
-	DWORD *lpTransArray;
-	TCHAR szSubblock[80];
-	TCHAR szSubblockHeader[25];
-	int retVal = VerQueryValue(versionbuf,  
-				  TEXT("\\VarFileInfo\\Translation"),
-				  (LPVOID*)&lpTransArray,
-				  &vdatalen);
-
-	if(retVal != 0) {
-		
-		//	Convert the code page info into a zero-terminated
-		//	string specifying which version-information value to retrieve
-		_stprintf(szSubblockHeader, TEXT("\\StringFileInfo\\%04X%04X"), LOWORD(lpTransArray[0]), HIWORD(lpTransArray[0]));					
-		_stprintf(szSubblock, TEXT("%s\\%s"), szSubblockHeader, TEXT("ProductVersion"));
-
-		//	Get the file's developement class
-		LPTSTR lpszValue;
-		retVal = VerQueryValue(versionbuf,
-								szSubblock, 
-								(LPVOID *)&lpszValue, 
-								&vdatalen);
-					  
-		if(retVal != 0) {
-
-			string productVersionStr = lpszValue;
-			if(productVersionStr.compare("") != 0) {
-				productVersion->SetValue(productVersionStr);
-				productVersion->SetStatus(OvalEnum::STATUS_EXISTS);
-			}
-
-		} else if(vdatalen == 0) {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_version. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get product_version. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		}
-
-	} else if(vdatalen == 0) {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_version. No value is available for the specified version-information name, \"szSubblock,\" for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
-	} else {
-
-		string errorMessage = "";
-		errorMessage.append("(FileProbe) Unable to get product_version. Either specified name, \"szSubblock,\" does not exist or the specified resource is not valid for file: ");
-		errorMessage.append(filePath);
-		errorMessage.append("'");
-		item->AppendMessage(new OvalMessage(errorMessage));
-
 	}
 }

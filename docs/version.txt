@@ -32,6 +32,40 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 3    ---
+---------------------------------------
+
+* Fixed collection of the command_line entity in unix-def:process58_test and unix-def:process_test by removing trailing spaces.
+* Added a config file, the contents of which is used as the value of the schemaLocation attribute in XML instance documents.  This relieves XML authors from having to remember to set it, and from errors and omissions in its value.  If the file is readable, its value is used in place of the value in instance documents, if any. If the file is not readable, the attribute value in the instance document is used.
+* Added support for collecting the last login time of a Windows user in the win-def:user_test. 
+* Added support for last write time in the win-def:registry_test.
+* Fixed a bug to properly display the Operating System name on Windows 7 systems in the system_info element of the OVAL System Characteristics file.
+* Added a message to the test results indicating the conversion of pre-OVAL 5.3 check='none exist' to OVAL 5.3+ format.
+* Added support for environmentvariable58 objects.  It is fully supported only 
+  on Linux and Windows.  Partial support, for the current process only, is
+  implemented on Solaris and OSX.
+* Fixed a crash bug in MacOS network interface detection code, that surfaced on OSX 10.7.
+* Fixed bug #3558996: when object collection fails, the version on the resulting collected object will now match the failed object.
+* Fixed serious issues with probe for win-def:interface_object, which could cause it to create garbage items.
+* Fixed bug 3446470: For certain probes, if a account/sid is not found, it 
+  results in an item with status=does not exist, rather than an error.  This
+  affected accesstoken, sid, sidsid, usersid55, usersid probes.
+
+---------------------------------------
+---       Version 5.10.1 build 2    ---
+---------------------------------------
+* Updated to no longer follow Windows junctions until the OVAL Language better defines how to handle them.
+* Fixed validation for evr_string values in EntityComparator.cpp.
+* Added support for the windows_view behavior in the Windows registry-based tests.
+* Fixed error in handling of Unicode characters found in Windows registry while performing regular expression matching.
+* The Windows registry-based tests now support the collection of keys from the HKEY_CURRENT_CONFIG hive.
+* Fixed a bug in the win-def:registry_test where it was incorrectly assigning reg_expand_sz values as ints instead of strings.
+* Fixed a bug in the unix-def:xinetd_test that was causing it to encounter an unknown error.
+* Added support for the REG_NONE and REG_QWORD types in the win-def:registry_test. Since REG_NONE has no associated data type, it is treated as binary data.
+* Improved error handling in the win-def:cmdlet_test.
+* Added snapin support in the win-def:cmdlet_test.
+
+---------------------------------------
 ---       Version 5.10.1 build 1    ---
 ---------------------------------------
 * Updated to align with the new three-component version identifier.

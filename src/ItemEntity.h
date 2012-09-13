@@ -43,32 +43,19 @@ class ItemEntity {
 public:
 
 	/** Create a complete ItemEntity object. */
-	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
+	ItemEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
 	/**
 	 * Create a complete ItemEntity object.  This ItemEntity takes ownership of
 	 * the given entity values, so don't delete them yourself.
 	 */
-	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, bool isObjectEntity = false, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
+	ItemEntity(std::string name, AbsEntityValueVector value, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_RECORD, OvalEnum::SCStatus status = OvalEnum::STATUS_EXISTS, bool isNil = false);
 
     /** ItemEntity copy constructor. */
     ItemEntity(const ItemEntity& itemEntity);
 
     /** ItemEntity destructor. */
     ~ItemEntity();
-
-	/** Return true if this ItemEntity is equal to the provided ItemEntity. Note: Status is not compared.
-		@param entity An ItemEntity* that you would like to compare to this ItemEntity.
-		@return A boolean value indicating whether or not the two ItemEntities are equal.
-	*/
-	bool Equals(ItemEntity* entity);
-
-	/** Return true if the specified entity value exists in the entity value vector.
-		@param entityValueVector the entity value vector for which you want to see if the specified entity value exists.
-		@param entityValue the entity value whose existence you would like to check in the specified entity value vector.
-		@return A boolean value indicating whether or not the specified entity value exists in the specified entity values vector.
-	*/
-	bool ValueExistsInItemEntity(AbsEntityValueVector entityValueVector, AbsEntityValue* entityValue);
 
 	/** Write this ItemEntity to the sc file.
 	    Inserts this ItemEntity as the last child of the specified
@@ -141,17 +128,6 @@ public:
 	 */
 	void SetDatatype(OvalEnum::Datatype datatype);
 
-	/** Return whether or not the ItemEntity is an object entity.
-	 *  @return A boolean value indicating whether or not the ItemEntity is an object entity.
-	 */
-	bool GetIsObjectEntity();
-
-	/** Set the boolean value indicating whether or not the ItemEntity is an object entity.
-	 *  @param isObjectEntity A boolean value indicating whether or not the ItemEntity is an object entity.
-	 *  @return Void.
-	 */
-	void SetIsObjectEntity(bool isObjectEntity);
-
 	/** Set the nil field's value.
 	 *  @param nil The boolean value indicating whether or not the entity has a nil value.
 	 *  @return void
@@ -168,7 +144,6 @@ private:
 	std::string name;
 	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
-	bool isObjectEntity;
 	bool nil;
 };
 

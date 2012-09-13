@@ -165,8 +165,8 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
                     for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "service_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator2 ), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "service_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                         collectedItems->push_back ( item );
                     }
                 }
@@ -215,8 +215,8 @@ Item* ServiceEffectiveRightsProbe::GetEffectiveRights ( SC_HANDLE serviceHandle,
         Log::Debug ( "Creating an item to hold the service effective rights for service_name: " + serviceNameStr + " and trustee_sid: " + trusteeSIDStr );
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );
-        item->AppendElement ( new ItemEntity ( "service_name", serviceNameStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
-        item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSIDStr, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "service_name", serviceNameStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+        item->AppendElement ( new ItemEntity ( "trustee_sid", trusteeSIDStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
         // Build structure to hold the rights
         pAccessRights = reinterpret_cast<PACCESS_MASK> ( ::LocalAlloc ( LPTR, sizeof ( PACCESS_MASK ) + sizeof ( ACCESS_MASK ) ) );
 
@@ -229,84 +229,84 @@ Item* ServiceEffectiveRightsProbe::GetEffectiveRights ( SC_HANDLE serviceHandle,
         WindowsCommon::GetEffectiveRightsForWindowsObject ( SE_SERVICE, pSid, serviceHandle, pAccessRights );
 
         if ( ( *pAccessRights ) & DELETE )
-            item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_delete", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 		else
-            item->AppendElement ( new ItemEntity ( "standard_delete", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_delete", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & READ_CONTROL )
-            item->AppendElement ( new ItemEntity ( "standard_read_control", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_read_control", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 		else
-            item->AppendElement ( new ItemEntity ( "standard_read_control", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_read_control", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & WRITE_DAC )
-            item->AppendElement ( new ItemEntity ( "standard_write_dac", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_dac", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "standard_write_dac", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_dac", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & WRITE_OWNER )
-            item->AppendElement ( new ItemEntity ( "standard_write_owner", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_owner", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "standard_write_owner", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "standard_write_owner", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( ( *pAccessRights ) & ( STANDARD_RIGHTS_READ | SERVICE_QUERY_CONFIG | SERVICE_QUERY_STATUS | SERVICE_INTERROGATE | SERVICE_ENUMERATE_DEPENDENTS ) ) == ( STANDARD_RIGHTS_READ | SERVICE_QUERY_CONFIG | SERVICE_QUERY_STATUS | SERVICE_INTERROGATE | SERVICE_ENUMERATE_DEPENDENTS ) )
-            item->AppendElement ( new ItemEntity ( "generic_read", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_read", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "generic_read", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_read", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( ( *pAccessRights ) & ( STANDARD_RIGHTS_WRITE | SERVICE_CHANGE_CONFIG ) ) == ( STANDARD_RIGHTS_WRITE | SERVICE_CHANGE_CONFIG ) )
-            item->AppendElement ( new ItemEntity ( "generic_write", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_write", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "generic_write", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_write", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( ( *pAccessRights ) & ( STANDARD_RIGHTS_EXECUTE | SERVICE_START | SERVICE_STOP | SERVICE_PAUSE_CONTINUE | SERVICE_USER_DEFINED_CONTROL ) ) == ( STANDARD_RIGHTS_EXECUTE | SERVICE_START | SERVICE_STOP | SERVICE_PAUSE_CONTINUE | SERVICE_USER_DEFINED_CONTROL ) )
-            item->AppendElement ( new ItemEntity ( "generic_execute", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_execute", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "generic_execute", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_QUERY_CONFIG )
-            item->AppendElement ( new ItemEntity ( "service_query_conf", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_query_conf", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_query_conf", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_query_conf", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_CHANGE_CONFIG )
-            item->AppendElement ( new ItemEntity ( "service_change_conf", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_change_conf", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_change_conf", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_change_conf", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_QUERY_STATUS )
-            item->AppendElement ( new ItemEntity ( "service_query_stat", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_query_stat", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_query_stat", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_query_stat", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_ENUMERATE_DEPENDENTS )
-            item->AppendElement ( new ItemEntity ( "service_enum_dependents", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_enum_dependents", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_enum_dependents", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_enum_dependents", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_START )
-            item->AppendElement ( new ItemEntity ( "service_start", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_start", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_start", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_start", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_STOP )
-            item->AppendElement ( new ItemEntity ( "service_stop", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_stop", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_stop", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_stop", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_PAUSE_CONTINUE )
-            item->AppendElement ( new ItemEntity ( "service_pause", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_pause", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_pause", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_pause", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_INTERROGATE )
-            item->AppendElement ( new ItemEntity ( "service_interrogate", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_interrogate", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_interrogate", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_interrogate", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
         if ( ( *pAccessRights ) & SERVICE_USER_DEFINED_CONTROL )
-            item->AppendElement ( new ItemEntity ( "service_user_defined", "1", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_user_defined", "1", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
         else
-            item->AppendElement ( new ItemEntity ( "service_user_defined", "0", OvalEnum::DATATYPE_BOOLEAN, false, OvalEnum::STATUS_EXISTS ) );
+            item->AppendElement ( new ItemEntity ( "service_user_defined", "0", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS ) );
 
     } catch ( Exception ex ) {
         if ( item != NULL ) {

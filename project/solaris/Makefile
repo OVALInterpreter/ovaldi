@@ -45,7 +45,7 @@ INCDIRS = -I/usr/local/include -I/usr/include -I$(SOLARISDIR) -I${SRCDIR} -I${UN
 EXECUTABLE = $(OUTDIR)/ovaldi
 
 # General options that should be used by g++.
-CPPFLAGS = -Wall -O -DBSD_COMP -DSUNOS $(INCDIRS)
+CPPFLAGS = -Wall -DBSD_COMP -DSUNOS $(INCDIRS)
 
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
@@ -61,7 +61,15 @@ OBJ_FILES = $(CPP_FILES:.cpp=.o)
 #                            Rules
 # *******************************************************************
 
-all: create-dir update $(EXECUTABLE)
+# adds opts specific to a optimized release build
+all: CPPFLAGS += -O
+all: main
+
+# adds opts specific to a unoptimized debug build
+debug: CPPFLAGS += -O0 -ggdb
+debug: main
+
+main: create-dir update $(EXECUTABLE)
 
 create-dir:
 	@install -d $(OUTDIR)
@@ -75,6 +83,3 @@ update:
 
 clean :
 	-rm -rf $(OUTDIR) $(OBJ_FILES)
-
-debug: CPPFLAGS += -Wall -ggdb
-debug: all

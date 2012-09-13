@@ -130,7 +130,7 @@ StringSet* RegistryFinder::GetHives ( ObjectEntity* hiveEntity ) {
         }
 
         // only keep hives that match operation and value and var check
-        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS );
 
         for ( StringSet::iterator it = allHives->begin(); it != allHives->end(); it++ ) {
             tmp->SetValue ( ( *it ) );
@@ -151,7 +151,6 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
     StringSet* keys = new StringSet();
 
     if ( keyEntity->GetNil() ) {
-        keys = new StringSet();
         keys->insert ( "" );
         return keys;
     }
@@ -203,7 +202,7 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
         }
 
         // only keep keys that match operation and value and var check
-        ItemEntity* tmp = new ItemEntity ( "key", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+        ItemEntity* tmp = new ItemEntity ( "key", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS );
 
         for ( StringSet::iterator it = allKeys->begin(); it != allKeys->end(); it++ ) {
             tmp->SetValue ( ( *it ) );
@@ -286,7 +285,7 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
         }
 
         // only keep names that match operation and value and var check
-        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS );
+        ItemEntity* tmp = new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS );
 
         for ( StringSet::iterator it = allNames->begin(); it != allNames->end(); it++ ) {
             tmp->SetValue ( ( *it ) );
@@ -433,9 +432,11 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
 		bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY
 		: 0;
 #endif
-
-    return RegOpenKeyExW ( superKey, WindowsCommon::StringToWide ( subKeyStr ),
+    LPWSTR lpSubKey = WindowsCommon::StringToWide(subKeyStr);
+    LONG status = RegOpenKeyExW ( superKey, lpSubKey,
 		0, access | view, keyHandle );
+	delete lpSubKey;
+    return status;
 }
 
 string RegistryFinder::BuildRegistryKey(const string hiveStr, const string keyStr) {
@@ -526,10 +527,11 @@ bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr 
     if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
-
-    if ( RegQueryValueExW ( keyHandle, WindowsCommon::StringToWide ( nameStr ), NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
+	LPWSTR wNameStr = WindowsCommon::StringToWide ( nameStr );
+    if ( RegQueryValueExW ( keyHandle, wNameStr, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
         return false;
     }
+	delete wNameStr;
 
     if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
         throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );

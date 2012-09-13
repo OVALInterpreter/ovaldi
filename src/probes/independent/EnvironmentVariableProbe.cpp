@@ -80,13 +80,13 @@ ItemVector* EnvironmentVariableProbe::CollectItems(Object *object) {
 			if(envValue != NULL) {
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("value", envValue, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value", envValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				collectedItems->push_back(item);
 			} else {
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("name", name->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				collectedItems->push_back(item);
 			}
 		} else {			
@@ -101,8 +101,8 @@ ItemVector* EnvironmentVariableProbe::CollectItems(Object *object) {
 						string second = (*iterator)->second;
 						Item* item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_EXISTS);
-						item->AppendElement(new ItemEntity("name", first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("value", second, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("name", first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("value", second, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						collectedItems->push_back(item);
 					}
 				} else {
@@ -110,8 +110,8 @@ ItemVector* EnvironmentVariableProbe::CollectItems(Object *object) {
 						string second = (*iterator)->second;
 						Item* item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_EXISTS);
-						item->AppendElement(new ItemEntity("name", first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("value", second, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("name", first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("value", second, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						collectedItems->push_back(item);
 					}
 				}
@@ -127,12 +127,12 @@ ItemVector* EnvironmentVariableProbe::CollectItems(Object *object) {
 		// only keep envs that match operation and value and var check
 		StringPairVector::iterator it;
 		for(it = envs->begin(); it != envs->end(); it++) {
-			ItemEntity* tmp = new ItemEntity("name", (*it)->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS);
+			ItemEntity* tmp = new ItemEntity("name", (*it)->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);
 			if(name->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
 				Item* item = this->CreateItem();
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
-				item->AppendElement(new ItemEntity("name", (*it)->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("value", (*it)->second, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("name", (*it)->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("value", (*it)->second, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				collectedItems->push_back(item);
 			}
 			delete tmp;

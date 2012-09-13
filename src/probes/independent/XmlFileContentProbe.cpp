@@ -120,9 +120,9 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 
 						item = this->CreateItem();
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
@@ -131,7 +131,7 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 
@@ -172,9 +172,9 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, true, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 					
@@ -201,7 +201,7 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 				}
@@ -305,10 +305,10 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 			item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
-			item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, true));
-			item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("xpath", xpath, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING));
+			item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("xpath", xpath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			
 			switch ( ( theResult.get() )->getType() ){
 				case XObject::eTypeBoolean:
@@ -321,7 +321,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 					for( int i=0; chVec[i] !='\0'; i++)
 						value += chVec[i]; 
 
-					item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 					break;
 				}
@@ -331,7 +331,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 					
 					if ( list.getLength() <= 0 ){
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					}
 
 					for(unsigned int i = 0 ;  i < list.getLength() ; i++){
@@ -343,7 +343,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 							for( int i=0; chVec[i] !='\0'; i++)
 								value += chVec[i]; 
 
-							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 						} else if(node->getNodeType() == XalanNode::ATTRIBUTE_NODE) {
 
@@ -353,14 +353,14 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 							for( int i=0; chVec[i] !='\0'; i++)
 								value += chVec[i];
 
-							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_EXISTS));
+							item->AppendElement(new ItemEntity("value_of", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						} 
 						
 						else {
 						
 							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 							OvalMessage* m = new OvalMessage("An xpath expression is only allowed to select text nodes or attributes from a document.");
-							item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+							item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 							item->AppendMessage(m);
 							throw ProbeException("Error: invalid xpath specified. An xpath expression is only allowed to select text nodes or attributes from a document.");
 						}
@@ -370,7 +370,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 				default:{
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					OvalMessage* m = new OvalMessage("An xpath object must be of type boolean, number, string, or node-set.");
-					item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, false, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("value_of", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendMessage(m);
 					throw ProbeException("Error: invalid xpath object type was specified. An xpath object must be of type boolean, number, string, or node-set.");
 				}

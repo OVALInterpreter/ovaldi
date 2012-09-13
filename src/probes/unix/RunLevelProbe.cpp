@@ -28,6 +28,12 @@
 //
 //****************************************************************************************//
 
+#include <cstring>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "RunLevelProbe.h"
 
 using namespace std;
@@ -521,32 +527,12 @@ RunLevelProbe::_analyzeRunlevelDir( const char * dir, const char runlevel ){
   }
 }
 
-
-
-/**
- *  Be sure to call 'delete' on the returned pointer
- **/
-
-char *
-RunLevelProbe::_generateRunlevelDir( const char runlevel ) const {
-  char * runlevelDir = new char[BUFLEN + 1];
-  
-  memset( runlevelDir, (char)NULL, BUFLEN + 1 );
-  snprintf( runlevelDir, BUFLEN + 1,  "%s/rc%c.d", RC_DIR, runlevel );
-
-  return runlevelDir;
-}
-
-
-
-
 void
 RunLevelProbe::_analyzeRunlevels ( ){
   const char runlevelTypes[] = { '0', '1', '2', '3', '4', '5', '6', 'S', 's' };
 
   for( unsigned int i = 0; i < sizeof( runlevelTypes ) / sizeof(char); ++i ){
-    char * runlevelDir = _generateRunlevelDir( runlevelTypes[i] );
-    _analyzeRunlevelDir( runlevelDir, runlevelTypes[i] );
-    delete[] runlevelDir;
+    string runlevelDir = string(RC_DIR "/rc") + runlevelTypes[i] + ".d";
+    _analyzeRunlevelDir( runlevelDir.c_str(), runlevelTypes[i] );
   }
 }

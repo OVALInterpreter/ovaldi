@@ -849,8 +849,12 @@ namespace {
 				dumbhack = availMod->name;
 				modNameIe.SetValue(marshal_as<string>(dumbhack));
 
-				if (availMod->guid != nullptr)
+				modIdIe.SetValue("");
+				modIdIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				if (availMod->guid != nullptr) {
+					modIdIe.SetStatus(OvalEnum::STATUS_EXISTS);
 					modIdIe.SetValue(marshal_as<string>(availMod->guid->ToString()));
+				}
 
 				modVersionIe.SetValue(marshal_as<string>(availMod->version->ToString()));
 
@@ -906,13 +910,26 @@ namespace {
 			return nullptr;
 
 		// for those non-nil'd entities, a final check against the actual
-		// module info.
-		if (modGuid != nullptr) 
+		// module info.  Reset the entities to make sure there aren't old
+		// values dangling in there...
+		modIdIe.SetValue("");
+		modIdIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		modNameIe.SetValue("");
+		modNameIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		modVersionIe.SetValue("");
+		modVersionIe.SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		if (modGuid != nullptr) { 
 			modIdIe.SetValue(marshal_as<string>(modGuid->ToString()));
-		if (modName != nullptr)
+			modIdIe.SetStatus(OvalEnum::STATUS_EXISTS);
+		}
+		if (modName != nullptr) {
 			modNameIe.SetValue(marshal_as<string>(modName));
-		if (modVersion != nullptr)
+			modNameIe.SetStatus(OvalEnum::STATUS_EXISTS);
+		}
+		if (modVersion != nullptr) {
 			modVersionIe.SetValue(marshal_as<string>(modVersion->ToString()));
+			modVersionIe.SetStatus(OvalEnum::STATUS_EXISTS);
+		}
 
 		bool match =
 			(modNameObjEntity->GetNil() || 
@@ -938,25 +955,25 @@ namespace {
 		String ^dumbhack = modUsed->name;
 		item->AppendElement(new ItemEntity("module_name",
 			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
-			OvalEnum::DATATYPE_STRING, true, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
+			OvalEnum::DATATYPE_STRING, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
 			dumbhack==nullptr));
 
 		dumbhack = modUsed->guid == nullptr ? nullptr : modUsed->guid->ToString();
 		item->AppendElement(new ItemEntity("module_id",
 			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
-			OvalEnum::DATATYPE_STRING, true, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
+			OvalEnum::DATATYPE_STRING, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
 			dumbhack==nullptr));
 
 		dumbhack = modUsed->version == nullptr ? nullptr : modUsed->version->ToString();
 		item->AppendElement(new ItemEntity("module_version",
 			(dumbhack==nullptr ? "":marshal_as<string>(dumbhack)),
-			OvalEnum::DATATYPE_VERSION, true, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
+			OvalEnum::DATATYPE_VERSION, (dumbhack==nullptr ? OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS),
 			dumbhack==nullptr));
 
 		item->AppendElement(new ItemEntity("verb", verb, OvalEnum::DATATYPE_STRING,
-			true, OvalEnum::STATUS_EXISTS));
+			OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("noun", noun, OvalEnum::DATATYPE_STRING,
-			true, OvalEnum::STATUS_EXISTS));
+			OvalEnum::STATUS_EXISTS));
 
 		AbsEntityValueVector paramEntityValues;
 		StringVector::const_iterator paramNameIter, paramComboIter;
@@ -968,11 +985,11 @@ namespace {
 
 		if (paramEntityValues.empty())
 			item->AppendElement(new ItemEntity("parameters", paramEntityValues,
-				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_NOT_COLLECTED,
+				OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_NOT_COLLECTED,
 				true));
 		else
 			item->AppendElement(new ItemEntity("parameters", paramEntityValues,
-				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS));
+				OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_EXISTS));
 
 		AbsEntityValueVector selectEntityValues;
 		StringVector::const_iterator selectNameIter, selectComboIter;
@@ -984,11 +1001,11 @@ namespace {
 
 		if (selectEntityValues.empty())
 			item->AppendElement(new ItemEntity("select", selectEntityValues,
-				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_NOT_COLLECTED,
+				OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_NOT_COLLECTED,
 				true));
 		else
 			item->AppendElement(new ItemEntity("select", selectEntityValues,
-				OvalEnum::DATATYPE_RECORD, true, OvalEnum::STATUS_EXISTS));
+				OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_EXISTS));
 
 		return item;
 	}

@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <sstream>
+#include <iomanip>
+
 #include "SystemInfo.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -181,11 +184,17 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 
 	switch (osvi.dwPlatformId) {
 
-		// Test for the Windows NT product family.
-		case VER_PLATFORM_WIN32_NT:
-
+	case VER_PLATFORM_WIN32_NT:
 			// Test for the specific product.
-			if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
+			if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && osvi.wProductType == VER_NT_WORKSTATION) {
+				sysInfo->os_name = "Microsoft Windows 7";	
+			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
+				sysInfo->os_name = "Microsoft Server 2008 R2";	
+			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
+				sysInfo->os_name = "Microsoft Server 2008";	
+			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && osvi.wProductType == VER_NT_WORKSTATION) {
+				sysInfo->os_name = "Microsoft Windows Vista";	
+			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
 				sysInfo->os_name = "Microsoft Windows Server 2003";	
 			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
 				sysInfo->os_name = "Microsoft Windows XP";
@@ -196,7 +205,6 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 			} else {
 				sysInfo->os_name = "unknown";
 			}
-
 
 			// Test for specific product on Windows NT 4.0 SP6 and later.
 			// using OSVERSIONINFOEX
@@ -548,34 +556,16 @@ IfDataVector SystemInfoCollector::GetInterfaces() {
 				*/
 
 				// Here I am using the description value as the name
-				char *descStr = (char*)malloc(pMibIfRow->dwDescrLen+1);
-				if(descStr == NULL) {
-					free(pIPAddrTable);
-					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
-				}
-				ZeroMemory(descStr, sizeof(pMibIfRow->dwDescrLen+1));
-				for (unsigned int j=0;j<pMibIfRow->dwDescrLen;j++) {
-					descStr[j] = (char)pMibIfRow->bDescr[j];
-					//sprintf(&descStr[j],"%s",pMibIfRow->bDescr[j]);
-				}
-				curIf->ifName = descStr;
-				free(descStr);
+				curIf->ifName = string((char*)&pMibIfRow->bDescr[0], pMibIfRow->dwDescrLen);
 
+				ostringstream macOss;
+				macOss << hex << uppercase << setfill('0');
+				if (pMibIfRow->dwPhysAddrLen > 0)
+					macOss << setw(2) << (int)pMibIfRow->bPhysAddr[0];
+				for (DWORD i = 1; i < pMibIfRow->dwPhysAddrLen; ++i)
+					macOss << '-' << setw(2) << (int)pMibIfRow->bPhysAddr[i];
 
-				// Format MAC Address
-				char *macStr = (char*)malloc(sizeof(char)*30);				
-				if(macStr == NULL) {
-					free(pIPAddrTable);
-					throw SystemInfoException("Error: Unable to allocate memeory while gathering interface information.");
-				}
-				ZeroMemory(macStr, 30);
-				for (unsigned int i=0;i<pMibIfRow->dwPhysAddrLen;i++) {
-					sprintf(&macStr[i*3],"%02X-",pMibIfRow->bPhysAddr[i]);
-				}
-				curIf->macAddress = macStr;
-				curIf->macAddress = curIf->macAddress.substr(0, curIf->macAddress.length()-1);
-				free(macStr);
-
+				curIf->macAddress = macOss.str();
 			} else {
 
 				curIf->ifName = "unknown";

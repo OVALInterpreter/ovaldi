@@ -141,8 +141,7 @@ namespace {
 			 ++nameIter) {
 
 			auto_ptr<ItemEntity> nameItemEntity(
-				new ItemEntity("name", *nameIter, OvalEnum::DATATYPE_STRING, 
-							   true));
+				new ItemEntity("name", *nameIter, OvalEnum::DATATYPE_STRING));
 			
 			if (nameObjEntity->Analyze(nameItemEntity.get()) != 
 				OvalEnum::RESULT_TRUE)

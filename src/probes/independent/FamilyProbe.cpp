@@ -71,7 +71,7 @@ ItemVector* FamilyProbe::CollectItems(Object* /*object*/) {
 
 	Item* item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("family", this->myFamily, OvalEnum::DATATYPE_STRING, true, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("family", this->myFamily, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	collectedItems->push_back(item);
 
 	return collectedItems;

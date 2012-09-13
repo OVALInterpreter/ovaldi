@@ -28,6 +28,15 @@
 //
 //****************************************************************************************//
 
+// Including Iphlpapi.h by itself results in errors because it
+// seems to use types like UCHAR without including the headers
+// which define them.  I dunno what the minimum prerequisite
+// includes are (WinDef.h wasn't enough); but including all of
+// windows.h seemed to work.
+#include <Windows.h>
+#include <Iphlpapi.h>
+
+#include "WindowsCommon.h"
 #include "PortProbe.h"
 
 //****************************************************************************************//
@@ -129,8 +138,9 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                         StringSet::iterator iterator3;
 
                         for ( iterator3 = localPorts->begin() ; iterator3 != localPorts->end() ; iterator3++ ) {
-                            string localPortStr = ( *iterator3 );
-                            long long portValue = PortProbe::StringToPortValue ( localPortStr );
+                            long long portValue;
+							if (!Common::FromString(*iterator3, &portValue))
+								throw ProbeException("Couldn't convert to long long: "+*iterator3);
 
                             if ( portValue > -1 ) {
                                 Item* item = PortProbe::GetPort ( localAddressStr , portValue , protocolStr );
@@ -147,9 +157,9 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                             if ( localPort->GetVarRef() == NULL ) {
                                 Item* item = this->CreateItem();
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                                item->AppendElement ( new ItemEntity ( "protocol" ,  protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "local_port" , localPort->GetValue() , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                item->AppendElement ( new ItemEntity ( "protocol" ,  protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                item->AppendElement ( new ItemEntity ( "local_port" , localPort->GetValue() , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
 
                             } else {
@@ -158,9 +168,9 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                                 for ( iterator = localPort->GetVarRef()->GetValues()->begin() ; iterator != localPort->GetVarRef()->GetValues()->end() ; iterator++ ) {
                                     Item* item = this->CreateItem();
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                                    item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "local_port" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                    item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                                    item->AppendElement ( new ItemEntity ( "local_port" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                     collectedItems->push_back ( item );
                                 }
                             }
@@ -176,8 +186,8 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                     if ( localAddress->GetVarRef() == NULL ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "local_address" , localAddress->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                        item->AppendElement ( new ItemEntity ( "local_address" , localAddress->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                         collectedItems->push_back ( item );
 
                     } else {
@@ -186,8 +196,8 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                         for ( iterator = localAddress->GetVarRef()->GetValues()->begin() ; iterator != localAddress->GetVarRef()->GetValues()->end() ; iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                            item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "local_address" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                            item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+                            item->AppendElement ( new ItemEntity ( "local_address" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                             collectedItems->push_back ( item );
                         }
                     }
@@ -203,7 +213,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
             if ( protocol->GetVarRef() == NULL ) {
                 Item* item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "protocol" , protocol->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "protocol" , protocol->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( item );
 
             } else {
@@ -212,7 +222,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                 for ( iterator = protocol->GetVarRef()->GetValues()->begin() ; iterator != protocol->GetVarRef()->GetValues()->end() ; iterator++ ) {
                     Item* item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                    item->AppendElement ( new ItemEntity ( "protocol" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                    item->AppendElement ( new ItemEntity ( "protocol" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                     collectedItems->push_back ( item );
                 }
             }
@@ -241,14 +251,14 @@ Item* PortProbe::CreateItem() {
 Item* PortProbe::BuildPortItem ( string localAddressStr , unsigned long localPort , string remoteAddressStr , unsigned long remotePort , string protocolStr , unsigned long pid ) {
     Item* item = this->CreateItem();
     item->SetStatus ( OvalEnum::STATUS_EXISTS );
-    item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-    item->AppendElement ( new ItemEntity ( "local_port" , Common::ToString ( localPort ) , OvalEnum::DATATYPE_INTEGER , true , OvalEnum::STATUS_EXISTS ) );
-    item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , true , OvalEnum::STATUS_EXISTS ) );
-    item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( pid ) , OvalEnum::DATATYPE_INTEGER , false , OvalEnum::STATUS_EXISTS ) );
+    item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+    item->AppendElement ( new ItemEntity ( "local_port" , Common::ToString ( localPort ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
+    item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+    item->AppendElement ( new ItemEntity ( "pid" , Common::ToString ( pid ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
 	if (!remoteAddressStr.empty()) {
 		// UDP and TCP server sockets don't have the remote address info
-		item->AppendElement ( new ItemEntity ( "foreign_address" , remoteAddressStr , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
-		item->AppendElement ( new ItemEntity ( "foreign_port" , Common::ToString ( remotePort ) , OvalEnum::DATATYPE_STRING , false , OvalEnum::STATUS_EXISTS ) );
+		item->AppendElement ( new ItemEntity ( "foreign_address" , remoteAddressStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+		item->AppendElement ( new ItemEntity ( "foreign_port" , Common::ToString ( remotePort ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
 	}
     return item;
 }
@@ -652,8 +662,8 @@ StringSet* PortProbe::GetMatchingLocalPorts ( string protocolStr , string localA
 
         for ( iterator = PortProbe::ports->begin() ; iterator != PortProbe::ports->end() ; iterator++ ) {
             if ( ( protocolStr.compare ( ( *iterator )->GetElementByName ( "protocol" )->GetValue() ) == 0 ) && ( localAddressStr.compare ( ( *iterator )->GetElementByName ( "local_address" )->GetValue() ) == 0 ) ) {
-                port1 = PortProbe::StringToPortValue ( ( *iterator )->GetElementByName ( "local_port" )->GetValue() );
-                port2 = PortProbe::StringToPortValue ( localPort->GetValue() );
+				Common::FromString(( *iterator )->GetElementByName ( "local_port" )->GetValue(), &port1);
+				Common::FromString(localPort->GetValue(), &port2);
 
                 if ( ( ( port1 > -1 ) && ( port2 > -1 ) ) && PortProbe::IsValidOperationAndValue ( op , port1 , port2 ) ) {
                     localPorts->insert ( Common::ToString ( port1 ) );
@@ -668,8 +678,8 @@ StringSet* PortProbe::GetMatchingLocalPorts ( string protocolStr , string localA
         for ( iterator1 = localPort->GetVarRef()->GetValues()->begin() ; iterator1 != localPort->GetVarRef()->GetValues()->end() ; iterator1++ ) {
             for ( iterator2 = PortProbe::ports->begin() ; iterator2 != PortProbe::ports->end() ; iterator2++ ) {
                 if ( ( protocolStr.compare ( ( *iterator2 )->GetElementByName ( "protocol" )->GetValue() ) == 0 ) && ( localAddressStr.compare ( ( *iterator2 )->GetElementByName ( "local_address" )->GetValue() ) == 0 ) ) {
-                    port1 = PortProbe::StringToPortValue ( ( *iterator2 )->GetElementByName ( "local_port" )->GetValue() );
-                    port2 = PortProbe::StringToPortValue ( ( *iterator1 )->GetValue() );
+					Common::FromString(( *iterator2 )->GetElementByName ( "local_port" )->GetValue(), &port1);
+					Common::FromString(( *iterator1 )->GetValue(), &port2);
 
                     if ( ( ( port1 > -1 ) && ( port2 > -1 ) ) && PortProbe::IsValidOperationAndValue ( op , port1 , port2 ) ) {
                         localPorts->insert ( Common::ToString ( port1 ) );
@@ -725,18 +735,6 @@ bool PortProbe::IsValidOperationAndValue ( OvalEnum::Operation op , long long po
     }
 
     return isValid;
-}
-
-long long PortProbe::StringToPortValue ( string portStr ) {
-    long long portValue;
-    char *endptr = NULL;
-    portValue = Common::StringToLongLong ( ( char* ) portStr.c_str() , &endptr , 10 );
-
-    if ( endptr != NULL ) {
-        *endptr = NULL;
-    }
-
-    return portValue;
 }
 
 void PortProbe::DeletePorts() {

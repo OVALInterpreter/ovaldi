@@ -192,9 +192,9 @@ ItemVector* Patch54Probe::CollectItems(Object *object) {
 		Item *item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		item->AppendElement(new ItemEntity("base", Common::ToString(patchIter->base),
-										   OvalEnum::DATATYPE_INTEGER, true));
+										   OvalEnum::DATATYPE_INTEGER));
 		item->AppendElement(new ItemEntity("version", Common::ToString(patchIter->version),
-										   OvalEnum::DATATYPE_INTEGER, true));
+										   OvalEnum::DATATYPE_INTEGER));
 		collectedItems->push_back(item);
 	}
 

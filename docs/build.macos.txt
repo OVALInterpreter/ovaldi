@@ -104,20 +104,42 @@ install the supporting libraries.
 
   B. Xerces Library
 
-       The OVAL Interpreter uses the open source Xerces library.  The
-       binary was compiled with version 2.7.0 of the xerces-c library.
-       
-       The source code for the Xerces-C library can be downloaded from the following link.
+       The OVAL Interpreter uses the open source Xerces library.  The following
+       instructions are slightly different between OSX 10.6 and 10.7 due to
+       compatibility problems with xerces 2.8 on OSX 10.7.
 
-           http://archive.apache.org/dist/xerces/c/2/sources/
-    
-       To compile and install the Xerces-C library simply run the following commands.
-	   
+       OSX 10.7:
+
+       The macports version of xerces 2.8.0 was causing ovaldi to crash, so we
+       built our own binaries from source.  To make the build work, we applied
+       the "macsvn.diff" patch, which is available from
+
+       https://issues.apache.org/jira/browse/XERCESC-1772
+       or
+       https://trac.macports.org/ticket/22287
+
+       OSX 10.6:
+
+       We built xerces 2.7 from source.  No patching was required.
+
+       In either case, the source code for the Xerces-C library can be
+       downloaded from the following link.
+
+           http://archive.apache.org/dist/xml/xerces-c/ (for 2.7)
+           or
+           http://xerces.apache.org/xerces-c/download.cgi (for 2.8)
+
+       To compile and install the Xerces-C library (this example builds 32-bit
+       xerces 2.7), simply run the following commands.
+
            export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_7_0'
            cd $XERCESCROOT/src/xercesc
-		   ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
-	       make
+           ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
+           make
            sudo -E make install
+
+       Building xerces 2.8 on OSX 10.7 after having applied the patch, is 
+       analogous.
 
   C. Xalan Library
 

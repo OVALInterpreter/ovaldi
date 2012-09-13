@@ -40,7 +40,7 @@ using namespace std;
 #define MIN_COMPATIBLE_VERSION "5.0"
 #define VENDOR "The MITRE Corporation"
 #define VERSION "5.10.1"
-#define BUILD 1
+#define BUILD 2
 
 #define SCHEMA_VERSION "5.10.1"
 
