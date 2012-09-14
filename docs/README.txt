@@ -142,10 +142,10 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
   C. Microsoft Windows Installation
      
        Install the OVAL Interpreter by running the installer
-       executable -      ovaldi-X.X.X-setup.exe
+       executable : ovaldi-<version>-<architecture>-setup.exe
 
        The installer is a self-extracting zip archive that prompts the user for
-       an installation directory ('C:\Program Files\OVAL\ovaldi' by default)
+       an installation directory ('C:\Program Files\OVAL' by default)
        and installs the OVAL Interpreter and its supporting files.
 
        Executables:
