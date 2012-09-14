@@ -528,7 +528,6 @@ OvalEnum::ResultEnumeration EntityComparator::CompareInteger(OvalEnum::Operation
 			result = CompareIntOperation(udefInt,uscInt, op);
 		}else if((Common::FromString(defValue, &defInt) && Common::FromString(scValue, &uscInt)) || (Common::FromString(defValue, &udefInt) && Common::FromString(scValue, &scInt))){
 			//check op
-			bool defSigned = Common::FromString(defValue, &defInt);
 			bool scSigned = Common::FromString(scValue, &scInt);
 			
 			switch(op){
