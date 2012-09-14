@@ -28,36 +28,14 @@
 //
 //****************************************************************************************//
 
+
 #include <memory>
 #include <AutoCloser.h>
-// need this in both 32 and 64-bit builds for the FS_REDIRECT_* macros
 #include <FsRedirectionGuard.h>
 
 #include "FileFinder.h"
 
-
 using namespace std;
-
-// our view variable is "bitnessView", so may as well macro that
-// too, wrapping the FS_DIRECT_GUARD macro, to avoid error-prone
-// duplication and save some typing. (FF=FileFinder)
-#define FF_FS_REDIRECT_GUARD_BEGIN FS_REDIRECT_GUARD_BEGIN(bitnessView)
-
-namespace {
-	/**
-	 * Wraps WindowsCommon::GetActualPathWithCase() with a guard to make sure
-	 * filesystem redirection is set & reset appropriately.
-	 */
-	inline string GetActualPathWithCase(const string &path, BitnessView bitnessView) {
-		// this prevents C4100, unreferenced formal parameter (bitnessView) in 64-bit builds.
-		// odd code, but it works.  And is perhaps nicer than a bunch of preprocessor
-		// junk...
-		bitnessView; 
-		FF_FS_REDIRECT_GUARD_BEGIN
-		return WindowsCommon::GetActualPathWithCase(path);
-		FS_REDIRECT_GUARD_END
-	}
-}
 
 FileFinder::FileFinder(BitnessView view) {
 #ifdef _WIN64
@@ -73,6 +51,18 @@ FileFinder::FileFinder(BitnessView view) {
 
 FileFinder::~FileFinder() {
 
+}
+
+StringPairVector* FileFinder::SearchFiles(ObjectEntity* path, ObjectEntity* fileName, BehaviorVector* behaviors) {
+	FS_REDIRECT_GUARD_BEGIN(bitnessView)
+	return AbsFileFinder::SearchFiles(path, fileName, behaviors);
+	FS_REDIRECT_GUARD_END
+}
+
+StringPairVector* FileFinder::SearchFiles(ObjectEntity* filePath) {
+	FS_REDIRECT_GUARD_BEGIN(bitnessView)
+	return AbsFileFinder::SearchFiles(filePath);
+	FS_REDIRECT_GUARD_END
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -134,9 +124,8 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes.
 		constPortion = Common::StripTrailingSeparators(
-			GetActualPathWithCase(
-				this->fileMatcher->RemoveExtraSlashes(constPortion),
-				bitnessView));
+			WindowsCommon::GetActualPathWithCase(
+				this->fileMatcher->RemoveExtraSlashes(constPortion)));
 	}
 
 	// Found a constant portion
@@ -249,11 +238,9 @@ StringVector* FileFinder::GetDrives() {
 			
 			const char *drive = lpBuffer + index;
 
-			//	Only fixed drives.  No need to mess with
-			// redirection here; drive letters shouldn't be affected
-			// by it, right?
+			// Only fixed drives.
 			if(GetDriveType(drive) == DRIVE_FIXED) {
-				drives->push_back(GetActualPathWithCase(drive, bitnessView));
+				drives->push_back(WindowsCommon::GetActualPathWithCase(drive));
 			}
 
 			index += strlen(drive) + 1; // skip over the '\0' too
@@ -294,9 +281,7 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 			WIN32_FIND_DATA FindFileData;
 			HANDLE hFind = INVALID_HANDLE_VALUE;
 
-			FF_FS_REDIRECT_GUARD_BEGIN
 			hFind = FindFirstFile(findDir.c_str(), &FindFileData);
-			FS_REDIRECT_GUARD_END
 
 			if (hFind == INVALID_HANDLE_VALUE) {
 
@@ -386,9 +371,7 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 		WIN32_FIND_DATA FindFileData;
 		HANDLE hFind = INVALID_HANDLE_VALUE;
 
-		FF_FS_REDIRECT_GUARD_BEGIN
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
-		FS_REDIRECT_GUARD_END
 
 		if (hFind == INVALID_HANDLE_VALUE) {
 
@@ -474,15 +457,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	try {
-		FF_FS_REDIRECT_GUARD_BEGIN
-		hFile = CreateFile(path.c_str(),					// DirName
-								0/*GENERIC_READ*/,				// access mode
-								FILE_SHARE_READ,			// share mode
-								NULL,						// SD
-								OPEN_EXISTING,				// how to create
-								FILE_FLAG_BACKUP_SEMANTICS,	// file attributes
-								NULL);						// handle to template file
-		FS_REDIRECT_GUARD_END
+		hFile = GetFileHandle(path, 0, true);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 
@@ -500,9 +475,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 				// under the mount point.
 				
 				DWORD attrs;
-				FF_FS_REDIRECT_GUARD_BEGIN
 				attrs = GetFileAttributes(path.c_str());
-				FS_REDIRECT_GUARD_END
 
 				if (attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT) {
 					exists = true;
@@ -522,7 +495,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 
 		if (exists && actualPath != NULL)
 			*actualPath = Common::StripTrailingSeparators(
-				GetActualPathWithCase(path, bitnessView));
+				WindowsCommon::GetActualPathWithCase(path));
 
 	} catch(Exception ex) {
 		if (hFile != INVALID_HANDLE_VALUE)
@@ -592,7 +565,7 @@ bool FileFinder::FileNameExists(string path, string fileName, string *actualFile
 		}
 
 		if (exists && actualFileName != NULL) {
-			string actualFilepath = GetActualPathWithCase(filePath, bitnessView);
+			string actualFilepath = WindowsCommon::GetActualPathWithCase(filePath);
 			auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
 			if (split.get())
 				*actualFileName = split->second;
@@ -637,17 +610,13 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		WIN32_FIND_DATA FindFileData;
 		HANDLE hFind = INVALID_HANDLE_VALUE;
 
-		FF_FS_REDIRECT_GUARD_BEGIN
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
-		FS_REDIRECT_GUARD_END
 
 		if (hFind == INVALID_HANDLE_VALUE) {
 			DWORD errorNum = GetLastError();
 			DWORD attrs;
 
-			FF_FS_REDIRECT_GUARD_BEGIN
 			attrs = GetFileAttributes(path.c_str());
-			FS_REDIRECT_GUARD_END
 
 			if (attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT && errorNum == ERROR_NOT_READY) {
 				// Specified path points to an empty removable media device mounted into the NTFS filesystem.  Skip it.
@@ -721,7 +690,11 @@ HANDLE FileFinder::GetFileHandle(const string &filepath, DWORD access, bool isDi
 
 	DWORD dirBit = isDirectory ? FILE_FLAG_BACKUP_SEMANTICS : 0;
 
-	FF_FS_REDIRECT_GUARD_BEGIN
+	// Note: disabling/reverting redirection can actually nest, so this
+	// is safe to call from the internal search implementation functions,
+	// for which the redirection state has already been set.
+
+	FS_REDIRECT_GUARD_BEGIN(bitnessView)
 
 	return CreateFile(filepath.c_str(),				  // file name
 						access,						  // access mode

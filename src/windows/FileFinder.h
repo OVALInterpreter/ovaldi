@@ -40,8 +40,6 @@
 
 using namespace std;
 
-class  AbsFileFinder;
-
 /**
 	This class is the windows file searching implmentation used by this application
 */
@@ -50,6 +48,18 @@ public:
 
 	explicit FileFinder(BitnessView view);
 	~FileFinder();
+
+	/**
+	 * Overrides AbsFileFinder::SearchFiles(ObjectEntity*,ObjectEntity*,BehaviorVector*) to
+	 * disable wow64 redirection if necessary, before calling the superclass method, and
+	 * re-enable it afterword.
+	 */
+	StringPairVector* SearchFiles(ObjectEntity* path, ObjectEntity* fileName, BehaviorVector* behaviors);
+	/**
+	 * Overrides AbsFileFinder::SearchFiles(ObjectEntity*) to disable wow64 redirection 
+	 * if necessary, before calling the superclass method, and re-enable it afterword.
+	 */
+	StringPairVector* SearchFiles(ObjectEntity* filePath);
 
 	/**
 	 * Gets a handle to a file or directory, to be used for whatever you want.

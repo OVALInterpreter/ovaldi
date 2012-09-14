@@ -29,7 +29,6 @@
 //****************************************************************************************//
 
 #include <memory>
-#include <algorithm>
 #include "AbsFileFinder.h"
 
 using namespace std;
