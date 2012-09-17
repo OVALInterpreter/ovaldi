@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdint.h>
 
 #include <iostream>
 #include <sstream>
