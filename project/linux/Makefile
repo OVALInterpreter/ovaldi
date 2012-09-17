@@ -50,7 +50,7 @@ CPPFLAGS = -Wall -DLINUX $(INCDIRS)
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -lblkid -lacl
+LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -llber -lblkid -lacl
 
 # Determine what package management system is being used 
 PACKAGE_RPM  = $(shell /usr/bin/env rpm  --version 2>/dev/null)
