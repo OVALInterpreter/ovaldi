@@ -262,7 +262,8 @@ bool AbsFileFinder::FilePathExists(string filePath, string *actualFilePath) {
 	if ( fpComponents.get() != NULL ) {
 		string actualFileName, actualPath;
 		exists = this->PathExists(fpComponents->first, &actualPath);
-		exists &= this->FileNameExists(actualPath, fpComponents->second, &actualFileName);
+		if (exists)
+			exists &= this->FileNameExists(actualPath, fpComponents->second, &actualFileName);
 		if (exists && actualFilePath != NULL)
 			*actualFilePath = Common::BuildFilePath(actualPath, actualFileName);
 	}
