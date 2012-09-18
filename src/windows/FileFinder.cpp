@@ -482,7 +482,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 				}
 			} else {
 				string errorMessage =
-					"(FileProbe) Unable to open a handle to the file '" +
+					"(FileProbe) Unable to open a handle to the directory '" +
 					path +
 					"': " +
 					WindowsCommon::GetErrorMessage(errorNum);
