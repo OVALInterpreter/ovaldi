@@ -503,6 +503,10 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 		case REG_SZ:
 			{
 				item->AppendElement(new ItemEntity("type", "reg_sz", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				// if the value ends with 0, as REG_SZ values should, make sure
+				// that 0 doesn't get into our entity value...
+				if (valuelenIn > 0 && valueIn[valuelenIn-1] == 0)
+					--valuelenIn;
 				item->AppendElement(new ItemEntity("value", string((const char*)valueIn, valuelenIn)));
 				break;
 			}
