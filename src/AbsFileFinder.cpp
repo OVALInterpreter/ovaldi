@@ -458,18 +458,14 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 		path->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {		
 		
 		if(path->GetVarRef() == NULL) {
-//			if(!this->PathExists(path->GetValue())) {
-				paths->push_back(path->GetValue());
-				result = true;
-//			}
+			paths->push_back(path->GetValue());
+			result = true;
 		} else {
 
 			VariableValueVector::iterator iterator;
 			for(iterator = path->GetVarRef()->GetValues()->begin(); iterator != path->GetVarRef()->GetValues()->end(); iterator++) {
-//				if(!this->PathExists((*iterator)->GetValue())) {
-					paths->push_back((*iterator)->GetValue());
-					result = true;
-//				}
+				paths->push_back((*iterator)->GetValue());
+				result = true;
 			}
 		}
 	}
@@ -486,19 +482,15 @@ bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileNa
 		!fileName->GetNil()) {		
 		
 		if(fileName->GetVarRef() == NULL) {
-//			if(!this->FileNameExists(path, fileName->GetValue())) {
-				fileNames->push_back(fileName->GetValue());
-				result = true;
-//			}
+			fileNames->push_back(fileName->GetValue());
+			result = true;
 		} else {
 
 			
 			VariableValueVector::iterator iterator;
 			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
-//				if(!this->FileNameExists(path, (*iterator)->GetValue())) {
-					fileNames->push_back((*iterator)->GetValue());
-					result = true;
-//				}
+				fileNames->push_back((*iterator)->GetValue());
+				result = true;
 			}
 		}
 	}
@@ -514,18 +506,14 @@ bool AbsFileFinder::ReportFilePathDoesNotExist(ObjectEntity *filePath, StringVec
 		filePath->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {		
 		
 		if(filePath->GetVarRef() == NULL) {
-//			if(!this->FilePathExists(filePath->GetValue())) {
-				filePaths->push_back(filePath->GetValue());
-				result = true;
-//			}
+			filePaths->push_back(filePath->GetValue());
+			result = true;
 		} else {
 
 			VariableValueVector::iterator iterator;
 			for(iterator = filePath->GetVarRef()->GetValues()->begin(); iterator != filePath->GetVarRef()->GetValues()->end(); iterator++) {
-//				if(!this->FilePathExists((*iterator)->GetValue())) {
-					filePaths->push_back((*iterator)->GetValue());
-					result = true;
-//				}
+				filePaths->push_back((*iterator)->GetValue());
+				result = true;
 			}
 		}
 	}

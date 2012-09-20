@@ -28,11 +28,26 @@
 //
 //****************************************************************************************//
 
-#include "FileHash58Probe.h"
 #include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <list>
+
+#ifdef WIN32
+#  include <PrivilegeGuard.h>
+#  include <WindowsCommon.h>
+#  include <FsRedirectionGuard.h>
+// macro this so it can disappear on non-windows OSs.
+#  define ADD_WINDOWS_VIEW_ENTITY \
+	item->AppendElement(new ItemEntity("windows_view", \
+		(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+#else
+#  define ADD_WINDOWS_VIEW_ENTITY
+#  define FS_REDIRECT_GUARD_BEGIN(x)
+#  define FS_REDIRECT_GUARD_END
+#endif
+
+#include "FileHash58Probe.h"
 
 using namespace std;
 
@@ -83,27 +98,26 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 	ObjectEntity* fileName = object->GetElementByName("filename");
     ObjectEntity* filePath = object->GetElementByName("filepath");
 	ObjectEntity *hashTypeEntity = object->GetElementByName("hash_type");
-	FileFinder fileFinder;
 	StringPairVector* filePaths = NULL;
 
-	#ifdef WIN32
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
-	#endif
-	
-	if(filePath != NULL){
-		if ( (object->GetBehaviors())->size() > 0 ){
-			throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
-		}
-		filePaths = fileFinder.SearchFiles(filePath);	
-	}else{
-		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
-	}
+#ifdef WIN32
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
+#else
+	FileFinder fileFinder;
+#endif
 
 	#ifdef WIN32
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+	#endif
+
+		if(filePath != NULL){
+			filePaths = fileFinder.SearchFiles(filePath);	
+		}else{
+			filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+		}
+
+	#ifdef WIN32
 	}
 	#endif
 
@@ -149,6 +163,7 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 							item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 							item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 							item->AppendElement(new ItemEntity(*itemEntityIter));
+							ADD_WINDOWS_VIEW_ENTITY
 							collectedItems->push_back(item);
 						}
 					}
@@ -162,6 +177,7 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 						item->SetStatus(OvalEnum::STATUS_ERROR);
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity(*itemEntityIter));
+						ADD_WINDOWS_VIEW_ENTITY
 						item->AppendMessage(new OvalMessage("Can't compute the hash of a directory"));
 						collectedItems->push_back(item);
 					}
@@ -173,9 +189,7 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 				// build the path string
                 string filePath = Common::BuildFilePath(fp->first, fp->second);
 
-				// check all digest types, since an object entity can give
-				// values which should not match just as easily as give
-				// values which should.
+				// Compute all hashes selected by the hash_type entity.
 				for (list<ItemEntity>::iterator itemEntityIter = hashTypeItemEntities.begin();
 						itemEntityIter != hashTypeItemEntities.end();
 						++itemEntityIter) {
@@ -188,13 +202,12 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 					item->AppendElement(new ItemEntity("filename", fp->second, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					item->AppendElement(new ItemEntity(*itemEntityIter));
 
-					if (object->Analyze(item)) {
-						// compute and add the remaining hash item entity
-						this->GetDigest(filePath, item, itemEntityIter->GetValue());
-						collectedItems->push_back(item);
-					}
-					else
-						delete item;
+					FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+					this->GetDigest(filePath, item, itemEntityIter->GetValue());
+					FS_REDIRECT_GUARD_END
+
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 				}
 			}
 
@@ -227,6 +240,7 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 						item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity(*itemEntityIter));
+						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 						
 						if ( fpComponents != NULL ){
@@ -258,6 +272,7 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 						item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->AppendElement(new ItemEntity(*itemEntityIter));
+						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
 				}

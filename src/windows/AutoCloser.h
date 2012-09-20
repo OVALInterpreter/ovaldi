@@ -37,11 +37,12 @@
 #include <Log.h>
 
 /**
- * There seem to be a lot of "close" functions which close handles
- * of various types.  Many have the same basic signature, and it
- * was getting awfully repetitive making the same basic guard class,
- * only changing the handle type and/or what closer function was
- * being called.  So I decided to make a template for it.
+ * There seem to be a lot of "close" functions in win32 which close
+ * handles of various types.  Many have the same basic signature,
+ * and it was getting awfully repetitive making the same basic
+ * guard class, only changing the handle type and/or what closer
+ * function was being called.  So I decided to make a template for
+ * it.
  * <p>
  * There are a couple different closer function prototypes I've seen,
  * and I decided to support both:

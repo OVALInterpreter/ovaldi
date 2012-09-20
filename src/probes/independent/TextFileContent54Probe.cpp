@@ -28,9 +28,24 @@
 //
 //****************************************************************************************//
 
-#include "TextFileContent54Probe.h"
 #include "FileFinder.h"
 #include "ObjectEntity.h"
+
+#ifdef WIN32
+#  include <WindowsCommon.h>
+#  include <FsRedirectionGuard.h>
+#  include <PrivilegeGuard.h>
+// macro this so it can disappear on non-windows OSs.
+#  define ADD_WINDOWS_VIEW_ENTITY \
+	item->AppendElement(new ItemEntity("windows_view", \
+		(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+#else
+#  define ADD_WINDOWS_VIEW_ENTITY
+#  define FS_REDIRECT_GUARD_BEGIN(x)
+#  define FS_REDIRECT_GUARD_END
+#endif
+
+#include "TextFileContent54Probe.h"
 
 using namespace std;
 
@@ -70,27 +85,26 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 
 	int matchOptions = this->Behaviors2MatchOptions(object->GetBehaviors());
 	ItemVector *collectedItems = new ItemVector();
-	FileFinder fileFinder;
 	StringPairVector* filePaths = NULL;
 
-	#ifdef WIN32
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
-	#endif
-	
-	if(filePath != NULL){
-		if ( (object->GetBehaviors())->size() > 0 ){
-			throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
-		}
-		filePaths = fileFinder.SearchFiles(filePath);	
-	}else{
-		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
-	}
+#ifdef WIN32
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
+#else
+	FileFinder fileFinder;
+#endif
 
 	#ifdef WIN32
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+	#endif
+
+		if(filePath != NULL){
+			filePaths = fileFinder.SearchFiles(filePath);	
+		}else{
+			filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
+		}
+
+	#ifdef WIN32
 	}
 	#endif
 
@@ -116,12 +130,14 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
 				}
 			} else {
-
-				this->GetItems(fp->first, fp->second, pattern, instance, matchOptions, collectedItems);
+				FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+				this->GetItems(fp->first, fp->second, pattern, instance, matchOptions, fileFinder, collectedItems);
+				FS_REDIRECT_GUARD_END
 			}
 
 			delete fp;
@@ -149,6 +165,7 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){
@@ -175,6 +192,7 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 				}
 			}
@@ -207,6 +225,7 @@ void TextFileContent54Probe::GetItems(string path, string fileName,
 									ObjectEntity *patternEntity,
 									ObjectEntity *instanceEntity,
 									int matchOptions,
+									FileFinder &fileFinder,
 									ItemVector* collectedItems) {
 
 	// construct the file path
@@ -227,7 +246,7 @@ void TextFileContent54Probe::GetItems(string path, string fileName,
 		infile.close();
 
 		this->GetMatches(path, fileName, fileContents, patternEntity,
-			instanceEntity, matchOptions, collectedItems);
+			instanceEntity, matchOptions, fileFinder, collectedItems);
 	}
 	else
 		throw ProbeException(string("Couldn't open file: ")+Common::BuildFilePath(path, fileName));
@@ -239,6 +258,7 @@ void TextFileContent54Probe::GetMatches(const string& path,
 										ObjectEntity *patternEntity,
 										ObjectEntity *instanceEntity,
 										int matchOptions,
+										FileFinder &fileFinder,
 										ItemVector *collectedItems) {
 
 	vector<StringVector> matches;
@@ -296,6 +316,7 @@ void TextFileContent54Probe::GetMatches(const string& path,
 			for (;subMatchIter != matchIter->end(); ++subMatchIter)
 				item->AppendElement(new ItemEntity("subexpression", *subMatchIter));
 
+			ADD_WINDOWS_VIEW_ENTITY
 			collectedItems->push_back(item);
 		}
 	}

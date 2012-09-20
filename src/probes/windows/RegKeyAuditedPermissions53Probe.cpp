@@ -105,7 +105,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
     }
 
     ItemVector *collectedItems = new ItemVector();
-    RegistryFinder registryFinder(RegistryFinder::behavior2view(object->GetBehaviors()));
+    RegistryFinder registryFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
     // Create a name ObjectEntity to provide to the RegistryFinder as it expects one, however, have the ObjectEntity set to NIL as its value does not matter.
     // Only the hive and key are relevant for this probe.
     ObjectEntity* nameEntity = new ObjectEntity();
@@ -164,10 +164,9 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 										keyVector->at(0)->SetStatus(OvalEnum::STATUS_NOT_COLLECTED);
 									}
 								}
-
 								item->AppendElement(new ItemEntity("windows_view",
-									(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
-								collectedItems->push_back ( item );
+									(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+                                collectedItems->push_back ( item );
                             }
                         } catch ( ProbeException ex ) {
                             Log::Message ( "ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );
@@ -194,7 +193,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 							}
                             item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 							item->AppendElement(new ItemEntity("windows_view",
-								(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+								(registryFinder.GetView()== BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
                         }
                     }
@@ -223,7 +222,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                 item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 				item->AppendElement(new ItemEntity("windows_view",
-					(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+					(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
             }
 
@@ -247,7 +246,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                         item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
                         item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, keyEntity->GetNil() ) );
 						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView()==RegistryFinder::BIT_32 ? "32_bit" : "64_bit")));
+							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
                 }

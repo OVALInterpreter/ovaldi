@@ -28,6 +28,22 @@
 //
 //****************************************************************************************//
 
+#ifdef WIN32
+#  include <FsRedirectionGuard.h>
+#  include <PrivilegeGuard.h>
+// macro this so it can disappear on non-windows OSs.
+#  define ADD_WINDOWS_VIEW_ENTITY \
+	item->AppendElement(new ItemEntity("windows_view", \
+		(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+#else
+#  define ADD_WINDOWS_VIEW_ENTITY
+#  define FS_REDIRECT_GUARD_BEGIN(x)
+#  define FS_REDIRECT_GUARD_END
+#endif
+
+#include <xercesc/sax/SAXException.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
+
 #include "XmlFileContentProbe.h"
 
 using namespace std;
@@ -63,29 +79,27 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 	ObjectEntity* xpath = object->GetElementByName("xpath");
 	
 	ItemVector *collectedItems = new ItemVector();
+#ifdef WIN32
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
+#else
 	FileFinder fileFinder;
+#endif
 	StringPairVector* filePaths = NULL;
 
-	#ifdef WIN32
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
-	#endif
+#ifdef WIN32
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
+#endif
 	
-	if(filePath != NULL){
-		if ( (object->GetBehaviors())->size() > 0 ){
-			throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
+		if(filePath != NULL){
+			filePaths = fileFinder.SearchFiles(filePath);	
+		}else{
+			filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
 		}
-		filePaths = fileFinder.SearchFiles(filePath);	
-	}else{
-		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
-	}
 
-	#ifdef WIN32
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
+#ifdef WIN32
 	}
-	#endif
+#endif
 
 	if(filePaths != NULL && filePaths->size() > 0) {
 		// Loop through all file paths
@@ -109,6 +123,7 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						ADD_WINDOWS_VIEW_ENTITY
 						collectedItems->push_back(item);
 					}
 					
@@ -117,14 +132,18 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 
 				}
 
 			} else {
-
-				Item* item = this->EvaluateXpath((*iterator)->first, (*iterator)->second, xpath->GetValue());
+				Item *item;
+				FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+				item = this->EvaluateXpath((*iterator)->first, (*iterator)->second, xpath->GetValue());
+				FS_REDIRECT_GUARD_END
 				if(item != NULL) {
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 				}
 				item = NULL;
@@ -156,6 +175,7 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){
@@ -182,6 +202,7 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 				}
 			}
@@ -243,6 +264,14 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 		XalanDocument* theDocument = NULL;
 		try {
 			theDocument = theLiaison.parseXMLStream(theInputSource);
+		} catch (SAXParseException &e) {
+			throw ProbeException("SAXParseException parsing " + filePath +
+								 ": " + XmlCommon::ToString(e.getMessage()) + 
+								 "  Line=" + Common::ToString(e.getLineNumber()) +
+								 ", Col=" + Common::ToString(e.getColumnNumber()));
+		} catch (SAXException &e) {
+			throw ProbeException("SAXException parsing " + filePath + ": " +
+								 XmlCommon::ToString(e.getMessage()));
 		} catch(...) {
 			theDocument = NULL;
 			// this should never happen at this point only documents that exist should get here
@@ -370,14 +399,14 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 		XPathEvaluator::terminate();
 		XMLPlatformUtils::Terminate();
 
-		throw ex;
+		throw;
 
 	} catch(Exception ex) {
 
 		XPathEvaluator::terminate();
 		XMLPlatformUtils::Terminate();
 
-		throw ex;
+		throw;
 
 	} catch(...) {
 

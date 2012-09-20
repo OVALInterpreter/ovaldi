@@ -28,18 +28,40 @@
 //
 //****************************************************************************************//
 
+
 #include <memory>
 #include <AutoCloser.h>
+#include <FsRedirectionGuard.h>
+
 #include "FileFinder.h"
 
 using namespace std;
 
-FileFinder::FileFinder() {
-
+FileFinder::FileFinder(BitnessView view) {
+#ifdef _WIN64
+	if (view == BIT_32)
+		throw Exception("Querying the 32-bit filesystem view from a "
+			"64-bit interpreter is not yet supported.");
+	bitnessView = BIT_64;
+#else
+	bitnessView = WindowsCommon::Is64BitOS() ? view : BIT_32;
+#endif
 }
 
 FileFinder::~FileFinder() {
 
+}
+
+StringPairVector* FileFinder::SearchFiles(ObjectEntity* path, ObjectEntity* fileName, BehaviorVector* behaviors) {
+	FS_REDIRECT_GUARD_BEGIN(bitnessView)
+	return AbsFileFinder::SearchFiles(path, fileName, behaviors);
+	FS_REDIRECT_GUARD_END
+}
+
+StringPairVector* FileFinder::SearchFiles(ObjectEntity* filePath) {
+	FS_REDIRECT_GUARD_BEGIN(bitnessView)
+	return AbsFileFinder::SearchFiles(filePath);
+	FS_REDIRECT_GUARD_END
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -101,7 +123,8 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes.
 		constPortion = Common::StripTrailingSeparators(
-			this->fileMatcher->RemoveExtraSlashes(constPortion));
+			WindowsCommon::GetActualPathWithCase(
+				this->fileMatcher->RemoveExtraSlashes(constPortion)));
 	}
 
 	// Found a constant portion
@@ -214,7 +237,7 @@ StringVector* FileFinder::GetDrives() {
 			
 			const char *drive = lpBuffer + index;
 
-			//	Only fixed drives
+			// Only fixed drives.
 			if(GetDriveType(drive) == DRIVE_FIXED) {
 				drives->push_back(WindowsCommon::GetActualPathWithCase(drive));
 			}
@@ -258,6 +281,7 @@ void FileFinder::GetPathsForOperation(string dirIn, string queryVal, StringVecto
 			HANDLE hFind = INVALID_HANDLE_VALUE;
 
 			hFind = FindFirstFile(findDir.c_str(), &FindFileData);
+
 			if (hFind == INVALID_HANDLE_VALUE) {
 
 				DWORD errorNum = GetLastError();
@@ -347,6 +371,7 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 		HANDLE hFind = INVALID_HANDLE_VALUE;
 
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
+
 		if (hFind == INVALID_HANDLE_VALUE) {
 
 			DWORD errorNum = GetLastError();
@@ -431,14 +456,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	try {
-		hFile = CreateFile(path.c_str(),					// DirName
-								0/*GENERIC_READ*/,				// access mode
-								FILE_SHARE_READ,			// share mode
-								NULL,						// SD
-								OPEN_EXISTING,				// how to create
-								FILE_FLAG_BACKUP_SEMANTICS,	// file attributes
-								NULL);						// handle to template file
-
+		hFile = GetFileHandle(path, 0, true);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 
@@ -455,7 +473,9 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 				// Test if the given path is the mount point itself or a subdirectory
 				// under the mount point.
 				
-				DWORD attrs = GetFileAttributes(path.c_str());
+				DWORD attrs;
+				attrs = GetFileAttributes(path.c_str());
+
 				if (attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT) {
 					exists = true;
 				}
@@ -473,7 +493,8 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 		}
 
 		if (exists && actualPath != NULL)
-			*actualPath = Common::StripTrailingSeparators(WindowsCommon::GetActualPathWithCase(path));
+			*actualPath = Common::StripTrailingSeparators(
+				WindowsCommon::GetActualPathWithCase(path));
 
 	} catch(Exception ex) {
 		if (hFile != INVALID_HANDLE_VALUE)
@@ -513,13 +534,8 @@ bool FileFinder::FileNameExists(string path, string fileName, string *actualFile
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	try {
-		hFile = CreateFile(filePath.c_str(),				// file name
-								0/*GENERIC_READ*/,				// access mode
-								FILE_SHARE_READ,			// share mode
-								NULL,						// SD
-								OPEN_EXISTING,				// how to create
-								FILE_ATTRIBUTE_NORMAL,		// file attributes
-								NULL);						// handle to template file
+
+		hFile = GetFileHandle(filePath);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 
@@ -594,9 +610,13 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		HANDLE hFind = INVALID_HANDLE_VALUE;
 
 		hFind = FindFirstFile(findDir.c_str(), &FindFileData);
+
 		if (hFind == INVALID_HANDLE_VALUE) {
 			DWORD errorNum = GetLastError();
-			DWORD attrs = GetFileAttributes(path.c_str());
+			DWORD attrs;
+
+			attrs = GetFileAttributes(path.c_str());
+
 			if (attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT && errorNum == ERROR_NOT_READY) {
 				// Specified path points to an empty removable media device mounted into the NTFS filesystem.  Skip it.
 				return childDirs;
@@ -604,9 +624,8 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 
 			delete childDirs;
 
-			string errorMessage;
-			errorMessage.append("Error: Unable to get a valid handle in GetChildDirectories(). Directory: ");
-			errorMessage.append(path);
+			string errorMessage = "FindFirstFile() failed for "+findDir+": " +
+				WindowsCommon::GetErrorMessage(errorNum);
 			throw FileFinderException(errorMessage);
 		}
 
@@ -670,9 +689,12 @@ HANDLE FileFinder::GetFileHandle(const string &filepath, DWORD access, bool isDi
 
 	DWORD dirBit = isDirectory ? FILE_FLAG_BACKUP_SEMANTICS : 0;
 
-	// When windows_view is supported for file-related tests, this will
-	// have to become more complicated to determine which file
-	// to actually open.  But for now, this is very simple.
+	// Note: disabling/reverting redirection can actually nest, so this
+	// is safe to call from the internal search implementation functions,
+	// for which the redirection state has already been set.
+
+	FS_REDIRECT_GUARD_BEGIN(bitnessView)
+
 	return CreateFile(filepath.c_str(),				  // file name
 						access,						  // access mode
 						FILE_SHARE_READ,			  // share mode
@@ -680,4 +702,6 @@ HANDLE FileFinder::GetFileHandle(const string &filepath, DWORD access, bool isDi
 						OPEN_EXISTING,				  // how to create
 						FILE_ATTRIBUTE_NORMAL|dirBit, // file attributes
 						NULL);						  // handle to template file
+
+	FS_REDIRECT_GUARD_END
 }

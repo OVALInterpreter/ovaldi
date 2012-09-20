@@ -77,21 +77,6 @@ public:
 	 */
 	StringPairVector* SearchFiles(ObjectEntity* filePath);
 
-	/** Return a vector of paths that match the specified criteria. */
-	StringVector* GetPaths(ObjectEntity* path, BehaviorVector* behaviors);
-
-	/** Return a vector of file names that match the specified criteria. 
-		Search the file system for files under the specified path that match the 
-	  	provided ObjectEntity.
-	*/
-	StringVector* GetFileNames(std::string path, ObjectEntity* fileName);
-
-	/** Return a StringVector of filepaths that match the specified filePath ObjectEntity. 
-	 *  @param filePath A ObjectEntity that represents the filepath(s) to retrieve.
-	 *  @return A StringVector that contains all of the matching filepaths specified by the filePath ObjectEntity.
-	 */
-	StringVector* GetFilePaths(ObjectEntity* filePath);
-	
 	/** Return true if the calling probe should report that the path does not exist.
 		If a path's operator is set to OPERATOR_EQUALS and the path does not exist
 		the caller should report that the path was not found. When getting the value 
@@ -125,6 +110,21 @@ public:
 
 protected:
 	
+	/** Return a vector of paths that match the specified criteria. */
+	StringVector* GetPaths(ObjectEntity* path, BehaviorVector* behaviors);
+
+	/** Return a vector of file names that match the specified criteria. 
+		Search the file system for files under the specified path that match the 
+	  	provided ObjectEntity.
+	*/
+	StringVector* GetFileNames(std::string path, ObjectEntity* fileName);
+
+	/** Return a StringVector of filepaths that match the specified filePath ObjectEntity. 
+	 *  @param filePath A ObjectEntity that represents the filepath(s) to retrieve.
+	 *  @return A StringVector that contains all of the matching filepaths specified by the filePath ObjectEntity.
+	 */
+	StringVector* GetFilePaths(ObjectEntity* filePath);	
+
 	/** Return the set of matching paths after applying behaviors */
 	virtual StringVector* ProcessPathBehaviors(StringVector* paths, BehaviorVector* behaviors) = 0;
 

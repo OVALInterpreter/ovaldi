@@ -70,16 +70,15 @@ private:
 	virtual Item* CreateItem();
 
 	/** Collectect all file attributes for the specified file on the specified path. */
-	Item* GetFileAttributes(std::string path, std::string fileName);
+	Item* GetFileAttributes(std::string path, std::string fileName, FileFinder &fileFinder);
 
 	/** Get the version of the file. */
 	void GetVersion(LPVOID versionbuf, std::string filePath, Item *item, ItemEntity* version);
 	/** Get the type of the file. */
-	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type);
+	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder);
 
 	/* holds the language mappings for the file language data */
 	static std::map<WORD,string> langMap;
-	
 };
 
 #endif

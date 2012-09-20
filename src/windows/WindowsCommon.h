@@ -36,6 +36,7 @@
 
 #include "Exception.h"
 #include "Log.h"
+#include <Behavior.h>
 
 #include <aclapi.h>
 #include <lm.h>
@@ -49,6 +50,15 @@
 
 
 using namespace std;
+
+/**
+ * Which "view" to search, on a 64-bit OS.  Applicable to the registry and
+ * filesystem.
+ */
+enum BitnessView {
+	BIT_32, ///< well, 32_BIT isn't a valid identifier...
+	BIT_64
+};
 
 class WindowsCommon {
 
@@ -338,10 +348,7 @@ public:
 	/**
 	 * Windows (NTFS anyway, afaik) is case-insensitive, but case-aware.  We
 	 * should have in our items, filenames and paths as they actually are
-	 * in the filesystem, matching case.  This is especially important when
-	 * doing case-sensitive matching, since the values given in object
-	 * entities can be in all different cases, and on windows we need to treat
-	 * matches as all the same.
+	 * in the filesystem, matching case.
 	 * <p>
 	 * Actually taking a path and resolving it to the actual path in the
 	 * filesystem, with the exact case like this, is annoyingly difficult
@@ -385,6 +392,34 @@ public:
 	 * Detects whether this app is running on 64-bit windows.
 	 */
 	static bool Is64BitOS();
+
+	/**
+	 * Convenience method that converts a behavior windows_view value to one of the
+	 * BitnessView enumerators.
+	 * <p>
+	 * This does not check the OS or app bitness to determine whether the view makes
+	 * sense, it's just a straight translation.  So callers will have to take those
+	 * factors into account to select the view, not just unconditionally use the
+	 * return value as the view to query.
+	 *
+	 * \throw Exception if viewStr isn't recognized as a valid view.
+	 */
+	static BitnessView behavior2view(const std::string &viewStr);
+
+	/**
+	 * Convenience method that gets a BitnessView enumerator for the windows_view
+	 * behavior from the given behavior vector.  If \p bv is NULL or doesn't contain
+	 * the windows_view behavior, the default as specified in the schema is returned.
+	 * <p>
+	 * This does not check the OS or app bitness to determine whether the view makes
+	 * sense, it's just a straight translation.  So callers will have to take those
+	 * factors into account to select the view, not just unconditionally use the
+	 * return value as the view to query.
+	 *
+	 * \throw Exception if \p bv contains the windows_view behavior,
+	 *	but its value isn't recognized as valid.
+	 */
+	static BitnessView behavior2view(BehaviorVector *bv);
 
 private:
 	

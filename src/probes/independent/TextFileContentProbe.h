@@ -104,7 +104,8 @@ private:
 		are found the set is returned empty. Calls out to the GetSubstrings function to 
 		determine if a given line in a file matches the criteria specified in the ObjectEntity. 
 	*/
-	void GetLines(std::string path, std::string fileName, ObjectEntity* line, ItemVector* collectedItems);
+	void GetLines(std::string path, std::string fileName, ObjectEntity* line, 
+		ItemVector* collectedItems, FileFinder &fileFinder);
 };
 
 #endif

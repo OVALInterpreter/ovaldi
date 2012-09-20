@@ -28,8 +28,12 @@
 //
 //****************************************************************************************//
 
+#include <AutoCloser.h>
+#include <PrivilegeGuard.h>
+#include <FsRedirectionGuard.h>
 #include <iomanip>
 #include <sstream>
+
 #include "FileProbe.h"
 
 using namespace std;
@@ -266,24 +270,17 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 	ObjectEntity* path = object->GetElementByName("path");
 	ObjectEntity* fileName = object->GetElementByName("filename");
     ObjectEntity* filePath = object->GetElementByName("filepath");
-    FileFinder fileFinder;
+	FileFinder fileFinder(WindowsCommon::behavior2view(object->GetBehaviors()));
 	StringPairVector* filePaths = NULL;
 	
-	if ( WindowsCommon::EnablePrivilege(SE_BACKUP_NAME) == 0 ){
-		Log::Message("Error: Unable to enable SE_BACKUP_NAME privilege.");
-	}
+	{
+		PrivilegeGuard pg(SE_BACKUP_NAME, false);
 	
-	if(filePath != NULL){
-		if ( (object->GetBehaviors())->size() > 0 ){
-			throw ProbeException("Error: Behaviors do not apply to the filepath entity and cannot be used.");
+		if(filePath != NULL){
+			filePaths = fileFinder.SearchFiles(filePath);	
+		}else{
+			filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
 		}
-		filePaths = fileFinder.SearchFiles(filePath);	
-	}else{
-		filePaths = fileFinder.SearchFiles(path, fileName, object->GetBehaviors());
-	}
-
-	if ( WindowsCommon::DisableAllPrivileges() == 0 ){
-		Log::Message("Error: Unable to disable all privileges.");
 	}
 
 	if(filePaths != NULL && filePaths->size() > 0) {
@@ -310,6 +307,8 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 						item->AppendElement(new ItemEntity("filepath",Common::BuildFilePath(fp->first,*iterator),OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
 						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("windows_view",
+							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
 					}
 					
@@ -325,13 +324,17 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					{
 						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
 					}
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
 
 				}
 
 			} else {
-				Item* item = this->GetFileAttributes(fp->first, fp->second);
+				Item* item = this->GetFileAttributes(fp->first, fp->second, fileFinder);
 				if(item != NULL) {
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
 				}
 				item = NULL;
@@ -360,6 +363,8 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
 					
 					if ( fpComponents != NULL ){
@@ -386,6 +391,8 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
 				}
 			}
@@ -415,14 +422,15 @@ Item* FileProbe::CreateItem() {
 	return item;
 }
 
-Item* FileProbe::GetFileAttributes(string path, string fileName) {
+Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fileFinder) {
 
 	HANDLE hFile;
 	DWORD res;
+	BOOL ok;
 
 	Item *item = NULL;
 
-	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
+	string filePath = Common::BuildFilePath(path, fileName);
 
 	try {
 
@@ -435,41 +443,18 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		// SMC-AUDIT: ISSUE: should probably verify that this is a regular file before opening,
 		// instead of a virtual memory file!
 		
-		hFile = CreateFile(filePath.c_str(),			// file name
-							GENERIC_READ,				// access mode
-							FILE_SHARE_READ,			// share mode
-							NULL,						// SD
-							OPEN_EXISTING,				// how to create
-							FILE_ATTRIBUTE_NORMAL,		// file attributes
-							NULL);						// handle to template file
+		hFile = fileFinder.GetFileHandle(filePath, READ_CONTROL);
+		AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> handleGuard(hFile, 
+			CloseHandle, "file "+filePath);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 
 			DWORD errorNum = GetLastError();
-			string sysErrMsg = WindowsCommon::GetErrorMessage(errorNum);
-
-			if(errorNum == ERROR_FILE_NOT_FOUND || errorNum == ERROR_PATH_NOT_FOUND) {
-				
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to open a handle to the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'. This error should never occur since the file has already be confirmed to exist on the system. " + sysErrMsg);
-				throw ProbeException(errorMessage);
-				
-			} else if(errorNum == ERROR_PATH_NOT_FOUND) {
-
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to open a handle to the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'. This error should never occur since the file has already be confirmed to exist on the system. " + sysErrMsg);
-				throw ProbeException(errorMessage);
-
-			} else {
-
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to open a handle to the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'.  " + sysErrMsg);
+			// not-found errors are ok; we're observing an active system, and files
+			// can appear and disappear at any time.
+			if(errorNum != ERROR_FILE_NOT_FOUND && errorNum != ERROR_PATH_NOT_FOUND) {
+				string sysErrMsg = WindowsCommon::GetErrorMessage(errorNum);
+				string errorMessage = "Unable to open a handle to the file: "+sysErrMsg;
 				throw ProbeException(errorMessage);
 			}
 		}
@@ -504,9 +489,8 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			if (res != ERROR_SUCCESS) {
 
 				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to get the security descriptor for the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'.");
+				errorMessage.append("(FileProbe) Unable to get the security descriptor: "
+					+ WindowsCommon::GetErrorMessage(res));
 				throw ProbeException(errorMessage, ERROR_NOTICE);
 			}
 
@@ -517,7 +501,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			DWORD dwdname = 0;
 			SID_NAME_USE eUse;
 
-			res = LookupAccountSid(NULL,					// name of local or remote computer
+			ok = LookupAccountSid(NULL,					// name of local or remote computer
 								   owner_sid,				// security identifier
 								   aname,					// account name buffer
 								   (LPDWORD)&dwaname,		// size of account name buffer
@@ -525,10 +509,17 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 								   (LPDWORD)&dwdname,		// size of domain name buffer
 								   &eUse);					// SID type
 
+			if (!ok && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+				LocalFree(p_sd);
+				string errorMessage = "LookupAccountSid: " +
+					WindowsCommon::GetErrorMessage(GetLastError());
+				throw ProbeException(errorMessage, ERROR_NOTICE);
+			}
+
 			// Reallocate memory for the buffers.
 			aname = (LPTSTR) malloc(dwaname);
 			if (aname == NULL) {
-
+				LocalFree(p_sd);
 				string errorMessage = "";
 				errorMessage.append("(FileProbe) Could not allocate space for the owner name for file: '");
 				errorMessage.append(filePath);
@@ -538,7 +529,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 			dname = (LPTSTR) malloc(dwdname);
 			if (dname == NULL) {
-
+				LocalFree(p_sd);
 				free(aname);
 
 				string errorMessage = "";
@@ -549,7 +540,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			}
 
 			// Second call to LookupAccountSid to get the account name.
-			res = LookupAccountSid(NULL,					// name of local or remote computer
+			ok = LookupAccountSid(NULL,					// name of local or remote computer
 								   owner_sid,				// security identifier
 								   aname,					// account name buffer
 								   (LPDWORD)&dwaname,		// size of account name buffer
@@ -557,16 +548,14 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 								   (LPDWORD)&dwdname,		// size of domain name buffer
 								   &eUse);					// SID type
 
-			if (res == FALSE) {
-
+			if (!ok) {
+				LocalFree(p_sd);
 				free(aname);
 				free(dname);
 
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to get the name of the account ");
-				errorMessage.append("for this SID for the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'.");
+				string errorMessage = 
+					"Unable to get the name of the account for this SID: " + 
+					WindowsCommon::GetErrorMessage(GetLastError());
 				throw ProbeException(errorMessage);
 			}
 			
@@ -577,6 +566,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 			ownerStr.append(aname);
 			owner->SetValue(ownerStr);
 			owner->SetStatus(OvalEnum::STATUS_EXISTS);
+			LocalFree(p_sd);
 			free(aname);
 			free(dname);
 
@@ -604,7 +594,9 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		int result;
  
 		// Get status information associated with the file.
+		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
 		result = _stat(filePath.c_str(), &statusBuffer);
+		FS_REDIRECT_GUARD_END
 		if (result < 0) {
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get status information ");
@@ -672,7 +664,9 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		DWORD headersum;  
 		DWORD checksum;
 
+		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
 		res = MapFileAndCheckSum(const_cast<char*>(filePath.c_str()), &headersum, &checksum);
+		FS_REDIRECT_GUARD_END
 		if (res != CHECKSUM_SUCCESS) {
 			string errorMessage = "";
 			errorMessage.append("(FileProbe) Unable to get ms_checksum information for the file: '");
@@ -710,11 +704,16 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		LPVOID versionbuf;
 
 		// Get the required size of the version info buffer.
+		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
 		versionsize = GetFileVersionInfoSize(filePath.c_str(), &junk);
+		FS_REDIRECT_GUARD_END
 		if (versionsize > 0) {
 
 			versionbuf = (LPVOID)malloc(versionsize);
-			if (GetFileVersionInfo(filePath.c_str(), 0, versionsize, versionbuf) == TRUE) {
+			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+			ok = GetFileVersionInfo(filePath.c_str(), 0, versionsize, versionbuf);
+			FS_REDIRECT_GUARD_END
+			if (ok) {
 
 				//////////////////////////////////////////////////////
 				////////////////////    version    ///////////////////
@@ -801,10 +800,8 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 				productName->SetStatus(OvalEnum::STATUS_ERROR);
 				productVersion->SetStatus(OvalEnum::STATUS_ERROR);
 
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) Unable to get version info for the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'");
+				string errorMessage = "(FileProbe) Unable to get version info for the file: '"
+					+ filePath + "': " + WindowsCommon::GetErrorMessage(GetLastError());
 				item->AppendMessage(new OvalMessage(errorMessage));
 			}
 
@@ -812,10 +809,8 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 
 		} else {
 
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) No version information available for the file: '");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
+			string errorMessage = "(FileProbe) No version information available for the file: '"
+				+ filePath + "': " + WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage(errorMessage));
 		}
 
@@ -823,15 +818,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 		/////////////////////  FileType  /////////////////////
 		//////////////////////////////////////////////////////
 
-		this->GetType(hFile, filePath, item, type);
+		this->GetType(hFile, filePath, item, type, fileFinder);
 
 		//////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////
-
-		//Close the file handle
-		if ( CloseHandle(hFile) == 0 ){
-			Log::Debug("Error: Unable to close the handle for "+filePath);
-		}
 
 	} catch(ProbeException ex) {	
 	
@@ -884,7 +874,7 @@ void FileProbe::GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemE
 	}
 }
 
-void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type) {
+void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder) {
 
 	DWORD res = GetFileType(hFile);
 
@@ -895,9 +885,11 @@ void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* t
 
 		case FILE_TYPE_DISK:
 
+			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
 			gfaRes = GetFileAttributesEx(filePath.c_str(),				// file or directory name
 										 GetFileExInfoStandard,			// attribute class
 										 (LPVOID)&lpFileInformation);	// attribute information 
+			FS_REDIRECT_GUARD_END
 
 			if (lpFileInformation.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
 				type->SetValue("FILE_ATTRIBUTE_DIRECTORY");

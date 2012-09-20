@@ -47,17 +47,6 @@ RegistryFinder::RegistryFinder(BitnessView view) {
 #endif
 }
 
-RegistryFinder::RegistryFinder(const string &viewStr) {
-	registryMatcher = new REGEX();
-
-	bitnessView =
-#ifdef _WIN64
-		behavior2view(viewStr);
-#else
-		WindowsCommon::Is64BitOS() ? behavior2view(viewStr) : BIT_32;
-#endif
-}
-
 RegistryFinder::~RegistryFinder() {
 	delete registryMatcher;
 }
@@ -844,28 +833,6 @@ void RegistryFinder::UpwardRegistryRecursion ( StringSet* keys, string hiveStr, 
     }
 
     return;
-}
-
-RegistryFinder::BitnessView RegistryFinder::behavior2view(const string &viewStr) {
-	if (viewStr == "32_bit")
-		return BIT_32;
-	if (viewStr == "64_bit")
-		return BIT_64;
-	throw RegistryFinderException("Unrecognized view value: "+viewStr);
-}
-
-RegistryFinder::BitnessView RegistryFinder::behavior2view(BehaviorVector *bv) {
-	BitnessView schemaDefault = BIT_64;
-
-	if (!bv)
-		return schemaDefault;
-
-	string viewStr = Behavior::GetBehaviorValue(bv, "windows_view");
-
-	if (viewStr.empty())
-		return schemaDefault;
-
-	return behavior2view(viewStr);
 }
 
 string RegKey::ToString() const {

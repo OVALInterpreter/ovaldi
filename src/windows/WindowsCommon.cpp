@@ -2511,3 +2511,25 @@ bool WindowsCommon::Is64BitOS()
 	return cachedValue;
 #endif
 }
+
+BitnessView WindowsCommon::behavior2view(const string &viewStr) {
+	if (viewStr == "32_bit")
+		return BIT_32;
+	if (viewStr == "64_bit")
+		return BIT_64;
+	throw Exception("Unrecognized windows_view value: "+viewStr);
+}
+
+BitnessView WindowsCommon::behavior2view(BehaviorVector *bv) {
+	BitnessView schemaDefault = BIT_64;
+
+	if (!bv)
+		return schemaDefault;
+
+	string viewStr = Behavior::GetBehaviorValue(bv, "windows_view");
+
+	if (viewStr.empty())
+		return schemaDefault;
+
+	return behavior2view(viewStr);
+}
