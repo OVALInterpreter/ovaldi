@@ -54,6 +54,7 @@
 #include "ProcessProbe.h"
 #include "Process58Probe.h"
 #include "EnvironmentVariableProbe.h"
+#include "EnvironmentVariable58Probe.h"
 #include "TextFileContentProbe.h"
 #include "XmlFileContentProbe.h"
 #include "VariableProbe.h"

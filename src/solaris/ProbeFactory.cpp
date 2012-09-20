@@ -58,6 +58,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileHash58Probe::Instance();
 	} else if(objectName.compare("environmentvariable_object") == 0) {
 		probe = EnvironmentVariableProbe::Instance();
+	} else if(objectName.compare("environmentvariable58_object") == 0) {
+		probe = EnvironmentVariable58Probe::Instance();
 	} else if(objectName.compare("variable_object") == 0) {
 		probe = VariableProbe::Instance();
 	} else if(objectName.compare("textfilecontent_object") == 0) {
