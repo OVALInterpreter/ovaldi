@@ -40,9 +40,8 @@ using namespace std;
 FileFinder::FileFinder(BitnessView view) {
 #ifdef _WIN64
 	if (view == BIT_32)
-		Log::Message("Warning: querying the 32-bit filesystem view from a "
-			"64-bit interpreter is not yet supported.  Using the 64-bit "
-			"view instead.");
+		throw Exception("Querying the 32-bit filesystem view from a "
+			"64-bit interpreter is not yet supported.");
 	bitnessView = BIT_64;
 #else
 	bitnessView = WindowsCommon::Is64BitOS() ? view : BIT_32;
