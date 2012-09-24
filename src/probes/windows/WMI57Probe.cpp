@@ -190,21 +190,21 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 	IEnumWbemClassObject* pEnumerator = NULL;
 
 	Item* item = NULL;
-
+	string errorMessage = "";
 	try {
 		HRESULT hres;
 
 		// find the WMI Locator
 		hres = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
 		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
+			errorMessage = _com_error(hres).ErrorMessage();
 			throw ProbeException("(WMI57Probe) Failed to create IWbemLocator object.  " + errorMessage, ERROR_FATAL);
 		}
 
 		// Connect to the specified namespace with the current user.
 		hres = pLoc->ConnectServer(_bstr_t(wmi_namespace->GetValue().c_str()), NULL, NULL, 0, NULL, 0, 0, &pSvc);
 		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();
+			errorMessage = _com_error(hres).ErrorMessage();
 			throw ProbeException("(WMI57Probe) Unable to connect to the '" + wmi_namespace->GetValue() + "' namespace.  " + errorMessage, ERROR_FATAL);
 		}
 
@@ -212,12 +212,11 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		// of the WMI connection.
 		hres = CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
 		if (FAILED(hres)) {
-			string errorMessage = _com_error(hres).ErrorMessage();   
+			errorMessage = _com_error(hres).ErrorMessage();   
  			throw ProbeException("(WMI57Probe) Unable to set the WMI proxy blanket.  " + errorMessage, ERROR_FATAL);
 		}
 	
 		// run the query.  The results will be stored in pEnumerator.
-
 		hres = pSvc->ExecQuery(_bstr_t(L"WQL"), _bstr_t(wmi_wql->GetValue().c_str()), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
 		if (FAILED(hres)) {
 			throw ProbeException("(WMI57Probe) Wmi query failed. ('" + wmi_wql->GetValue() + "')", ERROR_FATAL);
@@ -226,8 +225,8 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		IWbemClassObject *pclsObj[1];
 		ULONG uReturn = 0;
 		HRESULT enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn);
-		string errorMessage = _com_error(hres).ErrorMessage();
-				
+		errorMessage = _com_error(hres).ErrorMessage();
+		
 		// create item
 		item = this->CreateItem();
 		item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
@@ -241,132 +240,172 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 			// while loop. Must create an item .  This will cause the wmi
 			// probe to return an empty item vector which will mean the collected
 			// object in the sc file will have a does not exist flag.
+			AbsEntityValueVector fieldEntityValues;
+			
+			
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
-				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("result", fieldEntityValues, OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
 				break;
-			} else {
-				// We have a result.  Create an ItemEntity for it and add it to the
-				// item.
-
-				if ((enumhRes == WBEM_E_INVALID_PARAMETER) ||
-					(enumhRes == WBEM_E_OUT_OF_MEMORY) ||
-					(enumhRes == WBEM_E_UNEXPECTED) ||
-					(enumhRes == WBEM_E_TRANSPORT_FAILURE) ||
-					(enumhRes == WBEM_S_TIMEDOUT)) {
-
-					string errorMessage = "";
-					errorMessage.append("(WMI57Probe) There was an error retrieving one of the results.");
-
-					item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
-					item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_ERROR));
-
-				} else {
-
+			}else {
+				
+				if (enumhRes == WBEM_S_NO_ERROR) {
 					VARIANT vtProp;
+					CIMTYPE pvtType;
 					VariantInit(&vtProp);
 
 					// Get the name of the property.  We need to parse the SELECT
 					// statment to determine the name.
 					StringVector* fieldNames = this->GetWqlFields(wmi_wql->GetValue(),WMI57Probe::SELECT);
-					AbsEntityValueVector fieldEntityValues;
 					
 					for(StringVector::iterator it = fieldNames->begin(); it != fieldNames->end(); it++){
 						// Once the name has been retrieved, use it to get the value
 						// associated with it.
 						string fieldName = *it;
-						hres = pclsObj[0]->Get(bstr_t(fieldName.c_str()), 0, &vtProp, 0, 0);
-						string errorMsg = "";
+						hres = pclsObj[0]->Get(bstr_t(fieldName.c_str()), 0, &vtProp, &pvtType, 0);
 
-						if(hres == WBEM_E_NOT_FOUND) {
-							errorMsg = "WBEM_E_NOT_FOUND for wql: " + wmi_wql->GetValue();
-                        } else if(hres == WBEM_E_OUT_OF_MEMORY) {
-							errorMsg = "WBEM_E_OUT_OF_MEMORY for wql: " + wmi_wql->GetValue();
-						} else if(hres == WBEM_E_INVALID_PARAMETER) {
-							errorMsg = "WBEM_E_INVALID_PARAMETER for wql: " + wmi_wql->GetValue();
-						} else if(hres == WBEM_E_FAILED) {
-							errorMsg = "WBEM_E_FAILED for wql: " + wmi_wql->GetValue();
-						} else if(hres == WBEM_S_NO_ERROR) {
-
+						//convert fieldName to all lowercase as defined in OVAL Language (see oval-sc:FieldType)
+						fieldName = Common::ToLower(fieldName);
+						if(hres == WBEM_S_NO_ERROR) {
 							string strFieldValue = "";
-							//convert fieldName to all lowercase as defined in OVAL Language (see oval-sc:FieldType)
-							fieldName = Common::ToLower(fieldName);
-							// based on the type of data get the value of the field
-							if ((V_VT(&vtProp) == VT_BSTR)) {
-
-								char* szChar = NULL;
-								size_t size = 0;
-								if((size = wcstombs(0, vtProp.bstrVal, 0)) != -1) {
-									szChar = new char[size + 1];
-									szChar[size] = NULL;
-									wcstombs(szChar, vtProp.bstrVal, size);
-									strFieldValue = szChar;
-									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));                                 
-									delete szChar;
-								} else {
-									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+							switch(pvtType){
+								case CIM_EMPTY: {
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+									break;
 								}
-
-							} else if ((V_VT(&vtProp) == VT_UINT)) {
-								int value = V_INT(&vtProp);
-								strFieldValue = Common::ToString(value);
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-							} else if ((V_VT(&vtProp) == VT_BOOL)) {
-								bool value;								
-								if ( V_BOOL(&vtProp) == VARIANT_TRUE ){
-									value = true;
-								}else{
-									value = false;
+								case CIM_SINT8:
+								case CIM_SINT16:
+								case CIM_SINT32:
+								case CIM_SINT64: {
+									long long value = 0;
+									if (pvtType == CIM_SINT8) {
+										value = V_I1(&vtProp);
+										strFieldValue += value;
+									} else {
+										if (pvtType == CIM_SINT16) {
+											value = V_I2(&vtProp);
+										} else if (pvtType == CIM_SINT32) {
+											value = V_I4(&vtProp);
+										} else if (pvtType == CIM_SINT64) {
+											value = V_I8(&vtProp);
+										}
+										strFieldValue = Common::ToString(value);
+									}
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+									break;
 								}
-								strFieldValue = Common::ToString(value);
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
-							} else if ((V_VT(&vtProp) == VT_DATE)) {
-								errorMsg = "Unsupported datatype VT_DATE found.";
-							} else if ((V_VT(&vtProp) == VT_DECIMAL)) {
-								errorMsg = "Unsupported datatype VT_DECIMAL found.";
-							} else if ((V_VT(&vtProp) == VT_FILETIME)) {
-								errorMsg = "Unsupported datatype VT_FILETIME found.";
-							} else if ((V_VT(&vtProp) == VT_INT)) {
-								int value = V_INT(&vtProp);
-								strFieldValue = Common::ToString(value);                                  
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-							} else if ((V_VT(&vtProp) == VT_I1)) {
-								char value = V_I1(&vtProp);
-								strFieldValue += value;
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-							} else if ((V_VT(&vtProp) == VT_I2)) {
-								int value = V_I2(&vtProp);
-								strFieldValue = Common::ToString(value);
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-							} else if ((V_VT(&vtProp) == VT_I4)) {
-								long value = V_I4(&vtProp);
-								strFieldValue = Common::ToString(value);
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-							} else if ((V_VT(&vtProp) == VT_I8)) {
-								errorMsg = "Unsupported datatype VT_I8 found.";
-							} else if ((V_VT(&vtProp) == VT_NULL)) {
-								fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-							} else {
-								errorMsg = "Unsupported datatype found.";
+								case CIM_UINT8:
+								case CIM_UINT16:
+								case CIM_UINT32:
+								case CIM_UINT64: {
+									unsigned long long value = 0;
+									if (pvtType == CIM_UINT8) {
+										value = V_UI1(&vtProp);
+										strFieldValue += value;
+									} else {
+										if (pvtType == CIM_UINT16) {
+											value = V_UI2(&vtProp);
+										} else if (pvtType == CIM_UINT32) {
+											value = V_UI4(&vtProp);
+										} else if (pvtType == CIM_UINT64) {
+											value = V_UI8(&vtProp);
+										}
+										strFieldValue = Common::ToString(value);
+									}
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+									break;
+								}
+								case CIM_REAL32:
+								case CIM_REAL64: {
+									double value = 0.0;
+									if (pvtType == CIM_REAL32) {
+										value = V_R4(&vtProp);
+									} else {
+										value = V_R8(&vtProp);
+									}
+									strFieldValue = Common::ToString(value);
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_FLOAT, OvalEnum::STATUS_EXISTS));
+									break;
+								}
+								case CIM_BOOLEAN: {
+									bool value;								
+									if ( V_BOOL(&vtProp) == VARIANT_TRUE ){
+										value = true;
+									}else{
+										value = false;
+									}
+									strFieldValue = Common::ToString(value);
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
+									break;
+								}
+								case CIM_DATETIME:
+								case CIM_STRING: {
+									if((V_VT(&vtProp) == VT_NULL)) {
+										fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+									} else {
+										char* szChar = NULL;
+										size_t size = 0;
+										if((size = wcstombs(0, vtProp.bstrVal, 0)) != -1) {
+											szChar = new char[size + 1];
+											szChar[size] = NULL;
+											wcstombs(szChar, vtProp.bstrVal, size);
+											strFieldValue = szChar;
+											fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));                                 
+											delete szChar;
+										} else {
+											fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+										}
+									}
+									break;
+								}
+								case CIM_ILLEGAL:
+								case CIM_REFERENCE:
+								case CIM_CHAR16:
+								case CIM_OBJECT:
+								case CIM_FLAG_ARRAY: {
+									item->AppendMessage(new OvalMessage("Unsupported CIM datatype: " + Common::ToString(pvtType) + " found for field "+fieldName+".", OvalEnum::LEVEL_INFO));
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+									break;
+								}
+								default: {
+									item->AppendMessage(new OvalMessage("Unsupported datatype found for field "+fieldName+". This field corresponds to variant type: "+Common::ToString(V_VT(&vtProp))+".", OvalEnum::LEVEL_INFO));
+									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+									break;
+								}
 							}
-
-							if(errorMsg.compare("") != 0) {
-								item->AppendMessage(new OvalMessage(errorMsg, OvalEnum::LEVEL_ERROR));
-								item->SetStatus(OvalEnum::STATUS_ERROR);
-								Log::Debug("WMI Probe error: " + errorMsg);
-							}
+						} else if(hres == WBEM_E_NOT_FOUND) {
+							fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						} else {
+							errorMessage = "Error code: " + Common::ToString(hres) + " for wql: " + wmi_wql->GetValue();
+							item->AppendMessage(new OvalMessage(errorMessage, OvalEnum::LEVEL_ERROR));
+							item->SetStatus(OvalEnum::STATUS_ERROR);
+							fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+							Log::Debug("WMI Probe error: " + errorMessage);
 						}
 					}
 					// If we found values add them. Otherwise, make sure to report the result doesn't exist
 					if ( fieldEntityValues.size() ){
 						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_EXISTS));
 					}else{
-						item->AppendElement(new ItemEntity("result","",OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));					}
+						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));
 					}
-				
-				for (ULONG n=0; n<uReturn; n++) pclsObj[n]->Release();
+				}else {
+					/*
+					(enumhRes == WBEM_E_INVALID_PARAMETER) ||
+					(enumhRes == WBEM_E_OUT_OF_MEMORY) ||
+					(enumhRes == WBEM_E_UNEXPECTED) ||
+					(enumhRes == WBEM_E_TRANSPORT_FAILURE) ||
+					(enumhRes == WBEM_S_FALSE) ||
+					(enumhRes == WBEM_S_TIMEDOUT)
+					*/
+					item->SetStatus(OvalEnum::STATUS_ERROR);	
+					item->AppendMessage(new OvalMessage("(WMI57Probe) There was an error retrieving one of the results.", OvalEnum::LEVEL_ERROR));
+					item->AppendElement(new ItemEntity("result", fieldEntityValues, OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_ERROR));
+				}
 			}
-		}
-		while ( ( enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn) ) == WBEM_S_NO_ERROR  );
+			for (ULONG n=0; n<uReturn; n++) pclsObj[n]->Release();
+			
+		} while ( ( enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn) ) == WBEM_S_NO_ERROR  );
 	} catch (ProbeException ex) {
 		// Make sure we clean up if there is an error, otherwise we will get an COM
 		// security error when we try to run the wmi probe again.
