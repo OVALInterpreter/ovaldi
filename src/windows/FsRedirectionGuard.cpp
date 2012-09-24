@@ -4,6 +4,32 @@
 
 #include "FsRedirectionGuard.h"
 
+namespace {
+
+	// The wow64 disable/revert functions don't exist on XP, so
+	// we can't just unconditionally call them.  Look to see if
+	// they exist, and store the function pointers for reuse, if 
+	// we can find them.
+	typedef BOOL (WINAPI *Wow64DisableFuncType) (PVOID *OldValue);
+	typedef BOOL (WINAPI *Wow64RevertFuncType) (PVOID OldValue);
+	Wow64DisableFuncType disableFunc;
+	Wow64RevertFuncType revertFunc;
+
+	/**
+	 * Keeps track of whether we've searched for the wow64
+	 * filesystem redirect disable/revert functions, and what
+	 * the determination was, so we don't keep searching for
+	 * them.  We treat the two functions as a pair: if one
+	 * doesn't exist, neither exists, and vice versa.  So
+	 * we only need this one flag.
+	 */
+	enum {
+		UNKNOWN,
+		DONT_EXIST,
+		DO_EXIST
+	} doWow64FuncsExist = UNKNOWN;
+}
+
 #ifdef _WIN64
 // disable 4100 which is "unreferenced formal parameter".
 // This is ok in a 64-bit app, since the body of the constructor
@@ -24,9 +50,42 @@
 
 FsRedirectionGuard::FsRedirectionGuard(BitnessView view) : wasDisabled(false) {
 #ifndef _WIN64
+
+	switch (doWow64FuncsExist) {
+	case DONT_EXIST:
+		// if they don't exist, assume we aren't on a 64-bit platform
+		// which needs them, which means no redirection is necessary.
+		// So this ctor has nothing to do.
+		return;
+	case DO_EXIST:
+		break;
+	default: // UNKNOWN
+		disableFunc = (Wow64DisableFuncType)GetProcAddress(
+				GetModuleHandleA("kernel32"),
+				"Wow64DisableWow64FsRedirection");
+		revertFunc = (Wow64RevertFuncType)GetProcAddress(
+				GetModuleHandleA("kernel32"),
+				"Wow64RevertWow64FsRedirection");
+
+		if (!disableFunc || !revertFunc) {
+			// should I check the OS bitness here? e.g. call 
+			// WindowsCommon::Is64BitOS()?  Surely if this was
+			// a 64-bit OS, then the disable/revert functions
+			// would be there...
+			Log::Debug("Wow64 filesystem redirection disable/revert functions not found.  "
+				"Not disabling filesystem redirection.");
+			doWow64FuncsExist = DONT_EXIST;
+			return;
+		}
+
+		doWow64FuncsExist = DO_EXIST;
+
+		break;
+	}
+
 	if (view == BIT_64) {
 		if (WindowsCommon::Is64BitOS()) {
-			if (Wow64DisableWow64FsRedirection(&state))
+			if (disableFunc(&state))
 				wasDisabled = true;
 			else
 				throw Exception("Couldn't disable WOW64 filesystem redirection: " +
@@ -43,7 +102,7 @@ FsRedirectionGuard::FsRedirectionGuard(BitnessView view) : wasDisabled(false) {
 FsRedirectionGuard::~FsRedirectionGuard() {
 #ifndef _WIN64
 	if (wasDisabled)
-		if (!Wow64RevertWow64FsRedirection(state))
+		if (!revertFunc(state))
 			Log::Message("Warning: could not revert WOW64 filesystem "
 				"redirection: " + WindowsCommon::GetErrorMessage(GetLastError()));
 #endif
