@@ -134,7 +134,7 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	//////////////////////////////////////////////////////////
 	// Make a call GetSystemInfo to get architecture
 	SYSTEM_INFO siSysInfo;
-	GetSystemInfo(&siSysInfo);
+	GetNativeSystemInfo(&siSysInfo);
 	if(siSysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_UNKNOWN) {
 		sysInfo->architecture = "unknown";
 
