@@ -50,6 +50,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed bug 3446470: For certain probes, if a account/sid is not found, it 
   results in an item with status=does not exist, rather than an error.  This
   affected accesstoken, sid, sidsid, usersid55, usersid probes.
+* Added support for the creation_time, dep_enabled, and primary_window_text entities in the win-def:process58_test.
 
 ---------------------------------------
 ---       Version 5.10.1 build 2    ---
