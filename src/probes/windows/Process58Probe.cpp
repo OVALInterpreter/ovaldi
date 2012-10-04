@@ -188,13 +188,13 @@ BOOL CALLBACK Process58Probe::EnumWindowsProc(HWND hwnd,LPARAM lParam)
 
 void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
     HANDLE openProcessHandle = OpenProcess ( PROCESS_ALL_ACCESS, false, processEntry.th32ProcessID );
-
+	
     if ( openProcessHandle != NULL ) {
         StringStringMultiMap::iterator it;
         string commandLineStr = "";
         string deviceProcessImageNameStr = "";
         LPTSTR deviceProcessImageName = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * MAX_PATH );
-        unsigned int position = 0;
+       int position = 0;
 
         if ( ( it = Process58Probe::commandLineMap->find ( Common::ToString ( processEntry.th32ProcessID ) ) ) != Process58Probe::commandLineMap->end() ) {
             commandLineStr = it->second;
@@ -203,8 +203,12 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
         if ( GetProcessImageFileName ( openProcessHandle, deviceProcessImageName, MAX_PATH ) ) {
             deviceProcessImageNameStr = deviceProcessImageName;
 
+
             for ( StringStringMultiMap::iterator iterator = Process58Probe::pathMap->begin(); iterator != Process58Probe::pathMap->end(); iterator++ ) {
-                if ( ( position = deviceProcessImageNameStr.find ( iterator->first ) ) != string::npos ) {
+                
+				 position = deviceProcessImageNameStr.find ( iterator->first );
+				
+				if ( position  != string::npos ) {
                     deviceProcessImageNameStr.replace ( position, iterator->first.length(), iterator->second );
                     deviceProcessImageNameStr = deviceProcessImageNameStr.substr ( 0, deviceProcessImageNameStr.rfind ( processEntry.szExeFile ) - 1 );
                 }
@@ -265,7 +269,9 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
             deviceProcessImageName = NULL;
         }
 
+		
         if ( !CloseHandle ( openProcessHandle ) ) {
+			
             throw ProbeException ( "Error: The handle opened by the OpenProcess() function call could not be closed with the CloseHandle() function call. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
         }
     }
