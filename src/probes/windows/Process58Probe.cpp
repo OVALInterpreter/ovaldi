@@ -194,7 +194,7 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
         string commandLineStr = "";
         string deviceProcessImageNameStr = "";
         LPTSTR deviceProcessImageName = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * MAX_PATH );
-       int position = 0;
+        size_t position = 0;
 
         if ( ( it = Process58Probe::commandLineMap->find ( Common::ToString ( processEntry.th32ProcessID ) ) ) != Process58Probe::commandLineMap->end() ) {
             commandLineStr = it->second;
