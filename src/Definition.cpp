@@ -272,7 +272,14 @@ OvalEnum::ResultEnumeration Definition::NotEvaluated() {
 	if(!this->GetAnalyzed()) {
 
 		// analyze the definition and save the result
-		OvalEnum::ResultEnumeration currentResult = this->GetCriteria()->NotEvaluated();
+		OvalEnum::ResultEnumeration currentResult;
+		Criteria *crit = this->GetCriteria();
+		if (crit)
+			currentResult = crit->NotEvaluated();
+		else
+			// deprecated definitions don't need a <criteria> section.
+			currentResult = OvalEnum::RESULT_NOT_EVALUATED;
+
 		this->SetResult(currentResult);
 
 		this->SetAnalyzed(true);
