@@ -32,6 +32,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 4    ---
+---------------------------------------
+
+* Fixed a bug causing a crash when a deprecated definition was analyzed which
+  didn't have any criteria.
+* Fixed error message display bugs in registry-related probes, which caused
+  nonsensical error messages when RegCloseKey() failed.
+
+---------------------------------------
 ---       Version 5.10.1 build 3    ---
 ---------------------------------------
 
@@ -56,8 +65,6 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
   Windows builds.  You can query both filesystem views from 32-bit builds, but
   64-bit builds can only query the 64-bit view.
 * Added support for the creation_time, dep_enabled, and primary_window_text entities in the win-def:process58_test.
-* Fixed a bug causing a crash when a deprecated definition was analyzed which
-  didn't have any criteria.
 
 ---------------------------------------
 ---       Version 5.10.1 build 2    ---
