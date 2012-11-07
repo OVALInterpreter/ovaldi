@@ -500,8 +500,11 @@ bool RegistryFinder::HiveExists ( string hiveStr ) {
         return false;
     }
 
-    if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
-        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+	LONG err;
+    if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
+        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to hive " +
+			hiveStr+". Microsoft System Error " + Common::ToString (err) +
+			") - " + WindowsCommon::GetErrorMessage (err) );
     }
 
     return true;
@@ -514,8 +517,11 @@ bool RegistryFinder::KeyExists ( string hiveStr, string keyStr ) {
         return false;
     }
 
-    if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
-        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+	LONG err;
+    if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
+        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key " +
+			hiveStr + '\\' + keyStr + ". Microsoft System Error " +
+			Common::ToString(err) + ") - " + WindowsCommon::GetErrorMessage(err) );
     }
 
     return true;
@@ -531,10 +537,13 @@ bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr 
     if ( RegQueryValueExW ( keyHandle, wNameStr, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
         return false;
     }
-	delete wNameStr;
+	delete[] wNameStr;
 
-    if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
-        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+	LONG err;
+    if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
+        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key " +
+			hiveStr + '\\' + keyStr + ". Microsoft System Error " +
+			Common::ToString(err) + ") - " + WindowsCommon::GetErrorMessage(err) );
     }
 
     return true;
@@ -621,8 +630,11 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
             ++index;
         }
 
-        if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
-            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		LONG err;
+        if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
+            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key "+
+				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
+				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
     }
 
@@ -650,8 +662,11 @@ StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
             ++index;
         }
 
-        if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
-            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		LONG err;
+        if ((err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
+            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key "+
+				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
+				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
     }
 
@@ -740,8 +755,11 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
             ++index;
         }
 
-        if ( RegCloseKey ( keyHandle ) != ERROR_SUCCESS ) {
-            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close the handle. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		LONG err;
+        if ((err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
+            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key "+
+				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
+				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
     }
 
