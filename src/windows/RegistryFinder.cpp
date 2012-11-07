@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <FreeGuard.h>
+
 #include "RegistryFinder.h"
 
 char RegistryFinder::keySeparator = '\\';
@@ -606,7 +609,7 @@ StringSet* RegistryFinder::GetAllHives() {
 }
 
 StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
-    StringSet* subkeys = new StringSet();
+    auto_ptr<StringSet> subkeys(new StringSet());
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
     HKEY keyHandle;
     DWORD index = 0;
@@ -643,11 +646,11 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
         name = NULL;
     }
 
-    return subkeys;
+    return subkeys.release();
 }
 
 StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
-    StringSet* names = new StringSet();
+    auto_ptr<StringSet> names(new StringSet());
     LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
     HKEY keyHandle;
     DWORD index = 0;
@@ -675,7 +678,7 @@ StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
         name = NULL;
     }
 
-    return names;
+    return names.release();
 }
 
 StringSet* RegistryFinder::ProcessKeyBehaviors ( string hiveStr, StringSet* keys, BehaviorVector* behaviors ) {
@@ -734,20 +737,24 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
         keyStr.erase ( 0, 1 );
     }
 
-    LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
+	FreeGuard<WCHAR> name(malloc ( sizeof ( WCHAR ) * MAX_PATH ));
+	if (!name.get())
+		throw RegistryFinderException("Out of memory, trying to allocate " +
+			Common::ToString(sizeof ( WCHAR ) * MAX_PATH) + " bytes");
+
     HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
     if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
-        while ( RegEnumKeyExW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
-            if(!WindowsCommon::UnicodeIsValidASCII(name)){
+        while ( RegEnumKeyExW ( keyHandle, index, name.get(), &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
+            if(!WindowsCommon::UnicodeIsValidASCII(name.get())){
 				Log::Info("Skipping registry key found with invalid Unicode values.");
 				size = MAX_PATH;
 				++index;
 				continue;
 			}
-			string nameStr = WindowsCommon::UnicodeToAsciiString ( name );
+			string nameStr = WindowsCommon::UnicodeToAsciiString ( name.get() );
             string newKeyStr = keyStr;
             newKeyStr.append ( nameStr );
 			this->GetRegistriesForPattern( hiveStr, newKeyStr , regexStr, keys , isRegex );
@@ -761,11 +768,6 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
 				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
 				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
-    }
-
-    if ( name != NULL ) {
-        free ( name );
-        name = NULL;
     }
 }
 
