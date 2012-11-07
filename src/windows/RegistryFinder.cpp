@@ -438,7 +438,7 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
     LPWSTR lpSubKey = WindowsCommon::StringToWide(subKeyStr);
     LONG status = RegOpenKeyExW ( superKey, lpSubKey,
 		0, access | view, keyHandle );
-	delete lpSubKey;
+	delete[] lpSubKey;
     return status;
 }
 

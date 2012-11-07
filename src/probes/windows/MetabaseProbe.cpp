@@ -228,7 +228,7 @@ bool MetabaseProbe::KeyExists ( string keyStr ) {
 			Log::Message ( "Error: The method IMSAdminBase->OpenKey() failed because of an invalid parameter for key '"+keyStr+"'." );
 		}
 	}
-	delete wKeyStr;
+	delete[] wKeyStr;
 	metabase->CloseKey ( handle );
 	return exists;
 }

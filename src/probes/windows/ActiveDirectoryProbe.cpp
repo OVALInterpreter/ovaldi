@@ -770,7 +770,7 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
     }
 	LPWSTR wPathNameStr = WindowsCommon::StringToWide ( pathNameStr );
     hResult = ADsOpenObject (wPathNameStr , NULL , NULL , ADS_SECURE_AUTHENTICATION , IID_IDirectorySearch, ( void ** ) & adsiSearch );
-	delete wPathNameStr;
+	delete[] wPathNameStr;
     if ( SUCCEEDED ( hResult ) ) {
         if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::GET_ALL_ATTRIBUTES ) == 0 ) {
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_PAGESIZE;
