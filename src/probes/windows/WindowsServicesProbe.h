@@ -94,7 +94,7 @@ class WindowsServicesProbe : public AbsProbe {
          */
         StringSet* GetMatchingServices ( string patternStr , bool isRegex );
 
-
+		
 		 /** Determine if the service exists on the system.
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
          *  @return A boolean value that specifies whether or not the service exists on the system.

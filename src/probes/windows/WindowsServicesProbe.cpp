@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "WindowsServicesProbe.h"
+#include <PrivilegeGuard.h>
 
 //****************************************************************************************//
 //                              WindowsServicesProbe Class                                //
@@ -90,12 +91,18 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 		StringVector theServices;
 		serviceNameEntity->GetEntityValues(theServices);
 		for(StringVector::iterator it = theServices.begin(); it != theServices.end(); it++){
-			collectedItems->push_back(this->GetService(*it));
+			Item * theItem = this->GetService(*it);
+			if(theItem != NULL){
+				collectedItems->push_back(theItem);
+			}
 		}
 	}else if( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH || OvalEnum::OPERATION_NOT_EQUAL){
 			StringSet* allServices = WindowsServicesProbe::GetServices ( serviceNameEntity );
 			for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
-				collectedItems->push_back(this->GetService(*it));
+				Item * theItem = this->GetService(*it);
+				if(theItem != NULL){
+					collectedItems->push_back(theItem);
+				}
 			}
 	}
 
@@ -119,6 +126,8 @@ Item* WindowsServicesProbe::CreateItem() {
 StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity ) {
     StringSet* theServices = NULL;
 
+
+
     // Does this ObjectEntity use variables?
     if ( serviceNameEntity->GetVarRef() == NULL ) {
         // Proceed based on operation
@@ -131,11 +140,13 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
             }
 
         } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , false );
-
+            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , false);
         } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
             theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , true );
-        }
+        } 
+		//else if( serviceNameEntity->GetOperation() == OPERATION_CASE_INSENSITIVE_EQUALS,){
+		//	theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , true );
+		//}
 
     } else {
         theServices = new StringSet();
@@ -190,6 +201,8 @@ StringSet* WindowsServicesProbe::GetMatchingServices ( string patternStr , bool 
 
     return matchingServices;
 }
+
+
 
 StringSet* WindowsServicesProbe::GetAllServices() {
     StringSet* allServices = new StringSet();
@@ -246,8 +259,16 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
     LPSERVICE_DESCRIPTION lpsd;
     DWORD dwBytesNeeded, cbBufSize, dwError; 
 
+	#ifdef WIN32
+	
+	// Giving ourselves this privilege seems to gain us access
+	// to a lot more processes.
+	PrivilegeGuard pg(SE_DEBUG_NAME, false);
+
+	#endif
+
     // open service
-    schService = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_ALL_ACCESS); 
+    schService = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_CONFIG); 
  
     if (schService == NULL){  
          cout << "ERROR: The function OpenService() could not access the '" << serviceName << "' service on the system. Microsoft System Error " << Common::ToString(GetLastError()) << " - " << WindowsCommon::GetErrorMessage(GetLastError()) << endl;
