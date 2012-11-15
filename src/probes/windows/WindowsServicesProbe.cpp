@@ -126,8 +126,6 @@ Item* WindowsServicesProbe::CreateItem() {
 StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity ) {
     StringSet* theServices = NULL;
 
-
-
     // Does this ObjectEntity use variables?
     if ( serviceNameEntity->GetVarRef() == NULL ) {
         // Proceed based on operation
@@ -151,7 +149,7 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
     } else {
         theServices = new StringSet();
         // Get all services
-        StringSet* allServices = new StringSet();
+        StringSet* allServices; // = new StringSet();
 
         if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
             // In the case of equals simply loop through all the
@@ -203,7 +201,6 @@ StringSet* WindowsServicesProbe::GetMatchingServices ( string patternStr , bool 
 }
 
 
-
 StringSet* WindowsServicesProbe::GetAllServices() {
     StringSet* allServices = new StringSet();
 	ENUM_SERVICE_STATUS service;
@@ -224,7 +221,13 @@ StringSet* WindowsServicesProbe::GetAllServices() {
 			pServices = new ENUM_SERVICE_STATUS [dwBytes];
 			// Now query again for services
 			if(! EnumServicesStatus(serviceMgr->get(), SERVICE_WIN32 | SERVICE_DRIVER, SERVICE_STATE_ALL, pServices, dwBytes, &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle)){
-				 throw ProbeException ( "ERROR: The function EnumServicesStatusEx() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+				delete [] pServices;
+				pServices = NULL; 
+
+				delete allServices;
+				allServices = NULL;
+
+				throw ProbeException ( "ERROR: The function EnumServicesStatusEx() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 			}
 
 			// now traverse each service to get information
@@ -237,7 +240,11 @@ StringSet* WindowsServicesProbe::GetAllServices() {
 			pServices = NULL;
 
 		}else{
-			 throw ProbeException ( "ERROR: The function EnumServicesStatus() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+
+			delete allServices;
+			allServices = NULL;
+
+			throw ProbeException ( "ERROR: The function EnumServicesStatus() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 		}
 	}
 
