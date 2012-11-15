@@ -39,7 +39,7 @@
  *
  */
 
-//typedef multimap<string, string> StringStringMultiMap;
+
 
 class WindowsServicesProbe : public AbsProbe {
 
@@ -116,6 +116,44 @@ class WindowsServicesProbe : public AbsProbe {
 		 */
 		std::auto_ptr<AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> > serviceMgr;
 
+
+		enum WindowsServiceType	{SERVICE_KERNEL_DRIVER_TYPE=1,
+								SERVICE_FILE_SYSTEM_DRIVER_TYPE=2,		
+								SERVICE_WIN32_OWN_PROCESS_TYPE=16,
+								SERVICE_WIN32_SHARE_PROCESS_TYPE=32,
+								SERVICE_INTERACTIVE_OWN_PROCESS_TYPE=272,
+								SERVICE_INTERACTIVE_SHARE_PROCESS_TYPE=288};
+
+		
+		static std::string ServiceTypeToString(DWORD type);
+	
+		enum WindowsServiceStartType {SERVICE_BOOT_START_TYPE=0,
+									SERVICE_SYSTEM_START_TYPE=1,
+									SERVICE_AUTO_START_TYPE=2,
+									SERVICE_DEMAND_START_TYPE=3,
+									SERVICE_DISABLED_TYPE=4};
+
+		static std::string StartTypeToString(DWORD type);
+
+		enum WindowsServiceCurrentState {SERVICE_STOPPED_STATE=0x1,
+										SERVICE_START_PENDING_STATE=0x2,
+										SERVICE_STOP_PENDING_STATE=0x3,
+										SERVICE_RUNNING_STATE=0x4,
+										SERVICE_CONTINUE_PENDING_STATE=0x5,
+										SERVICE_PAUSE_PENDING_STATE=0x6,
+										SERVICE_PAUSED_STATE=0x7};
+
+		enum WindowsServiceControlsAccepted {SERVICE_CONTROL_ACCEPT_STOP=0x1,
+											SERVICE_CONTROL_ACCEPT_PAUSE_CONTINUE=0x2,
+											SERVICE_CONTROL_ACCEPT_SHUTDOWN=0x4,
+											SERVICE_CONTROL_ACCEPT_PARAMCHANGE=0x8,
+											SERVICE_CONTROL_ACCEPT_NETBINDCHANGE=0x10,
+											SERVICE_CONTROL_ACCEPT_HARDWAREPROFILECHANGE=0x20,
+											SERVICE_CONTROL_ACCEPT_POWEREVENT=0x40,
+											SERVICE_CONTROL_ACCEPT_SESSIONCHANGE=0x80,
+											SERVICE_CONTROL_ACCEPT_PRESHUTDOWN=0x100,
+											SERVICE_CONTROL_ACCEPT_TIMECHANGE=0x200,
+											SERVICE__CONTROLACCEPT_TRIGGEREVENT=0x400};
 };
 
 #endif

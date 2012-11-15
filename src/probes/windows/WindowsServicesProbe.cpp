@@ -258,6 +258,8 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
     LPQUERY_SERVICE_CONFIG lpsc; 
     LPSERVICE_DESCRIPTION lpsd;
     DWORD dwBytesNeeded, cbBufSize, dwError; 
+	std::string serviceType = "";
+	std::string startType = "";
 
 	#ifdef WIN32
 	
@@ -271,7 +273,8 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
     schService = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_CONFIG); 
  
     if (schService == NULL){  
-         cout << "ERROR: The function OpenService() could not access the '" << serviceName << "' service on the system. Microsoft System Error " << Common::ToString(GetLastError()) << " - " << WindowsCommon::GetErrorMessage(GetLastError()) << endl;
+		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.";
+		 Log::Info(logMsg);
 		 return NULL;
     }
 
@@ -282,17 +285,17 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
             cbBufSize = dwBytesNeeded;
             lpsc = (LPQUERY_SERVICE_CONFIG) LocalAlloc(LMEM_FIXED, cbBufSize);
         }else{
-			cout << " ERROR: The function QueryServiceConfig() failed on service '" << serviceName << "'. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) ;
+			std::string logMsg = "ERROR: The function QueryServiceConfig() failed.";
+			Log::Info(logMsg);
 			return NULL;
-			//throw ProbeException ( "ERROR: The function QueryServiceConfig() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
+		}
     }
   
     if( !QueryServiceConfig(schService, lpsc, cbBufSize, &dwBytesNeeded) ) {
-		cout << " ERROR: The function QueryServiceConfig() failed on service '" << serviceName << "'. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) ;		
+		std::string logMsg = "ERROR: The function QueryServiceConfig() failed.";
+		Log::Info(logMsg);
 		return NULL;
-		//throw ProbeException ( "ERROR: The function QueryServiceConfig() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-    }
+	}
 
     if( !QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &dwBytesNeeded)){
         dwError = GetLastError();
@@ -300,26 +303,143 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
             cbBufSize = dwBytesNeeded;
             lpsd = (LPSERVICE_DESCRIPTION) LocalAlloc(LMEM_FIXED, cbBufSize);
 		}else{
-			cout << " ERROR: The function QueryServiceConfig2() failed on service '" << serviceName << "'. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) ;
+			std::string logMsg = "ERROR: The function QueryServiceConfig2() failed.";
+			Log::Info(logMsg);
 			return NULL;
-			//throw ProbeException ( "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-        }
+		}
     }
  
     if (! QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, (LPBYTE) lpsd, cbBufSize,  &dwBytesNeeded) ) {
-		cout << " ERROR: The function QueryServiceConfig2() failed on service '" << serviceName << "'. Microsoft System Error " + Common::ToString ( GetLastError() ) + " - " + WindowsCommon::GetErrorMessage ( GetLastError() ) ;
+		std::string logMsg = "ERROR: The function QueryServiceConfig2() failed.";
+		Log::Info(logMsg);
 		return NULL;
-		//throw ProbeException ( "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-    }
+	 }
 
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	
 	item->AppendElement(new ItemEntity("service_name", serviceName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("service_type", Common::ToString(lpsc->dwServiceType), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		
+	
+	if(lpsc->lpBinaryPathName != NULL && strlen(lpsc->lpBinaryPathName) > 0){
+		item->AppendElement(new ItemEntity("path", Common::ToString(lpsc->lpBinaryPathName), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));	
+	}
+
+	serviceType = WindowsServicesProbe::ServiceTypeToString(lpsc->dwServiceType);
+	if(serviceType.length() > 0){
+		item->AppendElement(new ItemEntity("service_type", serviceType, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("service_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	startType = WindowsServicesProbe::StartTypeToString(lpsc->dwStartType);
+	if(startType.length() > 0){
+		item->AppendElement(new ItemEntity("start_type", startType, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("start_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	if(lpsc->lpDisplayName != NULL && strlen(lpsc->lpDisplayName) > 0){
+		item->AppendElement(new ItemEntity("display_name", Common::ToString(lpsc->lpDisplayName), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("display_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	if(lpsc->lpServiceStartName != NULL && strlen(lpsc->lpServiceStartName) > 0){
+		item->AppendElement(new ItemEntity("start_name", Common::ToString(lpsc->lpServiceStartName), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("start_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	if(lpsd->lpDescription != NULL && strlen(lpsd->lpDescription) > 0){
+		item->AppendElement(new ItemEntity("description", Common::ToString(lpsd->lpDescription), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("description", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+	
+	if(lpsc->lpDependencies != NULL && strlen(lpsc->lpDependencies) > 0){
+		item->AppendElement(new ItemEntity("dependencies", Common::ToString(lpsc->lpDependencies), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("dependencies", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
     LocalFree(lpsc); 
     LocalFree(lpsd);
     CloseServiceHandle(schService); 
-
+	
 	return item;
+}
+
+
+string WindowsServicesProbe::ServiceTypeToString(DWORD type){
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the ServiceType value to a string
+	//
+	// -----------------------------------------------------------------------
+	string typeStr = "";
+
+	switch(type) {
+		case (WindowsServicesProbe::SERVICE_KERNEL_DRIVER_TYPE):
+			typeStr = "Kernel Driver";
+			break;
+		case (WindowsServicesProbe::SERVICE_FILE_SYSTEM_DRIVER_TYPE):
+			typeStr = "File System Driver";
+			break;
+		case (WindowsServicesProbe::SERVICE_WIN32_OWN_PROCESS_TYPE):
+			typeStr = "Win32 Own Process";
+			break;
+		case (WindowsServicesProbe::SERVICE_WIN32_SHARE_PROCESS_TYPE):
+			typeStr = "Win32 Share Process";
+			break;
+		case(WindowsServicesProbe::SERVICE_INTERACTIVE_OWN_PROCESS_TYPE):
+			typeStr = "Interactive Process";
+			break;
+		case(WindowsServicesProbe::SERVICE_INTERACTIVE_SHARE_PROCESS_TYPE):
+			typeStr = "Interactive Process";
+			break;
+		default:
+			std::string logMsg = "WindowsServicesProbe::ServiceTypeToString - Error unsupported service type value.";
+			Log::Info(logMsg);
+			break;
+	}
+
+	return typeStr;
+}
+
+
+string WindowsServicesProbe::StartTypeToString(DWORD type){
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the StartType value to a string
+	//
+	// -----------------------------------------------------------------------
+	string typeStr = "";
+
+	switch(type) {
+		case (WindowsServicesProbe::SERVICE_BOOT_START_TYPE):
+			typeStr = "Boot";
+			break;
+		case (WindowsServicesProbe::SERVICE_SYSTEM_START_TYPE):
+			typeStr = "System";
+			break;
+		case (WindowsServicesProbe::SERVICE_AUTO_START_TYPE):
+			typeStr = "Automatic";
+			break;
+		case (WindowsServicesProbe::SERVICE_DEMAND_START_TYPE):
+			typeStr = "Manual";
+			break;
+		case(WindowsServicesProbe::SERVICE_DISABLED_TYPE):
+			typeStr = "Disabled";
+			break;
+		default:
+			std::string logMsg = "WindowsServicesProbe::StartTypeToString - Error unsupported service start type value.";
+			Log::Info(logMsg);
+			break;
+	}
+
+	return typeStr;
 }

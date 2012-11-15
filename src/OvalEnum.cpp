@@ -1055,31 +1055,28 @@ OvalEnum::ResultContent OvalEnum::CombineResultContent(OvalEnum::ResultContent r
 	}
 }
 
-string OvalEnum::SCStatusToString(OvalEnum::SCStatus status){
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Convert the SCStatus value to a string
-	//
-	// -----------------------------------------------------------------------
+
+std::string OvalEnum::SCStatusToString(OvalEnum::SCStatus status){
 	string statusStr = "";
 
-	switch(status) {
-		case (OvalEnum::STATUS_DOES_NOT_EXIST):
-			statusStr = "does not exist";
-			break;
-		case (OvalEnum::STATUS_ERROR):
-			statusStr = "error";
-			break;
-		case (OvalEnum::STATUS_EXISTS):
-			statusStr = "exists";
-			break;
-		case (OvalEnum::STATUS_NOT_COLLECTED):
-			statusStr = "not collected";
-			break;
+	switch(status){
+	case(OvalEnum::STATUS_DOES_NOT_EXIST):
+		statusStr = "does not exist";
+		break;
+	case(OvalEnum::STATUS_ERROR):
+		statusStr = "error";
+		break;
+	case(OvalEnum::STATUS_EXISTS):
+		statusStr = "exists";
+		break;
+	case(OvalEnum::STATUS_NOT_COLLECTED):
+		statusStr = "not collected";
+		break;
 	}
+
 	return statusStr;
 }
+
 
 OvalEnum::SCStatus OvalEnum::ToSCStatus(string statusStr){
 	// -----------------------------------------------------------------------
