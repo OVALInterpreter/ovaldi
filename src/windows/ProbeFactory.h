@@ -64,6 +64,7 @@
 #include "AccessTokenProbe.h"
 #include "GroupProbe.h"
 #include "UserProbe.h"
+#include "WindowsServicesProbe.h"
 #include "AuditEventPolicySubcategoriesProbe.h"
 #include "WUAUpdateSearcherProbe.h"
 #include "UserSidProbe.h"

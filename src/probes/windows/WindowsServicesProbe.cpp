@@ -208,7 +208,7 @@ StringSet* WindowsServicesProbe::GetAllServices() {
     DWORD dwServicesReturned = 0;
     DWORD dwResumedHandle = 0;
     DWORD dwServiceType = SERVICE_WIN32 | SERVICE_DRIVER;
-
+	
     // Query services
     BOOL retVal = EnumServicesStatus(serviceMgr->get(), dwServiceType, SERVICE_STATE_ALL, &service, sizeof(ENUM_SERVICE_STATUS), &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle);
  
@@ -262,6 +262,8 @@ bool WindowsServicesProbe::ServiceExists ( string serviceNameStr ) {
 Item* WindowsServicesProbe::GetService ( string serviceName ) {
 	Item* item = NULL;
     SC_HANDLE schService;
+	SC_HANDLE schService2;
+	SERVICE_STATUS_PROCESS ssStatus;
     LPQUERY_SERVICE_CONFIG lpsc; 
     LPSERVICE_DESCRIPTION lpsd;
     DWORD dwBytesNeeded, cbBufSize, dwError; 
@@ -373,8 +375,53 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 
     LocalFree(lpsc); 
     LocalFree(lpsd);
-    CloseServiceHandle(schService); 
-	
+	CloseServiceHandle(schService); 
+
+	// open service for status query
+    schService2 = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_STATUS); 
+    if (schService2 == NULL){  
+		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.";
+		 Log::Info(logMsg);
+		 return NULL;
+    }
+
+	if (!QueryServiceStatusEx( 
+				schService2,                     // handle to service 
+				SC_STATUS_PROCESS_INFO,         // information level
+				(LPBYTE) &ssStatus,             // address of structure
+				sizeof(SERVICE_STATUS_PROCESS), // size of structure
+				&dwBytesNeeded ) )              // size needed if buffer is too small
+		{
+			std::string logMsg = "ERROR: The function QueryServiceStatusEx() failed.";
+			Log::Info(logMsg);
+	}
+
+	if(ssStatus.dwProcessId > 0){
+		item->AppendElement(new ItemEntity("pid", Common::ToString(ssStatus.dwProcessId), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("pid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	string controlStr =  "";
+	controlStr = WindowsServicesProbe::ControlToString(ssStatus.dwControlsAccepted);
+
+	if(controlStr.length() > 0){
+		item->AppendElement(new ItemEntity("controls_accepted", controlStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("controls_accepted", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	string flagStr =  "";
+	flagStr = WindowsServicesProbe::ServiceFlagToString(ssStatus.dwServiceFlags);
+
+	if(flagStr.length() > 0){
+		item->AppendElement(new ItemEntity("service_flag", flagStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	}else{
+		item->AppendElement(new ItemEntity("service_flag", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+	}
+
+	CloseServiceHandle(schService2); 
+
 	return item;
 }
 
@@ -444,6 +491,124 @@ string WindowsServicesProbe::StartTypeToString(DWORD type){
 			break;
 		default:
 			std::string logMsg = "WindowsServicesProbe::StartTypeToString - Error unsupported service start type value.";
+			Log::Info(logMsg);
+			break;
+	}
+
+	return typeStr;
+}
+
+string WindowsServicesProbe::CurrentStateToString(DWORD type){
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the StartType value to a string
+	//
+	// -----------------------------------------------------------------------
+	string typeStr = "";
+
+	switch(type) {
+		case (WindowsServicesProbe::SERVICE_STOPPED_STATE):
+			typeStr = "Stopped";
+			break;
+		case (WindowsServicesProbe::SERVICE_START_PENDING_STATE):
+			typeStr = "Start Pending";
+			break;
+		case (WindowsServicesProbe::SERVICE_STOP_PENDING_STATE):
+			typeStr = "Stop Pending";
+			break;
+		case (WindowsServicesProbe::SERVICE_RUNNING_STATE):
+			typeStr = "Running";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTINUE_PENDING_STATE):
+			typeStr = "Continue Pending";
+			break;
+		case(WindowsServicesProbe::SERVICE_PAUSE_PENDING_STATE):
+			typeStr = "Pause Pending";
+			break;
+		case(WindowsServicesProbe::SERVICE_PAUSED_STATE):
+			typeStr = "Paused";
+			break;
+		default:
+			std::string logMsg = "WindowsServicesProbe::CurrentStateToString - Error unsupported service start type value.";
+			Log::Info(logMsg);
+			break;
+	}
+
+	return typeStr;
+}
+
+string WindowsServicesProbe::ControlToString(DWORD type){
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the StartType value to a string
+	//
+	// -----------------------------------------------------------------------
+	string typeStr = "";
+
+	switch(type) {
+		case (WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_STOP):
+			typeStr = "Stop";
+			break;
+		case (WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_PAUSE_CONTINUE):
+			typeStr = "Continue";
+			break;
+		case (WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_SHUTDOWN):
+			typeStr = "Shutdown";
+			break;
+		case (WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_PARAMCHANGE):
+			typeStr = "Param Change";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_NETBINDCHANGE):
+			typeStr = "Net Bind Change";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_HARDWAREPROFILECHANGE):
+			typeStr = "Hardware Profile Change";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_POWEREVENT):
+			typeStr = "Power Event";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_SESSIONCHANGE):
+			typeStr = "Session Change";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_PRESHUTDOWN):
+			typeStr = "Pre Shutdown";
+			break;
+		case(WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_TIMECHANGE):
+			typeStr = "Time Change";
+			break;
+		case(WindowsServicesProbe::SERVICE__CONTROLACCEPT_TRIGGEREVENT):
+			typeStr = "Trigger Event";
+			break;
+		default:
+			std::string logMsg = "WindowsServicesProbe::ControlStateToString - Error unsupported service start type value.";
+			Log::Info(logMsg);
+			break;
+	}
+
+	return typeStr;
+}
+
+string WindowsServicesProbe::ServiceFlagToString(DWORD type){
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the Service Flag value to a string
+	//
+	// -----------------------------------------------------------------------
+	string typeStr = "";
+
+	switch(type) {
+		case (WindowsServicesProbe::SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG):
+			typeStr = "Non-System Process";
+			break;
+		case (WindowsServicesProbe::SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG):
+			typeStr = "System Process";
+			break;
+		
+		default:
+			std::string logMsg = "WindowsServicesProbe::ServiceFlagToString - Error unsupported service flag value.";
 			Log::Info(logMsg);
 			break;
 	}

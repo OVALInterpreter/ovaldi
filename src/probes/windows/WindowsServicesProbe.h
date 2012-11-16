@@ -143,6 +143,8 @@ class WindowsServicesProbe : public AbsProbe {
 										SERVICE_PAUSE_PENDING_STATE=0x6,
 										SERVICE_PAUSED_STATE=0x7};
 
+		static std::string CurrentStateToString(DWORD type);
+
 		enum WindowsServiceControlsAccepted {SERVICE_CONTROL_ACCEPT_STOP=0x1,
 											SERVICE_CONTROL_ACCEPT_PAUSE_CONTINUE=0x2,
 											SERVICE_CONTROL_ACCEPT_SHUTDOWN=0x4,
@@ -154,6 +156,13 @@ class WindowsServicesProbe : public AbsProbe {
 											SERVICE_CONTROL_ACCEPT_PRESHUTDOWN=0x100,
 											SERVICE_CONTROL_ACCEPT_TIMECHANGE=0x200,
 											SERVICE__CONTROLACCEPT_TRIGGEREVENT=0x400};
+
+		static std::string ControlToString(DWORD type);
+
+		enum WindowsServiceFlag {SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG=0,
+								SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG=1};
+
+		static std::string ServiceFlagToString(DWORD type);
 };
 
 #endif
