@@ -293,6 +293,14 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
         if( ERROR_INSUFFICIENT_BUFFER == dwError ){
             cbBufSize = dwBytesNeeded;
             lpsc = (LPQUERY_SERVICE_CONFIG) LocalAlloc(LMEM_FIXED, cbBufSize);
+
+			if(lpsc == NULL){
+				std::string logMsg = "ERROR: The function LocalAlloc() failed.";
+				Log::Info(logMsg);
+				CloseServiceHandle(schService); 
+				return NULL;
+			}
+
         }else{
 			std::string logMsg = "ERROR: The function QueryServiceConfig() failed.";
 			Log::Info(logMsg);
@@ -311,6 +319,14 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
         if( ERROR_INSUFFICIENT_BUFFER == dwError ){
             cbBufSize = dwBytesNeeded;
             lpsd = (LPSERVICE_DESCRIPTION) LocalAlloc(LMEM_FIXED, cbBufSize);
+
+			if(lpsd == NULL){
+				std::string logMsg = "ERROR: The function LocalAlloc() failed.";
+				Log::Info(logMsg);
+				CloseServiceHandle(schService); 
+				return NULL;
+			}
+
 		}else{
 			std::string logMsg = "ERROR: The function QueryServiceConfig2() failed.";
 			Log::Info(logMsg);
