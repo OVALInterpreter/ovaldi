@@ -39,8 +39,6 @@
  *
  */
 
-
-
 class WindowsServicesProbe : public AbsProbe {
 
     public:
@@ -69,7 +67,7 @@ class WindowsServicesProbe : public AbsProbe {
          *  @param serviceName
          *  @return The Item object whose command line matches the specified value.
          */
-        Item* GetService( string serviceName );
+        Item* GetService( std::string serviceName );
 
         /** The static instance of the WindowsServicesProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.
@@ -92,14 +90,13 @@ class WindowsServicesProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching services.
          */
-        StringSet* GetMatchingServices ( string patternStr , bool isRegex );
-
+        std::auto_ptr<StringSet> GetMatchingServices ( std::string patternStr , bool isRegex );
 		
 		 /** Determine if the service exists on the system.
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
          *  @return A boolean value that specifies whether or not the service exists on the system.
          */
-        bool ServiceExists ( string serviceNameStr );
+        bool ServiceExists ( std::string serviceNameStr );
 
         /** Retrieve all of the services on the system.
          *  @return A pointer to a StringSet that contains all of the services on the system.

@@ -28,8 +28,14 @@
 //
 //****************************************************************************************//
 
-#include "WindowsServicesProbe.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include <set>
+
+#include <VectorPtrGuard.h>
 #include <PrivilegeGuard.h>
+#include "WindowsServicesProbe.h"
 
 //****************************************************************************************//
 //                              WindowsServicesProbe Class                                //
@@ -85,7 +91,7 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
         throw ProbeException ( "Error: invalid operation specified on service_name. Found: " + OvalEnum::OperationToString ( serviceNameEntity->GetOperation() ) );
     }
 
-    ItemVector* collectedItems = new ItemVector();
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ){
 		StringVector theServices;
@@ -96,6 +102,8 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 				collectedItems->push_back(theItem);
 			}
 		}
+		theServices.clear();
+
 	}else if( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH || OvalEnum::OPERATION_NOT_EQUAL){
 			StringSet* allServices = WindowsServicesProbe::GetServices ( serviceNameEntity );
 			for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
@@ -104,9 +112,10 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 					collectedItems->push_back(theItem);
 				}
 			}
+			allServices->clear();
 	}
 
-    return collectedItems;
+	return collectedItems.release();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -124,13 +133,14 @@ Item* WindowsServicesProbe::CreateItem() {
 }
 
 StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity ) {
-    StringSet* theServices = NULL;
+    std::auto_ptr<StringSet> theServices(new StringSet());
+	//StringSet* theServices = NULL;
 
     // Does this ObjectEntity use variables?
     if ( serviceNameEntity->GetVarRef() == NULL ) {
         // Proceed based on operation
         if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
-            theServices = new StringSet();
+            //theServices = new StringSet();
 
             // If the service exists add it to the list
             if ( this->ServiceExists ( serviceNameEntity->GetValue() ) ) {
@@ -147,9 +157,10 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
 		//}
 
     } else {
-        theServices = new StringSet();
+       // theServices = new StringSet();
         // Get all services
-        StringSet* allServices; // = new StringSet();
+		std::auto_ptr<StringSet> allServices(new StringSet());
+        //StringSet* allServices;
 
         if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
             // In the case of equals simply loop through all the
@@ -179,13 +190,16 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
                 theServices->insert ( ( *it ) );
             }
         }
+
+		allServices.release();
     }
 
-    return theServices;
+	
+    return theServices.release();
 }
 
-StringSet* WindowsServicesProbe::GetMatchingServices ( string patternStr , bool isRegex ) {
-    StringSet* matchingServices = new StringSet();
+std::auto_ptr<StringSet> WindowsServicesProbe::GetMatchingServices ( string patternStr , bool isRegex ) {
+   std::auto_ptr<StringSet> matchingServices(new StringSet());
 
 	if ( services == NULL ) {
 		services = GetAllServices();
@@ -199,7 +213,6 @@ StringSet* WindowsServicesProbe::GetMatchingServices ( string patternStr , bool 
 
     return matchingServices;
 }
-
 
 StringSet* WindowsServicesProbe::GetAllServices() {
     StringSet* allServices = new StringSet();
@@ -251,7 +264,7 @@ StringSet* WindowsServicesProbe::GetAllServices() {
     return allServices;
 }
 
-bool WindowsServicesProbe::ServiceExists ( string serviceNameStr ) {
+bool WindowsServicesProbe::ServiceExists ( std::string serviceNameStr ) {
     if ( WindowsServicesProbe::services->find ( serviceNameStr ) != WindowsServicesProbe::services->end() ) {
         return true;
     }
@@ -259,7 +272,7 @@ bool WindowsServicesProbe::ServiceExists ( string serviceNameStr ) {
     return false;
 }
 
-Item* WindowsServicesProbe::GetService ( string serviceName ) {
+Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	Item* item = NULL;
     SC_HANDLE schService;
 	SC_HANDLE schService2;
@@ -270,17 +283,14 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 	std::string serviceType = "";
 	std::string startType = "";
 
-	#ifdef WIN32
-	
 	// Giving ourselves this privilege seems to gain us access
 	// to a lot more processes.
 	PrivilegeGuard pg(SE_DEBUG_NAME, false);
 
-	#endif
-
     // open service
     schService = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_CONFIG); 
- 
+    AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schServiceCloser(schService, CloseServiceHandle, "ServiceCloser");
+
     if (schService == NULL){  
 		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.";
 		 Log::Info(logMsg);
@@ -395,6 +405,8 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 
 	// open service for status query
     schService2 = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_STATUS); 
+	AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schService2Closer(schService2, CloseServiceHandle, "ServiceCloser");
+
     if (schService2 == NULL){  
 		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.";
 		 Log::Info(logMsg);
@@ -418,7 +430,7 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		item->AppendElement(new ItemEntity("pid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-	string controlStr =  "";
+	std::string controlStr =  "";
 	controlStr = WindowsServicesProbe::ControlToString(ssStatus.dwControlsAccepted);
 
 	if(controlStr.length() > 0){
@@ -427,7 +439,7 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		item->AppendElement(new ItemEntity("controls_accepted", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-	string flagStr =  "";
+	std::string flagStr =  "";
 	flagStr = WindowsServicesProbe::ServiceFlagToString(ssStatus.dwServiceFlags);
 
 	if(flagStr.length() > 0){
@@ -441,15 +453,14 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 	return item;
 }
 
-
-string WindowsServicesProbe::ServiceTypeToString(DWORD type){
+std::string WindowsServicesProbe::ServiceTypeToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the ServiceType value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr = "";
+	std::string typeStr = "";
 
 	switch(type) {
 		case (WindowsServicesProbe::SERVICE_KERNEL_DRIVER_TYPE):
@@ -479,15 +490,14 @@ string WindowsServicesProbe::ServiceTypeToString(DWORD type){
 	return typeStr;
 }
 
-
-string WindowsServicesProbe::StartTypeToString(DWORD type){
+std::string WindowsServicesProbe::StartTypeToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the StartType value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr = "";
+	std::string typeStr = "";
 
 	switch(type) {
 		case (WindowsServicesProbe::SERVICE_BOOT_START_TYPE):
@@ -514,14 +524,14 @@ string WindowsServicesProbe::StartTypeToString(DWORD type){
 	return typeStr;
 }
 
-string WindowsServicesProbe::CurrentStateToString(DWORD type){
+std::string WindowsServicesProbe::CurrentStateToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the StartType value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr = "";
+	std::string typeStr = "";
 
 	switch(type) {
 		case (WindowsServicesProbe::SERVICE_STOPPED_STATE):
@@ -554,14 +564,14 @@ string WindowsServicesProbe::CurrentStateToString(DWORD type){
 	return typeStr;
 }
 
-string WindowsServicesProbe::ControlToString(DWORD type){
+std::string WindowsServicesProbe::ControlToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the StartType value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr = "";
+	std::string typeStr = "";
 
 	switch(type) {
 		case (WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_STOP):
@@ -606,14 +616,14 @@ string WindowsServicesProbe::ControlToString(DWORD type){
 	return typeStr;
 }
 
-string WindowsServicesProbe::ServiceFlagToString(DWORD type){
+std::string WindowsServicesProbe::ServiceFlagToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the Service Flag value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr = "";
+	std::string typeStr = "";
 
 	switch(type) {
 		case (WindowsServicesProbe::SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG):
