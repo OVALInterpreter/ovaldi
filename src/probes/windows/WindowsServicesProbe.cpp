@@ -140,8 +140,7 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
     if ( serviceNameEntity->GetVarRef() == NULL ) {
         // Proceed based on operation
         if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
-            //theServices = new StringSet();
-
+          
             // If the service exists add it to the list
             if ( this->ServiceExists ( serviceNameEntity->GetValue() ) ) {
                 theServices->insert ( serviceNameEntity->GetValue() );
@@ -292,7 +291,7 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
     AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schServiceCloser(schService, CloseServiceHandle, "ServiceCloser");
 
     if (schService == NULL){  
-		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.";
+		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system. Microsoft System Error " + Common::ToString (GetLastError()) + " - " + WindowsCommon::GetErrorMessage(GetLastError());
 		 Log::Info(logMsg);
 		 return NULL;
     }
@@ -305,21 +304,21 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
             lpsc = (LPQUERY_SERVICE_CONFIG) LocalAlloc(LMEM_FIXED, cbBufSize);
 
 			if(lpsc == NULL){
-				std::string logMsg = "ERROR: The function LocalAlloc() failed.";
+				std::string logMsg = "ERROR: The function LocalAlloc() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 				Log::Info(logMsg);
 				CloseServiceHandle(schService); 
 				return NULL;
 			}
 
         }else{
-			std::string logMsg = "ERROR: The function QueryServiceConfig() failed.";
+			std::string logMsg = "ERROR: The function QueryServiceConfig() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
 			return NULL;
 		}
     }
   
     if( !QueryServiceConfig(schService, lpsc, cbBufSize, &dwBytesNeeded) ) {
-		std::string logMsg = "ERROR: The function QueryServiceConfig() failed.";
+		std::string logMsg = "ERROR: The function QueryServiceConfig() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		Log::Info(logMsg);
 		return NULL;
 	}
@@ -331,21 +330,21 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
             lpsd = (LPSERVICE_DESCRIPTION) LocalAlloc(LMEM_FIXED, cbBufSize);
 
 			if(lpsd == NULL){
-				std::string logMsg = "ERROR: The function LocalAlloc() failed.";
+				std::string logMsg = "ERROR: The function LocalAlloc() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 				Log::Info(logMsg);
 				CloseServiceHandle(schService); 
 				return NULL;
 			}
 
 		}else{
-			std::string logMsg = "ERROR: The function QueryServiceConfig2() failed.";
+			std::string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
 			return NULL;
 		}
     }
  
     if (! QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, (LPBYTE) lpsd, cbBufSize,  &dwBytesNeeded) ) {
-		std::string logMsg = "ERROR: The function QueryServiceConfig2() failed.";
+		std::string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		Log::Info(logMsg);
 		return NULL;
 	 }
@@ -408,7 +407,7 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schService2Closer(schService2, CloseServiceHandle, "ServiceCloser");
 
     if (schService2 == NULL){  
-		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.";
+		 std::string logMsg = "ERROR: The function OpenService() could not access a service on the system.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		 Log::Info(logMsg);
 		 return NULL;
     }
@@ -420,8 +419,9 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 				sizeof(SERVICE_STATUS_PROCESS), // size of structure
 				&dwBytesNeeded ) )              // size needed if buffer is too small
 		{
-			std::string logMsg = "ERROR: The function QueryServiceStatusEx() failed.";
+			std::string logMsg = "ERROR: The function QueryServiceStatusEx() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
+			return NULL;
 	}
 
 	if(ssStatus.dwProcessId > 0){
