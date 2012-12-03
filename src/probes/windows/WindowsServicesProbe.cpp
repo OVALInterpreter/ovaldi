@@ -134,8 +134,7 @@ Item* WindowsServicesProbe::CreateItem() {
 
 StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity ) {
     std::auto_ptr<StringSet> theServices(new StringSet());
-	//StringSet* theServices = NULL;
-
+	
     // Does this ObjectEntity use variables?
     if ( serviceNameEntity->GetVarRef() == NULL ) {
         // Proceed based on operation
@@ -156,11 +155,9 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
 		//}
 
     } else {
-       // theServices = new StringSet();
         // Get all services
 		std::auto_ptr<StringSet> allServices(new StringSet());
-        //StringSet* allServices;
-
+       
         if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all services
@@ -301,10 +298,10 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
         dwError = GetLastError();
         if( ERROR_INSUFFICIENT_BUFFER == dwError ){
             cbBufSize = dwBytesNeeded;
-            lpsc = (LPQUERY_SERVICE_CONFIG) LocalAlloc(LMEM_FIXED, cbBufSize);
+            lpsc = (LPQUERY_SERVICE_CONFIG) malloc(cbBufSize);
 
 			if(lpsc == NULL){
-				std::string logMsg = "ERROR: The function LocalAlloc() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
+				std::string logMsg = "ERROR: The function malloc() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 				Log::Info(logMsg);
 				CloseServiceHandle(schService); 
 				return NULL;
@@ -327,10 +324,10 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
         dwError = GetLastError();
         if( ERROR_INSUFFICIENT_BUFFER == dwError ){
             cbBufSize = dwBytesNeeded;
-            lpsd = (LPSERVICE_DESCRIPTION) LocalAlloc(LMEM_FIXED, cbBufSize);
+            lpsd = (LPSERVICE_DESCRIPTION) malloc(cbBufSize);
 
 			if(lpsd == NULL){
-				std::string logMsg = "ERROR: The function LocalAlloc() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
+				std::string logMsg = "ERROR: The function malloc() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 				Log::Info(logMsg);
 				CloseServiceHandle(schService); 
 				return NULL;
@@ -354,45 +351,45 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	
 	item->AppendElement(new ItemEntity("service_name", serviceName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	
-	if(lpsc->lpBinaryPathName != NULL && strlen(lpsc->lpBinaryPathName) > 0){
+	if(lpsc->lpBinaryPathName != NULL && (lpsc->lpBinaryPathName && lpsc->lpBinaryPathName[0])){
 		item->AppendElement(new ItemEntity("path", Common::ToString(lpsc->lpBinaryPathName), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));	
 	}
 
 	serviceType = WindowsServicesProbe::ServiceTypeToString(lpsc->dwServiceType);
-	if(serviceType.length() > 0){
+	if(!serviceType.empty()){
 		item->AppendElement(new ItemEntity("service_type", serviceType, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("service_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
 	startType = WindowsServicesProbe::StartTypeToString(lpsc->dwStartType);
-	if(startType.length() > 0){
+	if(!startType.empty()){
 		item->AppendElement(new ItemEntity("start_type", startType, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("start_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-	if(lpsc->lpDisplayName != NULL && strlen(lpsc->lpDisplayName) > 0){
+	if(lpsc->lpDisplayName != NULL && (lpsc->lpDisplayName && lpsc->lpDisplayName[0])){
 		item->AppendElement(new ItemEntity("display_name", Common::ToString(lpsc->lpDisplayName), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("display_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-	if(lpsc->lpServiceStartName != NULL && strlen(lpsc->lpServiceStartName) > 0){
+	if(lpsc->lpServiceStartName != NULL && (lpsc->lpServiceStartName && lpsc->lpServiceStartName[0])){
 		item->AppendElement(new ItemEntity("start_name", Common::ToString(lpsc->lpServiceStartName), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("start_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-	if(lpsd->lpDescription != NULL && strlen(lpsd->lpDescription) > 0){
+	if(lpsd->lpDescription != NULL && (lpsd->lpDescription && lpsd->lpDescription[0])){
 		item->AppendElement(new ItemEntity("description", Common::ToString(lpsd->lpDescription), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("description", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 	
-	if(lpsc->lpDependencies != NULL && strlen(lpsc->lpDependencies) > 0){
+	if(lpsc->lpDependencies != NULL && (lpsc->lpDependencies && lpsc->lpDependencies[0])){
 		item->AppendElement(new ItemEntity("dependencies", Common::ToString(lpsc->lpDependencies), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("dependencies", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
@@ -433,7 +430,7 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	std::string controlStr =  "";
 	controlStr = WindowsServicesProbe::ControlToString(ssStatus.dwControlsAccepted);
 
-	if(controlStr.length() > 0){
+	if(!controlStr.empty()){
 		item->AppendElement(new ItemEntity("controls_accepted", controlStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("controls_accepted", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
@@ -442,7 +439,7 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	std::string flagStr =  "";
 	flagStr = WindowsServicesProbe::ServiceFlagToString(ssStatus.dwServiceFlags);
 
-	if(flagStr.length() > 0){
+	if(!flagStr.empty()){
 		item->AppendElement(new ItemEntity("service_flag", flagStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
 		item->AppendElement(new ItemEntity("service_flag", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
