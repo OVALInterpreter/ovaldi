@@ -28,11 +28,6 @@
 //
 //****************************************************************************************//
 
-#include <memory>
-#include <string>
-#include <vector>
-#include <set>
-
 #include <VectorPtrGuard.h>
 #include <PrivilegeGuard.h>
 #include "WindowsServicesProbe.h"
@@ -105,14 +100,16 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 		theServices.clear();
 
 	}else if( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH || OvalEnum::OPERATION_NOT_EQUAL){
-			StringSet* allServices = WindowsServicesProbe::GetServices ( serviceNameEntity );
-			for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
-				Item * theItem = this->GetService(*it);
-				if(theItem != NULL){
-					collectedItems->push_back(theItem);
-				}
+			
+		std::auto_ptr<StringSet> allServices( WindowsServicesProbe::GetServices ( serviceNameEntity ));
+		
+		for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
+			Item * theItem = this->GetService(*it);
+			if(theItem != NULL){
+				collectedItems->push_back(theItem);
 			}
-			allServices->clear();
+		}
+		allServices->clear();
 	}
 
 	return collectedItems.release();
@@ -186,10 +183,7 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
                 theServices->insert ( ( *it ) );
             }
         }
-
-		allServices.release();
     }
-
 	
     return theServices.release();
 }
@@ -219,42 +213,37 @@ StringSet* WindowsServicesProbe::GetAllServices() {
     DWORD dwServiceType = SERVICE_WIN32 | SERVICE_DRIVER;
 	
     // Query services
-    BOOL retVal = EnumServicesStatus(serviceMgr->get(), dwServiceType, SERVICE_STATE_ALL, &service, sizeof(ENUM_SERVICE_STATUS), &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle);
- 
-	if (!retVal) {
-		// Need big buffer
-		if (ERROR_MORE_DATA == GetLastError()) {
-			// Set the buffer
-			DWORD dwBytes = sizeof(ENUM_SERVICE_STATUS) + dwBytesNeeded;
-			ENUM_SERVICE_STATUS* pServices = NULL;
-			pServices = new ENUM_SERVICE_STATUS [dwBytes];
-			// Now query again for services
-			if(! EnumServicesStatus(serviceMgr->get(), SERVICE_WIN32 | SERVICE_DRIVER, SERVICE_STATE_ALL, pServices, dwBytes, &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle)){
-				delete [] pServices;
-				pServices = NULL; 
+    BOOL retVal = EnumServicesStatus(serviceMgr->get(), dwServiceType, SERVICE_STATE_ALL, NULL, sizeof(ENUM_SERVICE_STATUS), &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle);
+	DWORD errorCode = GetLastError();
 
-				delete allServices;
-				allServices = NULL;
+	// Need big buffer
+	while (!retVal && (ERROR_MORE_DATA == errorCode)) {
 
-				throw ProbeException ( "ERROR: The function EnumServicesStatusEx() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
-			}
+		// Set the buffer
+		ENUM_SERVICE_STATUS* pServices = (ENUM_SERVICE_STATUS*)new char[dwBytesNeeded];
 
-			// now traverse each service to get information
-			for (unsigned iIndex = 0; iIndex < dwServicesReturned; iIndex++) {
-				std::string serviceName = (pServices + iIndex)->lpServiceName;
-				 allServices->insert(serviceName);
-			}
- 
+		retVal = EnumServicesStatus(serviceMgr->get(), SERVICE_WIN32 | SERVICE_DRIVER, SERVICE_STATE_ALL, pServices, dwBytesNeeded, &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle);
+		errorCode = GetLastError();
+
+		// If the call failed for any other reason than more data
+		if(!retVal && (ERROR_MORE_DATA != errorCode)){
 			delete [] pServices;
-			pServices = NULL;
-
-		}else{
+			pServices = NULL; 
 
 			delete allServices;
 			allServices = NULL;
 
-			throw ProbeException ( "ERROR: The function EnumServicesStatus() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+			throw ProbeException ( "ERROR: The function EnumServicesStatusEx() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
 		}
+
+		// now traverse each service to get information
+		for (unsigned iIndex = 0; iIndex < dwServicesReturned; iIndex++) {
+			std::string serviceName = (pServices + iIndex)->lpServiceName;
+				allServices->insert(serviceName);
+		}
+ 
+		delete [] pServices;
+		pServices = NULL;
 	}
 
     return allServices;
@@ -301,9 +290,8 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
             lpsc = (LPQUERY_SERVICE_CONFIG) malloc(cbBufSize);
 
 			if(lpsc == NULL){
-				std::string logMsg = "ERROR: The function malloc() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
+				std::string logMsg = "ERROR: The function malloc() failed due to insufficient system memory.";
 				Log::Info(logMsg);
-				CloseServiceHandle(schService); 
 				return NULL;
 			}
 
@@ -317,6 +305,7 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
     if( !QueryServiceConfig(schService, lpsc, cbBufSize, &dwBytesNeeded) ) {
 		std::string logMsg = "ERROR: The function QueryServiceConfig() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		Log::Info(logMsg);
+		free(lpsc);
 		return NULL;
 	}
 
@@ -327,15 +316,16 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
             lpsd = (LPSERVICE_DESCRIPTION) malloc(cbBufSize);
 
 			if(lpsd == NULL){
-				std::string logMsg = "ERROR: The function malloc() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
+				std::string logMsg = "ERROR: The function malloc() failed due to insufficient system memory.";
 				Log::Info(logMsg);
-				CloseServiceHandle(schService); 
+				free(lpsc);
 				return NULL;
 			}
 
 		}else{
 			std::string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
+			free(lpsc);
 			return NULL;
 		}
     }
@@ -343,6 +333,8 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
     if (! QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, (LPBYTE) lpsd, cbBufSize,  &dwBytesNeeded) ) {
 		std::string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		Log::Info(logMsg);
+		free(lpsc);
+		free(lpsd);
 		return NULL;
 	 }
 
@@ -395,10 +387,9 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 		item->AppendElement(new ItemEntity("dependencies", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-    LocalFree(lpsc); 
-    LocalFree(lpsd);
-	CloseServiceHandle(schService); 
-
+    free(lpsc); 
+    free(lpsd);
+	
 	// open service for status query
     schService2 = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_STATUS); 
 	AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schService2Closer(schService2, CloseServiceHandle, "ServiceCloser");
@@ -444,8 +435,6 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	}else{
 		item->AppendElement(new ItemEntity("service_flag", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
-
-	CloseServiceHandle(schService2); 
 
 	return item;
 }

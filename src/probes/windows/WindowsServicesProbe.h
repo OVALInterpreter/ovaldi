@@ -30,6 +30,11 @@
 #ifndef WINDOWSSERVICESPROBE_H
 #define WINDOWSSERVICESPROBE_H
 
+#include <memory>
+#include <string>
+#include <vector>
+#include <set>
+
 #include "AbsProbe.h"
 #include <windows.h>
 #include <AutoCloser.h>
