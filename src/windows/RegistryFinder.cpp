@@ -31,6 +31,9 @@
 #include <memory>
 #include <FreeGuard.h>
 
+#include <AutoCloser.h>
+#include <FreeGuard.h>
+
 #include "RegistryFinder.h"
 
 char RegistryFinder::keySeparator = '\\';
@@ -651,15 +654,15 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
 
 StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
     auto_ptr<StringSet> names(new StringSet());
-    LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
+    FreeGuard<WCHAR> name(malloc ( sizeof ( WCHAR ) * MAX_PATH ));
     HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
     string nameStr = "";
 
     if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
-        while ( RegEnumValueW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
-            nameStr = WindowsCommon::UnicodeToAsciiString ( name );
+        while ( RegEnumValueW ( keyHandle, index, name.get(), &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
+            nameStr = WindowsCommon::UnicodeToAsciiString ( name.get() );
             names->insert ( nameStr );
             size = MAX_PATH;
             ++index;
@@ -671,11 +674,6 @@ StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
 				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
 				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
-    }
-
-    if ( name != NULL ) {
-        free ( name );
-        name = NULL;
     }
 
     return names.release();
@@ -742,11 +740,14 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
 		throw RegistryFinderException("Out of memory, trying to allocate " +
 			Common::ToString(sizeof ( WCHAR ) * MAX_PATH) + " bytes");
 
-    HKEY keyHandle;
+    HKEY keyHandle = NULL;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
     if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
+		AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyCloser(keyHandle, 
+			RegCloseKey, keyStr);
+
         while ( RegEnumKeyExW ( keyHandle, index, name.get(), &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             if(!WindowsCommon::UnicodeIsValidASCII(name.get())){
 				Log::Info("Skipping registry key found with invalid Unicode values.");
@@ -760,13 +761,6 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
 			this->GetRegistriesForPattern( hiveStr, newKeyStr , regexStr, keys , isRegex );
             size = MAX_PATH;
             ++index;
-        }
-
-		LONG err;
-        if ((err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
-            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key "+
-				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
-				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
     }
 }
