@@ -717,7 +717,7 @@ StringSet* RegistryFinder::ProcessKeyBehaviors ( string hiveStr, StringSet* keys
 }
 
 void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, string regexStr, StringSet *keys, bool isRegex ) {
-    if ( ( ( keyStr.empty() == true ) || ( keyStr == "" ) ) ) {
+    if (keyStr.empty()) {
         return;
     }
 
