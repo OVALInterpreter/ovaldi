@@ -34,6 +34,9 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <sstream>  //for std::istringstream
+#include <iterator> //for std::istream_iterator
+
 
 #include "AbsProbe.h"
 #include <windows.h>
