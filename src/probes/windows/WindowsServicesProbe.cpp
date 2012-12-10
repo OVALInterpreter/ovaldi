@@ -467,20 +467,17 @@ std::string WindowsServicesProbe::ServiceTypeToString(DWORD type){
 	std::string typeStr = "";
 
 	switch(type) {
-		case (WindowsServicesProbe::SERVICE_KERNEL_DRIVER_TYPE):
+		case (SERVICE_KERNEL_DRIVER):
 			typeStr = "SERVICE_KERNEL_DRIVER";
 			break;
-		case (WindowsServicesProbe::SERVICE_FILE_SYSTEM_DRIVER_TYPE):
+		case (SERVICE_FILE_SYSTEM_DRIVER):
 			typeStr = "SERVICE_FILE_SYSTEM_DRIVER";
 			break;
-		case (WindowsServicesProbe::SERVICE_WIN32_OWN_PROCESS_TYPE):
+		case (SERVICE_WIN32_OWN_PROCESS):
 			typeStr = "SERVICE_WIN32_OWN_PROCES";
 			break;
-		case (WindowsServicesProbe::SERVICE_WIN32_SHARE_PROCESS_TYPE):
+		case (SERVICE_WIN32_SHARE_PROCESS):
 			typeStr = "SERVICE_WIN32_SHARE_PROCESS";
-			break;
-		case(WindowsServicesProbe::SERVICE_INTERACTIVE_OWN_PROCESS_TYPE):
-			typeStr = "SERVICE_INTERACTIVE_PROCESS";
 			break;
 		default:
 			std::string logMsg = "WindowsServicesProbe::ServiceTypeToString - Error unsupported service type value.";
@@ -501,19 +498,19 @@ std::string WindowsServicesProbe::StartTypeToString(DWORD type){
 	std::string typeStr = "";
 
 	switch(type) {
-		case (WindowsServicesProbe::SERVICE_BOOT_START_TYPE):
+		case (SERVICE_BOOT_START):
 			typeStr = "SERVICE_BOOT_START";
 			break;
-		case (WindowsServicesProbe::SERVICE_SYSTEM_START_TYPE):
+		case (SERVICE_SYSTEM_START):
 			typeStr = "SERVICE_SYSTEM_START";
 			break;
-		case (WindowsServicesProbe::SERVICE_AUTO_START_TYPE):
+		case (SERVICE_AUTO_START):
 			typeStr = "SERVICE_AUTO_START";
 			break;
-		case (WindowsServicesProbe::SERVICE_DEMAND_START_TYPE):
+		case (SERVICE_DEMAND_START):
 			typeStr = "SERVICE_DEMAND_START";
 			break;
-		case(WindowsServicesProbe::SERVICE_DISABLED_TYPE):
+		case(SERVICE_DISABLED):
 			typeStr = "SERVICE_DISABLED";
 			break;
 		default:
@@ -535,25 +532,25 @@ std::string WindowsServicesProbe::CurrentStateToString(DWORD type){
 	std::string typeStr = "";
 
 	switch(type) {
-		case (WindowsServicesProbe::SERVICE_STOPPED_STATE):
+		case (SERVICE_STOPPED):
 			typeStr = "SERVICE_STOPPED";
 			break;
-		case (WindowsServicesProbe::SERVICE_START_PENDING_STATE):
+		case (SERVICE_START_PENDING):
 			typeStr = "SERVICE_START_PENDING";
 			break;
-		case (WindowsServicesProbe::SERVICE_STOP_PENDING_STATE):
+		case (SERVICE_STOP_PENDING):
 			typeStr = "SERVICE_STOP_PENDING";
 			break;
-		case (WindowsServicesProbe::SERVICE_RUNNING_STATE):
+		case (SERVICE_RUNNING):
 			typeStr = "SERVICE_RUNNING";
 			break;
-		case(WindowsServicesProbe::SERVICE_CONTINUE_PENDING_STATE):
+		case(SERVICE_CONTINUE_PENDING):
 			typeStr = "SERVICE_CONTINUE_PENDING";
 			break;
-		case(WindowsServicesProbe::SERVICE_PAUSE_PENDING_STATE):
+		case(SERVICE_PAUSE_PENDING):
 			typeStr = "SERVICE_PAUSE_PENDING";
 			break;
-		case(WindowsServicesProbe::SERVICE_PAUSED_STATE):
+		case(SERVICE_PAUSED):
 			typeStr = "SERVICE_PAUSED";
 			break;
 		default:
@@ -574,47 +571,47 @@ std::string WindowsServicesProbe::ControlToString(DWORD type){
 	// -----------------------------------------------------------------------
 	std::string typeStr = "";
 
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_STOP) {
+	if(type & SERVICE_ACCEPT_STOP) {
 			typeStr = "SERVICE_ACCEPT_STOP";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_PAUSE_CONTINUE){
+	if(type &SERVICE_ACCEPT_PAUSE_CONTINUE){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_PAUSE_CONTINUE";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_SHUTDOWN){
+	if(type & SERVICE_ACCEPT_SHUTDOWN){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_SHUTDOWN";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_PARAMCHANGE){
+	if(type & SERVICE_ACCEPT_PARAMCHANGE){
 			typeStr = typeStr +  " " + "SERVICE_ACCEPT_PARAMCHANGE";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_NETBINDCHANGE){
+	if(type & SERVICE_ACCEPT_NETBINDCHANGE){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_NETBINDCHANGE";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_HARDWAREPROFILECHANGE){
+	if(type & SERVICE_ACCEPT_HARDWAREPROFILECHANGE){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_HARDWAREPROFILECHANGE";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_POWEREVENT){
+	if(type & SERVICE_ACCEPT_POWEREVENT){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_POWEREVENT";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_SESSIONCHANGE){
+	if(type & SERVICE_ACCEPT_SESSIONCHANGE){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_SESSIONCHANGE";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_PRESHUTDOWN){
+	if(type & SERVICE_ACCEPT_PRESHUTDOWN){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_PRESHUTDOWN";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE_CONTROL_ACCEPT_TIMECHANGE){
+	if(type & SERVICE_ACCEPT_TIMECHANGE){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_TIMECHANGE";
 	}
 	
-	if(type & WindowsServicesProbe::SERVICE__CONTROLACCEPT_TRIGGEREVENT){
+	if(type & SERVICE_ACCEPT_TRIGGEREVENT){
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_TRIGGEREVENT";
 	}
 		
