@@ -82,11 +82,6 @@ class WindowsServicesProbe : public AbsProbe {
          */
         static WindowsServicesProbe* instance;
 
-        /** The ItemVector that holds the information about all of the Windows services on the local system. */
-        //ItemVector* services;
-
-		//std::vector<std::string> serviceNames;
-		
 		/** Get the set of all services on the system that match the object.
          *  @param serviceNameEntity A ObjectEntity that represents the service_name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the services specified in the ObjectEntity.
@@ -104,7 +99,7 @@ class WindowsServicesProbe : public AbsProbe {
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
          *  @return A boolean value that specifies whether or not the service exists on the system.
          */
-        bool ServiceExists ( std::string serviceNameStr );
+        bool ServiceExists ( std::string serviceNameStr, bool caseInsensitive );
 
         /** Retrieve all of the services on the system.
          *  @return A pointer to a StringSet that contains all of the services on the system.
@@ -133,6 +128,7 @@ class WindowsServicesProbe : public AbsProbe {
 								SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG=1};
 
 		static std::string ServiceFlagToString(DWORD type);
-};
+
+	};
 
 #endif

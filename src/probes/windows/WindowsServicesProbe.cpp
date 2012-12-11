@@ -82,13 +82,14 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 
     if ( serviceNameEntity->GetOperation() != OvalEnum::OPERATION_EQUALS
             && serviceNameEntity->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH
-            && serviceNameEntity->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL ) {
+            && serviceNameEntity->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL 
+			&& serviceNameEntity->GetOperation() != OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {
         throw ProbeException ( "Error: invalid operation specified on service_name. Found: " + OvalEnum::OperationToString ( serviceNameEntity->GetOperation() ) );
     }
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
-	if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ){
+	if ( (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS) ||  (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS)){
 		StringVector theServices;
 		serviceNameEntity->GetEntityValues(theServices);
 		for(StringVector::iterator it = theServices.begin(); it != theServices.end(); it++){
@@ -137,8 +138,8 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
         // Proceed based on operation
         if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
           
-            // If the service exists add it to the list
-            if ( this->ServiceExists ( serviceNameEntity->GetValue() ) ) {
+            // If the service exists, add it to the list
+            if ( this->ServiceExists ( serviceNameEntity->GetValue(), false ) ) {
                 theServices->insert ( serviceNameEntity->GetValue() );
             }
 
@@ -146,10 +147,11 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
             theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , false);
         } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
             theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , true );
-        } 
-		//else if( serviceNameEntity->GetOperation() == OPERATION_CASE_INSENSITIVE_EQUALS,){
-		//	theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , true );
-		//}
+        } else if( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS){
+			if ( this->ServiceExists ( serviceNameEntity->GetValue(), true ) ) {
+                theServices->insert ( serviceNameEntity->GetValue() );
+            }
+		}
 
     } else {
         // Get all services
@@ -162,12 +164,20 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
             VariableValueVector::iterator iterator;
 
             for ( iterator = serviceNameEntity->GetVarRef()->GetValues()->begin() ; iterator != serviceNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->ServiceExists ( ( *iterator )->GetValue() ) ) {
-                    allServices->insert ( ( *iterator )->GetValue() );
+                if ( this->ServiceExists ( ( *iterator )->GetValue(), false ) ) {
+                    allServices->insert ( ( *iterator )->GetValue(), false );
                 }
             }
 
-        } else {
+        } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS ) {
+			VariableValueVector::iterator iterator;
+
+            for ( iterator = serviceNameEntity->GetVarRef()->GetValues()->begin() ; iterator != serviceNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+                if ( this->ServiceExists ( ( *iterator )->GetValue(), true ) ) {
+                    allServices->insert ( ( *iterator )->GetValue(), false );
+                }
+            }
+		} else {
             allServices = this->GetMatchingServices ( ".*" , true );
         }
 
@@ -248,10 +258,23 @@ StringSet* WindowsServicesProbe::GetAllServices() {
     return allServices;
 }
 
-bool WindowsServicesProbe::ServiceExists ( std::string serviceNameStr ) {
-    if ( WindowsServicesProbe::services->find ( serviceNameStr ) != WindowsServicesProbe::services->end() ) {
-        return true;
-    }
+bool WindowsServicesProbe::ServiceExists ( std::string serviceNameStr, bool caseInsensitive ) {
+	if(caseInsensitive){
+		
+		for ( StringSet::iterator it = WindowsServicesProbe::services->begin(); it != WindowsServicesProbe::services->end(); it++ ) {
+
+			std::string temp = (std::string)(*it);
+			if(_stricmp(serviceNameStr.c_str(), temp.c_str()) == 0){
+				return true;
+			}
+		}
+			
+	}else{
+
+		if ( WindowsServicesProbe::services->find ( serviceNameStr ) != WindowsServicesProbe::services->end() ) {
+		    return true;
+		}
+	}
 
     return false;
 }
@@ -464,7 +487,7 @@ std::string WindowsServicesProbe::ServiceTypeToString(DWORD type){
 	//	Convert the ServiceType value to a string
 	//
 	// -----------------------------------------------------------------------
-	std::string typeStr = "";
+	std::string typeStr = ""; 
 
 	switch(type) {
 		case (SERVICE_KERNEL_DRIVER):
