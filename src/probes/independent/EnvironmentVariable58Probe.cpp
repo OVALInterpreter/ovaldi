@@ -579,7 +579,7 @@ namespace {
 			// search for '='
 			const CType *eq = beg;
 			while (*eq && *eq != CType('=')) ++eq;
-			if (eq) {
+			if (*eq) {
 				env[SType(beg, eq)] = SType(eq+1);
 				beg = eq;
 				while (*beg) ++beg; // skip to the end of the entry
