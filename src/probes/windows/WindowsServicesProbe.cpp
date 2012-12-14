@@ -374,11 +374,20 @@ Item* WindowsServicesProbe::GetService ( std::string serviceName ) {
 	}
 
 	serviceType = WindowsServicesProbe::ServiceTypeToString(lpsc->dwServiceType);
+	
 	if(!serviceType.empty()){
-		item->AppendElement(new ItemEntity("service_type", serviceType, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+
+		std::istringstream ss(serviceType);
+		std::istream_iterator<std::string> begin(ss), end;
+		std::vector<std::string> arrayTokens(begin, end); 
+
+		for(int i=0; i < arrayTokens.size(); i++){
+			item->AppendElement(new ItemEntity("service_type", Common::ToString(arrayTokens.at(i)), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		}
+
 	}else{
 		item->AppendElement(new ItemEntity("service_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-	}
+	}	
 
 	startType = WindowsServicesProbe::StartTypeToString(lpsc->dwStartType);
 	if(!startType.empty()){
@@ -489,23 +498,40 @@ std::string WindowsServicesProbe::ServiceTypeToString(DWORD type){
 	// -----------------------------------------------------------------------
 	std::string typeStr = ""; 
 
-	switch(type) {
-		case (SERVICE_KERNEL_DRIVER):
+	if(type & SERVICE_KERNEL_DRIVER){
 			typeStr = "SERVICE_KERNEL_DRIVER";
-			break;
-		case (SERVICE_FILE_SYSTEM_DRIVER):
+	}
+
+	if(type & SERVICE_FILE_SYSTEM_DRIVER){
+		if(typeStr.empty()){
 			typeStr = "SERVICE_FILE_SYSTEM_DRIVER";
-			break;
-		case (SERVICE_WIN32_OWN_PROCESS):
-			typeStr = "SERVICE_WIN32_OWN_PROCES";
-			break;
-		case (SERVICE_WIN32_SHARE_PROCESS):
+		}else{
+			typeStr = typeStr + " " + "SERVICE_FILE_SYSTEM_DRIVER";
+		}
+	}
+
+	if(type & SERVICE_WIN32_OWN_PROCESS){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_WIN32_OWN_PROCESS";
+		}else{
+			typeStr = typeStr + " " + "SERVICE_WIN32_OWN_PROCESS";
+		}
+	}
+
+	if(type & SERVICE_WIN32_SHARE_PROCESS){
+		if(typeStr.empty()){
 			typeStr = "SERVICE_WIN32_SHARE_PROCESS";
-			break;
-		default:
-			std::string logMsg = "WindowsServicesProbe::ServiceTypeToString - Error unsupported service type value.";
-			Log::Info(logMsg);
-			break;
+		}else{
+			typeStr = typeStr + " " + "SERVICE_WIN32_SHARE_PROCESS";
+		}
+	}
+
+	if(type & SERVICE_INTERACTIVE_PROCESS){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_INTERACTIVE_PROCESS";
+		}else{
+			typeStr = typeStr + " " + "SERVICE_INTERACTIVE_PROCESS";
+		}
 	}
 
 	return typeStr;
@@ -549,7 +575,7 @@ std::string WindowsServicesProbe::CurrentStateToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	Convert the StartType value to a string
+	//	Convert the CurrentStateType value to a string
 	//
 	// -----------------------------------------------------------------------
 	std::string typeStr = "";
@@ -589,7 +615,7 @@ std::string WindowsServicesProbe::ControlToString(DWORD type){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	Convert the StartType value to a string
+	//	Convert the ControlsAcceptedType value to a string
 	//
 	// -----------------------------------------------------------------------
 	std::string typeStr = "";
@@ -597,48 +623,87 @@ std::string WindowsServicesProbe::ControlToString(DWORD type){
 	if(type & SERVICE_ACCEPT_STOP) {
 			typeStr = "SERVICE_ACCEPT_STOP";
 	}
-	
-	if(type &SERVICE_ACCEPT_PAUSE_CONTINUE){
+
+	if(type & SERVICE_ACCEPT_PAUSE_CONTINUE){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_PAUSE_CONTINUE";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_PAUSE_CONTINUE";
+		}
 	}
-	
+
 	if(type & SERVICE_ACCEPT_SHUTDOWN){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_SHUTDOWN";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_SHUTDOWN";
+		}
 	}
-	
+
 	if(type & SERVICE_ACCEPT_PARAMCHANGE){
-			typeStr = typeStr +  " " + "SERVICE_ACCEPT_PARAMCHANGE";
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_PARAMCHANGE";
+		}else{
+			typeStr = typeStr + " " + "SERVICE_ACCEPT_PARAMCHANGE";
+		}
 	}
 	
 	if(type & SERVICE_ACCEPT_NETBINDCHANGE){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_NETBINDCHANGE";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_NETBINDCHANGE";
+		}
 	}
-	
+
 	if(type & SERVICE_ACCEPT_HARDWAREPROFILECHANGE){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_HARDWAREPROFILECHANGE";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_HARDWAREPROFILECHANGE";
-	}
+		}
+	}	
 	
 	if(type & SERVICE_ACCEPT_POWEREVENT){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_POWEREVENT";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_POWEREVENT";
-	}
-	
+		}
+	}	
+		
 	if(type & SERVICE_ACCEPT_SESSIONCHANGE){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_SESSIONCHANGE";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_SESSIONCHANGE";
-	}
-	
+		}
+	}	
+
 	if(type & SERVICE_ACCEPT_PRESHUTDOWN){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_PRESHUTDOWN";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_PRESHUTDOWN";
-	}
+		}
+	}	
 	
 	if(type & SERVICE_ACCEPT_TIMECHANGE){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_TIMECHANGE";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_TIMECHANGE";
-	}
-	
+		}
+	}	
+		
 	if(type & SERVICE_ACCEPT_TRIGGEREVENT){
+		if(typeStr.empty()){
+			typeStr = "SERVICE_ACCEPT_TRIGGEREVENT";
+		}else{
 			typeStr = typeStr + " " + "SERVICE_ACCEPT_TRIGGEREVENT";
+		}
 	}
 		
-
 	return typeStr;
 }
 
