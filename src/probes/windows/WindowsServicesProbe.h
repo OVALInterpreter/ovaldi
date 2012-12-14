@@ -127,7 +127,7 @@ class WindowsServicesProbe : public AbsProbe {
 		enum WindowsServiceFlag {SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG=0,
 								SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG=1};
 
-		static std::string ServiceFlagToString(DWORD type);
+		bool ServiceFlagToBool(DWORD type);
 
 	};
 
