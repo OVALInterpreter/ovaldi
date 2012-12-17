@@ -159,7 +159,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                 item->AppendElement ( new ItemEntity ( "protocol" ,  protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                 item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-                                item->AppendElement ( new ItemEntity ( "local_port" , localPort->GetValue() , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                item->AppendElement ( new ItemEntity ( "local_port" , "" , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                 collectedItems->push_back ( item );
 
                             } else {
@@ -170,7 +170,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                     item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                     item->AppendElement ( new ItemEntity ( "local_address" , localAddressStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-                                    item->AppendElement ( new ItemEntity ( "local_port" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                    item->AppendElement ( new ItemEntity ( "local_port" , "" , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                                     collectedItems->push_back ( item );
                                 }
                             }
@@ -187,7 +187,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "local_address" , localAddress->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "local_address" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                         collectedItems->push_back ( item );
 
                     } else {
@@ -197,7 +197,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "local_address" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                            item->AppendElement ( new ItemEntity ( "local_address" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                             collectedItems->push_back ( item );
                         }
                     }
@@ -213,7 +213,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
             if ( protocol->GetVarRef() == NULL ) {
                 Item* item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "protocol" , protocol->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "protocol" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( item );
 
             } else {
@@ -222,7 +222,7 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                 for ( iterator = protocol->GetVarRef()->GetValues()->begin() ; iterator != protocol->GetVarRef()->GetValues()->end() ; iterator++ ) {
                     Item* item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                    item->AppendElement ( new ItemEntity ( "protocol" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                    item->AppendElement ( new ItemEntity ( "protocol" , "", OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                     collectedItems->push_back ( item );
                 }
             }

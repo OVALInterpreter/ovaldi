@@ -137,7 +137,7 @@ Item* GroupSidProbe::GetGroupSidInfo ( string groupSidStr ) {
 
     } else {
         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-        item->AppendElement ( new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+        item->AppendElement ( new ItemEntity ( "group_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
         if ( WindowsCommon::IsGroupSID ( groupSidStr ) == 0 ) {
             item->AppendMessage ( new OvalMessage ( "The specified SID is not a group SID." ) );

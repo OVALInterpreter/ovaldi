@@ -102,7 +102,7 @@ ItemVector* InterfaceProbe::CollectItems ( Object* object ) {
             } else {
                 aInterface = this->CreateItem();
                 aInterface->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                aInterface->AppendElement ( new ItemEntity ( "name" , name->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                aInterface->AppendElement ( new ItemEntity ( "name" ,"" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( aInterface );
             }
 
