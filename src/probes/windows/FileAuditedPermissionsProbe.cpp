@@ -134,7 +134,7 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, false ) );
+                        item->AppendElement ( new ItemEntity ( "filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, false ) );
 						item->AppendElement(new ItemEntity("windows_view",
 							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );

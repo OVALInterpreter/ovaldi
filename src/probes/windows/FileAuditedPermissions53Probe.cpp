@@ -138,9 +138,9 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                     for ( iterator = fileNames.begin(); iterator != fileNames.end(); iterator++ ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
                         item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
+                        item->AppendElement ( new ItemEntity ( "filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
 						item->AppendElement(new ItemEntity("windows_view",
 							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
@@ -224,7 +224,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
                                 item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 								item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
-                                item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                item->AppendElement ( new ItemEntity ( "trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 								item->AppendElement(new ItemEntity("windows_view",
 									(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                                 collectedItems->push_back ( item );
@@ -270,9 +270,9 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
@@ -300,7 +300,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
