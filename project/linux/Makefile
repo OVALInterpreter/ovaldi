@@ -50,7 +50,7 @@ CPPFLAGS = -Wall -DLINUX $(INCDIRS)
 LIBDIR = -L/usr/local/lib -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -llber -lblkid -lacl
+LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -llber -lblkid -lacl -lselinux
 
 # Determine what package management system is being used 
 PACKAGE_RPM  = $(shell /usr/bin/env rpm  --version 2>/dev/null)
@@ -61,7 +61,7 @@ CPP_FILES := $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
 # Selectively enable/disable packages rather than assume presence is mutually exclusive.
 ifneq (${PACKAGE_RPM}, )
-	LIBS += -lrpm -lrpmdb -lrpmio
+	LIBS += -lrpm -lrpmdb -lrpmio -lpopt
 	CPPFLAGS += -DPACKAGE_RPM
 else
 	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))
