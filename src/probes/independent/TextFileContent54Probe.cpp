@@ -231,20 +231,21 @@ void TextFileContent54Probe::GetItems(string path, string fileName,
 	// construct the file path
 	string filePath = Common::BuildFilePath(path, fileName);
 
-	// read the file line by line
-	string buffer;
+	// read the file into memory
 	string fileContents;
+	char buf[100];
 	ifstream infile;
 	infile.open (filePath.c_str());
 	if (infile.is_open()) {
 
-		while (!infile.eof()) {
-			getline (infile, buffer);
-			fileContents += buffer;
-			if(!(infile.fail()|infile.eof())) {
-				fileContents += "\n";
-			}
+		infile.read(buf, sizeof(buf));
+		while (!infile.eof() && !infile.fail()) {
+			fileContents.append(buf, static_cast<size_t>(infile.gcount()));
+			infile.read(buf, sizeof(buf));
 		}
+		
+		if (infile.gcount() > 0)
+			fileContents.append(buf, static_cast<size_t>(infile.gcount()));
 
 		infile.close();
 
