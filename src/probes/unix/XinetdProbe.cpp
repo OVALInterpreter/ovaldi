@@ -674,7 +674,7 @@ void XinetdProbe::AddItemEntity(Item *item,
 
 	ServiceEntryMap::const_iterator iter;
 	if ((iter = service.find(paramName)) != service.end())
-		item->AppendElement(new ItemEntity(entityName.c_str(), iter->second[0].str(),
+		item->AppendElement(new ItemEntity(entityName, iter->second[0].str(),
 										   dataType));
 }
 
