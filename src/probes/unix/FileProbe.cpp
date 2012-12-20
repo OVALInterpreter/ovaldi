@@ -418,23 +418,31 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	//////////////////////////////////////////////////////
 
 # if defined (LINUX)
-	acl_t aclp;
-	acl_type_t acl_type = ACL_TYPE_ACCESS;
-       
-	aclp = acl_get_file(filePath.c_str(),acl_type);
-	if(aclp == (acl_t)NULL){
-	  if(errno == EOPNOTSUPP){
-	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_DOES_NOT_EXIST,0));
-	  }else{
-	    item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_ERROR,0));
-	    item->AppendMessage(new OvalMessage(string("Error reading ACL data: ") + strerror(errno)));
-	  }
+	/* From the original thread (http://making-security-measurable.1364806.n2.nabble.com/Proposal-for-UNIX-ACL-child-element-UNCLASSIFIED-td4542654.html#a4582129) the expected behavior is:
+	
+	   1) If an interpreter doesn't support the collection of ACL information, the status will be 'not collected'.
+	   2) If there is an error trying to retrieve this information, the status will be 'error'.
+	   3) If a system doesn't support ACLs, the status will be 'does not exist'.
+	   4) If a system supports ACLs, the status will be 'exists'.
+	   5) If a file doesn't have an ACL, or it matches the standard UNIX permissions, the value will be 'false' (this is covered by acl_extended_file() - thank you openscap)
+	   6) If a file has an ACL, the value will be 'true'.
+	*/
+	
+	int hasExtendedAcl = acl_extended_file(filePath.c_str());
+	if(hasExtendedAcl > -1){ // behavior 4, 5, and 6
+          item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString(hasExtendedAcl),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_EXISTS,0));
 	}else{
-	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("1"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_EXISTS,0));
-         acl_free(aclp);
-        }
+	  if(errno == EOPNOTSUPP){ // behavior 3
+	    item->AppendElement(new ItemEntity("has_extended_acl","",OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_DOES_NOT_EXIST,0));
+          }else{ // behavior 2
+	    item->AppendElement(new ItemEntity("has_extended_acl","",OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_ERROR,0));
+            item->AppendMessage(new OvalMessage(string("Error reading ACL data: ") + strerror(errno)));
+          }
+	}
+
 # else
-	  item->AppendElement(new ItemEntity("has_extended_acl",Common::ToString("0"),OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_NOT_COLLECTED,0));
+	// behavior 1
+	item->AppendElement(new ItemEntity("has_extended_acl","",OvalEnum::DATATYPE_BOOLEAN,OvalEnum::STATUS_NOT_COLLECTED,0));
 	
 # endif
 

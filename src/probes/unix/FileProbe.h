@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/acl.h>
+
 #include <time.h>
 #include <cerrno>
 
@@ -48,6 +48,9 @@
 #include <string>
 #include <vector>
 
+# if defined (LINUX)
+  #include <acl/libacl.h> 
+#endif
 /**
 	This class is responsible for collecting file information for red hat file_objects.
 */
@@ -72,7 +75,7 @@ private:
 	static FileProbe* instance;
 
 	/** Get all attributes for the file specified in fileIn. Return them in an Item. */
-	Item* GetFileAttributes(std::string path, std::string fileName);
+	Item* GetFileAttributes(std::string path, std::string fileName);	
 };
 
 #endif
