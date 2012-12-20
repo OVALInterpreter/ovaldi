@@ -40,6 +40,10 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed error message display bugs in registry-related probes, which caused
   nonsensical error messages when RegCloseKey() failed.
 * Updated the unix-def:xinetd_test to support unbounded item entities (flags, no_access, and only_from). This addresses bug #3495448.
+* Fixed the linked libraries in the linux makefile to include -lselinux, and 
+  not include -lpopt unless the RPM probes were being built.  This addresses
+  bug #3568359.  Thanks to Michael Wiegand of Greenbone Networks GmbH
+  (http://www.greenbone.net/) for reporting this issue and providing a patch.
 
 ---------------------------------------
 ---       Version 5.10.1 build 3    ---
