@@ -203,6 +203,26 @@ class XinetdProbe : public AbsProbe {
 					   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
 
 	/**
+         * Adds an unbounded entity to the given item with the given name, from the service param
+         * of the same name from the given service.
+         */
+        void AddUnboundedItemEntity(Item *item,
+			   const ServiceEntryMap& service,
+			   const std::string& paramName,
+			   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
+
+        /**
+         * Adds an unbounded entity to the given item with the given name, from the service param
+         * of the given name from the given service.  In this one, the entity is named
+         * differently from the service param name.
+         */
+        void AddUnboundedItemEntity(Item *item,
+			   const ServiceEntryMap& service,
+			   const std::string& paramName,
+			   const std::string& entityName,
+			   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
+
+	/**
 	 * Reads the contents of the given file into the given string.
 	 */
 	void ReadFileToString(const std::string& fileName, std::string &contents);
