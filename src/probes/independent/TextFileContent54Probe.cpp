@@ -240,7 +240,10 @@ void TextFileContent54Probe::GetItems(string path, string fileName,
 
 		while (!infile.eof()) {
 			getline (infile, buffer);
-			fileContents += buffer + "\n";
+			fileContents += buffer;
+			if(!(infile.fail()|infile.eof())) {
+				fileContents += "\n";
+			}
 		}
 
 		infile.close();
