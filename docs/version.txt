@@ -39,6 +39,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
   didn't have any criteria.
 * Fixed error message display bugs in registry-related probes, which caused
   nonsensical error messages when RegCloseKey() failed.
+* Updated the unix-def:xinetd_test to support unbounded item entities (flags, no_access, and only_from). This addresses bug #3495448.
 
 ---------------------------------------
 ---       Version 5.10.1 build 3    ---
