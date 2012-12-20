@@ -44,6 +44,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
   not include -lpopt unless the RPM probes were being built.  This addresses
   bug #3568359.  Thanks to Michael Wiegand of Greenbone Networks GmbH
   (http://www.greenbone.net/) for reporting this issue and providing a patch.
+* Fixed a bug when collecting the has_extended_acl entity in the unix-def:file_test so that we are assigning a value of 'false' when a file does not have an ACL or it matches the standard UNIX permissions. This addresses bug #3597938.
 
 ---------------------------------------
 ---       Version 5.10.1 build 3    ---
