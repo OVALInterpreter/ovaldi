@@ -123,7 +123,7 @@ private:
 	/**
 		Read the stat file for a specific process
 	*/
-	int RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
+	int RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, unsigned long *policy, std::string *errMsg);
 
 	/**
 	 * Reads uid's from the /proc/pid/status file.  This file supposedly contains
