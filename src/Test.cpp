@@ -293,6 +293,15 @@ void Test::Write(DOMElement* parentElm) {
 			XmlCommon::AddAttribute(testElm, "variable_instance", Common::ToString(this->GetVariableInstance()));
 		}	
 
+		OvalMessage* currentMessage = NULL;
+		unsigned int sizeOfMessageList = this->GetMessages()->size();
+		unsigned int msgCounter = 0;
+		while(msgCounter < sizeOfMessageList) {
+			currentMessage = this->GetMessages()->at(msgCounter);
+			currentMessage->Write(resultDoc,testElm,"oval-res");	 
+			msgCounter++;
+		}
+
 		TestedItem* currentElement = NULL;
 		unsigned int sizeOfItemList = this->GetTestedItems()->size();
 		unsigned int itemCounter = 0;
@@ -306,15 +315,6 @@ void Test::Write(DOMElement* parentElm) {
 		VariableValueVector::iterator iterator1;
 		for(iterator1 = this->GetTestedVariables()->begin(); iterator1 != this->GetTestedVariables()->end(); iterator1++) {
 			(*iterator1)->WriteTestedVariable(testElm);
-		}
-
-		OvalMessage* currentMessage = NULL;
-		unsigned int sizeOfMessageList = this->GetMessages()->size();
-		unsigned int msgCounter = 0;
-		while(msgCounter < sizeOfMessageList) {
-			currentMessage = this->GetMessages()->at(msgCounter);
-			currentMessage->Write(resultDoc,testElm,"oval");	 
-			msgCounter++;
 		}
 
 		// loop through all vars in the states
