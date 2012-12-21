@@ -35,6 +35,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---       Version 5.10.1 build 4    ---
 ---------------------------------------
 
+* Resolved the unknown error message in the win-def:process58_test. This addresses bug #3428326.
 * Fixed a bug causing a crash when a deprecated definition was analyzed which
   didn't have any criteria.
 * Fixed error message display bugs in registry-related probes, which caused
