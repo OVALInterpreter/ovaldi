@@ -127,7 +127,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
             StringPair* fp = ( *iterator );
 
             // If there is no file name and the fileName ObjectEntity is not set to nil.
-            if ( fp->second.compare ( "" ) == 0 && !fileName->GetNil() ) {
+            if ( fp->second.compare ( "" ) == 0 && fileName && !fileName->GetNil() ) {
                 Item* item = NULL;
                 // Check if the code should report that the filename does not exist.
                 StringVector fileNames;
@@ -194,7 +194,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                                 Item* item = this->GetAuditedPermissions ( fileHandle, fp->first, fp->second, ( *iterator ) );
 
                                 if ( item != NULL ) {
-									if (fileName->GetNil()) {
+									if (fileName && fileName->GetNil()) {
 										auto_ptr<ItemEntityVector> fileNameVector(item->GetElementsByName("filename"));
 										if (fileNameVector->size() > 0) {
 											fileNameVector->at(0)->SetNil(true);
@@ -271,8 +271,12 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 					pathStatus->SetValue(fpComponents->first);
 					fileNameStatus->SetValue(fpComponents->second);
 					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					
+					bool pathDne  = fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues);
+					bool filenameDne = fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues);
+					item->AppendElement(new ItemEntity("path", (pathDne)?"":fpComponents->first, OvalEnum::DATATYPE_STRING, (pathDne)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", (filenameDne)?"":fpComponents->second, OvalEnum::DATATYPE_STRING, (filenameDne)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
