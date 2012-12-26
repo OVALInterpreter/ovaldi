@@ -281,17 +281,14 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									long long value = 0;
 									if (pvtType == CIM_SINT8) {
 										value = V_I1(&vtProp);
-										strFieldValue += value;
-									} else {
-										if (pvtType == CIM_SINT16) {
-											value = V_I2(&vtProp);
-										} else if (pvtType == CIM_SINT32) {
-											value = V_I4(&vtProp);
-										} else if (pvtType == CIM_SINT64) {
-											value = V_I8(&vtProp);
-										}
-										strFieldValue = Common::ToString(value);
+									} else if (pvtType == CIM_SINT16) {
+										value = V_I2(&vtProp);
+									} else if (pvtType == CIM_SINT32) {
+										value = V_I4(&vtProp);
+									} else if (pvtType == CIM_SINT64) {
+										value = V_I8(&vtProp);
 									}
+									strFieldValue = Common::ToString(value);
 									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 									break;
 								}
@@ -302,17 +299,14 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									unsigned long long value = 0;
 									if (pvtType == CIM_UINT8) {
 										value = V_UI1(&vtProp);
-										strFieldValue += value;
-									} else {
-										if (pvtType == CIM_UINT16) {
-											value = V_UI2(&vtProp);
-										} else if (pvtType == CIM_UINT32) {
-											value = V_UI4(&vtProp);
-										} else if (pvtType == CIM_UINT64) {
-											value = V_UI8(&vtProp);
-										}
-										strFieldValue = Common::ToString(value);
+									} else if (pvtType == CIM_UINT16) {
+										value = V_UI2(&vtProp);
+									} else if (pvtType == CIM_UINT32) {
+										value = V_UI4(&vtProp);
+									} else if (pvtType == CIM_UINT64) {
+										value = V_UI8(&vtProp);
 									}
+									strFieldValue = Common::ToString(value);
 									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 									break;
 								}
