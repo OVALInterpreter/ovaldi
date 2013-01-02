@@ -77,7 +77,7 @@ AbsProbe* WindowsServicesProbe::Instance() {
 ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 
 	ObjectEntity* serviceNameEntity = object->GetElementByName("service_name");
-
+	
 	if ( serviceNameEntity->GetDatatype() != OvalEnum::DATATYPE_STRING ) {
         throw ProbeException ( "Error: invalid data type specified on service_name. Found: " + OvalEnum::DatatypeToString ( serviceNameEntity->GetDatatype() ) );
     }
@@ -85,13 +85,14 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
     if ( serviceNameEntity->GetOperation() != OvalEnum::OPERATION_EQUALS
             && serviceNameEntity->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH
             && serviceNameEntity->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL 
-			&& serviceNameEntity->GetOperation() != OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {
+			&& serviceNameEntity->GetOperation() != OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS
+			&& serviceNameEntity->GetOperation() != OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL) {
         throw ProbeException ( "Error: invalid operation specified on service_name. Found: " + OvalEnum::OperationToString ( serviceNameEntity->GetOperation() ) );
     }
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
-	if ( (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS) ||  (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS)){
+	/*if ( (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS) ||  (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS)){
 		StringVector theServices;
 		serviceNameEntity->GetEntityValues(theServices);
 		for(StringVector::iterator it = theServices.begin(); it != theServices.end(); it++){
@@ -102,18 +103,20 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 		}
 		theServices.clear();
 
-	}else if( (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) || (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL)){
-			
-		auto_ptr<StringSet> allServices( WindowsServicesProbe::GetServices ( serviceNameEntity ));
+	}else if( (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) || (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL)
+				|| (serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL)){
+	*/
+
+	auto_ptr<StringSet> allServices( WindowsServicesProbe::GetServices ( serviceNameEntity ));
 		
-		for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
-			Item * theItem = this->GetService(*it);
-			if(theItem != NULL){
-				collectedItems->push_back(theItem);
-			}
+	for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
+		Item * theItem = this->GetService(*it);
+		if(theItem != NULL){
+			collectedItems->push_back(theItem);
 		}
-		allServices->clear();
 	}
+	allServices->clear();
+	//}
 
 	return collectedItems.release();
 }
@@ -145,15 +148,19 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
                 theServices->insert ( serviceNameEntity->GetValue() );
             }
 
-        } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , false);
-        } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
-            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , true );
         } else if( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS){
-			if ( this->ServiceExists ( serviceNameEntity->GetValue(), true ) ) {
+
+			   // If the service exists, add it to the list
+            if ( this->ServiceExists ( serviceNameEntity->GetValue(), true ) ) {
                 theServices->insert ( serviceNameEntity->GetValue() );
             }
-		}
+		}else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
+            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , false,  false);
+        } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL ) {
+            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , false, true);
+        }else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
+            theServices = this->GetMatchingServices ( serviceNameEntity->GetValue() , true, false );
+        } 
 
     } else {
         // Get all services
@@ -180,7 +187,7 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
                 }
             }
 		} else {
-            allServices = this->GetMatchingServices ( ".*" , true );
+            allServices = this->GetMatchingServices ( ".*" , true, false );
         }
 
         // Loop through all services on the system
@@ -200,18 +207,24 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
     return theServices.release();
 }
 
-auto_ptr<StringSet> WindowsServicesProbe::GetMatchingServices ( string patternStr , bool isRegex ) {
+auto_ptr<StringSet> WindowsServicesProbe::GetMatchingServices ( string patternStr , bool isRegex, bool caseInsensitive ) {
    auto_ptr<StringSet> matchingServices(new StringSet());
 
-	if ( services == NULL ) {
-		services = GetAllServices();
-    }
+	if(caseInsensitive){
+		
+		for ( StringSet::iterator iterator = services->begin() ; iterator != services->end() ; iterator++ ){
+			if(! Common::EqualsIgnoreCase(*iterator,patternStr)){
+				matchingServices->insert ( *iterator );
+			}
+		}
 
-    for ( StringSet::iterator iterator = services->begin() ; iterator != services->end() ; iterator++ ) {
-        if ( this->IsMatch ( patternStr , *iterator , isRegex ) ) {
-            matchingServices->insert ( *iterator );
-        }
-    } 
+	}else{
+		for ( StringSet::iterator iterator = services->begin() ; iterator != services->end() ; iterator++ ) {
+		    if ( this->IsMatch ( patternStr , *iterator , isRegex ) ) {
+		        matchingServices->insert ( *iterator );
+		    }
+		} 
+	}
 
     return matchingServices;
 }
@@ -266,7 +279,7 @@ bool WindowsServicesProbe::ServiceExists ( string serviceNameStr, bool caseInsen
 		for ( StringSet::iterator it = WindowsServicesProbe::services->begin(); it != WindowsServicesProbe::services->end(); it++ ) {
 
 			string temp = (string)(*it);
-			if(_stricmp(serviceNameStr.c_str(), temp.c_str()) == 0){
+			if(Common::EqualsIgnoreCase(serviceNameStr, temp)){
 				return true;
 			}
 		}
@@ -296,8 +309,7 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 	string path;
 	string startName;
 
-	// Giving ourselves this privilege seems to gain us accessitem->AppendElement(new ItemEntity("current_state", CurrentStateToString(ssStatus.dwCurrentState), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-
+	// Giving ourselves this privilege seems to gain us access
 	// to a lot more processes.
 	PrivilegeGuard pg(SE_DEBUG_NAME, false);
 
@@ -383,9 +395,7 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 	if(lpsd->lpDescription != NULL && lpsd->lpDescription[0]){
 		item->AppendElement(new ItemEntity("description", Common::ToString(lpsd->lpDescription), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}else{
-		item->AppendElement(new ItemEntity("description", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The Description could not be determined or was unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
+		item->AppendElement(new ItemEntity("description", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
 	serviceType = WindowsServicesProbe::ServiceTypeToString(lpsc->dwServiceType);
@@ -394,7 +404,7 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		istream_iterator<string> begin(ss), end;
 		vector<string> arrayTokens(begin, end); 
 
-		for(int i=0; i < arrayTokens.size(); i++){
+		for(size_t i=0; i < arrayTokens.size(); i++){
 			item->AppendElement(new ItemEntity("service_type", Common::ToString(arrayTokens.at(i)), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 
@@ -419,6 +429,8 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 
 	if(lpsc->lpServiceStartName != NULL && lpsc->lpServiceStartName[0]){
 		startName = Common::ToString(lpsc->lpServiceStartName);
+	}else{
+		startName = "";
 	}
 
 	istringstream ss(lpsc->lpDependencies);
@@ -457,23 +469,20 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		istream_iterator<string> begin(ss), end;
 		vector<string> arrayTokens(begin, end); 
 
-		for(unsigned int i=0; i < arrayTokens.size(); i++){
+		for(size_t i=0; i < arrayTokens.size(); i++){
 			item->AppendElement(new ItemEntity("controls_accepted", Common::ToString(arrayTokens.at(i)), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 
 	}else{
-		item->AppendElement(new ItemEntity("controls_accepted", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The Controls Accepted could not be determined or were unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
+		item->AppendElement(new ItemEntity("controls_accepted", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
-	if(!startName.empty()){
-		item->AppendElement(new ItemEntity("start_name", startName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	}else{
-		item->AppendElement(new ItemEntity("start_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The StartName could not be determined or was unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
-	}
+	//string errorMessage = "The Controls Accepted could not be determined or were unrecognized.";
+	//item->AppendMessage(new OvalMessage(errorMessage));
+
+	// startName can be blank, so we don't check its length like we do with the other entities
+	item->AppendElement(new ItemEntity("start_name", startName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	
 	
 	if(!path.empty()){
 		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
@@ -492,9 +501,7 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 			item->AppendElement(new ItemEntity("dependencies", Common::ToString(depArrayTokens.at(i)), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 	}else{
-		item->AppendElement(new ItemEntity("dependencies", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The Dependencies could not be determined or were unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
+		item->AppendElement(new ItemEntity("dependencies", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
 	return item;
@@ -743,3 +750,4 @@ bool WindowsServicesProbe::ServiceFlagToBool(DWORD type){
 
 	return serviceFlag;
 }
+

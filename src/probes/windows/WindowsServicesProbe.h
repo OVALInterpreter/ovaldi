@@ -91,9 +91,10 @@ class WindowsServicesProbe : public AbsProbe {
         /** Retrieve all of the matching services.
          *  @param patternStr A string that contains the pattern to be matched.
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
+		 *  @param caseInsensitive A boolean value that specifies if the pattern should be case insensitive matched.
          *  @return A StringSet containing all of the matching services.
          */
-        std::auto_ptr<StringSet> GetMatchingServices ( std::string patternStr , bool isRegex );
+        std::auto_ptr<StringSet> GetMatchingServices ( std::string patternStr , bool isRegex, bool caseInsensitive);
 		
 		 /** Determine if the service exists on the system.
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
@@ -101,7 +102,7 @@ class WindowsServicesProbe : public AbsProbe {
          */
         bool ServiceExists ( std::string serviceNameStr, bool caseInsensitive );
 
-        /** Retrieve all of the services on the system.
+		 /** Retrieve all of the services on the system.
          *  @return A pointer to a StringSet that contains all of the services on the system.
          */
         StringSet* GetAllServices();
@@ -128,7 +129,7 @@ class WindowsServicesProbe : public AbsProbe {
 								SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG=1};
 
 		bool ServiceFlagToBool(DWORD type);
-
+		
 	};
 
 #endif
