@@ -221,7 +221,7 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 	if (!WindowsCommon::LookUpTrusteeSid(sidStr, &accountNameStr, &domainStr, &isGroup)) {
 		Item* item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		items->push_back(item);
 		return false;
 	}

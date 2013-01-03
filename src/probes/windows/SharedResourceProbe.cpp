@@ -84,7 +84,7 @@ ItemVector* SharedResourceProbe::CollectItems ( Object* object ) {
             } else {
                 aResource = this->CreateItem();
                 aResource->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                aResource->AppendElement ( new ItemEntity ( "netname" , netName->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                aResource->AppendElement ( new ItemEntity ( "netname" , "", OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( aResource );
             }
 

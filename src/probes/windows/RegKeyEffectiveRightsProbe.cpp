@@ -193,7 +193,7 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
                             item->AppendElement ( new ItemEntity ( "key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "trustee_name", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                            item->AppendElement ( new ItemEntity ( "trustee_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 							item->AppendElement(new ItemEntity("windows_view",
 								(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
@@ -225,7 +225,7 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                 Item* item = NULL;
                 item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 				item->AppendElement(new ItemEntity("windows_view",
 					(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                 collectedItems->push_back ( item );
@@ -249,7 +249,7 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                         item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "key", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );

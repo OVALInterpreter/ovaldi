@@ -223,7 +223,7 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 		if (!WindowsCommon::LookUpTrusteeName(&accountName, &sidStr, &domainStr, &isGroup)) {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("trustee_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 			items->push_back(item);
 			return false;
 		}
@@ -272,7 +272,7 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 		if(ex.GetSeverity() == ERROR_NOTICE) {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("trustee_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 			items->push_back(item);
 		} else {
 			throw ex;
