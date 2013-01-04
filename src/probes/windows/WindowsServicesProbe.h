@@ -117,13 +117,13 @@ class WindowsServicesProbe : public AbsProbe {
 		 */
 		std::auto_ptr<AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> > serviceMgr;
 		
-		static std::string ServiceTypeToString(DWORD type);
+		static std::vector<std::string> ServiceTypeToString(DWORD type);
 		
 		static std::string StartTypeToString(DWORD type);
 		
 		static std::string CurrentStateToString(DWORD type);
 
-		static std::string ControlToString(DWORD type);
+		static std::vector<std::string> ControlToString(DWORD type);
 
 		enum WindowsServiceFlag {SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG=0,
 								SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG=1};
