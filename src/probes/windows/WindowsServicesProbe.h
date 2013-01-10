@@ -41,6 +41,7 @@
 #include "AbsProbe.h"
 #include <windows.h>
 #include <AutoCloser.h>
+#include "EntityComparator.h"
 #include "WindowsCommon.h"
 
 /** This class is responsible for collecting Windows Services data.
@@ -89,12 +90,10 @@ class WindowsServicesProbe : public AbsProbe {
         StringSet* GetServices ( ObjectEntity* serviceNameEntity );
 
         /** Retrieve all of the matching services.
-         *  @param patternStr A string that contains the pattern to be matched.
-         *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
-		 *  @param caseInsensitive A boolean value that specifies if the pattern should be case insensitive matched.
+         *  @param serviceNameEntity A ObjectEntity that represents the service_name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet containing all of the matching services.
          */
-        std::auto_ptr<StringSet> GetMatchingServices ( std::string patternStr , bool isRegex, bool caseInsensitive);
+        std::auto_ptr<StringSet> GetMatchingServices ( ObjectEntity* serviceNameEntity);
 		
 		 /** Determine if the service exists on the system.
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
