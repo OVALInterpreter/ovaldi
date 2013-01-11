@@ -290,7 +290,7 @@ Item* RegKeyEffectiveRightsProbe::GetEffectiveRights ( HKEY keyHandle, string hi
     Item* item = NULL;
     PSID pSid = NULL;
     PACCESS_MASK pAccessRights = NULL;
-    string registryKey = RegistryFinder::BuildRegistryKey ( ( const string ) RegistryFinder::ConvertHiveForWindowsObjectName ( hiveStr ), ( const string ) keyStr );
+    //string registryKey = RegistryFinder::BuildRegistryKey ( ( const string ) RegistryFinder::ConvertHiveForWindowsObjectName ( hiveStr ), ( const string ) keyStr );
     string baseErrMsg = "Error unable to get effective rights for trustee: " + trusteeNameStr + " from dacl for registry key: " + RegistryFinder::BuildRegistryKey ( ( const string ) hiveStr, ( const string ) keyStr );
 
     try {
