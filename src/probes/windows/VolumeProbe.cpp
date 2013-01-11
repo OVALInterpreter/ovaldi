@@ -130,7 +130,7 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
 			
 			if ( error == ERROR_PATH_NOT_FOUND ){
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST));				
+				item->AppendElement(new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST));				
 			}else{
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ));

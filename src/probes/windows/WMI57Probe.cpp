@@ -246,7 +246,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 			
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("result", fieldEntityValues, OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
 				break;
 			}else {
 				
@@ -382,7 +382,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					if ( fieldEntityValues.size() ){
 						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_EXISTS));
 					}else{
-						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("result","",OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));
 					}
 				}else {
 					/*
