@@ -138,13 +138,11 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
             if ( this->ServiceExists ( serviceNameEntity->GetValue(), true ) ) {
                 theServices->insert ( serviceNameEntity->GetValue() );
             }
-		}else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
+		}else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL  || 
+				   serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL || 
+				   serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
             theServices = this->GetMatchingServices ( serviceNameEntity);
-        } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_NOT_EQUAL ) {
-            theServices = this->GetMatchingServices ( serviceNameEntity);
-        }else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH ) {
-            theServices = this->GetMatchingServices ( serviceNameEntity );
-        } 
+        }
 
     } else {
         // Get all services
@@ -209,7 +207,6 @@ auto_ptr<StringSet> WindowsServicesProbe::GetMatchingServices (ObjectEntity* ser
 	}
 	else if(serviceNameEntity->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH){
 		for ( StringSet::iterator iterator = services->begin() ; iterator != services->end() ; iterator++ ) {
-		    
 			if(EntityComparator::CompareString(OvalEnum::OPERATION_PATTERN_MATCH, serviceNameEntity->GetValue(), *iterator) == OvalEnum::RESULT_TRUE){
 				matchingServices->insert ( *iterator );
 			}
@@ -304,6 +301,9 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 	// to a lot more processes.
 	PrivilegeGuard pg(SE_DEBUG_NAME, false);
 
+	item = this->CreateItem();
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+
     // open service
     schService = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_CONFIG); 
     AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schServiceCloser(schService, CloseServiceHandle, "ServiceCloser");
@@ -311,7 +311,10 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
     if (schService == NULL){  
 		 string logMsg = "ERROR: The function OpenService() could not access a service on the system. Microsoft System Error " + Common::ToString (GetLastError()) + " - " + WindowsCommon::GetErrorMessage(GetLastError());
 		 Log::Info(logMsg);
-		 return NULL;
+
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+		item->AppendMessage(new OvalMessage(logMsg));
+		return item;
     }
 
     // Get the configuration information.
@@ -324,13 +327,19 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 			if(lpsc == NULL){
 				string logMsg = "ERROR: The function malloc() failed due to insufficient system memory.";
 				Log::Info(logMsg);
-				return NULL;
+				
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+				item->AppendMessage(new OvalMessage(logMsg));
+				return item;
 			}
 
         }else{
 			string logMsg = "ERROR: The function QueryServiceConfig() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
-			return NULL;
+
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+				item->AppendMessage(new OvalMessage(logMsg));
+				return item;
 		}
     }
   
@@ -338,7 +347,10 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		string logMsg = "ERROR: The function QueryServiceConfig() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		Log::Info(logMsg);
 		free(lpsc);
-		return NULL;
+
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+		item->AppendMessage(new OvalMessage(logMsg));
+		return item;
 	}
 
     if( !QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &dwBytesNeeded)){
@@ -351,14 +363,20 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 				string logMsg = "ERROR: The function malloc() failed due to insufficient system memory.";
 				Log::Info(logMsg);
 				free(lpsc);
-				return NULL;
+
+				item->SetStatus(OvalEnum::STATUS_ERROR);
+				item->AppendMessage(new OvalMessage(logMsg));
+				return item;
 			}
 
 		}else{
 			string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
 			free(lpsc);
-			return NULL;
+
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(logMsg));
+			return item;
 		}
     }
  
@@ -367,11 +385,11 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		Log::Info(logMsg);
 		free(lpsc);
 		free(lpsd);
-		return NULL;
-	 }
 
-	item = this->CreateItem();
-	item->SetStatus(OvalEnum::STATUS_EXISTS);
+		item->SetStatus(OvalEnum::STATUS_ERROR);
+		item->AppendMessage(new OvalMessage(logMsg));
+		return item;
+	 }
 	
 	item->AppendElement(new ItemEntity("service_name", serviceName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	
@@ -435,8 +453,10 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
     if (schService2 == NULL){  
 		 string logMsg = "ERROR: The function OpenService() could not access a service on the system.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 		 Log::Info(logMsg);
-		 delete item;
-		 return NULL;
+
+		 item->SetStatus(OvalEnum::STATUS_ERROR);
+		 item->AppendMessage(new OvalMessage(logMsg));
+		 return item;
     }
 
 	if (!QueryServiceStatusEx( 
@@ -448,17 +468,17 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 		{
 			string logMsg = "ERROR: The function QueryServiceStatusEx() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
 			Log::Info(logMsg);
-			delete item;
-			return NULL;
+
+			item->SetStatus(OvalEnum::STATUS_ERROR);
+			item->AppendMessage(new OvalMessage(logMsg));
+			return item;
 	}
 	
 	item->AppendElement(new ItemEntity("current_state", CurrentStateToString(ssStatus.dwCurrentState), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	
 	controlType = WindowsServicesProbe::ControlToString(ssStatus.dwControlsAccepted);
 	if(!controlType.empty()){
-
 		for(vector<string>::iterator it = controlType.begin(); it != controlType.end(); ++it) {
-
 			item->AppendElement(new ItemEntity("controls_accepted", *it, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		}
 	}else{
@@ -467,7 +487,6 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 
 	// startName can be blank, so we don't check its length like we do with the other entities
 	item->AppendElement(new ItemEntity("start_name", startName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	
 	
 	if(!path.empty()){
 		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
