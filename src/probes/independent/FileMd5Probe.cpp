@@ -113,16 +113,13 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 				// check if the code should report that the filename does not exist.
 				StringVector fileNames;
 				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
-					StringVector::iterator iterator;
-					for(iterator = fileNames.begin(); iterator != fileNames.end(); iterator++) {
 
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						ADD_WINDOWS_VIEW_ENTITY
-						collectedItems->push_back(item);
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 					
 				} else {
 
@@ -156,15 +153,11 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 		if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
 
 			Item* item = NULL;
-			StringVector::iterator iterator;
-			for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-
-				item = this->CreateItem();
-				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-				ADD_WINDOWS_VIEW_ENTITY
-				collectedItems->push_back(item);
-			}
+			item = this->CreateItem();
+			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+			item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+			ADD_WINDOWS_VIEW_ENTITY
+			collectedItems->push_back(item);
 		}
 	}
 	delete filePaths;
