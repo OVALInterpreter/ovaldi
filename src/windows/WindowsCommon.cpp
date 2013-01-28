@@ -213,7 +213,7 @@ bool WindowsCommon::GetTextualSid(PSID pSid, string* TextualSid) {
 		*TextualSid = sidCStr;
 #endif
 		LocalFree(sidCStr);
-		return true;
+		return true;	
 	}
 
 	return false;
@@ -320,6 +320,7 @@ StringSet* WindowsCommon::GetAllGroups() {
 bool WindowsCommon::IsGroup(string trusteeName) {
 	DWORD sidSize = 128;
 	DWORD domainSize = 128;
+	DWORD error;
 	//DWORD zero = 0;
 	SID_NAME_USE sidUse;
 	BOOL retVal = FALSE;
@@ -343,11 +344,10 @@ bool WindowsCommon::IsGroup(string trusteeName) {
 								domain.get(),									// domain name
 								&domainSize,							// size of domain name
 								&sidUse);								// SID-type indicator
-
-	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+		error = GetLastError();
+	} while (!retVal && error == ERROR_INSUFFICIENT_BUFFER);
 
 	if(retVal == FALSE) {	
-		DWORD error = GetLastError();
 		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
 			throw Exception("Unable to locate account: " + trusteeName + ". " + WindowsCommon::GetErrorMessage(error), ERROR_NOTICE);
 		} else {
@@ -471,7 +471,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 
 	} catch(...) {
 		if(localGroupName != NULL) {
-			delete localGroupName;
+			delete[] localGroupName;
 		}
 		
 		if(userInfo != NULL) {
@@ -482,7 +482,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 	}
 
 	if(localGroupName != NULL) {
-		delete localGroupName;
+		delete[] localGroupName;
 	}
 	
 	if(userInfo != NULL) {
@@ -1355,6 +1355,7 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 	FreeGuard<TCHAR> domain;
 	DWORD sidSize = 128;
 	DWORD domainSize = 128;
+	DWORD error;
 	SID_NAME_USE sid_type = SidTypeUnknown;
 	BOOL retVal = FALSE;
 
@@ -1374,11 +1375,10 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 								   domain.get(),										// domain name
 								   &domainSize,									// size of domain name
 								   &sid_type);									// SID-type indicator
-
-	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+		error = GetLastError();
+	} while (!retVal && error == ERROR_INSUFFICIENT_BUFFER);
 
 	if(!retVal) {
-		DWORD error = GetLastError();
 		if (error == ERROR_NONE_MAPPED)
 			return false;
 		if(error == ERROR_TRUSTED_RELATIONSHIP_FAILURE) {
