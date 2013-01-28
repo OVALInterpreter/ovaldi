@@ -50,7 +50,9 @@ bool Filter::DoFilter(Item* item) {
 
 	// for a filter really want to convert the result to a boolean
 	if (result != OvalEnum::RESULT_TRUE && result != OvalEnum::RESULT_FALSE)
-		throw AbsStateException("Filter::ApplyFilter method unable to convert result value to a boolean. Found result: " + OvalEnum::ResultToString(result));
+		throw AbsStateException("Filtering failed: analysis of an item did "
+			"not result in a true/false result.  Found result: " +
+			OvalEnum::ResultToString(result));
 
 	return (result == OvalEnum::RESULT_TRUE && !this->IsExcluding()) ||
 		(result == OvalEnum::RESULT_FALSE && this->IsExcluding());
