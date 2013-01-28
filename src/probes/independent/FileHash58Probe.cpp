@@ -28,9 +28,6 @@
 //
 //****************************************************************************************//
 
-#include <fstream>
-#include <iomanip>
-#include <sstream>
 #include <list>
 
 #ifdef WIN32
@@ -151,36 +148,23 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 				// check if the code should report that the filename does not exist.
 				StringVector fileNames;
 				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
-					StringVector::iterator iterator;
-					for(iterator = fileNames.begin(); iterator != fileNames.end(); iterator++) {
-						for (list<ItemEntity>::iterator itemEntityIter = hashTypeItemEntities.begin();
-								itemEntityIter != hashTypeItemEntities.end();
-								++itemEntityIter) {
 
-							item = this->CreateItem();
-							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-							item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-							item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-							item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-							item->AppendElement(new ItemEntity(*itemEntityIter));
-							ADD_WINDOWS_VIEW_ENTITY
-							collectedItems->push_back(item);
-						}
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 					
 				} else {
 
-					for (list<ItemEntity>::iterator itemEntityIter = hashTypeItemEntities.begin();
-							itemEntityIter != hashTypeItemEntities.end();
-							++itemEntityIter) {
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_ERROR);
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity(*itemEntityIter));
-						ADD_WINDOWS_VIEW_ENTITY
-						item->AppendMessage(new OvalMessage("Can't compute the hash of a directory"));
-						collectedItems->push_back(item);
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_ERROR);
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					ADD_WINDOWS_VIEW_ENTITY
+					item->AppendMessage(new OvalMessage("Can't compute the hash of a directory"));
+					collectedItems->push_back(item);
 
 				}
 
@@ -224,29 +208,21 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 
 				// build path ObjectEntity to pass to ReportPathDoesNotExist to retrieve the status of the path value
 				ObjectEntity* pathStatus = new ObjectEntity("path","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
-				// build filename ObjectEntity to pass to ReportFileNameDoesNotExist to retrieve the status of the filename value
-				ObjectEntity* fileNameStatus = new ObjectEntity("filename","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
 				
 				for(StringVector::iterator iterator = fpaths.begin(); iterator != fpaths.end(); iterator++) {
-					for (list<ItemEntity>::iterator itemEntityIter = hashTypeItemEntities.begin();
-							itemEntityIter != hashTypeItemEntities.end();
-							++itemEntityIter) {
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						fpComponents = Common::SplitFilePath(*iterator);
-						pathStatus->SetValue(fpComponents->first);
-						fileNameStatus->SetValue(fpComponents->second);
-						item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity(*itemEntityIter));
-						ADD_WINDOWS_VIEW_ENTITY
-						collectedItems->push_back(item);
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					fpComponents = Common::SplitFilePath(*iterator);
+					pathStatus->SetValue(fpComponents->first);
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 						
-						if ( fpComponents != NULL ){
-							delete fpComponents;
-							fpComponents = NULL;
-						}
+					if ( fpComponents != NULL ){
+						delete fpComponents;
+						fpComponents = NULL;
 					}
 				}
 
@@ -254,28 +230,16 @@ ItemVector* FileHash58Probe::CollectItems(Object* object) {
 					delete pathStatus;
 					pathStatus = NULL;
 				}
-				if ( fileNameStatus != NULL ){
-					delete fileNameStatus;
-					fileNameStatus = NULL;
-				}
 			}
 		}else{
 			StringVector paths;
 			if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
 				Item* item = NULL;
-				StringVector::iterator iterator;
-				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-					for (list<ItemEntity>::iterator itemEntityIter = hashTypeItemEntities.begin();
-							itemEntityIter != hashTypeItemEntities.end();
-							++itemEntityIter) {
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity(*itemEntityIter));
-						ADD_WINDOWS_VIEW_ENTITY
-						collectedItems->push_back(item);
-					}
-				}
+				item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				ADD_WINDOWS_VIEW_ENTITY
+				collectedItems->push_back(item);
 			}
 		}
 	}
