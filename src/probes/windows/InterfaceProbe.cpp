@@ -242,6 +242,7 @@ void InterfaceProbe::GetAllInterfaces() {
 				break;
 
 		Item *item = CreateItem();
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		interfaces->push_back(item);
 
 		PMIB_IFROW ifRow = &ifTable->table[ifIdx];
