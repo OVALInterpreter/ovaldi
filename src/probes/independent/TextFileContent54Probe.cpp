@@ -122,17 +122,14 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 				// check if the code should report that the filename does not exist.
 				StringVector fileNames;
 				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
-					StringVector::iterator iterator;
-					for(iterator = fileNames.begin(); iterator != fileNames.end(); iterator++) {
 
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						ADD_WINDOWS_VIEW_ENTITY
-						collectedItems->push_back(item);
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 				}
 			} else {
 				FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
@@ -153,18 +150,15 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 
 				// build path ObjectEntity to pass to ReportPathDoesNotExist to retrieve the status of the path value
 				ObjectEntity* pathStatus = new ObjectEntity("path","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
-				// build filename ObjectEntity to pass to ReportFileNameDoesNotExist to retrieve the status of the filename value
-				ObjectEntity* fileNameStatus = new ObjectEntity("filename","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
 				
 				for(StringVector::iterator iterator = fpaths.begin(); iterator != fpaths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
-					fileNameStatus->SetValue(fpComponents->second);
 					item->AppendElement(new ItemEntity("filepath","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 					
@@ -178,23 +172,16 @@ ItemVector* TextFileContent54Probe::CollectItems(Object* object) {
 					delete pathStatus;
 					pathStatus = NULL;
 				}
-				if ( fileNameStatus != NULL ){
-					delete fileNameStatus;
-					fileNameStatus = NULL;
-				}
 			}
 		}else{
 			StringVector paths;
 			if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
 				Item* item = NULL;
-				StringVector::iterator iterator;
-				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					ADD_WINDOWS_VIEW_ENTITY
-					collectedItems->push_back(item);
-				}
+				item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				ADD_WINDOWS_VIEW_ENTITY
+				collectedItems->push_back(item);
 			}
 		}
 	}
