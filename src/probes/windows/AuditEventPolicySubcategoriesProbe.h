@@ -32,7 +32,7 @@
 
 #pragma warning(disable:4786)
 
-#include <initguid.h>
+#include <guiddef.h>
 
 #include "AbsProbe.h"
 #include "WindowsCommon.h"
