@@ -459,7 +459,6 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path/*, StringVector* p
 		
 		if(path->GetVarRef() == NULL) {
 			if(!this->PathExists(path->GetValue())) {
-				//paths->push_back(path->GetValue());
 				result = true;
 			}
 		} else {
@@ -467,7 +466,6 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path/*, StringVector* p
 			VariableValueVector::iterator iterator;
 			for(iterator = path->GetVarRef()->GetValues()->begin(); iterator != path->GetVarRef()->GetValues()->end(); iterator++) {
 				if(!this->PathExists((*iterator)->GetValue())) {
-					//paths->push_back((*iterator)->GetValue());
 					result = true;
 					break;
 				}
