@@ -450,7 +450,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 	return filePathsFound.release();
 }
 
-bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path/*, StringVector* paths*/) {
+bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path) {
 
 	bool result = false;
 	
@@ -476,7 +476,7 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path/*, StringVector* p
 	return  result;
 }
 
-bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileName/*, StringVector *fileNames*/) {
+bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileName) {
 
 	bool result = false;
 	
