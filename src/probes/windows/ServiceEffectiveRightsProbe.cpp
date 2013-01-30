@@ -159,9 +159,8 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
                 }
             } else {
                 Log::Debug ( "No matching SIDs found when getting the effective rights for object: " + object->GetId() );
-                StringSet trusteeSIDs;
 
-                if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, &trusteeSIDs, true ) ) {
+                if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, true ) ) {
                     for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );

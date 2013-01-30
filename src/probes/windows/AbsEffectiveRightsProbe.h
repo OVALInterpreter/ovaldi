@@ -83,17 +83,13 @@ class AbsEffectiveRightsProbe : public AbsProbe {
             If a trustees operator is set to OPERATOR_EQUALS and the trustee does not exist
             the caller should report that the trustee was not found. When getting the value of the
             trustee to check its existence, we need to look for either a simple element value or a
-            variable element with one or more values. If the return value is true, the trustees
-            StringSet* parameter contains the set of trustees to report as not existing.
-            Otherwise, the the trustee's parameter is NULL. The caller is responsible for
-            making sure that any memory allocated for the trustee's parameter is cleaned up. The
-            trustee's parameter should be input as NULL when the function is called.
+            variable element with one or more values. 
+
             @param trusteeEntity A pointer to the trustee ObjectEntity that specifies the trustees whose existence should be checked.
-            @param trustees A pointer to a StringSet that contains the non-existent trustees.
 			@param isSID A boolean value that specifies whether or not the trustee entity is a SID.
             @return A boolean value that specifies whether or not the calling probe should report that a trustee does not exist.
         */
-        bool ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, StringSet* trustees, bool isSID );
+        bool ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, bool isSID );
 };
 
 #endif

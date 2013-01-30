@@ -111,8 +111,7 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 				Item* item = NULL;
 
 				// check if the code should report that the filename does not exist.
-				StringVector fileNames;
-				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
+				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName)) {
 
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
@@ -149,8 +148,7 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 
 	} else {
 		// if no filepaths check if the code should report that the path does not exist
-		StringVector paths;
-		if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+		if(fileFinder.ReportPathDoesNotExist(path)) {
 
 			Item* item = NULL;
 			item = this->CreateItem();

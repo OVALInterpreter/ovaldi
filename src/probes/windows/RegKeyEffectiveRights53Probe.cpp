@@ -192,9 +192,8 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
                     }
                 } else {
                     Log::Debug ( "No matching trustees found when getting effective rights for object: " + object->GetId() );
-                    StringSet* trusteeSIDs = new StringSet();
 
-                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, trusteeSIDs, true ) ) {
+                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, true ) ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
@@ -210,9 +209,6 @@ ItemVector* RegKeyEffectiveRights53Probe::CollectItems ( Object* object ) {
 							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
-
-                    trusteeSIDs->clear();
-                    delete trusteeSIDs;
                 }
 
             } catch ( ProbeException ex ) {

@@ -127,9 +127,8 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
             if ( fp->second.compare ( "" ) == 0 && !fileName->GetNil() ) {
                 Item* item = NULL;
                 // Check if the code should report that the filename does not exist.
-                StringVector fileNames;
 
-                if ( fileFinder.ReportFileNameDoesNotExist ( fp->first, fileName, &fileNames ) ) {
+                if ( fileFinder.ReportFileNameDoesNotExist ( fp->first, fileName ) ) {
                     item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                     item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
@@ -207,9 +206,8 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
                         }
                     } else {
                         Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
-                        StringSet* trusteeNames = new StringSet();
 
-                        if ( this->ReportTrusteeDoesNotExist ( trusteeName, trusteeNames, false ) ) {
+                        if ( this->ReportTrusteeDoesNotExist ( trusteeName, false ) ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
@@ -219,10 +217,6 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
 								(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                             collectedItems->push_back ( item );
                         }
-
-                        trusteeNames->clear();
-                        delete trusteeNames;
-                        trusteeNames = NULL;
                     }
 
                 } catch ( ProbeException ex ) {
@@ -242,9 +236,7 @@ ItemVector* FileAuditedPermissionsProbe::CollectItems ( Object* object ) {
 
     } else {
         // If there are no file paths check to see if the code should report that the path does not exist.
-        StringVector paths;
-
-        if ( fileFinder.ReportPathDoesNotExist ( path, &paths ) ) {
+        if ( fileFinder.ReportPathDoesNotExist ( path ) ) {
             Item* item = NULL;
 
             item = this->CreateItem();

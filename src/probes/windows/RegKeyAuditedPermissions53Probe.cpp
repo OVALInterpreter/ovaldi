@@ -177,9 +177,8 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                     }
                 } else {
                     Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
-                    StringSet trusteeSIDs;
 
-                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, &trusteeSIDs, true ) ) {
+                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, true ) ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );

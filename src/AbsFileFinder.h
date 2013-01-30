@@ -87,7 +87,7 @@ public:
 		that any memory allocated for the paths parameter is cleaned up. The paths paramter
 		should be input as NULL when the function is called.
 	*/
-	bool ReportPathDoesNotExist(ObjectEntity* path, StringVector* paths);
+	bool ReportPathDoesNotExist(ObjectEntity* path);
 
 	/** Return true if the calling probe should report that the filename does not exist.
 		If a filename's operator is set to OPERATOR_EQUALS and the file name does not exist
@@ -99,7 +99,7 @@ public:
 		that any memory allocated for the fileNames parameter is cleaned up. The fileNames paramter
 		should be input as NULL when the function is called.
 	*/
-	bool ReportFileNameDoesNotExist(std::string path, ObjectEntity* fileName, StringVector* fileNames);
+	bool ReportFileNameDoesNotExist(std::string path, ObjectEntity* fileName);
 
 	/** Return true if the calling probe should report that the filepath does not exist.
 	 *  @param filePath A ObjectEntity that represents the filePath entity in an Object as defined in the OVAL Definition Schema.

@@ -178,21 +178,20 @@ void AbsEffectiveRightsProbe::GetMatchingTrustees ( string trusteePatternStr, St
     }
 }
 
-bool AbsEffectiveRightsProbe::ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, StringSet* trustees, bool isSID ) {
+bool AbsEffectiveRightsProbe::ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, bool isSID ) {
     bool result = false;
 
     if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeEntity->GetNil() ) {
         if ( trusteeEntity->GetVarRef() == NULL ) {
             if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( trusteeEntity->GetValue() ) ) || (!isSID && !WindowsCommon::TrusteeNameExists ( trusteeEntity->GetValue() ) ) ) {
-                trustees->insert ( trusteeEntity->GetValue() );
                 result = true;
             }
 
         } else {
             for ( VariableValueVector::iterator iterator = trusteeEntity->GetVarRef()->GetValues()->begin(); iterator != trusteeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
 				if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( (*iterator)->GetValue() ) ) || ( !isSID && !WindowsCommon::TrusteeNameExists ( (*iterator)->GetValue() ) ) ) {
-                    trustees->insert ( ( *iterator )->GetValue() );
                     result = true;
+					break;
                 }
             }
         }

@@ -450,7 +450,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 	return filePathsFound.release();
 }
 
-bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* paths) {
+bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path/*, StringVector* paths*/) {
 
 	bool result = false;
 	
@@ -459,7 +459,7 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 		
 		if(path->GetVarRef() == NULL) {
 			if(!this->PathExists(path->GetValue())) {
-				paths->push_back(path->GetValue());
+				//paths->push_back(path->GetValue());
 				result = true;
 			}
 		} else {
@@ -467,8 +467,9 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 			VariableValueVector::iterator iterator;
 			for(iterator = path->GetVarRef()->GetValues()->begin(); iterator != path->GetVarRef()->GetValues()->end(); iterator++) {
 				if(!this->PathExists((*iterator)->GetValue())) {
-					paths->push_back((*iterator)->GetValue());
+					//paths->push_back((*iterator)->GetValue());
 					result = true;
+					break;
 				}
 			}
 		}
@@ -477,7 +478,7 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 	return  result;
 }
 
-bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileName, StringVector *fileNames) {
+bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileName/*, StringVector *fileNames*/) {
 
 	bool result = false;
 	
@@ -487,17 +488,15 @@ bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileNa
 		
 		if(fileName->GetVarRef() == NULL) {
 			if(!this->FileNameExists(path, fileName->GetValue())) {
-				fileNames->push_back(fileName->GetValue());
 				result = true;
 			}
 		} else {
-
 			
 			VariableValueVector::iterator iterator;
 			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
 				if(!this->FileNameExists(path, (*iterator)->GetValue())) {
-					fileNames->push_back((*iterator)->GetValue());
 					result = true;
+					break;
 				}
 			}
 		}

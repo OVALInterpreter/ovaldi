@@ -183,9 +183,8 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
                     }
                 } else {
                     Log::Debug ( "No matching trustees found when getting effective rights for object: " + object->GetId() );
-                    StringSet* trusteeNames = new StringSet();
 
-                    if ( this->ReportTrusteeDoesNotExist ( trusteeNameEntity, trusteeNames, false ) ) {
+                    if ( this->ReportTrusteeDoesNotExist ( trusteeNameEntity, false ) ) {
                         StringSet::iterator iterator;
 
                         Item* item = this->CreateItem();
@@ -197,9 +196,6 @@ ItemVector* RegKeyEffectiveRightsProbe::CollectItems ( Object* object ) {
 							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
-
-                    trusteeNames->clear();
-                    delete trusteeNames;
                 }
 
             } catch ( ProbeException ex ) {

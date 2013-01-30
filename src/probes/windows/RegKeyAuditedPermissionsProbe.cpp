@@ -172,9 +172,8 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
                     }
                 } else {
                     Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
-                    StringSet* trusteeNames = new StringSet();
 
-                    if ( this->ReportTrusteeDoesNotExist ( trusteeNameEntity, trusteeNames, false ) ) {
+                    if ( this->ReportTrusteeDoesNotExist ( trusteeNameEntity, false ) ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
@@ -184,10 +183,6 @@ ItemVector* RegKeyAuditedPermissionsProbe::CollectItems ( Object* object ) {
 							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
                         collectedItems->push_back ( item );
                     }
-
-                    trusteeNames->clear();
-                    delete trusteeNames;
-                    trusteeNames = NULL;
                 }
             } catch ( ProbeException ex ) {
                 Log::Message ( "ProbeException caught when collecting: " + object->GetId() + " " +  ex.GetErrorMessage() );

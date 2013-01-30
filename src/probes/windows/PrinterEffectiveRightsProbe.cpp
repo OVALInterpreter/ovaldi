@@ -149,16 +149,13 @@ ItemVector* PrinterEffectiveRightsProbe::CollectItems ( Object* object ) {
                 }
             } else {
                 Log::Debug ( "No matching SIDs found when getting the effective rights for object: " + object->GetId() );
-                StringSet* trusteeSIDs = new StringSet();
 
-				if ( this->ReportTrusteeDoesNotExist( trusteeSIDEntity, trusteeSIDs, true ) ) {
-                    for ( StringSet::iterator iterator2 = trusteeSIDs->begin(); iterator2 != trusteeSIDs->end(); iterator2++ ) {
-                        Item* item = this->CreateItem();
-                        item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "printer_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
-                        collectedItems->push_back ( item );
-                    }
+				if ( this->ReportTrusteeDoesNotExist( trusteeSIDEntity, true ) ) {
+                    Item* item = this->CreateItem();
+                    item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+                    item->AppendElement ( new ItemEntity ( "printer_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                    item->AppendElement ( new ItemEntity ( "trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                    collectedItems->push_back ( item );
                 }
             }
 
