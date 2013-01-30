@@ -112,7 +112,7 @@ Item* UserSid55Probe::GetUserSidInfo(string userSid) {
 	if (!WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain, &isGroup)) {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("user_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		return item;
 	}
 
@@ -159,7 +159,7 @@ Item* UserSid55Probe::GetUserSidInfo(string userSid) {
 	} else {
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("user_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 		
 	delete groups;
