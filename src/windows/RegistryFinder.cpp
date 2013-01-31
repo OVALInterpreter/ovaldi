@@ -308,82 +308,52 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
     return names;
 }
 
-StringSet* RegistryFinder::ReportHiveDoesNotExist ( ObjectEntity *hiveEntity ) {
-    StringSet* hives = NULL;
-
+bool RegistryFinder::ReportHiveDoesNotExist ( ObjectEntity *hiveEntity ) {
     if ( hiveEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
         if ( hiveEntity->GetVarRef() == NULL ) {
-            if ( !this->HiveExists ( hiveEntity->GetValue() ) ) {
-                hives = new StringSet();
-                hives->insert ( hiveEntity->GetValue() );
-            }
-
+            if ( !this->HiveExists ( hiveEntity->GetValue() ) )
+				return true;
         } else {
             for ( VariableValueVector::iterator iterator = hiveEntity->GetVarRef()->GetValues()->begin(); iterator != hiveEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->HiveExists ( ( *iterator )->GetValue() ) ) {
-                    if ( hives == NULL ) {
-                        hives = new StringSet();
-                    }
-
-                    hives->insert ( ( *iterator )->GetValue() );
-                }
+                if ( !this->HiveExists ( ( *iterator )->GetValue() ) )
+					return true;
             }
         }
     }
 
-    return hives;
+    return false;
 }
 
-StringSet* RegistryFinder::ReportKeyDoesNotExist ( string hiveStr, ObjectEntity *keyEntity ) {
-    StringSet* keys = NULL;
-
+bool RegistryFinder::ReportKeyDoesNotExist ( string hiveStr, ObjectEntity *keyEntity ) {
     if ( keyEntity->GetOperation() == OvalEnum::OPERATION_EQUALS && !keyEntity->GetNil() ) {
         if ( keyEntity->GetVarRef() == NULL ) {
-            if ( !this->KeyExists ( hiveStr, keyEntity->GetValue() ) ) {
-                keys = new StringSet();
-                keys->insert ( keyEntity->GetValue() );
-            }
-
+            if ( !this->KeyExists ( hiveStr, keyEntity->GetValue() ) )
+				return true;
         } else {
             for ( VariableValueVector::iterator iterator = keyEntity->GetVarRef()->GetValues()->begin(); iterator != keyEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->KeyExists ( hiveStr, ( *iterator )->GetValue() ) ) {
-                    if ( keys == NULL ) {
-                        keys = new StringSet();
-                    }
-
-                    keys->insert ( ( *iterator )->GetValue() );
-                }
+                if ( !this->KeyExists ( hiveStr, ( *iterator )->GetValue() ) )
+					return true;
             }
         }
     }
 
-    return keys;
+    return false;
 }
 
-StringSet* RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keyStr, ObjectEntity *nameEntity ) {
-    StringSet* names = NULL;
-
+bool RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keyStr, ObjectEntity *nameEntity ) {
     if ( nameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS && !nameEntity->GetNil() ) {
         if ( nameEntity->GetVarRef() == NULL ) {
-            if ( !this->NameExists ( hiveStr, keyStr, nameEntity->GetValue() ) ) {
-                names = new StringSet();
-                names->insert ( nameEntity->GetValue() );
-            }
-
+            if ( !this->NameExists ( hiveStr, keyStr, nameEntity->GetValue() ) )
+				return true;
         } else {
             for ( VariableValueVector::iterator iterator = nameEntity->GetVarRef()->GetValues()->begin(); iterator != nameEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->NameExists ( hiveStr, keyStr, ( *iterator )->GetValue() ) ) {
-                    if ( names == NULL ) {
-                        names = new StringSet();
-                    }
-
-                    names->insert ( ( *iterator )->GetValue() );
-                }
+                if ( !this->NameExists ( hiveStr, keyStr, ( *iterator )->GetValue() ) )
+					return true;
             }
         }
     }
 
-    return names;
+    return false;
 }
 
 LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string keyStr, REGSAM access ) {

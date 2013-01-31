@@ -174,26 +174,26 @@ class RegistryFinder {
          */
         StringSet* GetNames ( std::string hiveStr, std::string keyStr, ObjectEntity* nameEntity );
 
-		/** Return a StringSet of hives, if any, that do not exist on the system.
+		/** Determine whether non-existence of a hive should be reported.
          *  @param hiveEntity A ObjectEntity that represents the hive entity in an Object as defined in the OVAL Definition Schema.
-         *  @return A StringSet that contains all of the names specified in the ObjectEntity that do not exist on the system.  If all of the hives exist on the system this method returns NULL.
+         *  @return true if non-existence should be reported, false otherwise
          */
-        StringSet* ReportHiveDoesNotExist ( ObjectEntity* hiveEntity );
+        bool ReportHiveDoesNotExist ( ObjectEntity* hiveEntity );
 
-        /** Return a StringSet of keys, if any, that do not exist on the system.
+        /** Determine whether non-existence of a key should be reported.
          *  @param hiveStr A string that contains the hive to be used during the matching process.
          *  @param keyEntity A ObjectEntity that represents the key entity in an Object as defined in the OVAL Definition Schema.
-         *  @return A StringSet that contains all of the keys specified in the ObjectEntity that do not exist on the system.  If all of the keys exist on the system this method returns NULL.
+         *  @return true if non-existence should be reported, false otherwise
          */
-        StringSet* ReportKeyDoesNotExist ( std::string hiveStr, ObjectEntity* keyEntity );
+        bool ReportKeyDoesNotExist ( std::string hiveStr, ObjectEntity* keyEntity );
 
-        /** Return a StringSet of names, if any, that do not exist on the system.
+        /** Determine whether non-existence of a name should be reported.
          *  @param hiveStr A string that contains the hive to be used during the matching process.
          *  @param keyStr A string that contains the key to be used during the matching process.
          *  @param nameEntity A ObjectEntity that represents the name entity in an Object as defined in the OVAL Definition Schema.
-         *  @return A StringSet that contains all of the names specified in the ObjectEntity that do not exist on the system.  If all of the names exist on the system this method returns NULL.
+         *  @return true if non-existence should be reported, false otherwise
          */
-        StringSet* ReportNameDoesNotExist ( std::string hiveStr, std::string keyString, ObjectEntity* nameEntity );
+        bool ReportNameDoesNotExist ( std::string hiveStr, std::string keyString, ObjectEntity* nameEntity );
 		
 		/**
 		 * Retrieve the handle of a specified registry key under the 
