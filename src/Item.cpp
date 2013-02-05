@@ -205,27 +205,23 @@ ItemEntityVector* Item::GetElementsByName(string elementName) {
 
 ItemEntity* Item::GetElementByName(string itemEntityNameStr) {
     
-    ItemEntityVector* matchingElements = new ItemEntityVector();
+	ItemEntity *ie = NULL;
 	ItemEntityVector::iterator iterator;
-
 	for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
 
-		ItemEntity* element = (ItemEntity*)(*iterator);
+		ItemEntity* element = *iterator;
 
-		if(element->GetName().compare(itemEntityNameStr) == 0) {
-			matchingElements->push_back(element);   
+		if(element->GetName() == itemEntityNameStr) {
+			if (ie) {
+				delete ie;
+				throw Exception("Error: This Item has contains multiple ItemEntities with the name '"+itemEntityNameStr+"'.");
+			} else
+				ie = new ItemEntity(*element);
 		}
 	}
     
-    switch ( matchingElements->size() ){
-        case 0:
-            return new ItemEntity();
-        case 1:
-            return new ItemEntity(*(matchingElements->front()));
-        default:
-            throw Exception("Error: This Item has contains multiple ItemEntities with the name '"+itemEntityNameStr+"'.");
-    }
-        
+	if (ie) return ie;
+	return new ItemEntity();
 }
 
 void Item::Parse(DOMElement* scItemElm) {
