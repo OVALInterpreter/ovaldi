@@ -132,7 +132,7 @@ install the supporting libraries.
        To compile and install the Xerces-C library (this example builds 32-bit
        xerces 2.7), simply run the following commands.
 
-           export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_7_0'
+           export XERCESCROOT=<path to xerces-c>/xerces-c-src_2_7_0
            cd $XERCESCROOT/src/xercesc
            ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
            make
@@ -152,8 +152,8 @@ install the supporting libraries.
 	   
        To compile and install the Xalan-C library simply run the following commands.
 	   
-           export XALANCROOT='<path to xalan-c>/xml-xalan/c'
-	       export XERCESCROOT='<install path of xerces-c>'
+           export XALANCROOT=<path to xalan-c>/xml-xalan/c
+	       export XERCESCROOT=<install path of xerces-c>
            cd $XALANCROOT
            ./runConfigure -p macosx -c gcc -x g++ -P 'install path'
            make
