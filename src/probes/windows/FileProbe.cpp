@@ -357,7 +357,14 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					pathStatus->SetValue(fpComponents->first);
 					ItemEntity* filepath = new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
 					item->AppendElement(filepath);
-					ItemEntity* path = new ItemEntity("path", "",  OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS);	
+					bool pathDoesntExist = fileFinder.ReportPathDoesNotExist(pathStatus);
+					ItemEntity *path;
+					if (pathDoesntExist)
+						path = new ItemEntity("path", "", 
+							OvalEnum::DATATYPE_STRING, 
+							OvalEnum::STATUS_DOES_NOT_EXIST);
+					else
+						path = new ItemEntity("path", fpComponents->first);	
 					item->AppendElement(path);
 					ItemEntity* filename = new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
 					item->AppendElement(filename);
