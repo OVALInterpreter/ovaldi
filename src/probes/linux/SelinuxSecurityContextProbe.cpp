@@ -415,7 +415,7 @@ namespace {
 						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 						fpComponents = Common::SplitFilePath(*iterator);
 						pathStatus.SetValue(fpComponents->first);
-						item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						if (fileFinder.ReportPathDoesNotExist(&pathStatus))
 							item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 						else
