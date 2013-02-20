@@ -47,7 +47,7 @@ EXECUTABLE = $(OUTDIR)/ovaldi
 # General options that should be used by g++.
 CPPFLAGS = -Wall -DDARWIN $(INCDIRS)
 
-LIBDIR = -L/usr/lib -L/usr/local/lib -L/opt/local/lib
+LIBDIR = -L/usr/lib -L/opt/local/lib
 
 # What libraries do we need?
 LIBS = -lxerces-c -lxalan-c -lpcre -lgcrypt -lldap -llber
