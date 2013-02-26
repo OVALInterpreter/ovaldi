@@ -224,7 +224,7 @@ string OvalEnum::DatatypeToString(OvalEnum::Datatype datatype){
 	//	Conver the Datatype value to a string
 	// -----------------------------------------------------------------------
 
-	string datatypeStr = "";
+	string datatypeStr;
 
 	switch(datatype) {
 		case (DATATYPE_STRING):
@@ -256,6 +256,9 @@ string OvalEnum::DatatypeToString(OvalEnum::Datatype datatype){
 			break;
 		case (DATATYPE_IPV4_ADDRESS):
 			datatypeStr = "ipv4_address";
+			break;
+		case (DATATYPE_IPV6_ADDRESS):
+			datatypeStr = "ipv6_address";
 			break;
 		default:	
 			throw Exception("OvalEnum::DatatypeToString - Error unsupported datatype.");
@@ -295,6 +298,8 @@ OvalEnum::Datatype OvalEnum::ToDatatype(string datatypeStr){
 		datatype = DATATYPE_RECORD;
 	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_IPV4_ADDRESS)) == 0) {
 		datatype = DATATYPE_IPV4_ADDRESS;
+	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_IPV6_ADDRESS)) == 0) {
+		datatype = DATATYPE_IPV6_ADDRESS;
 	} else {
 		throw Exception("OvalEnum::ToDatatype - Error unsupported datatype value: " + datatypeStr);
 	}
