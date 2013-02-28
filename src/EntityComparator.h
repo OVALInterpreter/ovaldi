@@ -90,6 +90,10 @@ public:
 		@return Returns the result of the comparison.
 	*/
 	static OvalEnum::ResultEnumeration CompareIpv4Address(OvalEnum::Operation op, std::string defValue, std::string scValue);
+	/** Compare two ipv6_address strings based on the input operation. 
+		@return Returns the result of the comparison.
+	*/
+	static OvalEnum::ResultEnumeration CompareIpv6Address(OvalEnum::Operation op, std::string defValue, std::string scValue);
 private:
 
 	/** 
