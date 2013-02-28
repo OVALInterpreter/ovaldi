@@ -33,7 +33,6 @@
 #include <typeinfo>
 #include <ostream>
 #include <cstring>  // for strerror(), memcmp()
-#include <cstdint>
 #include <iomanip>
 #include <sstream>
 #include <cctype>
@@ -43,9 +42,11 @@
 #  include <BaseTsd.h> // for UINT32
 #  define uint32_t UINT32
 #  include <ws2tcpip.h>
+#  include <cstdint>
 
 #  include <WindowsCommon.h>
 #else
+#  include <stdint.h> // our rhel5 gcc doesn't have <cstdint>.
 #  include <arpa/inet.h>
 #  include <cerrno>
 #endif
@@ -1293,9 +1294,9 @@ namespace {
 #else
 		int err = inet_pton(AF_INET6, ipPart.c_str(), &addr_);
 		if (!err)
-			throw Exception("Invalid ipv6 address syntax: "+addrStr);
+			throw Exception("Invalid ipv6 address: \""+addrStr+'"');
 		if (err < 0)
-			throw Exception("Error parsing ipv6 address ("+addrStr+"): " +
+			throw Exception("Error parsing ipv6 address \""+addrStr+"\": " +
 				strerror(errno)
 			);
 #endif
@@ -1507,6 +1508,14 @@ namespace {
 
 	ostream &operator<<(ostream &out, const Ipv6Address &addr) {
 
+
+		// store and then restore original stream flags
+		ios::fmtflags oldFlags = out.flags();
+		out << hex;
+
+// No ipv6 conversion functions are available on XP! :(
+#ifdef WIN32
+
 /* A very simple straightforward format: 4 chars per component,
    all uppercase letters, no "::".
 
@@ -1573,9 +1582,6 @@ namespace {
 			}
 		}
 
-		// store and then restore original stream flags
-		ios::fmtflags oldFlags = out.flags();
-		out << hex;
 
 		for (int byteIdx = 0; byteIdx < 16; ) {
 			if (bestZerosLength > 2 && byteIdx == bestZerosStartIdx) {
@@ -1595,6 +1601,23 @@ namespace {
 				byteIdx += 2;
 			}
 		}
+
+
+#else
+
+		char addrStr[INET6_ADDRSTRLEN];
+		in6_addr addrStruct = addr.getAddress();
+		if (!inet_ntop(AF_INET6, &addrStruct, addrStr, sizeof(addrStr))) {
+			out.flags(oldFlags);
+			// surely this is highly unlikely... :-P
+			throw Exception(string("Error converting ipv6 address to string: ")+
+							strerror(errno));
+		}
+		
+		
+		out << addrStr;
+
+#endif
 
 		if (addr.getPrefixSize() < 128)
 			out << '/' << dec << addr.getPrefixSize();
@@ -1646,7 +1669,7 @@ and want to retest... I wish we had a way to do unit tests...
 	try{Ipv6Address a("11:22:33:44::55:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
 	try{Ipv6Address a("::11:22:33:44:55:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
 	try{Ipv6Address a("11:22:33:44:55:66:77:88::");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
-	try{Ipv6Address a("11:22:33:44:55:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("11:22:33:44:00:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
 	try{Ipv6Address a("0ab0:000f:0:0:dd:0:0:0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
 	try{Ipv6Address a("0ab0:000f:0:0:0:dd:0:0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
 	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
@@ -1659,6 +1682,5 @@ and want to retest... I wish we had a way to do unit tests...
 	try{Ipv6Address a("/64");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
 	for(int i=0; i<129; ++i)
 		try{Ipv6Address a("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/"+Common::ToString(i));Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
-
 */
 
