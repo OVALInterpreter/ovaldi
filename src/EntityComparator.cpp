@@ -240,12 +240,14 @@ namespace {
 
 	in_addr dottedQuadToInAddr(const string &addrStr);
 
+#ifdef WIN32
 	/**
 	 * Convert the given string representation of an ipv6 address
 	 * to an in6_addr struct.
 	 * \throw Exception if the address is syntactically invalid.
 	 */
 	in6_addr toIn6Addr(const string &addrStr);
+#endif
 
 	template<typename T>
 	OvalEnum::ResultEnumeration CompareIntOperation(T defInt, T scInt, OvalEnum::Operation op);
@@ -1354,6 +1356,7 @@ namespace {
 		return result;
 	}
 
+#ifdef WIN32
 	in6_addr toIn6Addr(const string &addrStr) {
 
 		// sanity checks and special cases
@@ -1494,6 +1497,7 @@ namespace {
 
 		return addr;
 	}
+#endif
 
 	ostream &operator<<(ostream &out, const Ipv4Address &addr) {
 		// inet_ntoa is gonna expect network byte order, so I gotta
