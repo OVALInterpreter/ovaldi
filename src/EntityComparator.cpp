@@ -38,9 +38,6 @@
 #include <cctype>
 
 #ifdef WIN32
-// stupid windows doesn't have stdint.h.... sigh
-#  include <BaseTsd.h> // for UINT32
-#  define uint32_t UINT32
 #  include <ws2tcpip.h>
 #  include <cstdint>
 
