@@ -208,6 +208,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 				result = EntityComparator::CompareRecord(this->GetOperation(), this->GetValues(), scElement->GetValues());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
 				result = EntityComparator::CompareIpv4Address(this->GetOperation(), this->GetValue(), scElement->GetValue());
+			} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV6_ADDRESS) {
+				result = EntityComparator::CompareIpv6Address(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			}
 
 		} else {

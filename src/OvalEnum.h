@@ -80,7 +80,8 @@ public:
 					DATATYPE_FLOAT,
 					DATATYPE_VERSION,
 					DATATYPE_RECORD,
-					DATATYPE_IPV4_ADDRESS};
+					DATATYPE_IPV4_ADDRESS,
+					DATATYPE_IPV6_ADDRESS};
 	static std::string DatatypeToString(OvalEnum::Datatype datatype);
 	static OvalEnum::Datatype ToDatatype(std::string datatypeStr);
 
