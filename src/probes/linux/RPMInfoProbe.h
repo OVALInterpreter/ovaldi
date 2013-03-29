@@ -95,14 +95,10 @@ private:
 	void GetRPMInfo(std::string name, ItemVector* items, BehaviorVector* beh);
 
 	/**
-	   Read readErrh and readh until there is no more data to be read. Wait for the 
-       child process to complete. Return a the result string with the data.
-    */
-	std::string ParentGetSigKeyId(int readErrh, int readh, int pid);
-	void ChildGetSigKeyId(int writeErrh, int writeh, std::string rpmName);
+	 * Gets the signature_keyid entity value of the given RPM.  If
+	 * one is not found, an empty string is returned.
+	 */
 	std::string GetSigKeyId(std::string rpmName);
-
-	std::string readHeaderBinary(Header header, int_32 tag_id);
 
 	/**
 	 * Reads a string value from the given header.  val receives the result.  If
