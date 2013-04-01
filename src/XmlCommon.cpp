@@ -586,11 +586,11 @@ void XmlCommon::AddSchemaLocation(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *do
 
 string XmlCommon::GetNamespace(DOMElement *element) {
 
-	string xmlns = "";
-	xmlns = XmlCommon::ToString(element->getTypeInfo()->getNamespace());
-	if (xmlns.compare("") == 0) {
-		xmlns = "";
-	}
+	string xmlns;
+	const XMLCh *ns = element->lookupNamespaceURI(element->getPrefix());
+	if (ns)
+		xmlns = XmlCommon::ToString(ns);
+
 	return xmlns;
 }
 //****************************************************************************************//

@@ -432,12 +432,17 @@ BinInputStream* DummyEntityResolver::NoOpInputSource::makeStream() const
     return new DummyEntityResolver::DoNothingBinInputStream();
 }
 
-unsigned int DummyEntityResolver::DoNothingBinInputStream::curPos() const
+XMLFilePos DummyEntityResolver::DoNothingBinInputStream::curPos() const
 {
     return 0;
 }
 
-unsigned int DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const /*toFill*/, const unsigned int /*maxToRead*/)
+XMLSize_t DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const /*toFill*/, const XMLSize_t /*maxToRead*/)
 {
     return 0;
+}
+
+const XMLCh *DummyEntityResolver::DoNothingBinInputStream::getContentType() const
+{
+	return NULL;
 }

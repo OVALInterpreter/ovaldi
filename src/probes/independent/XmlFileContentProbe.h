@@ -65,10 +65,6 @@
 #include <xercesc/sax/InputSource.hpp>
 #include <xercesc/util/BinInputStream.hpp>
 
-// end xalan and xerces includes
-
-XERCES_CPP_NAMESPACE_USE
-
 /**
 	This class encapsulates common functionality for the XmlFileContentProbe. 
 */
@@ -112,30 +108,31 @@ private:
  * This class is an entity resolver that disables DTD resolution when
  * parsing an XML document.  This prevents unwanted network accesses.
  */
-class DummyEntityResolver : public EntityResolver
+class DummyEntityResolver : public xercesc::EntityResolver
 {
 public:
-    virtual InputSource* resolveEntity(const XMLCh *const publicId, const XMLCh *const systemId);
+    virtual xercesc::InputSource* resolveEntity(const XMLCh *const publicId, const XMLCh *const systemId);
 
 private:
     /**
      * An InputSource implementation which always returns a DoNothingBinInputStream.
      */
-    class NoOpInputSource : public InputSource
+    class NoOpInputSource : public xercesc::InputSource
     {
     public:
-        virtual BinInputStream* makeStream() const;
+        virtual xercesc::BinInputStream* makeStream() const;
     };
 
     /**
      * A BinInputStream implementation which does nothing.  Both of its methods
      * simply return 0.
      */
-    class DoNothingBinInputStream : public BinInputStream
+    class DoNothingBinInputStream : public xercesc::BinInputStream
     {
     public:
-        virtual unsigned int curPos() const;
-        virtual unsigned int readBytes(XMLByte *const toFill, const unsigned int maxToRead);
+        virtual XMLFilePos curPos() const;
+        virtual XMLSize_t readBytes(XMLByte *const toFill, const XMLSize_t maxToRead);
+		virtual const XMLCh *getContentType() const;
     };
 };
 
