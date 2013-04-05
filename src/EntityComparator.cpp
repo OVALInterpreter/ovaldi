@@ -55,6 +55,8 @@
 
 using namespace std;
 
+typedef vector<long long> LongLongVector;
+
 namespace {
 	/**
 	 * Represents the ipv4 address of a host or network.  A prefix size

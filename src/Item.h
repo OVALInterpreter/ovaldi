@@ -35,16 +35,9 @@
 #include <vector>
 #include <map>
 #include <utility>
-#include <iostream>
-#include <stdlib.h>
 
-#include "Common.h"
 #include "ItemEntity.h"
 #include "OvalMessage.h"
-#include "DocumentManager.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 class Item;
 
@@ -122,12 +115,12 @@ public:
     ItemEntity* GetElementByName(std::string itemEntityNameStr);
 
 	/** Parse the provided item element from an sc file into an Item object. */
-	void Parse(DOMElement* scItemElm);
+	void Parse(xercesc::DOMElement* scItemElm);
 
 	/** Write this item to a sc file. 
 		Make sure the item has not already been written to the sc file.
 	*/
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemsElm);
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* itemsElm);
 
     /** Create a unique string representation of the Item.
         A unique string can be created for an Item by concatenating the results of each of the following:

@@ -33,20 +33,13 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
 
-#include "Common.h"
 #include "Filter.h"
-#include "Object.h"
+#include "AbsObject.h"
 #include "OvalEnum.h"
 #include "VariableValue.h"
 
-XERCES_CPP_NAMESPACE_USE
-
 // Forward declarations to allow compilation.
-class AbsState;
-typedef std::vector < AbsState* > AbsStateVector;
 class Set;
 typedef std::vector < Set* > SetVector;
 // end forward declarations
@@ -68,7 +61,7 @@ public:
 	~Set();
 
 	/** Parse the provided Set object element. */
-	void Parse(DOMElement* setElm);
+	void Parse(xercesc::DOMElement* setElm);
 
 	/** Return a vector of all variable values used for this set. */
 	VariableValueVector* GetVariableValues();

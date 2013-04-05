@@ -45,31 +45,19 @@
 
 //	required xerces includes
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
 
 
 //	other includes
 #include <string>
-#include <iostream>
-#include <sstream>
-#include <stdlib.h>
 #include <vector>
 
 #include "Exception.h"
-
-//	namespaces
-XERCES_CPP_NAMESPACE_USE
 
 /**	
 	A vector for storing DOMElement objects. 
 	Stores only pointers to the objects. 
 */
-typedef std::vector < DOMElement* > ElementVector;
+typedef std::vector < xercesc::DOMElement* > ElementVector;
 
 /**
 	This class encapsulates a set of static methods for manipulating XML
@@ -77,82 +65,108 @@ typedef std::vector < DOMElement* > ElementVector;
 class XmlCommon {
 public:
 	/** Add an attribute to the specified DOMElement. */
-	static void AddAttribute(DOMElement *node, std::string attName, std::string attValue); 
+	static void AddAttribute(xercesc::DOMElement *node, std::string attName, std::string attValue); 
+	/** Add a namespaced attribute to the specified DOMElement. */
+	static void AddAttributeNS(xercesc::DOMElement *node, std::string ns, std::string attName, std::string attValue);
 	/** Add a new DOMElement node to the parent node.  
 		Use nodeName and nodeValue to construct the new node. Only attempt
 		to add a value if a value is specified. Return a ptr to the new DOMElement. 
 	*/
-	static DOMElement* AddChildElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, DOMElement *parent, std::string nodeName, std::string nodeValue = "");
+	static xercesc::DOMElement* AddChildElement(xercesc::DOMDocument *doc, xercesc::DOMElement *parent, std::string nodeName, std::string nodeValue = "");
+	/** Add a new DOMElement node to the parent node.  
+	* Return a ptr to the new DOMElement. 
+	*/
+	static xercesc::DOMElement* AddChildElementNS(xercesc::DOMDocument *doc, xercesc::DOMElement *parent, std::string ns, std::string nodeName, std::string nodeValue = "");
 	/** Create a new DOMElement node with the specified value. 
 		Use nodeName and nodeValue to construct the new node. Only attempt
 		to add a value if a value is specified. 
 		Return a ptr to the new DOMElement. 
 	*/
-	static DOMElement* CreateElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*, std::string, std::string nodeValue = "");
+	static xercesc::DOMElement* CreateElement(xercesc::DOMDocument*, std::string nodeName, std::string nodeValue = "");
+	/** Create a new namespaced DOMElement node with the specified value.
+		Return a ptr to the new DOMElement. 
+	*/
+	static xercesc::DOMElement* CreateElementNS(xercesc::DOMDocument*, std::string ns, std::string nodeName, std::string nodeValue = "");
 	/** Return the all nodes in the specified document that match the node name and attribute value.
 		Attribute name and value are optional as well as xmlns.
 	*/
-	static ElementVector* FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *node, std::string nodeName, std::string attribute = "", std::string attValue = "", std::string xmlns = "*");
+	static ElementVector* FindAllElements(xercesc::DOMDocument *node, std::string nodeName, std::string attribute = "", std::string attValue = "", std::string xmlns = "*");
 	/** Return the first node found that has the corresponding name with the attribute and attribute value specified.
 		Requires input of at least a node name and a DOMDocument to search. 
 		The attribute and attribute value parameters are optional.
 	*/
-	static DOMElement* FindElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, std::string nodeName, std::string attribute = "", std::string attValue ="");
+	static xercesc::DOMElement* FindElement(xercesc::DOMDocument *doc, std::string nodeName, std::string attribute = "", std::string attValue ="");
 	/** Return the first node found that has the corresponding name with the attribute and attribute value specified.
 		Requires input of at least a DOMElement name and a DOMElement.
 		The attribute and attribute value parameters are optional.
 	*/
-	static DOMElement* FindElement(DOMElement *node, std::string nodeName, std::string attribute = "", std::string attValue ="");
+	static xercesc::DOMElement* FindElement(xercesc::DOMElement *node, std::string nodeName, std::string attribute = "", std::string attValue ="");
 	/**	Return the first node found that has the corresponding name with the attribute and attribute value specified and the specified xmlns.
 		Requires input of at least a DOMElement name and a DOMDocument.
 		Attribute name and value are optional as well as xmlns.
 	*/
-	static DOMElement* FindElementNS(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, std::string nodeName, std::string attribute = "", std::string attValue ="", std::string xmlns = "*");
+	static xercesc::DOMElement* FindElementNS(xercesc::DOMDocument *doc, std::string nodeName, std::string attribute = "", std::string attValue ="", std::string xmlns = "*");
 	/**	Return the first node found that has the corresponding name with the attribute and attribute value specified and the specified xmlns.
 		Requires input of at least a DOMElement name and a DOMElement.
 		Attribute name and value are optional as well as xmlns.
 	*/
-	static DOMElement* FindElementNS(DOMElement *node, std::string nodeName, std::string attribute = "", std::string attValue ="", std::string xmlns = "*");
+	static xercesc::DOMElement* FindElementNS(xercesc::DOMElement *node, std::string nodeName, std::string attribute = "", std::string attValue ="", std::string xmlns = "*");
 	/** Recursively search the specified  DOMElement for an element with a corresponding attribute and attribute value.
 	*/
-	static DOMElement* FindElementByAttribute(DOMElement *node, std::string attribute, std::string attValue);
+	static xercesc::DOMElement* FindElementByAttribute(xercesc::DOMElement *node, std::string attribute, std::string attValue);
 	/**	Get the name of the specified attribute.
 		Return empty string if the attribute is not found. 
 	*/
-	static std::string GetAttributeByName(DOMElement *node, std::string name);
+	static std::string GetAttributeByName(xercesc::DOMElement *node, std::string name);
 	/**	Get the text value of the specified node. 
 		Return an empty string if there is no value. 
 		Throws an exception if the specifeid DOMElement has child elements.
 	*/
-	static std::string GetDataNodeValue(DOMElement*);
+	static std::string GetDataNodeValue(xercesc::DOMElement*);
 	/** Get the name of the specified element. */
-	static std::string GetElementName(DOMElement*);
+	static std::string GetElementName(xercesc::DOMElement*);
 	/** Get the prefix of the specified element. */
-	static std::string GetElementPrefix(DOMElement*);
+	static std::string GetElementPrefix(xercesc::DOMElement*);
 	/** Return true if the specified node has child elements. */
-	static bool HasChildElements(DOMNode*);
+	static bool HasChildElements(xercesc::DOMNode*);
 	/**	Remove the specified attribute. */
-	static void RemovetAttributeByName(DOMElement*, std::string);
+	static void RemovetAttributeByName(xercesc::DOMElement*, std::string);
 	/** Convert the XMLCh* to a string and handle memory allocation. */
 	static std::string ToString(const XMLCh*);
 	/** Add the specified namespace to the root element in the specified document. */
-	static void AddXmlns(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, std::string newXmlnsUri, std::string newXmlnsAlias = "");
+	static void AddXmlns(xercesc::DOMDocument *doc, std::string newXmlnsUri, std::string newXmlnsAlias = "");
 	/** Add the specified schema location to the document. 
 		Ensures that schema locations are unique. 
 	*/
-	static void AddSchemaLocation(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, std::string newSchemaLocation);
+	static void AddSchemaLocation(xercesc::DOMDocument *doc, std::string newSchemaLocation);
 	//static void SplitnNSPrefixandElmenetName(std::string nameAndPrefix
 	/** Remove all the attributes from the specified element. */
-	static void RemoveAttributes(DOMElement* elm);
+	static void RemoveAttributes(xercesc::DOMElement* elm);
 	/** Copy the schema location from the source document to the destionation document. */
-	static void CopySchemaLocation(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* source, XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* dest);
+	static void CopySchemaLocation(xercesc::DOMDocument* source, xercesc::DOMDocument* dest);
 	/** Copy the namespace on the source elmement to the destination element.
 		Do not overwrite the destination element's default xmlns. 
 	*/
-	static void CopyNamespaces(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* source, XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* dest); 
+	static void CopyNamespaces(xercesc::DOMDocument* source, xercesc::DOMDocument* dest); 
 	
 	/** Return the namespace of the specified element or null if no namespace is present. */
-	static std::string GetNamespace(DOMElement*);
+	static std::string GetNamespace(xercesc::DOMElement*);
+
+	/** The oval definitions XML namespace */
+	static const std::string defNS;
+	/** The oval system characteristics XML namespace */
+	static const std::string scNS;
+	/** The oval results XML namespace */
+	static const std::string resNS;
+	/** The oval common XML namespace */
+	static const std::string comNS;
+	/**
+	 * The XML-Schema instance namespace:
+	 * http://www.w3.org/2001/XMLSchema-instance
+	 * It seems xerces doesn't have a predefined
+	 * constant for this...
+	 */
+	static const std::string xsiNS;
 };
 
 /** 

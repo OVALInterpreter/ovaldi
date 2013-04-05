@@ -28,7 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "TestedItem.h"
+
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Test Class												  //	
@@ -69,10 +74,10 @@ void TestedItem::SetResult(OvalEnum::ResultEnumeration result) {
 void TestedItem::Write(DOMElement* parentElm) {
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new tested_item element
-	DOMElement* testedItemElm = XmlCommon::AddChildElement(resultDoc, parentElm, "tested_item");
+	DOMElement* testedItemElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "tested_item");
 
 	// add the attributes
 	XmlCommon::AddAttribute(testedItemElm, "item_id", Common::ToString(this->GetItem()->GetId()));

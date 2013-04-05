@@ -28,15 +28,22 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+#include <sstream>
+
+#include "LocalVariable.h"
+#include "ConstantVariable.h"
+#include "ExternalVariable.h"
 
 #include "VariableFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableFactory Class									  //
 //****************************************************************************************//
-DOMElement* VariableFactory::variablesElm = NULL;
+
 // ***************************************************************************************	//
 //								Public members												//
 // ***************************************************************************************	//

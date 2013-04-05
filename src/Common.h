@@ -63,8 +63,7 @@
 #include <functional>
 #include <cctype>
 
-
-#include "XmlCommon.h"
+//#include "XmlCommon.h"
 #include "DocumentManager.h"
 
 /**

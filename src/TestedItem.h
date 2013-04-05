@@ -31,10 +31,9 @@
 #ifndef TESTEDITEM_H
 #define TESTEDITEM_H
 
-#include "Log.h"
-#include "Item.h"
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "Item.h"
 
 /**
 	This class representsa tested_item int eh oval results schema.
@@ -49,7 +48,7 @@ public:
 	~TestedItem();
 
 	/** Write a TestedItem element as a child of the parent element. */
-	void Write(DOMElement* parent);
+	void Write(xercesc::DOMElement* parent);
 	
 	/** Return the result field's value. */
 	OvalEnum::ResultEnumeration GetResult();

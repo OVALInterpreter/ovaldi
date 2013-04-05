@@ -41,8 +41,6 @@
 #include "OvalMessage.h"
 
 
-XERCES_CPP_NAMESPACE_USE
-
 class Test;
 
 /**	

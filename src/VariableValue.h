@@ -33,8 +33,6 @@
 
 #include "XmlCommon.h"
 
-XERCES_CPP_NAMESPACE_USE
-
 class VariableValue;
 typedef std::vector < VariableValue* > VariableValueVector;
 
@@ -47,9 +45,9 @@ public:
 	VariableValue(std::string id = "", std::string value = "");
 	~VariableValue();
 
-	void Parse(DOMElement* variableValueElm);
-	void Write(DOMElement* collectedObjectElm);
-	void WriteTestedVariable(DOMElement* parentElm);
+	void Parse(xercesc::DOMElement* variableValueElm);
+	void Write(xercesc::DOMElement* collectedObjectElm);
+	void WriteTestedVariable(xercesc::DOMElement* parentElm);
 
 	std::string GetId();
 	void SetId(std::string id);

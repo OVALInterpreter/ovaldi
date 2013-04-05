@@ -28,6 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+
+#include "ObjectFactory.h"
+#include "Common.h"
+
 #include "Set.h"
 
 using namespace std;

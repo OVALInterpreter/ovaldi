@@ -46,8 +46,6 @@
 #include "AbsDataCollector.h"
 #include "OvalEnum.h"
 
-XERCES_CPP_NAMESPACE_USE
-
 
 class CollectedObject;
 
@@ -96,7 +94,7 @@ public:
     */
 	static void WriteCollectedObjects();
 
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* collectObjectsElm);
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* collectObjectsElm);
 	
 	OvalEnum::Flag GetFlag();
 	void SetFlag(OvalEnum::Flag flag);

@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include "ComponentFactory.h"
+
 #include "TimeDifferenceFunction.h"
 
 using namespace std;

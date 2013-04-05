@@ -31,6 +31,7 @@
 #include "Test.h"
 
 using namespace std;
+using namespace xercesc;
 
 TestMap Test::processedTestsMap;
 //****************************************************************************************//
@@ -276,10 +277,10 @@ void Test::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new Test element
-		DOMElement* testElm = XmlCommon::AddChildElement(resultDoc, parentElm, "test");
+		DOMElement* testElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "test");
 
 		// add the attributes
 		XmlCommon::AddAttribute(testElm, "test_id", this->GetId());
@@ -298,7 +299,7 @@ void Test::Write(DOMElement* parentElm) {
 		unsigned int msgCounter = 0;
 		while(msgCounter < sizeOfMessageList) {
 			currentMessage = this->GetMessages()->at(msgCounter);
-			currentMessage->Write(resultDoc,testElm,"oval-res");	 
+			currentMessage->Write(resultDoc,testElm,"oval-res", XmlCommon::resNS);
 			msgCounter++;
 		}
 

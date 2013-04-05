@@ -28,12 +28,15 @@
 //
 //****************************************************************************************//
 
+#include "VariableFactory.h"
+
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
 
 #include "StateEntity.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								StateEntity Class						     			  //	

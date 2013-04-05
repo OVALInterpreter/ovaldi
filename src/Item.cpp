@@ -28,9 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+#include <stdlib.h>
+
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+
 #include "Item.h"
 
 using namespace std;
+using namespace xercesc;
 
 int Item::idCounter = 1;
 ItemMap Item::processedItemsMap;
@@ -257,21 +264,20 @@ void Item::Parse(DOMElement* scItemElm) {
 	}	
 }
 
-void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemsElm) {
+void Item::Write(xercesc::DOMDocument* scFile, DOMElement* itemsElm) {
 
 	if(!this->GetIsWritten()) {
 		this->SetIsWritten(true);
 		//this->SetId(Item::AssignId());
 
 		// add the namespace and schema location to the sc document
-		XmlCommon::AddXmlns(DocumentManager::GetSystemCharacteristicsDocument(), this->GetXmlns(), this->GetXmlnsAlias());
-		XmlCommon::AddSchemaLocation(DocumentManager::GetSystemCharacteristicsDocument(), this->GetSchemaLocation());
+		xercesc::DOMDocument *scDoc = DocumentManager::GetSystemCharacteristicsDocument();
+		XmlCommon::AddXmlns(scDoc, this->GetXmlns(), this->GetXmlnsAlias());
+		XmlCommon::AddSchemaLocation(scDoc, this->GetSchemaLocation());
 
 		// Create a new item element	
-		XMLCh* name = XMLString::transcode(this->GetName().c_str());
-		DOMElement *newItemElem = scFile->createElement(name);
+		DOMElement *newItemElem = XmlCommon::CreateElementNS(scDoc, this->GetXmlns(), this->GetName());
 		//Free memory allocated by XMLString::transcode(char*)
-		XMLString::release(&name);
 		itemsElm->appendChild(newItemElem);
 
 		// Add the attributes
@@ -282,8 +288,6 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 		if(strStatus.compare("exists") != 0)
 			XmlCommon::AddAttribute(newItemElem, "status", strStatus);
 
-		XmlCommon::AddAttribute(newItemElem, "xmlns", this->GetXmlns());	
-
 		// Add any messges.  As of v5.8, no more than 50 are allowed per item.
 		if(this->GetMessages()->size() > 0) {
 			OvalMessageVector::iterator messageIterator;
@@ -292,7 +296,7 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 				messageIterator != this->GetMessages()->end() && messageCounter < 50;
 				messageIterator++, messageCounter++) {
 				OvalMessage* message = (*messageIterator);
-				message->Write(scFile, newItemElem, "oval-sc");
+				message->Write(scFile, newItemElem, "oval-sc", XmlCommon::scNS);
 			}
 		}
 
@@ -300,7 +304,7 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 		ItemEntityVector::iterator elementIterator;
 		for(elementIterator = this->GetElements()->begin(); elementIterator != this->GetElements()->end(); elementIterator++) {
 			ItemEntity* element = (ItemEntity*)(*elementIterator);
-			element->Write(scFile, newItemElem);
+			element->Write(scFile, newItemElem, this->GetXmlns());
 		}
 	}
 }

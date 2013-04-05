@@ -28,9 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
 #include "PossibleRestrictionType.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									PossibleType Class									  //	

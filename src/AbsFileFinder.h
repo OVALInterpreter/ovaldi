@@ -41,6 +41,7 @@
 #include "REGEX.h"
 #include "ObjectEntity.h"
 #include "ItemEntity.h"
+#include "Behavior.h"
 
 #include <string>
 #include <vector>

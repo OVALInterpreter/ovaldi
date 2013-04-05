@@ -33,33 +33,10 @@
 
 #pragma warning(disable:4786)
 
-
-
-#include <iostream>
 #include <string>
 #include <vector>
 
-#undef DOMDocument
-
-#include "Common.h"
 #include "Exception.h"
-#include "Log.h"
-
-
-
-//#undef _MAC	// This is a bit messy. windows.h includes winsock.h if _MAC is defined. this causes a conflict with winsock2.h
-
-//#include "winsock2.h"
-#ifndef _INC_WINDOWS
-#include <windows.h>
-#endif
-//#include "Ws2tcpip.h"
-#include "Iphlpapi.h"
-
-//#define _MAC // see note above
-
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	This class stores interface infocmetion as strings.
@@ -69,18 +46,18 @@ class IfData {
 public:
 	IfData(){};
 	~IfData(){};
-	IfData(string ifn, string ipAddr, string macAddr) : ifName(ifn), ipAddress(ipAddr), macAddress(macAddr) {}
+	IfData(std::string ifn, std::string ipAddr, std::string macAddr) : ifName(ifn), ipAddress(ipAddr), macAddress(macAddr) {}
 
-	string ifName;
-	string ipAddress;
-	string macAddress;
+	std::string ifName;
+	std::string ipAddress;
+	std::string macAddress;
 };
 
 /**	
 	A vector for storing interface data dobjects. 
 	Stores only pointers to the objects. 
 */
-typedef vector < IfData*, allocator<IfData*> > IfDataVector;
+typedef std::vector < IfData* > IfDataVector;
 
 /**
 	This class stores system info as defined in the oval system characteristics schema.
@@ -96,12 +73,12 @@ public:
 	~SystemInfo();
 
 	/** Write the system_info node to the sc file. */
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc);
+	void Write(xercesc::DOMDocument *scDoc);
 		
-	string os_name;
-	string os_version;
-	string architecture;
-	string primary_host_name;
+	std::string os_name;
+	std::string os_version;
+	std::string architecture;
+	std::string primary_host_name;
 	IfDataVector interfaces;
 };
 
@@ -129,7 +106,7 @@ class SystemInfoCollector {
 */
 class SystemInfoException : public Exception {
 	public:
-		SystemInfoException(string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
+		SystemInfoException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL);
 		~SystemInfoException();
 };
 

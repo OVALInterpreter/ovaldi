@@ -31,14 +31,8 @@
 #ifndef CRITERION_H
 #define CRITERION_H
 
-#include "Analyzer.h"
 #include "Test.h"
 #include "AbsCriteria.h"
-
-
-XERCES_CPP_NAMESPACE_USE
-
-class AbsCriteria;
 
 /**
 	This class represenets a criterion in an oval definition.
@@ -55,11 +49,11 @@ public:
 	/** Writes a criterion element
 	    calls test->Write() on the test ref 
 	*/
-	void Write(DOMElement* parent);
+	void Write(xercesc::DOMElement* parent);
 	/** Parses Criterion elm to a Criterion obj
 		calls test->Parse() on the Test Ref
 	*/
-	void Parse(DOMElement* CriterionElm);
+	void Parse(xercesc::DOMElement* CriterionElm);
 	/** Determine the result for the Criteria.
 		Calls test->Analyze()
 		Applies negate attribute

@@ -28,9 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
 #include "StringEntityValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								StringEntityValue Class										  //	

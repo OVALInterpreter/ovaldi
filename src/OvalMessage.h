@@ -32,13 +32,9 @@
 #define OVALMESSAGE_H
 
 #include <string>
-#include <iostream>
-#include <stdlib.h>
+#include <vector>
 
-#include "Common.h"
 #include "OvalEnum.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents an OvalMessage in the oval schema
@@ -53,10 +49,16 @@ public:
 
 	~OvalMessage();
 
-	/** Write this message to the specified document. */
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm, std::string prefix);
+	/**
+	 * Write this message to the specified document.
+	 * These messages can go into either results or sc documents,
+	 * and each has its own &lt;message&gt; element.
+	 * So callers must tell us which kind of element to create
+	 * (which namespace to use) and which qname prefix.
+	 */
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* itemElm, std::string prefix, std::string ns);
 	/** Parse the supplied message element into a message object. */
-	void Parse(DOMElement* msgElm);
+	void Parse(xercesc::DOMElement* msgElm);
 
 	/** Return the value field's value. */
 	std::string GetValue();

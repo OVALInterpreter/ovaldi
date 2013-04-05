@@ -28,9 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "ComponentFactory.h"
+
 #include "SubstringFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	

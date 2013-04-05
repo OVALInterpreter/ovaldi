@@ -61,7 +61,7 @@ DOMElement* AbsDataCollector::GetSCCollectedObjectsElm() {
 	if(this->collectedObjectsElm == NULL) {
 		//	Create the collected_objects element and add it as a child of the sc element
 		DOMElement* scNode = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "oval_system_characteristics");
-		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), scNode, "collected_objects"); 
+		DOMElement *elm = XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), scNode, XmlCommon::scNS, "collected_objects"); 
 		this->collectedObjectsElm = elm;
 	}
 	return this->collectedObjectsElm;
@@ -72,7 +72,7 @@ DOMElement* AbsDataCollector::GetSCSystemDataElm() {
 	if(this->systemDataElm == NULL) {
 		//	Create the system_data element and add it as a child of the sc element
 		DOMElement* scNode = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "oval_system_characteristics");
-		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), scNode, "system_data"); 
+		DOMElement *elm = XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), scNode, XmlCommon::scNS, "system_data"); 
 		this->systemDataElm = elm;
 	}
 	return this->systemDataElm;
@@ -101,7 +101,7 @@ void AbsDataCollector::InitBase(AbsObjectCollector* objectCollector) {
 	this->WriteGenerator();
 
 	//	Create the system_info element and add it as a child of the sc element
-	DOMElement *sysInfoElm = XmlCommon::CreateElement(DocumentManager::GetSystemCharacteristicsDocument(), "system_info"); 
+	DOMElement *sysInfoElm = XmlCommon::CreateElementNS(DocumentManager::GetSystemCharacteristicsDocument(), XmlCommon::scNS, "system_info"); 
 	scNode->appendChild(sysInfoElm);
 
 	// Write system info
@@ -203,11 +203,11 @@ bool AbsDataCollector::GetIsRunning(){
 void AbsDataCollector::WriteGenerator() {
 
 	DOMElement *scNode = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "oval_system_characteristics");
-	DOMElement *generatorElm = XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), scNode, "generator");
-	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:product_name", "cpe:/a:mitre:ovaldi:" + Version::GetVersion() + "." + Version::GetBuild());
-	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
-	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:schema_version", Version::GetSchemaVersion());
-	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "oval:timestamp", Common::GetTimeStamp());
+	DOMElement *generatorElm = XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), scNode, XmlCommon::scNS, "generator");
+	XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, XmlCommon::comNS, "oval:product_name", "cpe:/a:mitre:ovaldi:" + Version::GetVersion() + "." + Version::GetBuild());
+	XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, XmlCommon::comNS, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
+	XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, XmlCommon::comNS, "oval:schema_version", Version::GetSchemaVersion());
+	XmlCommon::AddChildElementNS(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, XmlCommon::comNS, "oval:timestamp", Common::GetTimeStamp());
 	XmlCommon::AddChildElement(DocumentManager::GetSystemCharacteristicsDocument(), generatorElm, "vendor", Version::GetVendor());
 }
 

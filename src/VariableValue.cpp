@@ -31,6 +31,7 @@
 #include "VariableValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 VariableValueVector VariableValue::vars;
 
@@ -109,12 +110,8 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 	// -----------------------------------------------------------------------
 
 	// Create new item element
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
-	string elementName = "variable_value";
-	XMLCh* name = XMLString::transcode(elementName.c_str());
-	DOMElement* newVariableValueElem = scFile->createElement(name);
-	//Free memory allocated by XMLString::transcode(char*)
-	XMLString::release(&name);
+	xercesc::DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
+	DOMElement* newVariableValueElem = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "variable_value");
 	collectedObjectElm->appendChild(newVariableValueElem);
 
 	// Add the attributes

@@ -28,10 +28,19 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <windows.h>
+#include <Iphlpapi.h>
+
+#include "XmlCommon.h"
+#include "Log.h"
 
 #include "SystemInfo.h"
+
+using namespace std;
+using namespace xercesc;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~		Class SystemInfo		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -62,26 +71,18 @@ SystemInfo::~SystemInfo() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc) {
+void SystemInfo::Write(xercesc::DOMDocument *scDoc) {
 
 	//	Find the system_info node
 	DOMElement* sysInfoNode = XmlCommon::FindElement(scDoc, "system_info");
 
-	DOMElement* tmpElm = XmlCommon::CreateElement(scDoc, "os_name", os_name);
-	sysInfoNode->appendChild(tmpElm);
-
-	tmpElm = XmlCommon::CreateElement(scDoc, "os_version", os_version);
-	sysInfoNode->appendChild(tmpElm);
-
-	tmpElm = XmlCommon::CreateElement(scDoc, "architecture", architecture);
-	sysInfoNode->appendChild(tmpElm);
-
-	tmpElm = XmlCommon::CreateElement(scDoc, "primary_host_name", primary_host_name);
-	sysInfoNode->appendChild(tmpElm);
+	XmlCommon::AddChildElementNS(scDoc, sysInfoNode, XmlCommon::scNS, "os_name", os_name);
+	XmlCommon::AddChildElementNS(scDoc, sysInfoNode, XmlCommon::scNS, "os_version", os_version);
+	XmlCommon::AddChildElementNS(scDoc, sysInfoNode, XmlCommon::scNS, "architecture", architecture);
+	XmlCommon::AddChildElementNS(scDoc, sysInfoNode, XmlCommon::scNS, "primary_host_name", primary_host_name);
 
 	// Add the interfaces element and its children
-	DOMElement* interfacesElm = XmlCommon::CreateElement(scDoc, "interfaces");
-	sysInfoNode->appendChild(interfacesElm);
+	DOMElement* interfacesElm = XmlCommon::AddChildElementNS(scDoc, sysInfoNode, XmlCommon::scNS, "interfaces");
 
 	// Loop through contents of the interfaces vector and write each IfData objet
 	IfDataVector::iterator iterator;
@@ -89,18 +90,12 @@ void SystemInfo::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc) {
 
 		if((*iterator)->ipAddress.compare("127.0.0.1") != 0) { 
 			// Create a new interface element
-			DOMElement* interfaceElm = XmlCommon::CreateElement(scDoc, "interface");
-			interfacesElm->appendChild(interfaceElm);
+			DOMElement* interfaceElm = XmlCommon::AddChildElementNS(scDoc, interfacesElm, XmlCommon::scNS, "interface");
 
-			// Add the childer to the inerface element
-			tmpElm = XmlCommon::CreateElement(scDoc, "interface_name", (*iterator)->ifName);
-			interfaceElm->appendChild(tmpElm);
-			
-			tmpElm = XmlCommon::CreateElement(scDoc, "ip_address", (*iterator)->ipAddress);
-			interfaceElm->appendChild(tmpElm);
-
-			tmpElm = XmlCommon::CreateElement(scDoc, "mac_address", (*iterator)->macAddress);
-			interfaceElm->appendChild(tmpElm);
+			// Add the child to the interface element
+			XmlCommon::AddChildElementNS(scDoc, interfaceElm, XmlCommon::scNS, "interface_name", (*iterator)->ifName);
+			XmlCommon::AddChildElementNS(scDoc, interfaceElm, XmlCommon::scNS, "ip_address", (*iterator)->ipAddress);
+			XmlCommon::AddChildElementNS(scDoc, interfaceElm, XmlCommon::scNS, "mac_address", (*iterator)->macAddress);
 		}
 	}
 }

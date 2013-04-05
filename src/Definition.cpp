@@ -31,6 +31,7 @@
 #include "Definition.h"
 
 using namespace std;
+using namespace xercesc;
 
 DefinitionMap Definition::processedDefinitionsMap;
 
@@ -186,10 +187,10 @@ void Definition::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new definition element
-		DOMElement* definitionElm = XmlCommon::AddChildElement(resultDoc, parentElm, "definition");
+		DOMElement* definitionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "definition");
 
 		// add the attributes
 		XmlCommon::AddAttribute(definitionElm, "definition_id", this->GetId());

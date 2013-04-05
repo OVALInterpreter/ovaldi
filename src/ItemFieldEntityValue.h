@@ -31,9 +31,14 @@
 #ifndef ITEMFIELDENTITYVALUE_H
 #define ITEMFIELDENTITYVALUE_H
 
-#include "AbsEntityValue.h"
+#include <string>
+#include <vector>
 
-XERCES_CPP_NAMESPACE_USE
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "OvalEnum.h"
+#include "AbsEntityValue.h"
 
 /**
 	This class represents a field entity in an item entity that has a datatype of record as defined in the OVAL systems characteristics schema.
@@ -95,13 +100,13 @@ public:
 	 *  @param itemEntityElm A pointer to a DOMDocument that specifies the entity for which the ItemFieldEntityValue should be written to.
 	 *  @return Void.
 	 */
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemEntityElm);
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* itemEntityElm);
 	
 	/** Parse the specified entity to retrieve its field entity value.
 	 *  @param entityElm A pointer to a DOMElement from which the field entity value should be retrieved.  This value should then be used to initialize the ItemFieldEntityValue. 
 	 *  @return Void.
 	 */
-	void Parse(DOMElement* entityElm);
+	void Parse(xercesc::DOMElement* entityElm);
 
 private:
 	std::string name;
