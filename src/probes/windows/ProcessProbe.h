@@ -30,12 +30,9 @@
 #ifndef PROCESSPROBE_H
 #define PROCESSPROBE_H
 
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "WMIUtil.h"
-#include <Psapi.h>
-#include <tlhelp32.h>
+#include <Tlhelp32.h> // for PROCESSENTRY32
 
+#include "AbsProbe.h"
 
 /** This class is responsible for collecting Windows 32-bit process data.  It is important to note that
  *  the OpenProcess() API call does not have access to all of the processes on the system.  Most

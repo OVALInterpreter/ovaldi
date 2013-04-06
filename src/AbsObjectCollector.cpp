@@ -29,6 +29,15 @@
 //****************************************************************************************//
 
 #include <algorithm>
+#include <typeinfo>
+#include <vector>
+
+#include "Common.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "Log.h"
+#include "ObjectFactory.h"
+
 #include "AbsObjectCollector.h"
 
 using namespace std;

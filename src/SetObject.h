@@ -31,18 +31,8 @@
 #ifndef SETOBJECT_H
 #define SETOBJECT_H
 
-#include "Common.h"
-#include "ObjectFactory.h"
-#include "AbsObject.h"
-#include "State.h"
-#include "Object.h"
 #include "Set.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class Set;
-typedef std::vector < Set* > SetVector;
-
+#include "VariableValue.h"
 
 /**
 	This class represents an SetObject in an oval definition schema.

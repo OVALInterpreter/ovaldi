@@ -31,14 +31,13 @@
 #ifndef FILEFINDER_H
 #define FILEFINDER_H
 
-#pragma warning(disable:4786)
+#include <string>
+#include <Windows.h> // for basic types like DWORD and HANDLE
 
+#include "ObjectEntity.h"
+#include "Behavior.h"
 #include "AbsFileFinder.h"
-#include "WindowsCommon.h"
-
-#include <iostream>
-
-using namespace std;
+#include "BitnessView.h"
 
 /**
 	This class is the windows file searching implmentation used by this application
@@ -106,17 +105,17 @@ private:
 										   StringVector *pathsFound);
 
 	/** Return true if the specified file exists on the specifeid path. */
-	virtual bool FileNameExists(string path, string fileName, string *actualFileName = NULL);
+	virtual bool FileNameExists(std::string path, std::string fileName, std::string *actualFileName = NULL);
 
 	/** This function gets all file names that match a given pattern on the spaecified path.
 	    If a match is found the filename is pushed on to a vector of strings.
 	*/
-	virtual void GetFilesForOperation(string path, string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath);
+	virtual void GetFilesForOperation(std::string path, std::string pattern, StringVector* fileNames, OvalEnum::Operation op, bool isFilePath);
 
 	/** Search the file system for paths that match the provided regex.
 	    Attempt to break off a constant portion of the path to spead up searching. 
 	*/
-	virtual void FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op);
+	virtual void FindPaths(std::string queryVal, StringVector* paths, OvalEnum::Operation op);
 
 	/** Get all fixed drives on the system. Return them in a string vector. */
 	StringVector* GetDrives();
@@ -135,12 +134,12 @@ private:
 		the recursive search should have dirIn capitalized properly.  Otherwise all
 		the found paths will have an incorrectly capitalized prefix.
 	*/
-	void GetPathsForOperation(string dirIn, string pattern, StringVector* pathVector, OvalEnum::Operation op);
+	void GetPathsForOperation(std::string dirIn, std::string pattern, StringVector* pathVector, OvalEnum::Operation op);
 
 	/** Get the full path of all child directories as a StringVector. 
 	    The caller is responsible for deleting the StringVector* of child paths.
 	*/
-	virtual StringVector* GetChildDirectories(string path);
+	virtual StringVector* GetChildDirectories(std::string path);
 
 	BitnessView bitnessView;
 };

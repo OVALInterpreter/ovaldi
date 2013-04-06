@@ -33,20 +33,14 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
 #include <map>
 #include <utility>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "DocumentManager.h"
-#include "OvalMessage.h"
 #include "OvalEnum.h"
 #include "VariableValue.h"
-#include "Item.h"
 #include "AbsEntity.h"
-#include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include "Exception.h"
 
 /**
 	This class represents an State in an oval definition file.
@@ -59,7 +53,7 @@ public:
 	AbsState(std::string id, std::string name, std::string xmlns, OvalEnum::Operator myOperator = OvalEnum::OPERATOR_AND, int version = 1);
 	virtual ~AbsState();
 
-	virtual void Parse(DOMElement* stateElm) = 0;
+	virtual void Parse(xercesc::DOMElement* stateElm) = 0;
 
 	VariableValueVector* GetVariableValues();
 

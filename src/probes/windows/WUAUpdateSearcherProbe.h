@@ -31,20 +31,9 @@
 #ifndef WUAUPDATESEARCHERPROBE_H
 #define WUAUPDATESEARCHERPROBE_H
 
-#pragma warning(disable:4786)
-
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-
-#undef __DOMDocument_FWD_DEFINED__
-#include <comdef.h>
-#include <Dsgetdc.h>
-#include <Lm.h>
-#include <windows.h>
 #include <Wuapi.h>
 
-using namespace std;
+#include "AbsProbe.h"
 
 /** 
     This class is responsible for collecting information for windows wuaupdatesearcher_object.

@@ -31,7 +31,9 @@
 #ifndef VARIABLEVALUE_H
 #define VARIABLEVALUE_H
 
-#include "XmlCommon.h"
+#include <string>
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
 
 class VariableValue;
 typedef std::vector < VariableValue* > VariableValueVector;

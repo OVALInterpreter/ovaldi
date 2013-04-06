@@ -31,11 +31,12 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "Item.h"
+#include "OvalEnum.h"
 #include "AbsState.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class Item;
 
 /**
 	This class represents a state in the oval definition schema.
@@ -58,7 +59,7 @@ public:
 	OvalEnum::ResultEnumeration Analyze(Item* item);
 
 	/** Parse the provided state element from a oval definition file into a State object. */
-	void Parse(DOMElement* stateElm);
+	void Parse(xercesc::DOMElement* stateElm);
 
 	/** Sarch the cache of States for the specified State. 
 		Return NULL if not found

@@ -85,7 +85,7 @@ string OvalMessage::ToString() {
 	return msgStr;
 }
 
-void OvalMessage::Write(xercesc::DOMDocument* doc, DOMElement* parentElm, string prefix, string ns) {
+void OvalMessage::Write(DOMDocument* doc, DOMElement* parentElm, string prefix, string ns) {
 
 	// Create new item element
 	string elementName = "message";

@@ -28,10 +28,27 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
 #include <memory>
+
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
+#include "FileFinder.h"
+#include "WindowsCommon.h"
+
 #include "FileAuditedPermissions53Probe.h"
+
+using namespace std;
+
+namespace {
+
+    /** Get the string representation of the audited permissions.
+    *  @param success An ACCESS_MASK that represents the successful audit permissions.
+    *  @param failure An ACCESS_MASK that represents the failure audit permissions.
+    *  @return The string representation of the audited permissions.
+    */
+    string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
+}
 
 //****************************************************************************************//
 //                              FileAuditedPermissions53Probe Class                       //
@@ -422,14 +439,18 @@ Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( HANDLE fileHandle, 
     return item;
 }
 
-string FileAuditedPermissions53Probe::ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure ) {
-    if ( success && failure ) return "AUDIT_SUCCESS_FAILURE";
+namespace {
 
-    else if ( success && !failure ) return "AUDIT_SUCCESS";
+	string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure ) {
+		if ( success && failure ) return "AUDIT_SUCCESS_FAILURE";
 
-    else if ( !success && failure ) return "AUDIT_FAILURE";
+		else if ( success && !failure ) return "AUDIT_SUCCESS";
 
-    else if ( !success && !failure ) return "AUDIT_NONE";
+		else if ( !success && failure ) return "AUDIT_FAILURE";
 
-    else return "";
+		else if ( !success && !failure ) return "AUDIT_NONE";
+
+		else return "";
+	}
+
 }

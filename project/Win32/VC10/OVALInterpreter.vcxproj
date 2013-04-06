@@ -473,7 +473,6 @@
     <ClInclude Include="..\..\..\src\Item.h" />
     <ClInclude Include="..\..\..\src\ItemEntity.h" />
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />
-    <ClInclude Include="..\..\..\src\Main.h" />
     <ClInclude Include="..\..\..\src\Meta.h" />
     <ClInclude Include="..\..\..\src\Noncopyable.h" />
     <ClInclude Include="..\..\..\src\Object.h" />
@@ -488,6 +487,7 @@
     <ClInclude Include="..\..\..\src\State.h" />
     <ClInclude Include="..\..\..\src\StateEntity.h" />
     <ClInclude Include="..\..\..\src\StateOrObjectFieldEntityValue.h" />
+    <ClInclude Include="..\..\..\src\StdTypedefs.h" />
     <ClInclude Include="..\..\..\src\StringEntityValue.h" />
     <ClInclude Include="..\..\..\src\Test.h" />
     <ClInclude Include="..\..\..\src\TestedItem.h" />
@@ -536,6 +536,7 @@ echo off
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h" />
     <ClInclude Include="..\..\..\src\VectorPtrGuard.h" />
     <ClInclude Include="..\..\..\src\windows\AutoCloser.h" />
+    <ClInclude Include="..\..\..\src\windows\BitnessView.h" />
     <ClInclude Include="..\..\..\src\windows\FileFinder.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h" />

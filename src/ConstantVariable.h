@@ -31,6 +31,9 @@
 #ifndef CONSTANTVARIABLE_H
 #define CONSTANTVARIABLE_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsVariable.h"
 
 /**
@@ -42,7 +45,7 @@ public:
 	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
 	~ConstantVariable();
 
-	void Parse(DOMElement* constantVariableElm);
+	void Parse(xercesc::DOMElement* constantVariableElm);
 
 	VariableValueVector* GetVariableValues();	
 };

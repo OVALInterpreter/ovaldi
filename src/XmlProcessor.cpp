@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <fstream>
+
 //	required xerces	includes
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMException.hpp>
@@ -36,6 +38,8 @@
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMImplementationLS.hpp>
 #include <xercesc/dom/DOMLSSerializer.hpp>
+#include <xercesc/dom/DOMLSOutput.hpp>
+#include <xercesc/dom/DOMLocator.hpp>
 #include <xercesc/framework/StdOutFormatTarget.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xercesc/util/XMLUni.hpp>
@@ -44,8 +48,10 @@
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 
-#include "Common.h" 
+#include "XmlCommon.h"
+#include "Common.h"
 #include "XmlProcessor.h"
+#include "Log.h"
 
 using namespace std;
 using namespace xercesc;

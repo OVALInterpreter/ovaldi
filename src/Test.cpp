@@ -28,6 +28,14 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+
 #include "Test.h"
 
 using namespace std;
@@ -277,7 +285,7 @@ void Test::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new Test element
 		DOMElement* testElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "test");

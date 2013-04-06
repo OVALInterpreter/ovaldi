@@ -28,6 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ExtendedDefinition.h"
+#include "Criterion.h"
+#include "Analyzer.h"
+#include "XmlCommon.h"
+
 #include "Criteria.h"
 
 using namespace std;
@@ -136,7 +145,7 @@ void Criteria::Write(DOMElement* parentElm) {
 	// -----------------------------------------------------------------------
 
 	// get the parent document
-	xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
 	DOMElement* criteriaElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "criteria");

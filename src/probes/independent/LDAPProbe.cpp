@@ -31,6 +31,17 @@
 #include <sstream>
 #include <iomanip>
 
+#ifdef WIN32
+#  include <Windows.h> // defines symbols needed by <LM.h>
+#  include <LM.h>
+#  include <Dsgetdc.h>
+#  include <Winldap.h> // defines symbols needed by <Winber.h>
+#  include <Winber.h>
+#endif
+
+#include "REGEX.h"
+#include "Log.h"
+
 #include "LDAPProbe.h"
 
 using namespace std;

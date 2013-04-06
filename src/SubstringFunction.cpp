@@ -28,7 +28,12 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
 #include "ComponentFactory.h"
+#include "Common.h"
+#include "XmlCommon.h"
 
 #include "SubstringFunction.h"
 

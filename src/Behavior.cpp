@@ -28,6 +28,10 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMAttr.hpp>
+#include <xercesc/dom/DOMNamedNodeMap.hpp>
+
 #include "XmlCommon.h"
 
 #include "Behavior.h"

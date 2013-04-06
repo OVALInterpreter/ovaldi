@@ -30,12 +30,7 @@
 #ifndef USERSIDPROBE_H
 #define USERSIDPROBE_H
 
-#pragma warning(disable:4786)
-
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-using namespace std;
 
 
 /**
@@ -58,9 +53,9 @@ private:
    	/** Return a new Item created for storing usersid information. */
 	virtual Item* CreateItem();
 
-	Item* GetUserSidInfo(string userSid);
+	Item* GetUserSidInfo(std::string userSid);
 
-	bool GetEnabledFlagForUser(string userName);
+	bool GetEnabledFlagForUser(std::string userName);
 };
 
 #endif

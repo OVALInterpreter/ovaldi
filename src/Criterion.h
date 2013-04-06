@@ -31,6 +31,8 @@
 #ifndef CRITERION_H
 #define CRITERION_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "Test.h"
 #include "AbsCriteria.h"
 

@@ -31,10 +31,6 @@
 #define PROCESS58PROBE_H
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "WMIUtil.h"
-#include <Psapi.h>
-#include <tlhelp32.h>
 
 
 /** This class is responsible for collecting Windows 32-bit process data.  It is important to note that

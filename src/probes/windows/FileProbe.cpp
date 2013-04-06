@@ -28,11 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <aclapi.h>
+#include <imagehlp.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tchar.h>
+
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
 #include <FsRedirectionGuard.h>
 #include <iomanip>
 #include <sstream>
+
+#include <WindowsCommon.h>
 
 #include "FileProbe.h"
 

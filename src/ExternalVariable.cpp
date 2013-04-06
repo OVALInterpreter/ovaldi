@@ -28,9 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "AbsVariable.h"
+#include "XmlCommon.h"
+
 #include "ExternalVariable.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									ExternalVariable Class								  //	
@@ -108,7 +119,7 @@ void ExternalVariable::AppendPossibleRestrictionType(PossibleRestrictionType* pr
 void ExternalVariable::ComputeValue() {
 
 	// get the external variables file
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* externalVariableDoc = NULL;
+	DOMDocument* externalVariableDoc = NULL;
 	try {
 		externalVariableDoc = DocumentManager::GetExternalVariableDocument();
 	} catch(Exception ex) {

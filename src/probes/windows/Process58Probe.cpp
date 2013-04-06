@@ -27,6 +27,15 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <Windows.h>
+#include <Psapi.h>
+#include <tlhelp32.h>
+
+#include "WMIUtil.h"
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "Process58Probe.h"
 
 //****************************************************************************************//

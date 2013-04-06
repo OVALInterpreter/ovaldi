@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+
 #include "XmlCommon.h"
 #include "Common.h"
 
@@ -74,7 +76,7 @@ void TestedItem::SetResult(OvalEnum::ResultEnumeration result) {
 void TestedItem::Write(DOMElement* parentElm) {
 
 	// get the parent document
-	xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new tested_item element
 	DOMElement* testedItemElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "tested_item");

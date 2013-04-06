@@ -31,6 +31,12 @@
 #ifndef META_H
 #define META_H
 
+// to give us a wchar_t type, which we need
+// since ovaldi is built without wchar_t being
+// builtin type.  I tried to choose a small
+// header that has the typedef....
+#include <BaseTyps.h>
+
 /**
  * \file
  * This header implements some metaprogramming tools we had a need for.

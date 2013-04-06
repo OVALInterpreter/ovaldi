@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
 #include "XmlCommon.h"
 
 #include "ItemFieldEntityValue.h"
@@ -89,7 +92,7 @@ void ItemFieldEntityValue::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-void ItemFieldEntityValue::Write(xercesc::DOMDocument* scFile, DOMElement* itemEntityElm) {
+void ItemFieldEntityValue::Write(DOMDocument* scFile, DOMElement* itemEntityElm) {
 	// Create new field element
 	DOMElement* newEntityValueElem = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "oval-sc:field");
 	itemEntityElm->appendChild(newEntityValueElem);

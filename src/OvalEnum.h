@@ -32,9 +32,6 @@
 #define OVALENUM_H
 
 #include <string>
-
-// I am NOT including all of common.h just for a typedef
-// of vector<int>!!!
 #include <vector>
 
 /**

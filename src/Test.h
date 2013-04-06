@@ -31,15 +31,12 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <vector>
-//#include "Analyzer.h"
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "TestedItem.h"
 #include "VariableValue.h"
-#include "Log.h"
-#include "State.h"
 #include "Object.h"
 #include "OvalMessage.h"
-
 
 class Test;
 

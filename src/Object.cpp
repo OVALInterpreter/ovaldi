@@ -28,9 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+
 #include "Object.h"
 
 using namespace std;
+using namespace xercesc;
 
 ObjectMap Object::objectCache;
 

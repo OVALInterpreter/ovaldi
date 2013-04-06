@@ -28,7 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <windows.h>
+#include <comdef.h>
+//#include <Dsgetdc.h>
+//#include <Lm.h>
+#include <Wbemidl.h>
+
+#include "Log.h"
+
 #include "WMIProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								WMIProbe Class											  //	

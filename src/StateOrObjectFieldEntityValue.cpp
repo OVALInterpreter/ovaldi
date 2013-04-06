@@ -28,9 +28,10 @@
 //
 //****************************************************************************************//
 
-
+#include "Log.h"
 #include "VariableFactory.h"
 #include "EntityComparator.h"
+#include "XmlCommon.h"
 
 #include "StateOrObjectFieldEntityValue.h"
 

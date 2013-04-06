@@ -31,18 +31,12 @@
 #ifndef SET_H
 #define SET_H
 
-#include <string>
-#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
 
 #include "Filter.h"
 #include "AbsObject.h"
-#include "OvalEnum.h"
 #include "VariableValue.h"
-
-// Forward declarations to allow compilation.
-class Set;
-typedef std::vector < Set* > SetVector;
-// end forward declarations
+#include "OvalEnum.h"
 
 /**
 	This class represents an Set in an oval definition schema.

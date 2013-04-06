@@ -31,12 +31,12 @@
 #ifndef CRITERIA_H
 #define CRITERIA_H
 
-#include "AbsCriteria.h"
-#include "ExtendedDefinition.h"
-#include "Criterion.h"
-#include "Analyzer.h"
+#include <vector>
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsCriteria.h"
+#include "OvalEnum.h"
 
 class AbsCriteria;
 typedef std::vector < AbsCriteria* > AbsCriteriaVector;
@@ -53,8 +53,8 @@ public:
 		OvalEnum::Operator op = OvalEnum::OPERATOR_AND);
 	~Criteria();
 
-	void Write(DOMElement* parent);
-	void Parse(DOMElement* criteriaElm);
+	void Write(xercesc::DOMElement* parent);
+	void Parse(xercesc::DOMElement* criteriaElm);
 	OvalEnum::ResultEnumeration Analyze();
 	OvalEnum::ResultEnumeration NotEvaluated();
 

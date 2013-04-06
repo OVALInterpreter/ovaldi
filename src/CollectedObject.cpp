@@ -28,6 +28,11 @@
 //
 //****************************************************************************************//
 
+#include "Common.h"
+#include "XmlCommon.h"
+#include "AbsDataCollector.h"
+#include "DocumentManager.h"
+
 #include "CollectedObject.h"
 
 using namespace std;
@@ -487,7 +492,7 @@ void CollectedObject::AppendVariableValues(VariableValueVector* vars) {
 	}
 }
 
-void CollectedObject::Write(xercesc::DOMDocument* scFile, DOMElement* collectedObjectsElm) {
+void CollectedObject::Write(DOMDocument* scFile, DOMElement* collectedObjectsElm) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//

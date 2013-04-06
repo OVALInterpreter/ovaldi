@@ -32,22 +32,12 @@
 #ifndef WMIUTIL_H
 #define WMIUTIL_H
 
-// No need to include <comdefsp.h> which causes conflicts with the XERCES headers
-#define _INC_COMDEFSP
-#include <comdef.h>
-#undef _INC_COMDEFSP
-
-#include <Dsgetdc.h>
-#include <Lm.h>
-#include <Wbemidl.h>
 #include <windows.h>
 
 #include <string>
 #include <vector>
 #include <map>
 
-#include "Exception.h"
-#include "Log.h"
 #include "WMIItem.h"
 
 using namespace std;

@@ -28,6 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <comdef.h>
+#include <Dsgetdc.h>
+#include <Lm.h>
+#include <Wbemidl.h>
+
+#include "Common.h"
+#include "Exception.h"
+#include "Log.h"
+
 #include "WMIUtil.h"
 
 static IEnumWbemClassObject* pEnumerator = NULL;

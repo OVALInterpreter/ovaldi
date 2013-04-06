@@ -29,6 +29,8 @@
 //****************************************************************************************//
 
 #include "ItemFieldEntityValue.h"
+#include "AbsDataCollector.h"
+#include "XmlCommon.h"
 
 #include "ObjectComponent.h"
 

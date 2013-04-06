@@ -32,18 +32,8 @@
 #define OBJECTFACTORY_H
 
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 
-#include "Common.h"
-#include "AbsDataCollector.h"
 #include "AbsObject.h"
-#include "SetObject.h"
-#include "Object.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class is a Factory class for getting parsed objects.

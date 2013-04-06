@@ -32,15 +32,13 @@
 #define ABSENTITY_H
 
 #include <string>
-#include <iostream>
-#include <stdlib.h>
+#include <map>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "OvalEnum.h"
 #include "VariableValue.h"
 #include "AbsVariable.h"
 #include "ItemEntity.h"
-#include "EntityComparator.h"
 #include "AbsEntityValue.h"
 
 /** 

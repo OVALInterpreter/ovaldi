@@ -29,9 +29,13 @@
 //****************************************************************************************//
 
 #include <iostream>
-#include <stdlib.h>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
 #include "XmlCommon.h"
+#include "Common.h"
 #include "DocumentManager.h"
 
 #include "Item.h"
@@ -264,14 +268,14 @@ void Item::Parse(DOMElement* scItemElm) {
 	}	
 }
 
-void Item::Write(xercesc::DOMDocument* scFile, DOMElement* itemsElm) {
+void Item::Write(DOMDocument* scFile, DOMElement* itemsElm) {
 
 	if(!this->GetIsWritten()) {
 		this->SetIsWritten(true);
 		//this->SetId(Item::AssignId());
 
 		// add the namespace and schema location to the sc document
-		xercesc::DOMDocument *scDoc = DocumentManager::GetSystemCharacteristicsDocument();
+		DOMDocument *scDoc = DocumentManager::GetSystemCharacteristicsDocument();
 		XmlCommon::AddXmlns(scDoc, this->GetXmlns(), this->GetXmlnsAlias());
 		XmlCommon::AddSchemaLocation(scDoc, this->GetSchemaLocation());
 

@@ -33,12 +33,6 @@
 
 #include "Definition.h"
 #include "AbsCriteria.h"
-#include "Analyzer.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class AbsCriteria;
-class Definition;
 
 /**
 	This class represents an extended_definition in the oval defintiion schema.
@@ -54,13 +48,13 @@ public:
 		Calls Definition->Write() on the Definition Ref to ensure that
 		it is also written to the results document.
 	*/
-	void Write(DOMElement* parent);
+	void Write(xercesc::DOMElement* parent);
 	
 	/** Parse ExtendedDefinition element into a ExtendedDefinition object.
 		Search the cach
 		calls definition->Parse() on the definition ref to 
 	*/
-	void Parse(DOMElement* ExtendedDefinitionElm);
+	void Parse(xercesc::DOMElement* ExtendedDefinitionElm);
 
 	/** Analyze the ExtendedDefinition object.
 		Calls definition->Analyze() to get the result for the definition.

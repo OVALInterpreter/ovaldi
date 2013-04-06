@@ -28,9 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "XmlCommon.h"
+
 #include "ConstantVariable.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									ConstantVariable Class								  //	

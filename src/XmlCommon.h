@@ -31,25 +31,13 @@
 #ifndef XMLCOMMON_H
 #define XMLCOMMON_H
 
-/**
-  msxml.h defines its own DOMDocument so we have to safegaurd against this.
-  If msxml.h was included and the XERCES headers have not been included yet, 
-  undefine DOMDocument so that XERCES can redefine it.
-**/
-
-#ifdef	__msxml_h__
-#ifndef	DOMDocument_HEADER_GUARD_
-#undef	DOMDocument
-#endif  /* DOMDocument_HEADER_GUARD_ */
-#endif  /* __msxml_h__ */
-
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-
-
 //	other includes
 #include <string>
 #include <vector>
+
+//	required xerces includes
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
 
 #include "Exception.h"
 

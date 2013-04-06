@@ -28,51 +28,17 @@
 //
 //****************************************************************************************//
 
-#include <Exception.h>
-#include <Log.h>
-#include <WindowsCommon.h>
-#include <Common.h>
+#ifndef BITNESSVIEW_H
+#define BITNESSVIEW_H
 
-#include "PrivilegeGuard.h"
+/**
+ * Which "view" to search, on a 64-bit OS.  Applicable to the registry and
+ * filesystem.
+ */
+enum BitnessView {
+	BIT_32, ///< well, 32_BIT isn't a valid identifier...
+	BIT_64
+};
 
-using namespace std;
+#endif
 
-PrivilegeGuard::PrivilegeGuard(const string &privName, bool ctorThrow)
-	: disabled(false) {
-	if ( !WindowsCommon::EnablePrivilege ( privName ) ) {
-		string msg = "Error: Security privilege " + privName +
-			" could not be enabled. Microsoft System Error " +
-			Common::ToString ( GetLastError() ) + " - " + 
-			WindowsCommon::GetErrorMessage ( GetLastError() );
-
-		if (ctorThrow)
-			throw Exception(msg);
-		else {
-			// We couldn't enable the priv, so no point in trying to disable
-			// it later.
-			disabled = true;
-			Log::Message(msg);
-		}
-	}
-}
-
-PrivilegeGuard::~PrivilegeGuard() {
-	if (!disabled)
-		if ( !WindowsCommon::DisableAllPrivileges() ) {
-			Log::Message( "Error: All of the privileges could not be disabled. Microsoft System Error " +
-				Common::ToString ( GetLastError() ) + " - " +
-				WindowsCommon::GetErrorMessage ( GetLastError() ) );
-		}
-}
-
-void PrivilegeGuard::disable() {
-	if (disabled) return;
-
-	disabled = true;
-
-	if ( !WindowsCommon::DisableAllPrivileges() ) {
-		throw Exception ( "Error: All of the privileges could not be disabled. Microsoft System Error " +
-			Common::ToString ( GetLastError() ) + " - " +
-			WindowsCommon::GetErrorMessage ( GetLastError() ) );
-	}
-}

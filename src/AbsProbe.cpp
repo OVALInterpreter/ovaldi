@@ -29,6 +29,10 @@
 //****************************************************************************************//
 
 #include <algorithm>
+
+#include "Log.h"
+#include "Common.h"
+
 #include "AbsProbe.h"
 
 using namespace std;

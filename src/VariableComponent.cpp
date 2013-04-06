@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "VariableFactory.h"
+#include "XmlCommon.h"
 
 #include "VariableComponent.h"
 

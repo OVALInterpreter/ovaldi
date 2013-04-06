@@ -30,10 +30,13 @@
 #ifndef REGISTRYPROBE_H
 #define REGISTRYPROBE_H
 
-#pragma warning(disable:4786)
+#include <windows.h>
+#include <string>
+
 #include "RegistryFinder.h"
 #include "AbsProbe.h"
-#include <windows.h>
+#include "Item.h"
+#include "Object.h"
 
 /**
 	This class is responsible for collecting registry information for windows registry_objects.

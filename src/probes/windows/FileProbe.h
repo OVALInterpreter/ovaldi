@@ -33,18 +33,15 @@
 
 #pragma warning(disable:4786)
 
-#include "FileFinder.h"
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-#include <TCHAR.H>
-#include <aclapi.h>
-#include <imagehlp.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <windows.h>
 #include <string>
+#include <map>
+
+#include "Item.h"
+#include "Object.h"
+#include "FileFinder.h"
+#include "AbsProbe.h"
+
 
 /**
 	This class is responsible for collecting file information for windows file_objects.
@@ -78,7 +75,7 @@ private:
 	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder);
 
 	/* holds the language mappings for the file language data */
-	static std::map<WORD,string> langMap;
+	static std::map<WORD,std::string> langMap;
 };
 
 #endif

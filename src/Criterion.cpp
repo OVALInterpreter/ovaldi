@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "Analyzer.h"
+#include "XmlCommon.h"
 
 #include "Criterion.h"
 
@@ -67,7 +68,7 @@ void Criterion::SetTestRef(Test* testRef) {
 void Criterion::Write(DOMElement* parentElm) {
 
 	// get the parent document
-	xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
 	DOMElement* criterionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "criterion");

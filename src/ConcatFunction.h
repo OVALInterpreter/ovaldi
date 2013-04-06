@@ -31,10 +31,9 @@
 #ifndef CONCATFUNCTION_H
 #define CONCATFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsFunctionComponent.h"
 
 /**
 	This class represents a ConcatFunction component in a local_variable in the oval definition schema.
@@ -45,7 +44,7 @@ public:
 	~ConcatFunction();
 
 	/** Parse the concat element and its child component elements. */
-	void Parse(DOMElement* componentElm); 
+	void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired concatenated strings and return the values. */
 	ComponentValue* ComputeValue();

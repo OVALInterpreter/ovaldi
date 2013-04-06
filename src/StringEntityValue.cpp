@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
 #include "XmlCommon.h"
 
 #include "StringEntityValue.h"

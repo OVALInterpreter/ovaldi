@@ -33,19 +33,14 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
 #include <map>
 #include <utility>
 
-#include "Common.h"
 #include "AbsObject.h"
 #include "OvalMessage.h"
 #include "Item.h"
 #include "VariableValue.h"
-#include "AbsDataCollector.h"
 #include "OvalEnum.h"
-
 
 class CollectedObject;
 
@@ -66,9 +61,6 @@ typedef std::pair <std::string, CollectedObject* > CollectedObjectPair;
 	Stores only pointers to the objects. 
 */
 typedef std::map <std::string, CollectedObject* > CollectedObjectMap;
-
-class Item;
-typedef std::vector < Item* > ItemVector;
 
 /**
 	This class represents an object in a oval sytem characteristics schema.

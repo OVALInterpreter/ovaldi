@@ -50,6 +50,7 @@
 #include <NTSecAPI.h>
 
 #include <Common.h>
+#include "Log.h"
 
 #include "AuditEventPolicySubcategoriesProbe.h"
 

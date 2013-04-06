@@ -28,6 +28,14 @@
 //
 //****************************************************************************************//
 
+// See: 
+// http://xml.apache.org/xalan-c/usagepatterns.html#xalantransformer
+// for info about how to use the XalanTransformer C++ API
+
+//	required xalan includes 
+
+#include <xalanc/XalanTransformer/XalanCAPI.h>
+
 #include "XslCommon.h"
 
 using namespace std;

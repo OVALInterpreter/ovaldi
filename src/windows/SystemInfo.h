@@ -35,6 +35,7 @@
 
 #include <string>
 #include <vector>
+#include <xercesc/dom/DOMDocument.hpp>
 
 #include "Exception.h"
 

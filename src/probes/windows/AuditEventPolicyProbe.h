@@ -31,15 +31,9 @@
 #ifndef AUDITEVENTPOLICYPROBE_H
 #define AUDITEVENTPOLICYPROBE_H
 
-#pragma warning(disable:4786)
-
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-#include <Ntsecapi.h>
-#include <windows.h>
-
-using namespace std;
+#include "Item.h"
+#include "Object.h"
 
 class AuditEventPolicyProbe : public AbsProbe {
 public:
@@ -56,13 +50,6 @@ private:
 
     /** Return a new Item created for storing audit event policy information. */
 	virtual Item* CreateItem();
-
-	/** Read the Audit options and set the value of the ItemEntity.
-		LSA Policy defines a mask for the valid event auditing options. 
-		The POLICY_AUDIT_EVENT_MASK mask evaluates to TRUE if it is set 
-		equal to any of the preceding event auditing options.
-	*/
-	void ReadAuditOptions(Item* item, ItemEntity* itemElm, ULONG auditPolicy);
 
 	static AuditEventPolicyProbe *instance;
 };

@@ -31,18 +31,7 @@
 #ifndef XSLCOMMON_H
 #define XSLCOMMON_H
 
-
-// See: 
-// http://xml.apache.org/xalan-c/usagepatterns.html#xalantransformer
-// for info about how to use the XalanTransformer C++ API
-
-//	required xalan includes 
-
-#include <xalanc/XalanTransformer/XalanCAPI.h>
-
-
-//	other includes
-#include "Log.h"
+#include <string>
 
 /**
 	This class encapsulates a set of static methods for applying an xsl to an xml file

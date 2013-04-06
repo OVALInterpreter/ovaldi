@@ -30,10 +30,9 @@
 #ifndef VOLUMEPROBE_H
 #define VOLUMEPROBE_H
 
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
+#include <string>
 
-using namespace std;
+#include "AbsProbe.h"
 
 /** This class is responsible for collecting Windows volume data. */
 
@@ -65,21 +64,13 @@ class VolumeProbe : public AbsProbe {
          *  @param rootPathStr A string that represents the rootpath of the Windows volume whose infomation you would like to enumerate.
          *  @return A Item object that contains all of the specified volume's associated information.
          */
-        Item* BuildVolumeObject ( string rootPathStr );
+        Item* BuildVolumeObject ( std::string rootPathStr );
 
         /** Retrieve the pathname of a particular volume using the specified volume name.
          *  @param volumeNameStr A string that represents the name of the volume whose path you would like to enumerate.
          *  @return A string representing the path name of the specified volume.
          */
-        string GetPathName ( string volumeNameStr );
-
-		/**
-		 * Convert a DriveTypeEnumeration into a string
-		 *
-		 * @param OvalEnum::DriveTypeEnumeration driveTypeEnum
-		 * @return std::string
-		 **/
-		static std::string DriveTypeToString(UINT driveType);
+        std::string GetPathName ( std::string volumeNameStr );
 
         /** The static instance of the VolumeProbe.
         All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes. */

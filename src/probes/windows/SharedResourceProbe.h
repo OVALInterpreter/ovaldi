@@ -30,9 +30,11 @@
 #ifndef SHAREDRESOURCEPROBE_H
 #define SHAREDRESOURCEPROBE_H
 
+#include <string>
+
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include <lm.h>
+#include "Item.h"
+#include "Object.h"
 
 /** This class is responsible for collecting Windows shared resource data. */
 
@@ -59,25 +61,12 @@ class SharedResourceProbe : public AbsProbe {
          *  @param netNameStr A string that contains the share name of a Windows shared resource.
          *  @return The Item object whose share name matches the specified value.
          */
-        Item* GetSharedResource ( string netNameStr );
+        Item* GetSharedResource ( std::string netNameStr );
 
         /** Retrieve all of the Windows shared resources on the local system.
          *  @return Void.
          */
         void GetAllSharedResources();
-
-        /** Convert a SharedResource type DWORD value into its corresponding string value.
-         *  Currently, as of Version 5.5, the OVAL Language only supports STYPE_DISKTREE, STYPE_PRINTQ,
-         *  STYPE_DEVICE, STYPE_IPC, STYPE_SPECIAL, and STYPE_TEMPORARY as values for shared resource types.
-         *  However, as the result of implementing this Probe, the shared resource types found in the corresponding
-         *  function definition that are not mentioned above may be added to the OVAL Language in Version 5.6
-         *  pending approval from the OVAL Board.  For more information regarding this issue, refer to the following link.
-         *  http://n2.nabble.com/Proposal-to-Amend-the-win-def%3AEntityStateSharedResourceTypeType-Definition-td2617124.html.
-         *  For Version 5.6, make sure to uncomment the case statements for the newly added shared resouce types, and to remove the STYPE_SPECIAL and STYPE_TEMPORARY case statements.
-         *  @param sharedType A DWORD value that contains a bitmask of flags that represent the type of the Windows shared resource.
-         *  @return A string representing the type of the Windows shared resource.
-         */
-        string GetSharedResourceType ( DWORD sharedType );
 
         /** Delete all of the Items in the resources ItemVector.
          *  @return Void.

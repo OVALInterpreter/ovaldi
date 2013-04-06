@@ -31,6 +31,10 @@
 #ifndef STATEENTITY_H
 #define STATEENTITY_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "OvalEnum.h"
 #include "AbsEntity.h" 
 
 /**

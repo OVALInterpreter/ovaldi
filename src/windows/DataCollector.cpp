@@ -30,6 +30,7 @@
 
 #include "ObjectCollector.h"
 #include "SystemInfo.h"
+#include "DocumentManager.h"
 
 #include "DataCollector.h"
 

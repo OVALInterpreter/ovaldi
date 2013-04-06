@@ -35,6 +35,8 @@
 
 #include <OvalEnum.h>
 #include "AbsProbe.h"
+#include "Item.h"
+#include "Object.h"
 
 /** This class is responsible for collecting Windows port data. */
 

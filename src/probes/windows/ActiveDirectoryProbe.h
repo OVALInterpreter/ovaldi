@@ -31,18 +31,17 @@
 #ifndef ACTIVEDIRECTORYPROBE_H
 #define ACTIVEDIRECTORYPROBE_H
 
-#include "AbsProbe.h"
-#include "Common.h"
-#include "WindowsCommon.h"
-#include <Winldap.h>
-#include <dsgetdc.h>
+#include <string>
+#include <map>
 #include <iads.h>
-#include <activeds.h>
-#include <iomanip>
+
+#include "Item.h"
+#include "Object.h"
+#include "AbsProbe.h"
 
 /** This class is responsible for collecting Windows Active Directory data. */
 
-typedef map < string , StringKeyedItemMap* > ActiveDirectoryMap;
+typedef std::map < std::string , StringKeyedItemMap* > ActiveDirectoryMap;
 
 class ActiveDirectoryProbe : public AbsProbe {
 
@@ -68,7 +67,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param adsType A ADSTYPE value which represents the type of the Active Directory attribute.
          *  @return A string representation of an Active Directory attribute type.
          */
-        string GetAdsType ( ADSTYPE adsType );
+        std::string GetAdsType ( ADSTYPE adsType );
 
         /** Retrieve a particular Active Directory item from the Active Directory cache using the Active Directory's naming context, relative distinguished name, and attribute as the key.
          *  @param namingContextStr A string that contains the naming context of an Active Directory item.  Possible values are 'domain', 'configuration', and 'schema'.
@@ -76,21 +75,21 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeStr A string that contains the naming context of an Active Directory item.
          *  @return The Item representing an Active Directory item whose naming context, relative distinguished name, and attribute match the specified values.
          */
-        Item* GetActiveDirectoryData ( string namingContextStr , string relativeDnStr , string attributeStr );
+        Item* GetActiveDirectoryData ( std::string namingContextStr , std::string relativeDnStr , std::string attributeStr );
 
         /** Retrieves the object class of the Active Directory item with the specified naming context and relative distinguished name.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
          *  @param relativeDnStr A string that contains the relative distinguished name of the Active Directory item.
          *  @return A string value that contains the object class of the Active Directory item with the specified naming context and relative distinguished name.
          */
-        string GetObjectClass ( string namingContextStr , string relativeDnStr );
+        std::string GetObjectClass ( std::string namingContextStr , std::string relativeDnStr );
 
         /** Creates a distinguished name with the given naming context and relative distinguished name.
          *  @param namingContextStr A string that contains the naming context of an Active Directory item.  Possible values are 'domain', 'configuration', and 'schema'.
          *  @param relativeDnStr A string that contains the relative distinguished name of an Active Directory item.
          *  @return A string representing the distinguished name of an Active Directory item.
          */
-        string BuildDistinguishedName ( string namingContextStr, string relativeDnStr );
+        std::string BuildDistinguishedName ( std::string namingContextStr, std::string relativeDnStr );
 
         /** Retrieve the domain components of the Active Directory.
          *  @return Void.
@@ -102,7 +101,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param distinguishedNameStr A string that contains the relative distinguished name of the Active Directory item.
          *  @return A wstring value that represents the relative distinguished name of the distinguished name that was specified.
          */
-        string RemoveDnBase ( string namingContextStr, string distinguishedNameStr );
+        std::string RemoveDnBase ( std::string namingContextStr, std::string distinguishedNameStr );
 
         /** Get the set of all naming context values on the system that match the object.
          *  @param namingContextEntity A ObjectEntity that represents the naming context entity in an Object as defined in the OVAL Definition Schema.
@@ -115,20 +114,20 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching naming context values.
          */
-        StringSet* GetMatchingNamingContexts ( string patternStr , bool isRegex );
+        StringSet* GetMatchingNamingContexts ( std::string patternStr , bool isRegex );
 
         /** Determine if the specified naming context value exists.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
          *  @return A boolean value indicating whether or not a Active Directory item with the specified naming context value exists.
          */
-        bool NamingContextExists ( string namingContextStr );
+        bool NamingContextExists ( std::string namingContextStr );
 
         /** Get the set of all relative distinguished names on the system that match the object.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
          *  @param relativeDnEntity A ObjectEntity that represents the relative distinguished name entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the relative distinguished names specified in the ObjectEntity that also match the specified naming context.
          */
-        StringSet* GetRelativeDns ( string namingContextStr , ObjectEntity* relativeDnEntity );
+        StringSet* GetRelativeDns ( std::string namingContextStr , ObjectEntity* relativeDnEntity );
 
         /** Retrieve all of the matching relative distinguished names.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
@@ -136,14 +135,14 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching relative distinguished names that also match the specified naming context.
          */
-        StringSet* GetMatchingRelativeDns ( string namingContextStr , string patternStr , bool isRegex );
+        StringSet* GetMatchingRelativeDns ( std::string namingContextStr , std::string patternStr , bool isRegex );
 
         /** Deterimine if the specified relative distinguished name value exists.
          *  @param namingContextStr A string that contains the naming context value of the Active Directory item.
          *  @param relativeDnStr A string that contains the relative distinguished name of the Active Directory item.
          *  @return A boolean value indicating whether or not a Active Directory item with the specified naming context and relative distinguished name exists.
          */
-        bool RelativeDnExists ( string namingContextStr , string relativeDnStr );
+        bool RelativeDnExists ( std::string namingContextStr , std::string relativeDnStr );
 
         /** Get the set of all Active Directory attributes on the system that match the object.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
@@ -151,7 +150,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeEntity A ObjectEntity that represents the attribute entity in an Object as defined in the OVAL Definition Schema.
          *  @return A StringSet that contains all of the attributes specified in the ObjectEntity that also match the specified naming context and relative distinguished name.
          */
-        StringSet* GetAttributes ( string namingContextStr , string relativeDnStr , ObjectEntity* attributeEntity );
+        StringSet* GetAttributes ( std::string namingContextStr , std::string relativeDnStr , ObjectEntity* attributeEntity );
 
         /** Retrieve all of the matching Active Directory attributes.
          *  @param namingContextStr A string that contains the naming context value to be used during the matching process.
@@ -160,7 +159,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching attributes that also match the specified naming context and relative distinguished name.
          */
-        StringSet* GetMatchingAttributes ( string namingContextStr , string relativeDnStr , string patternStr , bool isRegex );
+        StringSet* GetMatchingAttributes ( std::string namingContextStr , std::string relativeDnStr , std::string patternStr , bool isRegex );
 
         /** Deterimine if the specified attribute value exists.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
@@ -168,7 +167,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeStr A string that contains the attribute of the Active Directory item.
          *  @return A boolean value indicating whether or not a Active Directory item with the specified naming context, relative distinguished name, and attribute exists.
          */
-        bool AttributeExists ( string namingContextStr , string relativeDnStr , string attributeStr );
+        bool AttributeExists ( std::string namingContextStr , std::string relativeDnStr , std::string attributeStr );
 
         /** Retrieves data from the Active Directory.
          *  @param namingContextStr A string that contains the naming context of the Active Directory item.
@@ -177,25 +176,25 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param activeDirectoryData A pointer to a StringSet which contains all of the distinguished names or attributes depending on which value is specified for the activeDirectoryOperation.  This value should be NULL when not retrieving all of the Active Directory distinguished names or all of the attributes for a particular distinguished name.
          *  @return A boolean value indicating that operation performed was completed successfully.
          */
-        bool QueryActiveDirectory ( string namingContextStr , string relativeDnStr , string activeDirectoryOperationStr , StringSet* activeDirectoryData );
+        bool QueryActiveDirectory ( std::string namingContextStr , std::string relativeDnStr , std::string activeDirectoryOperationStr , StringSet* activeDirectoryData );
 
         /** Converts an ADS_OCTET_STRING structure into its equivalent string representation.  Note that this function only works for the 'objectSid' and 'objectGUID' attributes.
          *  @param attributeStr A string that represents the attribute name whose value you are trying to convert.
          *  @return A string representation of the attribute's ADS_OCTET_STRING value.
          */
-        string ConvertOctetString ( string attributeStr, ADS_OCTET_STRING* octetString );
+        std::string ConvertOctetString ( std::string attributeStr, ADS_OCTET_STRING* octetString );
 
         /** Converts SYSTEMTIME structure into its equivalent UTC time representation string.
          *  @param time A pointer to a SYSTEMTIME structure which represents the a time value of an Active Directory attribute.
          *  @return A string representation of the attribute's time value in UTC.
          */
-        string BuildUTCTimeString ( SYSTEMTIME *time );
+        std::string BuildUTCTimeString ( SYSTEMTIME *time );
 
         /** Retrieve a string representation of the last ADSI error message.
          *  @param hResult A HRESULT that represents the return value of some ADSI API function call.
          *  @return A string representation of the last ADSI error message.
          */
-        string GetLastAdsiErrorMessage ( HRESULT hResult );
+        std::string GetLastAdsiErrorMessage ( HRESULT hResult );
 
         /** Delete all of the distinguished names in the in the distinguished names StringSet*.
         *  @return Void.
@@ -219,37 +218,37 @@ class ActiveDirectoryProbe : public AbsProbe {
         StringSet* distinguishedNames;
 
         /** The string that contains the base distinguished name of the Active Directory */
-        string domainName;
+        std::string domainName;
 
         /** The string that contains the domain name that is used to create the base distinguished name of the Active Directory */
-        string dnsName;
+        std::string dnsName;
 
         /** String constant representing the domain naming context value */
-        static const string NAMING_CONTEXT_TYPE_DOMAIN;
+        static const std::string NAMING_CONTEXT_TYPE_DOMAIN;
 
         /** String constant representing the configuration naming context value */
-        static const string NAMING_CONTEXT_TYPE_CONFIGURATION;
+        static const std::string NAMING_CONTEXT_TYPE_CONFIGURATION;
 
         /** String constant representing the schema naming context value */
-        static const string NAMING_CONTEXT_TYPE_SCHEMA;
+        static const std::string NAMING_CONTEXT_TYPE_SCHEMA;
 
         /* String constants that represent the function to be performed by the ActiveDirectoryProbe::QueryActiveDirectory() method
          * GET_ALL_ATTRIBUTES - Retrieve all of the attributes for the specified Active Directory object
          * GET_ALL_DISTINGUISHED_NAMES - Retrieve all of the distinguished names from the Active Directory
          * OBJECT_EXISTS - Determine if the specified Active Directory object exists
          */
-        static const string GET_ALL_ATTRIBUTES;
-        static const string GET_ALL_DISTINGUISHED_NAMES;
-        static const string OBJECT_EXISTS;
+        static const std::string GET_ALL_ATTRIBUTES;
+        static const std::string GET_ALL_DISTINGUISHED_NAMES;
+        static const std::string OBJECT_EXISTS;
 
         /** String constant representing the distinguishedName attribute */
-        static const string DISTINGUISHED_NAME_ATTRIBUTE;
+        static const std::string DISTINGUISHED_NAME_ATTRIBUTE;
 
         /** String constant representing the objectClass attribute */
-        static const string OBJECT_CLASS_ATTRIBUTE;
+        static const std::string OBJECT_CLASS_ATTRIBUTE;
 
         /** String constant representing the LDAP protocol */
-        static const string LDAP_PROTOCOL;
+        static const std::string LDAP_PROTOCOL;
 };
 
 #endif

@@ -28,6 +28,13 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+#include "Common.h"
+#include "Analyzer.h"
+
 #include "Definition.h"
 
 using namespace std;
@@ -187,7 +194,7 @@ void Definition::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		xercesc::DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new definition element
 		DOMElement* definitionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "definition");

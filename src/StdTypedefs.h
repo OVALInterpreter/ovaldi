@@ -28,51 +28,51 @@
 //
 //****************************************************************************************//
 
-#include <Exception.h>
-#include <Log.h>
-#include <WindowsCommon.h>
-#include <Common.h>
+#ifndef STDTYPEDEFS_H
+#define STDTYPEDEFS_H
 
-#include "PrivilegeGuard.h"
+/*
 
-using namespace std;
+I decided it doesn't make sense to pull in all the stuff in Common.h
+just to get a few typedefs.  So I am factoring the typedefs out to
+this header.
 
-PrivilegeGuard::PrivilegeGuard(const string &privName, bool ctorThrow)
-	: disabled(false) {
-	if ( !WindowsCommon::EnablePrivilege ( privName ) ) {
-		string msg = "Error: Security privilege " + privName +
-			" could not be enabled. Microsoft System Error " +
-			Common::ToString ( GetLastError() ) + " - " + 
-			WindowsCommon::GetErrorMessage ( GetLastError() );
+*/
 
-		if (ctorThrow)
-			throw Exception(msg);
-		else {
-			// We couldn't enable the priv, so no point in trying to disable
-			// it later.
-			disabled = true;
-			Log::Message(msg);
-		}
-	}
-}
+#include <string>
+#include <vector>
+#include <utility>
+#include <set>
 
-PrivilegeGuard::~PrivilegeGuard() {
-	if (!disabled)
-		if ( !WindowsCommon::DisableAllPrivileges() ) {
-			Log::Message( "Error: All of the privileges could not be disabled. Microsoft System Error " +
-				Common::ToString ( GetLastError() ) + " - " +
-				WindowsCommon::GetErrorMessage ( GetLastError() ) );
-		}
-}
+/**
+	A vector for storing strings.
+*/
+typedef std::vector < std::string > StringVector;
 
-void PrivilegeGuard::disable() {
-	if (disabled) return;
+/**
+    A set for storing unique strings.
+*/
+typedef std::set < std::string > StringSet;
 
-	disabled = true;
+/**
+	A vector for storing integers.
+*/
+typedef std::vector < int > IntVector;
 
-	if ( !WindowsCommon::DisableAllPrivileges() ) {
-		throw Exception ( "Error: All of the privileges could not be disabled. Microsoft System Error " +
-			Common::ToString ( GetLastError() ) + " - " +
-			WindowsCommon::GetErrorMessage ( GetLastError() ) );
-	}
-}
+/**
+	A vector for storing long long integers.
+*/
+typedef std::vector < long long > LongLongVector;
+
+/**	
+	A pair for storing two related strings.
+*/
+typedef std::pair < std::string, std::string > StringPair;
+
+/**	
+	A vector for storing pairs of strings.
+*/
+typedef std::vector < StringPair* > StringPairVector;
+
+
+#endif

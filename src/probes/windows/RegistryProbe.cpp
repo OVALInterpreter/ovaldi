@@ -31,6 +31,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include "WindowsCommon.h"
+
 #include "RegistryProbe.h"
 
 using namespace std;

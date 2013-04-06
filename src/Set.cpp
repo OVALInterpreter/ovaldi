@@ -28,10 +28,12 @@
 //
 //****************************************************************************************//
 
-#include <iostream>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
 #include "ObjectFactory.h"
 #include "Common.h"
+#include "XmlCommon.h"
 
 #include "Set.h"
 

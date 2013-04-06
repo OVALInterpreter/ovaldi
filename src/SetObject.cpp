@@ -28,6 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Common.h"
+#include "ObjectFactory.h"
+#include "AbsObject.h"
+#include "State.h"
+#include "Object.h"
+#include "XmlCommon.h"
+
 #include "SetObject.h"
 
 using namespace std;

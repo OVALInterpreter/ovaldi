@@ -36,6 +36,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cctype>
+#include <iostream>
 
 #ifdef WIN32
 #  include <ws2tcpip.h>
@@ -49,9 +50,11 @@
 #endif
 
 #include "REGEX.h"
-#include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "ItemFieldEntityValue.h"
+#include "Log.h"
+
+#include "EntityComparator.h"
 
 using namespace std;
 

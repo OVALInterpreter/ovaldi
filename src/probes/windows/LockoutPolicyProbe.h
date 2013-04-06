@@ -34,13 +34,6 @@
 #pragma warning(disable:4786)
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-#include <aclapi.h>
-#include <windows.h>
-#include <lm.h>
-
-using namespace std;
 
 class LockoutPolicyProbe : public AbsProbe {
 public:

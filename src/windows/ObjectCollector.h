@@ -33,6 +33,7 @@
 
 //	include the parent class.
 #include "AbsObjectCollector.h"
+#include "AbsProbe.h"
 
 /**
 	The object collector for windows definitions.

@@ -28,9 +28,9 @@
 //
 //****************************************************************************************//
 
-#include <iostream>
-#include <sstream>
-
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "Log.h"
 #include "LocalVariable.h"
 #include "ConstantVariable.h"
 #include "ExternalVariable.h"

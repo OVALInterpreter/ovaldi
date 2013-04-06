@@ -28,9 +28,23 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "Common.h"
+#include "XmlCommon.h"
+#include "Version.h"
+#include "AbsVariable.h"
+#include "CollectedObject.h"
+
 #include "AbsDataCollector.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								AbsDataCollector Class									  //	

@@ -28,6 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+
+#include "Common.h"
+#include "Exception.h"
+
 #include "Log.h"
 
 using namespace std;

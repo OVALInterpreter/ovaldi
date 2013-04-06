@@ -31,10 +31,8 @@
 #ifndef COMPONENTVALUE_H
 #define COMPONENTVALUE_H
 
-#include "Common.h"
 #include "OvalEnum.h"
-
-
+#include "StdTypedefs.h"
 
 /**
 	This class represents a the value of a variable component.

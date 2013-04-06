@@ -33,8 +33,14 @@
 
 #include <AutoCloser.h>
 #include <FreeGuard.h>
+#include "Log.h"
+#include "Common.h"
+#include "ItemEntity.h"
+#include "WindowsCommon.h"
 
 #include "RegistryFinder.h"
+
+using namespace std;
 
 char RegistryFinder::keySeparator = '\\';
 

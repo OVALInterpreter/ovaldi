@@ -28,6 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
 #include "XmlCommon.h"
 #include "ItemFieldEntityValue.h"
 #include "StringEntityValue.h"
@@ -148,7 +153,7 @@ void ItemEntity::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-void ItemEntity::Write(xercesc::DOMDocument* scFile, DOMElement* itemElm, const string &ns) {
+void ItemEntity::Write(DOMDocument* scFile, DOMElement* itemElm, const string &ns) {
 
 	// Create new item element
 

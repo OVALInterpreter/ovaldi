@@ -31,17 +31,13 @@
 #ifndef REGISTRYFINDER_H
 #define REGISTRYFINDER_H
 
-#pragma warning(disable:4786)
+#include <string>
 
-#include "Log.h"
-#include "Common.h"
-#include "Exception.h"
 #include "REGEX.h"
+#include "Exception.h"
 #include "ObjectEntity.h"
-#include "ItemEntity.h"
-#include "WindowsCommon.h"
-
-#include <iostream>
+#include "BitnessView.h"
+#include "Behavior.h"
 
 /**
     This class provides a data structure for storing and accessing registry keys and values

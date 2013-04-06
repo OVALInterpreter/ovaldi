@@ -28,10 +28,14 @@
 //
 //****************************************************************************************//
 
-#include "VariableFactory.h"
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
+#include "Log.h"
+#include "VariableFactory.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
+#include "XmlCommon.h"
 
 #include "StateEntity.h"
 

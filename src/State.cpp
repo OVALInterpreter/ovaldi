@@ -29,10 +29,18 @@
 //****************************************************************************************//using namespace std;
 
 #include <memory>
-#include "State.h"
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+
+#include "XmlCommon.h"
+#include "Log.h"
 #include "StateEntity.h"
+#include "DocumentManager.h"
+
+#include "State.h"
 
 using namespace std;
+using namespace xercesc;
 
 AbsStateMap State::processedStatesMap;
 

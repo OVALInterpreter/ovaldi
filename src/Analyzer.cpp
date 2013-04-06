@@ -28,9 +28,23 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "Definition.h"
+#include "DocumentManager.h"
+#include "Version.h"
+#include "Item.h"
+#include "XmlCommon.h"
+#include "Common.h"
+#include "Test.h"
+
 #include "Analyzer.h"
 
 using namespace std;
+using namespace xercesc;
 
 DOMElement* Analyzer::definitionsElm = NULL;
 DOMElement* Analyzer::testsElm = NULL;

@@ -28,8 +28,14 @@
 //
 //****************************************************************************************//
 
-#include "ObjectEntity.h"
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
 #include "StateOrObjectFieldEntityValue.h"
+#include "XmlCommon.h"
+
+#include "ObjectEntity.h"
 
 using namespace std;
 

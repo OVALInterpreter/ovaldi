@@ -31,6 +31,7 @@
 #include <AutoCloser.h>
 #include "RegKeyEffectiveRightsProbe.h"
 
+using namespace std;
 
 //****************************************************************************************//
 //                              RegKeyEffectiveRightsProbe Class                              //

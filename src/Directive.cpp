@@ -27,10 +27,19 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <iostream>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "DocumentManager.h"
+#include "Log.h"
+#include "XmlCommon.h"
+
 #include "Directive.h"
 
 using namespace std;
-XERCES_CPP_NAMESPACE_USE
+using namespace xercesc;
 
 //
 // Static members
@@ -124,7 +133,7 @@ void Directive::LoadDirectives() {
 	}
 }
 
-void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc) {
+void Directive::ApplyAll(DOMDocument* resultsDoc) {
 	//
 	// Update <directives> tag in results with correct settings
 	//

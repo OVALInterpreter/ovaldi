@@ -33,6 +33,8 @@
 
 #include <string>
 #include <vector>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
 
 #include "OvalEnum.h"
 

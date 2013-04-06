@@ -31,15 +31,11 @@
 #ifndef PASSWORDPOLICYPROBE_H
 #define PASSWORDPOLICYPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "REGEX.h"
-
-#include <aclapi.h>
-#include <windows.h>
-#include <lm.h>
+#include "Item.h"
+#include "Object.h"
 
 using namespace std;
 

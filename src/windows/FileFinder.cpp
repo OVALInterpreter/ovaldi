@@ -28,10 +28,12 @@
 //
 //****************************************************************************************//
 
-
 #include <memory>
+
 #include <AutoCloser.h>
 #include <FsRedirectionGuard.h>
+#include <EntityComparator.h>
+#include "WindowsCommon.h"
 
 #include "FileFinder.h"
 

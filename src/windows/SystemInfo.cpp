@@ -33,6 +33,8 @@
 #include <iomanip>
 #include <windows.h>
 #include <Iphlpapi.h>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
 
 #include "XmlCommon.h"
 #include "Log.h"
