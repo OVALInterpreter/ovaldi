@@ -145,7 +145,7 @@ void VariableValue::WriteTestedVariable(DOMElement* parentElm) {
 	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new tested_item element
-	DOMElement* testedVarElm = XmlCommon::AddChildElement(resultDoc, parentElm, "tested_variable", this->GetValue());
+	DOMElement* testedVarElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "tested_variable", this->GetValue());
 
 	// add the attributes
 	XmlCommon::AddAttribute(testedVarElm, "variable_id", this->GetId());
