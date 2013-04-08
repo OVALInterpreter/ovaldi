@@ -31,8 +31,6 @@
 #ifndef PRINTEREFFECTIVRIGHTSPROBE_H
 #define PRINTEREFFECTIVRIGHTSPROBE_H
 
-#pragma warning(disable:4786)
-
 #include <string>
 #include <Windows.h> // for HANDLE
 

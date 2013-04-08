@@ -32,12 +32,11 @@
 #define ABSEFFECTIVERIGHTSPROBE_H
 
 #include <string>
+#include <windows.h> // for HANDLE
+#include <AccCtrl.h> // for SE_OBJECT_TYPE
 
 #include "AbsProbe.h"
 #include "ObjectEntity.h"
-
-#include <windows.h> // for HANDLE
-#include <AccCtrl.h> // for SE_OBJECT_TYPE
 
 /** 
 	The AbsEffectiveRightsProbe class provides several methods used by all effective rights probes including a

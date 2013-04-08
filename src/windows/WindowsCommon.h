@@ -30,8 +30,6 @@
 #ifndef WINDOWSCOMMON_H
 #define WINDOWSCOMMON_H
 
-#pragma warning(disable:4786)
-
 #include <Windows.h> // for lots of windows types, e.g. DWORD
 #include <AccCtrl.h> // for SE_OBJECT_TYPE
 #include <string>

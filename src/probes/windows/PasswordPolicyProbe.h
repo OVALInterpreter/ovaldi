@@ -37,8 +37,6 @@
 #include "Item.h"
 #include "Object.h"
 
-using namespace std;
-
 class PasswordPolicyProbe : public AbsProbe {
 public:
 	virtual ~PasswordPolicyProbe();

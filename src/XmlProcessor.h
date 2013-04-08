@@ -31,10 +31,6 @@
 #ifndef	XMLPROCESSOR_H
 #define	XMLPROCESSOR_H
 
-#ifdef WIN32
-#pragma	warning(disable:4786)
-#endif
-
 #include <string>
 
 //	required xerces	includes

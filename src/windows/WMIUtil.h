@@ -32,15 +32,11 @@
 #ifndef WMIUTIL_H
 #define WMIUTIL_H
 
-#include <windows.h>
-
 #include <string>
 #include <vector>
 #include <map>
 
 #include "WMIItem.h"
-
-using namespace std;
 
 /**
 	This class is responsible for collecting information from WMI.
@@ -56,7 +52,6 @@ public:
 
 private:
 	static void Open(std::string wmi_namespace);
-	static std::string GetStringFromVariant(VARIANT value);
 	static void Close();
 };
 

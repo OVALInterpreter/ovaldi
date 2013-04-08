@@ -31,8 +31,6 @@
 #ifndef FILEPROBE_H
 #define FILEPROBE_H
 
-#pragma warning(disable:4786)
-
 #include <windows.h>
 #include <string>
 #include <map>

@@ -31,8 +31,6 @@
 #ifndef LOCKOUTPOLICYPROBE_H
 #define LOCKOUTPOLICYPROBE_H
 
-#pragma warning(disable:4786)
-
 #include "AbsProbe.h"
 
 class LockoutPolicyProbe : public AbsProbe {

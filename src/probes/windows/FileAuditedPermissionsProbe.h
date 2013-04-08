@@ -31,8 +31,6 @@
 #ifndef FILEAUDITEDPERMISSIONSPROBE_H
 #define FILEAUDITEDPERMISSIONSPROBE_H
 
-#pragma warning(disable:4786)
-
 #include <Windows.h>
 #include <string>
 

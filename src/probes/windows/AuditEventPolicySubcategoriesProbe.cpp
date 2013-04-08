@@ -54,6 +54,8 @@
 
 #include "AuditEventPolicySubcategoriesProbe.h"
 
+using namespace std;
+
 typedef pair<GUID, string> GuidString;
 vector<GuidString> _guidItemElementNameVector;
 

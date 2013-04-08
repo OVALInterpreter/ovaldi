@@ -31,8 +31,6 @@
 #ifndef FILEAUDITEDPERMISSIONS53PROBE_H
 #define FILEAUDITEDPERMISSIONS53PROBE_H
 
-#pragma warning(disable:4786)
-
 #include "AbsEffectiveRightsProbe.h"
 
 /**

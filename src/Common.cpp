@@ -41,7 +41,6 @@
 #include "REGEX.h"
 
 #ifdef WIN32
-	#pragma warning(disable:4786)
 	#include <windows.h>
 #endif
 

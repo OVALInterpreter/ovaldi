@@ -31,8 +31,6 @@
 #ifndef SYSTEMINFO_H
 #define SYSTEMINFO_H
 
-#pragma warning(disable:4786)
-
 #include <string>
 #include <vector>
 #include <xercesc/dom/DOMDocument.hpp>

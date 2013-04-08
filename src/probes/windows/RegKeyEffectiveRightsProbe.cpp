@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <aclapi.h>
+
 #include <AutoCloser.h>
 #include "RegKeyEffectiveRightsProbe.h"
 

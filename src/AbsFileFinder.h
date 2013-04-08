@@ -31,10 +31,6 @@
 #ifndef ABSFILEFINDER_H
 #define ABSFILEFINDER_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-#endif
-
 #include "Log.h"
 #include "Common.h"
 #include "Exception.h"

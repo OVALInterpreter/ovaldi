@@ -31,8 +31,6 @@
 #ifndef REGKEYAUDITEDPERMISSIONSPROBE_H
 #define REGKEYAUDITEDPERMISSIONSPROBE_H
 
-#pragma warning(disable:4786)
-
 #include <Windows.h> // for HKEY
 #include "AbsEffectiveRightsProbe.h"
 
