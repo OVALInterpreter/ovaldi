@@ -130,7 +130,6 @@ XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 	}
 
     try  {
-        XMLPlatformUtils::Initialize();
 
 		parser = makeParser(schemaLocation);
 		parserWithCallerAdoption = makeParser(schemaLocation);
@@ -153,7 +152,6 @@ XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 XmlProcessor::~XmlProcessor() {
 
     XmlProcessor::instance = NULL;
-	//  Delete the parser itself.  Must be done prior to calling Terminate, below.
 
 	if(parser != NULL){
 		parser->release();
@@ -162,7 +160,6 @@ XmlProcessor::~XmlProcessor() {
 	if (parserWithCallerAdoption != NULL){
 		parserWithCallerAdoption->release();
     }
-	XMLPlatformUtils::Terminate();
 }
 
 DOMLSParser *XmlProcessor::makeParser(const string &schemaLocation) {

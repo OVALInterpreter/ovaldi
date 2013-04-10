@@ -35,6 +35,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <xercesc/util/PlatformUtils.hpp>
 
 #ifdef WIN32
 	#include <comdef.h>
@@ -54,6 +55,7 @@
 #include "OvalEnum.h"
 #include "Directive.h"
 #include "Log.h"
+#include "Noncopyable.h"
 
 #define EXIT_SUCCESS	0
 #define	EXIT_FAILURE	1
@@ -86,6 +88,19 @@ namespace {
 	 * \return true if validation succeeded, false if validation failed.
 	 */
 	bool SchematronValidate(const string &fileToValidate, const string &schematronXSLFile);
+
+	/**
+	 * Enables exception-safe init/de-init of Xerces.
+	 */
+	class XercesInitializer : private Noncopyable {
+	public:
+		XercesInitializer() {
+			XMLPlatformUtils::Initialize();
+		}
+		~XercesInitializer() {
+			XMLPlatformUtils::Terminate();
+		}
+	};
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -284,6 +299,9 @@ int main(int argc, char* argv[]) {
 			exit( EXIT_FAILURE );
 		}
 	}
+
+	// Important: gotta initialize Xerces to do any XML processing!
+	XercesInitializer xercesInit;
 
 	//////////////////////////////////////////////////////
 	////////////  parse oval.xml file	//////////////////

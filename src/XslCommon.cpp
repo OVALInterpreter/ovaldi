@@ -28,65 +28,46 @@
 //
 //****************************************************************************************//
 
-// See: 
-// http://xml.apache.org/xalan-c/usagepatterns.html#xalantransformer
-// for info about how to use the XalanTransformer C++ API
+#include <sstream>
+#include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
-//	required xalan includes 
-
-#include <xalanc/XalanTransformer/XalanCAPI.h>
+#include "Noncopyable.h"
 
 #include "XslCommon.h"
 
 using namespace std;
+using namespace xalanc;
+
+namespace {
+	/** Enables exception-safe init and shutdown of xalanc::XalanTransformer. */
+	class TransformerInitializer : private Noncopyable {
+	public:
+		TransformerInitializer() {
+			XalanTransformer::initialize();
+		}
+		~TransformerInitializer() {
+			XalanTransformer::terminate();
+		}
+	};
+}
 
 //****************************************************************************************//
 //										XslCommon Class									  //	
 //****************************************************************************************//
 
 void XslCommon::ApplyXSL(string xmlIn, string xslIn, string xmlOut) {
+	TransformerInitializer init;
+	XalanTransformer xform;
 
-	// 2. Initialize Xalan and Xerces
-	XalanInitialize();
-
-	// 3. Create a Xalan transformer
-	XalanHandle xalan = NULL;
-	xalan = CreateXalanTransformer();
-
-	// 4. Perform each transformation
-	int theResult = 0;
-	theResult = XalanTransformToFile(xmlIn.c_str(),xslIn.c_str(), xmlOut.c_str(), xalan);
-
-    DeleteXalanTransformer(xalan);
-	// 5. Shut down Xalan
-	XalanTerminate(false);
+	xform.transform(xmlIn.c_str(), xslIn.c_str(), xmlOut.c_str());
 }
 
 string XslCommon::ApplyXSL(string xmlIn, string xslIn) {
+	TransformerInitializer init;
+	XalanTransformer xform;
+	ostringstream out;
 
-	// 2. Initialize Xalan and Xerces
-	XalanInitialize();
+	xform.transform(xmlIn.c_str(), xslIn.c_str(), out);
 
-	// 3. Create a Xalan transformer
-	XalanHandle xalan = NULL;
-	xalan = CreateXalanTransformer();
-
-	char* theData = NULL;
-
-	// 4. Perform each transformation
-	int theResult = 0;
-	theResult = XalanTransformToData(xmlIn.c_str(),xslIn.c_str(), &theData, xalan);
-
-	string result = "";
-	if(theData != NULL) {
-		result.append(theData);
-
-		XalanFreeData(theData);
-	}
-
-    DeleteXalanTransformer(xalan);
-	// 5. Shut down Xalan
-	XalanTerminate(false);
-
-	return result;
+	return out.str();
 }
