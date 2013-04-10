@@ -28,11 +28,55 @@
 //
 //****************************************************************************************//
 
+#include <set>
+
+//	include the probe classes
+#include "FileProbe.h"
+#include "FileMd5Probe.h"
+#include "FileHashProbe.h"
+#include "FileHash58Probe.h"
+#include "FamilyProbe.h"
+#include "UnameProbe.h"
+#ifdef PACKAGE_RPM
+ #include "RPMInfoProbe.h"
+ #include "RPMVerifyProbe.h"
+ #include "RPMVerifyFileProbe.h" 
+ #include "RPMVerifyPackageProbe.h"
+#endif
+#ifdef PACKAGE_DPKG
+ #include "DPKGInfoProbe.h"
+#endif
+
+#include "InetListeningServersProbe.h"
+#include "ProcessProbe.h"
+#include "Process58Probe.h"
+#include "ShadowProbe.h"
+#include "PasswordProbe.h"
+#include "InterfaceProbe.h"
+#include "PasswordProbe.h"
+#include "EnvironmentVariableProbe.h"
+#include "EnvironmentVariable58Probe.h"
+#include "XmlFileContentProbe.h"
+#include "TextFileContentProbe.h"
+#include "TextFileContent54Probe.h"
+#include "VariableProbe.h"
+#include "RunLevelProbe.h"
+#include "XinetdProbe.h"
+#include "InetdProbe.h"
+#include "LDAPProbe.h"
+#include "PartitionProbe.h"
+#include "SelinuxSecurityContextProbe.h"
+#include "SelinuxBooleanProbe.h"
+#include "IfListenersProbe.h"
+#include "SysctlProbe.h"
+
 #include "ProbeFactory.h"
 
 using namespace std;
 
-AbsProbeSet ProbeFactory::_probes;
+typedef set<AbsProbe*> AbsProbeSet;
+static AbsProbeSet _probes;
+
 
 
 // ***************************************************************************************	//

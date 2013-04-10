@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <math.h>
 #include <time.h>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>

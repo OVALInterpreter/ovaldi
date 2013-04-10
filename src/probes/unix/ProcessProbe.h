@@ -31,36 +31,15 @@
 #ifndef PROCESSPROBE_H
 #define PROCESSPROBE_H
 
-#include "AbsProbe.h"
-
-#include <cerrno>
-#include <strings.h>
-#include <dirent.h>
-#include <pwd.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <iostream>
-#include <sstream>
-#include <iomanip>
 #include <string>
+#include <sys/types.h>
 
 #ifdef SUNOS
-#include <fstream>
-#include <procfs.h>
-#include <ftw.h>
-#include <algorithm>
-#include <cctype>
+#  include <procfs.h>
 #endif
 
-#ifdef DARWIN
-#include <sys/sysctl.h>
-#endif
+#include "AbsProbe.h"
 
-// Define some buffer lengths
-#define CMDLINE_LEN 1024
-#define TTY_LEN PATH_MAX
 
 /**
 	Data collector for process test.

@@ -28,6 +28,32 @@
 //
 //****************************************************************************************//
 
+#include <fstream>
+#include <cerrno>
+#include <strings.h>
+#include <dirent.h>
+#include <pwd.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#include <sstream>
+#include <iomanip>
+#include <string>
+
+#ifdef SUNOS
+#include <ftw.h>
+#include <algorithm>
+#include <cctype>
+#endif
+
+#ifdef DARWIN
+#include <sys/sysctl.h>
+#endif
+
+// Define some buffer lengths
+#define CMDLINE_LEN 1024
+#define TTY_LEN PATH_MAX
+
 #include "ProcessProbe.h"
 
 using namespace std;
