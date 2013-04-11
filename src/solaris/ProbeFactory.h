@@ -37,40 +37,8 @@
 #define PROBEFACTORY_H
 
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 
-#include "AbsDataCollector.h"
-
-
-//	include the probe classes
-#include "FileProbe.h"
-#include "FileMd5Probe.h"
-#include "FileHashProbe.h"
-#include "FileHash58Probe.h"
-#include "FamilyProbe.h"
-#include "UnameProbe.h"
-#include "ProcessProbe.h"
-#include "Process58Probe.h"
-#include "EnvironmentVariableProbe.h"
-#include "EnvironmentVariable58Probe.h"
-#include "TextFileContentProbe.h"
-#include "XmlFileContentProbe.h"
-#include "VariableProbe.h"
-#include "InetdProbe.h"
-#include "PasswordProbe.h"
-#include "ShadowProbe.h"
-#include "InterfaceProbe.h"
-//#include "LDAPProbe.h"
-#include "TextFileContent54Probe.h"
-#include "XinetdProbe.h"
-#include "RunLevelProbe.h"
-// SOLARIS PORT NOTICE: Add other probes here to support collection of solaris specific objects.
-#include "IsainfoProbe.h"
-#include "Patch54Probe.h"
-
-class AbsProbe;
+#include <AbsProbe.h>
 
 /**
 	This class is a Factory class for getting probes for an object in an oval definitions file. 
@@ -96,9 +64,6 @@ public:
 		Shutdown the ProbeFactory.
 	*/
 	static void Shutdown();
-
-private:
-  static AbsProbeSet _probes;
 };
 
 

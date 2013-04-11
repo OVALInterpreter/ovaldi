@@ -420,6 +420,7 @@ string LDAPProbe::GetObjectClass ( string suffixStr, string relativeDnStr ) {
 string LDAPProbe::GetLDAPServerLocation() {
 	
 	#ifdef WIN32
+
 	DOMAIN_CONTROLLER_INFO* DomainControllerInfo = NULL;
 	DWORD dReturn = 0L;
 	ULONG dcFlags;
@@ -435,9 +436,9 @@ string LDAPProbe::GetLDAPServerLocation() {
 	} else {
 		throw ProbeException ( "Error: DsGetDcName() was unable to retrieve the name of the specified domain controller." );
 	}
-	#endif
 
-	#if defined (LINUX) || defined (DARWIN)
+	#elif defined (LINUX) || defined (DARWIN)
+
 	string pathStr = "/etc/";
 	string fileNameStr = "ldap.conf";
 	string bufferStr;
@@ -466,6 +467,11 @@ string LDAPProbe::GetLDAPServerLocation() {
 	}
 
 	return "";
+
+	#else
+
+	return "";
+	
 	#endif
 }
 

@@ -50,6 +50,8 @@
 #include <sys/sysctl.h>
 #endif
 
+#include <Log.h>
+
 // Define some buffer lengths
 #define CMDLINE_LEN 1024
 #define TTY_LEN PATH_MAX

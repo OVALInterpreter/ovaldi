@@ -31,38 +31,12 @@
 #ifndef SYSTEMINFO_H
 #define SYSTEMINFO_H
 
-//	required xerces includes
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMAttr.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/parsers/AbstractDOMParser.hpp>
 
-#include "XmlCommon.h"
-#include "Common.h"
-#include "Exception.h"
-#include "Log.h"
-
-#ifdef LINUX
-#include <sys/sysinfo.h>
-#endif
-
-#include <sys/utsname.h>
-
-#include <unistd.h>
-
-#include <netdb.h>
-#include <arpa/inet.h>
-
-#include <iostream>
 #include <string>
 #include <list>
 
+#include "Exception.h"
 #include <NetworkInterfaces.h>
-
-XERCES_CPP_NAMESPACE_USE
 
 typedef std::list<NetworkInterfaces::Interface> IntfList;
 
@@ -76,7 +50,7 @@ class SystemInfo {
 public:
 	SystemInfo();
 	~SystemInfo();
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *scDoc);
+	void Write(xercesc::DOMDocument *scDoc);
 		
 	std::string os_name;
 	std::string os_version;
