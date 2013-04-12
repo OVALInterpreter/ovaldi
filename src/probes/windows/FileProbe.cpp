@@ -60,199 +60,8 @@ namespace {
 //								FileProbe Class											  //	
 //****************************************************************************************//
 FileProbe* FileProbe::instance = NULL;
-map<WORD,string> FileProbe::langMap;
 
 FileProbe::FileProbe() {
-	if(langMap.size() == 0){
-		langMap[1078] = "Afrikaans";
-		langMap[1052] = "Albanian";
-		langMap[1118] = "Amharic";
-		langMap[5121] = "Arabic - Algeria";
-		langMap[15361] = "Arabic - Bahrain";
-		langMap[3073] = "Arabic - Egypt";
-		langMap[2049] = "Arabic - Iraq";
-		langMap[11265] = "Arabic - Jordan";
-		langMap[13313] = "Arabic - Kuwait";
-		langMap[12289] = "Arabic - Lebanon";
-		langMap[4097] = "Arabic - Libya";
-		langMap[6145] = "Arabic - Morocco";
-		langMap[8193] = "Arabic - Oman";
-		langMap[16385] = "Arabic - Qatar";
-		langMap[1025] = "Arabic - Saudi Arabia";
-		langMap[10241] = "Arabic - Syria";
-		langMap[7169] = "Arabic - Tunisia";
-		langMap[14337] = "Arabic - United Arab Emirates";
-		langMap[9217] = "Arabic - Yemen";
-		langMap[1067] = "Armenian";
-		langMap[1101] = "Assamese";
-		langMap[2092] = "Azeri - Cyrillic";
-		langMap[1068] = "Azeri - Latin";
-		langMap[1069] = "Basque";
-		langMap[1059] = "Belarusian";
-		langMap[2117] = "Bengali - Bangladesh";
-		langMap[1093] = "Bengali - India";
-		langMap[5146] = "Bosnian";
-		langMap[1026] = "Bulgarian";
-		langMap[1109] = "Burmese";
-		langMap[1027] = "Catalan";
-		langMap[2052] = "Chinese - China";
-		langMap[3076] = "Chinese - Hong Kong SAR";
-		langMap[5124] = "Chinese - Macau SAR";
-		langMap[4100] = "Chinese - Singapore";
-		langMap[1028] = "Chinese - Taiwan";
-		langMap[1050] = "Croatian";
-		langMap[1029] = "Czech";
-		langMap[1030] = "Danish";
-		langMap[1125] = "Divehi";
-		langMap[2067] = "Dutch - Belgium";
-		langMap[1043] = "Dutch - Netherlands";
-		langMap[1126] = "Edo";
-		langMap[3081] = "English - Australia";
-		langMap[10249] = "English - Belize";
-		langMap[4105] = "English - Canada";
-		langMap[9225] = "English - Caribbean";
-		langMap[2057] = "English - Great Britain";
-		langMap[16393] = "English - India";
-		langMap[6153] = "English - Ireland";
-		langMap[8201] = "English - Jamaica";
-		langMap[5129] = "English - New Zealand";
-		langMap[13321] = "English - Phillippines";
-		langMap[7177] = "English - Southern Africa";
-		langMap[11273] = "English - Trinidad";
-		langMap[1033] = "English - United States";
-		langMap[12297] = "English - Zimbabwe";
-		langMap[1061] = "Estonian";
-		langMap[1080] = "Faroese";
-		langMap[1065] = "Farsi - Persian";
-		langMap[1124] = "Filipino";
-		langMap[1035] = "Finnish";
-		langMap[2060] = "French - Belgium";
-		langMap[11276] = "French - Cameroon";
-		langMap[3084] = "French - Canada";
-		langMap[9228] = "French - Congo";
-		langMap[12300] = "French - Cote d'Ivoire";
-		langMap[1036] = "French - France";
-		langMap[5132] = "French - Luxembourg";
-		langMap[13324] = "French - Mali";
-		langMap[6156] = "French - Monaco";
-		langMap[14348] = "French - Morocco";
-		langMap[10252] = "French - Senegal";
-		langMap[4108] = "French - Switzerland";
-		langMap[7180] = "French - West Indies";
-		langMap[1122] = "Frisian - Netherlands";
-		langMap[1071] = "FYRO Macedonia";
-		langMap[2108] = "Gaelic - Ireland";
-		langMap[1084] = "Gaelic - Scotland";
-		langMap[1110] = "Galician";
-		langMap[1079] = "Georgian";
-		langMap[3079] = "German - Austria";
-		langMap[1031] = "German - Germany";
-		langMap[5127] = "German - Liechtenstein";
-		langMap[4103] = "German - Luxembourg";
-		langMap[2055] = "German - Switzerland";
-		langMap[1032] = "Greek";
-		langMap[1140] = "Guarani - Paraguay";
-		langMap[1095] = "Gujarati";
-		langMap[1037] = "Hebrew";
-		langMap[1279] = "HID (Human Interface Device)";
-		langMap[1081] = "Hindi";
-		langMap[1038] = "Hungarian";
-		langMap[1039] = "Icelandic";
-		langMap[1136] = "Igbo - Nigeria";
-		langMap[1057] = "Indonesian";
-		langMap[1040] = "Italian - Italy";
-		langMap[2064] = "Italian - Switzerland";
-		langMap[1041] = "Japanese";
-		langMap[1099] = "Kannada";
-		langMap[1120] = "Kashmiri";
-		langMap[1087] = "Kazakh";
-		langMap[1107] = "Khmer";
-		langMap[1111] = "Konkani";
-		langMap[1042] = "Korean";
-		langMap[1088] = "Kyrgyz - Cyrillic";
-		langMap[1108] = "Lao";
-		langMap[1142] = "Latin";
-		langMap[1062] = "Latvian";
-		langMap[1063] = "Lithuanian";
-		langMap[2110] = "Malay - Brunei";
-		langMap[1086] = "Malay - Malaysia";
-		langMap[1100] = "Malayalam";
-		langMap[1082] = "Maltese";
-		langMap[1112] = "Manipuri";
-		langMap[1153] = "Maori";
-		langMap[1102] = "Marathi";
-		langMap[2128] = "Mongolian";
-		langMap[1104] = "Mongolian";
-		langMap[1121] = "Nepali";
-		langMap[1044] = "Norwegian - Bokml";
-		langMap[2068] = "Norwegian - Nynorsk";
-		langMap[1096] = "Oriya";
-		langMap[1045] = "Polish";
-		langMap[1046] = "Portuguese - Brazil";
-		langMap[2070] = "Portuguese - Portugal";
-		langMap[1094] = "Punjabi";
-		langMap[1047] = "Raeto-Romance";
-		langMap[2072] = "Romanian - Moldova";
-		langMap[1048] = "Romanian - Romania";
-		langMap[1049] = "Russian";
-		langMap[2073] = "Russian - Moldova";
-		langMap[1083] = "Sami Lappish";
-		langMap[1103] = "Sanskrit";
-		langMap[3098] = "Serbian - Cyrillic";
-		langMap[2074] = "Serbian - Latin";
-		langMap[1072] = "Sesotho (Sutu)";
-		langMap[1074] = "Setsuana";
-		langMap[1113] = "Sindhi";
-		langMap[1115] = "Sinhala";
-		langMap[1051] = "Slovak";
-		langMap[1060] = "Slovenian";
-		langMap[1143] = "Somali";
-		langMap[1070] = "Sorbian";
-		langMap[11274] = "Spanish - Argentina";
-		langMap[16394] = "Spanish - Bolivia";
-		langMap[13322] = "Spanish - Chile";
-		langMap[9226] = "Spanish - Colombia";
-		langMap[5130] = "Spanish - Costa Rica";
-		langMap[7178] = "Spanish - Dominican Republic";
-		langMap[12298] = "Spanish - Ecuador";
-		langMap[17418] = "Spanish - El Salvador";
-		langMap[4106] = "Spanish - Guatemala";
-		langMap[18442] = "Spanish - Honduras";
-		langMap[2058] = "Spanish - Mexico";
-		langMap[19466] = "Spanish - Nicaragua";
-		langMap[6154] = "Spanish - Panama";
-		langMap[15370] = "Spanish - Paraguay";
-		langMap[10250] = "Spanish - Peru";
-		langMap[20490] = "Spanish - Puerto Rico";
-		langMap[1034] = "Spanish - Spain (Traditional)";
-		langMap[14346] = "Spanish - Uruguay";
-		langMap[8202] = "Spanish - Venezuela";
-		langMap[1089] = "Swahili";
-		langMap[2077] = "Swedish - Finland";
-		langMap[1053] = "Swedish - Sweden";
-		langMap[1114] = "Syriac";
-		langMap[1064] = "Tajik";
-		langMap[1097] = "Tamil";
-		langMap[1092] = "Tatar";
-		langMap[1098] = "Telugu";
-		langMap[1054] = "Thai";
-		langMap[1105] = "Tibetan";
-		langMap[1073] = "Tsonga";
-		langMap[1055] = "Turkish";
-		langMap[1090] = "Turkmen";
-		langMap[1058] = "Ukrainian";
-		langMap[0] = "Unicode";
-		langMap[1056] = "Urdu";
-		langMap[2115] = "Uzbek - Cyrillic";
-		langMap[1091] = "Uzbek - Latin";
-		langMap[1075] = "Venda";
-		langMap[1066] = "Vietnamese";
-		langMap[1106] = "Welsh";
-		langMap[1076] = "Xhosa";
-		langMap[1085] = "Yiddish";
-		langMap[1077] = "Zulu";
-
-	}
 }
 
 FileProbe::~FileProbe() {
@@ -752,12 +561,18 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 				WORD* langInfo;        
 				UINT cbLang;
 				VerQueryValue(versionbuf, _T("\\VarFileInfo\\Translation"),(LPVOID*)&langInfo, &cbLang);  
-				
-				if(langMap.count(langInfo[0]) > 0){
-					language->SetValue(langMap[langInfo[0]]);
+				DWORD lcid = langInfo[0];
+				LPTSTR szLang = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * 100 );
+				if(VerLanguageName(lcid, szLang, 100) != 0){
+					language->SetValue(Common::ToString(szLang));
 					language->SetStatus(OvalEnum::STATUS_EXISTS);
+					
 				}else{
 					language->SetStatus(OvalEnum::STATUS_ERROR);
+				}
+				if ( szLang != NULL ) {
+					free ( szLang );
+					szLang = NULL;
 				}
 
 				//////////////////////////////////////////////////////
