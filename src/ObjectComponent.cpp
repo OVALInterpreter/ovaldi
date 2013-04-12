@@ -37,6 +37,7 @@
 #include "ObjectComponent.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ObjectComponent Class									  //	

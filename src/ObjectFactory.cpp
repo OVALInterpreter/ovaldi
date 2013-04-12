@@ -37,6 +37,7 @@
 #include "ObjectFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 // ***************************************************************************************	//
 //								 Public members												//

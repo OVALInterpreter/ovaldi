@@ -36,6 +36,7 @@
 #include "Criterion.h"
 #include "Analyzer.h"
 #include "XmlCommon.h"
+#include "Common.h"
 
 #include "Criteria.h"
 

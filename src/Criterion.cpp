@@ -30,6 +30,7 @@
 
 #include "Analyzer.h"
 #include "XmlCommon.h"
+#include "Common.h"
 
 #include "Criterion.h"
 

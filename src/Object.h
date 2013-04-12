@@ -64,7 +64,7 @@ public:
 	~Object();
 
     /** Parse the provided object element into an object. */
-	void Parse(DOMElement* objectElm);
+	void Parse(xercesc::DOMElement* objectElm);
 
     /** Return a vector of variable values that were used for this object. */
 	VariableValueVector* GetVariableValues();

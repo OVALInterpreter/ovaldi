@@ -38,6 +38,7 @@
 #include "Set.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									Set Class											  //	

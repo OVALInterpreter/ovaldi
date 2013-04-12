@@ -33,6 +33,7 @@
 #include "LiteralComponent.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								LiteralComponent Class									  //	

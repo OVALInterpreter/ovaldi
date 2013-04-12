@@ -41,6 +41,7 @@
 #include "SetObject.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									SetObject Class										  //	

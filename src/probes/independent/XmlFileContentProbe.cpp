@@ -36,7 +36,6 @@
 #include <xercesc/sax/SAXParseException.hpp>
 #include <xercesc/sax/InputSource.hpp>
 #include <xercesc/util/BinInputStream.hpp>
-//#include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xalanc/PlatformSupport/XSLException.hpp>
 #include <xalanc/DOMSupport/XalanDocumentPrefixResolver.hpp>
 #include <xalanc/XPath/XObject.hpp>
@@ -65,6 +64,7 @@
 #include "XmlFileContentProbe.h"
 
 using namespace std;
+using namespace xercesc;
 
 namespace {
 	/**

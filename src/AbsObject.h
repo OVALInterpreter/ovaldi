@@ -35,6 +35,7 @@
 #include <vector>
 #include <xercesc/dom/DOMElement.hpp>
 
+#include "Exception.h"
 #include "VariableValue.h"
 
 /**

@@ -35,6 +35,7 @@
 #include "Log.h"
 #include "DocumentManager.h"
 #include "XmlCommon.h"
+#include "Common.h"
 
 #include "Test.h"
 

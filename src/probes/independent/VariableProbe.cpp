@@ -33,10 +33,12 @@
 
 #include "XmlCommon.h"
 #include "DocumentManager.h"
+#include "VariableFactory.h"
 
 #include "VariableProbe.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableProbe Class										  //	

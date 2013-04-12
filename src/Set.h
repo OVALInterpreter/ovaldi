@@ -46,7 +46,7 @@ class Set {
 
 public:
 	/** Parse the set element and populate this object with its data.*/
-	Set(DOMElement* setElm);
+	Set(xercesc::DOMElement* setElm);
 
 	/** Initialize the set and set the simple set flag to true */
 	Set();

@@ -70,7 +70,7 @@ public:
 		calls testedObject->Write() 
 		calls testedVariable->Write() for each tested var.
 	*/
-	void Write(DOMElement* parent);
+	void Write(xercesc::DOMElement* parent);
 
 
 	/** Evaluate the test and return the result. 
@@ -212,7 +212,7 @@ private:
 	/** Parse the Test element into a Test object. 
 		The resulting object is cached.
 	*/
-	void Parse(DOMElement* testElm);
+	void Parse(xercesc::DOMElement* testElm);
 
 	/** Search the cache of Tests for the specified Test. 
 	    Return NULL if not found 

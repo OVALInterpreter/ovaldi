@@ -33,6 +33,7 @@
 
 #include "Set.h"
 #include "VariableValue.h"
+#include "AbsObject.h"
 
 /**
 	This class represents an SetObject in an oval definition schema.
@@ -43,7 +44,7 @@ public:
 	SetObject(std::string id = "", std::string comment = "", std::string name = "", int version = 1, std::string xmlns = "");
 	~SetObject();
 
-	void Parse(DOMElement* setObjectElm);
+	void Parse(xercesc::DOMElement* setObjectElm);
 	VariableValueVector* GetVariableValues();
 	
 	Set* GetSet();
