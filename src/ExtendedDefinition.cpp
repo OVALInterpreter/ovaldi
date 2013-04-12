@@ -79,7 +79,7 @@ void ExtendedDefinition::SetDefinitionRef(Definition* definitionRef) {
 void ExtendedDefinition::Write(DOMElement* parentElm) {
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
 	DOMElement* extendedDefinitionElm = XmlCommon::AddChildElement(resultDoc, parentElm, "extend_definition");

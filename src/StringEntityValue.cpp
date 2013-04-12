@@ -54,7 +54,7 @@ StringEntityValue::~StringEntityValue(){
 
 }
 
-void StringEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm){
+void StringEntityValue::Write(DOMDocument* scFile, DOMElement* entityElm){
     XMLCh *name = XMLString::transcode(this->GetValue().c_str());
 	DOMText* newItemEntityElemValue = scFile->createTextNode(name);
 	entityElm->appendChild(newItemEntityElemValue);

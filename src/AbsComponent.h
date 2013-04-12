@@ -31,6 +31,7 @@
 #ifndef ABSCOMPONENT_H
 #define ABSCOMPONENT_H
 
+#include <vector>
 #include <xercesc/dom/DOMElement.hpp>
 
 #include "VariableValue.h"

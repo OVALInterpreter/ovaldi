@@ -32,15 +32,14 @@
 #define OBJECT_H
 
 #include <map>
+#include <utility>
+#include <string>
 
 #include "AbsObject.h"
 #include "ObjectEntity.h"
 #include "Behavior.h"
 #include "Filter.h"
 
-XERCES_CPP_NAMESPACE_USE
-
-class ObjectEntity;
 class Object;
 
 /**	

@@ -31,6 +31,8 @@
 #include "ItemFieldEntityValue.h"
 #include "AbsDataCollector.h"
 #include "XmlCommon.h"
+#include "AbsObjectCollector.h"
+#include "ObjectReader.h"
 
 #include "ObjectComponent.h"
 

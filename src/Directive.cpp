@@ -28,7 +28,6 @@
 //
 //****************************************************************************************//
 
-#include <iostream>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 
@@ -58,7 +57,7 @@ void Directive::SetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::Res
 
 void Directive::LoadDirectives() {
 	// Load the configuration XML.  If it can not be loaded, load defaults and return.
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* config;
+	DOMDocument* config;
 
     if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE] != NULL)
         delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE];

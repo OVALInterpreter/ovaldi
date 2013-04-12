@@ -31,17 +31,11 @@
 #ifndef ABSOBJECT_H
 #define ABSOBJECT_H
 
-
-//	other includes
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents an AbsObject in an oval definition file.
@@ -51,7 +45,7 @@ class AbsObject {
 public:
 	virtual ~AbsObject();
 
-	virtual void Parse(DOMElement*) = 0;
+	virtual void Parse(xercesc::DOMElement*) = 0;
 	virtual VariableValueVector* GetVariableValues() = 0;
 	
 	std::string GetId();

@@ -34,10 +34,12 @@
 #include "Log.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "XmlCommon.h"
+#include "VariableFactory.h"
 
 #include "ObjectEntity.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ObjectEntity Class										  //	

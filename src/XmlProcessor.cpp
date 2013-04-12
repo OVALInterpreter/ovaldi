@@ -211,9 +211,9 @@ DOMLSParser *XmlProcessor::makeParser(const string &schemaLocation) {
 	return parser;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string filePathIn, bool callerAdopts) {
+DOMDocument* XmlProcessor::ParseFile(string filePathIn, bool callerAdopts) {
 	
-    XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *resultDocument = NULL;
+    DOMDocument *resultDocument = NULL;
 
     try  {
 		errHandler.resetErrors();
@@ -252,25 +252,25 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string fileP
 	return resultDocument;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocument(string root) {
+DOMDocument* XmlProcessor::CreateDOMDocument(string root) {
 
 	XMLCh *xmlRoot = XMLString::transcode(root.c_str());
 	XMLCh* core = XMLString::transcode ("Core");
 	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(core);
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc = impl->createDocument(0, xmlRoot, 0);
+	DOMDocument* doc = impl->createDocument(0, xmlRoot, 0);
 	//Free memory allocated by XMLString::transcode(char*)
 	XMLString::release(&xmlRoot);
 	XMLString::release(&core);
 	return(doc);
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocumentNS(string namespaceURI, string qualifiedName) {
+DOMDocument* XmlProcessor::CreateDOMDocumentNS(string namespaceURI, string qualifiedName) {
 
 	XMLCh *uri = XMLString::transcode(namespaceURI.c_str());
 	XMLCh *name = XMLString::transcode(qualifiedName.c_str());
 	XMLCh *core = XMLString::transcode ("Core");
 	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(core);
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc = impl->createDocument(uri, name, NULL);
+	DOMDocument* doc = impl->createDocument(uri, name, NULL);
 	//Free memory allocated by XMLString::transcode(char*)
 	XMLString::release(&uri);
 	XMLString::release(&name);
@@ -278,7 +278,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocumentNS(st
 	return(doc);
 }
 
-void XmlProcessor::WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc,  string filePath, bool writeToFile) {
+void XmlProcessor::WriteDOMDocument(DOMDocument* doc,  string filePath, bool writeToFile) {
 
 	DOMLSOutput *out = NULL;
 	XMLFormatTarget *myFormTarget = NULL;
