@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <cerrno>
 #include <memory>
 #include <unistd.h>
 #include <sys/types.h>
@@ -36,6 +37,8 @@
 
 #include <linux/RpmGuards.h>
 #include <VectorPtrGuard.h>
+#include <Log.h>
+
 #include "RPMInfoProbe.h"
 
 using namespace std;
