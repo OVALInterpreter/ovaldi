@@ -32,48 +32,7 @@
 #define PROBEFACTORY_H
 
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
-
-#include "AbsDataCollector.h"
-
-
-//	include the probe classes
-#include "FileProbe.h"
-#include "FileMd5Probe.h"
-#include "FileHashProbe.h"
-#include "FileHash58Probe.h"
-#include "FamilyProbe.h"
-#include "UnameProbe.h"
-//Not applicable
-//#ifdef PACKAGE_RPM
-//#include "RPMInfoProbe.h"
-//#endif
-//#ifdef PACKAGE_DPKG
-//#include "DPKGInfoProbe.h"
-//#endif
-//Not ported yet
-//#include "InetListeningServersProbe.h"
-#include "ProcessProbe.h"
-#include "Process58Probe.h"
-//Not ported yet
-//#include "ShadowProbe.h"
-#include "PasswordProbe.h"
-#include "InterfaceProbe.h"
-#include "PasswordProbe.h"
-#include "EnvironmentVariableProbe.h"
-#include "EnvironmentVariable58Probe.h"
-#include "XmlFileContentProbe.h"
-#include "TextFileContentProbe.h"
-#include "TextFileContent54Probe.h"
-#include "VariableProbe.h"
-//Mac OS has no notion of runlevels
-//#include "RunLevelProbe.h"
-#include "XinetdProbe.h"
-#include "InetdProbe.h"
-#include "LDAPProbe.h"
-
+#include "AbsProbe.h"
 
 
 class AbsProbe;
@@ -102,10 +61,6 @@ public:
 		Shutdown the ProbeFactory.
 	*/
 	static void Shutdown();
-
-private:
-  static AbsProbeSet _probes;
-
 };
 
 #endif
