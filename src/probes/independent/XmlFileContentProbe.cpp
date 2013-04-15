@@ -65,6 +65,7 @@
 
 using namespace std;
 using namespace xercesc;
+using namespace xalanc;
 
 namespace {
 	/**
@@ -258,23 +259,7 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 	string contextNode = "/";
 
-	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
-
-    XALAN_USING_XALAN(XSLException)
-	XALAN_USING_XERCES(XMLPlatformUtils)
-	XALAN_USING_XALAN(XPathEvaluator)
-	XALAN_USING_XERCES(LocalFileInputSource)
-	XALAN_USING_XALAN(NodeRefList)
-	XALAN_USING_XALAN(XalanDocument)
-	XALAN_USING_XALAN(XalanDocumentPrefixResolver)
-	XALAN_USING_XALAN(XalanDOMString)
-	XALAN_USING_XALAN(XalanNode)
-	XALAN_USING_XALAN(XalanSourceTreeInit)
-	XALAN_USING_XALAN(XalanSourceTreeDOMSupport)
-	XALAN_USING_XALAN(XalanSourceTreeParserLiaison)
-	XALAN_USING_XALAN(XObjectPtr)
-	XALAN_USING_XALAN(CharVectorType)	
-	XALAN_USING_XALAN(XObject)	
+	string filePath = Common::BuildFilePath(path, fileName);
 
 	XMLPlatformUtils::Initialize();
 	XPathEvaluator::initialize();
