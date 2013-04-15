@@ -29,7 +29,6 @@
 //****************************************************************************************//
 
 // Xalan and Xerces includes
-#include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/sax/EntityResolver.hpp>
 #include <xercesc/sax/SAXException.hpp>
@@ -261,7 +260,6 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 	string filePath = Common::BuildFilePath(path, fileName);
 
-	XMLPlatformUtils::Initialize();
 	XPathEvaluator::initialize();
 
 	// Initialize the XalanSourceTree subsystem...
@@ -401,7 +399,6 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 	}
 	
 	XPathEvaluator::terminate();
-	XMLPlatformUtils::Terminate();
 
 	} catch(const XSLException& theException) {
 		
@@ -411,28 +408,24 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 		string errMsg = m.str();
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw ProbeException("Error while evaluating an xpath. " + errMsg);
 
 	} catch(ProbeException ex) {
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw;
 
 	} catch(Exception ex) {
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw;
 
 	} catch(...) {
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw ProbeException("Error: XmlFileContentProbe() An unknown error occured while collecting data.");
 	}
