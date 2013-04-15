@@ -564,15 +564,7 @@ string XmlCommon::GetElementName(DOMElement *elm) {
 }
 
 string XmlCommon::GetElementPrefix(DOMElement *elm) {
-
-	string prefix = "";
-
-	prefix = XmlCommon::ToString(elm->getPrefix());
-	if (prefix.compare("") == 0) {
-		prefix = "";
-	}
-
-	return prefix;
+	return XmlCommon::ToString(elm->getPrefix());
 }
 
 bool XmlCommon::HasChildElements(DOMNode *node) {
