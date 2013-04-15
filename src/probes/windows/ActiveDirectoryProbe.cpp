@@ -1,6 +1,6 @@
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2013, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are

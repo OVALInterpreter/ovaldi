@@ -4,7 +4,7 @@
 
           Build Instructions - Solaris
 
-  Copyright (c) 2002-2012, The MITRE Corporation
+  Copyright (c) 2002-2013, The MITRE Corporation
 
 ****************************************************
 
@@ -242,6 +242,6 @@ OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland
 Security. OVAL and the OVAL logo are trademarks of The MITRE
-Corporation. Copyright 2002-2012, The MITRE Corporation (www.mitre.org).
+Corporation. Copyright 2002-2013, The MITRE Corporation (www.mitre.org).
 
 
