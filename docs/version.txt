@@ -48,6 +48,7 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug when collecting the has_extended_acl entity in the unix-def:file_test so that we are assigning a value of 'false' when a file does not have an ACL or it matches the standard UNIX permissions. This addresses bug #3597938.
 * Added support for the scheduling_class entity in the unix-def:process_test and the unix-def:process58_test. This addresses feature request tracker #3597952.
 * Fixed a bug where we were outputting invalid OVAL Results when messages were included on tests. This addresses bug #3596906.
+* Improved robustness in getting the signature_keyid entity in rpminfo_item's.  It should no longer get "(not a blob)" for any rpm's.
 
 ---------------------------------------
 ---       Version 5.10.1 build 3    ---
