@@ -173,12 +173,12 @@ void Directive::ApplyAll(DOMDocument* resultsDoc) {
 		}
 		
 		skip = false;
-		DOMElement* classElem = XmlCommon::CreateElement(resultsDoc, "class_directives");
+		DOMElement* classElem = XmlCommon::CreateElementNS(resultsDoc, XmlCommon::resNS, "class_directives");
 		XmlCommon::AddAttribute(classElem, "class", OvalEnum::ClassToString(defClass));
 		ovalResultsElem->insertBefore(classElem, ovalElem);
 		for (DirectiveMap::iterator j = i->second.begin(); j != i->second.end(); j++) {
 			string defType = OvalEnum::ResultToDirectiveString(j->first);
-			DOMElement* defElem = XmlCommon::AddChildElement(resultsDoc, classElem, defType);
+			DOMElement* defElem = XmlCommon::AddChildElementNS(resultsDoc, classElem, XmlCommon::resNS, defType);
 			XmlCommon::AddAttribute(defElem, "content", OvalEnum::ResultContentToString(j->second->GetResultContent()));
 			XmlCommon::AddAttribute(defElem, "reported", j->second->GetReported() ? "true" : "false");
 		}

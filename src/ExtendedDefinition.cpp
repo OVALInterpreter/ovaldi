@@ -82,7 +82,7 @@ void ExtendedDefinition::Write(DOMElement* parentElm) {
 	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
-	DOMElement* extendedDefinitionElm = XmlCommon::AddChildElement(resultDoc, parentElm, "extend_definition");
+	DOMElement* extendedDefinitionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "extend_definition");
 
 	// add the attributes
 	XmlCommon::AddAttribute(extendedDefinitionElm, "definition_ref", this->GetDefinitionRef()->GetId());
