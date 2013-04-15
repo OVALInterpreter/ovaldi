@@ -32,6 +32,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 5    ---
+---------------------------------------
+
+* Improved robustness in getting the signature_keyid entity in rpminfo_item's.  It should no longer get "(not a blob)" for any rpm's.
+* Added support for the ipv6_address datatype.  Ipv6 addresses aren't actually collected yet.
+* Changed the format of values of the language entity of win-def:file_item's.  It used to be hard-coded; now, the VerLanguageName() function is used, which means the OS chooses the format. 
+
+---------------------------------------
 ---       Version 5.10.1 build 4    ---
 ---------------------------------------
 
@@ -48,8 +56,6 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 * Fixed a bug when collecting the has_extended_acl entity in the unix-def:file_test so that we are assigning a value of 'false' when a file does not have an ACL or it matches the standard UNIX permissions. This addresses bug #3597938.
 * Added support for the scheduling_class entity in the unix-def:process_test and the unix-def:process58_test. This addresses feature request tracker #3597952.
 * Fixed a bug where we were outputting invalid OVAL Results when messages were included on tests. This addresses bug #3596906.
-* Improved robustness in getting the signature_keyid entity in rpminfo_item's.  It should no longer get "(not a blob)" for any rpm's.
-* Added support for the ipv6_address datatype.  Ipv6 addresses aren't actually collected yet.
 
 ---------------------------------------
 ---       Version 5.10.1 build 3    ---
