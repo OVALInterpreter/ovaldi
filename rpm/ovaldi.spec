@@ -137,7 +137,7 @@ if [ $1 = 1 ]; then
 fi
 
 %files 
-%defattr(-,root,root,0700)
+%defattr(-,root,root,0755)
 %doc docs/terms.txt docs/README.txt docs/version.txt
 %doc %{_mandir}/man1/ovaldi.1.gz
 %defattr(-,root,root,0600)
