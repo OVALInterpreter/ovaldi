@@ -38,6 +38,7 @@
 #include <string>
 
 #include <IOException.h>
+#include <InvalidArgumentException.h>
 #include <Noncopyable.h>
 
 // Perhaps all these guard classes aren't strictly necessary in all cases,
@@ -80,11 +81,22 @@ private:
 
 /**
  * A guard class for managing an rpm database iterator.  The contained value is
- * of type \c rpmdbMatchIterator, acquired with \c rpmtsInitIterator(), and
- * released with \c rpmdbFreeIterator().
+ * of type \c rpmdbMatchIterator, acquired (in the second constructor) with \c
+ * rpmtsInitIterator(), and released with \c rpmdbFreeIterator().
  */
 class RpmdbIterGuard : private Noncopyable {
-public:
+public:	
+	/**
+	 * Initialize the guard with a pre-existing iterator.
+	 * \p iter must be non-NULL.
+	 */
+	RpmdbIterGuard(rpmdbMatchIterator iter) {
+		if (!iter)
+			throw InvalidArgumentException("Guard initialized with invalid iterator!");
+
+		this->iter = iter;
+	}
+	
 	RpmdbIterGuard(const rpmts ts, rpmTag rpmtag,
 				   const void * keyp, size_t keylen) {
 		iter = rpmtsInitIterator(ts, rpmtag, keyp, keylen);
