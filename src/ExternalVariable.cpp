@@ -37,6 +37,7 @@
 #include "DocumentManager.h"
 #include "AbsVariable.h"
 #include "XmlCommon.h"
+#include "Common.h"
 
 #include "ExternalVariable.h"
 
@@ -63,7 +64,8 @@ void ExternalVariable::Parse(DOMElement* externalVariableElm) {
 	this->SetId(XmlCommon::GetAttributeByName(externalVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(externalVariableElm, "datatype")));
 	string versionStr = XmlCommon::GetAttributeByName(externalVariableElm, "version");
-	int version = atoi(versionStr.c_str());
+	int version = 0;
+	Common::FromString(versionStr, &version);
 	this->SetVersion(version);
 
 	// Get all the possible elements' values

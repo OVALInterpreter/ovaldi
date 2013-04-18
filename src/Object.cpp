@@ -154,11 +154,11 @@ void Object::Parse(DOMElement* objectElm) {
 	this->SetComment(XmlCommon::GetAttributeByName(objectElm, "comment"));
 	this->SetXmlns(XmlCommon::GetNamespace(objectElm));
 	string versionStr = XmlCommon::GetAttributeByName(objectElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 

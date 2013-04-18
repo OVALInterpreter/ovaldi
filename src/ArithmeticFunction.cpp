@@ -167,9 +167,11 @@ ComponentValue* ArithmeticFunction::CombineTwoComponentValues(ComponentValue* co
     for (values1Iter = values1->begin(); values1Iter != values1->end(); ++values1Iter) {
         for (values2Iter = values2->begin(); values2Iter != values2->end(); ++values2Iter) {
 
-            double value1 = atof(values1Iter->c_str());
-            double value2 = atof(values2Iter->c_str());
+            double value1 = 0;
+            double value2 = 0;
             double result;
+			Common::FromString(*values1Iter, &value1);
+			Common::FromString(*values2Iter, &value2);
 
             switch (op) {
             case OvalEnum::ARITHMETIC_ADD:

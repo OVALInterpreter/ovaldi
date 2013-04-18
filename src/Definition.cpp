@@ -223,7 +223,8 @@ void Definition::Parse(DOMElement* definitionElm) {
 	// get the attributes
 	this->SetId(XmlCommon::GetAttributeByName(definitionElm, "id"));
 	string versionStr = XmlCommon::GetAttributeByName(definitionElm, "version");
-	int versionInt = atoi(versionStr.c_str());
+	int versionInt = 0;
+	Common::FromString(versionStr, &versionInt);
 	this->SetVersion(versionInt);
 	
 	// parse the criteria

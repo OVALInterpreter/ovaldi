@@ -32,6 +32,7 @@
 #include <xercesc/dom/DOMNodeList.hpp>
 
 #include "XmlCommon.h"
+#include "Common.h"
 
 #include "ConstantVariable.h"
 
@@ -74,11 +75,11 @@ void ConstantVariable::Parse(DOMElement* constantVariableElm) {
 	this->SetId(XmlCommon::GetAttributeByName(constantVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(constantVariableElm, "datatype")));
 	string versionStr = XmlCommon::GetAttributeByName(constantVariableElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 

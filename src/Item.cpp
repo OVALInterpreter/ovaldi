@@ -237,8 +237,10 @@ ItemEntity* Item::GetElementByName(string itemEntityNameStr) {
 
 void Item::Parse(DOMElement* scItemElm) {
 
+	int id = 0;
 	this->SetName(XmlCommon::GetElementName(scItemElm));
-	this->SetId(atoi((XmlCommon::GetAttributeByName(scItemElm, "id")).c_str()));
+	Common::FromString(XmlCommon::GetAttributeByName(scItemElm, "id"), &id);
+	this->SetId(id);
 	this->SetXmlns(XmlCommon::GetNamespace(scItemElm));
 	this->SetStatus(OvalEnum::ToSCStatus(XmlCommon::GetAttributeByName(scItemElm, "status")));
 	
@@ -333,7 +335,11 @@ Item* Item::GetItemById(string itemId) {
 	Item* item = NULL;
 	
 	// Search the cache
-	item = Item::SearchCache(atoi(itemId.c_str()));
+	int id;
+	if (!Common::FromString(itemId, &id))
+		throw Exception("GetItemById: invalid item ID: "+itemId);
+	
+	item = Item::SearchCache(id);
 
 	// if not found try to parse it.
 	if(item == NULL) {

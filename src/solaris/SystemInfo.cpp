@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <cstdlib>
 
 //	required xerces includes
 #include <xercesc/dom/DOMDocument.hpp>

@@ -32,6 +32,7 @@
 #include <xercesc/dom/DOMNodeList.hpp>
 
 #include "XmlCommon.h"
+#include "Common.h"
 
 #include "LocalVariable.h"
 
@@ -88,9 +89,9 @@ void LocalVariable::Parse(DOMElement* localVariableElm) {
 	this->SetId(XmlCommon::GetAttributeByName(localVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(localVariableElm, "datatype")));
 	string versionStr = XmlCommon::GetAttributeByName(localVariableElm, "version");
-	int version;
-	if(versionStr.compare("") != 0) {
-		version = atoi(versionStr.c_str());
+	int version = 0;
+	if(!versionStr.empty()) {
+		Common::FromString(versionStr, &version);
 		this->SetVersion(version);
 	}	
    

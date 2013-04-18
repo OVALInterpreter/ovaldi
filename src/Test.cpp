@@ -352,7 +352,9 @@ void Test::Parse(DOMElement* testElm) {
 	// get the attributes
 	this->SetId(XmlCommon::GetAttributeByName(testElm, "id"));
 	this->SetName(XmlCommon::GetElementName(testElm));
-	this->SetVersion(atoi(XmlCommon::GetAttributeByName(testElm, "version").c_str()));
+	int vers = 0;
+	Common::FromString(XmlCommon::GetAttributeByName(testElm, "version"), &vers);
+	this->SetVersion(vers);
 	this->SetCheckExistence(OvalEnum::ToExistence(XmlCommon::GetAttributeByName(testElm, "check_existence")));
 	this->SetCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(testElm, "check")));
     this->SetStateOperator(OvalEnum::ToOperator(XmlCommon::GetAttributeByName(testElm, "state_operator")));

@@ -37,6 +37,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include <cstdlib>
 #include <iomanip>
 #include <sstream>
 

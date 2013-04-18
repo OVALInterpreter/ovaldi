@@ -30,6 +30,8 @@
 
 #include <math.h>
 #include <time.h>
+#include <cstdlib>
+#include <cstring>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 
