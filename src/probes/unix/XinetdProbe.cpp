@@ -37,6 +37,8 @@
 #include <fstream>
 #include <Log.h>
 #include <netdb.h>
+#include <limits.h> // for PATH_MAX
+
 #include <ObjectEntity.h>
 #include <OvalEnum.h>
 #include <sys/stat.h>
