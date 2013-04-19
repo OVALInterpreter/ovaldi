@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+
 #include "Object.h"
 
 using namespace std;
@@ -176,9 +178,9 @@ void Object::Parse(DOMElement* objectElm) {
 			} else if (childName == "filter") {
 				this->filters.push_back(new Filter(objectChild));
 			} else {
-                ObjectEntity* objectEntity = new ObjectEntity();
+                auto_ptr<ObjectEntity> objectEntity(new ObjectEntity());
 				objectEntity->Parse(objectChild);
-				this->AppendElement(objectEntity);
+				this->AppendElement(objectEntity.release());
 			}
 		}
 	}
