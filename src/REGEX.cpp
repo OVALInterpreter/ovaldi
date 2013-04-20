@@ -309,7 +309,9 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 	} else if (rc == -1) {
 		result = false;
 	} else if (rc < -1) {
-		
+
+		pcre_free(compiledPattern);
+
 		// An error occured
 		string errMsg = "Error: PCRE returned error code (" + Common::ToString(rc);
 		errMsg.append(") While evaluating the following regex: ");
@@ -331,6 +333,7 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 
 			if (res == PCRE_ERROR_NOMEMORY) {
 				string error = "get substring list failed: unable to get memory for the result set.";
+				pcre_free(compiledPattern);
 				throw REGEXException(error);
 			} else {
 				int i = 0;
@@ -343,6 +346,7 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 				
 				if (stringlist[i] != NULL) {
 					pcre_free_substring_list(stringlist);
+					pcre_free(compiledPattern);
 					string error = "string list not terminated by NULL";
 					throw REGEXException(error);
 				}
@@ -352,6 +356,7 @@ bool REGEX::GetMatchingSubstrings(const char *patternIn, const char *searchStrin
 		}
 	}
 
+	pcre_free(compiledPattern);
 	return(result);
 }
 
