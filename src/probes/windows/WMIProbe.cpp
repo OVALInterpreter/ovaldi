@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+
 #include "WMIProbe.h"
 
 //****************************************************************************************//
@@ -81,12 +83,16 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 	ItemVector* collectedItems = new ItemVector();
 
 	// get all the namespaces
-	ItemEntityVector* namespaces = this->GetNamespaces(wmi_namespace);
+	// Note that the namespaces and wqls vectors don't own their contents.
+	// Their contents are shared with AbsProbe::createdItemEntities, which
+	// is the real owner.  We only need to make sure the vector itself is
+	// deleted.
+	auto_ptr<ItemEntityVector> namespaces(this->GetNamespaces(wmi_namespace));
 	ItemEntityVector::iterator namespaceIt;
 	for(namespaceIt=namespaces->begin(); namespaceIt!=namespaces->end(); namespaceIt++) {
 		
 			// get all the wql queries
-			ItemEntityVector* wqls = this->GetWQLs(wmi_wql);
+			auto_ptr<ItemEntityVector> wqls(this->GetWQLs(wmi_wql));
 			ItemEntityVector::iterator wqlIt;
 			for(wqlIt=wqls->begin(); wqlIt!=wqls->end(); wqlIt++) {
 
@@ -97,9 +103,7 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 					collectedItems->push_back(item);
 				}
 			}
-			delete wqls;
 	}
-	delete namespaces;
 
 	return collectedItems;
 }
