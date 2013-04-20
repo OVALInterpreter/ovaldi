@@ -30,6 +30,8 @@
 
 #include <memory>
 
+#include <VectorPtrGuard.h>
+
 #include "WMIProbe.h"
 
 //****************************************************************************************//
@@ -80,7 +82,7 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 		throw ProbeException("Error: invalid operation specified on wql. Found: " + OvalEnum::OperationToString(wmi_wql->GetOperation()));
 	}
 
-	ItemVector* collectedItems = new ItemVector();
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	// get all the namespaces
 	// Note that the namespaces and wqls vectors don't own their contents.
@@ -105,7 +107,7 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 			}
 	}
 
-	return collectedItems;
+	return collectedItems.release();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
