@@ -28,31 +28,21 @@
 //
 //****************************************************************************************//
 
-#ifndef COUNTFUNCTION_H
-#define COUNTFUNCTION_H
+#ifndef INVALIDARGUMENTEXCEPTION_H
+#define INVALIDARGUMENTEXCEPTION_H
 
-#include "xercesc/dom/DOMElement.hpp"
-#include "AbsFunctionComponent.h"
-#include "ComponentValue.h"
-#include "VariableValue.h"
+#include <Exception.h>
 
 /**
-	This class represents a CountFunction component in a local_variable in the oval definition schema.
-*/
-class CountFunction : public AbsFunctionComponent {
+ * One place this ought to be useful is in constructors, which can't return
+ * values.  So if invalid parameters are passed to a ctor, throwing this
+ * exception is one thing you could do do signal an error.
+ */
+class InvalidArgumentException : public Exception {
 public:
-	CountFunction();
-	~CountFunction();
-
-	/** Parse the count element and its child component elements. */
-	void Parse(xercesc::DOMElement* componentElm); 
-
-	/** Perform the count and return the result. */
-	ComponentValue* ComputeValue();
-
-	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
-
+	InvalidArgumentException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception* ex = NULL)
+		: Exception(errMsgIn, severity, ex) {
+	}
 };
 
 #endif

@@ -2,7 +2,7 @@
 
 OVAL Interpreter (ovaldi)
 
-Copyright (c) 2002-2012, The MITRE Corporation
+Copyright (c) 2002-2013, The MITRE Corporation
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -30,6 +30,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************
 
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
+
+---------------------------------------
+---       Version 5.10.1 build 5    ---
+---------------------------------------
+
+* Improved robustness in getting the signature_keyid entity in rpminfo_item's.  It should no longer get "(not a blob)" for any rpm's.
+* Added support for the ipv6_address datatype.  Ipv6 addresses aren't actually collected yet.
+* Changed the format of values of the language entity of win-def:file_item's.  It used to be hard-coded; now, the VerLanguageName() function is used, which means the OS chooses the format. 
 
 ---------------------------------------
 ---       Version 5.10.1 build 4    ---

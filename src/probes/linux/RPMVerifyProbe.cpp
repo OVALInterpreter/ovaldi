@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2013, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,7 +30,6 @@
 
 #include <cerrno>
 #include <memory>
-#include <VectorPtrGuard.h>
 
 #include <rpm/rpmcli.h>
 #include <rpm/rpmts.h>
@@ -50,12 +49,14 @@ rpmlib = misc stuff...?
 
 #include <sys/stat.h>
 
-#include "RPMVerifyProbe.h"
+#include <VectorPtrGuard.h>
 #include <OvalMessage.h>
 #include <OvalEnum.h>
 #include <Behavior.h>
 #include <Log.h>
 #include <linux/RpmGuards.h>
+
+#include "RPMVerifyProbe.h"
 
 using namespace std;
 
@@ -253,7 +254,16 @@ namespace {
 			 ++iter) {
 			
 			RpmtsGuard ts;
-			RpmdbIterGuard pkgIter(ts, RPMTAG_BASENAMES, iter->c_str(), 0);
+
+			// If the file doesn't exist in a package, you don't seem to be able
+			// to create an iterator as is done below.  So I will try it first,
+			// and if it doesn't work, skip the file.  I don't know if there are
+			// other reasons this might fail, that I should check for somehow...
+			rpmdbMatchIterator dbIter = rpmtsInitIterator(ts, RPMTAG_BASENAMES, iter->c_str(), 0);
+			if (!dbIter)
+				continue;
+			
+			RpmdbIterGuard pkgIter(dbIter);
 			Header hdr;
 			
 			while ((hdr = rpmdbNextIterator(pkgIter))) {

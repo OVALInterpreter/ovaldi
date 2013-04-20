@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2013, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <memory>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 
@@ -185,9 +186,9 @@ void Object::Parse(DOMElement* objectElm) {
 			} else if (childName == "filter") {
 				this->filters.push_back(new Filter(objectChild));
 			} else {
-                ObjectEntity* objectEntity = new ObjectEntity();
+                auto_ptr<ObjectEntity> objectEntity(new ObjectEntity());
 				objectEntity->Parse(objectChild);
-				this->AppendElement(objectEntity);
+				this->AppendElement(objectEntity.release());
 			}
 		}
 	}

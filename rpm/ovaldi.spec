@@ -1,5 +1,5 @@
 %define name	ovaldi
-%define version	5.10.1.4
+%define version	5.10.1.5
 %define release	1
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
@@ -137,7 +137,7 @@ if [ $1 = 1 ]; then
 fi
 
 %files 
-%defattr(-,root,root,0700)
+%defattr(-,root,root,0755)
 %doc docs/terms.txt docs/README.txt docs/version.txt
 %doc %{_mandir}/man1/ovaldi.1.gz
 %defattr(-,root,root,0600)
