@@ -245,6 +245,8 @@ bool REGEX::IsMatch(const char *patternIn, const char *searchStringIn) {
 		this->matchCount++;
 	}
 
+	pcre_free(compiledPattern);
+
 	return(result);
 }
 
