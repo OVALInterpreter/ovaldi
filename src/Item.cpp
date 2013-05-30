@@ -365,21 +365,7 @@ void Item::AppendElement(ItemEntity* itemEntity) {
 void Item::AppendMessage(OvalMessage* msg) {
 	this->messages.push_back(msg);
 }
-/*
-ItemEntityVector* Item::GetObjectElements() {
 
-	ItemEntityVector* objElms = new ItemEntityVector();
-
-	ItemEntityVector::iterator iterator;
-	for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
-		if((*iterator)->GetIsObjectEntity()) {
-			objElms->push_back((*iterator));   
-		}
-	}
-
-	return objElms;
-}
-*/
 ItemEntityVector* Item::GetElementsByName(string elementName) {
 
 	ItemEntityVector* matchingElements = new ItemEntityVector();
