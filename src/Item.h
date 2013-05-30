@@ -36,6 +36,7 @@
 #include <map>
 #include <utility>
 #include <iostream>
+#include <functional>
 #include <stdlib.h>
 
 #include "Common.h"
@@ -83,6 +84,16 @@ typedef std::map < std::string, Item* > StringKeyedItemMap;
 */
 typedef std::pair < StringKeyedItemMap::iterator, bool > ItemCacheResult;
 
+namespace std {
+	/**
+	 * Specialization of std::less to allow us to
+	 * put Items into sets.
+	 */
+	template<> 
+	struct less<const Item*> : public binary_function<const Item*, const Item*, bool> {
+		bool operator()(const Item *left, const Item *right);
+	};
+}
 
 /**
 	This class represents an Item in a system characteristics document.
@@ -129,18 +140,12 @@ public:
 	*/
 	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemsElm);
 
-    /** Create a unique string representation of the Item.
-        A unique string can be created for an Item by concatenating the results of each of the following:
-        <ul>
-            <li>getting the item xmlns alias</li>
-            <li>getting the item name</li>
-            <li>converting each object entity to a string</li>
-        </ul>
-    */
-    std::string UniqueString();
-
     /** Get the elements field's value. */
 	ItemEntityVector* GetElements();
+    /** Get the elements field's value. */
+	const ItemEntityVector* GetElements() const { return &elements; }
+	/** Get the number of entities in this item. */
+	size_t GetNumElements() const { return elements.size(); }
     /** Set the elements field's value. */
 	void SetElements(ItemEntityVector* elements);
 
@@ -160,7 +165,7 @@ public:
 	void SetMessages(OvalMessageVector* messages);
 
     /** Get the name field's value. */
-	std::string GetName();
+	std::string GetName() const;
     /** Set the name field's value. */
 	void SetName(std::string name);
 
@@ -170,17 +175,17 @@ public:
 	void SetSchemaLocation(std::string schemaLocation);
 
     /** Get the xmlns field's value. */
-	std::string GetXmlns();
+	std::string GetXmlns() const;
     /** Set the xmlns field's value. */
 	void SetXmlns(std::string xmlns);
 
     /** Get the xmlnsAlias field's value. */
-	std::string GetXmlnsAlias();
+	std::string GetXmlnsAlias() const;
     /** Set the xmlnsAlias field's value. */
 	void SetXmlnsAlias(std::string xmlnsAlias);
 
     /** Get the status field's value. */
-	OvalEnum::SCStatus GetStatus();
+	OvalEnum::SCStatus GetStatus() const;
 	/** Set the status field's value. */
     void SetStatus(OvalEnum::SCStatus status);
 

@@ -29,11 +29,32 @@
 //****************************************************************************************//
 
 #include <algorithm>
+#include <set>
+
 #include "AbsProbe.h"
 
 using namespace std;
 
-StringKeyedItemMap AbsProbe::globalItemCache;
+namespace {
+	// seems like the most typical std::less impl would not modify
+	// its args, so it makes sense to declare them const.  In order
+	// that std::less's first_argument_type and second_argument_type
+	// typedefs don't lie about its arg types, that means you need to
+	// specialize std::less for a const type, rather than use non-const
+	// and just declare operator()(const T&, const T&) (i.e. add separate
+	// const's in the formal parameter list).  But you also ought to
+	// be able to use that comparator with a set with a non-const 
+	// value_type, which means you can't just declare set<T> and use
+	// the default comparator, because it would use std::less<T> rather
+	// than std::less<const T>.  So you have to force a <const T>
+	// comparator.  It's a weird situation... or I spose I could have
+	// just not bothered with const at all, but shouldn't we try to
+	// use const wherever it makes sense, to ensure const-correctness??
+	// Or maybe I should have implemented operator<() for items and
+	// used the default std::less template...?
+	typedef set<Item*, std::less<const Item*> > ItemCache;
+	ItemCache globalItemCache;
+}
 
 //****************************************************************************************//
 //								AbsProbe Class											  //	
@@ -77,9 +98,9 @@ ItemVector* AbsProbe::CacheAllItems(ItemVector* items) {
 	for(ItemVector::iterator itemIt = items->begin(); itemIt != items->end(); itemIt++) {
         Item* cacheCandidateItem = (*itemIt);
 
-        ItemCacheResult ret = AbsProbe::globalItemCache.insert(StringItemPair(cacheCandidateItem->UniqueString(), cacheCandidateItem));
+        pair<ItemCache::iterator, bool> ret = globalItemCache.insert(cacheCandidateItem);
 
-        // if a new elment was inserted ret.second will be true
+        // if a new element was inserted ret.second will be true
         if (ret.second == true) {
 
             // need to id the item
@@ -92,10 +113,10 @@ ItemVector* AbsProbe::CacheAllItems(ItemVector* items) {
             cacheCandidateItem = NULL;
         }
 
-        // add the corresponding item in the global cache to the output of chacedItems
-        StringKeyedItemMap::iterator cachedItemIt = ret.first;
-        Item* retItem = (*cachedItemIt).second;
-        cachedItems->push_back(retItem);            
+        // add the corresponding item in the global cache to the output of cachedItems
+        ItemCache::iterator cachedItemIt = ret.first;
+        Item* retItem = *cachedItemIt;
+        cachedItems->push_back(retItem);
 	}
 
     items->clear();
@@ -107,12 +128,12 @@ ItemVector* AbsProbe::CacheAllItems(ItemVector* items) {
 
 void AbsProbe::ClearGlobalCache() {
 
-    for(StringKeyedItemMap::iterator it = AbsProbe::globalItemCache.begin(); it != AbsProbe::globalItemCache.end(); it++) {
-        Item* item = (*it).second;
+    for(ItemCache::iterator it = globalItemCache.begin(); it != globalItemCache.end(); it++) {
+        Item* item = *it;
         delete item;
 	  	item = NULL;
     }
-    AbsProbe::globalItemCache.clear();
+    globalItemCache.clear();
 }
 
 ItemEntity* AbsProbe::CreateItemEntity(ObjectEntity* obj) {

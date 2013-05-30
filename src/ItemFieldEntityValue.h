@@ -60,7 +60,7 @@ public:
 	/** Return the name value of the field.
 	 *  @return A string representing the name value of the field.
 	 */
-	std::string GetName();
+	std::string GetName() const;
 
 	/** Set the name field's value.
 	 *  @param name A string value representing the field's name.
@@ -71,7 +71,7 @@ public:
 	/** Return the datatype of the field.
  	 *  @return A value from the OvalEnum::Datatype enumeration representing the datatype of the field.
 	 */
-	OvalEnum::Datatype GetDatatype();
+	OvalEnum::Datatype GetDatatype() const;
 
 	/** Set the datatype of the field.
 	 *  @param datatype A OvalEnum::Datatype enumeration value representing the datatype of the field.
@@ -82,7 +82,7 @@ public:
 	/** Return the status of the ItemFieldEntityValue.
 	 *  @return A OvalEnum::SCStatus value representing the status of the ItemFieldEntityValue.
 	 */
-	OvalEnum::SCStatus GetStatus();
+	OvalEnum::SCStatus GetStatus() const;
 
 	/** Set the status of the ItemFieldEntityValue.
 	    @param status The status of the ItemFieldEntityValue.  

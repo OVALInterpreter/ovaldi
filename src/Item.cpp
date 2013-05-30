@@ -28,12 +28,204 @@
 //
 //****************************************************************************************//
 
+
+#include <StringEntityValue.h>
+#include <ItemFieldEntityValue.h>
+
 #include "Item.h"
 
 using namespace std;
 
 int Item::idCounter = 1;
 ItemMap Item::processedItemsMap;
+
+namespace {
+
+	/**
+	 * Defines a total order on entity values.  This function is an
+	 * implementation detail of std::less<Item*> and assumes that
+	 * \p left and \p right are of the same subtype (StringEntityValue*
+	 * or ItemFieldEntityValue*).
+	 *
+	 * \return true if \p left is "less than" \p right, false otherwise.
+	 */
+	bool entityValueLessThan(const AbsEntityValue *left, const AbsEntityValue *right) {
+
+		/*
+		This is a simple string check for string entity values.
+		For fields of records, we have the following structure:
+			datatype, status, name, value
+		the "mask" attr is not supported by ovaldi.  I put
+		the quick things to check first and name/value last.
+		I hope this speeds things up.
+		*/
+
+		// Afaik, these are the only two subclasses of AbsEntityValue which can
+		// be used in an ItemEntity.
+		const StringEntityValue *lsv, *rsv;
+		const ItemFieldEntityValue *liv, *riv;
+
+		lsv = dynamic_cast<const StringEntityValue*>(left);
+		liv = dynamic_cast<const ItemFieldEntityValue*>(left);
+		rsv = dynamic_cast<const StringEntityValue*>(right);
+		riv = dynamic_cast<const ItemFieldEntityValue*>(right);
+
+		assert((lsv&&rsv)||(liv&&riv));
+
+		if (lsv) {
+			// plain strings
+			int comp = lsv->GetValue().compare(rsv->GetValue());
+			if (comp < 0)
+				return true;
+			return false;
+		} else {
+			// record fields
+			if (liv->GetDatatype() < riv->GetDatatype())
+				return true;
+			else if (liv->GetDatatype() > riv->GetDatatype())
+				return false;
+
+			if (liv->GetStatus() < riv->GetStatus())
+				return true;
+			else if (liv->GetStatus() > riv->GetStatus())
+				return false;
+
+			int comp = liv->GetName().compare(riv->GetName());
+			if (comp < 0)
+				return true;
+			else if (comp > 0)
+				return false;
+
+			comp = liv->GetValue().compare(riv->GetValue());
+			if (comp < 0)
+				return true;
+			return false;
+		}
+	}
+
+	/**
+	 * Defines a total order on item entities.
+	 *
+	 * \return true if \p left is "less than" \p right, false otherwise.
+	 */
+	bool itemEntityLessThan(const ItemEntity *left, const ItemEntity *right) {
+			
+		/*
+		General ItemEntity structure:
+			datatype, status, nil, name, value(s)
+		the "mask" attr is not supported by ovaldi.  I put
+		the quick things to check first and name/values last.
+		I hope this speeds things up.
+
+		Record-type item entities may have more than one
+		value; non-records have no more than one.  In fact,
+		I think records can also have zero values and non-records
+		must have exactly one??  It is confusing...
+
+		*/
+
+		// first check overall "length".  The only variability
+		// is in the values, so just check that.
+		size_t fieldsLeft = left->GetNumValues();
+		size_t fieldsRight = right->GetNumValues();
+		if (fieldsLeft < fieldsRight)
+			return true;
+		else if (fieldsLeft > fieldsRight)
+			return false;
+
+		if (left->GetDatatype() < right->GetDatatype())
+			return true;
+		else if (left->GetDatatype() > right->GetDatatype())
+			return false;
+
+		if (left->GetStatus() < right->GetStatus())
+			return true;
+		else if (left->GetStatus() > right->GetStatus())
+			return false;
+
+		// treat bools like ints
+		if (left->GetNil() < right->GetNil())
+			return true;
+		else if (left->GetNil() > right->GetNil())
+			return false;
+
+		int comp = left->GetName().compare(right->GetName());
+		if (comp < 0)
+			return true;
+		else if (comp > 0)
+			return false;
+
+		// check values
+		AbsEntityValueVector leftVals = left->GetValues();
+		AbsEntityValueVector rightVals = right->GetValues();
+		AbsEntityValueVector::iterator leftIter, rightIter;
+		for (leftIter = leftVals.begin(), rightIter = rightVals.begin();
+			leftIter != leftVals.end();
+			++leftIter, ++rightIter) {
+
+			if (entityValueLessThan(*leftIter, *rightIter))
+				return true;
+			else if (entityValueLessThan(*rightIter, *leftIter))
+				return false;
+		}
+
+		return false;
+	}
+}
+
+namespace std {
+
+	bool less<const Item*>::operator()(const Item *left, const Item *right) {
+
+		/*
+		General Item structure:
+			status, xml namespace, name, entity(s)
+		I put the quick things to check first and name/entities last.
+		I hope this speeds things up.
+		*/
+
+		// first check overall "length".  The only variability
+		// is in the entities, so just check that.
+		if (left->GetNumElements() < right->GetNumElements())
+			return true;
+		else if (left->GetNumElements() > right->GetNumElements())
+			return false;
+
+		if (left->GetStatus() < right->GetStatus())
+			return true;
+		else if (left->GetStatus() > right->GetStatus())
+			return false;
+
+		int comp = left->GetName().compare(right->GetName());
+		if (comp < 0)
+			return true;
+		else if (comp > 0)
+			return false;
+
+		comp = left->GetXmlns().compare(right->GetXmlns());
+		if (comp < 0)
+			return true;
+		else if (comp > 0)
+			return false;
+
+		// check entities
+		const ItemEntityVector *leftEnts = left->GetElements();
+		const ItemEntityVector *rightEnts = right->GetElements();
+		ItemEntityVector::const_iterator leftIter, rightIter;
+		for (leftIter = leftEnts->begin(), rightIter = rightEnts->begin();
+			leftIter != leftEnts->end();
+			++leftIter, ++rightIter) {
+
+			if (itemEntityLessThan(*leftIter, *rightIter))
+				return true;
+			else if (itemEntityLessThan(*rightIter, *leftIter))
+				return false;
+		}
+
+		return false;
+	}
+
+}
 
 //****************************************************************************************//
 //									Item Class											  //	
@@ -126,7 +318,7 @@ void Item::SetMessages(OvalMessageVector* messages) {
     this->messages = (*messages);
 }
 
-string Item::GetName() {
+string Item::GetName() const {
 	return this->name;
 }
 
@@ -134,7 +326,7 @@ void Item::SetName(string name) {
 	this->name = name;
 }
 
-OvalEnum::SCStatus Item::GetStatus() {
+OvalEnum::SCStatus Item::GetStatus() const {
 	return this->status;
 }
 
@@ -142,7 +334,7 @@ void Item::SetStatus(OvalEnum::SCStatus status) {
 	this->status = status;
 }
 
-string Item::GetXmlns() {
+string Item::GetXmlns() const {
 	return this->xmlns;
 }
 
@@ -150,7 +342,7 @@ void Item::SetXmlns(string xmlns) {
 	this->xmlns = xmlns;
 }
 
-string Item::GetXmlnsAlias() {
+string Item::GetXmlnsAlias() const {
 	return this->xmlnsAlias;
 }
 
@@ -303,21 +495,6 @@ void Item::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement*
 			element->Write(scFile, newItemElem);
 		}
 	}
-}
-
-string Item::UniqueString() {
-
-	string uniqueString;
-    uniqueString.append(this->GetXmlnsAlias());
-    uniqueString.append(this->GetName());
-
-
-    ItemEntityVector* myElms = this->GetElements();
-	for(ItemEntityVector::iterator it = myElms->begin(); it != myElms->end(); it++) {
-		uniqueString.append((*it)->UniqueString());
-	}
-
-    return uniqueString;
 }
 
 Item* Item::GetItemById(string itemId) {

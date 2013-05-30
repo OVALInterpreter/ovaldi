@@ -95,7 +95,7 @@ ItemEntity::~ItemEntity() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string ItemEntity::GetName() {
+string ItemEntity::GetName() const {
 
 	return this->name;
 }
@@ -105,7 +105,7 @@ void ItemEntity::SetName(string name) {
 	this->name = name;
 }
 
-string ItemEntity::GetValue() {
+string ItemEntity::GetValue() const {
 	if ( this->value.empty() ){
 		return "";
 	}else{
@@ -125,11 +125,11 @@ void ItemEntity::SetValues(AbsEntityValueVector value){
 	this->value = value;
 }
 
-AbsEntityValueVector ItemEntity::GetValues(){
+AbsEntityValueVector ItemEntity::GetValues() const {
 	return this->value;
 }
 
-OvalEnum::Datatype ItemEntity::GetDatatype() {
+OvalEnum::Datatype ItemEntity::GetDatatype() const {
 
 	return this->datatype;
 }
@@ -139,7 +139,7 @@ void ItemEntity::SetDatatype(OvalEnum::Datatype datatype) {
 	this->datatype = datatype;
 }
 
-OvalEnum::SCStatus ItemEntity::GetStatus() {
+OvalEnum::SCStatus ItemEntity::GetStatus() const {
 
 	return this->scStatus;
 }
@@ -182,19 +182,6 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 				((ItemFieldEntityValue*)*it)->Write(scFile,newItemEntityElem);
 		}
 	}
-}
-
-string ItemEntity::UniqueString() {
-	string valueStr = "";
-	AbsEntityValueVector allValues = this->GetValues();
-	for(AbsEntityValueVector::iterator it = allValues.begin(); it != allValues.end(); it++){
-		// If a record append the name of each field before its value
-		if ( this->GetDatatype() == OvalEnum::DATATYPE_RECORD ){
-			valueStr.append(((ItemFieldEntityValue*)(*it))->GetName());
-		}
-		valueStr.append((*it)->GetValue());
-	}
-	return this->GetName() + valueStr;
 }
 
 void ItemEntity::Parse(DOMElement* itemEntityElm) {
@@ -240,6 +227,6 @@ void ItemEntity::SetNil(bool isNil) {
 	this->nil = isNil;
 }
 
-bool ItemEntity::GetNil() {
+bool ItemEntity::GetNil() const {
 	return this->nil;
 }
