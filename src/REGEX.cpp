@@ -135,7 +135,7 @@ void REGEX::GetConstantPortion(string patternIn, char delimIn, string *patternOu
 
 	//	Add the $ to the end of the pattern if it was removed 
 	//	and there is a pattern ramaining
-	if(rmCarrot && (*patternOut).length() != 0)
+	if(rmDollar && (*patternOut).length() != 0)
 	{
 		(*patternOut) = (*patternOut) + "$";
 	}
