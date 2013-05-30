@@ -44,7 +44,7 @@ SetObject::SetObject(string id, string comment, string name, int version, string
 	// -----------------------------------------------------------------------
 
 	this->type = "SetObject";
-
+	this->set = NULL;
 }
 
 SetObject::~SetObject() {
@@ -55,7 +55,8 @@ SetObject::~SetObject() {
 	//
 	// -----------------------------------------------------------------------
 	
-	delete(this->set);
+	if (this->set)
+		delete(this->set);
 }
 
 // ***************************************************************************************	//
