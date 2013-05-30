@@ -62,7 +62,7 @@ ItemFieldEntityValue::~ItemFieldEntityValue() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string ItemFieldEntityValue::GetName() {
+string ItemFieldEntityValue::GetName() const {
 
 	return this->name;
 }
@@ -72,7 +72,7 @@ void ItemFieldEntityValue::SetName(string name) {
 	this->name = name;
 }
 
-OvalEnum::Datatype ItemFieldEntityValue::GetDatatype() {
+OvalEnum::Datatype ItemFieldEntityValue::GetDatatype() const {
 
 	return this->datatype;
 }
@@ -82,7 +82,7 @@ void ItemFieldEntityValue::SetDatatype(OvalEnum::Datatype datatype) {
 	this->datatype = datatype;
 }
 
-OvalEnum::SCStatus ItemFieldEntityValue::GetStatus() {
+OvalEnum::SCStatus ItemFieldEntityValue::GetStatus() const {
 
 	return this->scStatus;
 }

@@ -98,24 +98,12 @@ public:
 	void GetConstantPortion(std::string patternIn, char delimIn, std::string *patternOut, std::string *constOut);
 	
 	/**	Return true if the searchString matches the specified pattern.
-
-		Regular expression support is provided by the REGEX library package,
-		which is open source software, written by Philip Hazel, and copyright
-		by the University of Cambridge, England. 
-
-		Download site:	ftp://ftp.csx.cam.ac.uk/pub/software/programming/REGEX/
 	*/
 	bool IsMatch(const char *patternIn, const char *searchStringIn);
 
 	/**	Return true if the searchString matches the specified pattern including the set of matched substrings.
 		If the input regex identifies any subexpressions the matching substrings for those subexpressions
 		are pushed onto the substrings input parameter.
-
-		Regular expression support is provided by the REGEX library package,
-		which is open source software, written by Philip Hazel, and copyright
-		by the University of Cambridge, England. 
-
-		Download site:	ftp://ftp.csx.cam.ac.uk/pub/software/programming/REGEX/
 	*/
 	bool GetMatchingSubstrings(const char *patternIn, const char *searchStringIn, StringVector* substrings);
 

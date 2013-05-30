@@ -48,7 +48,7 @@ AbsEntityValue::AbsEntityValue(string value){
 	this->value = value;
 }
 
-string AbsEntityValue::GetValue(){
+string AbsEntityValue::GetValue() const {
 	return this->value;
 }
 

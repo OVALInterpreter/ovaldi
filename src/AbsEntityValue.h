@@ -53,7 +53,7 @@ public:
 	/** Return the value of the entity.
 	 *  @return A string representing the value of the entity.
 	 */
-	std::string GetValue();
+	std::string GetValue() const;
 
 	/** Set the value of the entity.
 	 *  @param value A string representation of the value of the entity.

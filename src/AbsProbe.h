@@ -138,9 +138,6 @@ private:
 		These are deleted after each run of the probe.
 	*/
 	ItemEntityVector createdItemEntities;
-
-	/** The cache of all Items created by all probes. */
-    static StringKeyedItemMap globalItemCache;
 };
 
 
