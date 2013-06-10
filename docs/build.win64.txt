@@ -214,171 +214,72 @@ install the supporting libraries.
 
 	F. Build Xerces
 
-		The C++ source code for Xerces is available from:
-
-			http://xerces.apache.org/xerces-c/
-
-		Ovaldi requires Xerces 2.x; it is incompatible with 3.x.  Click the "Download"
-		link in the left sidebar, and scroll down to the 2-series releases.  There is a
-		windows x64 binary available, but we can't use it due to different compiler
-		settings between ovaldi and what was used to build those binaries, specifically
-		with regard to treatment of wchar_t.  So grab the 2.7 source.
-
-		Open VC and load up <xerces_dir>\Projects\Win32\VC7.1\xerces-all\xerces-all.sln.
-		Using the 7.1 version of the solution will make building Xalan easier, since it
-		is hard-coded to refer to v7.1 xerces directories.  Let later versions of the
-		IDE upgrade the solution.
-
-		We are concerned specifically with building one project from this solution:
-		XercesLib.  First, we need to create x64 configurations, as the project does not
-		come with them.  Right click the solution in the Solution Explorer pane, click 
-		Properties to bring up the solution properties window.  Click Configuration 
-		Properties in the left pane.  This will enable the Configuration Manager button 
-		on the top right.  Click that button to bring up the config manager window.  
-		Click the "Active solution platform" dropdown on the top right, and click 
-		<New...>.  Another dialog comes up.  Choose x64 in the top dropdown, leave the 
-		rest the same, and click OK.  You should see the values in the Platform column 
-		of the config manager window all change to x64.  Dismiss the remaining dialogs.
-
-		Now if you choose any project and look at its properties, under Linker->Advanced
-		->Target Machine, it should say MachineX64.  Unfortunately, there is still a
-		vestige of an x86 configuration left, and I don't know how to fix it from within
-		the IDE.  The only way I know how is to manually edit the project file in a text
-		editor.  If you don't do this, linking will fail with an error about conflicting
-		x86 and x64 targets.  Do this for x64 configurations in the project file for the
-		aforementioned project:
-
-			<xerces_dir>\Projects\Win32\VC7.1\xerces-all\XercesLib\XercesLib.vcproj
-
-		Close the solution and open this file in, say, notepad.  It's an XML file with 
-		each configuration in a <Configuration> tag.  You can search for "Release|x64" 
-		for the release x64 config, and similar for others.  Scroll down to the 
-		VCLinkerTool.  There is an AdditionalOptions attribute that says /MACHINE:I386.
-		Delete that attribute.  Then load up the solution again in the IDE.
-
-		Since settings were copied from the Win32 configuration, there are still some
-		that need changing.  For the aforementioned project, add WIN64 as a defined 
-		preprocessor symbol (properties->C/C++->Preprocessor->Preprocessor Definitions).
-		Another thing you could change if you wanted to are the output directories.  
-		They're the same between x86 and x64 builds, so they will overwrite each other.
-		If you care about that.
-
-		Also change the wchar_t setting to disable the built-in type for the project:
-		properties->C/C++->Language->Treat wchar_t as Built-in Type
-
-		Right-click the XercesLib project and select Project Only->Build Only XercesLib.
-		The library should build.  There will be many warnings about type conversions.
-		Apparently xerces was not written with x64 portability in mind, but luckily they
-		don't stop the build.
-
-		The results are put into:
-
-			<xerces_dir>\Build\Win32\VC7.1\<Release|Debug>\
-
-		or whatever output directory you chose.  You will have to create a normal
-		installation directory yourself.  Create your own bin and lib subdirs and copy
-		the DLL into the former and import lib into the latter.  Extracting the
-		headers from the source distribution is more trouble... the easiest thing to
-		do is get a prepackaged binary distribution and copy the include directory out
-		of that.
+		Download and install a binary distribution of the xerces-c library.
+		The OVAL Interpreter currently uses version 3.1.1 of the xerces-c
+		library. The binary distribution file can be found at:
+		
+		  http://www.apache.org/dist/xerces/c/3/binaries/
 
 	G. Build Xalan
 
-		The normal xalan build process includes running an nmake file, which doesn't 
-		work with recent versions of VC, and doesn't create the right type of binaries.
-		We'll have to hack it to make it work, in addition to everything else.  I 
-		recommend creating a batch file to invoke nmake with the required environment 
-		and commandline, to make it easy to run repeatedly as you work through the 
-		changes.
-
-		The project which requires the nmake build step is located in
-
-			<xalan_src_dir>\c\Projects\Win32\VC7.1\Utils
-
-		I put my batch file in that directory.  It contains:
-
-			---
-			set XERCESCROOT=<your xerces install dir>
-
-			cd Localization
-			nmake /f BuildMessages.mak BITS=Win64 CFG=Release TYPE=inmem LOCALE=en_US
-			cd ..
-			---
-
-		This batch file builds a release version.  Change to CFG=Debug to build a debug
-		version.
-
-		Open <xalan_src_dir>\c\Projects\Win32\VC7.1\Utils\MsgCreator\MsgCreator.mak
-		in a text editor.  It has several sections, one for each supported 
-		configuration.  Find the appropriate section, identified by a line like:
-
-			!ELSEIF  "$(CFG)" == "MsgCreator - Win64 Release" 
-
-		In that section, edit the CPP_PROJ variable, which contains the compiler
-		commandline to update obsolete, nonexistent, and missing parameters.
-		 - /GX becomes /EHsc (this has to do with exception handling)
-		 - Delete /YX and /Fp params (precompiled header junk)
-		 - /ML becomes /MD (has to do with which C runtime to link to.  xerces used /MD)
-		 - Add /Zc:wchar_t- to disable wchar_t as a built-in type
-
-		Edit the LINK32_FLAGS variable and replace /machine:IA64 at the end of that line
-		with /machine:x64.
-
-		Open <xalan_src_dir>\c\Projects\Win32\VC7.1\Utils\XalanMsgLib\XalanMsgLib.mak
-		in a text editor.  Apply the same treatment to this file as described above, in
-		the appropriate section.
-
-		Open a MSVC x64 command prompt, and from there, run the batch file you created 
-		previously.  It should run successfully, but with many warnings, similar those 
-		we got when building xerces.  Note that the output goes to:
-
-			<xalan_src_dir>\c\Build\Win64\VC7.1\<Release|Debug>
-
-		The VC x64 Xalan project we create will be initially configured to write output
-		to a Win32 directory, so we'll need to change that so all the libs go to the
-		same place.
-
-		Create an environment variable named XERCESCROOT.  This can point to either your
-		source directory or installation directory.  It must be done before starting
-		VC, or it won't be picked up.
-
-		Start VC and load the Xalan VC project from 
-		<xalan_src_dir>\c\Projects\Win32\VC7.1\Xalan.sln.  Let the IDE convert the 
-		project to whatever version your IDE is.  Create x64 configurations for all the 
-		projects, as described in the xerces build instructions.
-
-		The AllInOne project is the one which creates the library.  In the project
-		properties for that project, for the x64 configuration you plan to use, make the
-		following changes:
-		 - C/C++->General: change "Win32" to "Win64" in the last path under 
-			 Additional Include Directories
-		 - C/C++->Output Files: change "Win32" in all the output paths to "Win64"
-		 - C/C++->Language: disable wchar_t as an built-in type
-		 - Linker->General: change "Win32" in the Output File path to "Win64", and
-			 again in the last path listed under Additional Library Directories
-		 - Linker->Advanced: change "Win32" to "Win64" in the path under Import Library
-
-		Close the solution and make the same change to the vcproj file as was done with
-		xerces, to remove the erroneous x86 linker setting.  Then load the solution
-		again.  The file to edit is:
-
-			<xalan_src_dir>\c\Projects\Win32\VC7.1\AllInOne\AllInOne.vcproj
-
-		It is also advisable to add two more preprocessor symbols to the project,
-		otherwise you will get a *lot* of warning spam about use of insecure functions,
-		and the build will take a lot longer:
+		The OVAL Interpreter uses the open source Xalan library.  The
+		binary was compiled with version 1.11.0 of the xalan-c library.  From
+		the Xalan Web site:
 		
-			_SCL_SECURE_NO_WARNINGS, _CRT_SECURE_NO_WARNINGS
-
-		Build the AllInOne project: right click AllInOne in the Solution Explorer pane,
-		click Project Only->Build Only AllInOne.
-
-		The libraries are written to 
-		<xalan_src_dir>\c\Build\Win64\VC7.1\<Release|Debug>.  Now you have the same task
-		as for xerces: create an installation directory structure and copy the files 
-		into it.  As before, it's probably easiest to just copy the include directory 
-		from a binary distribution rather than try to extract all the *.hpp files from 
-		the source distribution yourself.
+		 "This product includes software developed by the Apache Software
+		     Foundation (http://www.apache.org/)."
+		
+		For more information about Xalan visit:
+		
+		 http://xalan.apache.org
+		
+		Source is available from:
+		
+		 http://www.apache.org/dist/xalan/xalan-c/
+		
+		Before compiling, you may optionally apply xalan_optional_patch.txt, 
+		which resolves two issues.  One of them can cause a crash under certain
+		circumstances on any platform, the other seems to always cause crashes in
+		Windows debug builds specifically.  Windows release builds don't seem to
+		be affected by the latter issue.  If you don't wish to apply the patch,
+		you can skip building from source and use a pre-built binary available
+		from the same place as the source.
+		
+		The Xalan binary distribution site given above also has "combined" zips
+		which contain both Xerces and Xalan.  They are named "xalan_comb-*".  So
+		you could download that if you wanted to get both libraries in one fell
+		swoop, and if you didn't want to apply any patches and build from source.
+		
+		Building Xalan from source:
+		
+		These instructions assume you're using VC++10 (VC++ 2010) to build 64-bit
+		binaries.  Before starting Visual Studio, set an environment variable 
+		named XERCESCROOT which points to where xerces 3.1.1 is installed.  Also,
+		add %XERCESCROOT%\bin to your PATH:
+		
+		Control Panel -> System -> Advanced system settings -> Advanced (tab) ->
+		 Environment Variables (button).
+		
+		Next, navigate to <xalan source dir>\c\Projects\Win32\VC10 and open
+		"Xalan.sln" in Visual Studio.  The simplest thing to do from here is
+		perform a batch build of what you need:
+		
+		Right click the solution -> Batch Build...
+		
+		Check checkboxes for what you want to build.  E.g. if you want to build
+		64-bit debug and release builds of everything, check checkboxes for
+		project "All", config "Debug|x64" and "Release|x64".  If you just
+		want the DLLs, choose project "AllInOne".  Then click "Build".
+		
+		When the build is done, your DLLs will be in
+		<xalan source dir>\c\Build\Win64\VC10\(Debug|Release).
+		
+		This doesn't create a standard directory layout with bin/lib/include
+		directories, so you'll either have to create that yourself, or just use
+		the files where they are in your Xalan source tree.  Either way, don't
+		forget to include the generated headers in:
+		
+		<xalan source dir>\c\Build\Win64\VC10\(Debug|Release)\Nls\Include
 
 	H. Building the OVAL Interpreter
 
