@@ -32,6 +32,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 6    ---
+---------------------------------------
+
+*Fixed a bug in State::Parse() where it was not parsing the operator attribute even if it was specified. As a result, the state operator attribute was not being considered and was always set to the default value of "AND". This bug was fixed in revision #1677.
+
+---------------------------------------
 ---       Version 5.10.1 build 5    ---
 ---------------------------------------
 
