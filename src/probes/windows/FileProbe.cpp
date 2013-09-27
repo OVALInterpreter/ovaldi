@@ -397,71 +397,44 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		/////////////////////  FileSize  /////////////////////
 		//////////////////////////////////////////////////////
 
-		struct _stat statusBuffer;
-		int result;
- 
-		// Get status information associated with the file.
+		// Get size of file.
+		WIN32_FILE_ATTRIBUTE_DATA wfad;
 		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-		result = _stat(filePath.c_str(), &statusBuffer);
+		ok = GetFileAttributesEx(filePath.c_str(), GetFileExInfoStandard, &wfad);
 		FS_REDIRECT_GUARD_END
-		if (result < 0) {
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get status information ");
-			errorMessage.append("associated with the file: '");
-			errorMessage.append(filePath);
-			errorMessage.append("'.");
-			
-			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
+		if (!ok) {
+			string errorMessage = string("Unable to get file attributes: ") +
+				WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage(errorMessage));
-			
-		} else {
-			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-		}
 
-
-		//////////////////////////////////////////////////////
-		/////////////////////  File Times  ///////////////////
-		//////////////////////////////////////////////////////
-		FILETIME creationTime;
-		FILETIME lastAccessTime;
-		FILETIME writeTime;
-
-		BOOL timeRes = GetFileTime(	hFile,
-									&creationTime,   //c_time
-									&lastAccessTime, //a_time
-									&writeTime);     //m_time
-
-		if(!timeRes) {
-
+			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
 			item->AppendElement(aTime);
             ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(cTime);
 			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(mTime);
-			string lastError = WindowsCommon::GetErrorMessage(GetLastError());
-			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
-
 		} else {
-			
+			item->AppendElement(new ItemEntity("size",
+				Common::ToString((((UINT64)wfad.nFileSizeHigh)<<32) | wfad.nFileSizeLow),
+				OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 			//////////////////////////////////////////////////////
 			/////////////////////  Accessed  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
+			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(wfad.ftLastAccessTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(aTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Created  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
+			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(wfad.ftCreationTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(cTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Modified  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
+			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(wfad.ftLastWriteTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(mTime);
-
 		}
 
 		//////////////////////////////////////////////////////
@@ -631,7 +604,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		/////////////////////  FileType  /////////////////////
 		//////////////////////////////////////////////////////
 
-		this->GetType(hFile, filePath, item, type, fileFinder);
+		this->GetType(hFile, filePath, item, type, wfad);
 
 		//////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////
@@ -687,27 +660,19 @@ void FileProbe::GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemE
 	}
 }
 
-void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder) {
+void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type,
+		const WIN32_FILE_ATTRIBUTE_DATA &lpFileInformation) {
 
 	DWORD res = GetFileType(hFile);
-
-	BOOL gfaRes;
-	WIN32_FILE_ATTRIBUTE_DATA lpFileInformation;
 
 	switch (res) {
 
 		case FILE_TYPE_DISK:
 
-			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-			gfaRes = GetFileAttributesEx(filePath.c_str(),				// file or directory name
-										 GetFileExInfoStandard,			// attribute class
-										 (LPVOID)&lpFileInformation);	// attribute information 
-			FS_REDIRECT_GUARD_END
-
-			if (lpFileInformation.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+			if (lpFileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				type->SetValue("FILE_ATTRIBUTE_DIRECTORY");
 			else
-					type->SetValue("FILE_TYPE_DISK");
+				type->SetValue("FILE_TYPE_DISK");
 
 			type->SetStatus(OvalEnum::STATUS_EXISTS);
 
@@ -725,18 +690,7 @@ void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* t
 			type->SetStatus(OvalEnum::STATUS_EXISTS);
 			break;
 
-		case FILE_TYPE_UNKNOWN:
-			{
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) No file type information available for the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'");
-				item->AppendMessage(new OvalMessage(errorMessage));
-				type->SetStatus(OvalEnum::STATUS_ERROR);
-			}
-			
-			break;
-
+		/* case FILE_TYPE_UNKNOWN: */
 		default:
 			{
 				string errorMessage = "";
