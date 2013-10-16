@@ -131,6 +131,12 @@ void State::Parse(DOMElement* stateElm) {
 	}
 	this->SetVersion(version);
 
+	// if the operator attribute is specified let's set it. otherwise we will use the default operator set in the constructor.
+        string operatorStr = XmlCommon::GetAttributeByName(stateElm, "operator");
+        if (operatorStr.compare("") != 0){
+          this->SetOperator(OvalEnum::ToOperator(operatorStr));
+        }
+
 	// loop over all elements
 	DOMNodeList *stateChildren = stateElm->getChildNodes();
 	unsigned int index = 0;

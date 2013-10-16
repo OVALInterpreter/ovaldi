@@ -70,7 +70,8 @@ private:
 	/** Get the version of the file. */
 	void GetVersion(LPVOID versionbuf, std::string filePath, Item *item, ItemEntity* version);
 	/** Get the type of the file. */
-	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder);
+	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type,
+		const WIN32_FILE_ATTRIBUTE_DATA &lpFileInformation);
 };
 
 #endif
