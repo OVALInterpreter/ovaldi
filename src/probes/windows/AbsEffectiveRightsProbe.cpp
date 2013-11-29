@@ -138,25 +138,25 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 
         // Apply the behaviors
         for ( StringSet::iterator it = workingTrustees.begin(); it != workingTrustees.end(); it++ ) {
-            // Is this a group
-            bool isGroup;
+            
+            if ( resolveGroupBehavior ) {
+				// Is this a group
+				bool isGroup;
+				if ( isSID ) isGroup = WindowsCommon::IsGroupSID ( ( *it ) );
+				else isGroup = WindowsCommon::IsGroup ( ( *it ) );
+				if( isGroup ) {
+					if ( includeGroupBehavior ) {
+						resultingTrustees.insert ( ( *it ) );
+					}
 
-			if ( isSID ) isGroup = WindowsCommon::IsGroupSID ( ( *it ) );
-			else isGroup = WindowsCommon::IsGroup ( ( *it ) );
-
-            if ( isGroup && resolveGroupBehavior ) {
-                if ( includeGroupBehavior ) {
-                    resultingTrustees.insert ( ( *it ) );
-                }
-
-                // Get the group members and add them to the set
-                StringSet groupMembers;
-                if ( isSID ) WindowsCommon::ExpandGroupBySID ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
-				else  WindowsCommon::ExpandGroup ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
-                for ( StringSet::iterator iterator = groupMembers.begin(); iterator != groupMembers.end(); iterator++ ) {
-                    resultingTrustees.insert ( ( *iterator ) );
-                }
-
+					// Get the group members and add them to the set
+					StringSet groupMembers;
+					if ( isSID ) WindowsCommon::ExpandGroupBySID ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
+					else  WindowsCommon::ExpandGroup ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
+					for ( StringSet::iterator iterator = groupMembers.begin(); iterator != groupMembers.end(); iterator++ ) {
+						resultingTrustees.insert ( ( *iterator ) );
+					}
+				}
             } else {
                 resultingTrustees.insert ( ( *it ) );
             }

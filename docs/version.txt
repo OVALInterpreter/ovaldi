@@ -35,7 +35,8 @@ This document contains a log of all changes made to the OVAL Interpreter (ovaldi
 ---       Version 5.10.1 build 6    ---
 ---------------------------------------
 
-*Fixed a bug in State::Parse() where it was not parsing the operator attribute even if it was specified. As a result, the state operator attribute was not being considered and was always set to the default value of "AND". This bug was fixed in revision #1677.
+* Fixed a bug in State::Parse() where it was not parsing the operator attribute even if it was specified. As a result, the state operator attribute was not being considered and was always set to the default value of "AND". This bug was fixed in revision #1677.
+* Fixed a bug in the Windows AbsEffectiveRightsProbe which could crash upon collection of domain accounts while disconnected from the network. This bug was fixed in revision #1681.
 
 ---------------------------------------
 ---       Version 5.10.1 build 5    ---
