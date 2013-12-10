@@ -111,19 +111,9 @@ void Test::AppendTestedItem(TestedItem* testedItem) {
 	this->GetTestedItems()->push_back(testedItem);
 }
 
-VariableValueVector* Test::GetTestedVariables() {
-
-	return &this->testedVariables;
-}
-
-void Test::SetTestedVariables(VariableValueVector* testedVariables) {
-
-	this->testedVariables = (*testedVariables);
-}
-
-void Test::AppendTestedVariable(VariableValue* testedVariable) {
+void Test::AppendTestedVariable(const VariableValue &testedVariable) {
 	
-	this->GetTestedVariables()->push_back(testedVariable);
+	this->testedVariables.push_back(testedVariable);
 }
 
 string Test::GetId() {
@@ -313,8 +303,8 @@ void Test::Write(DOMElement* parentElm) {
 
 		// loop through all variable values and call write method
 		VariableValueVector::iterator iterator1;
-		for(iterator1 = this->GetTestedVariables()->begin(); iterator1 != this->GetTestedVariables()->end(); iterator1++) {
-			(*iterator1)->WriteTestedVariable(testElm);
+		for(iterator1 = this->testedVariables.begin(); iterator1 != this->testedVariables.end(); iterator1++) {
+			iterator1->WriteTestedVariable(testElm);
 		}
 
 		// loop through all vars in the states
@@ -323,12 +313,10 @@ void Test::Write(DOMElement* parentElm) {
 		    State* tmpState = State::SearchCache((*it));
 		    if(tmpState != NULL) { 
 			    VariableValueVector::iterator iterator2;
-			    VariableValueVector* stateVars = tmpState->GetVariableValues();
-			    for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
-				    (*iterator2)->WriteTestedVariable(testElm);
+			    VariableValueVector stateVars = tmpState->GetVariableValues();
+			    for(iterator2 = stateVars.begin(); iterator2 != stateVars.end(); iterator2++) {
+				    iterator2->WriteTestedVariable(testElm);
 			    }
-                stateVars->clear();
-                delete stateVars;
 		    }		    
         }
 	}
@@ -496,8 +484,8 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 						
 						} else if(childName.compare("variable_value") == 0) {
 							// create a new tested variable
-							VariableValue* testedVar = new VariableValue();
-							testedVar->Parse(collectedObjChildElm);
+							VariableValue testedVar;
+							testedVar.Parse(collectedObjChildElm);
 							this->AppendTestedVariable(testedVar);
 						} 
 					}

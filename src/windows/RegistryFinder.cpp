@@ -112,9 +112,10 @@ StringSet* RegistryFinder::GetHives ( ObjectEntity* hiveEntity ) {
             // in the case of equals simply loop through all the
             // variable values and add them to the set of all hives
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = hiveEntity->GetVarRef()->GetValues()->begin(); iterator != hiveEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( this->HiveExists ( ( *iterator )->GetValue() ) ) {
-                    hives->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = hiveEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( this->HiveExists ( iterator->GetValue() ) ) {
+                    hives->insert ( iterator->GetValue() );
                 }
             }
 
@@ -123,14 +124,14 @@ StringSet* RegistryFinder::GetHives ( ObjectEntity* hiveEntity ) {
             // any of the variable values. Then analyze each hive found on
             // the system against the variable values
             // loop through all variable values and call FindHives()
-            VariableValueVector* values = hiveEntity->GetVariableValues();
+            VariableValueVector values = hiveEntity->GetVariableValues();
 
-            for ( VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++ ) {
+            for ( VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++ ) {
                 if ( hiveEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                    this->FindHives ( ( *iterator )->GetValue(), allHives, false );
+                    this->FindHives ( iterator->GetValue(), allHives, false );
 
                 } else {
-                    this->FindHives ( ( *iterator )->GetValue(), allHives, true );
+                    this->FindHives ( iterator->GetValue(), allHives, true );
                 }
             }
         }
@@ -184,9 +185,10 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
             // in the case of equals simply loop through all the
             // variable values and add them to the set of all keys
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = keyEntity->GetVarRef()->GetValues()->begin(); iterator != keyEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( this->KeyExists ( hiveStr, ( *iterator )->GetValue() ) ) {
-                    keys->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = keyEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( this->KeyExists ( hiveStr, iterator->GetValue() ) ) {
+                    keys->insert ( iterator->GetValue() );
                 }
             }
 
@@ -195,14 +197,14 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
             // any of the variable values. Then analyze each key found on
             // the system against the variable values
             // loop through all variable values and call FindKeys
-            VariableValueVector* values = keyEntity->GetVariableValues();
+            VariableValueVector values = keyEntity->GetVariableValues();
 
-            for ( VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++ ) {
+            for ( VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++ ) {
                 if ( keyEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                    this->FindKeys ( hiveStr, ( *iterator )->GetValue(), allKeys, false );
+                    this->FindKeys ( hiveStr, iterator->GetValue(), allKeys, false );
 
                 } else {
-                    this->FindKeys ( hiveStr, ( *iterator )->GetValue(), allKeys, true );
+                    this->FindKeys ( hiveStr, iterator->GetValue(), allKeys, true );
                 }
             }
         }
@@ -267,9 +269,10 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
             // in the case of equals simply loop through all the
             // variable values and add them to the set of all names
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = nameEntity->GetVarRef()->GetValues()->begin(); iterator != nameEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( this->NameExists ( hiveStr, keyStr, ( *iterator )->GetValue() ) ) {
-                    names->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = nameEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( this->NameExists ( hiveStr, keyStr, iterator->GetValue() ) ) {
+                    names->insert ( iterator->GetValue() );
                 }
             }
 
@@ -278,14 +281,14 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
             // any of the variable values. Then analyze each name found on
             // the system against the variable values
             // loop through all variable values and call FindNames
-            VariableValueVector* values = nameEntity->GetVariableValues();
+            VariableValueVector values = nameEntity->GetVariableValues();
 
-            for ( VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++ ) {
+            for ( VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++ ) {
                 if ( nameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                    this->FindNames ( hiveStr, keyStr, ( *iterator )->GetValue(), allNames, false );
+                    this->FindNames ( hiveStr, keyStr, iterator->GetValue(), allNames, false );
 
                 } else {
-                    this->FindNames ( hiveStr, keyStr, ( *iterator )->GetValue(), allNames, true );
+                    this->FindNames ( hiveStr, keyStr, iterator->GetValue(), allNames, true );
                 }
             }
         }
@@ -314,8 +317,9 @@ bool RegistryFinder::ReportHiveDoesNotExist ( ObjectEntity *hiveEntity ) {
             if ( !this->HiveExists ( hiveEntity->GetValue() ) )
 				return true;
         } else {
-            for ( VariableValueVector::iterator iterator = hiveEntity->GetVarRef()->GetValues()->begin(); iterator != hiveEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->HiveExists ( ( *iterator )->GetValue() ) )
+			VariableValueVector vals = hiveEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( !this->HiveExists ( iterator->GetValue() ) )
 					return true;
             }
         }
@@ -330,8 +334,9 @@ bool RegistryFinder::ReportKeyDoesNotExist ( string hiveStr, ObjectEntity *keyEn
             if ( !this->KeyExists ( hiveStr, keyEntity->GetValue() ) )
 				return true;
         } else {
-            for ( VariableValueVector::iterator iterator = keyEntity->GetVarRef()->GetValues()->begin(); iterator != keyEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->KeyExists ( hiveStr, ( *iterator )->GetValue() ) )
+			VariableValueVector vals = keyEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( !this->KeyExists ( hiveStr, iterator->GetValue() ) )
 					return true;
             }
         }
@@ -346,8 +351,9 @@ bool RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keyStr, Obj
             if ( !this->NameExists ( hiveStr, keyStr, nameEntity->GetValue() ) )
 				return true;
         } else {
-            for ( VariableValueVector::iterator iterator = nameEntity->GetVarRef()->GetValues()->begin(); iterator != nameEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->NameExists ( hiveStr, keyStr, ( *iterator )->GetValue() ) )
+			VariableValueVector vals = nameEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( !this->NameExists ( hiveStr, keyStr, iterator->GetValue() ) )
 					return true;
             }
         }

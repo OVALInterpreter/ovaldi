@@ -52,7 +52,7 @@ public:
 	virtual ~AbsObject();
 
 	virtual void Parse(DOMElement*) = 0;
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual VariableValueVector GetVariableValues() = 0;
 	
 	std::string GetId();
 	void SetId(std::string id);

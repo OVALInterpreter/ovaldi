@@ -69,8 +69,7 @@ void LocalVariable::ComputeValue() {
 	if(value->GetFlag() == OvalEnum::FLAG_COMPLETE || value->GetFlag() == OvalEnum::FLAG_INCOMPLETE) {
 		StringVector::iterator iterator;
 		for(iterator = value->GetValues()->begin(); iterator != value->GetValues()->end(); iterator++) {
-			VariableValue* varValue = new VariableValue(this->GetId(), (*iterator));
-			this->AppendVariableValue(varValue);
+			this->AppendVariableValue(this->GetId(), *iterator);
 		}
 	}
 
@@ -99,6 +98,7 @@ void LocalVariable::Parse(DOMElement* localVariableElm) {
 			// Call the ComponentFactory
 			AbsComponent* absComponent = ComponentFactory::GetComponent(childElm);
 			this->SetComponent(absComponent);
+			break; // local_variable gets no more than one component
 		}
 		index ++;
 	}
@@ -107,11 +107,6 @@ void LocalVariable::Parse(DOMElement* localVariableElm) {
 	this->ComputeValue();
 }
 
-VariableValueVector* LocalVariable::GetVariableValues() {
-
-	VariableValueVector* values = NULL;
-
-	values = this->GetComponent()->GetVariableValues();
-
-	return values;
+VariableValueVector LocalVariable::GetVariableValues() {
+	return this->GetComponent()->GetVariableValues();
 }

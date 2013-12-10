@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
 #include "CollectedSet.h"
 
 using namespace std;
@@ -62,24 +64,20 @@ void CollectedSet::SetFlag(OvalEnum::Flag flag) {
 	this->flag = flag;
 }
 
-VariableValueVector* CollectedSet::GetVariableValues() {
-	return &this->variableValues;
+VariableValueVector CollectedSet::GetVariableValues() {
+	return this->variableValues;
 }
 
-void CollectedSet::SetVariableValues(VariableValueVector* variableValues) {
-	this->variableValues = (*variableValues);
+void CollectedSet::SetVariableValues(const VariableValueVector &variableValues) {
+	this->variableValues = variableValues;
 }
 
-void CollectedSet::AppendVariableValue(VariableValue* variableValue) {
+void CollectedSet::AppendVariableValue(const VariableValue &variableValue) {
 	this->variableValues.push_back(variableValue);
 }
 
-void CollectedSet::AppendVariableValues(VariableValueVector* vars) {
-	VariableValueVector::iterator iterator;
-	for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
-		VariableValue* var = (*iterator);
-		this->variableValues.push_back(var);
-	}
+void CollectedSet::AppendVariableValues(const VariableValueVector &vars) {
+	copy(vars.begin(), vars.end(), back_inserter(variableValues));
 }
 
 //****************************************************************************************//

@@ -716,10 +716,11 @@ bool LDAPProbe::ReportSuffixDoesNotExist ( ObjectEntity *suffixEntity, StringVec
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = suffixEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for ( iterator = suffixEntity->GetVarRef()->GetValues()->begin(); iterator != suffixEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->SuffixExists ( ( *iterator )->GetValue() ) ) {
-					suffixesDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->SuffixExists ( iterator->GetValue() ) ) {
+					suffixesDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}
@@ -737,10 +738,11 @@ bool LDAPProbe::ReportRelativeDnDoesNotExist ( string suffixStr, ObjectEntity *r
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = relativeDnEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for ( iterator = relativeDnEntity->GetVarRef()->GetValues()->begin(); iterator != relativeDnEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->RelativeDnExists ( suffixStr, ( *iterator )->GetValue() ) ) {
-					relativeDnsDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->RelativeDnExists ( suffixStr, iterator->GetValue() ) ) {
+					relativeDnsDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}
@@ -758,10 +760,11 @@ bool LDAPProbe::ReportAttributeDoesNotExist ( string suffixStr, string relativeD
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = attributeEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for ( iterator = attributeEntity->GetVarRef()->GetValues()->begin(); iterator != attributeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->AttributeExists ( suffixStr, relativeDnStr, ( *iterator )->GetValue() ) ) {
-					attributesDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->AttributeExists ( suffixStr, relativeDnStr, iterator->GetValue() ) ) {
+					attributesDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}

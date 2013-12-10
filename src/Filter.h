@@ -73,7 +73,7 @@ public:
 	/**
 	 * Get variable values used in the referenced state.
 	 */
-	VariableValueVector *GetVariableValues()
+	VariableValueVector GetVariableValues()
 	{ return state->GetVariableValues(); }
 
 private:

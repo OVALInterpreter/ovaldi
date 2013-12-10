@@ -138,16 +138,16 @@ ItemEntityVector* WMI57Probe::GetNamespaces(ObjectEntity* wmi_namespace) {
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = wmi_namespace->GetVariableValues();
+		VariableValueVector vars = wmi_namespace->GetVariableValues();
 
 		// we may need to add a check to see if the namespace exists here?
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(wmi_namespace);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			namespaces->push_back(tmp);
 		}
 	}
@@ -169,14 +169,14 @@ ItemEntityVector* WMI57Probe::GetWQLs(ObjectEntity* wmi_wql) {
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = wmi_wql->GetVariableValues();
+		VariableValueVector vars = wmi_wql->GetVariableValues();
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(wmi_wql);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			wqls->push_back(tmp);
 		}
 	}

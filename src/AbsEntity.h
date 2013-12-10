@@ -127,7 +127,7 @@ public:
 	 *	Return a vector of variable values that were used for this entity.
 	 *	@return A VariableValueVector* that represents the variable values specified by the entity.
 	 */
-	VariableValueVector* GetVariableValues(); 
+	VariableValueVector GetVariableValues(); 
 
 	/** Return the name field's value. 
 	 *  @return A string representing the name of the entity.

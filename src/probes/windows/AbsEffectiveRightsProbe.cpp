@@ -108,10 +108,11 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 
         } else {
             if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
+				VariableValueVector vals = trusteeEntity->GetVarRef()->GetValues();
                 // In the case of equals simply loop through all the variable values and add them to the set of all sids if they exist on the system
-                for ( VariableValueVector::iterator iterator = trusteeEntity->GetVarRef()->GetValues()->begin(); iterator != trusteeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-					if ( ( isSID && WindowsCommon::TrusteeSIDExists ( ( *iterator )->GetValue() ) ) || ( !isSID && WindowsCommon::TrusteeNameExists ( ( *iterator )->GetValue() ) ) ) {
-                        allTrustees.insert ( ( *iterator )->GetValue() );
+                for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+					if ( ( isSID && WindowsCommon::TrusteeSIDExists ( iterator->GetValue() ) ) || ( !isSID && WindowsCommon::TrusteeNameExists ( iterator->GetValue() ) ) ) {
+                        allTrustees.insert ( iterator->GetValue() );
                     }
                 }
             }
@@ -188,8 +189,9 @@ bool AbsEffectiveRightsProbe::ReportTrusteeDoesNotExist ( ObjectEntity *trusteeE
             }
 
         } else {
-            for ( VariableValueVector::iterator iterator = trusteeEntity->GetVarRef()->GetValues()->begin(); iterator != trusteeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( (*iterator)->GetValue() ) ) || ( !isSID && !WindowsCommon::TrusteeNameExists ( (*iterator)->GetValue() ) ) ) {
+			VariableValueVector vals = trusteeEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( iterator->GetValue() ) ) || ( !isSID && !WindowsCommon::TrusteeNameExists ( iterator->GetValue() ) ) ) {
                     result = true;
 					break;
                 }

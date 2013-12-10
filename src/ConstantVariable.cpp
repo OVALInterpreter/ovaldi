@@ -85,33 +85,31 @@ void ConstantVariable::Parse(DOMElement* constantVariableElm) {
 		if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
 			DOMElement *childElm = (DOMElement*)tmpNode;
 
-			if(XmlCommon::GetElementName(childElm).compare("value") == 0) {
+			if(XmlCommon::GetElementName(childElm) == "value") {
 				foundValue = true;
 				string elmValue = XmlCommon::GetDataNodeValue(childElm);
 				// get and save the value.
-				VariableValue* varValue = new VariableValue(this->GetId(), elmValue);
-				this->AppendVariableValue(varValue);
-				this->SetFlag(OvalEnum::FLAG_COMPLETE);
+				this->AppendVariableValue(this->GetId(), elmValue);
 			}
 		}
 		index ++;
 	}
-	if(!foundValue) {
+
+	if (foundValue)
+		this->SetFlag(OvalEnum::FLAG_COMPLETE);
+	else {
 		this->SetFlag(OvalEnum::FLAG_ERROR);
 		this->AppendMessage("Error a value was not found for the constant variable.");
 	}
-
 }
 
-VariableValueVector* ConstantVariable::GetVariableValues() {
+VariableValueVector ConstantVariable::GetVariableValues() {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	return the variable values used to compute this variable's value
 	//	in this case just an empty vector.
 	// -----------------------------------------------------------------------
-	
-	VariableValueVector* values = new VariableValueVector();
 
-	return values;
+	return VariableValueVector();
 }

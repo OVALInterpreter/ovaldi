@@ -48,10 +48,10 @@ public:
 	ObjectComponent(std::string objectId = "", std::string itemField = "", std::string recordField = "");
 	
 	/** ObjectComponent destructor */
-	~ObjectComponent();
+	virtual ~ObjectComponent();
 
     /** Parse the ObjectComponent element and populate the current ObjectComponent. */
-	void Parse(DOMElement* componentElm);
+	virtual void Parse(DOMElement* componentElm);
 
 
     /** Calculate the value of this ObjectComponent
@@ -62,10 +62,10 @@ public:
             <li>Then get that value and return it as a string.</li>
         </ul>
     */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
     /** Return the variable values used to compute this component's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
     /** Return the objectId field's value. */
 	std::string GetObjectId();

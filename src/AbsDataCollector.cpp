@@ -189,7 +189,6 @@ void AbsDataCollector::Run() {
 		AbsVariable::ClearCache();
 		AbsProbe::ClearGlobalCache();
         Item::ClearCache();
-		VariableValue::ClearCache();
 	} 
 
 	AbsDataCollector::isRunning = false;

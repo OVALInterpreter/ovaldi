@@ -107,15 +107,13 @@ void LiteralComponent::Parse(DOMElement* componentElm) {
 	this->SetValue(XmlCommon::GetDataNodeValue(componentElm));
 }
 
-VariableValueVector* LiteralComponent::GetVariableValues() {
+VariableValueVector LiteralComponent::GetVariableValues() {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	return the variable values used to compute this component's value
 	// in this case just an empty vector.
 	// -----------------------------------------------------------------------
-	
-	VariableValueVector* values = new VariableValueVector();
 
-	return values;
+	return VariableValueVector();
 }

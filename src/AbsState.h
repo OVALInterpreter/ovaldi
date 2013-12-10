@@ -61,7 +61,7 @@ public:
 
 	virtual void Parse(DOMElement* stateElm) = 0;
 
-	VariableValueVector* GetVariableValues();
+	VariableValueVector GetVariableValues();
 
 	AbsEntityVector* GetElements();
 	void SetElements(AbsEntityVector* elements);

@@ -44,12 +44,12 @@ XERCES_CPP_NAMESPACE_USE
 class VariableComponent : public AbsComponent {
 public:
 	VariableComponent(AbsVariable* varRef = NULL);
-	~VariableComponent();
+	virtual ~VariableComponent();
 
-	void Parse(DOMElement* componentElm); 
-	ComponentValue* ComputeValue();
+	virtual void Parse(DOMElement* componentElm); 
+	virtual ComponentValue* ComputeValue();
 
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	AbsVariable* GetVarRef();
 	void SetVarRef(AbsVariable* varRef);

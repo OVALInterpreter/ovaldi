@@ -82,12 +82,12 @@ ComponentValue* VariableComponent::ComputeValue() {
 	// Compute the value for this component. 
 	// -----------------------------------------------------------------------
 
-	VariableValueVector* varValues = this->GetVarRef()->GetValues();
+	VariableValueVector varValues = this->GetVarRef()->GetValues();
 	StringVector* values = new StringVector();
 
 	VariableValueVector::iterator iterator;
-	for(iterator = varValues->begin(); iterator != varValues->end(); iterator++) {
-		values->push_back((*iterator)->GetValue());
+	for(iterator = varValues.begin(); iterator != varValues.end(); iterator++) {
+		values->push_back(iterator->GetValue());
 	}
 
 	// need to create a copy of the messages.
@@ -117,29 +117,27 @@ void VariableComponent::Parse(DOMElement* componentElm) {
 	this->SetVarRef(var);
 }
 
-VariableValueVector* VariableComponent::GetVariableValues() {
+VariableValueVector VariableComponent::GetVariableValues() {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	return the variable values used to compute this component's value
 	// -----------------------------------------------------------------------
 	
-	VariableValueVector* values = new VariableValueVector();
+	VariableValueVector values;
 	
 	// loop through the variable values used by the var ref
-    VariableValueVector* varRefDeps = this->GetVarRef()->GetVariableValues();
+    VariableValueVector varRefDeps = this->GetVarRef()->GetVariableValues();
 	VariableValueVector::iterator iterator;
-	for(iterator = varRefDeps->begin(); iterator != varRefDeps->end(); iterator++) {
-		VariableValue* varRefDep = (*iterator);
-		values->push_back(varRefDep);
+	for(iterator = varRefDeps.begin(); iterator != varRefDeps.end(); iterator++) {
+		values.push_back(*iterator);
 	}
 
 	// Add the values associated with the var ref
-	VariableValueVector* varRefValues = this->GetVarRef()->GetValues();
+	VariableValueVector varRefValues = this->GetVarRef()->GetValues();
 	VariableValueVector::iterator iterator2;
-	for(iterator2 = varRefValues->begin(); iterator2 != varRefValues->end(); iterator2++) {
-		VariableValue* varRefValue = (*iterator2);
-		values->push_back(varRefValue);
+	for(iterator2 = varRefValues.begin(); iterator2 != varRefValues.end(); iterator2++) {
+		values.push_back(*iterator2);
 	}
 
 	return values;

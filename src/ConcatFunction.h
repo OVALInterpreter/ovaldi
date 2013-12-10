@@ -42,16 +42,16 @@ XERCES_CPP_NAMESPACE_USE
 class ConcatFunction : public AbsFunctionComponent {
 public:
 	ConcatFunction();
-	~ConcatFunction();
+	virtual ~ConcatFunction();
 
 	/** Parse the concat element and its child component elements. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(DOMElement* componentElm); 
 
 	/** Compute the desired concatenated strings and return the values. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/**
 		Recursively process all components of this function starting

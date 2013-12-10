@@ -82,11 +82,8 @@ void ExternalVariable::Parse(DOMElement* externalVariableElm) {
 	this->ComputeValue();
 }
 
-VariableValueVector* ExternalVariable::GetVariableValues() {
-
-	VariableValueVector* values = new VariableValueVector();
-
-	return values;
+VariableValueVector ExternalVariable::GetVariableValues() {
+	return VariableValueVector();
 }
 
 PossibleValueTypeVector* ExternalVariable::GetPossibleValueTypes() {
@@ -154,8 +151,7 @@ void ExternalVariable::ComputeValue() {
 					if(this->ValidateValue(this->GetDatatype(), externalValue)) {
 
 						// add the value to the set of values for this exteranl variable.
-						VariableValue* varValue = new VariableValue(this->GetId(), externalValue);
-						this->AppendVariableValue(varValue);
+						this->AppendVariableValue(this->GetId(), externalValue);
 
 					} else {
 						this->SetFlag(OvalEnum::FLAG_ERROR);

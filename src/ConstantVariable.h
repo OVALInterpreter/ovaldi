@@ -40,11 +40,11 @@ class ConstantVariable : public AbsVariable {
 public:
 
 	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
-	~ConstantVariable();
+	virtual ~ConstantVariable();
 
-	void Parse(DOMElement* constantVariableElm);
+	virtual void Parse(DOMElement* constantVariableElm);
 
-	VariableValueVector* GetVariableValues();	
+	virtual VariableValueVector GetVariableValues();	
 };
 
 #endif

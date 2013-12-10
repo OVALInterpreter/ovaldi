@@ -202,13 +202,12 @@ Item* VariableProbe::GetItemForVarId(string varId) {
 		
 	AbsVariable* var = VariableFactory::GetVariable(varId);
 
-	VariableValueVector* varValues = var->GetValues();
+	VariableValueVector varValues = var->GetValues();
 
 	// loop through all values
 	VariableValueVector::iterator iterator;
-	for(iterator = varValues->begin(); iterator != varValues->end(); iterator++) { 		
-		string value = (*iterator)->GetValue();	
-		item->AppendElement(new ItemEntity("value", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	for(iterator = varValues.begin(); iterator != varValues.end(); iterator++) { 		
+		item->AppendElement(new ItemEntity("value", iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}
 
 	return item;

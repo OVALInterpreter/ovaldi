@@ -139,19 +139,13 @@ void AbsVariable::SetName(string name) {
 	this->name = name;
 }
 
-VariableValueVector* AbsVariable::GetValues() {
-
-	return &this->values;
-}
-
-void AbsVariable::SetValues(VariableValueVector* values) {
-
-	this->values = (*values);
-}
-
-void AbsVariable::AppendVariableValue(VariableValue* value) {
+void AbsVariable::AppendVariableValue(const VariableValue &value) {
 
 	this->values.push_back(value);
+}
+
+void AbsVariable::AppendVariableValue(const string &varId, const string &varValue) {
+	this->values.push_back(VariableValue(varId, varValue));
 }
 
 int AbsVariable::GetVersion() {

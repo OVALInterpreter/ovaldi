@@ -214,15 +214,12 @@ void ObjectComponent::Parse(DOMElement* ObjectComponentElm) {
 	this->SetRecordField(XmlCommon::GetAttributeByName(ObjectComponentElm, "record_field"));
 }
 
-VariableValueVector* ObjectComponent::GetVariableValues() {
+VariableValueVector ObjectComponent::GetVariableValues() {
 
-    VariableValueVector* values = NULL;
 	if(AbsDataCollector::GetIsRunning()) {
 		CollectedObject* collectedObject = AbsObjectCollector::Instance()->Run(this->GetObjectId());
-		values = collectedObject->GetVariableValues();
+		return collectedObject->GetVariableValues();
 	} else {
-		values = ObjectReader::GetVariableValuesForObject(this->GetObjectId());
+		return ObjectReader::GetVariableValuesForObject(this->GetObjectId());
 	}
-	
-	return values;
 }

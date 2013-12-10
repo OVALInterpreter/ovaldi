@@ -60,14 +60,14 @@ public:
 	void SetItems(ItemVector* items);
 	
 	/** Return the variableValues field's value. */
-	VariableValueVector* GetVariableValues();
+	VariableValueVector GetVariableValues();
 	/** Set the variableValues field's value. */
-	void SetVariableValues(VariableValueVector* variableValues);
+	void SetVariableValues(const VariableValueVector &variableValues);
 	
 	/** Add a variable value to the end of the variable values vector. */
-	void AppendVariableValue(VariableValue* variableValue);
+	void AppendVariableValue(const VariableValue &variableValue);
 	/** Add a vector of variable values to the end of the variable values vector. */
-	void AppendVariableValues(VariableValueVector* variableValues);
+	void AppendVariableValues(const VariableValueVector &variableValues);
     
 	/** Return the flag field's value. */
 	OvalEnum::Flag GetFlag();

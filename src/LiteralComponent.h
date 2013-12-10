@@ -42,12 +42,12 @@ XERCES_CPP_NAMESPACE_USE
 class LiteralComponent : public AbsComponent {
 public:
 	LiteralComponent(std::string value = "");
-	~LiteralComponent();
+	virtual ~LiteralComponent();
 
-	void Parse(DOMElement* componentElm); 
-	ComponentValue* ComputeValue();
+	virtual void Parse(DOMElement* componentElm); 
+	virtual ComponentValue* ComputeValue();
 
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	std::string GetValue();
 	void SetValue(std::string value);

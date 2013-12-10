@@ -70,7 +70,7 @@ public:
 
 	virtual void Parse(DOMElement*) = 0;
 
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual VariableValueVector GetVariableValues() = 0;
 	
 	/** Return the id field's value. */
 	std::string GetId();
@@ -92,12 +92,15 @@ public:
 	/** Set the name field's value. */
 	void SetName(std::string name);
 
-	/** Return the values field's value. */
-	VariableValueVector* GetValues();
+	/** Return this variable's values. */
+	VariableValueVector GetValues() const
+	{ return values; }
 	/** Set the values field's value. */
-	void SetValues(VariableValueVector* value);
+	void SetValues(const VariableValueVector &values)
+	{ this->values = values; }
 	/** Add a value to the set of values associated with this variable. */
-	void AppendVariableValue(VariableValue* value);
+	void AppendVariableValue(const VariableValue &value);
+	void AppendVariableValue(const std::string &varId, const std::string &varValue);
 
 	/** Return the version field's value. */
 	int GetVersion();

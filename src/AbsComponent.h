@@ -73,7 +73,7 @@ public:
 	/** Return the variable values used to compute the concrete component's value.
 		Each concrete component uses variables differently and will return this set differently.
 	*/
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual VariableValueVector GetVariableValues() = 0;
 };
 
 /**

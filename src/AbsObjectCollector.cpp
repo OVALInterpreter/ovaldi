@@ -281,8 +281,7 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 			ItemVector* itemSet1 = refOneCollectedObj->GetReferences();
 			ItemVector filteredItems(*itemSet1);
 			this->ApplyFilters(&filteredItems, set->GetFilters());
-			VariableValueVector* set1Vars = refOneCollectedObj->GetVariableValues();
-			collectedSet1->AppendVariableValues(set1Vars);
+			collectedSet1->AppendVariableValues(refOneCollectedObj->GetVariableValues());
 			collectedSet1->SetFlag(refOneCollectedObj->GetFlag());
 			collectedSet1->SetItems(&filteredItems);
 		}
@@ -293,8 +292,7 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 			ItemVector* itemSet2 = refTwoCollectedObj->GetReferences();
 			ItemVector filteredItems(*itemSet2);
 			this->ApplyFilters(&filteredItems, set->GetFilters());
-			VariableValueVector* set2Vars = refTwoCollectedObj->GetVariableValues();
-			collectedSet2->AppendVariableValues(set2Vars);
+			collectedSet2->AppendVariableValues(refTwoCollectedObj->GetVariableValues());
 			collectedSet2->SetFlag(refTwoCollectedObj->GetFlag());
 			collectedSet2->SetItems(&filteredItems);
 		}

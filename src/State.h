@@ -46,7 +46,7 @@ class State : public AbsState {
 
 public:
 
-	~State();
+	virtual ~State();
 
 	/** Analyze the specified Item return the Result value for the Item.
 	
@@ -58,7 +58,7 @@ public:
 	OvalEnum::ResultEnumeration Analyze(Item* item);
 
 	/** Parse the provided state element from a oval definition file into a State object. */
-	void Parse(DOMElement* stateElm);
+	virtual void Parse(DOMElement* stateElm);
 
 	/** Sarch the cache of States for the specified State. 
 		Return NULL if not found

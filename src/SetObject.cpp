@@ -84,21 +84,15 @@ void SetObject::SetSet(Set* set) {
 	this->set = set;
 }
 
-VariableValueVector* SetObject::GetVariableValues() {
+VariableValueVector SetObject::GetVariableValues() {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Return a vector of all variable values used in this SetObject
 	//
 	// -----------------------------------------------------------------------
-	
-	VariableValueVector* varValues = NULL;
 
-	// This call is ok because the Set creates a new VariableValueVector 
-	// and returns it to the caller 
-	varValues = this->GetSet()->GetVariableValues();
-
-	return varValues;
+	return this->GetSet()->GetVariableValues();
 }
 
 void SetObject::Parse(DOMElement* setObjectElm) {

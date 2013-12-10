@@ -142,14 +142,14 @@ ItemEntityVector* WUAUpdateSearcherProbe::GetSearchCriteria(ObjectEntity* search
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = search_criteria->GetVariableValues();
+		VariableValueVector vars = search_criteria->GetVariableValues();
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(search_criteria);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			searchCriteriaItems->push_back(tmp);
 		}
 	}

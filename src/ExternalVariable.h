@@ -43,10 +43,10 @@ class ExternalVariable : public AbsVariable {
 public:
 
 	ExternalVariable(std::string id = "", std::string name = "external_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
-	~ExternalVariable();
+	virtual ~ExternalVariable();
 
 	/** Parse the provided ExternalVariable element into a ExternalVariable. */
-	void Parse(DOMElement* externalVariableElm);
+	virtual void Parse(DOMElement* externalVariableElm);
 
 	/** Fetch the variable from the external-variables.xml file.
 		Then get each value associated with the variable.
@@ -70,7 +70,7 @@ public:
 	void AppendPossibleRestrictionType(PossibleRestrictionType* pr);
 
 	/** Return the variable values used to compute this variable's value. In this case just an empty vector. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	PossibleValueTypeVector possibleValueTypes;
 	PossibleRestrictionTypeVector possibleRestrictionTypes;

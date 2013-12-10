@@ -44,16 +44,16 @@ public:
 
 	/** Create a complete SubstringFunction object. */
 	SubstringFunction(int start = 0, int length = 0);
-	~SubstringFunction();
+	virtual ~SubstringFunction();
 
 	/** Parse the substring element and its child component elements. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the values. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the start field's value. */
 	int GetStart();

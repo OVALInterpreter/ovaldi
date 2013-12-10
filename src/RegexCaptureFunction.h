@@ -50,16 +50,16 @@ public:
 
 	/** Create a complete RegexCaptureFunction object. */
 	RegexCaptureFunction(std::string pattern = "");
-	~RegexCaptureFunction();
+	virtual ~RegexCaptureFunction();
 
 	/** Parse the substring element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the pattern field's value. */
 	std::string GetPattern();

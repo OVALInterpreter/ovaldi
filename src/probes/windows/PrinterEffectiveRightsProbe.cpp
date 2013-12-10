@@ -357,11 +357,12 @@ StringSet* PrinterEffectiveRightsProbe::GetPrinters ( ObjectEntity* printerNameE
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all printers
             // if they exist on the system
+			VariableValueVector vals = printerNameEntity->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
 
-            for ( iterator = printerNameEntity->GetVarRef()->GetValues()->begin() ; iterator != printerNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->PrinterExists ( ( *iterator )->GetValue() ) ) {
-                    allPrinters->insert ( ( *iterator )->GetValue() );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->PrinterExists ( iterator->GetValue() ) ) {
+                    allPrinters->insert ( iterator->GetValue() );
                 }
             }
 

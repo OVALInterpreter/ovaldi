@@ -49,16 +49,16 @@ public:
 
 	/** Create a complete BeginFunction object. */
 	BeginFunction(std::string charIn = "");
-	~BeginFunction();
+	virtual ~BeginFunction();
 
 	/** Parse the begin element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(DOMElement* componentElm); 
 
 	/** Compute and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the character field's value. */
 	std::string GetCharacter();

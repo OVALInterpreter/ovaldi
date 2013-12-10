@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
 
 #include "Object.h"
@@ -114,23 +116,16 @@ ObjectEntity* Object::GetElementByName(string elementName) {
 	return matchingElm;
 }
 
-VariableValueVector* Object::GetVariableValues() {
+VariableValueVector Object::GetVariableValues() {
 
-	VariableValueVector* varValues = new VariableValueVector();
+	VariableValueVector varValues, tmpValues;
 
 	// get the variable values used on each element
 	AbsEntityVector::iterator iterator;
 	for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
 		ObjectEntity* entity = (ObjectEntity*)(*iterator);
-		VariableValueVector* values = entity->GetVariableValues();
-		VariableValueVector::iterator varValueIt;
-		for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
-			VariableValue* var = (*varValueIt);
-			varValues->push_back(var);
-		}
-
-		delete values;
-		values = NULL;
+		tmpValues = entity->GetVariableValues();
+		copy(tmpValues.begin(), tmpValues.end(), back_inserter(varValues));
 	}
 
 	return varValues;

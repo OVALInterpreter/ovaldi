@@ -71,7 +71,7 @@ public:
 	void Parse(DOMElement* setElm);
 
 	/** Return a vector of all variable values used for this set. */
-	VariableValueVector* GetVariableValues();
+	VariableValueVector GetVariableValues();
 	
 	/** Return the filters field's value. */
 	FilterVector* GetFilters();

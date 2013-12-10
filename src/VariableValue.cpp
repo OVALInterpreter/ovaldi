@@ -32,22 +32,16 @@
 
 using namespace std;
 
-VariableValueVector VariableValue::vars;
-
 //****************************************************************************************//
 //								VariableValue Class										  //	
 //****************************************************************************************//
-VariableValue::VariableValue(string id, string value) {
+VariableValue::VariableValue(string id, string value) : id(id), value(value) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Create a complete VariableValue object
 	//
 	// -----------------------------------------------------------------------
-
-	this->SetId(id);
-	this->SetValue(value);
-	VariableValue::vars.push_back(this);
 }
 
 VariableValue::~VariableValue() {
@@ -57,7 +51,7 @@ VariableValue::~VariableValue() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string VariableValue::GetId() {
+string VariableValue::GetId() const {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -79,7 +73,7 @@ void VariableValue::SetId(string id) {
 	this->id = id;
 }
 
-string VariableValue::GetValue() {
+string VariableValue::GetValue() const {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -101,7 +95,7 @@ void VariableValue::SetValue(string value) {
 	this->value = value;
 }
 
-void VariableValue::Write(DOMElement* collectedObjectElm) {
+void VariableValue::Write(DOMElement* collectedObjectElm) const {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -110,7 +104,7 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 
 	// Create new item element
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
-	string elementName = "variable_value";
+	string elementName("variable_value");
 	XMLCh* name = XMLString::transcode(elementName.c_str());
 	DOMElement* newVariableValueElem = scFile->createElement(name);
 	//Free memory allocated by XMLString::transcode(char*)
@@ -122,7 +116,7 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 	XmlCommon::AddAttribute(newVariableValueElem, "variable_id", this->GetId());
 
 	// Add the value
-	if(this->GetValue().compare("") != 0) {
+	if(!this->GetValue().empty()) {
 		XMLCh* value = XMLString::transcode(this->GetValue().c_str());
 		DOMText* newVariableValueElemValue = scFile->createTextNode(value);
 		//Free memory allocated by XMLString::transcode(char*)
@@ -164,19 +158,15 @@ void VariableValue::Parse(DOMElement* variableValueElm) {
 	this->SetValue(XmlCommon::GetDataNodeValue(variableValueElm));
 }
 
-void VariableValue::ClearCache() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	delete all items in the cache
-	//
-	// -----------------------------------------------------------------------
+bool VariableValue::operator<(const VariableValue &other) const {
+	int cmp = id.compare(other.id);
+	if (cmp < 0)
+		return true;
+	else if (cmp > 0)
+		return false;
 
-	VariableValue* variableValue = NULL;
-	while(VariableValue::vars.size() != 0) {
-	  	variableValue = VariableValue::vars[VariableValue::vars.size()-1];
-	  	VariableValue::vars.pop_back();
-	  	delete variableValue;
-	  	variableValue = NULL;
-	}
+	cmp = value.compare(other.value);
+	if (cmp < 0)
+		return true;
+	return false;
 }

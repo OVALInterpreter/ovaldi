@@ -51,10 +51,10 @@ class SetObject : public AbsObject {
 
 public:
 	SetObject(std::string id = "", std::string comment = "", std::string name = "", int version = 1, std::string xmlns = "");
-	~SetObject();
+	virtual ~SetObject();
 
-	void Parse(DOMElement* setObjectElm);
-	VariableValueVector* GetVariableValues();
+	virtual void Parse(DOMElement* setObjectElm);
+	virtual VariableValueVector GetVariableValues();
 	
 	Set* GetSet();
 	void SetSet(Set* set);

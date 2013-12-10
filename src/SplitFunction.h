@@ -51,16 +51,16 @@ public:
 
 	/** Create a complete SplitFunction object. */
 	SplitFunction(std::string delimiter = "");
-	~SplitFunction();
+	virtual ~SplitFunction();
 
 	/** Parse the substring element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(DOMElement* componentElm); 
 
 	/** Compute the desired substrings and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the delimiter field's value. */
 	std::string GetDelimiter();
