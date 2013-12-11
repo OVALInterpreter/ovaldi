@@ -410,7 +410,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
                 // Get the component name from the first part of the test name
 				// NOTE: Due to the inconsistent OVAL object, test, items names this won't work for inetlisteningserver(s)
 				string componentName;
-                string::size_type loc = this->name.find("_", 0);
+                string::size_type loc = this->name.find_last_of('_');
 				if( loc != string::npos ) {
 					componentName = this->name.substr(0, loc);
 				}
