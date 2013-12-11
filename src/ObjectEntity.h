@@ -44,11 +44,6 @@ class ObjectEntity;
 */
 class ObjectEntity : public AbsEntity {
 public:
-	/**
-		Copy constructor. Creates a new ObjectEntity based on the specified ObjectEntity. 
-		@param orig a ObjectEntity* to be copied
-	*/
-	ObjectEntity(ObjectEntity* orig);
 
 	/** Create a complete ObjectEntity object. */
 	ObjectEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);

@@ -38,25 +38,6 @@ using namespace std;
 //****************************************************************************************//
 //								StateEntity Class						     			  //	
 //****************************************************************************************//
-StateEntity::StateEntity(StateEntity* orig) : AbsEntity() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Copy constructor.
-	//	Create a complete StateEntity object based on the specified obj.
-	//
-	// -----------------------------------------------------------------------
-
-	this->SetDatatype(orig->GetDatatype());
-	this->SetEntityCheck(orig->GetEntityCheck());
-	this->SetName(orig->GetName());
-	this->SetNil(orig->GetNil());
-	this->SetOperation(orig->GetOperation());
-	this->SetValue(orig->GetValue());
-	this->SetVarCheck(orig->GetVarCheck());
-	this->SetVarRef(orig->GetVarRef());
-}
-
 StateEntity::StateEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check entityCheck, OvalEnum::Check varCheck, bool nil)
 									: AbsEntity(name, value, datatype, operation, varRef, varCheck, nil) {
 	// -----------------------------------------------------------------------
