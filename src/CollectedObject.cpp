@@ -286,7 +286,7 @@ ItemVector* CollectedObject::GetReferences() {
 	return &this->references;
 }
 
-void CollectedObject::SetReferences(ItemVector* references) {
+void CollectedObject::SetReferences(const ItemVector* references) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//

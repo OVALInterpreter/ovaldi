@@ -84,7 +84,7 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 			collectedObject->SetFlag(ex.GetVariable()->GetFlag());
 			
 			// add all the messages reported with the AbsVariable
-			StringVector::iterator iterator;
+			StringVector::const_iterator iterator;
 			for(iterator = ex.GetVariable()->GetMessages()->begin(); iterator != ex.GetVariable()->GetMessages()->end(); iterator++) {
 				collectedObject->AppendOvalMessage(new OvalMessage((*iterator)));
 			}
@@ -153,11 +153,11 @@ void AbsObjectCollector::ApplyFilters(ItemVector* items, FilterVector* filters) 
 			items->end());
 }
 
-bool AbsObjectCollector::ExistsInSet(ItemVector* itemSet, Item* item) {
+bool AbsObjectCollector::ExistsInSet(const ItemVector* itemSet, Item* item) {
 
 	bool exists = false;
 	
-	for(ItemVector::iterator iterator = itemSet->begin(); iterator != itemSet->end(); iterator++) {
+	for(ItemVector::const_iterator iterator = itemSet->begin(); iterator != itemSet->end(); iterator++) {
 		if(item->GetId() == (*iterator)->GetId()) {
 			exists = true;
 			break;
@@ -170,10 +170,10 @@ CollectedSet* AbsObjectCollector::Union(CollectedSet* collectedSet1, CollectedSe
 	
 	ItemVector* resultItems = new ItemVector();
 
-	ItemVector* itemSet1 = collectedSet1->GetItems();
-	ItemVector* itemSet2 = collectedSet2->GetItems();
+	const ItemVector* itemSet1 = collectedSet1->GetItems();
+	const ItemVector* itemSet2 = collectedSet2->GetItems();
 
-	ItemVector::iterator iterator;
+	ItemVector::const_iterator iterator;
 	for(iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(!this->ExistsInSet(resultItems, (*iterator))) {
 			resultItems->push_back((*iterator));
@@ -196,11 +196,11 @@ CollectedSet* AbsObjectCollector::Intersection(CollectedSet* collectedSet1, Coll
 
 	ItemVector* resultItems = new ItemVector();
 
-	ItemVector* itemSet1 = collectedSet1->GetItems();
-	ItemVector* itemSet2 = collectedSet2->GetItems();
+	const ItemVector* itemSet1 = collectedSet1->GetItems();
+	const ItemVector* itemSet2 = collectedSet2->GetItems();
 
 	// Add the items from set 1 that exist in set 2
-	for(ItemVector::iterator iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
+	for(ItemVector::const_iterator iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(this->ExistsInSet(itemSet2, (*iterator))) {
 			resultItems->push_back((*iterator));
 		}
@@ -216,10 +216,10 @@ CollectedSet* AbsObjectCollector::Compelement(CollectedSet* collectedSet1, Colle
 
 	ItemVector* resultItems = new ItemVector();
 
-	ItemVector* itemSet1 = collectedSet1->GetItems();
-	ItemVector* itemSet2 = collectedSet2->GetItems();
+	const ItemVector* itemSet1 = collectedSet1->GetItems();
+	const ItemVector* itemSet2 = collectedSet2->GetItems();
 
-	ItemVector::iterator iterator;
+	ItemVector::const_iterator iterator;
 	for(iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(!this->ExistsInSet(itemSet2, (*iterator))) {
 			resultItems->push_back((*iterator));

@@ -32,9 +32,9 @@
 #include <cassert>
 #include <iterator>
 
-#include "AbsEntity.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
+#include "AbsEntity.h"
 
 using namespace std;
 
@@ -52,25 +52,11 @@ AbsEntity::AbsEntity(string name, string value, OvalEnum::Datatype datatype, Ova
 	this->SetNil(nil);
 }
 
-AbsEntity::~AbsEntity() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 
-string AbsEntity::GetName() {
-
-	return this->name;
-}
-
-void AbsEntity::SetName(string name) {
-
-	this->name = name;
-}
-
-string AbsEntity::GetValue() {
+string AbsEntity::GetValue() const {
 	if ( this->value.empty() ){
 		return "";
 	}else{
@@ -84,64 +70,6 @@ void AbsEntity::SetValue(string value) {
 	}else{
 		this->value.front()->SetValue(value);
 	}
-}
-
-void AbsEntity::SetValues(AbsEntityValueVector value){
-	this->value = value;
-}
-
-AbsEntityValueVector AbsEntity::GetValues(){
-	return this->value;
-}
-
-OvalEnum::Datatype AbsEntity::GetDatatype() {
-
-	return this->datatype;
-}
-
-void AbsEntity::SetDatatype(OvalEnum::Datatype datatype) {
-
-	this->datatype = datatype;
-}
-
-OvalEnum::Check AbsEntity::GetVarCheck() {
-
-	return this->varCheck;
-}
-
-void AbsEntity::SetVarCheck(OvalEnum::Check varCheck) {
-
-	this->varCheck = varCheck;
-}
-
-bool AbsEntity::GetNil() {
-
-	return this->nil;
-}
-
-void AbsEntity::SetNil(bool nil) {
-
-	this->nil = nil;
-}
-
-OvalEnum::Operation AbsEntity::GetOperation() {
-
-	return this->operation;
-}
-
-void AbsEntity::SetOperation(OvalEnum::Operation operation) {
-
-	this->operation = operation;
-}
-
-AbsVariable* AbsEntity::GetVarRef() {
-
-	return this->varRef;
-}
-
-void AbsEntity::SetVarRef(AbsVariable* varRef) {
-
-	this->varRef = varRef;
 }
 
 VariableValueVector AbsEntity::GetVariableValues() {

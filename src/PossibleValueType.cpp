@@ -36,13 +36,6 @@ using namespace std;
 //									PossibleValueType Class								  //	
 //****************************************************************************************//
 
-PossibleValueType::PossibleValueType() {
-}
-
-PossibleValueType::~PossibleValueType() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
@@ -56,22 +49,6 @@ void PossibleValueType::Parse(DOMElement* possibleValueTypeElm) {
 	
 	this->SetHint(XmlCommon::GetAttributeByName(possibleValueTypeElm, "hint"));
 	this->SetValue(XmlCommon::GetDataNodeValue(possibleValueTypeElm));
-}
-
-void PossibleValueType::SetHint(string hint) {
-	this->hint = hint;
-}
-
-string PossibleValueType::GetHint() {
-	return this->hint;
-}
-
-void PossibleValueType::SetValue(string value) {
-	this->value = value;
-}
-
-string PossibleValueType::GetValue() {
-	return this->value;
 }
 
 bool PossibleValueType::ValidateValue(OvalEnum::Datatype datatype, string externalValue) {

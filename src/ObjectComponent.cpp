@@ -37,41 +37,9 @@ using namespace std;
 //****************************************************************************************//
 //								ObjectComponent Class									  //	
 //****************************************************************************************//
-ObjectComponent::ObjectComponent(string objectId, string itemField, string recordField) : AbsComponent() {
-	this->SetObjectId(objectId);
-	this->SetItemField(itemField);
-	this->SetRecordField(recordField);
-}
-
-ObjectComponent::~ObjectComponent() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string ObjectComponent::GetObjectId() {
-	return this->objectId;
-}
-
-void ObjectComponent::SetObjectId(string objectId) {
-	this->objectId = objectId;
-}
-
-string ObjectComponent::GetItemField() {
-	return this->itemField;
-}
-
-void ObjectComponent::SetItemField(string itemField) {
-	this->itemField = itemField;
-}
-
-string ObjectComponent::GetRecordField() {
-	return this->recordField;
-}
-
-void ObjectComponent::SetRecordField(string recordField) {
-	this->recordField = recordField;
-}
 
 ComponentValue* ObjectComponent::ComputeValue() {
 

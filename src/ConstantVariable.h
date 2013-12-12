@@ -39,12 +39,18 @@
 class ConstantVariable : public AbsVariable {
 public:
 
-	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
-	virtual ~ConstantVariable();
+	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector())
+		: AbsVariable (id, name, version, datatype, msgs)
+	{}
+
+	virtual ~ConstantVariable()
+	{}
 
 	virtual void Parse(DOMElement* constantVariableElm);
 
-	virtual VariableValueVector GetVariableValues();	
+	virtual VariableValueVector GetVariableValues() const {
+		return VariableValueVector();
+	}
 };
 
 #endif

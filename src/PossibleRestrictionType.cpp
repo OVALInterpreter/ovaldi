@@ -36,14 +36,6 @@ using namespace std;
 //									PossibleType Class									  //	
 //****************************************************************************************//
 
-PossibleRestrictionType::PossibleRestrictionType() {
-
-}
-
-PossibleRestrictionType::~PossibleRestrictionType() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
@@ -80,22 +72,6 @@ void PossibleRestrictionType::Parse(DOMElement* possibleRestrictionTypeElm) {
 	}
 }
 
-void PossibleRestrictionType::SetHint(string hint) {
-	this->hint = hint;
-}
-
-string PossibleRestrictionType::GetHint() {
-	return this->hint;
-}
-
-RestrictionTypeVector* PossibleRestrictionType::GetRestrictionTypes() {
-	return &this->restrictionTypes;
-}
-
-void PossibleRestrictionType::AppendRestrictionType(RestrictionType* rt) {
-	this->restrictionTypes.push_back(rt);
-}
-
 bool PossibleRestrictionType::ValidateValue(OvalEnum::Datatype datatype, string externalValue) {
 	// -----------------------------------------------------------------------
 	//	Abstract
@@ -108,7 +84,7 @@ bool PossibleRestrictionType::ValidateValue(OvalEnum::Datatype datatype, string 
 	bool isValid = true;
 	
 	// loop through all restriction elements - if all are true return true 
-	RestrictionTypeVector::iterator iterator;
+	RestrictionTypeVector::const_iterator iterator;
 	for(iterator = this->GetRestrictionTypes()->begin(); iterator != this->GetRestrictionTypes()->end(); iterator++) {
 		isValid = (*iterator)->ValidateValue(datatype, externalValue);
 		if(!isValid) {

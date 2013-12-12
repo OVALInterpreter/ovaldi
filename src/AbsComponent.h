@@ -48,9 +48,11 @@ XERCES_CPP_NAMESPACE_USE
 class AbsComponent {
 public:
 	/** Create complete AbsComponent. */
-	AbsComponent();
+	AbsComponent()
+	{}
 
-	virtual ~AbsComponent();
+	virtual ~AbsComponent()
+	{}
 
 	/** Parse a compnent element.
 		Each concrete component has a slightly different corresponding element to parse.

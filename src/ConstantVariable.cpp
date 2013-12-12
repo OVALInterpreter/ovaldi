@@ -36,24 +36,6 @@ using namespace std;
 //									ConstantVariable Class								  //	
 //****************************************************************************************//
 
-ConstantVariable::ConstantVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) : AbsVariable (id, name, version, datatype, msgs) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete ConstantVariable
-	//
-	// -----------------------------------------------------------------------
-
-}
-
-ConstantVariable::~ConstantVariable() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	// -----------------------------------------------------------------------
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
@@ -101,15 +83,4 @@ void ConstantVariable::Parse(DOMElement* constantVariableElm) {
 		this->SetFlag(OvalEnum::FLAG_ERROR);
 		this->AppendMessage("Error a value was not found for the constant variable.");
 	}
-}
-
-VariableValueVector ConstantVariable::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this variable's value
-	//	in this case just an empty vector.
-	// -----------------------------------------------------------------------
-
-	return VariableValueVector();
 }

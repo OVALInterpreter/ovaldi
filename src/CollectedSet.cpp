@@ -38,55 +38,11 @@ using namespace std;
 //									CollectedSet Class									  //	
 //****************************************************************************************//
 
-CollectedSet::CollectedSet() {
-	this->SetFlag(OvalEnum::FLAG_ERROR);
-}
-
-CollectedSet::~CollectedSet() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-ItemVector* CollectedSet::GetItems() {
-	return &this->items;
-}
-
-void CollectedSet::SetItems(ItemVector* items) {
-	this->items = (*items);
-}
-
-OvalEnum::Flag CollectedSet::GetFlag() {
-	return this->flag;
-}
-
-void CollectedSet::SetFlag(OvalEnum::Flag flag) {
-	this->flag = flag;
-}
-
-VariableValueVector CollectedSet::GetVariableValues() {
-	return this->variableValues;
-}
-
-void CollectedSet::SetVariableValues(const VariableValueVector &variableValues) {
-	this->variableValues = variableValues;
-}
-
-void CollectedSet::AppendVariableValue(const VariableValue &variableValue) {
-	this->variableValues.push_back(variableValue);
-}
 
 void CollectedSet::AppendVariableValues(const VariableValueVector &vars) {
 	copy(vars.begin(), vars.end(), back_inserter(variableValues));
 }
 
-//****************************************************************************************//
-//								CollectedSetException Class								  //	
-//****************************************************************************************//
-CollectedSetException::CollectedSetException(string errMsgIn, int severity, Exception* ex) : Exception(errMsgIn, severity, ex) {
-
-}
-
-CollectedSetException::~CollectedSetException() {
-
-}

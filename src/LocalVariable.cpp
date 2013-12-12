@@ -36,25 +36,9 @@ using namespace std;
 //									LocalVariable Class									  //	
 //****************************************************************************************//
 
-LocalVariable::LocalVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) : AbsVariable (id, name, version, datatype, msgs) {
-
-}
-
-LocalVariable::~LocalVariable() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-AbsComponent* LocalVariable::GetComponent() {
-	return this->component;
-}
-
-void LocalVariable::SetComponent(AbsComponent* component) {
-	this->component = component;
-}
-
 void LocalVariable::ComputeValue() {
 
     ComponentValue* value = this->GetComponent()->ComputeValue();
@@ -105,8 +89,4 @@ void LocalVariable::Parse(DOMElement* localVariableElm) {
 
 	// Finally call ComputeValue
 	this->ComputeValue();
-}
-
-VariableValueVector LocalVariable::GetVariableValues() {
-	return this->GetComponent()->GetVariableValues();
 }

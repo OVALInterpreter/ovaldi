@@ -35,51 +35,9 @@ using namespace std;
 //****************************************************************************************//
 //								LiteralComponent Class									  //	
 //****************************************************************************************//
-LiteralComponent::LiteralComponent(string value) : AbsComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete LiteralComponent object
-	//
-	// -----------------------------------------------------------------------
-
-	this->SetValue(value);
-}
-
-LiteralComponent::~LiteralComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string LiteralComponent::GetValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the value field's value
-	//
-	// -----------------------------------------------------------------------
-
-	return this->value;
-}
-
-void LiteralComponent::SetValue(string value) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the value field's value
-	//
-	// -----------------------------------------------------------------------
-
-	this->value = value;
-}
-
 
 ComponentValue* LiteralComponent::ComputeValue() {
 	// -----------------------------------------------------------------------
@@ -105,15 +63,4 @@ void LiteralComponent::Parse(DOMElement* componentElm) {
 	// -----------------------------------------------------------------------
     
 	this->SetValue(XmlCommon::GetDataNodeValue(componentElm));
-}
-
-VariableValueVector LiteralComponent::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this component's value
-	// in this case just an empty vector.
-	// -----------------------------------------------------------------------
-
-	return VariableValueVector();
 }

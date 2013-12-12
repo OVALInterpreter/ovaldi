@@ -35,45 +35,10 @@ using namespace std;
 //****************************************************************************************//
 //								VariableComponent Class									  //	
 //****************************************************************************************//
-VariableComponent::VariableComponent(AbsVariable* varRef) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete VariableComponent object
-	//
-	// -----------------------------------------------------------------------
-
-	this->SetVarRef(varRef);
-}
-
-VariableComponent::~VariableComponent() {
-
-}
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-AbsVariable* VariableComponent::GetVarRef() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the varRef field's value
-	//
-	// -----------------------------------------------------------------------
-
-	return this->varRef;
-}
-
-void VariableComponent::SetVarRef(AbsVariable* varRef) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the varRef field's value
-	//
-	// -----------------------------------------------------------------------
-
-	this->varRef = varRef;
-}
 
 ComponentValue* VariableComponent::ComputeValue() {
 	// -----------------------------------------------------------------------
@@ -91,9 +56,9 @@ ComponentValue* VariableComponent::ComputeValue() {
 	}
 
 	// need to create a copy of the messages.
-	StringVector* msg = this->GetVarRef()->GetMessages();
+	const StringVector* msg = this->GetVarRef()->GetMessages();
 	StringVector* messages = new StringVector();
-	StringVector::iterator iterator1;
+	StringVector::const_iterator iterator1;
 	for(iterator1 = msg->begin(); iterator1 != msg->end(); iterator1++) {
 		messages->push_back((*iterator1));
 	}

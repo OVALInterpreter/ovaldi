@@ -51,28 +51,44 @@ class CollectedSet {
 
 public:
 	/** Initialize the collected set. */
-	CollectedSet();
-	~CollectedSet();
+	CollectedSet() : flag(OvalEnum::FLAG_ERROR)
+	{}
+	~CollectedSet()
+	{}
 
 	/** Return the items field's value. */
-	ItemVector* GetItems();
+	const ItemVector* GetItems() const {
+		return &this->items;
+	}
 	/** Set the items field's value. */
-	void SetItems(ItemVector* items);
+	void SetItems(ItemVector* items) {
+		this->items = (*items);
+	}
 	
 	/** Return the variableValues field's value. */
-	VariableValueVector GetVariableValues();
+	VariableValueVector GetVariableValues() const {
+		return variableValues;
+	}
 	/** Set the variableValues field's value. */
-	void SetVariableValues(const VariableValueVector &variableValues);
+	void SetVariableValues(const VariableValueVector &variableValues) {
+		this->variableValues = variableValues;
+	}
 	
 	/** Add a variable value to the end of the variable values vector. */
-	void AppendVariableValue(const VariableValue &variableValue);
+	void AppendVariableValue(const VariableValue &variableValue) {
+		variableValues.push_back(variableValue);
+	}
 	/** Add a vector of variable values to the end of the variable values vector. */
 	void AppendVariableValues(const VariableValueVector &variableValues);
     
 	/** Return the flag field's value. */
-	OvalEnum::Flag GetFlag();
+	OvalEnum::Flag GetFlag() const {
+		return this->flag;
+	}
 	/** Set the flag field's value. */
-	void SetFlag(OvalEnum::Flag flag);
+	void SetFlag(OvalEnum::Flag flag) {
+		this->flag = flag;
+	}
 
 private:
 	ItemVector items;
@@ -85,8 +101,11 @@ private:
 */
 class CollectedSetException : public Exception {
 	public:
-		CollectedSetException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL);
-		~CollectedSetException();
+		CollectedSetException(std::string errMsgIn = "", int severity = ERROR_FATAL, Exception *ex = NULL)
+			: Exception(errMsgIn, severity, ex)
+		{}
+		~CollectedSetException()
+		{}
 };
 
 #endif

@@ -414,8 +414,6 @@
     <ClCompile Include="..\..\..\src\XmlCommon.cpp" />
     <ClCompile Include="..\..\..\src\XmlProcessor.cpp" />
     <ClCompile Include="..\..\..\src\XslCommon.cpp" />
-    <ClCompile Include="..\..\..\src\AbsComponent.cpp" />
-    <ClCompile Include="..\..\..\src\AbsFunctionComponent.cpp" />
     <ClCompile Include="..\..\..\src\AbsVariable.cpp" />
     <ClCompile Include="..\..\..\src\ArithmeticFunction.cpp" />
     <ClCompile Include="..\..\..\src\BeginFunction.cpp" />

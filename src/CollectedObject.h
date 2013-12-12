@@ -111,7 +111,7 @@ public:
 	void SetMessages(OvalMessageVector* messages);
 
 	ItemVector* GetReferences();
-	void SetReferences(ItemVector* references);
+	void SetReferences(const ItemVector* references);
 
 	int GetVariableInstance();
 	void SetVariableInstance(int variableInstance);

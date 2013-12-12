@@ -44,16 +44,24 @@ class AbsFunctionComponent : public AbsComponent {
 public:
 
     /** Create a complete AbsFunctionComponent object. */
-	AbsFunctionComponent();
-	virtual ~AbsFunctionComponent();
+	AbsFunctionComponent()
+	{}
+	virtual ~AbsFunctionComponent()
+	{}
 
     /** Return the components field's value. */
-	AbsComponentVector* GetComponents();
+	AbsComponentVector* GetComponents() {
+		return &this->components;
+	}
     /** Set the components field's value. */
-	void SetComponents(AbsComponentVector* components);
+	void SetComponents(AbsComponentVector* components) {
+		this->components = (*components);
+	}
 
-    /** Appned the input componenet to the list of componenets. */
-	void AppendComponent(AbsComponent* component);
+    /** Append the input componenet to the list of componenets. */
+	void AppendComponent(AbsComponent* component) {
+		this->GetComponents()->push_back(component);
+	}
 
 private:
 	AbsComponentVector components;
