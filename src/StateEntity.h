@@ -44,11 +44,6 @@
 */
 class StateEntity : public AbsEntity {
 public:
-	/**
-		Copy constructor. Creates a new StateEntity based on the specified StateEntity. 
-		@param orig a StateEntity* to be copied
-	*/
-	StateEntity(StateEntity* orig);
 	/** Create a complete StateEntity object. */
 	StateEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check entityCheck = OvalEnum::CHECK_ALL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
 

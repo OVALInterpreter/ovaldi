@@ -121,4 +121,3 @@ private:
 typedef std::vector < ItemFieldEntityValue* > ItemFieldEntityValueVector;
 
 #endif
-

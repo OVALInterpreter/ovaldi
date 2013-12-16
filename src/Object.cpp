@@ -232,6 +232,30 @@ bool Object::Analyze(Item* item) {
             for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end() && overallResult == OvalEnum::RESULT_TRUE; iterator++) {
 				ObjectEntity* objectEntity = (ObjectEntity*)(*iterator);
 
+				/*******************************************************
+				 Ugly hackage to make user_sid objects match their items.
+				 This is done by checking for a particular entity of a
+				 particular object, and if found, we replace it with a
+				 dupe object entity with a changed name, for the purposes
+				 of the subsequent analysis.
+				 *******************************************************/
+				auto_ptr<ObjectEntity> fakedSidObjectEntity;
+				if (GetXmlns() == "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" &&
+					GetName() == "user_sid_object") {
+				  if (objectEntity->GetName() == "user") {
+					fakedSidObjectEntity.reset(new ObjectEntity(*objectEntity));
+					fakedSidObjectEntity->SetName("user_sid");
+					objectEntity = fakedSidObjectEntity.get();
+				  } else if (objectEntity->GetName() == "group") {
+					fakedSidObjectEntity.reset(new ObjectEntity(*objectEntity));
+					fakedSidObjectEntity->SetName("group_sid");
+					objectEntity = fakedSidObjectEntity.get();
+				  }
+				}
+				/******************************************************
+				 End ugly hackage
+				 ******************************************************/
+
 				// locate matching elements in the item
 				string objectElmName = objectEntity->GetName(); 
 				ItemEntityVector* scElements = item->GetElementsByName(objectElmName);

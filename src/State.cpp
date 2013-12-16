@@ -85,8 +85,32 @@ OvalEnum::ResultEnumeration State::Analyze(Item* item) {
 	for(stateElements = this->GetElements()->begin(); stateElements != this->GetElements()->end(); stateElements++) {
 		StateEntity* stateElm = (StateEntity*)(*stateElements);
 
+		/*******************************************************
+		 Ugly hackage to make user_sid states match their items.
+		 This is done by checking for a particular entity of a
+		 particular state, and if found, we replace it with a
+		 dupe state entity with a changed name, for the purposes
+		 of the subsequent analysis.
+		 *******************************************************/
+		auto_ptr<StateEntity> fakedSidStateEntity;
+		if (GetXmlns() == "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" &&
+			GetName() == "user_sid_state") {
+		  if (stateElm->GetName() == "user") {
+			fakedSidStateEntity.reset(new StateEntity(*stateElm));
+			fakedSidStateEntity->SetName("user_sid");
+			stateElm = fakedSidStateEntity.get();
+		  } else if (stateElm->GetName() == "group") {
+			fakedSidStateEntity.reset(new StateEntity(*stateElm));
+			fakedSidStateEntity->SetName("group_sid");
+			stateElm = fakedSidStateEntity.get();
+		  }
+		}
+		/******************************************************
+		 End ugly hackage
+		 ******************************************************/
+
 		// locate matching elements in the item
-		string stateElmName = stateElm->GetName(); 
+		string stateElmName = stateElm->GetName();
 		// i think the vector needs deleting, but the item retains ownership
 		// of the vector's contents.
 		auto_ptr<ItemEntityVector> scElements(item->GetElementsByName(stateElmName));

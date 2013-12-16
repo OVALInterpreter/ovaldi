@@ -94,7 +94,7 @@ StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behavi
 
 	// make a copy of the path so I can switch its operation without
 	// affecting the original.
-	ObjectEntity tmpPath(path);
+	ObjectEntity tmpPath(*path);
 
 #ifdef WIN32
 	// On windows, always ignore case sensitivity.
@@ -327,7 +327,7 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
 
 	// make a copy of the path so I can switch its operation without
 	// affecting the original.
-	ObjectEntity tmpFileName(fileName);
+	ObjectEntity tmpFileName(*fileName);
 
 #ifdef WIN32
 	// On windows, always ignore case sensitivity.
@@ -395,7 +395,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 
 	// make a copy of the filepath so I can switch the operation on the
 	// copy without affecting the original.
-	ObjectEntity tmpFilePath(filePath);
+	ObjectEntity tmpFilePath(*filePath);
 
 #ifdef WIN32
 	// On windows, always ignore case sensitivity.
