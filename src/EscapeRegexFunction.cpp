@@ -28,9 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ComponentFactory.h"
+#include "REGEX.h"
+
 #include "EscapeRegexFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	

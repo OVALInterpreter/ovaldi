@@ -31,6 +31,12 @@
 #ifndef POSSIBLERESTRICTIONTYPE_H
 #define POSSIBLERESTRICTIONTYPE_H
 
+#include <string>
+#include <vector>
+
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "OvalEnum.h"
 #include "RestrictionType.h"
 
 class PossibleRestrictionType;
@@ -51,7 +57,7 @@ public:
 	std::string GetHint();
 
 	/** Parses a valid PossibleRestrictionType element as defined int eh oval definitions schema. */
-	void Parse(DOMElement* possibleRestrictionElm);
+	void Parse(xercesc::DOMElement* possibleRestrictionElm);
 
 	/** Ensure that the specified value matches the criteria specified by this possible_restriction element. */
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);

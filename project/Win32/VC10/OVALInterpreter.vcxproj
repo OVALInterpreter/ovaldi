@@ -124,7 +124,6 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -142,7 +141,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;User32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_3D.lib;Xalan-C_1D.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;User32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(Platform)\$(Configuration)\ovaldiD.exe</OutputFile>
       <Version>2.0</Version>
       <AdditionalLibraryDirectories>..\..\..\build\Win32\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -173,7 +172,6 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_DCOM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -192,7 +190,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;User32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_3D.lib;Xalan-C_1D.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;User32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(Platform)\$(Configuration)\ovaldiD.exe</OutputFile>
       <Version>2.0</Version>
       <AdditionalLibraryDirectories>..\..\..\build\Win32\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -224,7 +222,6 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -241,7 +238,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_3.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(Platform)\$(Configuration)\ovaldi.exe</OutputFile>
       <Version>5.0</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -274,7 +271,6 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -291,7 +287,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_2.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wuguid.lib;Wbemuuid.lib;pcre.lib;xerces-c_3.lib;Xalan-C_1.lib;version.lib;imagehlp.lib;IPHlpAPI.lib;Wldap32.lib;Netapi32.lib;WS2_32.lib;Authz.lib;ActiveDs.lib;ADSIid.lib;Psapi.Lib;Dnsapi.lib;libgcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(Platform)\$(Configuration)\ovaldi.exe</OutputFile>
       <Version>5.0</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -473,7 +469,6 @@
     <ClInclude Include="..\..\..\src\Item.h" />
     <ClInclude Include="..\..\..\src\ItemEntity.h" />
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h" />
-    <ClInclude Include="..\..\..\src\Main.h" />
     <ClInclude Include="..\..\..\src\Meta.h" />
     <ClInclude Include="..\..\..\src\Noncopyable.h" />
     <ClInclude Include="..\..\..\src\Object.h" />
@@ -488,6 +483,7 @@
     <ClInclude Include="..\..\..\src\State.h" />
     <ClInclude Include="..\..\..\src\StateEntity.h" />
     <ClInclude Include="..\..\..\src\StateOrObjectFieldEntityValue.h" />
+    <ClInclude Include="..\..\..\src\StdTypedefs.h" />
     <ClInclude Include="..\..\..\src\StringEntityValue.h" />
     <ClInclude Include="..\..\..\src\Test.h" />
     <ClInclude Include="..\..\..\src\TestedItem.h" />
@@ -536,6 +532,7 @@ echo off
     <ClInclude Include="..\..\..\src\probes\windows\FileEffectiveRightsProbe.h" />
     <ClInclude Include="..\..\..\src\VectorPtrGuard.h" />
     <ClInclude Include="..\..\..\src\windows\AutoCloser.h" />
+    <ClInclude Include="..\..\..\src\windows\BitnessView.h" />
     <ClInclude Include="..\..\..\src\windows\FileFinder.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHash58Probe.h" />
     <ClInclude Include="..\..\..\src\probes\independent\FileHashProbe.h" />

@@ -28,9 +28,14 @@
 //
 //****************************************************************************************//
 
+#include "FileFinder.h"
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
+#include <WindowsCommon.h>
+
 #include "FileAuditedPermissionsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              FileAuditedPermissionsProbe Class                         //

@@ -31,13 +31,11 @@
 #ifndef ABSCOMPONENT_H
 #define ABSCOMPONENT_H
 
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "VariableValue.h"
 #include "ComponentValue.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This calss is the base class for all types of variable components.
@@ -55,7 +53,7 @@ public:
 	/** Parse a compnent element.
 		Each concrete component has a slightly different corresponding element to parse.
 	*/
-	virtual void Parse(DOMElement* componentElm) = 0;
+	virtual void Parse(xercesc::DOMElement* componentElm) = 0;
     /**
      * Compute the value for the AbsComponent.
      * Each concrete component computes its value differently.  However, there are

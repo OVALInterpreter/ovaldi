@@ -32,15 +32,14 @@
 #define OBJECT_H
 
 #include <map>
+#include <utility>
+#include <string>
 
 #include "AbsObject.h"
 #include "ObjectEntity.h"
 #include "Behavior.h"
 #include "Filter.h"
 
-XERCES_CPP_NAMESPACE_USE
-
-class ObjectEntity;
 class Object;
 
 /**	
@@ -65,7 +64,7 @@ public:
 	~Object();
 
     /** Parse the provided object element into an object. */
-	void Parse(DOMElement* objectElm);
+	void Parse(xercesc::DOMElement* objectElm);
 
     /** Return a vector of variable values that were used for this object. */
 	VariableValueVector* GetVariableValues();

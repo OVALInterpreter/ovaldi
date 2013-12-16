@@ -30,8 +30,11 @@
 
 #ifndef STRINGENTITYVALUE_H
 #define STRINGABSENTITYVALUE_H
+
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsEntityValue.h"
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a string entity value in an entity.  The datatype of an entity that has a string entity value should not be record as defined in the OVAL Language.
@@ -55,13 +58,13 @@ public:
 	 *  @param entityElm A pointer to a DOMDocument that specifies the entity for which the StringEntityValue should be written to.
 	 *  @return Void.
 	 */
-	virtual void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm);
+	virtual void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* entityElm);
 
     /** Parse the specified entity to retrieve its value.
      *  @param entityElm A pointer to a DOMElement from which the value should be retrieved.  This value should then be used to initialize the StringEntityValue. 
      *  @return Void.
      */
-	virtual void Parse(DOMElement* entityElm);
+	virtual void Parse(xercesc::DOMElement* entityElm);
 };
 
 #endif

@@ -28,9 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <windows.h>
+#include <aclapi.h>
+
 #include <AutoCloser.h>
+#include "RegistryFinder.h"
+#include "WindowsCommon.h"
+
 #include "RegKeyEffectiveRights53Probe.h"
 
+using namespace std;
 
 //****************************************************************************************//
 //                              RegKeyEffectiveRights53Probe Class                            //

@@ -31,6 +31,8 @@
 #ifndef ENTITYCOMPARATOR_H
 #define ENTITYCOMPARATOR_H
 
+#include <vector>
+
 #include "OvalEnum.h"
 #include "AbsEntityValue.h"
 
@@ -104,7 +106,7 @@ private:
 		If a given component of the version string can not be converted to an integer an error is thrown.
 		If a delimiter is found but no integer components are found an error is thrown.		
 	*/
-	static LongLongVector* ParseVersionStr(std::string versionStr);
+	static std::vector<long long>* ParseVersionStr(std::string versionStr);
 
 	// copied from lib/rpmvercmp.c
 	static int rpmvercmp(const char * a, const char * b);

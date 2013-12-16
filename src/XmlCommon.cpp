@@ -28,9 +28,67 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+#include <sstream>
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XMLUni.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMNamedNodeMap.hpp>
+#include <xercesc/dom/DOMText.hpp>
+#include <xercesc/dom/DOMAttr.hpp>
+
 #include "XmlCommon.h"
 
 using namespace std;
+using namespace xercesc;
+
+const std::string XmlCommon::defNS = "http://oval.mitre.org/XMLSchema/oval-definitions-5";
+const std::string XmlCommon::scNS = "http://oval.mitre.org/XMLSchema/oval-system-characteristics-5";
+const std::string XmlCommon::resNS = "http://oval.mitre.org/XMLSchema/oval-results-5";
+const std::string XmlCommon::comNS = "http://oval.mitre.org/XMLSchema/oval-common-5";
+const std::string XmlCommon::xsiNS = "http://www.w3.org/2001/XMLSchema-instance";
+
+/**
+ * The XML-Schema instance namespace as an
+ * XMLCh string constant.
+ */
+static const XMLCh xsiNS[] = {
+	chLatin_h, chLatin_t, chLatin_t, chLatin_p, 
+	chColon, chForwardSlash, chForwardSlash,
+	chLatin_w, chLatin_w, chLatin_w, chPeriod,
+	chLatin_w, chDigit_3, chPeriod,
+	chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+	chDigit_2, chDigit_0, chDigit_0, chDigit_1, chForwardSlash,
+	chLatin_X, chLatin_M, chLatin_L, 
+	chLatin_S, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a,
+	chDash, chLatin_i, chLatin_n, chLatin_s, chLatin_t, chLatin_a, chLatin_n, chLatin_c, chLatin_e,
+	chNull
+};
+
+/**
+ * An XMLCh string constant for "schemaLocation".
+ */
+static const XMLCh schemaLocation[] = {
+	chLatin_s, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a,
+	chLatin_L, chLatin_o, chLatin_c, chLatin_a, chLatin_t, chLatin_i, chLatin_o, chLatin_n,
+	chNull
+};
+
+/**
+ * An XMLCh string constant for "xsi:schemaLocation".
+ */
+static const XMLCh xsiSchemaLocation[] = {
+	chLatin_x, chLatin_s, chLatin_i, chColon,
+	chLatin_s, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a,
+	chLatin_L, chLatin_o, chLatin_c, chLatin_a, chLatin_t, chLatin_i, chLatin_o, chLatin_n,
+	chNull
+};
 
 //****************************************************************************************//
 //										XmlCommon Class									  //	
@@ -46,7 +104,20 @@ void XmlCommon::AddAttribute(DOMElement *node, string attName, string attValue) 
 
 }
 
-DOMElement* XmlCommon::AddChildElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, DOMElement *parent, string nodeName, string nodeValue) {
+void XmlCommon::AddAttributeNS(DOMElement *node, string ns, string attName, string attValue) {
+
+	XMLCh *xns = XMLString::transcode(ns.c_str());
+	XMLCh *name = XMLString::transcode(attName.c_str());
+	XMLCh *value = XMLString::transcode(attValue.c_str());
+	node->setAttributeNS(xns, name, value);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&xns);
+	XMLString::release(&name);
+	XMLString::release(&value);
+
+}
+
+DOMElement* XmlCommon::AddChildElement(DOMDocument *doc, DOMElement *parent, string nodeName, string nodeValue) {
 
 	DOMElement *newElem = NULL;
 
@@ -56,7 +127,14 @@ DOMElement* XmlCommon::AddChildElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocumen
 	return newElem;
 }
 
-void XmlCommon::CopyNamespaces(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* source, XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* dest) {
+DOMElement* XmlCommon::AddChildElementNS(DOMDocument *doc, DOMElement *parent, string ns, string nodeName, string nodeValue) {
+	DOMElement *newElem = CreateElementNS(doc, ns, nodeName, nodeValue);
+	parent->appendChild(newElem);
+
+	return newElem;
+}
+
+void XmlCommon::CopyNamespaces(DOMDocument* source, DOMDocument* dest) {
 
 	DOMNamedNodeMap* attributes = source->getDocumentElement()->getAttributes();
 	for(unsigned int i = 0; i < attributes->getLength(); i++) {
@@ -71,7 +149,7 @@ void XmlCommon::CopyNamespaces(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* sourc
 	}
 }
 
-void XmlCommon::CopySchemaLocation(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* source, XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* dest) {
+void XmlCommon::CopySchemaLocation(DOMDocument* source, DOMDocument* dest) {
 
 	string srcSchemaLocations = XmlCommon::GetAttributeByName(source->getDocumentElement(), "xsi:schemaLocation");
 
@@ -111,11 +189,6 @@ void XmlCommon::RemoveAttributes(DOMElement* elm) {
 	unsigned int len = attributes->getLength();
 	while(len > 0) {
 		DOMAttr* attr = (DOMAttr*)attributes->item(0);
-		string ln = XmlCommon::ToString(attr->getLocalName());
-		string p = XmlCommon::ToString(attr->getPrefix());
-		string v = XmlCommon::ToString(attr->getNodeValue());
-		string n = XmlCommon::ToString(attr->getName());
-
 		DOMNode* oldAttr = attributes->removeNamedItem(attr->getName());
 		oldAttr->release();
 		attributes = elm->getAttributes();
@@ -123,7 +196,7 @@ void XmlCommon::RemoveAttributes(DOMElement* elm) {
 	}
 }
 
-DOMElement* XmlCommon::CreateElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string nodeName, string nodeValue) {
+DOMElement* XmlCommon::CreateElement(DOMDocument *doc, string nodeName, string nodeValue) {
 	
 	DOMText *tmpTextNode = NULL;
 	DOMElement *newElem = NULL;
@@ -143,7 +216,25 @@ DOMElement* XmlCommon::CreateElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument 
 	return newElem;
 }
 
-ElementVector* XmlCommon::FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string nodeName, string attribute, string attValue, string xmlns) {
+DOMElement* XmlCommon::CreateElementNS(DOMDocument *doc, string ns, string nodeName, string nodeValue) {
+	
+	XMLCh* name = XMLString::transcode(nodeName.c_str());
+	XMLCh *xns = XMLString::transcode(ns.c_str());
+	DOMElement *newElem = doc->createElementNS(xns, name);
+	//Free memory allocated by XMLString::transcode(char*)
+	XMLString::release(&xns);
+	XMLString::release(&name);
+	if(!nodeValue.empty()) {
+		XMLCh* value = XMLString::transcode(nodeValue.c_str());
+		newElem->setTextContent(value);
+		//Free memory allocated by XMLString::transcode(char*)
+		XMLString::release(&value);
+	}
+
+	return newElem;
+}
+
+ElementVector* XmlCommon::FindAllElements(DOMDocument *doc, string nodeName, string attribute, string attValue, string xmlns) {
 
 	ElementVector *nodes	= new ElementVector();
 	DOMElement *tmpNode		= NULL;
@@ -188,7 +279,7 @@ ElementVector* XmlCommon::FindAllElements(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocu
 	return nodes;
 }
 
-DOMElement* XmlCommon::FindElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string nodeName, string attribute, string attValue) {
+DOMElement* XmlCommon::FindElement(DOMDocument *doc, string nodeName, string attribute, string attValue) {
 
 	DOMElement *tmpNode		= NULL;
 	DOMElement *result			= NULL;
@@ -280,52 +371,8 @@ DOMElement* XmlCommon::FindElement(DOMElement *element, string nodeName, string 
 	return result;
 }
 
-DOMElement* XmlCommon::FindElementNS(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string nodeName, string attribute, string attValue, string xmlns) {
-
-	DOMElement *tmpNode		= NULL;
-	DOMElement *result			= NULL;
-	DOMNodeList *nodeList	= NULL;
-	int listLen				= 0;
-	int index				= 0;
-
-
-	//	Get a list of all the nodes in the document with the nodeName and loop through them
-	XMLCh* xmlnsValue = XMLString::transcode(xmlns.c_str());
-	XMLCh* name = XMLString::transcode(nodeName.c_str());
-	nodeList = doc->getElementsByTagNameNS(xmlnsValue, name);
-	//Free memory allocated by XMLString::transcode(char*)
-	XMLString::release(&xmlnsValue);
-	XMLString::release(&name);
-	listLen = nodeList->getLength();
-	XMLCh* attName = XMLString::transcode(attribute.c_str());
-	while(index < listLen)
-	{
-		tmpNode = (DOMElement*)nodeList->item(index++);	
-		if(tmpNode != NULL)
-		{
-			//	Check for attribute if desired
-			if(attribute.compare("") == 0)
-			{
-				result = tmpNode;
-				break;
-			}else if(tmpNode->hasAttribute(attName))
-			{
-				//	Check for attribute value if desired
-				if(attValue.compare("") == 0)
-				{
-					result = tmpNode;
-					break;
-				}else if((GetAttributeByName(tmpNode, attribute)).compare(attValue) == 0)
-				{
-					result = tmpNode;
-					break;
-				}
-			}
-		}
-	}
-	//Free memory allocated by XMLString::transcode(char*)
-	XMLString::release(&attName);
-	return result;
+DOMElement* XmlCommon::FindElementNS(DOMDocument *doc, string nodeName, string attribute, string attValue, string xmlns) {
+	return XmlCommon::FindElementNS(doc->getDocumentElement(), nodeName, attribute, attValue, xmlns);
 }
 
 DOMElement* XmlCommon::FindElementNS(DOMElement *element, string nodeName, string attribute, string attValue, string xmlns) {
@@ -343,18 +390,20 @@ DOMElement* XmlCommon::FindElementNS(DOMElement *element, string nodeName, strin
 	XMLString::release(&xmlnsValue);
 	XMLString::release(&name);
 	listLen = nodeList->getLength();
+
+	if (attribute.empty()) {
+		if (listLen > 0)
+			return (DOMElement*)nodeList->item(0);
+		return NULL;
+	}
+
 	XMLCh* attName = XMLString::transcode(attribute.c_str());
 	while(index < listLen)
 	{
 		tmpNode = (DOMElement*)nodeList->item(index++);	
 		if(tmpNode != NULL)
 		{
-			//	Check for attribute if desired
-			if(attribute.compare("") == 0)
-			{
-				result = tmpNode;
-				break;
-			}else if(tmpNode->hasAttribute(attName))
+			if(tmpNode->hasAttribute(attName))
 			{
 				//	Check for attribute value if desired
 				if(attValue.compare("") == 0)
@@ -515,15 +564,7 @@ string XmlCommon::GetElementName(DOMElement *elm) {
 }
 
 string XmlCommon::GetElementPrefix(DOMElement *elm) {
-
-	string prefix = "";
-
-	prefix = XmlCommon::ToString(elm->getPrefix());
-	if (prefix.compare("") == 0) {
-		prefix = "";
-	}
-
-	return prefix;
+	return XmlCommon::ToString(elm->getPrefix());
 }
 
 bool XmlCommon::HasChildElements(DOMNode *node) {
@@ -558,39 +599,53 @@ string XmlCommon::ToString(const XMLCh *xml) {
 	return(result);
 }
 
-void XmlCommon::AddXmlns(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, string newXmlnsUri, string newXmlnsAlias) {
+void XmlCommon::AddXmlns(DOMDocument* doc, string newXmlnsUri, string newXmlnsAlias) {
 
 	DOMElement *rootElm = doc->getDocumentElement();
 	if(newXmlnsAlias.compare("") == 0) {
 		XmlCommon::AddAttribute(rootElm, "xmlns", newXmlnsUri);
 	} else {
-		XmlCommon::AddAttribute(rootElm, "xmlns:" + newXmlnsAlias, newXmlnsUri);
+		XMLCh *uri = XMLString::transcode(newXmlnsUri.c_str());
+		XMLCh *attrName = XMLString::transcode(("xmlns:"+newXmlnsAlias).c_str());
+		rootElm->setAttributeNS(XMLUni::fgXMLNSURIName, attrName, uri);
+		XMLString::release(&uri);
+		XMLString::release(&attrName);
 	}
 }
 
-void XmlCommon::AddSchemaLocation(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc, string newSchemaLocation) {
+void XmlCommon::AddSchemaLocation(DOMDocument *doc, string newSchemaLocation) {
 
 	DOMElement *rootElm = doc->getDocumentElement();
-	string currentSchemaLocation = XmlCommon::GetAttributeByName(rootElm, "xsi:schemaLocation");
+	string currentSchemaLocation;
+	XMLCh *tmp;
+	const XMLCh *ctmp;
 
-	if(currentSchemaLocation.compare("") != 0) {
+	ctmp = rootElm->getAttributeNS(::xsiNS, schemaLocation);
+	if (ctmp)
+		currentSchemaLocation = ToString(ctmp);
+
+	if(!currentSchemaLocation.empty()) {
 		size_t pos = currentSchemaLocation.find(newSchemaLocation, 0);
 		if(pos == string::npos) {
 			currentSchemaLocation.append(" " + newSchemaLocation);
-			XmlCommon::AddAttribute(rootElm, "xsi:schemaLocation", currentSchemaLocation);
+			tmp = XMLString::transcode(currentSchemaLocation.c_str());
+			rootElm->setAttributeNS(::xsiNS, xsiSchemaLocation, tmp);
+			XMLString::release(&tmp);
 		}
 	} else {
-		XmlCommon::AddAttribute(rootElm, "xsi:schemaLocation", newSchemaLocation);
+		tmp = XMLString::transcode(newSchemaLocation.c_str());
+		rootElm->setAttributeNS(::xsiNS, xsiSchemaLocation, tmp);
+		XMLString::release(&tmp);
 	}
 }	
 
 string XmlCommon::GetNamespace(DOMElement *element) {
 
-	string xmlns = "";
-	xmlns = XmlCommon::ToString(element->getTypeInfo()->getNamespace());
-	if (xmlns.compare("") == 0) {
-		xmlns = "";
-	}
+	string xmlns;
+	const XMLCh *ns = element->lookupNamespaceURI(element->getPrefix());
+	if (ns)
+		xmlns = XmlCommon::ToString(ns);
+
 	return xmlns;
 }
 //****************************************************************************************//

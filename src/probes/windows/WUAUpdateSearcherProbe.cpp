@@ -28,7 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <comdef.h>
+//#include <Dsgetdc.h>
+//#include <Lm.h>
+
+#include "WindowsCommon.h"
+
 #include "WUAUpdateSearcherProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //						WUAUpdateSearcherProbe Class									  //	

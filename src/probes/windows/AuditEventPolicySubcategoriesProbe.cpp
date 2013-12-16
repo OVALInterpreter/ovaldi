@@ -50,8 +50,11 @@
 #include <NTSecAPI.h>
 
 #include <Common.h>
+#include "Log.h"
 
 #include "AuditEventPolicySubcategoriesProbe.h"
+
+using namespace std;
 
 typedef pair<GUID, string> GuidString;
 vector<GuidString> _guidItemElementNameVector;

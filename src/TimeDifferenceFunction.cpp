@@ -28,9 +28,22 @@
 //
 //****************************************************************************************//
 
+#include <math.h>
+#include <time.h>
+#include <cstdlib>
+#include <cstring>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ComponentFactory.h"
+#include "Common.h"
+#include "XmlCommon.h"
+#include "Exception.h"
+
 #include "TimeDifferenceFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	

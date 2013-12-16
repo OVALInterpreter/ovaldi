@@ -36,9 +36,11 @@
 // we'll use libblkid to figure out UUIDs of partitions
 #include <blkid/blkid.h>
 
-#include "PartitionProbe.h"
 #include <OvalMessage.h>
 #include <OvalEnum.h>
+#include <Log.h>
+
+#include "PartitionProbe.h"
 
 using namespace std;
 

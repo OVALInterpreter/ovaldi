@@ -28,9 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
+#include "XmlCommon.h"
+
 #include "ItemFieldEntityValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ItemFieldEntityValue Class								  //	
@@ -86,11 +92,9 @@ void ItemFieldEntityValue::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-void ItemFieldEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemEntityElm) {
+void ItemFieldEntityValue::Write(DOMDocument* scFile, DOMElement* itemEntityElm) {
 	// Create new field element
-	XMLCh* scField = XMLString::transcode("oval-sc:field");
-	DOMElement* newEntityValueElem = scFile->createElement(scField);
-	XMLString::release(&scField);
+	DOMElement* newEntityValueElem = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "oval-sc:field");
 	itemEntityElm->appendChild(newEntityValueElem);
 
 	// Add the attributes

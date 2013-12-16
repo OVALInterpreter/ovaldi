@@ -28,7 +28,25 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
+#include <windns.h>
+
+#include "WindowsCommon.h"
+
 #include "DNSCacheProbe.h"
+
+using namespace std;
+
+typedef struct _DnsCacheEntry{
+    struct _DnsCacheEntry* pNext;  // Pointer to next entry
+    PWSTR pszName;                 // DNS Record Name
+    unsigned short wType;          // DNS Record Type
+    unsigned short wDataLength;    // Not referenced
+    unsigned long  dwFlags;        // DNS Record Flags
+}DNSCACHEENTRY;
+
+typedef BOOL (WINAPI DnsGetCacheDataTableAddress)(DNSCACHEENTRY** ppCacheEntry);
+
 
 //****************************************************************************************//
 //								DNSCacheProbe Class											  //	

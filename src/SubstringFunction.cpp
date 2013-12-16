@@ -28,9 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ComponentFactory.h"
+#include "Common.h"
+#include "XmlCommon.h"
+
 #include "SubstringFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	
@@ -120,11 +128,16 @@ ComponentValue* SubstringFunction::ComputeValue() {
 
 void SubstringFunction::Parse(DOMElement* componentElm) {
 
+	int tmp;
 	// get the start and length attrs
 	string start = XmlCommon::GetAttributeByName(componentElm, "substring_start");
-	this->SetStart(atoi(start.c_str()));
+	tmp = 0;
+	Common::FromString(start, &tmp);
+	this->SetStart(tmp);	
 	string length = XmlCommon::GetAttributeByName(componentElm, "substring_length");
-	this->SetLength(atoi(length.c_str()));
+	tmp = 0;
+	Common::FromString(length, &tmp);
+	this->SetLength(tmp);
 
 	// Loop through all child elements
 	// there should only ever be one 

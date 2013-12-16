@@ -31,6 +31,7 @@
 #include <Exception.h>
 #include <Log.h>
 #include <WindowsCommon.h>
+#include <Common.h>
 
 #include "PrivilegeGuard.h"
 

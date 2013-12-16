@@ -39,6 +39,8 @@
 #include <VectorPtrGuard.h>
 #include <ItemFieldEntityValue.h>
 #include <OvalEnum.h>
+#include <Log.h>
+
 #include "CmdletProbe.h"
 
 using namespace std;

@@ -31,12 +31,10 @@
 #ifndef OBJECTENTITY_H
 #define OBJECTENTITY_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsEntity.h"
-#include "VariableFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class ObjectEntity;
 
 /**
 	This class represents an entity in an ObjectEntity as defined in the oval definition schema. 
@@ -55,7 +53,7 @@ public:
 	 *	@param entityElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.
 	 */
-	void Parse(DOMElement* entityElm);
+	void Parse(xercesc::DOMElement* entityElm);
 };
 
 #endif

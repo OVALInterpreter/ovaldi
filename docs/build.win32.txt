@@ -118,21 +118,71 @@ to setup and install the supporting libraries.
   B. Xerces Library
 
        Download and install a binary distribution of the xerces-c library.
-	   The OVAL Interpreter currently uses version 2.7.0 of the xerces-c
-	   library. The binary distribution file can be found at:
+       The OVAL Interpreter currently uses version 3.1.1 of the xerces-c
+       library. The binary distribution file can be found at:
 
-          http://archive.apache.org/dist/xml/xerces-c/binaries/
+          http://www.apache.org/dist/xerces/c/3/binaries/
 
   C. Xalan Library
       
-	   Download and install a binary distribution of the xalan-c library. The OVAL Interpreter
-	   currently uses version 1.10.0 of the xalan-c library. The binary distribution file can
-	   be found at:
+       The OVAL Interpreter uses the open source Xalan library.  The
+       binary was compiled with version 1.11.0 of the xalan-c library.  From
+       the Xalan Web site:
 
-          http://archive.apache.org/dist/xml/xalan-c/binaries/
+         "This product includes software developed by the Apache Software
+	     Foundation (http://www.apache.org/)."
 
-       Please refer to 'build.xerces.xalan.win32.txt' for instructions on how to build the
-	   xalan-c library on Windows.
+       For more information about Xalan visit:
+
+         http://xalan.apache.org
+
+       Source is available from:
+
+         http://www.apache.org/dist/xalan/xalan-c/
+
+       Before compiling, you may optionally apply xalan_optional_patch.txt, 
+       which resolves two issues.  One of them can cause a crash under certain
+       circumstances on any platform, the other seems to always cause crashes in
+       Windows debug builds specifically.  Windows release builds don't seem to
+       be affected by the latter issue.  If you don't wish to apply the patch,
+       you can skip building from source and use a pre-built binary available
+       from the same place as the source.
+
+       The Xalan binary distribution site given above also has "combined" zips
+       which contain both Xerces and Xalan.  They are named "xalan_comb-*".  So
+       you could download that if you wanted to get both libraries in one fell
+       swoop, and if you didn't want to apply any patches and build from source.
+
+       Building Xalan from source:
+
+       These instructions assume you're using VC++10 (VC++ 2010) to build 32-bit
+       binaries.  Before starting Visual Studio, set an environment variable 
+       named XERCESCROOT which points to where xerces 3.1.1 is installed.  Also,
+       add %XERCESCROOT%\bin to your PATH:
+
+       Control Panel -> System -> Advanced system settings -> Advanced (tab) ->
+         Environment Variables (button).
+
+       Next, navigate to <xalan source dir>\c\Projects\Win32\VC10 and open
+       "Xalan.sln" in Visual Studio.  The simplest thing to do from here is
+       perform a batch build of what you need:
+
+       Right click the solution -> Batch Build...
+
+       Check checkboxes for what you want to build.  E.g. if you want to build
+       32-bit debug and release builds of everything, check checkboxes for
+       project "All", config "Debug|Win32" and "Release|Win32".  If you just
+       want the DLLs, choose project "AllInOne".  Then click "Build".
+
+       When the build is done, your DLLs will be in
+       <xalan source dir>\c\Build\Win32\VC10\(Debug|Release).
+
+       This doesn't create a standard directory layout with bin/lib/include
+       directories, so you'll either have to create that yourself, or just use
+       the files where they are in your Xalan source tree.  Either way, don't
+       forget to include the generated headers in:
+
+       <xalan source dir>\c\Build\Win32\VC10\(Debug|Release)\Nls\Include
 
   D. Libgcrypt Library
 

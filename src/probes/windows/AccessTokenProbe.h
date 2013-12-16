@@ -30,16 +30,11 @@
 #ifndef ACCESSTOKENPROBE_H
 #define ACCESSTOKENPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-#include <aclapi.h>
-#include <lm.h>
-#include <Ntsecapi.h>
-
-using namespace std;
+#include "Item.h"
+#include "Object.h"
 
 /**
 	This class is responsbile for collecting registry information for windows registry_objects.
@@ -79,7 +74,7 @@ private:
 	/** Given an account name, gather information about it. 
 		Currently always returns true.
 	*/
-	bool GetAccountInformation(string accountNameIn,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
+	bool GetAccountInformation(std::string accountNameIn,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
 };
 
 #endif

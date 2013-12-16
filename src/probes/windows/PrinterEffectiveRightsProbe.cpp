@@ -29,7 +29,11 @@
 //****************************************************************************************//
 
 #include <AutoCloser.h>
+#include <WindowsCommon.h>
+
 #include "PrinterEffectiveRightsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              PrinterEffectiveRightsProbe Class                         //

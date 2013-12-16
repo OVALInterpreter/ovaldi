@@ -28,6 +28,11 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+
+#include "Common.h"
+#include "Exception.h"
+
 #include "Log.h"
 
 using namespace std;
@@ -127,7 +132,8 @@ void Log::Fatal(string msg) {
 
 void Log::SetLevel(string strLevel) {
 	
-	int tmpLevel = atoi(strLevel.c_str());
+	int tmpLevel = 0;
+	Common::FromString(strLevel, &tmpLevel);
 	if(tmpLevel > Log::FATAL || tmpLevel < Log::DEBUG) {
 		string msg = "Error setting Log level. A log level between " + Common::ToString((int)Log::FATAL) + " and " + Common::ToString((int)Log::DEBUG) + " must be specified. Setting Log level to " + Common::ToString((int)Log::DEBUG) + ". Note that this message has not been written to the log file.";
 		cout << Common::GetTimeStamp() + " : MESSAGE : " << msg << endl;

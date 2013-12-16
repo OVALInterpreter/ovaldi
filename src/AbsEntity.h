@@ -32,18 +32,14 @@
 #define ABSENTITY_H
 
 #include <string>
-#include <iostream>
-#include <stdlib.h>
+#include <map>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "OvalEnum.h"
 #include "VariableValue.h"
 #include "AbsVariable.h"
 #include "ItemEntity.h"
-#include "EntityComparator.h"
 #include "AbsEntityValue.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /** 
 	This class aligns roughly with the EntityBaseType as defined in the oval-definition-schema. 
@@ -74,7 +70,7 @@ public:
 		Parse the specified DOMElement* into an AbsEntity.
 		@param entitiyElm a DOMElement* that represents the xml version of an entity.
 	*/
-	virtual void Parse(DOMElement* entitiyElm) = 0;
+	virtual void Parse(xercesc::DOMElement* entitiyElm) = 0;
 
 	/**
 		Analyze the specified item entity based on the current AbsEntity's attributes and value.

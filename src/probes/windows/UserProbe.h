@@ -30,12 +30,9 @@
 #ifndef USERPROBE_H
 #define USERPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-using namespace std;
 
 /**
 	This class is responsible for collecting information for windows user_objects.
@@ -64,7 +61,7 @@ private:
 	/** Return an item for the specified user name. 
 	    If the user is not found return and item with the status set to does not exist
 	*/
-	Item* GetUserInfo(string userName);
+	Item* GetUserInfo(std::string userName);
 
 	/** Return the set of users on the local host. */
 	StringSet* GetAllUsers();

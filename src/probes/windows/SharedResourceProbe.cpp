@@ -28,7 +28,28 @@
 //
 //****************************************************************************************//
 
+#include "WindowsCommon.h"
+#include <lm.h>
+
 #include "SharedResourceProbe.h"
+
+using namespace std;
+
+namespace {
+
+    /** Convert a SharedResource type DWORD value into its corresponding string value.
+        *  Currently, as of Version 5.5, the OVAL Language only supports STYPE_DISKTREE, STYPE_PRINTQ,
+        *  STYPE_DEVICE, STYPE_IPC, STYPE_SPECIAL, and STYPE_TEMPORARY as values for shared resource types.
+        *  However, as the result of implementing this Probe, the shared resource types found in the corresponding
+        *  function definition that are not mentioned above may be added to the OVAL Language in Version 5.6
+        *  pending approval from the OVAL Board.  For more information regarding this issue, refer to the following link.
+        *  http://n2.nabble.com/Proposal-to-Amend-the-win-def%3AEntityStateSharedResourceTypeType-Definition-td2617124.html.
+        *  For Version 5.6, make sure to uncomment the case statements for the newly added shared resouce types, and to remove the STYPE_SPECIAL and STYPE_TEMPORARY case statements.
+        *  @param sharedType A DWORD value that contains a bitmask of flags that represent the type of the Windows shared resource.
+        *  @return A string representing the type of the Windows shared resource.
+        */
+    string GetSharedResourceType ( DWORD sharedType );
+}
 
 //****************************************************************************************//
 //                              SharedResourceProbe Class                                 //
@@ -216,7 +237,7 @@ void SharedResourceProbe::GetAllSharedResources() {
             }
 
             item->AppendElement ( new ItemEntity ( "netname" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_netname ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-			( ( typeStr = SharedResourceProbe::GetSharedResourceType ( bufPtr->shi2_type ) ).compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR ) ) : item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+			( ( typeStr = GetSharedResourceType ( bufPtr->shi2_type ) ).compare ( "" ) == 0 ) ? item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR ) ) : item->AppendElement ( new ItemEntity ( "shared_type" , typeStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "max_uses" , Common::ToString ( bufPtr->shi2_max_uses ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "current_uses" , Common::ToString ( bufPtr->shi2_current_uses ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
 			item->AppendElement ( new ItemEntity ( "local_path" , WindowsCommon::UnicodeToAsciiString ( bufPtr->shi2_path ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -262,67 +283,6 @@ Item* SharedResourceProbe::GetSharedResource ( string netNameStr ) {
 }
 
 
-string SharedResourceProbe::GetSharedResourceType ( DWORD sharedType ) {
-    string typeStr;
-
-    switch ( sharedType ) {
-        case STYPE_DISKTREE:
-            typeStr = "STYPE_DISKTREE";
-            break;
-        case STYPE_PRINTQ:
-            typeStr = "STYPE_PRINTQ";
-            break;
-        case STYPE_DEVICE:
-            typeStr = "STYPE_DEVICE";
-            break;
-        case STYPE_IPC:
-            typeStr = "STYPE_IPC";
-            break;
-            case ( STYPE_SPECIAL | STYPE_DISKTREE ) :
-                typeStr = "STYPE_DISKTREE_SPECIAL";
-                break;
-            case ( STYPE_TEMPORARY | STYPE_DISKTREE ) :
-                typeStr = "STYPE_DISKTREE_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_DISKTREE ) :
-                typeStr = "STYPE_DISKTREE_SPECIAL_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_PRINTQ ) :
-                typeStr = "STYPE_PRINTQ_SPECIAL";
-                break;
-            case ( STYPE_TEMPORARY | STYPE_PRINTQ ) :
-                typeStr = "STYPE_PRINTQ_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_PRINTQ ) :
-                typeStr = "STYPE_PRINTQ_SPECIAL_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_DEVICE ) :
-                typeStr = "STYPE_DEVICE_SPECIAL";
-                break;
-            case ( STYPE_TEMPORARY | STYPE_DEVICE ) :
-                typeStr = "STYPE_DEVICE_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_DEVICE ) :
-                typeStr = "STYPE_DEVICE_SPECIAL_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_IPC ) :
-                typeStr = "STYPE_IPC_SPECIAL";
-                break;
-            case ( STYPE_TEMPORARY | STYPE_IPC ) :
-                typeStr = "STYPE_IPC_TEMPORARY";
-                break;
-            case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_IPC ) :
-                typeStr = "STYPE_IPC_SPECIAL_TEMPORARY";
-                break;
-        default:
-            typeStr = "";
-            break;
-    }
-
-    return typeStr;
-}
-
-
 void SharedResourceProbe::DeleteSharedResources() {
     if ( SharedResourceProbe::resources != NULL ) {
         ItemVector::iterator it;
@@ -339,4 +299,68 @@ void SharedResourceProbe::DeleteSharedResources() {
     }
 
     return;
+}
+
+namespace {
+
+	string GetSharedResourceType ( DWORD sharedType ) {
+		string typeStr;
+
+		switch ( sharedType ) {
+			case STYPE_DISKTREE:
+				typeStr = "STYPE_DISKTREE";
+				break;
+			case STYPE_PRINTQ:
+				typeStr = "STYPE_PRINTQ";
+				break;
+			case STYPE_DEVICE:
+				typeStr = "STYPE_DEVICE";
+				break;
+			case STYPE_IPC:
+				typeStr = "STYPE_IPC";
+				break;
+			case ( STYPE_SPECIAL | STYPE_DISKTREE ) :
+				typeStr = "STYPE_DISKTREE_SPECIAL";
+				break;
+			case ( STYPE_TEMPORARY | STYPE_DISKTREE ) :
+				typeStr = "STYPE_DISKTREE_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_DISKTREE ) :
+				typeStr = "STYPE_DISKTREE_SPECIAL_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_PRINTQ ) :
+				typeStr = "STYPE_PRINTQ_SPECIAL";
+				break;
+			case ( STYPE_TEMPORARY | STYPE_PRINTQ ) :
+				typeStr = "STYPE_PRINTQ_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_PRINTQ ) :
+				typeStr = "STYPE_PRINTQ_SPECIAL_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_DEVICE ) :
+				typeStr = "STYPE_DEVICE_SPECIAL";
+				break;
+			case ( STYPE_TEMPORARY | STYPE_DEVICE ) :
+				typeStr = "STYPE_DEVICE_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_DEVICE ) :
+				typeStr = "STYPE_DEVICE_SPECIAL_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_IPC ) :
+				typeStr = "STYPE_IPC_SPECIAL";
+				break;
+			case ( STYPE_TEMPORARY | STYPE_IPC ) :
+				typeStr = "STYPE_IPC_TEMPORARY";
+				break;
+			case ( STYPE_SPECIAL | STYPE_TEMPORARY | STYPE_IPC ) :
+				typeStr = "STYPE_IPC_SPECIAL_TEMPORARY";
+				break;
+			default:
+				typeStr = "";
+				break;
+		}
+
+		return typeStr;
+	}
+
 }

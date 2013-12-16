@@ -32,9 +32,11 @@
 #define ITEMENTITY_H
 
 #include <string>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+
 #include "OvalEnum.h"
 #include "AbsEntityValue.h"
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents an entity in an Item as defined in the oval system characteristics schema.
@@ -61,10 +63,10 @@ public:
 	    Inserts this ItemEntity as the last child of the specified
 		itemElm.
 	*/
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm);
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* itemElm, const std::string &ns);
 
 	/** Parse the provided entity element */
-	void Parse(DOMElement* entityElm);
+	void Parse(xercesc::DOMElement* entityElm);
 
 	/** Return the status field's value. */
 	OvalEnum::SCStatus GetStatus() const;

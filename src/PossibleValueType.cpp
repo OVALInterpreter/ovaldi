@@ -28,9 +28,13 @@
 //
 //****************************************************************************************//
 
+#include "EntityComparator.h"
+#include "XmlCommon.h"
+
 #include "PossibleValueType.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									PossibleValueType Class								  //	

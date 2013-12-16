@@ -31,10 +31,11 @@
 #ifndef STATEENTITY_H
 #define STATEENTITY_H
 
-#include "AbsEntity.h" 
-#include "VariableFactory.h"
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "OvalEnum.h"
+#include "AbsEntity.h" 
 
 /**
 	This class represents an entity in the State as definted in the oval definition schema. 
@@ -53,7 +54,7 @@ public:
 	 *	@param entitiyElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.
 	 */
-	void Parse(DOMElement* entitiyElm);
+	void Parse(xercesc::DOMElement* entitiyElm);
 
 	/** Return the entity check value.
  	 *  @return A value from the OvalEnum::Check enumeration representing the entity check value of the state entity.

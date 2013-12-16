@@ -28,9 +28,19 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "Test.h"
 
 using namespace std;
+using namespace xercesc;
 
 TestMap Test::processedTestsMap;
 //****************************************************************************************//
@@ -276,10 +286,10 @@ void Test::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new Test element
-		DOMElement* testElm = XmlCommon::AddChildElement(resultDoc, parentElm, "test");
+		DOMElement* testElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "test");
 
 		// add the attributes
 		XmlCommon::AddAttribute(testElm, "test_id", this->GetId());
@@ -298,7 +308,7 @@ void Test::Write(DOMElement* parentElm) {
 		unsigned int msgCounter = 0;
 		while(msgCounter < sizeOfMessageList) {
 			currentMessage = this->GetMessages()->at(msgCounter);
-			currentMessage->Write(resultDoc,testElm,"oval-res");	 
+			currentMessage->Write(resultDoc,testElm,"oval-res", XmlCommon::resNS);
 			msgCounter++;
 		}
 
@@ -342,7 +352,9 @@ void Test::Parse(DOMElement* testElm) {
 	// get the attributes
 	this->SetId(XmlCommon::GetAttributeByName(testElm, "id"));
 	this->SetName(XmlCommon::GetElementName(testElm));
-	this->SetVersion(atoi(XmlCommon::GetAttributeByName(testElm, "version").c_str()));
+	int vers = 0;
+	Common::FromString(XmlCommon::GetAttributeByName(testElm, "version"), &vers);
+	this->SetVersion(vers);
 	this->SetCheckExistence(OvalEnum::ToExistence(XmlCommon::GetAttributeByName(testElm, "check_existence")));
 	this->SetCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(testElm, "check")));
     this->SetStateOperator(OvalEnum::ToOperator(XmlCommon::GetAttributeByName(testElm, "state_operator")));

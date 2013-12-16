@@ -31,17 +31,10 @@
 #ifndef ABSCRITERIA_H
 #define ABSCRITERIA_H
 
-#include <string>
-#include <iostream>
-#include <stdlib.h>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "OvalEnum.h"
 
-
-XERCES_CPP_NAMESPACE_USE
-
-class AbsCriteria;
 
 /**
 	This class represents the the commonalities among all types of criteria in the oval definitions schema.
@@ -80,9 +73,9 @@ public :
 	virtual ~AbsCriteria();
 
 	/** Abstract method to write a concrete criteria to an oval results document. */
-	virtual void Write(DOMElement* parent) = 0;
+	virtual void Write(xercesc::DOMElement* parent) = 0;
 	/** Abstract method to parse a concrete criteria from an oval definitions document. */
-	virtual void Parse(DOMElement* criteriaElm) = 0;
+	virtual void Parse(xercesc::DOMElement* criteriaElm) = 0;
 	/** Abstract method that evaluates a concrete criteria and returns the result. */
 	virtual OvalEnum::ResultEnumeration Analyze() = 0;
 

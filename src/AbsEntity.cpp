@@ -30,9 +30,12 @@
 
 #include <cassert>
 
-#include "AbsEntity.h"
+#include "Log.h"
+#include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
+
+#include "AbsEntity.h"
 
 using namespace std;
 

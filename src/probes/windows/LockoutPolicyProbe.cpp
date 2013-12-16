@@ -27,8 +27,18 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <string>
+#include <windows.h>
+#include <aclapi.h>
+#include <lm.h>
+
+#include "WindowsCommon.h"
 #include <Common.h>
+
 #include "LockoutPolicyProbe.h"
+
+using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  LockoutPolicyProbe Class  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

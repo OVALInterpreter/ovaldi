@@ -33,8 +33,6 @@
 
 #include "AbsComponent.h"
 
-XERCES_CPP_NAMESPACE_USE
-
 /**
 	This class represents abstract function component in a local_variable in the oval definition schema.
 	The oval definition schema defines a set of funtions for use in local_variables. All functions have 

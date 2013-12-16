@@ -31,11 +31,11 @@
 #ifndef REGEXCAPTUREFUNCTION_H
 #define REGEXCAPTUREFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
-#include "REGEX.h"
+#include <string>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsFunctionComponent.h"
+#include "VariableValue.h"
+#include "REGEX.h"
 
 /**
 	This class represents a RegexCaptureFunction component in a local_variable in the oval definition schema.
@@ -53,7 +53,7 @@ public:
 	~RegexCaptureFunction();
 
 	/** Parse the substring element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the value. */
 	ComponentValue* ComputeValue();

@@ -28,9 +28,27 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
+#include "VariableComponent.h"
+#include "LiteralComponent.h"
+#include "ObjectComponent.h"
+#include "SubstringFunction.h"
+#include "ConcatFunction.h"
+#include "EscapeRegexFunction.h"
+#include "BeginFunction.h"
+#include "EndFunction.h"
+#include "SplitFunction.h"
+#include "RegexCaptureFunction.h"
+#include "ArithmeticFunction.h"
+#include "TimeDifferenceFunction.h"
+#include "CountFunction.h"
+#include "UniqueFunction.h"
+
 #include "ComponentFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 // ***************************************************************************************	//
 //								 Public members												//

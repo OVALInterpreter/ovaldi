@@ -28,8 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <AclAPI.h>
+
+#include "WindowsCommon.h"
+#include "RegistryFinder.h"
+#include <FileFinder.h>
 #include <AutoCloser.h>
+
 #include "AbsEffectiveRightsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              AbsEffectiveRightsProbe Class                         //

@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include "Exception.h"
+
 #include "OvalEnum.h"
 
 using namespace std;
@@ -370,7 +372,7 @@ OvalEnum::Flag OvalEnum::ToFlag(string flagStr){
 	return flag;
 }
 
-OvalEnum::Flag OvalEnum::CombineFlags(IntVector* flags) {
+OvalEnum::Flag OvalEnum::CombineFlags(vector<int>* flags) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -391,7 +393,7 @@ OvalEnum::Flag OvalEnum::CombineFlags(IntVector* flags) {
 	int doesNotExistCount = 0;
 	int notCollectedCount = 0;
 	int notApplicableCount = 0;
-	IntVector::iterator flag;
+	vector<int>::iterator flag;
 	for (flag=flags->begin(); flag!=flags->end(); flag++) {
 
 		if((*flag) == OvalEnum::FLAG_ERROR) {
@@ -775,7 +777,7 @@ string OvalEnum::ResultToDirectiveString(OvalEnum::ResultEnumeration result) {
 	return resultStr;
 }
 
-OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(IntVector* results, OvalEnum::Check check) {
+OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(vector<int>* results, OvalEnum::Check check) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -802,7 +804,7 @@ OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(IntVector* results, 
 	int errorCount = 0;
 	int notEvaluatedCount = 0;
 	int notApplicableCount = 0;
-	IntVector::iterator result;
+	vector<int>::iterator result;
 	for (result=results->begin(); result!=results->end(); result++) {
 
 		if((*result) == OvalEnum::RESULT_TRUE) {
@@ -881,7 +883,7 @@ OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(IntVector* results, 
 	return combinedResult;
 }
 
-OvalEnum::ResultEnumeration OvalEnum::CombineResultsByOperator(IntVector* results, OvalEnum::Operator op) {
+OvalEnum::ResultEnumeration OvalEnum::CombineResultsByOperator(vector<int>* results, OvalEnum::Operator op) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -908,7 +910,7 @@ OvalEnum::ResultEnumeration OvalEnum::CombineResultsByOperator(IntVector* result
 	int errorCount = 0;
 	int notEvaluatedCount = 0;
 	int notApplicableCount = 0;
-	IntVector::iterator result;
+	vector<int>::iterator result;
 	for (result=results->begin(); result!=results->end(); result++) {
 
 		if((*result) == OvalEnum::RESULT_TRUE) {

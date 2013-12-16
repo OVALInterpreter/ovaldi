@@ -28,10 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
 #include "Filter.h"
 
-XERCES_CPP_NAMESPACE_USE
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									Filter Class										  //	

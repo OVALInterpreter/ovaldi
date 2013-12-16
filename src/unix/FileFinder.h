@@ -31,15 +31,10 @@
 #ifndef FILEFINDER_H
 #define FILEFINDER_H
 
+#include <string>
+
+#include "StdTypedefs.h"
 #include "AbsFileFinder.h"
-
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-
-#include <dirent.h>
-#include <limits.h>
 
 /**
 	This class is the linux file searching implmentation used by this application

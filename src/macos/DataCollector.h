@@ -32,10 +32,6 @@
 #define DATACOLLECTOR_H
 
 #include "AbsDataCollector.h"
-#include "ObjectCollector.h"
-#include "SystemInfo.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	The linux specific data collector

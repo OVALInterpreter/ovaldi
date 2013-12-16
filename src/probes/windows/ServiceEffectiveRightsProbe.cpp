@@ -28,8 +28,14 @@
 //
 //****************************************************************************************//
 
-#include <AutoCloser.h>
+#include <memory>
+#include <aclapi.h>
+
+#include "WindowsCommon.h"
+
 #include "ServiceEffectiveRightsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              ServiceEffectiveRightsProbe Class                         //

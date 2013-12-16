@@ -32,11 +32,7 @@
 #define VARIABLECOMPONENT_H
 
 #include "AbsComponent.h"
-#include "VariableFactory.h"
 #include "AbsVariable.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a VariableComponent in a local_variable in the oval definition schema.
@@ -46,7 +42,7 @@ public:
 	VariableComponent(AbsVariable* varRef = NULL);
 	~VariableComponent();
 
-	void Parse(DOMElement* componentElm); 
+	void Parse(xercesc::DOMElement* componentElm); 
 	ComponentValue* ComputeValue();
 
 	VariableValueVector* GetVariableValues();

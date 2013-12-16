@@ -28,15 +28,19 @@
 //
 //****************************************************************************************//
 
-#include <stdlib.h>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
-#include "Common.h"
+#include "XmlCommon.h"
 #include "ItemFieldEntityValue.h"
 #include "StringEntityValue.h"
 
 #include "ItemEntity.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ItemEntity Class										  //	
@@ -149,12 +153,12 @@ void ItemEntity::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm) {
+void ItemEntity::Write(DOMDocument* scFile, DOMElement* itemElm, const string &ns) {
 
 	// Create new item element
-	XMLCh* nameValue = XMLString::transcode(this->GetName().c_str());
-	DOMElement* newItemEntityElem = scFile->createElement(nameValue);
-	XMLString::release(&nameValue);
+
+	DOMElement* newItemEntityElem = XmlCommon::CreateElementNS(scFile, ns,
+		this->GetName());
 	itemElm->appendChild(newItemEntityElem);
 
 	// Add the attributes
@@ -168,7 +172,7 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
         XmlCommon::AddAttribute(newItemEntityElem, "status", strStatus);
 
 	if (this->GetNil()) {
-		XmlCommon::AddAttribute(newItemEntityElem, "xsi:nil", "true");
+		XmlCommon::AddAttributeNS(newItemEntityElem, XmlCommon::xsiNS, "xsi:nil", "true");
 	}
 
 	// Add the value(s)

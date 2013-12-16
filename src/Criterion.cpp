@@ -28,9 +28,14 @@
 //
 //****************************************************************************************//
 
+#include "Analyzer.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "Criterion.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Criterion Class											  //	
@@ -64,10 +69,10 @@ void Criterion::SetTestRef(Test* testRef) {
 void Criterion::Write(DOMElement* parentElm) {
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
-	DOMElement* criterionElm = XmlCommon::AddChildElement(resultDoc, parentElm, "criterion");
+	DOMElement* criterionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "criterion");
 
 	// add the attributes
 	XmlCommon::AddAttribute(criterionElm, "test_ref", this->GetTestRef()->GetId());

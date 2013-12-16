@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2013, The MITRE Corporation
+// Copyright (c) 2002-2012, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,50 +28,17 @@
 //
 //****************************************************************************************//
 
-#ifndef FILEPROBE_H
-#define FILEPROBE_H
-
-#include <windows.h>
-#include <string>
-#include <map>
-
-#include "Item.h"
-#include "Object.h"
-#include "FileFinder.h"
-#include "AbsProbe.h"
-
+#ifndef BITNESSVIEW_H
+#define BITNESSVIEW_H
 
 /**
-	This class is responsible for collecting file information for windows file_objects.
-*/
-class FileProbe : public AbsProbe {
-
-public:
-	virtual ~FileProbe();
-	
-	/** Get all the files on the system that match the pattern. */
-	virtual ItemVector* CollectItems(Object* object);
-
-	/** Gets single instance of the FileProbe. Uses lazy initialization. */
-	static AbsProbe* Instance();
-
-private:
-	FileProbe();
-
-	/** The static Singleton instance of the FileProbe. */
-	static FileProbe* instance;
-    
-	/** Return a new Item created for storing file information */
-	virtual Item* CreateItem();
-
-	/** Collectect all file attributes for the specified file on the specified path. */
-	Item* GetFileAttributes(std::string path, std::string fileName, FileFinder &fileFinder);
-
-	/** Get the version of the file. */
-	void GetVersion(LPVOID versionbuf, std::string filePath, Item *item, ItemEntity* version);
-	/** Get the type of the file. */
-	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type,
-		const WIN32_FILE_ATTRIBUTE_DATA &lpFileInformation);
+ * Which "view" to search, on a 64-bit OS.  Applicable to the registry and
+ * filesystem.
+ */
+enum BitnessView {
+	BIT_32, ///< well, 32_BIT isn't a valid identifier...
+	BIT_64
 };
 
 #endif
+

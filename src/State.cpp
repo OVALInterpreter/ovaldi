@@ -29,10 +29,19 @@
 //****************************************************************************************//using namespace std;
 
 #include <memory>
-#include "State.h"
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+
+#include "XmlCommon.h"
+#include "Log.h"
 #include "StateEntity.h"
+#include "DocumentManager.h"
+#include "Common.h"
+
+#include "State.h"
 
 using namespace std;
+using namespace xercesc;
 
 AbsStateMap State::processedStatesMap;
 
@@ -138,11 +147,11 @@ void State::Parse(DOMElement* stateElm) {
 	this->SetId(XmlCommon::GetAttributeByName(stateElm, "id"));
 	this->SetXmlns(XmlCommon::GetNamespace(stateElm));
 	string versionStr = XmlCommon::GetAttributeByName(stateElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 

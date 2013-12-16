@@ -27,7 +27,22 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <Windows.h>
+#include <Psapi.h>
+#include <tlhelp32.h>
+
+#include "WMIUtil.h"
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "Process58Probe.h"
+
+using namespace std;
+
+namespace {
+	BOOL CALLBACK EnumWindowsProc(HWND hwnd,LPARAM lParam);
+}
 
 //****************************************************************************************//
 //                              Process58Probe Class                                 //
@@ -156,36 +171,6 @@ Item* Process58Probe::GetProcess ( string commandLineStr ) {
     return NULL;
 }
 
-
-BOOL CALLBACK Process58Probe::EnumWindowsProc(HWND hwnd,LPARAM lParam)
-{
-	DWORD processID = 0;
-	LPDWORD procIdPtr = &processID;
-    char WinText[256] = {NULL};
-	std::pair<DWORD,string> * pairing = reinterpret_cast<std::pair<DWORD,string>*>(lParam); 
-
-    if(!hwnd) 
-		return TRUE; 
-
-	GetWindowThreadProcessId(hwnd,procIdPtr);
-
-	if(processID == pairing->first){
-		LONG ExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);		
-		HWND parentHwnd = GetWindow(hwnd, GW_OWNER);
-		if(parentHwnd == NULL){
-
-			if(!(ExStyle & WS_EX_NOACTIVATE)){
-				GetWindowText(hwnd,WinText,sizeof(WinText));
-				pairing->second = WinText;
-				return FALSE;
-			}		
-		}
-	}
- 
-    return TRUE; 
-}
-
-
 void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
     HANDLE openProcessHandle = OpenProcess ( PROCESS_ALL_ACCESS, false, processEntry.th32ProcessID );
 	
@@ -234,8 +219,8 @@ void Process58Probe::BuildProcessItem ( PROCESSENTRY32 processEntry ) {
 
 				DWORD procID = GetProcessId(openProcessHandle);
 
-				std::pair<DWORD,string> pairing (procID,"");
-				EnumWindows(&Process58Probe::EnumWindowsProc, reinterpret_cast<LPARAM>(&pairing));
+				pair<DWORD,string> pairing (procID,"");
+				EnumWindows(&EnumWindowsProc, reinterpret_cast<LPARAM>(&pairing));
 				string primaryWindowText = pairing.second;
 
 				if(primaryWindowText.length() > 0){
@@ -350,4 +335,36 @@ void Process58Probe::DeleteProcesses() {
     }
 
     return;
+}
+
+namespace {
+
+	BOOL CALLBACK EnumWindowsProc(HWND hwnd,LPARAM lParam)
+	{
+		DWORD processID = 0;
+		LPDWORD procIdPtr = &processID;
+		char WinText[256] = {NULL};
+		pair<DWORD,string> * pairing = reinterpret_cast<pair<DWORD,string>*>(lParam); 
+
+		if(!hwnd) 
+			return TRUE; 
+
+		GetWindowThreadProcessId(hwnd,procIdPtr);
+
+		if(processID == pairing->first){
+			LONG ExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);		
+			HWND parentHwnd = GetWindow(hwnd, GW_OWNER);
+			if(parentHwnd == NULL){
+
+				if(!(ExStyle & WS_EX_NOACTIVATE)){
+					GetWindowText(hwnd,WinText,sizeof(WinText));
+					pairing->second = WinText;
+					return FALSE;
+				}		
+			}
+		}
+ 
+		return TRUE; 
+	}
+
 }

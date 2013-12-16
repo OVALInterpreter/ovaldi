@@ -28,9 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Common.h"
+#include "ObjectFactory.h"
+#include "AbsObject.h"
+#include "State.h"
+#include "Object.h"
+#include "XmlCommon.h"
+
 #include "SetObject.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									SetObject Class										  //	
@@ -114,11 +125,11 @@ void SetObject::Parse(DOMElement* setObjectElm) {
 	this->SetComment(XmlCommon::GetAttributeByName(setObjectElm, "comment"));
 	this->SetXmlns(XmlCommon::GetNamespace(setObjectElm));
 	string versionStr = XmlCommon::GetAttributeByName(setObjectElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 

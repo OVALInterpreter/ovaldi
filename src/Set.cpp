@@ -28,9 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ObjectFactory.h"
+#include "Common.h"
+#include "XmlCommon.h"
+
 #include "Set.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									Set Class											  //	

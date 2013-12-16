@@ -31,13 +31,12 @@
 #ifndef ABSEFFECTIVERIGHTSPROBE_H
 #define ABSEFFECTIVERIGHTSPROBE_H
 
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "RegistryFinder.h"
-#include <FileFinder.h>
+#include <string>
+#include <windows.h> // for HANDLE
+#include <AccCtrl.h> // for SE_OBJECT_TYPE
 
-#include <aclapi.h>
-#include <windows.h>
+#include "AbsProbe.h"
+#include "ObjectEntity.h"
 
 /** 
 	The AbsEffectiveRightsProbe class provides several methods used by all effective rights probes including a
@@ -77,7 +76,7 @@ class AbsEffectiveRightsProbe : public AbsProbe {
             @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
             @return Void.
         */
-        void GetMatchingTrustees ( string trusteePatternStr, StringSet* allTrustees, StringSet* trustees, bool isRegex );
+        void GetMatchingTrustees ( std::string trusteePatternStr, StringSet* allTrustees, StringSet* trustees, bool isRegex );
 
         /** Return true if the calling probe should report that the trustee does not exist.
             If a trustees operator is set to OPERATOR_EQUALS and the trustee does not exist

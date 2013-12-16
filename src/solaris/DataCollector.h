@@ -38,13 +38,9 @@
 #define DATACOLLECTOR_H
 
 #include "AbsDataCollector.h"
-#include "ObjectCollector.h"
-#include "SystemInfo.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
-	The red hat specific data collector
+	The solaris specific data collector
 */
 class DataCollector : public AbsDataCollector {
 public:

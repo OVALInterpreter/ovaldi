@@ -31,15 +31,9 @@
 #ifndef METABASEPROBE_H
 #define METABASEPROBE_H
 
-#pragma warning(disable:4786)
+#include <iadmw.h>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-#include <windows.h>
-#include <initguid.h>
-#include <iadmw.h>
-#include <iiscnfg.h>
 
 /**
 	This class is responsible for collecting metabase information for windows metabase_objects.

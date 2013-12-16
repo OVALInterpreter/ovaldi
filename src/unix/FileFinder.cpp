@@ -28,8 +28,18 @@
 //
 //****************************************************************************************//
 
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <dirent.h>
+#include <limits.h>
 #include <cassert>
+#include <cerrno>
+
 #include <DirGuard.h>
+#include <EntityComparator.h>
+
 #include "FileFinder.h"
 
 using namespace std;
@@ -93,12 +103,12 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 
 		string recurseStr = Behavior::GetBehaviorValue(behaviors, "recurse");
 		if(recurseStr.compare("") != 0) {
-			throw ProbeException("Unsupported behavior: recurse");
+			throw FileFinderException("Unsupported behavior: recurse");
 		}
 
 		string recurse_file_systemStr = Behavior::GetBehaviorValue(behaviors, "recurse_file_system");
 		if(recurse_file_systemStr.compare("") != 0) {
-			throw ProbeException("Unsupported behavior: recurse_file_system");
+			throw FileFinderException("Unsupported behavior: recurse_file_system");
 		}
 
 

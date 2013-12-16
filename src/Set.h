@@ -31,25 +31,12 @@
 #ifndef SET_H
 #define SET_H
 
-#include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "Filter.h"
-#include "Object.h"
-#include "OvalEnum.h"
+#include "AbsObject.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-// Forward declarations to allow compilation.
-class AbsState;
-typedef std::vector < AbsState* > AbsStateVector;
-class Set;
-typedef std::vector < Set* > SetVector;
-// end forward declarations
+#include "OvalEnum.h"
 
 /**
 	This class represents an Set in an oval definition schema.
@@ -59,7 +46,7 @@ class Set {
 
 public:
 	/** Parse the set element and populate this object with its data.*/
-	Set(DOMElement* setElm);
+	Set(xercesc::DOMElement* setElm);
 
 	/** Initialize the set and set the simple set flag to true */
 	Set();
@@ -68,7 +55,7 @@ public:
 	~Set();
 
 	/** Parse the provided Set object element. */
-	void Parse(DOMElement* setElm);
+	void Parse(xercesc::DOMElement* setElm);
 
 	/** Return a vector of all variable values used for this set. */
 	VariableValueVector* GetVariableValues();

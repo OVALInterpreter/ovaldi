@@ -31,14 +31,11 @@
 #ifndef REGKEYEFFECTIVRIGHTSPROBE_H
 #define REGKEYEFFECTIVRIGHTSPROBE_H
 
-#pragma warning(disable:4786)
+#include <windows.h>
 
 #include "RegistryFinder.h"
 #include "AbsEffectiveRightsProbe.h"
 #include "WindowsCommon.h"
-
-#include <aclapi.h>
-#include <windows.h>
 
 /**
     This class is responsible for collecting registry key information for windows registrykeyeffectiverights_objects.

@@ -31,12 +31,9 @@
 #ifndef ABSPROBE_H
 #define ABSPROBE_H
 
-#include <iostream>
 #include <string>
 #include <vector>
 
-#include "Log.h"
-#include "Common.h"
 #include "Exception.h"
 #include "REGEX.h"
 #include "Item.h"
@@ -44,12 +41,6 @@
 #include "Object.h"
 #include "ObjectEntity.h"
 #include "Filter.h"
-
-
-class Object;
-class ObjectEntity;
-class Item;
-typedef std::vector < Item* > ItemVector;
 
 /**
 	This class in the base for all probes. 

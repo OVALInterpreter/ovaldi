@@ -29,10 +29,16 @@
 //****************************************************************************************//
 
 #include <memory>
+#include <windows.h>
+#include <comdef.h>
+#include <Wbemidl.h>
 
+#include "Log.h"
 #include <VectorPtrGuard.h>
 
 #include "WMIProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								WMIProbe Class											  //	

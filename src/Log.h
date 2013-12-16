@@ -31,11 +31,8 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "Common.h"
 #include <fstream>
 #include <string>
-#include <stdio.h>
-#include <iostream>
 
 /** 
 	This class provides logging for the application.

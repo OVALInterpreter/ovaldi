@@ -32,9 +32,6 @@
 #define SUBSTRINGFUNCTION_H
 
 #include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a SubstringFunction component in a local_variable in the oval definition schema.
@@ -47,7 +44,7 @@ public:
 	~SubstringFunction();
 
 	/** Parse the substring element and its child component elements. */
-	void Parse(DOMElement* componentElm); 
+	void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the values. */
 	ComponentValue* ComputeValue();

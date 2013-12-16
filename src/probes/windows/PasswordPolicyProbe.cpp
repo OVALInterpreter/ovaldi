@@ -27,11 +27,19 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+#include <windows.h>
+#include <aclapi.h>
+#include <lm.h>
 
+#include "WindowsCommon.h"
+#include "REGEX.h"
 #include <Common.h>
-#include "PasswordPolicyProbe.h"
 #include "WMIItem.h"
 #include "WMIUtil.h"
+
+#include "PasswordPolicyProbe.h"
+
+using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  PasswordPolicyProbe Class  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
