@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include "Log.h"
 #include "PasswordProbe.h"
 #include "ItemEntity.h"
 #include "ObjectEntity.h"
