@@ -127,13 +127,13 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 				collectedItems->push_back(item.release());
 
 			} else {
-
+				VariableValueVector vals = name->GetVarRef()->GetValues();
 				VariableValueVector::iterator iterator;
-				for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
+				for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 					auto_ptr<Item> item = ::CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("name", (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("name", iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item.release());
 				}
 			}
@@ -186,11 +186,12 @@ void RPMInfoProbe::GetRPMNames(ObjectEntity* name, StringVector *names) {
 			// in the case of equals simply loop through all the
 			// variable values and add them to the set of all names
 			// if they exist on the system
+			VariableValueVector vals = name->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
-				if(this->RPMExists((*iterator)->GetValue())) {
-					names->push_back((*iterator)->GetValue());
+				if(this->RPMExists(iterator->GetValue())) {
+					names->push_back(iterator->GetValue());
 				}
 			}
 

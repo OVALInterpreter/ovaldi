@@ -188,12 +188,13 @@ ItemVector* Process58Probe::CollectItems(Object* object) {
 
 			} else {
 
+				VariableValueVector vals = command->GetVarRef()->GetValues();
 				VariableValueVector::iterator iterator;
-				for(iterator = command->GetVarRef()->GetValues()->begin(); iterator != command->GetVarRef()->GetValues()->end(); iterator++) {
+				for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("command_line",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("command_line",  iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
