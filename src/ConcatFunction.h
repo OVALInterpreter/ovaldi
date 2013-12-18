@@ -40,8 +40,10 @@
 */
 class ConcatFunction : public AbsFunctionComponent {
 public:
-	ConcatFunction();
-	virtual ~ConcatFunction();
+	ConcatFunction()
+	{}
+	virtual ~ConcatFunction()
+	{}
 
 	/** Parse the concat element and its child component elements. */
 	virtual void Parse(xercesc::DOMElement* componentElm); 

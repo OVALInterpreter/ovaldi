@@ -44,26 +44,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-ArithmeticFunction::ArithmeticFunction(OvalEnum::ArithmeticOperation op) : AbsFunctionComponent() {
-
-    this->SetArithmeticOperation(op);
-}
-
-ArithmeticFunction::~ArithmeticFunction() {
-}
-
 // ***************************************************************************************	//
 //                                  Public members                                          //
 // ***************************************************************************************	//
-
-OvalEnum::ArithmeticOperation ArithmeticFunction::GetArithmeticOperation() {
-	return this->arithmeticOperation;
-}
-
-void ArithmeticFunction::SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn) {
-
-	this->arithmeticOperation = opIn;
-}
 
 ComponentValue* ArithmeticFunction::ComputeValue() {
 

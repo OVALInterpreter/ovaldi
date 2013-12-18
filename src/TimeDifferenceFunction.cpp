@@ -50,34 +50,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-TimeDifferenceFunction::TimeDifferenceFunction(OvalEnum::DateTimeFormat format1, OvalEnum::DateTimeFormat format2) : AbsFunctionComponent() {
-
-    this->SetFormat1(format1);
-    this->SetFormat2(format2);
-}
-
-TimeDifferenceFunction::~TimeDifferenceFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-OvalEnum::DateTimeFormat TimeDifferenceFunction::GetFormat1() {
-	return this->format1;
-}
-
-void TimeDifferenceFunction::SetFormat1(OvalEnum::DateTimeFormat format1) {
-	this->format1 = format1;
-}
-
-OvalEnum::DateTimeFormat TimeDifferenceFunction::GetFormat2() {
-	return this->format2;
-}
-
-void TimeDifferenceFunction::SetFormat2(OvalEnum::DateTimeFormat format2) {
-	this->format2 = format2;
-}
-
 ComponentValue* TimeDifferenceFunction::ComputeValue() {
 	
 	AbsComponentVector * components = this->GetComponents();

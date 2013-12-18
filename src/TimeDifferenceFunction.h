@@ -67,8 +67,11 @@ class TimeDifferenceFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete TimeDifferenceFunction object. */
-    TimeDifferenceFunction(OvalEnum::DateTimeFormat format1 = OvalEnum::DATETIME_YEAR_MONTH_DAY, OvalEnum::DateTimeFormat format2 = OvalEnum::DATETIME_YEAR_MONTH_DAY);
-	virtual ~TimeDifferenceFunction();
+    TimeDifferenceFunction(OvalEnum::DateTimeFormat format1 = OvalEnum::DATETIME_YEAR_MONTH_DAY, OvalEnum::DateTimeFormat format2 = OvalEnum::DATETIME_YEAR_MONTH_DAY)
+		: format1(format1), format2(format2)
+	{}
+	virtual ~TimeDifferenceFunction()
+	{}
 
 	/** Parse the substring element and its child component element. */
 	virtual void Parse(xercesc::DOMElement* componentElm); 
@@ -87,14 +90,22 @@ private:
     OvalEnum::DateTimeFormat format2;
 
 	/** Get the format1 field's value. */
-	OvalEnum::DateTimeFormat GetFormat1();
+	OvalEnum::DateTimeFormat GetFormat1() const {
+		return this->format1;
+	}
 	/** Set the format1 field's value. */
-	void SetFormat1(OvalEnum::DateTimeFormat format1);
+	void SetFormat1(OvalEnum::DateTimeFormat format1) {
+		this->format1 = format1;
+	}
 
     /** Get the format2 field's value. */
-	OvalEnum::DateTimeFormat GetFormat2();
+	OvalEnum::DateTimeFormat GetFormat2() const {
+		return this->format2;
+	}
 	/** Set the format2 field's value. */
-	void SetFormat2(OvalEnum::DateTimeFormat format2);
+	void SetFormat2(OvalEnum::DateTimeFormat format2) {
+		this->format2 = format2;
+	}
 	
 	/** Convert a DateTime_YEAR_MONTH_DAY format date-time value to seconds **/
 	time_t YearMonthDayValueToSeconds(std::string dateTimeValue);

@@ -41,8 +41,10 @@
 */
 class CountFunction : public AbsFunctionComponent {
 public:
-	CountFunction();
-	virtual ~CountFunction();
+	CountFunction()
+	{}
+	virtual ~CountFunction()
+	{}
 
 	/** Parse the count element and its child component elements. */
 	virtual void Parse(xercesc::DOMElement* componentElm); 

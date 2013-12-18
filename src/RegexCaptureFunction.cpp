@@ -44,26 +44,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-RegexCaptureFunction::RegexCaptureFunction(string pattern) : AbsFunctionComponent() {
-
-	this->SetPattern(pattern);
-}
-
-RegexCaptureFunction::~RegexCaptureFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string RegexCaptureFunction::GetPattern() {
-	return this->pattern;
-}
-
-void RegexCaptureFunction::SetPattern(string pattern) {
-
-	this->pattern = pattern;
-}
-
 ComponentValue* RegexCaptureFunction::ComputeValue() {
 
     AbsComponentVector *components = this->GetComponents();

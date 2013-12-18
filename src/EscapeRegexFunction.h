@@ -52,8 +52,10 @@ class EscapeRegexFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete Component object. */
-	EscapeRegexFunction();
-	virtual ~EscapeRegexFunction();
+	EscapeRegexFunction()
+	{}
+	virtual ~EscapeRegexFunction()
+	{}
 
 	/** parse the component element. */
 	virtual void Parse(xercesc::DOMElement* componentElm); 

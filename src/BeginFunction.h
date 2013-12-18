@@ -48,8 +48,10 @@ class BeginFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete BeginFunction object. */
-	BeginFunction(std::string charIn = "");
-	virtual ~BeginFunction();
+	BeginFunction(std::string charIn = "") : character(charIn)
+	{}
+	virtual ~BeginFunction()
+	{}
 
 	/** Parse the begin element and its child component element. */
 	virtual void Parse(xercesc::DOMElement* componentElm); 
@@ -61,9 +63,13 @@ public:
 	virtual VariableValueVector GetVariableValues();
 
 	/** Get the character field's value. */
-	std::string GetCharacter();
+	std::string GetCharacter() const {
+		return this->character;
+	}
 	/** Set the character field's value. */
-	void SetCharacter(std::string charIn);
+	void SetCharacter(std::string charIn) {
+		this->character = charIn;
+	}
 
 private:
 	std::string character;

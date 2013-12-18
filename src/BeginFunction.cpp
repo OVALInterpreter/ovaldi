@@ -43,25 +43,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-BeginFunction::BeginFunction(string charIn) : AbsFunctionComponent() {
-
-	this->SetCharacter(charIn);
-}
-
-BeginFunction::~BeginFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string BeginFunction::GetCharacter() {
-	return this->character;
-}
-
-void BeginFunction::SetCharacter(string charIn) {
-
-	this->character = charIn;
-}
 
 ComponentValue* BeginFunction::ComputeValue() {
 

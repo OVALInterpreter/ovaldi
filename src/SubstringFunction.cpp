@@ -45,36 +45,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-SubstringFunction::SubstringFunction(int start, int length) : AbsFunctionComponent() {
-
-	this->SetStart(start);
-	this->SetLength(length);
-}
-
-SubstringFunction::~SubstringFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-int SubstringFunction::GetStart() {
-	return this->start;
-}
-
-void SubstringFunction::SetStart(int start) {
-
-	this->start = start;
-}
-
-int SubstringFunction::GetLength() {
-
-	return this->length;
-}
-
-void SubstringFunction::SetLength(int length) {
-
-	this->length = length;
-}
 
 ComponentValue* SubstringFunction::ComputeValue() {
 

@@ -44,26 +44,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-SplitFunction::SplitFunction(string delimiter) : AbsFunctionComponent() {
-
-	this->SetDelimiter(delimiter);
-}
-
-SplitFunction::~SplitFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string SplitFunction::GetDelimiter() {
-	return this->delimiter;
-}
-
-void SplitFunction::SetDelimiter(string delimiter) {
-
-	this->delimiter = delimiter;
-}
-
 ComponentValue* SplitFunction::ComputeValue() {
 
 	AbsComponentVector *args = this->GetComponents();

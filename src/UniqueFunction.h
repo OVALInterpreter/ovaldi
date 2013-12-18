@@ -41,8 +41,10 @@
 */
 class UniqueFunction : public AbsFunctionComponent {
 public:
-	UniqueFunction();
-	virtual ~UniqueFunction();
+	UniqueFunction()
+	{}
+	virtual ~UniqueFunction()
+	{}
 
 	/** Parse the count element and its child component elements. */
 	virtual void Parse(xercesc::DOMElement* componentElm); 
