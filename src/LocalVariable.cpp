@@ -43,25 +43,9 @@ using namespace xercesc;
 //									LocalVariable Class									  //	
 //****************************************************************************************//
 
-LocalVariable::LocalVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) : AbsVariable (id, name, version, datatype, msgs) {
-
-}
-
-LocalVariable::~LocalVariable() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-AbsComponent* LocalVariable::GetComponent() {
-	return this->component;
-}
-
-void LocalVariable::SetComponent(AbsComponent* component) {
-	this->component = component;
-}
-
 void LocalVariable::ComputeValue() {
 
     ComponentValue* value = this->GetComponent()->ComputeValue();
@@ -76,8 +60,7 @@ void LocalVariable::ComputeValue() {
 	if(value->GetFlag() == OvalEnum::FLAG_COMPLETE || value->GetFlag() == OvalEnum::FLAG_INCOMPLETE) {
 		StringVector::iterator iterator;
 		for(iterator = value->GetValues()->begin(); iterator != value->GetValues()->end(); iterator++) {
-			VariableValue* varValue = new VariableValue(this->GetId(), (*iterator));
-			this->AppendVariableValue(varValue);
+			this->AppendVariableValue(this->GetId(), *iterator);
 		}
 	}
 
@@ -106,19 +89,11 @@ void LocalVariable::Parse(DOMElement* localVariableElm) {
 			// Call the ComponentFactory
 			AbsComponent* absComponent = ComponentFactory::GetComponent(childElm);
 			this->SetComponent(absComponent);
+			break; // local_variable gets no more than one component
 		}
 		index ++;
 	}
 
 	// Finally call ComputeValue
 	this->ComputeValue();
-}
-
-VariableValueVector* LocalVariable::GetVariableValues() {
-
-	VariableValueVector* values = NULL;
-
-	values = this->GetComponent()->GetVariableValues();
-
-	return values;
 }

@@ -49,22 +49,29 @@ class ArithmeticFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete ArithmeticFunction object. */
-    ArithmeticFunction(OvalEnum::ArithmeticOperation op = OvalEnum::ARITHMETIC_ADD);
-	~ArithmeticFunction();
+    ArithmeticFunction(OvalEnum::ArithmeticOperation op = OvalEnum::ARITHMETIC_ADD)
+		: arithmeticOperation(op)
+	{}
+	virtual ~ArithmeticFunction()
+	{}
 
 	/** Parse the begin element and its child component element. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the arithmetic_operation field's value. */
-	OvalEnum::ArithmeticOperation GetArithmeticOperation();
+	OvalEnum::ArithmeticOperation GetArithmeticOperation() const {
+		return this->arithmeticOperation;
+	}
 	/** Set the arithmetic_operation field's value. */
-	void SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn);
+	void SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn) {
+		this->arithmeticOperation = opIn;
+	}
 
 private:
     /**

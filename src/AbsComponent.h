@@ -46,9 +46,11 @@
 class AbsComponent {
 public:
 	/** Create complete AbsComponent. */
-	AbsComponent();
+	AbsComponent()
+	{}
 
-	virtual ~AbsComponent();
+	virtual ~AbsComponent()
+	{}
 
 	/** Parse a compnent element.
 		Each concrete component has a slightly different corresponding element to parse.
@@ -71,7 +73,7 @@ public:
 	/** Return the variable values used to compute the concrete component's value.
 		Each concrete component uses variables differently and will return this set differently.
 	*/
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual VariableValueVector GetVariableValues() = 0;
 };
 
 /**

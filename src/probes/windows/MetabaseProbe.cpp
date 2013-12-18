@@ -577,12 +577,12 @@ bool MetabaseProbe::ReportKeyDoesNotExist ( ObjectEntity *keyEntity, StringVecto
 				result = true;
 			}
 		} else {
-
+			VariableValueVector vals = keyEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
 
-			for ( iterator = keyEntity->GetVarRef()->GetValues()->begin(); iterator != keyEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->KeyExists ( ( *iterator )->GetValue() ) ) {
-					keysDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->KeyExists ( iterator->GetValue() ) ) {
+					keysDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}
@@ -602,11 +602,12 @@ bool MetabaseProbe::ReportIdDoesNotExist ( string keyStr, ObjectEntity *idEntity
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = idEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
 
-			for ( iterator = idEntity->GetVarRef()->GetValues()->begin(); iterator != idEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->IdExists ( keyStr, ( *iterator )->GetValue() ) ) {
-					idsDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->IdExists ( keyStr, iterator->GetValue() ) ) {
+					idsDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}

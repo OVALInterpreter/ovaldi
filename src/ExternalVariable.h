@@ -42,11 +42,14 @@
 class ExternalVariable : public AbsVariable {
 public:
 
-	ExternalVariable(std::string id = "", std::string name = "external_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
-	~ExternalVariable();
+	ExternalVariable(std::string id = "", std::string name = "external_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector())
+		: AbsVariable (id, name, version, datatype, msgs)
+	{}
+	virtual ~ExternalVariable()
+	{}
 
 	/** Parse the provided ExternalVariable element into a ExternalVariable. */
-	void Parse(xercesc::DOMElement* externalVariableElm);
+	virtual void Parse(xercesc::DOMElement* externalVariableElm);
 
 	/** Fetch the variable from the external-variables.xml file.
 		Then get each value associated with the variable.
@@ -58,19 +61,29 @@ public:
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
 	/** Get the set of PossibleValueType objects for this ExternalVariable. */
-	PossibleValueTypeVector* GetPossibleValueTypes();
+	const PossibleValueTypeVector* GetPossibleValueTypes() const {
+		return &this->possibleValueTypes;
+	}
 
 	/** Append a PossibleValueType to the set of PossibleValueType objects for this ExternalVariable. */
-	void AppendPossibleValueType(PossibleValueType* pv);
+	void AppendPossibleValueType(PossibleValueType* pv)	{
+		this->possibleValueTypes.push_back(pv);
+	}
 
 	/** Get the set of PossibleRestrictionType objects for this ExternalVariable. */
-	PossibleRestrictionTypeVector* GetPossibleRestrictionTypes();
+	const PossibleRestrictionTypeVector* GetPossibleRestrictionTypes() const {
+		return &this->possibleRestrictionTypes;
+	}
 
 	/** Append a PossibleRestrictionType to the set of PossibleRestrictionType objects for this ExternalVariable. */
-	void AppendPossibleRestrictionType(PossibleRestrictionType* pr);
+	void AppendPossibleRestrictionType(PossibleRestrictionType* pr) {
+		this->possibleRestrictionTypes.push_back(pr);
+	}
 
 	/** Return the variable values used to compute this variable's value. In this case just an empty vector. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues() const {
+		return VariableValueVector();
+	}
 
 	PossibleValueTypeVector possibleValueTypes;
 	PossibleRestrictionTypeVector possibleRestrictionTypes;

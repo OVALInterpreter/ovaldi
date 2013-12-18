@@ -101,13 +101,15 @@ public:
 	void SetMessages(OvalMessageVector* messages);
 
 	ItemVector* GetReferences();
-	void SetReferences(ItemVector* references);
+	void SetReferences(const ItemVector* references);
 
 	int GetVariableInstance();
 	void SetVariableInstance(int variableInstance);
-	
-	VariableValueVector* GetVariableValues();
-	void SetVariableValues(VariableValueVector* variableValues);
+
+	VariableValueVector GetVariableValues() const
+	{ return variableValues; }
+	void SetVariableValues(const VariableValueVector &variableValues)
+	{ this->variableValues = variableValues; }
 
 	int GetVersion();
 	void SetVersion(int version);
@@ -117,18 +119,16 @@ public:
 
 	/** Creates references to the set of input items and computes the flag value of this object based on the set. */
 	void AppendReferencesAndComputeFlag(ItemVector* references);
-	
-	void AppendVariableValue(VariableValue* variableValue);
-	void AppendVariableValues(VariableValueVector* variableValues);
-    
+
+	void AppendVariableValue(const VariableValue &variableValue);
+	void AppendVariableValues(const VariableValueVector &variableValues);
+
 private:
 
 	/** Creates references to the set of input items. */
 	void AppendReferences(ItemVector* references);
 
 	CollectedObject(std::string id = "", std::string comment = "", int version = 1, int variableInstance = 0, OvalEnum::Flag flag = OvalEnum::FLAG_ERROR);
-	/** Ensure that a given variable value for a variable id is only written once. */
-	bool IsWritten(StringPairVector* varIdValuePairs, std::string varId, std::string value);
 	/** Ensure that references are only written once. */
 	bool IsWritten(IntVector* itemIds, int itemId);
 	

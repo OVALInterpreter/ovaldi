@@ -462,10 +462,10 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path) {
 				result = true;
 			}
 		} else {
-
+			VariableValueVector vals = path->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for(iterator = path->GetVarRef()->GetValues()->begin(); iterator != path->GetVarRef()->GetValues()->end(); iterator++) {
-				if(!this->PathExists((*iterator)->GetValue())) {
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
+				if(!this->PathExists(iterator->GetValue())) {
 					result = true;
 					break;
 				}
@@ -491,8 +491,9 @@ bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileNa
 		} else {
 			
 			VariableValueVector::iterator iterator;
-			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
-				if(!this->FileNameExists(path, (*iterator)->GetValue())) {
+			VariableValueVector vals = fileName->GetVarRef()->GetValues();
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
+				if(!this->FileNameExists(path, iterator->GetValue())) {
 					result = true;
 					break;
 				}
@@ -518,9 +519,10 @@ bool AbsFileFinder::ReportFilePathDoesNotExist(ObjectEntity *filePath, StringVec
 		} else {
 
 			VariableValueVector::iterator iterator;
-			for(iterator = filePath->GetVarRef()->GetValues()->begin(); iterator != filePath->GetVarRef()->GetValues()->end(); iterator++) {
-				if(!this->FilePathExists((*iterator)->GetValue())) {
-					filePaths->push_back((*iterator)->GetValue());
+			VariableValueVector vals = filePath->GetVarRef()->GetValues();
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
+				if(!this->FilePathExists(iterator->GetValue())) {
+					filePaths->push_back(iterator->GetValue());
 					result = true;
 				}
 			}

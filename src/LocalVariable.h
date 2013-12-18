@@ -44,11 +44,14 @@ class LocalVariable : public AbsVariable {
 public:
 
 	/** Create a complete LocalVariable. */
-	LocalVariable(std::string id = "", std::string name = "local_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
-	~LocalVariable();
+	LocalVariable(std::string id = "", std::string name = "local_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector())
+		: AbsVariable (id, name, version, datatype, msgs)
+	{}
+	virtual ~LocalVariable()
+	{}
 
 	/** Parse the provided local_variable element into a LocalVariable. */
-	void Parse(xercesc::DOMElement* localVariableElm);
+	virtual void Parse(xercesc::DOMElement* localVariableElm);
 
     /** Compute the value of the component.
         Create a VariableValue for each value in the returned ComponentValue
@@ -59,12 +62,18 @@ public:
     /** Return the variable values used to compute this variable's value.
         Here we can simply return the values used by the component.
     */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues() const {
+		return this->GetComponent()->GetVariableValues();
+	}
 	
 	/** Get the AbsComponent. */
-	AbsComponent* GetComponent();
+	AbsComponent* GetComponent() const {
+		return component;
+	}
 	/** Set the AbsComponent. */
-	void SetComponent(AbsComponent* component);
+	void SetComponent(AbsComponent* component) {
+		this->component = component;
+	}
 
 private:
 	AbsComponent* component;

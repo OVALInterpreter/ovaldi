@@ -48,14 +48,6 @@ using namespace xercesc;
 //									ExternalVariable Class								  //	
 //****************************************************************************************//
 
-ExternalVariable::ExternalVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) : AbsVariable (id, name, version, datatype, msgs) {
-
-}
-
-ExternalVariable::~ExternalVariable() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
@@ -93,29 +85,6 @@ void ExternalVariable::Parse(DOMElement* externalVariableElm) {
 
 	// Finally call ComputeValue
 	this->ComputeValue();
-}
-
-VariableValueVector* ExternalVariable::GetVariableValues() {
-
-	VariableValueVector* values = new VariableValueVector();
-
-	return values;
-}
-
-PossibleValueTypeVector* ExternalVariable::GetPossibleValueTypes() {
-	return &this->possibleValueTypes;
-}
-
-void ExternalVariable::AppendPossibleValueType(PossibleValueType* pv) {
-	this->possibleValueTypes.push_back(pv);
-}
-
-PossibleRestrictionTypeVector* ExternalVariable::GetPossibleRestrictionTypes() {
-	return &this->possibleRestrictionTypes;
-}
-
-void ExternalVariable::AppendPossibleRestrictionType(PossibleRestrictionType* pr) {
-	this->possibleRestrictionTypes.push_back(pr);
 }
 
 void ExternalVariable::ComputeValue() {
@@ -167,8 +136,7 @@ void ExternalVariable::ComputeValue() {
 					if(this->ValidateValue(this->GetDatatype(), externalValue)) {
 
 						// add the value to the set of values for this exteranl variable.
-						VariableValue* varValue = new VariableValue(this->GetId(), externalValue);
-						this->AppendVariableValue(varValue);
+						this->AppendVariableValue(this->GetId(), externalValue);
 
 					} else {
 						this->SetFlag(OvalEnum::FLAG_ERROR);
@@ -189,7 +157,7 @@ bool ExternalVariable::ValidateValue(OvalEnum::Datatype datatype, string externa
 	bool isValid = false;
 	
 	// loop through all possible_value elements - if any are true return true 
-	PossibleValueTypeVector::iterator value;
+	PossibleValueTypeVector::const_iterator value;
 	for(value = this->GetPossibleValueTypes()->begin(); value != this->GetPossibleValueTypes()->end(); value++) {
 		isValid = (*value)->ValidateValue(datatype, externalValue);
 		if(isValid) {
@@ -199,7 +167,7 @@ bool ExternalVariable::ValidateValue(OvalEnum::Datatype datatype, string externa
 
 	if(!isValid) {
 		// loop through all the possible_restriction elements - if any are true return true
-		PossibleRestrictionTypeVector::iterator restriction;
+		PossibleRestrictionTypeVector::const_iterator restriction;
 		for(restriction = this->GetPossibleRestrictionTypes()->begin(); restriction != this->GetPossibleRestrictionTypes()->end(); restriction++) {
 			isValid = (*restriction)->ValidateValue(datatype, externalValue);
 			if(isValid) {

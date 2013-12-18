@@ -52,17 +52,19 @@ class EscapeRegexFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete Component object. */
-	EscapeRegexFunction();
-	~EscapeRegexFunction();
+	EscapeRegexFunction()
+	{}
+	virtual ~EscapeRegexFunction()
+	{}
 
 	/** parse the component element. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the value by escaping all the values of the associated component. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 };
 
 #endif

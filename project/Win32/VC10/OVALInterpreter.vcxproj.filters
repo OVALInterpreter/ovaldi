@@ -330,12 +330,6 @@
     <ClCompile Include="..\..\..\src\XslCommon.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\AbsComponent.cpp">
-      <Filter>Source Files\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\AbsFunctionComponent.cpp">
-      <Filter>Source Files\variables</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\AbsVariable.cpp">
       <Filter>Source Files\variables</Filter>
     </ClCompile>

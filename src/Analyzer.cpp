@@ -221,7 +221,6 @@ void Analyzer::Run() {
 		Test::ClearCache();
 		Item::ClearCache();
 		State::ClearCache();
-		VariableValue::ClearCache();
 
 		this->FinializeResultsDocument();
 
@@ -338,7 +337,6 @@ void Analyzer::Run(StringVector* definitionIds) {
 		Test::ClearCache();
 		Item::ClearCache();
 		State::ClearCache();
-		VariableValue::ClearCache();
 
 		this->FinializeResultsDocument();
 

@@ -165,9 +165,10 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                                 collectedItems->push_back ( item );
 
                             } else {
+								VariableValueVector vals = localPort->GetVarRef()->GetValues();
                                 VariableValueVector::iterator iterator;
 
-                                for ( iterator = localPort->GetVarRef()->GetValues()->begin() ; iterator != localPort->GetVarRef()->GetValues()->end() ; iterator++ ) {
+                                for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                                     Item* item = this->CreateItem();
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                     item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -193,9 +194,10 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                         collectedItems->push_back ( item );
 
                     } else {
+						VariableValueVector vals = localAddress->GetVarRef()->GetValues();
                         VariableValueVector::iterator iterator;
 
-                        for ( iterator = localAddress->GetVarRef()->GetValues()->begin() ; iterator != localAddress->GetVarRef()->GetValues()->end() ; iterator++ ) {
+                        for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "protocol" , protocolStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -219,9 +221,10 @@ ItemVector* PortProbe::CollectItems ( Object* object ) {
                 collectedItems->push_back ( item );
 
             } else {
+				VariableValueVector vals = protocol->GetVarRef()->GetValues();
                 VariableValueVector::iterator iterator;
 
-                for ( iterator = protocol->GetVarRef()->GetValues()->begin() ; iterator != protocol->GetVarRef()->GetValues()->end() ; iterator++ ) {
+                for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                     Item* item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                     item->AppendElement ( new ItemEntity ( "protocol" , "", OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
@@ -455,11 +458,12 @@ StringSet* PortProbe::GetProtocols ( ObjectEntity* protocol ) {
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all protocols
             // if they exist on the system
+			VariableValueVector vals = protocol->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
 
-            for ( iterator = protocol->GetVarRef()->GetValues()->begin() ; iterator != protocol->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->ProtocolExists ( ( *iterator )->GetValue() ) ) {
-                    allProtocols->insert ( ( *iterator )->GetValue() );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->ProtocolExists ( iterator->GetValue() ) ) {
+                    allProtocols->insert ( iterator->GetValue() );
                 }
             }
 
@@ -541,11 +545,12 @@ StringSet* PortProbe::GetLocalAddresses ( string protocolStr , ObjectEntity* loc
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all local addresses
             // if they exist on the system
+			VariableValueVector vals = localAddress->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
 
-            for ( iterator = localAddress->GetVarRef()->GetValues()->begin() ; iterator != localAddress->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->LocalAddressExists ( protocolStr , ( *iterator )->GetValue() ) ) {
-                    allLocalAddresses->insert ( ( *iterator )->GetValue() );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->LocalAddressExists ( protocolStr , iterator->GetValue() ) ) {
+                    allLocalAddresses->insert ( iterator->GetValue() );
                 }
             }
 
@@ -624,11 +629,12 @@ StringSet* PortProbe::GetLocalPorts ( string protocolStr , string localAddressSt
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all ports
             // if they exist on the system
+			VariableValueVector vals = localPort->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
 
-            for ( iterator = localPort->GetVarRef()->GetValues()->begin() ; iterator != localPort->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->LocalPortExists ( protocolStr , localAddressStr , ( *iterator )->GetValue() ) ) {
-                    allLocalPorts->insert ( ( *iterator )->GetValue() );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->LocalPortExists ( protocolStr , localAddressStr , iterator->GetValue() ) ) {
+                    allLocalPorts->insert ( iterator->GetValue() );
                 }
             }
 
@@ -674,14 +680,15 @@ StringSet* PortProbe::GetMatchingLocalPorts ( string protocolStr , string localA
         }
 
     } else {
+		VariableValueVector varVals = localPort->GetVarRef()->GetValues();
         VariableValueVector::iterator iterator1;
         ItemVector::iterator iterator2;
 
-        for ( iterator1 = localPort->GetVarRef()->GetValues()->begin() ; iterator1 != localPort->GetVarRef()->GetValues()->end() ; iterator1++ ) {
+        for ( iterator1 = varVals.begin() ; iterator1 != varVals.end() ; iterator1++ ) {
             for ( iterator2 = PortProbe::ports->begin() ; iterator2 != PortProbe::ports->end() ; iterator2++ ) {
                 if ( ( protocolStr.compare ( ( *iterator2 )->GetElementByName ( "protocol" )->GetValue() ) == 0 ) && ( localAddressStr.compare ( ( *iterator2 )->GetElementByName ( "local_address" )->GetValue() ) == 0 ) ) {
 					Common::FromString(( *iterator2 )->GetElementByName ( "local_port" )->GetValue(), &port1);
-					Common::FromString(( *iterator1 )->GetValue(), &port2);
+					Common::FromString(iterator1->GetValue(), &port2);
 
                     if ( ( ( port1 > -1 ) && ( port2 > -1 ) ) && PortProbe::IsValidOperationAndValue ( op , port1 , port2 ) ) {
                         localPorts->insert ( Common::ToString ( port1 ) );

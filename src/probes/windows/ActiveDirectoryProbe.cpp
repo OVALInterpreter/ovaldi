@@ -189,7 +189,8 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                                 collectedItems->push_back ( new Item ( *item ) );
 
                             } else {
-                                for ( VariableValueVector::iterator iterator = attributeEntity->GetVarRef()->GetValues()->begin() ; iterator != attributeEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+								VariableValueVector vals = attributeEntity->GetVarRef()->GetValues();
+                                for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                                     Item* item = this->CreateItem();
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                     item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -223,7 +224,8 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                         collectedItems->push_back ( item );
 
                     } else {
-                        for ( VariableValueVector::iterator iterator = relativeDnEntity->GetVarRef()->GetValues()->begin() ; iterator != relativeDnEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+						VariableValueVector vals = relativeDnEntity->GetVarRef()->GetValues();
+                        for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -247,7 +249,8 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                 collectedItems->push_back ( item );
 
             } else {
-                for ( VariableValueVector::iterator iterator = namingContextEntity->GetVarRef()->GetValues()->begin() ; iterator != namingContextEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+				VariableValueVector vals = namingContextEntity->GetVarRef()->GetValues();
+                for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                     Item* item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                     item->AppendElement ( new ItemEntity ( "naming_context" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
@@ -503,9 +506,10 @@ StringSet* ActiveDirectoryProbe::GetNamingContexts ( ObjectEntity* namingContext
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all naming contexts
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = namingContextEntity->GetVarRef()->GetValues()->begin() ; iterator != namingContextEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->NamingContextExists ( ( *iterator )->GetValue() ) ) {
-                    allNamingContexts->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = namingContextEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->NamingContextExists ( iterator->GetValue() ) ) {
+                    allNamingContexts->insert ( iterator->GetValue() );
                 }
             }
 
@@ -594,9 +598,10 @@ StringSet* ActiveDirectoryProbe::GetRelativeDns ( string namingContextStr , Obje
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all relative distinguished names
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = relativeDnEntity->GetVarRef()->GetValues()->begin() ; iterator != relativeDnEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->RelativeDnExists ( namingContextStr , ( *iterator )->GetValue() ) ) {
-                    allRelativeDns->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = relativeDnEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->RelativeDnExists ( namingContextStr , iterator->GetValue() ) ) {
+                    allRelativeDns->insert ( iterator->GetValue() );
                 }
             }
 
@@ -706,9 +711,10 @@ StringSet* ActiveDirectoryProbe::GetAttributes ( string namingContextStr , strin
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all attributes
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = attributeEntity->GetVarRef()->GetValues()->begin() ; iterator != attributeEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->AttributeExists ( namingContextStr , relativeDnStr , ( *iterator )->GetValue() ) ) {
-                    allAttributes->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = attributeEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->AttributeExists ( namingContextStr , relativeDnStr , iterator->GetValue() ) ) {
+                    allAttributes->insert ( iterator->GetValue() );
                 }
             }
 

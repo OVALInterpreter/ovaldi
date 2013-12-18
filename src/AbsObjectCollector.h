@@ -127,7 +127,7 @@ protected:
 	    Comparing items based on their ids assumes that Item ids are only
 	    assigned to unique items. This is ensured when probes return Items.
 	*/
-	bool ExistsInSet(ItemVector* itemSet, Item* item);
+	bool ExistsInSet(const ItemVector* itemSet, Item* item);
 
 	/** Return a single set that contains all unique items in both sets. */
 	CollectedSet* Union(CollectedSet* collectedSet1, CollectedSet* collectedSet2);

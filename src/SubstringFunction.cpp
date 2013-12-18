@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 
@@ -43,36 +45,9 @@ using namespace xercesc;
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-SubstringFunction::SubstringFunction(int start, int length) : AbsFunctionComponent() {
-
-	this->SetStart(start);
-	this->SetLength(length);
-}
-
-SubstringFunction::~SubstringFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-int SubstringFunction::GetStart() {
-	return this->start;
-}
-
-void SubstringFunction::SetStart(int start) {
-
-	this->start = start;
-}
-
-int SubstringFunction::GetLength() {
-
-	return this->length;
-}
-
-void SubstringFunction::SetLength(int length) {
-
-	this->length = length;
-}
 
 ComponentValue* SubstringFunction::ComputeValue() {
 
@@ -157,23 +132,15 @@ void SubstringFunction::Parse(DOMElement* componentElm) {
 	}
 }
 
-VariableValueVector* SubstringFunction::GetVariableValues() {
+VariableValueVector SubstringFunction::GetVariableValues() {
 	
-	VariableValueVector* values = new VariableValueVector();
+	VariableValueVector values;
 	AbsComponentVector* components = this->GetComponents();
 	AbsComponentVector::iterator iterator;
 	for(iterator = components->begin(); iterator != components->end(); iterator++) {
 		AbsComponent* component = (AbsComponent*)(*iterator);
-		VariableValueVector* tmp = component->GetVariableValues();
-		VariableValueVector::iterator varIterator;
-		for(varIterator = tmp->begin(); varIterator != tmp->end(); varIterator++) {
-			values->push_back((*varIterator));
-		}
-		// BUG - These can not currenrtly be deleted. 
-		// The code is no consistant here. In places a new vector is returned
-		// in others a reference to a vector that is managed by other code is returned.
-		//delete tmp;
-		//tmp = NULL;
+		VariableValueVector tmp = component->GetVariableValues();
+		copy(tmp.begin(), tmp.end(), back_inserter(values));
 	}
 
 	return values;

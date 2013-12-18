@@ -39,16 +39,22 @@
 */
 class VariableComponent : public AbsComponent {
 public:
-	VariableComponent(AbsVariable* varRef = NULL);
-	~VariableComponent();
+	VariableComponent(AbsVariable* varRef = NULL) : varRef(varRef)
+	{}
+	virtual ~VariableComponent()
+	{}
 
-	void Parse(xercesc::DOMElement* componentElm); 
-	ComponentValue* ComputeValue();
+	virtual void Parse(xercesc::DOMElement* componentElm); 
+	virtual ComponentValue* ComputeValue();
 
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
-	AbsVariable* GetVarRef();
-	void SetVarRef(AbsVariable* varRef);
+	const AbsVariable* GetVarRef() const {
+		return this->varRef;
+	}
+	void SetVarRef(AbsVariable* varRef) {
+		this->varRef = varRef;
+	}
 
 private:
 	AbsVariable* varRef;

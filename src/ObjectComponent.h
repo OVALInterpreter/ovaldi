@@ -42,13 +42,16 @@ class ObjectComponent : public AbsComponent {
 public:
 
     /** Create a complete ObjectComponent object/ */
-	ObjectComponent(std::string objectId = "", std::string itemField = "", std::string recordField = "");
+	ObjectComponent(std::string objectId = "", std::string itemField = "", std::string recordField = "")
+		: objectId(objectId), itemField(itemField), recordField(recordField)
+	{}
 	
 	/** ObjectComponent destructor */
-	~ObjectComponent();
+	virtual ~ObjectComponent()
+	{}
 
     /** Parse the ObjectComponent element and populate the current ObjectComponent. */
-	void Parse(xercesc::DOMElement* componentElm);
+	virtual void Parse(xercesc::DOMElement* componentElm);
 
 
     /** Calculate the value of this ObjectComponent
@@ -59,26 +62,38 @@ public:
             <li>Then get that value and return it as a string.</li>
         </ul>
     */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
     /** Return the variable values used to compute this component's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
     /** Return the objectId field's value. */
-	std::string GetObjectId();
+	std::string GetObjectId() const {
+		return objectId;
+	}
     /** Set the objectId field's value. */
-	void SetObjectId(std::string objectId);
+	void SetObjectId(std::string objectId) {
+		this->objectId = objectId;
+	}
 
     /** Return the itemField field's value. */
-	std::string GetItemField();
+	std::string GetItemField() const {
+		return itemField;
+	}
     /** Set the itemField field's value. */
-	void SetItemField(std::string itemField);
+	void SetItemField(std::string itemField) {
+		this->itemField = itemField;
+	}
 
 	/** Return the recordField field's value. */
-	std::string GetRecordField();
+	std::string GetRecordField() const {
+		return recordField;
+	}
 
     /** Set the recordField field's value. */
-	void SetRecordField(std::string recordField);
+	void SetRecordField(std::string recordField) {
+		this->recordField = recordField;
+	}
 
 private:
 	std::string objectId;

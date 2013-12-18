@@ -50,11 +50,17 @@ class PossibleRestrictionType {
 public:
 
 	/** Create a new PossibleRestrictionType. */
-	PossibleRestrictionType();
-	~PossibleRestrictionType();
+	PossibleRestrictionType()
+	{}
+	~PossibleRestrictionType()
+	{}
 
-	void SetHint(std::string hint);
-	std::string GetHint();
+	void SetHint(std::string hint) {
+		this->hint = hint;
+	}
+	std::string GetHint() const {
+		return this->hint;
+	}
 
 	/** Parses a valid PossibleRestrictionType element as defined int eh oval definitions schema. */
 	void Parse(xercesc::DOMElement* possibleRestrictionElm);
@@ -62,8 +68,12 @@ public:
 	/** Ensure that the specified value matches the criteria specified by this possible_restriction element. */
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
-	RestrictionTypeVector* GetRestrictionTypes();
-	void AppendRestrictionType(RestrictionType* rt);
+	const RestrictionTypeVector* GetRestrictionTypes() const {
+		return &this->restrictionTypes;
+	}
+	void AppendRestrictionType(RestrictionType* rt) {
+		this->restrictionTypes.push_back(rt);
+	}
 
 private:
 

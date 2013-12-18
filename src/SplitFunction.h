@@ -51,22 +51,28 @@ class SplitFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete SplitFunction object. */
-	SplitFunction(std::string delimiter = "");
-	~SplitFunction();
+	SplitFunction(std::string delimiter = "") : delimiter(delimiter)
+	{}
+	virtual ~SplitFunction()
+	{}
 
 	/** Parse the substring element and its child component element. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substrings and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the delimiter field's value. */
-	std::string GetDelimiter();
+	std::string GetDelimiter() const {
+		return this->delimiter;
+	}
 	/** Set the delimiter field's value. */
-	void SetDelimiter(std::string delimiter);
+	void SetDelimiter(std::string delimiter) {
+		this->delimiter = delimiter;
+	}
 
 private:
 	std::string delimiter;

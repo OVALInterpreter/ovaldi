@@ -48,22 +48,28 @@ class EndFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete EndFunction object. */
-	EndFunction(std::string charIn = "");
-	~EndFunction();
+	EndFunction(std::string charIn = "") : character(charIn)
+	{}
+	virtual ~EndFunction()
+	{}
 
 	/** Parse the begin element and its child component element. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the character field's value. */
-	std::string GetCharacter();
+	std::string GetCharacter() const {
+		return this->character;
+	}
 	/** Set the character field's value. */
-	void SetCharacter(std::string charIn);
+	void SetCharacter(std::string charIn) {
+		this->character = charIn;
+	}
 
 private:
 	std::string character;

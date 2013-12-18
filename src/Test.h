@@ -173,12 +173,15 @@ public:
 	void AppendTestedItem(TestedItem* testedItem);
 
 	/** Return the testedVariables field's value **/
-	VariableValueVector* GetTestedVariables();
+	VariableValueVector GetTestedVariables() const
+	{ return testedVariables; }
 
 	/** Set the testedVariables field's value **/
-	void SetTestedVariables(VariableValueVector* testedVariables);
+	void SetTestedVariables(const VariableValueVector &testedVariables)
+	{ this->testedVariables = testedVariables; }
+
 	/** Add the specified TestedVariable to the set of tested variables **/
-	void AppendTestedVariable(VariableValue* testedVariable);
+	void AppendTestedVariable(const VariableValue &testedVariable);
 
     /** mark all the tested items as not evaluated. **/
     void MarkTestedItemsNotEvaluated();

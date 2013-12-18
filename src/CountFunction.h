@@ -41,17 +41,19 @@
 */
 class CountFunction : public AbsFunctionComponent {
 public:
-	CountFunction();
-	~CountFunction();
+	CountFunction()
+	{}
+	virtual ~CountFunction()
+	{}
 
 	/** Parse the count element and its child component elements. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Perform the count and return the result. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 };
 

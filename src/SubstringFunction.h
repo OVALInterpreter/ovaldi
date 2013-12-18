@@ -40,27 +40,38 @@ class SubstringFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete SubstringFunction object. */
-	SubstringFunction(int start = 0, int length = 0);
-	~SubstringFunction();
+	SubstringFunction(int start = 0, int length = 0)
+		: start(start), length(length)
+	{}
+	virtual ~SubstringFunction()
+	{}
 
 	/** Parse the substring element and its child component elements. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the values. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the start field's value. */
-	int GetStart();
+	int GetStart() const {
+		return this->start;
+	}
 	/** Set the start field's value. */
-	void SetStart(int start);
+	void SetStart(int start) {
+		this->start = start;
+	}
 
 	/** Get the length field's value. */
-	int GetLength();
+	int GetLength() const {
+		return this->length;
+	}
 	/** Set the length field's value. */
-	void SetLength(int length);
+	void SetLength(int length) {
+		this->length = length;
+	}
 
 private:
 	int start;

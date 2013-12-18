@@ -35,9 +35,6 @@
 #include <vector>
 #include <xercesc/dom/DOMElement.hpp>
 
-class VariableValue;
-typedef std::vector < VariableValue* > VariableValueVector;
-
 /**
 	This class represents a variable value.
 	Vairable values are used in the oval system characterisitcs schema and the oval results schema.
@@ -48,24 +45,24 @@ public:
 	~VariableValue();
 
 	void Parse(xercesc::DOMElement* variableValueElm);
-	void Write(xercesc::DOMElement* collectedObjectElm);
+	void Write(xercesc::DOMElement* collectedObjectElm) const;
 	void WriteTestedVariable(xercesc::DOMElement* parentElm);
 
-	std::string GetId();
+	std::string GetId() const;
 	void SetId(std::string id);
 
-	std::string GetValue();
+	std::string GetValue() const;
 	void SetValue(std::string value);
 
-	static void ClearCache();
+	/** Lets us use VariableValue objects as map keys. */
+	bool operator<(const VariableValue &other) const;
+	
 
 private:
 	std::string id;
 	std::string value;
-
-	static VariableValueVector vars;
 };
 
-typedef std::vector < VariableValue* > VariableValueVector;
+typedef std::vector < VariableValue > VariableValueVector;
 
 #endif

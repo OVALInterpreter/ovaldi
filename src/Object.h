@@ -61,13 +61,13 @@ class Object : public AbsObject {
 public:
     /** Create a complete object */
 	Object(std::string id = "", std::string comment = "", std::string xmlns = "", std::string name = "", int version = 1);
-	~Object();
+	virtual ~Object();
 
     /** Parse the provided object element into an object. */
-	void Parse(xercesc::DOMElement* objectElm);
+	virtual void Parse(xercesc::DOMElement* objectElm);
 
     /** Return a vector of variable values that were used for this object. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 	
     /** Set the behaviors field's value. */
 	BehaviorVector* GetBehaviors();

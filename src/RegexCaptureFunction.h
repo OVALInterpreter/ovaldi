@@ -49,22 +49,28 @@ class RegexCaptureFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete RegexCaptureFunction object. */
-	RegexCaptureFunction(std::string pattern = "");
-	~RegexCaptureFunction();
+	RegexCaptureFunction(std::string pattern = "") : pattern(pattern)
+	{}
+	virtual ~RegexCaptureFunction()
+	{}
 
 	/** Parse the substring element and its child component element. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the pattern field's value. */
-	std::string GetPattern();
+	std::string GetPattern() const {
+		return this->pattern;
+	}
 	/** Set the pattern field's value. */
-	void SetPattern(std::string pattern);
+	void SetPattern(std::string pattern) {
+		this->pattern = pattern;
+	}
 
 private:
 	std::string pattern;

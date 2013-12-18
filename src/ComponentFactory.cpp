@@ -57,7 +57,6 @@ AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
 
 	AbsComponent* absComponent = NULL;
 
-	// determine if this is a set object or a simple object
 	string elmName = XmlCommon::GetElementName(componentElm);
 	if(elmName.compare("variable_component")  == 0) {
 		absComponent = new VariableComponent();
