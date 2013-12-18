@@ -30,7 +30,7 @@
 
 #include <algorithm>
 #include <iterator>
-//#include <math.h>
+#include <math.h>
 #include <time.h>
 #include <cstdlib>
 #include <cstring>
