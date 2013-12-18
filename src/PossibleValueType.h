@@ -31,9 +31,10 @@
 #ifndef POSSIBLEVALUETYPE_H
 #define POSSIBLEVALUETYPE_H
 
-#include "Common.h"
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "OvalEnum.h"
-#include "EntityComparator.h"
 
 class PossibleValueType;
 
@@ -52,7 +53,7 @@ public:
 	{}
 
 	/** Parses a valid PossibleValueType element as defined in the oval definitions schema. */
-	void Parse(DOMElement* possibleElm);
+	void Parse(xercesc::DOMElement* possibleElm);
 
 	/** Ensure that the specified value matches the criteria specified by this possible_value element. */
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);

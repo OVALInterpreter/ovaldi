@@ -28,9 +28,13 @@
 //
 //****************************************************************************************//
 
+#include "EntityComparator.h"
+#include "XmlCommon.h"
+
 #include "RestrictionType.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									RestrictionType Class								  //	

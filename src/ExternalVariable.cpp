@@ -28,9 +28,21 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "AbsVariable.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "ExternalVariable.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									ExternalVariable Class								  //	
@@ -44,7 +56,8 @@ void ExternalVariable::Parse(DOMElement* externalVariableElm) {
 	this->SetId(XmlCommon::GetAttributeByName(externalVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(externalVariableElm, "datatype")));
 	string versionStr = XmlCommon::GetAttributeByName(externalVariableElm, "version");
-	int version = atoi(versionStr.c_str());
+	int version = 0;
+	Common::FromString(versionStr, &version);
 	this->SetVersion(version);
 
 	// Get all the possible elements' values
@@ -77,7 +90,7 @@ void ExternalVariable::Parse(DOMElement* externalVariableElm) {
 void ExternalVariable::ComputeValue() {
 
 	// get the external variables file
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* externalVariableDoc = NULL;
+	DOMDocument* externalVariableDoc = NULL;
 	try {
 		externalVariableDoc = DocumentManager::GetExternalVariableDocument();
 	} catch(Exception ex) {

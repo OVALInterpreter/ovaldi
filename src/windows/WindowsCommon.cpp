@@ -28,16 +28,27 @@
 //
 //****************************************************************************************//
 
+#include <aclapi.h>
+#include <lm.h>
+#include <Ntsecapi.h>
+#include <Sddl.h>
+#include <Authz.h>
+#include <comdef.h>
+#include <DelayImp.h>
+
 #include <tchar.h>
 #include <cctype>
 #include <cstring>
 #include <memory>
 #include <time.h>
 
+#include "Log.h"
 #include <ArrayGuard.h>
 #include <FreeGuard.h>
 #include <Common.h>
 #include "WindowsCommon.h"
+
+using namespace std;
 
 StringSet* WindowsCommon::allLocalUserSIDs = NULL;
 StringSet* WindowsCommon::allLocalGroupSIDs = NULL;

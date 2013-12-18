@@ -30,10 +30,15 @@
 
 #include <algorithm>
 #include <iterator>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "XmlCommon.h"
 
 #include "BeginFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	

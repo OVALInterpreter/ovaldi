@@ -31,6 +31,9 @@
 #ifndef CONSTANTVARIABLE_H
 #define CONSTANTVARIABLE_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsVariable.h"
 
 /**
@@ -46,7 +49,7 @@ public:
 	virtual ~ConstantVariable()
 	{}
 
-	virtual void Parse(DOMElement* constantVariableElm);
+	virtual void Parse(xercesc::DOMElement* constantVariableElm);
 
 	virtual VariableValueVector GetVariableValues() const {
 		return VariableValueVector();

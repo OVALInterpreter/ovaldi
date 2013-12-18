@@ -31,9 +31,11 @@
 #ifndef ABSENTITYVALUE_H
 #define ABSENTITYVALUE_H
 
+#include <string>
+#include <vector>
+
 #include "OvalEnum.h"
 
-XERCES_CPP_NAMESPACE_USE
 /**
 	This class represents an entity value in an entity as defined in the oval system characteristics schema.
 */

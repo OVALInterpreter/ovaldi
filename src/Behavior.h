@@ -31,10 +31,9 @@
 #ifndef BEHAVIOR_H
 #define BEHAVIOR_H
 
-#include "Common.h"
-
-XERCES_CPP_NAMESPACE_USE
-
+#include <vector>
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
 
 class Behavior;
 
@@ -55,7 +54,7 @@ public:
 	~Behavior();
 
 	/** Parses the set of behaviors specified on an object and returns then as a vector. */ 
-	static BehaviorVector* Parse(DOMElement* behaviorsElement);
+	static BehaviorVector* Parse(xercesc::DOMElement* behaviorsElement);
 
 	/** Get the value of a named behavior in the specified set of behaviors. */
 	static std::string GetBehaviorValue(BehaviorVector* behaviors, std::string name);

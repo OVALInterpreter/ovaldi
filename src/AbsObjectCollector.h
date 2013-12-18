@@ -34,42 +34,16 @@
 
 //	other includes
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
-#include <typeinfo>
 
-#include "Common.h"
 #include "OvalEnum.h"
 #include "Filter.h"
 #include "Object.h"
 #include "SetObject.h"
+#include "Set.h"
 #include "Item.h"
 #include "CollectedObject.h"
 #include "CollectedSet.h"
 #include "AbsProbe.h"
-
-// forward declarations
-class AbsProbe;
-class SetObject;
-class Object;
-class Set;
-class CollectedObject;
-class CollectedSet;
-class Filter;
-class AbsState;
-typedef std::vector < AbsState* > AbsStateVector;
-
-
-struct probe_comparator {
-  bool operator() ( AbsProbe * p1, AbsProbe * p2 ) {
-    return p1 < p2;
-  }
-};
-
-
-typedef std::set<AbsProbe *, probe_comparator> AbsProbeSet;
-
 
 /**
 	This class acts a base class for all platform specific object collectors.

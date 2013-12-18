@@ -31,10 +31,11 @@
 #ifndef SPLITFUNCTION_H
 #define SPLITFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "ComponentValue.h"
+#include "AbsFunctionComponent.h"
 
 /**
 	This class represents a SplitFunction component in a local_variable in the oval definition schema.
@@ -54,7 +55,7 @@ public:
 	virtual ~SplitFunction();
 
 	/** Parse the substring element and its child component element. */
-	virtual void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substrings and return the value. */
 	virtual ComponentValue* ComputeValue();

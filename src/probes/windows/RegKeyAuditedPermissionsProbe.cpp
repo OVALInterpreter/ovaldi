@@ -30,7 +30,12 @@
 
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
+#include "WindowsCommon.h"
+#include "RegistryFinder.h"
+
 #include "RegKeyAuditedPermissionsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              RegKeyAuditedPermissionsProbe Class                       //

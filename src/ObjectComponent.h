@@ -31,12 +31,9 @@
 #ifndef OBJECTCOMPONENT_H
 #define OBJECTCOMPONENT_H
 
+#include <string>
+
 #include "AbsComponent.h"
-#include "AbsObjectCollector.h"
-#include "ObjectReader.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a ObjectComponent in a local_variable in the oval definition schema.
@@ -54,7 +51,7 @@ public:
 	{}
 
     /** Parse the ObjectComponent element and populate the current ObjectComponent. */
-	virtual void Parse(DOMElement* componentElm);
+	virtual void Parse(xercesc::DOMElement* componentElm);
 
 
     /** Calculate the value of this ObjectComponent

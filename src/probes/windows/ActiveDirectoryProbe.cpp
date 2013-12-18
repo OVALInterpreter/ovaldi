@@ -27,7 +27,21 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
+//#include <Winldap.h>
+#include <LM.h>
+#include <dsgetdc.h>
+#include <activeds.h>
+#include <Sddl.h>
+#include <iomanip>
+
+#include "Log.h"
+#include "Common.h"
+#include "WindowsCommon.h"
+
 #include "ActiveDirectoryProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              ActiveDirectoryProbe Class                                //

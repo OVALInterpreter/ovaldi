@@ -31,8 +31,6 @@
 #ifndef REGKEYAUDITEDPERMISSIONS53PROBE_H
 #define REGKEYAUDITEDPERMISSIONS53PROBE_H
 
-#pragma warning(disable:4786)
-
 #include <string>
 #include "RegistryFinder.h"
 #include "AbsEffectiveRightsProbe.h"

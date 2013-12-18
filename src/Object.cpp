@@ -31,10 +31,18 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+#include "Common.h"
 
 #include "Object.h"
 
 using namespace std;
+using namespace xercesc;
 
 ObjectMap Object::objectCache;
 
@@ -142,11 +150,11 @@ void Object::Parse(DOMElement* objectElm) {
 	this->SetComment(XmlCommon::GetAttributeByName(objectElm, "comment"));
 	this->SetXmlns(XmlCommon::GetNamespace(objectElm));
 	string versionStr = XmlCommon::GetAttributeByName(objectElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 

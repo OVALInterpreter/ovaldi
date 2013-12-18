@@ -31,6 +31,8 @@
 #ifndef LOCALVARIABLE_H
 #define LOCALVARIABLE_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsVariable.h"
 #include "ComponentFactory.h"
 #include "VariableFactory.h"
@@ -49,7 +51,7 @@ public:
 	{}
 
 	/** Parse the provided local_variable element into a LocalVariable. */
-	virtual void Parse(DOMElement* localVariableElm);
+	virtual void Parse(xercesc::DOMElement* localVariableElm);
 
     /** Compute the value of the component.
         Create a VariableValue for each value in the returned ComponentValue

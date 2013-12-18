@@ -31,7 +31,9 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
-#include <set>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
 #include "Common.h"
 #include "ComponentFactory.h"
 #include "UniqueFunction.h"

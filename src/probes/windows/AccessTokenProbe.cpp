@@ -28,7 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <aclapi.h>
+#include <lm.h>
+#include <Ntsecapi.h>
+
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "AccessTokenProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								AccessTokenProbe Class									  //	

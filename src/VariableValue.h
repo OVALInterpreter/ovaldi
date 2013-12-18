@@ -31,9 +31,9 @@
 #ifndef VARIABLEVALUE_H
 #define VARIABLEVALUE_H
 
-#include "XmlCommon.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include <string>
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
 
 /**
 	This class represents a variable value.
@@ -44,9 +44,9 @@ public:
 	VariableValue(std::string id = "", std::string value = "");
 	~VariableValue();
 
-	void Parse(DOMElement* variableValueElm);
-	void Write(DOMElement* collectedObjectElm) const;
-	void WriteTestedVariable(DOMElement* parentElm);
+	void Parse(xercesc::DOMElement* variableValueElm);
+	void Write(xercesc::DOMElement* collectedObjectElm) const;
+	void WriteTestedVariable(xercesc::DOMElement* parentElm);
 
 	std::string GetId() const;
 	void SetId(std::string id);

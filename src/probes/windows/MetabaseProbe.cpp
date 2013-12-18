@@ -28,8 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <windows.h>
+#include <initguid.h>
+#include <iiscnfg.h>
 #include <iomanip>
 #include <sstream>
+
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "MetabaseProbe.h"
 
 using namespace std;

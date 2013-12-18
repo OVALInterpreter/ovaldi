@@ -34,6 +34,7 @@
 #include <iomanip>
 #include <iterator>
 #include <sstream>
+#include <fstream>
 #include <dirent.h>
 #include <sys/stat.h>
 

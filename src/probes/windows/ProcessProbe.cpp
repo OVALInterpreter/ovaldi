@@ -28,7 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
+#include <Psapi.h>
+#include <tlhelp32.h>
+
+#include "WindowsCommon.h"
+#include "WMIUtil.h"
+
 #include "ProcessProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              ProcessProbe Class                                 //

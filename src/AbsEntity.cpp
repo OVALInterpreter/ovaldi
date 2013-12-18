@@ -32,8 +32,12 @@
 #include <cassert>
 #include <iterator>
 
+#include "Log.h"
+#include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
+#include "AbsEntity.h"
+
 #include "AbsEntity.h"
 
 using namespace std;

@@ -31,10 +31,10 @@
 #ifndef ENDFUNCTION_H
 #define ENDFUNCTION_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a EndFunction component in a local_variable in the oval definition schema.
@@ -52,7 +52,7 @@ public:
 	virtual ~EndFunction();
 
 	/** Parse the begin element and its child component element. */
-	virtual void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute and return the value. */
 	virtual ComponentValue* ComputeValue();

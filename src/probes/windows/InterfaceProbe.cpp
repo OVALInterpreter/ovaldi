@@ -35,6 +35,7 @@
 
 #include <FreeGuard.h>
 #include <VectorPtrGuard.h>
+#include "WindowsCommon.h"
 
 #include "InterfaceProbe.h"
 

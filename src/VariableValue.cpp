@@ -28,9 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
+#include "XmlCommon.h"
+
 #include "VariableValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableValue Class										  //	
@@ -103,12 +110,8 @@ void VariableValue::Write(DOMElement* collectedObjectElm) const {
 	// -----------------------------------------------------------------------
 
 	// Create new item element
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
-	string elementName("variable_value");
-	XMLCh* name = XMLString::transcode(elementName.c_str());
-	DOMElement* newVariableValueElem = scFile->createElement(name);
-	//Free memory allocated by XMLString::transcode(char*)
-	XMLString::release(&name);
+	DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
+	DOMElement* newVariableValueElem = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "variable_value");
 	collectedObjectElm->appendChild(newVariableValueElem);
 
 	// Add the attributes
@@ -133,10 +136,10 @@ void VariableValue::WriteTestedVariable(DOMElement* parentElm) {
 	// -----------------------------------------------------------------------
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new tested_item element
-	DOMElement* testedVarElm = XmlCommon::AddChildElement(resultDoc, parentElm, "tested_variable", this->GetValue());
+	DOMElement* testedVarElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "tested_variable", this->GetValue());
 
 	// add the attributes
 	XmlCommon::AddAttribute(testedVarElm, "variable_id", this->GetId());

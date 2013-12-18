@@ -28,9 +28,13 @@
 //
 //****************************************************************************************//
 
+#include "VariableFactory.h"
+#include "XmlCommon.h"
+
 #include "VariableComponent.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableComponent Class									  //	

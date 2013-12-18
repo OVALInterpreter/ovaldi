@@ -45,6 +45,8 @@
 #include <OutOfMemoryException.h>
 #include <SocketGuard.h>
 #include <Log.h>
+#include <Common.h>
+
 #include <NetworkInterfaces.h>
 
 using namespace std;

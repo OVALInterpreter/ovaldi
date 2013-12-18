@@ -33,15 +33,11 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
 
 #include "Item.h"
 #include "VariableValue.h"
 #include "Exception.h"
 #include "OvalEnum.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents an CollectedSet in an oval definition schema.

@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#include <cerrno>
 #include <cctype>
 #include <cstring>
 #include <fstream>
@@ -46,6 +47,8 @@
 #include <VectorPtrGuard.h>
 #include <DirGuard.h>
 #include <NetworkInterfaces.h>
+#include <Log.h>
+
 #include "IfListenersProbe.h"
 
 using namespace std;

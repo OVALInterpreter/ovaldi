@@ -31,14 +31,10 @@
 #ifndef FILEAUDITEDPERMISSIONSPROBE_H
 #define FILEAUDITEDPERMISSIONSPROBE_H
 
-#pragma warning(disable:4786)
-
 #include <Windows.h>
-#include "FileFinder.h"
+#include <string>
+
 #include "AbsEffectiveRightsProbe.h"
-
-using namespace std;
-
 
 /**
     This class is responsible for collecting file information for windows fileauditedpermissions_objects.
@@ -68,14 +64,14 @@ class FileAuditedPermissionsProbe : public AbsEffectiveRightsProbe {
          *  @param trusteeName A string that contains the trustee name of the file that you want to get the audited permissions of.
          *  @return The item that contains the file audited permissions of the specified path, filename, and trustee name.
          */
-        Item* GetAuditedPermissions ( HANDLE fileHandle, string path, string fileName, string trusteeName );
+        Item* GetAuditedPermissions ( HANDLE fileHandle, std::string path, std::string fileName, std::string trusteeName );
 
         /** Get the string representation of the audited permissions.
          *  @param success An ACCESS_MASK that represents the successful audit permissions.
          *  @param failure An ACCESS_MASK that represents the failure audit permissions.
          *  @return The string representation of the audited permissions.
          */
-        string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
+        std::string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
 
         /** The static instance of the FileAuditedPermissionsProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.

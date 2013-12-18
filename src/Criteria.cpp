@@ -28,9 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ExtendedDefinition.h"
+#include "Criterion.h"
+#include "Analyzer.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "Criteria.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								AbsCriteria Class										  //	
@@ -135,10 +146,10 @@ void Criteria::Write(DOMElement* parentElm) {
 	// -----------------------------------------------------------------------
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
-	DOMElement* criteriaElm = XmlCommon::AddChildElement(resultDoc, parentElm, "criteria");
+	DOMElement* criteriaElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "criteria");
 
 	// add the attributes
 	XmlCommon::AddAttribute(criteriaElm, "operator", OvalEnum::OperatorToString(this->GetOperator()));

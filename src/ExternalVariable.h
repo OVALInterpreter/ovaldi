@@ -31,10 +31,10 @@
 #ifndef EXTERNALVARIABLE_H
 #define EXTERNALVARIABLE_H
 
-#include "AbsVariable.h"
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "PossibleValueType.h"
 #include "PossibleRestrictionType.h"
-#include "DocumentManager.h"
 
 /**
 	This class represents an external_variable in the oval definition schema.
@@ -49,7 +49,7 @@ public:
 	{}
 
 	/** Parse the provided ExternalVariable element into a ExternalVariable. */
-	virtual void Parse(DOMElement* externalVariableElm);
+	virtual void Parse(xercesc::DOMElement* externalVariableElm);
 
 	/** Fetch the variable from the external-variables.xml file.
 		Then get each value associated with the variable.

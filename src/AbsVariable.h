@@ -33,18 +33,15 @@
 
 //	other includes
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 #include <map>
 #include <utility>
 
-#include "Common.h"
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "StdTypedefs.h"
 #include "Exception.h"
 #include "OvalEnum.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 class AbsVariable;
 
@@ -70,7 +67,7 @@ public:
 		if (msgs) delete msgs;
 	}
 
-	virtual void Parse(DOMElement*) = 0;
+	virtual void Parse(xercesc::DOMElement*) = 0;
 
 	virtual VariableValueVector GetVariableValues() const = 0;
 	

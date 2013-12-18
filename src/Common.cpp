@@ -28,6 +28,22 @@
 //
 //****************************************************************************************//
 
+#include <time.h>
+#include <algorithm>
+#include <iostream>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "REGEX.h"
+
+#ifdef WIN32
+	#include <windows.h>
+#endif
+
 #include "Common.h"
 
 using namespace std;
@@ -342,7 +358,8 @@ void Common::SetResultsSchematronPath(string path) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 StringVector* Common::ParseDefinitionIdsFile() {
-		
+	using namespace xercesc;
+
 	string definitinIdsFile = Common::GetDefinitionIdsFile();
 
 	Log::Debug("Parsing definition id file for limited definition evaluation. \"" + definitinIdsFile + "\"");
@@ -391,9 +408,8 @@ StringVector* Common::ParseDefinitionIdsString() {
 	Log::UnalteredMessage(logMessage);
 
 	// validate the format of the string
-	REGEX* regex = new REGEX();
-	if(!regex->IsMatch(Common::DEFINITION_ID_LIST.c_str(), definitionIdsString.c_str())) {
-		delete regex;
+	REGEX regex;
+	if(!regex.IsMatch(Common::DEFINITION_ID_LIST.c_str(), definitionIdsString.c_str())) {
 		throw Exception("Error: Invalid parameter format. Expected a comma separated list of definition ids. No spaces are allowed.");
 	}
 
@@ -409,7 +425,6 @@ StringVector* Common::ParseDefinitionIdsString() {
 		if(theString != NULL) {
 			free(theString);
 		}
-		delete regex;
 		delete definitionIds;
 		throw Exception("Error parsing definition id list. A delimiter was found, but no definition ids were found. Input version string: \'" + definitionIdsString + "\'");
 	} else {
@@ -419,12 +434,11 @@ StringVector* Common::ParseDefinitionIdsString() {
 			string tokenStr = token;
 			
 			// make sure it is a valid dafinition id
-			if(!regex->IsMatch(Common::DEFINITION_ID.c_str(), definitionIdsString.c_str())) {
+			if(!regex.IsMatch(Common::DEFINITION_ID.c_str(), definitionIdsString.c_str())) {
 				if(theString != NULL) {
 					free(theString);
 				}	
 				delete definitionIds;
-				delete regex;
 				throw Exception("Error: Invalid parameter format. Expected a comma separated list of definition ids. No spaces are allowed. Found invalid definition id");
 			}
 
@@ -439,7 +453,6 @@ StringVector* Common::ParseDefinitionIdsString() {
 	if(theString != NULL) {
 		free(theString);
 	}
-	delete regex;
 
 	return definitionIds;
 }

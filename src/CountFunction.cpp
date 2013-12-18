@@ -32,8 +32,14 @@
 #include <iterator>
 #include <memory>
 #include <cstddef>
-#include "CountFunction.h"
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
 #include "ComponentFactory.h"
+#include "Common.h"
+
+#include "CountFunction.h"
 
 using namespace std;
 using namespace xercesc;

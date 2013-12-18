@@ -31,10 +31,10 @@
 #ifndef ARITHMETICFUNCTION_H
 #define ARITHMETICFUNCTION_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a ArithmeticFunction component in a local_variable in the 
@@ -53,7 +53,7 @@ public:
 	virtual ~ArithmeticFunction();
 
 	/** Parse the begin element and its child component element. */
-	virtual void Parse(DOMElement* componentElm);
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute and return the value. */
 	virtual ComponentValue* ComputeValue();

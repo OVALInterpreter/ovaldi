@@ -31,12 +31,12 @@
 #ifndef OBJECTREADER_H
 #define OBJECTREADER_H
 
-#include "Common.h"
-#include "DocumentManager.h"
+#include <string>
+
+#include "OvalEnum.h"
 #include "Item.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include "StdTypedefs.h"
 
 /**
 	This class reads collected objects in a system characteristics files.

@@ -28,8 +28,12 @@
 //
 //****************************************************************************************//
 
-#include "StateOrObjectFieldEntityValue.h"
+#include "Log.h"
 #include "VariableFactory.h"
+#include "EntityComparator.h"
+#include "XmlCommon.h"
+
+#include "StateOrObjectFieldEntityValue.h"
 
 using namespace std;
 using namespace xercesc;

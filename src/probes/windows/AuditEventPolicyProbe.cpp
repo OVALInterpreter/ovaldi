@@ -28,8 +28,24 @@
 //
 //****************************************************************************************//
 
+#include <windows.h>
+#include <Ntsecapi.h>
+
 #include <Common.h>
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "AuditEventPolicyProbe.h"
+
+namespace {
+	/** Read the Audit options and set the value of the ItemEntity.
+		LSA Policy defines a mask for the valid event auditing options. 
+		The POLICY_AUDIT_EVENT_MASK mask evaluates to TRUE if it is set 
+		equal to any of the preceding event auditing options.
+	*/
+	void ReadAuditOptions(Item* item, ItemEntity* itemElm, ULONG auditPolicy);
+
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  AuditEventPolicyProbe Class  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -150,31 +166,31 @@ ItemVector* AuditEventPolicyProbe::CollectItems(Object* /*object*/) {
 
 				switch (i) {
 					case AuditCategorySystem:
-						this->ReadAuditOptions(item, systemItem, current); 
+						ReadAuditOptions(item, systemItem, current); 
 						break;
 					case AuditCategoryLogon:
-						this->ReadAuditOptions(item, logonItem, current); 
+						ReadAuditOptions(item, logonItem, current); 
 						break;
 					case AuditCategoryObjectAccess:
-						this->ReadAuditOptions(item, objectAccessItem, current); 
+						ReadAuditOptions(item, objectAccessItem, current); 
 						break;
 					case AuditCategoryPrivilegeUse:
-						this->ReadAuditOptions(item, privilegeUseItem, current); 
+						ReadAuditOptions(item, privilegeUseItem, current); 
 						break;
 					case AuditCategoryDetailedTracking:
-						this->ReadAuditOptions(item, detailedTrackingItem, current); 
+						ReadAuditOptions(item, detailedTrackingItem, current); 
 						break;
 					case AuditCategoryPolicyChange:
-						this->ReadAuditOptions(item, policyChangeItem, current); 
+						ReadAuditOptions(item, policyChangeItem, current); 
 						break;
 					case AuditCategoryAccountManagement:
-						this->ReadAuditOptions(item, accountManagementItem, current); 
+						ReadAuditOptions(item, accountManagementItem, current); 
 						break;
 					case AuditCategoryDirectoryServiceAccess:
-						this->ReadAuditOptions(item, directoryServiceAccessItem, current); 
+						ReadAuditOptions(item, directoryServiceAccessItem, current); 
 						break;
 					case AuditCategoryAccountLogon:
-						this->ReadAuditOptions(item, accountLogonItem, current); 
+						ReadAuditOptions(item, accountLogonItem, current); 
 						break;
 					default:
 						Log::Info("Unknown POLICY_AUDIT_EVENT_TYPE. ");
@@ -229,47 +245,51 @@ Item* AuditEventPolicyProbe::CreateItem() {
 	return item;
 }
 
-void AuditEventPolicyProbe::ReadAuditOptions(Item* item, ItemEntity* itemEntity, ULONG auditPolicy) {
+namespace {
 
-	if(auditPolicy & POLICY_AUDIT_EVENT_NONE) {
-        itemEntity->SetValue("AUDIT_NONE");
-		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
-	} else if(auditPolicy & POLICY_AUDIT_EVENT_FAILURE && auditPolicy & POLICY_AUDIT_EVENT_SUCCESS) {
-		itemEntity->SetValue("AUDIT_SUCCESS_FAILURE");
-		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
-	} else if(auditPolicy & POLICY_AUDIT_EVENT_FAILURE) {
-		itemEntity->SetValue("AUDIT_FAILURE");
-		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
-	} else if(auditPolicy & POLICY_AUDIT_EVENT_SUCCESS) {
-		itemEntity->SetValue("AUDIT_SUCCESS");
-		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
-	} else if (auditPolicy == POLICY_AUDIT_EVENT_UNCHANGED){
-		// Originally I thought that I should not get here. 
-		// These are my original notes on this:
-		// For some reason we seem to hit this condition 
-		// when looking at the permissions for AuditCategoryDetailedTracking
-		// As documented at the link below i would not expect to get this value 
-		// after doing a query. The value should only be used when doing a set.
-		// Reference url:
-		// http://msdn2.microsoft.com/en-us/library/ms721901.aspx
+	void ReadAuditOptions(Item* item, ItemEntity* itemEntity, ULONG auditPolicy) {
 
-		// I have now looked into this a bit more. This appears to be the value
-		// we get when the the auditing option is not set in the gui. I verified 
-		// this through testing. I have not been able to verify it through the 
-		// Microsoft API documentation. For now i think it is safe to assume that 
-		// this value can be treated as AUDIT_NONE.
-		//
+		if(auditPolicy & POLICY_AUDIT_EVENT_NONE) {
+			itemEntity->SetValue("AUDIT_NONE");
+			itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else if(auditPolicy & POLICY_AUDIT_EVENT_FAILURE && auditPolicy & POLICY_AUDIT_EVENT_SUCCESS) {
+			itemEntity->SetValue("AUDIT_SUCCESS_FAILURE");
+			itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else if(auditPolicy & POLICY_AUDIT_EVENT_FAILURE) {
+			itemEntity->SetValue("AUDIT_FAILURE");
+			itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else if(auditPolicy & POLICY_AUDIT_EVENT_SUCCESS) {
+			itemEntity->SetValue("AUDIT_SUCCESS");
+			itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else if (auditPolicy == POLICY_AUDIT_EVENT_UNCHANGED){
+			// Originally I thought that I should not get here. 
+			// These are my original notes on this:
+			// For some reason we seem to hit this condition 
+			// when looking at the permissions for AuditCategoryDetailedTracking
+			// As documented at the link below i would not expect to get this value 
+			// after doing a query. The value should only be used when doing a set.
+			// Reference url:
+			// http://msdn2.microsoft.com/en-us/library/ms721901.aspx
 
-		itemEntity->SetValue("AUDIT_NONE");
-		itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+			// I have now looked into this a bit more. This appears to be the value
+			// we get when the the auditing option is not set in the gui. I verified 
+			// this through testing. I have not been able to verify it through the 
+			// Microsoft API documentation. For now i think it is safe to assume that 
+			// this value can be treated as AUDIT_NONE.
+			//
 
-		/*Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.");
-		item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.", OvalEnum::LEVEL_WARNING));
-		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);*/
-	} else {
-		// should never get here
-		Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found.");
-		item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found.", OvalEnum::LEVEL_WARNING));
-		itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
-	} 
+			itemEntity->SetValue("AUDIT_NONE");
+			itemEntity->SetStatus(OvalEnum::STATUS_EXISTS);
+
+			/*Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.");
+			item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found: POLICY_AUDIT_EVENT_UNCHANGED.", OvalEnum::LEVEL_WARNING));
+			itemEntity->SetStatus(OvalEnum::STATUS_ERROR);*/
+		} else {
+			// should never get here
+			Log::Debug("Unexpected POLICY_AUDIT_EVENT_TYPE found.");
+			item->AppendMessage(new OvalMessage(itemEntity->GetName() + " policy - Unexpected POLICY_AUDIT_EVENT_TYPE found.", OvalEnum::LEVEL_WARNING));
+			itemEntity->SetStatus(OvalEnum::STATUS_ERROR);
+		} 
+	}
+
 }

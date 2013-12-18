@@ -28,9 +28,14 @@
 //
 //****************************************************************************************//
 
+#include "Analyzer.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "ExtendedDefinition.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ExtendedDefinition Class								  //	
@@ -74,10 +79,10 @@ void ExtendedDefinition::SetDefinitionRef(Definition* definitionRef) {
 void ExtendedDefinition::Write(DOMElement* parentElm) {
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new criteria element
-	DOMElement* extendedDefinitionElm = XmlCommon::AddChildElement(resultDoc, parentElm, "extend_definition");
+	DOMElement* extendedDefinitionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "extend_definition");
 
 	// add the attributes
 	XmlCommon::AddAttribute(extendedDefinitionElm, "definition_ref", this->GetDefinitionRef()->GetId());

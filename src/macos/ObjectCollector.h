@@ -35,9 +35,6 @@
 #include "AbsObjectCollector.h"
 #include "ProbeFactory.h"
 
-//	namespaces
-XERCES_CPP_NAMESPACE_USE
-
 /**
 	The object collector for linux definitions.
 */

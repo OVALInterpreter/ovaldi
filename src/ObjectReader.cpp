@@ -28,9 +28,18 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "Common.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+
 #include "ObjectReader.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ObjectReader Class										  //	

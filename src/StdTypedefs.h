@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2013, The MITRE Corporation
+// Copyright (c) 2002-2012, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,62 +28,52 @@
 //
 //****************************************************************************************//
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef STDTYPEDEFS_H
+#define STDTYPEDEFS_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-	#include "WindowsCommon.h"
-	#include <windows.h>
-#endif
+/*
 
-#ifdef LINUX
-#  define STRNICMP strnicmp
-#elif defined SUNOS
-#  define STRNICMP strncasecmp
-#elif defined DARWIN
-#  define STRNICMP strnicmp
-#endif
+I decided it doesn't make sense to pull in all the stuff in Common.h
+just to get a few typedefs.  So I am factoring the typedefs out to
+this header.
 
+*/
 
-#define EXIT_SUCCESS	0
-#define	EXIT_FAILURE	1
-
-
-//	other includes
-#include <time.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
+#include <set>
 
+/**
+	A vector for storing strings.
+*/
+typedef std::vector < std::string > StringVector;
 
-#include "XmlProcessor.h"
-#include "AbsDataCollector.h"
-#include "Version.h"
-#include "Analyzer.h"
-#include "DocumentManager.h"
-#include "DataCollector.h"
-#include "XslCommon.h"
-#include "EntityComparator.h"
-#include "OvalEnum.h"
-#include "Directive.h"
+/**
+    A set for storing unique strings.
+*/
+typedef std::set < std::string > StringSet;
 
+/**
+	A vector for storing integers.
+*/
+typedef std::vector < int > IntVector;
 
-#define BUFFER_SIZE 4096
+/**
+	A vector for storing long long integers.
+*/
+typedef std::vector < long long > LongLongVector;
 
-/** The starting point for the application. */
-int main(int argc, char* argv[]);
+/**	
+	A pair for storing two related strings.
+*/
+typedef std::pair < std::string, std::string > StringPair;
 
-/** 
- *  Processes the commandline arguments and enforces required arguments. 
- *  There must be at least two arguments.  The program name and the xmlfile hash. (or
- *  the -m flag signifing no hash is required)
- */
-void ProcessCommandLine(int argc, char* argv[]);
+/**	
+	A vector for storing pairs of strings.
+*/
+typedef std::vector < StringPair* > StringPairVector;
 
-/** Prints out a list of option flags that can be used with this exe. */
-void Usage();
 
 #endif
+

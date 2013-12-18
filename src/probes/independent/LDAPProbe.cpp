@@ -31,6 +31,17 @@
 #include <sstream>
 #include <iomanip>
 
+#ifdef WIN32
+#  include <Windows.h> // defines symbols needed by <LM.h>
+#  include <LM.h>
+#  include <Dsgetdc.h>
+#  include <Winldap.h> // defines symbols needed by <Winber.h>
+#  include <Winber.h>
+#endif
+
+#include "REGEX.h"
+#include "Log.h"
+
 #include "LDAPProbe.h"
 
 using namespace std;
@@ -409,6 +420,7 @@ string LDAPProbe::GetObjectClass ( string suffixStr, string relativeDnStr ) {
 string LDAPProbe::GetLDAPServerLocation() {
 	
 	#ifdef WIN32
+
 	DOMAIN_CONTROLLER_INFO* DomainControllerInfo = NULL;
 	DWORD dReturn = 0L;
 	ULONG dcFlags;
@@ -424,9 +436,9 @@ string LDAPProbe::GetLDAPServerLocation() {
 	} else {
 		throw ProbeException ( "Error: DsGetDcName() was unable to retrieve the name of the specified domain controller." );
 	}
-	#endif
 
-	#if defined (LINUX) || defined (DARWIN)
+	#elif defined (LINUX) || defined (DARWIN)
+
 	string pathStr = "/etc/";
 	string fileNameStr = "ldap.conf";
 	string bufferStr;
@@ -455,6 +467,11 @@ string LDAPProbe::GetLDAPServerLocation() {
 	}
 
 	return "";
+
+	#else
+
+	return "";
+	
 	#endif
 }
 

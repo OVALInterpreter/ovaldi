@@ -31,18 +31,9 @@
 #ifndef OBJECTCOLLECTOR_H
 #define OBJECTCOLLECTOR_H
 
-#include <windows.h>
-#include <iphlpapi.h>
-#include <vector>
-
 //	include the parent class.
 #include "AbsObjectCollector.h"
-#include "ProbeFactory.h"
-
-
-//	namespaces
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
+#include "AbsProbe.h"
 
 /**
 	The object collector for windows definitions.

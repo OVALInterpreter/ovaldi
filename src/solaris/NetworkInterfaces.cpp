@@ -37,6 +37,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include <cstdlib>
 #include <iomanip>
 #include <sstream>
 
@@ -45,6 +46,7 @@
 #include <OutOfMemoryException.h>
 #include <SocketGuard.h>
 #include <Log.h>
+#include <Common.h>
 
 #include <NetworkInterfaces.h>
 

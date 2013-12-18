@@ -28,9 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
+#include "XmlCommon.h"
+
 #include "StringEntityValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								StringEntityValue Class										  //	
@@ -48,7 +54,7 @@ StringEntityValue::~StringEntityValue(){
 
 }
 
-void StringEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm){
+void StringEntityValue::Write(DOMDocument* scFile, DOMElement* entityElm){
     XMLCh *name = XMLString::transcode(this->GetValue().c_str());
 	DOMText* newItemEntityElemValue = scFile->createTextNode(name);
 	entityElm->appendChild(newItemEntityElemValue);

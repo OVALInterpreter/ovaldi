@@ -28,10 +28,22 @@
 //
 //****************************************************************************************//
 
+#include <comdef.h>
+#include <Dsgetdc.h>
+#include <Lm.h>
+#include <Wbemidl.h>
+#include <Wmiutils.h>
+#include <windows.h>
+
+#include "AbsEntityValue.h"
 #include <ArrayGuard.h>
 #include <ItemFieldEntityValue.h>
+#include "WindowsCommon.h"
+#include "Log.h"
 
 #include "WMI57Probe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								WMI57Probe Class											  //	

@@ -32,16 +32,9 @@
 
 //	other includes
 #include <string>
-#include <iostream>
-#include <sstream>
 
-#include "Common.h" 
 #include "Exception.h" 
-#include "LocalVariable.h"
-#include "ConstantVariable.h"
-#include "ExternalVariable.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include "AbsVariable.h"
 
 /**
 	This class provides a single interface to all variable classes.
@@ -50,9 +43,6 @@ XERCES_CPP_NAMESPACE_USE
 class VariableFactory {
 public:
 	static AbsVariable* GetVariable(std::string varId);
-
-private:
-	static DOMElement* variablesElm;
 };
 
 /** 

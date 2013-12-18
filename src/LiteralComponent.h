@@ -31,10 +31,9 @@
 #ifndef LITERALCOMPONENT_H
 #define LITERALCOMPONENT_H
 
+#include <string>
+
 #include "AbsComponent.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a LiteralComponent in a local_variable in the oval definition schema
@@ -46,7 +45,7 @@ public:
 	virtual ~LiteralComponent()
 	{}
 
-	virtual void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 	virtual ComponentValue* ComputeValue();
 
 	virtual VariableValueVector GetVariableValues() {

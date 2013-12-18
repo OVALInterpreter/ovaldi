@@ -30,9 +30,16 @@
 
 #include <memory>
 
+#include "AbsObject.h"
+#include "SetObject.h"
+#include "Object.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+
 #include "ObjectFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 // ***************************************************************************************	//
 //								 Public members												//

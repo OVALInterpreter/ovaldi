@@ -28,11 +28,53 @@
 //
 //****************************************************************************************//
 
-#include "Main.h"
+//	other includes
+#include <time.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <xercesc/util/PlatformUtils.hpp>
+
+#ifdef WIN32
+	#include <comdef.h>
+	#include "WindowsCommon.h"
+#endif
+
+#include "Digest.h"
+#include "XmlProcessor.h"
+#include "AbsDataCollector.h"
+#include "Version.h"
+#include "Analyzer.h"
+#include "DocumentManager.h"
+#include "DataCollector.h"
+#include "XslCommon.h"
+#include "XmlCommon.h"
+#include "EntityComparator.h"
+#include "OvalEnum.h"
+#include "Directive.h"
+#include "Log.h"
+#include "Noncopyable.h"
+
+#define EXIT_SUCCESS	0
+#define	EXIT_FAILURE	1
+#define BUFFER_SIZE 4096
 
 using namespace std;
+using namespace xercesc;
 
 namespace {
+	/** 
+	 *  Processes the commandline arguments and enforces required arguments. 
+	 *  There must be at least two arguments.  The program name and the xmlfile hash. (or
+	 *  the -m flag signifing no hash is required)
+	 */
+	void ProcessCommandLine(int argc, char* argv[]);
+
+	/** Prints out a list of option flags that can be used with this exe. */
+	void Usage();
+
 #ifdef WIN32
 	/**
 	 * Checks if we're a 32-bit process running under 64-bit
@@ -46,6 +88,19 @@ namespace {
 	 * \return true if validation succeeded, false if validation failed.
 	 */
 	bool SchematronValidate(const string &fileToValidate, const string &schematronXSLFile);
+
+	/**
+	 * Enables exception-safe init/de-init of Xerces.
+	 */
+	class XercesInitializer : private Noncopyable {
+	public:
+		XercesInitializer() {
+			XMLPlatformUtils::Initialize();
+		}
+		~XercesInitializer() {
+			XMLPlatformUtils::Terminate();
+		}
+	};
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -230,8 +285,7 @@ int main(int argc, char* argv[]) {
 		// This means that without the second check, if the supplied datafile hash is only
 		// the first character of the real hash, then the test will succeed.
 
-		if ((STRNICMP(hashBuf.c_str(), Common::GetXMLfileMD5().c_str(), Common::GetXMLfileMD5().length()) != 0) ||
-			(STRNICMP(Common::GetXMLfileMD5().c_str(), hashBuf.c_str(), hashBuf.length()) != 0))
+		if (!Common::EqualsIgnoreCase(hashBuf, Common::GetXMLfileMD5()))
 		{
 			string errorMessage = "";
 
@@ -245,6 +299,9 @@ int main(int argc, char* argv[]) {
 			exit( EXIT_FAILURE );
 		}
 	}
+
+	// Important: gotta initialize Xerces to do any XML processing!
+	XercesInitializer xercesInit;
 
 	//////////////////////////////////////////////////////
 	////////////  parse oval.xml file	//////////////////
@@ -517,6 +574,8 @@ int main(int argc, char* argv[]) {
 	return 0;
 
 }
+
+namespace {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Functions  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -980,8 +1039,6 @@ void Usage() {
 	cout << "   -z           = return md5 of current oval-definitions file." << endl;
 	cout << endl;
 }
-
-namespace {
 
 #ifdef WIN32
 	void CheckWow64() {

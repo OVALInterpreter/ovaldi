@@ -30,9 +30,15 @@
 
 #include <algorithm>
 #include <iterator>
+#include "Common.h"
+#include "XmlCommon.h"
+#include "AbsDataCollector.h"
+#include "DocumentManager.h"
+
 #include "CollectedObject.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								CollectedObject Class									  //	
@@ -459,7 +465,7 @@ void CollectedObject::AppendVariableValues(const VariableValueVector &vars) {
 	copy(vars.begin(), vars.end(), back_inserter(variableValues));
 }
 
-void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* collectedObjectsElm) {
+void CollectedObject::Write(DOMDocument* scFile, DOMElement* collectedObjectsElm) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -469,7 +475,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 	// -----------------------------------------------------------------------
 
 	// Create a new object element
-	DOMElement *newCollectedObjectElem = XmlCommon::AddChildElement(scFile, collectedObjectsElm, "object");
+	DOMElement *newCollectedObjectElem = XmlCommon::AddChildElementNS(scFile, collectedObjectsElm, XmlCommon::scNS, "object");
 
 	// Add the attributes
 	// handling defaults in the schema
@@ -490,7 +496,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 		OvalMessageVector::iterator messageIterator;
 		for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
 			OvalMessage* message = (*messageIterator);
-			message->Write(scFile, newCollectedObjectElem, "oval-sc");
+			message->Write(scFile, newCollectedObjectElem, "", XmlCommon::scNS);
 		}
 	}
 
@@ -517,11 +523,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 				reference->Write(scFile, AbsDataCollector::Instance()->GetSCSystemDataElm());
 
 				// add the reference to the collected obj element
-				string refElementName = "reference";
-				XMLCh* name = XMLString::transcode(refElementName.c_str());
-				DOMElement *newReferenceElm = scFile->createElement(name);
-				//Free memory allocated by XMLString::transcode(char*)
-				XMLString::release(&name);
+				DOMElement *newReferenceElm = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "reference");
 				newCollectedObjectElem->appendChild(newReferenceElm);
 				string idStr = Common::ToString(reference->GetId());
 				XmlCommon::AddAttribute(newReferenceElm, "item_ref", idStr);
