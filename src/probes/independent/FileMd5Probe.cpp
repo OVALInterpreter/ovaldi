@@ -41,6 +41,9 @@
 #  define FS_REDIRECT_GUARD_END
 #endif
 
+#include "FileFinder.h"
+#include "Log.h"
+
 #include "FileMd5Probe.h"
 
 using namespace std;

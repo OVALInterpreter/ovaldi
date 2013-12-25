@@ -31,10 +31,8 @@
 #ifndef FILEMD5PROBE_H
 #define FILEMD5PROBE_H
 
-#include "FileFinder.h"
 #include "AbsProbe.h"
 #include <Digest.h>
-
 
 /**
 	This class is responsible for collecting file md5 data.

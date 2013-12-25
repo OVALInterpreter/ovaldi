@@ -31,7 +31,6 @@
 #ifndef ABSFILEFINDER_H
 #define ABSFILEFINDER_H
 
-#include "Log.h"
 #include "Common.h"
 #include "Exception.h"
 #include "REGEX.h"

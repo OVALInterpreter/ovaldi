@@ -30,6 +30,9 @@
 
 #include <memory>
 #include <algorithm>
+
+#include "Log.h"
+
 #include "AbsFileFinder.h"
 
 using namespace std;
