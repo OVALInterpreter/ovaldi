@@ -39,6 +39,7 @@
 
 #include <DirGuard.h>
 #include <EntityComparator.h>
+#include <Log.h>
 
 #include "FileFinder.h"
 

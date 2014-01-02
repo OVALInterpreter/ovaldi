@@ -43,6 +43,7 @@
 #include <Behavior.h>
 #include <Common.h>
 #include <FileFinder.h>
+#include <Log.h>
 #include <REGEX.h>
 #include <VectorPtrGuard.h>
 #include <DirGuard.h>

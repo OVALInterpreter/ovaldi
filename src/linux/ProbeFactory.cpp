@@ -31,6 +31,7 @@
 #include <set>
 
 //	include the probe classes
+#include "Log.h"
 #include "FileProbe.h"
 #include "FileMd5Probe.h"
 #include "FileHashProbe.h"
