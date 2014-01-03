@@ -206,7 +206,7 @@ the Xerces Web site:
 
 For more information about Xerces visit:
 
-  http://xml.apache.org
+  http://xerces.apache.org
 
 The source code is also available at the above Web site.
 
@@ -221,7 +221,7 @@ Xalan Web site:
 
 For more information about Xalan visit:
 
-    http://xml.apache.org
+    http://xalan.apache.org
 
 The source code is also available at the above Web site.
 
