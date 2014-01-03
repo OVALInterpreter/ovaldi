@@ -152,13 +152,13 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        ovaldi.exe - OVAL Interpreter binary
 
        Libraries:
-       xerces-c_2_7_0.dll - Xerces XML library
+       xerces-c_3_1.dll - Xerces XML library
        msvcr100.dll - Microsoft C Runtime Library
        pcre.dll - Perl-compatible regular-expression library
-       Xalan-C_1_10.dll - Xalan XSLT library
-       XalanMessages_1_10.dll - Xalan XSLT library
-	   libgcrypt-11.dll - Libgcrypt library
-	   libgpg-error-0.dll - GnuPG error code library
+       Xalan-C_1_11.dll - Xalan XSLT library
+       XalanMessages_1_11.dll - Xalan XSLT library
+	  libgcrypt-11.dll - Libgcrypt library
+	  libgpg-error-0.dll - GnuPG error code library
 	   
 
        Documentation:
@@ -533,7 +533,7 @@ site:
 -- VI -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.7 of the xerces-c library.  From
+binary was compiled with version 3.1.1 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
