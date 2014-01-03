@@ -77,9 +77,9 @@ make
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
 if grep "release 5" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL5/libxerces-c-3.1.so $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL5/libxalan-c.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  /bin/cp project/linux/EL5/libxalanMsg.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
 else
   echo "Unsupported Redhat version. Exiting."
   exit 1
@@ -100,20 +100,20 @@ fi
 %preun libs
 if [ $1 = 0 ]; then
     #// Do stuff specific to uninstalls
-    if [ -e %{_libdir}/ovaldi/libxerces-c.so.27 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.27
+    if [ -e %{_libdir}/ovaldi/libxerces-c-3.1.so ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxerces-c-3.1.so
     fi
     if [ -e %{_libdir}/ovaldi/libxerces-c.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxerces-c.so
     fi
-    if [ -e %{_libdir}/ovaldi/libxalan-c.so.110 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxalan-c.so.110
+    if [ -e %{_libdir}/ovaldi/libxalan-c.so.111 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalan-c.so.111
     fi
     if [ -e %{_libdir}/ovaldi/libxalan-c.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxalan-c.so
     fi
-    if [ -e %{_libdir}/ovaldi/libxalanRMsg.so.110 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxalanMsg.so.110
+    if [ -e %{_libdir}/ovaldi/libxalanMsg.so.111 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalanMsg.so.111
     fi
     if [ -e %{_libdir}/ovaldi/libxalanMsg.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxalanMsg.so
@@ -151,11 +151,14 @@ fi
 /usr/share/ovaldi/*.xsd
 
 %files libs
-%{_libdir}/ovaldi/libxerces-c.so.27.0
-%{_libdir}/ovaldi/libxalan-c.so.110.0
-%{_libdir}/ovaldi/libxalanMsg.so.110.0
+%{_libdir}/ovaldi/libxerces-c-3.1.so
+%{_libdir}/ovaldi/libxalan-c.so.111.0
+%{_libdir}/ovaldi/libxalanMsg.so.111.0
 
 %changelog
+
+* Fri Jan 3 2014 David Rothenberg <drothenberg@mitre.org> 5.10.1.6-1.0
+* Updated for libxerces-c-3.1.so, libxalan-c.so.111.0, and libxalanMsg.so.111.0
 
 * Thu Jul 28 2011 Danny Haynes <dhaynes@mitre.org> 5.9.2-1.0
 * Updated to include oval-system-characteristics-schematron.xsl and oval-results-schematron.xsl

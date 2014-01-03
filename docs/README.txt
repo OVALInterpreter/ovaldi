@@ -98,9 +98,9 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        ovaldi - OVAL Interpreter binary
 
        Libraries:
-       libxerces-c.so.27.0 - Xerces XML library
-       libxalan-c.so.110.0 - Xalan XSL library
-       libxalanMsg.so.110.0 - Xalan Message library
+       libxerces-c-3.1.so - Xerces XML library
+       libxalan-c.so.111.0 - Xalan XSL library
+       libxalanMsg.so.111.0 - Xalan Message library
        libpcre.so.0.0.1 - PCRE Regular Expression library
 
        Documentation:
@@ -533,7 +533,7 @@ site:
 -- VI -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 3.1.1 of the xerces-c library.  From
+binary was compiled with version 2.7 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
