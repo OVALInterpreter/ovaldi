@@ -36,6 +36,7 @@
 #include <limits.h>
 #include <cassert>
 #include <cerrno>
+#include <memory>
 
 #include <DirGuard.h>
 #include <EntityComparator.h>
@@ -103,24 +104,23 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 		}
 
 		string recurseStr = Behavior::GetBehaviorValue(behaviors, "recurse");
-		if(recurseStr.compare("") != 0) {
+		if(recurseStr != "symlinks and directories") { // if not the default value
 			throw FileFinderException("Unsupported behavior: recurse");
 		}
 
 		string recurse_file_systemStr = Behavior::GetBehaviorValue(behaviors, "recurse_file_system");
-		if(recurse_file_systemStr.compare("") != 0) {
+		if(recurse_file_systemStr != "all") { // if not the default value
 			throw FileFinderException("Unsupported behavior: recurse_file_system");
 		}
 
-
 		// only need to address recurseDirection up & down if maxDepth is not 0
-		if(recurseDirection.compare("up") == 0 && maxDepth != 0) {
+		if(recurseDirection == "up" && maxDepth != 0) {
 			StringVector::iterator path;
 			for(path = paths->begin(); path != paths->end(); path++) {
 				this->UpwardPathRecursion(behaviorPaths, (*path), maxDepth);
 			}
 
-		} else if(recurseDirection.compare("down") == 0 && maxDepth != 0) {
+		} else if(recurseDirection == "down" && maxDepth != 0) {
 			StringVector::iterator path;
 			for(path = paths->begin(); path != paths->end(); path++) {
 				this->DownwardPathRecursion(behaviorPaths, (*path), maxDepth);
@@ -133,7 +133,6 @@ StringVector* FileFinder::ProcessPathBehaviors(StringVector* paths, BehaviorVect
 }
 
 void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Operation op) {
-//void FileFinder::FindPaths(string regex, StringVector* paths, bool isRegex) {
 	// -----------------------------------------------------------------------
 	//
 	//  ABSTRACT
@@ -307,7 +306,7 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 			}
 
 			//	If a regular file, check if a match
-			if(S_ISREG(statbuf.st_mode)) {
+			if(!S_ISDIR(statbuf.st_mode)) {
 				if ( isFilePath ){
 					if (EntityComparator::CompareString(op, queryVal, filepath) == OvalEnum::RESULT_TRUE)
 						fileNames->push_back(filepath);
@@ -316,14 +315,6 @@ void FileFinder::GetFilesForOperation(string path, string queryVal, StringVector
 						fileNames->push_back(dirp->d_name);
 				}
 			}
-		}
-
-		//	Close the directory
-		if(dp.close() < 0) {
-			//	Error closing the directory
-			//	not sure this error matters
-			// cout << "Failed to close the directory" << endl;
-			return;
 		}
 
 	//	Just need to ensure that all exceptions have a nice message. 
@@ -421,51 +412,52 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 	//
 	// -----------------------------------------------------------------------
 
-	StringVector* childDirs = new StringVector();
+	auto_ptr<StringVector> childDirs(new StringVector());
 	try {
 
 		struct stat statbuf;
 		struct dirent *dirp;
-		DIR *dp;
+		DirGuard dp(path, false);
 
-		//	Call stat 
-		if(lstat(path.c_str(), &statbuf) < 0) {
-			// dir does not exist
-			return childDirs; 
+		if(dp.isClosed()) {
+			if (errno == ENOENT)
+				return childDirs.release();
+			throw FileFinderException("Couldn't open directory " + path +
+									  ": " + strerror(errno));
 		}
 
-		// only consider dirs
-		if(S_ISDIR(statbuf.st_mode) == 1) {
+		//	Loop through all names in the directory and make recursive call
+		errno = 0;
+		while((dirp = readdir(dp)) != NULL) {
+			//	Ignore dot and dot-dot
+			if(strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
+				continue;
 
-			//	Open the directory
-			dp = opendir(path.c_str());
-			if(dp == NULL) {
-				//	Error opening directory
-				//	not sure this error matters
-				// cout << "Failed to open the directory" << endl;
-				return childDirs;
-			}
-
-			//	Loop through all names in the directory and make recursive call
-			while((dirp = readdir(dp)) != NULL) {
-				//	Ignore dot and dot-dot
-				if(strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
+			string filePath = Common::BuildFilePath(path, dirp->d_name);
+			//	Call lstat 
+			if(lstat(filePath.c_str(), &statbuf) < 0) {
+				if (errno == ENOENT) {
+					// shouldn't happen if readdir() just returned it, but
+					// just in case...
+					errno = 0;
 					continue;
+				}
 
-				childDirs->push_back(Common::BuildFilePath(path, dirp->d_name));
+				throw FileFinderException("lstat(" + filePath +
+										  "): " + strerror(errno));
 			}
 
-			//	Close the directory
-			if(closedir(dp) < 0) {
-				//	Error closing the directory
-				//	not sure this error matters
-				// cout << "Failed to close the directory" << endl;
-				return childDirs;
-			}
+			if (S_ISDIR(statbuf.st_mode))
+				childDirs->push_back(filePath);
+
+			errno = 0;
 		}
 
-	//	Just need to ensure that all exceptions have a nice message. 
-	//	So rethrow the exceptions I created catch the others and format them.
+		if (errno)
+			throw FileFinderException("readdir("+path+"): "+strerror(errno));
+
+		//	Just need to ensure that all exceptions have a nice message. 
+		//	So rethrow the exceptions I created catch the others and format them.
 	} catch(Exception ex) {
 		throw;
 	} catch(...) {
@@ -476,7 +468,7 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 		throw FileFinderException(errorMessage);
 	}
 
-	return childDirs;
+	return childDirs.release();
 }
 
 namespace {
