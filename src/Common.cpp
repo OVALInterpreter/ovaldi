@@ -374,9 +374,14 @@ StringVector* Common::ParseDefinitionIdsFile() {
 	} else {
 		
         definitionIds = new StringVector();
-
+		xercesc::DOMDocument* idDocument;
+		try{
+			idDocument = DocumentManager::GetEvaluationIdDocument();
+		} catch (Exception e) {
+			throw Exception("Error: Failed to read definitions id file.");
+		}
 		// parse the file to get the set of ids
-		DOMElement* definitionsElm = XmlCommon::FindElementNS(DocumentManager::GetEvaluationIdDocument(), "evalutation-definition-ids");
+		DOMElement* definitionsElm = idDocument->getDocumentElement();
 		if(definitionsElm != NULL) {
 
 			DOMNodeList* definitionElms = definitionsElm->getChildNodes();
