@@ -368,6 +368,7 @@ CollectedObject* AbsObjectCollector::ProcessObject(Object* object) {
 				collectedObject = CollectedObject::Create(object);
 				collectedObject->AppendVariableValues(object->GetVariableValues());
 				collectedObject->AppendReferencesAndComputeFlag(items);
+				delete items;
 			} else {
 				
 				// because we first check if the object is supported the code should never get here.
