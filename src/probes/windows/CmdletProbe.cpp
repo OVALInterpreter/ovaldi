@@ -372,6 +372,12 @@ namespace {
 	 * Maps a .net type to an Oval type.
 	 */
 	OvalEnum::Datatype GetDatatype(Type ^type);
+
+	/**
+	 * Converts a cmdlet result value to a string.  Any conversion
+	 * idiosyncrasies can go here.
+	 */
+	string Value2String(System::Object ^obj);
 }
 
 //****************************************************************************************//
@@ -1190,7 +1196,8 @@ namespace {
 						"", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 				else
 					fieldVals.push_back(new ItemFieldEntityValue(marshal_as<string>(propInfo->Name->ToLower()),
-						marshal_as<string>(propInfo->Value->ToString()), GetDatatype(propInfo->Value->GetType())));
+						Value2String(propInfo->Value),
+						GetDatatype(propInfo->Value->GetType())));
 #ifdef _DEBUG
 				oss << (propInfo->Value == nullptr ? "(null)" : 
 					marshal_as<string>(propInfo->Value->ToString())) << endl;
@@ -1236,5 +1243,17 @@ namespace {
 			return OvalEnum::DATATYPE_FLOAT;
 
 		return OvalEnum::DATATYPE_STRING;
+	}
+
+	string Value2String(System::Object ^obj) {
+
+		// Only have to special-case System::Boolean, as far
+		// as I know, so that we get "true" and "false" instead
+		// of "True" and "False".
+		System::Boolean ^b = dynamic_cast<System::Boolean^>(obj);
+		if (b)
+			return (*b) ? "true" : "false";
+
+		return marshal_as<string>(obj->ToString());
 	}
 }
