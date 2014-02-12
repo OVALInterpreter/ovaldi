@@ -45,10 +45,13 @@ public:
 
 	/** Create a complete LocalVariable. */
 	LocalVariable(std::string id = "", std::string name = "local_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector())
-		: AbsVariable (id, name, version, datatype, msgs)
+		: AbsVariable (id, name, version, datatype, msgs),
+		component(NULL)
 	{}
-	virtual ~LocalVariable()
-	{}
+	virtual ~LocalVariable() {
+		if (component)
+			delete component;
+	}
 
 	/** Parse the provided local_variable element into a LocalVariable. */
 	virtual void Parse(xercesc::DOMElement* localVariableElm);
@@ -72,6 +75,8 @@ public:
 	}
 	/** Set the AbsComponent. */
 	void SetComponent(AbsComponent* component) {
+		if (this->component)
+			delete this->component;
 		this->component = component;
 	}
 

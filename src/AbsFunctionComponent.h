@@ -44,8 +44,9 @@ public:
     /** Create a complete AbsFunctionComponent object. */
 	AbsFunctionComponent()
 	{}
-	virtual ~AbsFunctionComponent()
-	{}
+	virtual ~AbsFunctionComponent()	{
+		DestroyComponents();
+	}
 
     /** Return the components field's value. */
 	AbsComponentVector* GetComponents() {
@@ -53,6 +54,7 @@ public:
 	}
     /** Set the components field's value. */
 	void SetComponents(AbsComponentVector* components) {
+		DestroyComponents();
 		this->components = (*components);
 	}
 
@@ -62,6 +64,14 @@ public:
 	}
 
 private:
+	void DestroyComponents() {
+		for (AbsComponentVector::iterator iter = components.begin();
+			iter != components.end();
+			++iter)
+			if (*iter)
+				delete *iter;
+	}
+
 	AbsComponentVector components;
 };
 
