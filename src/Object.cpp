@@ -278,10 +278,9 @@ bool Object::Analyze(Item* item) {
 
                 scElements->clear();
 				delete scElements;
+				// compute the overall result
+				overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
 			}
-
-			// compute the overall result
-            overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
 		}
 	}
 
