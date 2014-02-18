@@ -224,7 +224,7 @@ bool Object::Analyze(Item* item) {
 
 			// Loop through all elements in the object
 			AbsEntityVector::iterator iterator;
-            for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end() && overallResult == OvalEnum::RESULT_TRUE; iterator++) {
+            for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
 				ObjectEntity* objectEntity = (ObjectEntity*)(*iterator);
 
 				/*******************************************************
@@ -278,9 +278,9 @@ bool Object::Analyze(Item* item) {
 
                 scElements->clear();
 				delete scElements;
-				// compute the overall result
-				overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
 			}
+			// compute the overall result
+			overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
 		}
 	}
 
