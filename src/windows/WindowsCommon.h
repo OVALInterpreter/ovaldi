@@ -190,6 +190,23 @@ public:
 	 */
 	static bool LookUpTrusteeSid(std::string sidStr, std::string* pAccountNameStr, std::string* pDomainStr, bool *isGroup);
 
+	/**
+	 * Normalizes the given trustee name.  Any of the out-params may be NULL,
+	 * if you don't need that particular value.
+	 *
+	 * \param[in] trusteeName the name to look up
+	 * \param[out] normName the normalized trustee name, or NULL
+	 * \param[out] normDomain the normalized domain name, or NULL
+	 * \param[out] normFormattedName the normalized formatted name, or NULL
+	 * \param[out] sidStr the SID, as a string, for the given trustee, or NULL
+	 * \param[out] isGroup whether the given trustee refers to a group
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool NormalizeTrusteeName(const std::string &trusteeName, 
+		std::string *normName, std::string *normDomain, 
+		std::string *normFormattedName, std::string *sidStr,
+		bool *isGroup);
+
 	/** Convert a vector of trustee names to a vector of corresponding SID strings */
 	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);
 

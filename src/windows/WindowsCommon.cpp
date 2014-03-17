@@ -767,7 +767,7 @@ void WindowsCommon::GetWellKnownTrusteeNames() {
 			LocalFree(psid);
 		}
 
-		Log::Debug("Found " + Common::ToString(WindowsCommon::wellKnownTrusteeNames->size()) + " well known truseee names.");
+		Log::Debug("Found " + Common::ToString(WindowsCommon::wellKnownTrusteeNames->size()) + " well known trustee names.");
 	}
 }
 
@@ -1512,6 +1512,129 @@ bool WindowsCommon::LookUpTrusteeSid(string sidStr, string* pAccountNameStr, str
 	}
 
 	*isGroup = IsAccountGroup(sid_type, *pAccountNameStr);
+	return true;
+}
+
+bool WindowsCommon::NormalizeTrusteeName(const string &trusteeName, 
+	string *normName, string *normDomain, string *normFormattedName,
+	string *sidStr, bool *isGroup) {
+
+	FreeGuard<> sid;
+	DWORD sidSizeBytes = 128;
+	FreeGuard<TCHAR> domain;
+	DWORD domainSizeChars = 128;
+	FreeGuard<TCHAR> normNameBuf;
+	DWORD normNameSizeChars = 128;
+	SID_NAME_USE trusteeType, notused2;
+	BOOL retVal;
+	DWORD err;
+
+	// API weirdness...  Docs say that LookupAccount*() will return
+	// the required domain buffer size, in TCHARS, if the call fails
+	// (with error ERROR_INSUFFICIENT_BUFFER).  It does not say what
+	// happens when the call succeeds.  From what I've observed, I think
+	// it returns the length of the domain string (not including the 
+	// terminal null).  Therefore the sixth param can get two different 
+	// values depending on whether the call succeeded.  Now, lets say 
+	// you want to call the LookupAccount*() function twice, like I'm 
+	// doing here.  You can't pass the address of your real buffer size
+	// var, because it'll get clobbered, and if the call succeeds, it 
+	// won't even get clobbered with a value you can use to pass into
+	// the second call (it'll be one TCHAR short).  So I'm passing in the
+	// address of a temp variable, and only updating the real buffer size
+	// variable if the call failed with ERROR_INSUFFICIENT_BUFFER.
+	// Because on success I'll get an undocumented value I don't really
+	// need (and don't trust).
+
+	// name -> sid
+	do {
+		if (!domain.realloc(domainSizeChars * sizeof(TCHAR)))
+			throw Exception(string("realloc: ")+strerror(errno));
+		if (!sid.realloc(sidSizeBytes))
+			throw Exception(string("realloc: ")+strerror(errno));
+
+		DWORD tmp = domainSizeChars;
+		retVal = LookupAccountName(NULL,
+								  trusteeName.c_str(),
+								  sid.get(),
+								  &sidSizeBytes,
+								  domain.get(),
+								  &tmp,
+								  &trusteeType);
+
+		err = GetLastError();
+		if (!retVal && err == ERROR_INSUFFICIENT_BUFFER)
+			domainSizeChars = tmp;
+
+	} while (!retVal && err == ERROR_INSUFFICIENT_BUFFER);
+
+	if (!retVal) {
+		if (err == ERROR_NONE_MAPPED)
+			return false;
+
+		throw Exception("Normalization of trustee name \""+trusteeName+"\" failed: " + WindowsCommon::GetErrorMessage(err));
+	}
+
+	if (normDomain)
+		*normDomain = domain.get();
+
+	if (sidStr)
+		if (!GetTextualSid(sid.get(), sidStr))
+			throw Exception("Couldn't convert SID to string: " + GetErrorMessage(GetLastError()));
+
+	// if no further normalization requested, we're done.
+	if (!normName && !normFormattedName && !isGroup)
+		return true;
+
+	// sid -> name
+	do {
+		if (!normNameBuf.realloc(normNameSizeChars * sizeof(TCHAR)))
+			throw Exception(string("realloc: ")+strerror(errno));
+
+		// if the domain buf was big enough for LookupAccountName() to
+		// succeed, it ought to be big enough for this to succeed!  So
+		// I shouldn't need to realloc that buffer...
+		retVal = LookupAccountSid(NULL,
+								  sid.get(),
+								  normNameBuf.get(),
+								  &normNameSizeChars,
+								  domain.get(),
+								  &domainSizeChars,
+								  &notused2);
+		err = GetLastError();
+
+	} while (!retVal && err == ERROR_INSUFFICIENT_BUFFER);
+
+	if (!retVal) {
+		if (err == ERROR_NONE_MAPPED)
+			return false;
+
+		throw Exception("Normalization of trustee name \""+trusteeName+"\" failed: " + WindowsCommon::GetErrorMessage(err));
+	}
+
+	if (normName)
+		*normName = normNameBuf.get();
+
+	if (normFormattedName) {
+		if(trusteeType == SidTypeUser) {
+			// all user accounts are prefixed by their domain or the local system name.
+			*normFormattedName = string(domain.get()) + '\\' + normNameBuf.get();
+		} else if(trusteeType == SidTypeDomain) {
+			// do not prepend the domain if it is a domain...
+			*normFormattedName = domain.get();
+		} else {
+			// make sure all local group accounts are prefixed by their domain
+			// except if domain is "BUILTIN" or "NT AUTHORITY"
+			if(!strcmp(domain.get(), "BUILTIN") || !strcmp(domain.get(), "NT AUTHORITY"))
+				*normFormattedName = normNameBuf.get();
+			else
+				*normFormattedName = string(domain.get()) + '\\' + normNameBuf.get();
+		}
+	}
+
+	if (isGroup)
+		*isGroup = IsAccountGroup(trusteeType, normNameBuf.get());
+
 	return true;
 }
 
