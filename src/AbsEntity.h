@@ -246,7 +246,6 @@ private:
 	std::string name;
 	AbsEntityValueVector value;
 	OvalEnum::Datatype datatype;
-	bool isObjectEntity;
 	OvalEnum::Check varCheck;
 	OvalEnum::Operation operation;
 	AbsVariable* varRef;
