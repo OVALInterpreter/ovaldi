@@ -775,24 +775,11 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 
 	StringSet* allGroups = new StringSet();
 
-	NTSTATUS nts;
 	LOCALGROUP_INFO_0* localGroupInfo = NULL;
 	NET_API_STATUS nas;
     DWORD recordsEnumerated = 0;
     DWORD totalRecords = 0;
 	DWORD_PTR resumeHandle = 0;
-
-	// Get a handle to the policy object.
-	LSA_HANDLE polHandle;
-	LSA_OBJECT_ATTRIBUTES ObjectAttributes;
-
-	ZeroMemory(&ObjectAttributes, sizeof(ObjectAttributes));
-
-	nts = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_LOOKUP_NAMES, &polHandle);
-	if (nts != ERROR_SUCCESS) {
-		Log::Debug("Error unable to open a handle to the Policy object when getting all local groups.");
-		return allGroups;
-	}
 
 	do { 
 		nas = NetLocalGroupEnum(NULL, 
@@ -816,7 +803,6 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 				allGroups->insert(groupName);
 			}
 		} else {
-			nts = LsaClose(polHandle);
 
 			if(nas == ERROR_ACCESS_DENIED) { 
 				delete allGroups;
@@ -840,9 +826,6 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 
 	// Check again for allocated memory.
 	if (localGroupInfo != NULL) NetApiBufferFree(localGroupInfo);
-
-	// Close the handle to the open policy object.
-	nts = LsaClose(polHandle);
 
 	return allGroups;
 }
@@ -998,22 +981,7 @@ DWORD WindowsCommon::GetLastLogonTimeStamp(string username){
 	}
 }
 
-
-
 void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
-
-	NTSTATUS nts;
-
-	// Get a handle to the policy object.
-	LSA_HANDLE polHandle;
-	LSA_OBJECT_ATTRIBUTES ObjectAttributes;
-	ZeroMemory(&ObjectAttributes, sizeof(ObjectAttributes));
-
-	nts = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_LOOKUP_NAMES, &polHandle);
-	if (nts != ERROR_SUCCESS) {
-		Log::Fatal("Error unable to open a handle to the Policy object when trying to get all local users.");
-		return;
-	}
 
 	NET_API_STATUS nas;
     DWORD recordsEnumerated = 0;
@@ -1057,8 +1025,6 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 			}
 
 		} else {
-			nts = LsaClose(polHandle);
-
 			if(nas == ERROR_ACCESS_DENIED) { 
 				throw Exception("Error unable to enumerate local users. The user does not have access to the requested information.");
 			} else if(nas == NERR_InvalidComputer) {
@@ -1079,9 +1045,6 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 
 	// Check again for allocated memory.
 	if (userInfo != NULL) NetApiBufferFree(userInfo);
-
-	// Close the handle to the open policy object.
-	nts = LsaClose(polHandle);
 }
 
 string WindowsCommon::GetFormattedTrusteeName(PSID pSid) {
