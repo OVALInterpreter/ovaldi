@@ -1367,12 +1367,6 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 	if (!WindowsCommon::GetTextualSid(psid.get(), sidStr))
 		throw Exception("Error converting SID to string: " + GetErrorMessage(GetLastError()));
 
-	// determin if this is a group
-	*isGroup = false;
-	if(sid_type == SidTypeGroup || sid_type == SidTypeWellKnownGroup || sid_type == SidTypeAlias) {
-		if((*accountNameStr).compare("SYSTEM") != 0) // special case...
-			*isGroup = true;
-	} 
 	// make sure account names are consistently formated
 	if(sid_type == SidTypeUser) {
 		// make sure all user accounts are prefixed by their domain or the local system name.
@@ -1390,6 +1384,8 @@ bool WindowsCommon::LookUpTrusteeName(string* accountNameStr, string* sidStr, st
 				(*accountNameStr) = (*domainStr) + "\\" + (*accountNameStr);
 		}
 	}
+
+	*isGroup = IsAccountGroup(sid_type, *accountNameStr);
 
 	return true;
 }
