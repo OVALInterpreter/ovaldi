@@ -1,6 +1,12 @@
 %define name	ovaldi
-%define version	5.10.1.6
+%define version	5.10.1.7
 %define release	1
+%ifarch x86_64
+  %define arch	x86_64
+%else
+  %define arch	i386
+%endif
+
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
 Name:		%{name}
@@ -11,7 +17,7 @@ License:	BSD
 Group:		System/Configuration/Other
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 Prefix:		%{_prefix}
-BuildArch: 	i386
+BuildArch: 	%{arch}
 
 %description
 The OVAL Interpreter is a freely available reference 
@@ -77,9 +83,15 @@ make
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
 if grep "release 5" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL5/libxerces-c-3.1.so $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL5/libxalan-c.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL5/libxalanMsg.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  %ifarch x86_64
+    /bin/cp project/linux/EL5/64/libxerces-c-3.1.so $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/64/libxalan-c.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/64/libxalanMsg.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  %else
+    /bin/cp project/linux/EL5/32/libxerces-c-3.1.so $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/32/libxalan-c.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/32/libxalanMsg.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  %endif
 else
   echo "Unsupported Redhat version. Exiting."
   exit 1
