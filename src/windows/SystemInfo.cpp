@@ -71,7 +71,6 @@ SystemInfo::SystemInfo() {
 	os_version = "";
 	architecture = "";
 	primary_host_name = "";
-	interfaces;
 }
 
 SystemInfo::~SystemInfo() {
