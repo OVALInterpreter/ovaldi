@@ -169,6 +169,9 @@ fi
 
 %changelog
 
+* Fri Mar 25 2014 David Rothenberg <drothenberg@mitre.org> 5.10.1.7-1.0
+* Updated with architecture conditional statements to build correct 32/64-bit environment.
+
 * Fri Jan 3 2014 David Rothenberg <drothenberg@mitre.org> 5.10.1.6-1.0
 * Updated for libxerces-c-3.1.so, libxalan-c.so.111.0, and libxalanMsg.so.111.0
 
