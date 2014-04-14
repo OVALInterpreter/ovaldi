@@ -31,11 +31,29 @@
 #include <iomanip>
 #include <sstream>
 
+#include <AutoCloser.h>
 #include "WindowsCommon.h"
 
 #include "RegistryProbe.h"
 
 using namespace std;
+
+namespace {
+	/**
+	 * Gets the last write time of the given hive/key and appends
+	 * the last_write_time entity to the given item.  On errors, except for
+	 * a not-found condition, the entity is still added, with status=error.
+	 *
+	 * \param[in] hive The hive of the key to look at
+	 * \param[in] key The key in \p hive to look at
+	 * \param[in] item The item to add the last_write_time entity to
+	 * \param[in] regFinder The registry finder to use to get key handles.
+	 * \return true if the entity was added, false if not.  It is only not
+	 *   added if the key wasn't found, and if the key no longer exists,
+	 *   the caller should probably drop the item.
+	 */
+	bool getLastWriteTimeOfKey(const string &hive, const string &key, Item *item, RegistryFinder &regFinder);
+}
 
 //****************************************************************************************//
 //								RegistryProbe Class										  //	
@@ -95,86 +113,55 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 
 	RegKeyVector* registryKeys = registryFinder.SearchRegistries(hive, key, name, object->GetBehaviors());
 
-	if(registryKeys->size() > 0) {
+	if(!registryKeys->empty()) {
 		RegKeyVector::iterator iterator;
 		for(iterator = registryKeys->begin(); iterator != registryKeys->end(); iterator++) {
 
 			RegKey* registryKey = (*iterator);
 			
-			if ( (registryKey->GetKey()).compare("") == 0 ){
-				Item* item = NULL;
+			if ( registryKey->GetKey().empty() ){
 
-				if( !(key->GetNil()) && registryFinder.ReportKeyDoesNotExist(registryKey->GetHive(), key) ) {
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("key", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, key->GetNil()));
-						
+				Item *item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_EXISTS);
+				item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				if (key->GetNil()) {
+					item->AppendElement(new ItemEntity("key", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+				} else {
+					item->AppendElement(new ItemEntity("key", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
+				}
+
+				if (name->GetNil()) {
+					item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
+				} else {
+					item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
+				}
+
+				if (getLastWriteTimeOfKey(registryKey->GetHive(), "", item, registryFinder)) {
 					item->AppendElement(new ItemEntity("windows_view",
 						(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
-				} else {
-					item = this->CreateItem();
+				} else
+					delete item;
+
+			}else{			
+				if(registryKey->GetName().empty() && name->GetNil() ) {
+					Item *item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_EXISTS);
 					item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 					if (key->GetNil()){
 						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
-					}
-					else
-					{
+					} else {
 						item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
 					}
-					if (name->GetNil()){
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
-					}
-					else
-					{
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
-					}
+					item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true as checked above
 
-					item->AppendElement(new ItemEntity("windows_view",
-						(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-
-					collectedItems->push_back(item);
-				}
-
-			}else{			
-				if((registryKey->GetName()).compare("") == 0 && name->GetNil() ) {
-					Item* item = NULL;
-
-					if(registryFinder.ReportNameDoesNotExist(registryKey->GetHive(), registryKey->GetKey(), name)) {
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						if (key->GetNil()){
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
-						}
-						else
-						{
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
-						}
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, true));
-							
+					if (getLastWriteTimeOfKey(registryKey->GetHive(), registryKey->GetKey(), item, registryFinder)) {
 						item->AppendElement(new ItemEntity("windows_view",
 							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 						collectedItems->push_back(item);
-					} else {
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_EXISTS);
-						item->AppendElement(new ItemEntity("hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						if (key->GetNil()){
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
-						}
-						else
-						{
-							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS,false)); //GetNil is false
-						}
-						item->AppendElement(new ItemEntity("name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true as checked above
+					} else
+						delete item;
 						
-						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-						collectedItems->push_back(item);
-					}
 				} else {
 					Item* item = this->GetRegistryKey( registryKey->GetHive(), registryKey->GetKey(), registryKey->GetName(), registryFinder);
 					if(item != NULL) {
@@ -229,6 +216,7 @@ ItemVector* RegistryProbe::CollectItems(Object *object) {
 					delete keys;
 				}
 			}
+			delete hives;
 		}
 	}
 
@@ -502,5 +490,47 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 				
 				break;
 			}
+	}
+}
+
+namespace {
+	bool getLastWriteTimeOfKey(const string &hive, const string &key, Item *item, RegistryFinder &regFinder) {
+		HKEY keyHandle;
+		LONG res = regFinder.GetHKeyHandle(&keyHandle, hive, key, KEY_QUERY_VALUE);
+		if (res == ERROR_FILE_NOT_FOUND)
+			return false; // key disappeared... need to drop the item.
+		else if (res != ERROR_SUCCESS) {
+			item->AppendElement(new ItemEntity("last_write_time",
+				"", OvalEnum::DATATYPE_INTEGER,
+				OvalEnum::STATUS_ERROR));
+			item->AppendMessage(new OvalMessage("Couldn't open key: " + 
+				WindowsCommon::GetErrorMessage(res),
+				OvalEnum::LEVEL_ERROR));
+			return true;
+		}
+
+		AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyCloser(keyHandle, RegCloseKey,
+			"Registry key "+hive+'\\'+key);
+
+		FILETIME ft;
+		res = RegQueryInfoKey(keyHandle, NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL, NULL, NULL, NULL, &ft);
+
+		if (res == ERROR_SUCCESS)
+			item->AppendElement(new ItemEntity("last_write_time", 
+				WindowsCommon::ToString(ft), OvalEnum::DATATYPE_INTEGER));
+		else if (res == ERROR_FILE_NOT_FOUND) {
+			return false;
+		} else {
+			item->AppendElement(new ItemEntity("last_write_time",
+				"", OvalEnum::DATATYPE_INTEGER,
+				OvalEnum::STATUS_ERROR));
+			item->AppendMessage(new OvalMessage("Couldn't get "
+				"key info: " + 
+				WindowsCommon::GetErrorMessage(res),
+				OvalEnum::LEVEL_ERROR));
+		}
+
+		return true;
 	}
 }
