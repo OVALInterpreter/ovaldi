@@ -31,6 +31,7 @@
 #include <memory>
 #include <FreeGuard.h>
 
+#include <ArrayGuard.h>
 #include <AutoCloser.h>
 #include <FreeGuard.h>
 #include "Log.h"
@@ -521,17 +522,15 @@ bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr 
     if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
+
+	AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+		"Registry key "+hiveStr+'\\'+keyStr);
+
 	LPWSTR wNameStr = WindowsCommon::StringToWide ( nameStr );
+	ArrayGuard<WCHAR> strGuard(wNameStr);
+
     if ( RegQueryValueExW ( keyHandle, wNameStr, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
         return false;
-    }
-	delete[] wNameStr;
-
-	LONG err;
-    if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
-        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key " +
-			hiveStr + '\\' + keyStr + ". Microsoft System Error " +
-			Common::ToString(err) + ") - " + WindowsCommon::GetErrorMessage(err) );
     }
 
     return true;
