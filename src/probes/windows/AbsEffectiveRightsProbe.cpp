@@ -53,7 +53,7 @@ AbsEffectiveRightsProbe::~AbsEffectiveRightsProbe() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,  bool resolveGroupBehavior, bool includeGroupBehavior ) {
+StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,  bool resolveGroupBehavior, bool includeGroupBehavior, bool useSacl ) {
     PACL pdacl = NULL;
     PSID owner;
     PSID primaryGroup;
@@ -65,23 +65,40 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
     try {
         // Start by getting the sids from the dacl, owner, and primary group off the object's security descriptor
         string baseErrMsg = "Error: unable to get trustees for " + WindowsCommon::GetObjectType ( objectType ) + ".";
-        DWORD res = GetSecurityInfo ( objectHandle,                                // Object name
-                                      objectType,                                  // Object type
-                                      DACL_SECURITY_INFORMATION |                  // Information type
-                                      GROUP_SECURITY_INFORMATION |
-                                      OWNER_SECURITY_INFORMATION,
-                                      &owner,                                      // Owner
-                                      &primaryGroup,                               // Primary group
-                                      &pdacl,                                      // DACL
-                                      NULL,                                        // SACL
-                                      &pSD );                                      // Security Descriptor
+
+		DWORD res;
+		if (useSacl)
+			res = GetSecurityInfo ( objectHandle,      // Object name
+				objectType,                            // Object type
+				SACL_SECURITY_INFORMATION |            // Information type
+				GROUP_SECURITY_INFORMATION |
+				OWNER_SECURITY_INFORMATION,
+				&owner,                                // Owner
+				&primaryGroup,                         // Primary group
+				NULL,                                  // DACL
+				&pdacl,                                // SACL
+				&pSD );                                // Security Descriptor
+		else
+			res = GetSecurityInfo ( objectHandle,      // Object name
+				objectType,                            // Object type
+				DACL_SECURITY_INFORMATION |            // Information type
+				GROUP_SECURITY_INFORMATION |
+				OWNER_SECURITY_INFORMATION,
+				&owner,                                // Owner
+				&primaryGroup,                         // Primary group
+				&pdacl,                                // DACL
+				NULL,                                  // SACL
+				&pSD );                                // Security Descriptor
+
         if ( res != ERROR_SUCCESS ) {
             throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error (" + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
         }
 
         // Get sids from the dacl and insert the owner and primary group sids
 		if ( isSID ){
-			WindowsCommon::GetSidsFromPACL ( pdacl, &allTrustees );
+			// ACL's can be NULL (missing from a securable object).
+			if (pdacl)
+				WindowsCommon::GetSidsFromPACL ( pdacl, &allTrustees );
 			string sidStr;
 			if (!WindowsCommon::GetTextualSid(owner, &sidStr))
 				throw Exception("GetTrusteesForWindowsObject: Couldn't convert SID to string: "+
@@ -92,7 +109,9 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 					WindowsCommon::GetErrorMessage(GetLastError()));
 			allTrustees.insert(sidStr);
 		}else{
-			WindowsCommon::GetTrusteeNamesFromPACL(pdacl, &allTrustees);
+			// ACL's can be NULL (missing from a securable object).
+			if (pdacl)
+				WindowsCommon::GetTrusteeNamesFromPACL(pdacl, &allTrustees);
 			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(owner));
 			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(primaryGroup));
 		}

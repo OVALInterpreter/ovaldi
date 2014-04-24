@@ -1234,11 +1234,23 @@ void WindowsCommon::GetSidsFromPACL(PACL pacl, StringSet *sids) {
 				ACE_HEADER *header = (ACE_HEADER *)ace;
 				PSID psid = NULL;
 
-				if(header->AceType == ACCESS_ALLOWED_ACE_TYPE) {
+				// obviously this is not exhaustive.  We will need to add more
+				// ACE types as we discover them in use.  Or be really complete
+				// and handle them all...
+				switch (header->AceType) {
+				case ACCESS_ALLOWED_ACE_TYPE:
 					psid = (PSID)&((ACCESS_ALLOWED_ACE *)ace)->SidStart;
-				} else if(header->AceType == ACCESS_DENIED_ACE_TYPE) {
+					break;
+				case ACCESS_DENIED_ACE_TYPE:
 					psid = (PSID)&((ACCESS_DENIED_ACE *)ace)->SidStart;
-				} else {
+					break;
+				case SYSTEM_AUDIT_ACE_TYPE:
+					psid = (PSID)&((SYSTEM_AUDIT_ACE *)ace)->SidStart;
+					break;
+				case SYSTEM_MANDATORY_LABEL_ACE_TYPE:
+					psid = (PSID)&((SYSTEM_MANDATORY_LABEL_ACE *)ace)->SidStart;
+					break;
+				default:
 					//TODO skip for now
 					Log::Debug("Unsupported AceType found when getting sids from acl.");
 				}
@@ -1293,11 +1305,23 @@ void WindowsCommon::GetTrusteeNamesFromPACL(PACL pacl, StringSet *trusteeNames) 
 				ACE_HEADER *header = (ACE_HEADER *)ace;
 				PSID psid = NULL;
 
-				if(header->AceType == ACCESS_ALLOWED_ACE_TYPE) {
+				// obviously this is not exhaustive.  We will need to add more
+				// ACE types as we discover them in use.  Or be really complete
+				// and handle them all...
+				switch (header->AceType) {
+				case ACCESS_ALLOWED_ACE_TYPE:
 					psid = (PSID)&((ACCESS_ALLOWED_ACE *)ace)->SidStart;
-				} else if(header->AceType == ACCESS_DENIED_ACE_TYPE) {
+					break;
+				case ACCESS_DENIED_ACE_TYPE:
 					psid = (PSID)&((ACCESS_DENIED_ACE *)ace)->SidStart;
-				} else {
+					break;
+				case SYSTEM_AUDIT_ACE_TYPE:
+					psid = (PSID)&((SYSTEM_AUDIT_ACE *)ace)->SidStart;
+					break;
+				case SYSTEM_MANDATORY_LABEL_ACE_TYPE:
+					psid = (PSID)&((SYSTEM_MANDATORY_LABEL_ACE *)ace)->SidStart;
+					break;
+				default:
 					//TODO skip for now
 					Log::Debug("Unsupported AceType found when getting sids from acl.");
 				}
