@@ -30,6 +30,8 @@
 
 #include <set>
 
+#include <Log.h>
+
 //	include the probe classes
 #include "FileProbe.h"
 #include "FileMd5Probe.h"
