@@ -33,21 +33,6 @@
 
 #include "AbsProbe.h"
 
-#ifdef LINUX
-#include <sys/sysinfo.h>
-#endif
-
-#ifdef SUNOS
-#include <sys/systeminfo.h>
-#endif
-
-#include <sys/utsname.h>
-
-#include <iostream>
-#include <string>
-#include <vector>
-
-
 class UnameProbe : public AbsProbe {
 public:
 	virtual ~UnameProbe();
