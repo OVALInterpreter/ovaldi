@@ -295,44 +295,15 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	//////////////////////////////////////////////////////////
 	//////////	 Get fully qualified host name	//////////////
 	//////////////////////////////////////////////////////////
-	
-	// NOTE: the gethostbyname() method is deprecated. 
-	// This should be replaced with the new methods
   
-	WORD version = MAKEWORD(2,2);
-	WSADATA wsaData;
-	
-	if(WSAStartup(version, &wsaData) != 0) {
-		sysInfo->primary_host_name = "unknown";	
-		throw SystemInfoException("Error: Unable to get hostname. Sockets could not be initialized.");
-	}
-
-	// Confirm that the WinSock DLL supports 2.2.  Note that if the DLL supports versions
-	// greater than 2.2 in addition to 2.2, it will still return 2.2 in wVersion since that
-	// is the version we requested.
-	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2 ) {
-		sysInfo->primary_host_name = "unknown";	
-		WSACleanup();
-		throw SystemInfoException("Error: Unable to get hostname. Could not find a usable version of the WinSock DLL.");
-	}
-
-	// First get the host name
 	char host_name[256];
-	int res = gethostname(host_name, sizeof(host_name));
-	if (res != 0) {
-		res = WSAGetLastError();
+	DWORD bufSz = sizeof(host_name);
+	if (GetComputerNameEx(ComputerNamePhysicalDnsFullyQualified,
+		host_name, &bufSz))
+		sysInfo->primary_host_name = host_name;
+	else {
 		sysInfo->primary_host_name = "unknown";
-		Log::Debug("Unable to get short hostname from system");
-	} else {
-		// next get the fully qualified host name
-		hostent *remoteHost;
-		remoteHost = gethostbyname(host_name);
-		if(remoteHost != NULL) {
-			sysInfo->primary_host_name = remoteHost->h_name;	
-		} else {
-			sysInfo->primary_host_name = host_name;
-			Log::Debug("Unable to resolve system FQDN.  Using short hostname instead.");
-		}
+		Log::Debug("Unable to get hostname from system");
 	}
 }
 
