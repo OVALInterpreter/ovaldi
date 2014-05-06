@@ -419,8 +419,6 @@ public:
 
 private:
 	
-	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
-
 	/** Split Trustee name between domain and account portion */
 	static void SplitTrusteeName(std::string trusteeName, std::string *domainName, std::string *accountName);
 
