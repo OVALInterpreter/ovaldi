@@ -1621,27 +1621,6 @@ bool WindowsCommon::NormalizeTrusteeName(const string &trusteeName,
 	return true;
 }
 
-string WindowsCommon::LookUpLocalSystemName() {
-
-	string systemName = "";
-
-	LPTSTR buff = NULL;
-	buff = (LPTSTR) malloc(MAX_COMPUTERNAME_LENGTH + 1);
-	DWORD  buffSize = MAX_COMPUTERNAME_LENGTH + 1;
- 
-	// Get and display the name of the computer. 
-	if(!GetComputerName( buff, &buffSize )) {
-		free(buff);
-		DWORD error = GetLastError();
-		throw Exception("Error failed to get local computer name. " + WindowsCommon::GetErrorMessage(error));
-	} else {
-		systemName = buff;
-		free(buff);
-	}
-
-	return systemName;
-}
-
 string WindowsCommon::ToString(FILETIME fTime) {
 	ULONGLONG fTimeResult = (((ULONGLONG)fTime.dwHighDateTime)<<32) + fTime.dwLowDateTime;
 	return Common::ToString(fTimeResult);
@@ -2523,7 +2502,7 @@ LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
 	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, wDomainName, &domainControllerName) != NERR_Success) {
 		domainControllerName = NULL;
 	}
-	delete wDomainName;
+	delete[] wDomainName;
 
 	return (LPCWSTR)domainControllerName;
 }

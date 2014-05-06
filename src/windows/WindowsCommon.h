@@ -452,9 +452,6 @@ private:
 	*/
 	static void GetWellKnownTrusteeNames();
 
-	/** Look up the local system name. */
-	static std::string LookUpLocalSystemName();
-
 	/** Retrieve the domain controller name for the specified domain name.
 	  @param domainName A string that represents the domain name.
 	  @return A LPCWSTR representing the domain controller name or NULL if the domain name is the empty string or if the domain controller name lookup failed.
