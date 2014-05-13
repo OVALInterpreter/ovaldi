@@ -277,7 +277,7 @@ public:
      *  @param str A std:string that want to convert to a null-terminated string of Unicode characters (16-bit).
      *  @return A null-terminated string of Unicode characters (16-bit).
      */
-	static LPWSTR StringToWide(std::string s);
+	static std::wstring StringToWide(std::string s);
 
 	/** Converts a wide-character string of Unicode characters into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.

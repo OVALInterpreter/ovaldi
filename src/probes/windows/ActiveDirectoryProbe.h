@@ -182,7 +182,7 @@ class ActiveDirectoryProbe : public AbsProbe {
          *  @param attributeStr A string that represents the attribute name whose value you are trying to convert.
          *  @return A string representation of the attribute's ADS_OCTET_STRING value.
          */
-        std::string ConvertOctetString ( std::string attributeStr, ADS_OCTET_STRING* octetString );
+        std::string ConvertOctetString ( LPCWSTR attributeStr, ADS_OCTET_STRING* octetString );
 
         /** Converts SYSTEMTIME structure into its equivalent UTC time representation string.
          *  @param time A pointer to a SYSTEMTIME structure which represents the a time value of an Active Directory attribute.
@@ -240,12 +240,6 @@ class ActiveDirectoryProbe : public AbsProbe {
         static const std::string GET_ALL_ATTRIBUTES;
         static const std::string GET_ALL_DISTINGUISHED_NAMES;
         static const std::string OBJECT_EXISTS;
-
-        /** String constant representing the distinguishedName attribute */
-        static const std::string DISTINGUISHED_NAME_ATTRIBUTE;
-
-        /** String constant representing the objectClass attribute */
-        static const std::string OBJECT_CLASS_ATTRIBUTE;
 
         /** String constant representing the LDAP protocol */
         static const std::string LDAP_PROTOCOL;

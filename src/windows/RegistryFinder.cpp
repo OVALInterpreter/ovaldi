@@ -421,10 +421,10 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
 		bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY
 		: 0;
 #endif
-    LPWSTR lpSubKey = WindowsCommon::StringToWide(subKeyStr);
-    LONG status = RegOpenKeyExW ( superKey, lpSubKey,
+    wstring lpSubKey = WindowsCommon::StringToWide(subKeyStr);
+    LONG status = RegOpenKeyExW ( superKey, lpSubKey.c_str(),
 		0, access | view, keyHandle );
-	delete[] lpSubKey;
+
     return status;
 }
 
@@ -526,10 +526,9 @@ bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr 
 	AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
 		"Registry key "+hiveStr+'\\'+keyStr);
 
-	LPWSTR wNameStr = WindowsCommon::StringToWide ( nameStr );
-	ArrayGuard<WCHAR> strGuard(wNameStr);
+	wstring wNameStr = WindowsCommon::StringToWide ( nameStr );
 
-    if ( RegQueryValueExW ( keyHandle, wNameStr, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
+    if ( RegQueryValueExW ( keyHandle, wNameStr.c_str(), NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
         return false;
     }
 

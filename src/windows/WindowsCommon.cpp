@@ -35,12 +35,12 @@
 #include <Authz.h>
 #include <comdef.h>
 #include <DelayImp.h>
-
+#include <time.h>
 #include <tchar.h>
+
 #include <cctype>
 #include <cstring>
 #include <memory>
-#include <time.h>
 
 #include "Log.h"
 #include <ArrayGuard.h>
@@ -371,13 +371,22 @@ bool WindowsCommon::IsGroup(string trusteeName) {
 	return isGroup;
 }
 
-LPWSTR WindowsCommon::StringToWide(string s) {
+wstring WindowsCommon::StringToWide(string s) {
 	
-	size_t size = mbstowcs(NULL, s.c_str(), s.length()) + 1;
-	LPWSTR wide = new wchar_t[size];
-	mbstowcs(wide, s.c_str(), s.size() + 1 );
+	size_t size = mbstowcs(NULL, s.c_str(), s.length());
+	// why would docs say -1 is returned on error, when the
+	// return types are all unsigned?!?  Guessing I have to
+	// compare to -1 cast to size_t...
+	if (size == (size_t)-1)
+		throw Exception("Couldn't widen string: " + s);
+	// mbstowcs ret value doesn't count the terminal NULL...
+	LPWSTR wide = new WCHAR[size + 1];
+	mbstowcs(wide, s.c_str(), size);
+	wide[size] = 0;
+	wstring ws(wide);
+	delete[] wide;
 
-	return wide;
+	return ws;
 }
 
 void WindowsCommon::SplitTrusteeName(string trusteeName, string *domainName, string *accountName) {
@@ -401,7 +410,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 	bool groupExists = false;
 
 	NET_API_STATUS  res;
-	LPCWSTR localGroupName = NULL;
+	wstring localGroupName;
 	DWORD entriesread;
 	DWORD totalentries;
 	LOCALGROUP_MEMBERS_INFO_0* userInfo = NULL;
@@ -419,7 +428,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 	try {
 
 		res = NetLocalGroupGetMembers(NULL,						// server name NULL == localhost
-									  localGroupName,			// group name
+									  localGroupName.c_str(),	// group name
   									  0,						// level LOCALGROUP_MEMBERS_INFO_3
 									  (unsigned char**) &userInfo,
 									  MAX_PREFERRED_LENGTH,
@@ -481,10 +490,7 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 		}
 
 	} catch(...) {
-		if(localGroupName != NULL) {
-			delete[] localGroupName;
-		}
-		
+	
 		if(userInfo != NULL) {
 			NetApiBufferFree(userInfo);
 		}
@@ -492,10 +498,6 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 		throw;
 	}
 
-	if(localGroupName != NULL) {
-		delete[] localGroupName;
-	}
-	
 	if(userInfo != NULL) {
 		NetApiBufferFree(userInfo);
 	}
@@ -513,14 +515,11 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 	NET_API_STATUS res;
 	string shortGroupName;
 	bool groupExists = false;
-	LPWSTR wDomainName = NULL;
-	LPWSTR globalgroupname = NULL;
+	wstring globalgroupname;
 	LPCWSTR domainControllerName = NULL;
 	GROUP_USERS_INFO_0* userInfo = NULL; 
 
 	WindowsCommon::SplitTrusteeName(groupName, &domainName, &shortGroupName);
-
-	wDomainName = WindowsCommon::StringToWide(domainName);
 
 	try {
 
@@ -528,15 +527,13 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 			globalgroupname = WindowsCommon::StringToWide(shortGroupName);
 
 			res = NetGroupGetUsers((LPCWSTR)domainControllerName,		// server name NULL == localhost
-								   globalgroupname,						// group name
+								   globalgroupname.c_str(),				// group name
 								   0,									// level LOCALGROUP_MEMBERS_INFO_3
 								   (unsigned char**) &userInfo,
 								   MAX_PREFERRED_LENGTH,
 								   &entriesread,
 								   &totalentries,
 								   NULL);
-
-			delete globalgroupname;
 
 			// was there an error?
 			if(res == NERR_Success) {
@@ -602,10 +599,6 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 			NetApiBufferFree(userInfo);
 		}
 
-		if(wDomainName != NULL) {
-			delete wDomainName;	
-		}
-
 		throw;
 	}
 
@@ -615,10 +608,6 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 
 	if(userInfo != NULL) {
 		NetApiBufferFree(userInfo);
-	}
-
-	if(wDomainName != NULL) {
-		delete wDomainName;
 	}
 
 	return groupExists;
@@ -1734,7 +1723,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	string userName;
 	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&userName);
 	
-	LPCWSTR userNameApi = WindowsCommon::StringToWide(userNameIn);
+	wstring userNameApi = WindowsCommon::StringToWide(userNameIn);
 	LPCWSTR serverName = WindowsCommon::GetDomainControllerName(domain);	
 	DWORD dwEntriesRead;
 	DWORD dwTotalEntries;
@@ -1746,7 +1735,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	
 	// Call the NetUserGetGroups function, specifying level 0.
 	NET_API_STATUS nStatus = NetUserGetGroups(serverName,
-								userNameApi,
+								userNameApi.c_str(),
 								dwLevel,
 								(LPBYTE*)&pBuf,
 								dwPrefMaxLen,
@@ -1875,7 +1864,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	//   function should also return the names of the local 
 	//   groups in which the user is indirectly a member.
 	nStatus = NetUserGetLocalGroups(NULL,
-									userNameApi,
+									userNameApi.c_str(),
 									dwLevel,
 									dwFlags,
 									(LPBYTE *) &pLocalBuf,
@@ -2004,8 +1993,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		pBuf = NULL;
 	}
 
-	delete userNameApi;
-
 	return userExists;
 }
 
@@ -2015,7 +2002,7 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	bool enabled = true;											  // Initialize user enabled to true
 	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&accountName); // Split into domain and account name components
 	LPCWSTR serverName = WindowsCommon::GetDomainControllerName(domain);  // Retrieve the server name for the specified domain
-	LPCWSTR userNameApi = WindowsCommon::StringToWide(accountName);   // Convert account name into wide string for use in the api
+	wstring userNameApi = WindowsCommon::StringToWide(accountName);   // Convert account name into wide string for use in the api
 	DWORD dwLevel = 23;                                               // Need USER_INFO_23  to get enabled flag
 	LPUSER_INFO_23 pBuf = NULL;                                       // Will be used to hold the user info 
 
@@ -2026,7 +2013,7 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	// information for users that are not defined on the local host.
 	//
 	NET_API_STATUS nStatus = NetUserGetInfo(serverName,
-							userNameApi,
+							userNameApi.c_str(),
 							dwLevel,
 							(LPBYTE *)&pBuf);
 
@@ -2072,8 +2059,6 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	// Free the allocated memory.
 	if (pBuf != NULL)
 		NetApiBufferFree(pBuf);
-
-	delete userNameApi;
 
     return enabled;
 }
@@ -2498,11 +2483,10 @@ string WindowsCommon::GetObjectType ( SE_OBJECT_TYPE objectType ) {
 LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
 
 	LPBYTE domainControllerName = NULL;
-	LPWSTR wDomainName = WindowsCommon::StringToWide(domainName);
-	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, wDomainName, &domainControllerName) != NERR_Success) {
+	wstring wDomainName = WindowsCommon::StringToWide(domainName);
+	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, wDomainName.c_str(), &domainControllerName) != NERR_Success) {
 		domainControllerName = NULL;
 	}
-	delete[] wDomainName;
 
 	return (LPCWSTR)domainControllerName;
 }
