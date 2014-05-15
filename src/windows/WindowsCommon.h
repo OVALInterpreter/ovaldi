@@ -42,6 +42,15 @@
 class WindowsCommon {
 
 public:
+	/** Do some one-time setup. */
+	static void init();
+
+	/**
+	 * Release resources acquired in init().
+	 * I'm letting this throw... so be careful when calling
+	 * from destructors.
+	 */
+	static void uninit();
 	/** Disable all the privileges associated with the current process token.
 		If a specific privilege is needed later, it can be enabled by calling
 		AdjustTokenPrivileges() again.
@@ -456,7 +465,7 @@ private:
 	  @param domainName A string that represents the domain name.
 	  @return A LPCWSTR representing the domain controller name or NULL if the domain name is the empty string or if the domain controller name lookup failed.
 	*/
-	static LPCWSTR GetDomainControllerName(std::string domainName);
+	static std::wstring GetDomainControllerName(std::string domainName);
 
 	static StringSet* allTrusteeNames;
 	static StringSet* allTrusteeSIDs;

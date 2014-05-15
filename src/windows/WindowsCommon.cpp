@@ -40,6 +40,7 @@
 
 #include <cctype>
 #include <cstring>
+#include <map>
 #include <memory>
 
 #include "Log.h"
@@ -56,6 +57,177 @@ StringSet* WindowsCommon::allTrusteeNames = NULL;
 StringSet* WindowsCommon::allTrusteeSIDs = NULL;
 StringSet* WindowsCommon::wellKnownTrusteeNames = NULL;
 const int NAME_BUFFER_SIZE = 255;
+
+namespace {
+
+	/**
+	 * Contains some info obtained once and cached, so we don't have
+	 * to re-acquire it over and over...
+	 */
+	namespace globals {
+		/**
+		 * This computer's name.
+		 */
+		wstring computerName;
+
+		/**
+		 * This computer's SID.
+		 */
+		PSID computerSID = NULL;
+
+		/**
+		 * Domain name of this computer.  If empty, this computer is not
+		 * joined to a domain.
+		 */
+		wstring domainName;
+
+		/**
+		 * The SID of this computer's domain.  If NULL, this computer is not
+		 * joined to a domain.
+		 */
+		PSID domainSID = NULL;
+
+		typedef map<wstring, wstring> DomainControllerMap;
+		/**
+		 * Maps domain names to domain controller hostnames.  This way, we
+		 * can look them up once and cache the results.  If the mapped-to
+		 * domain controller hostname is the empty string, then a controller
+		 * name couldn't be found.  This can happen e.g. when the network
+		 * is not available.
+		 */
+		DomainControllerMap domainControllerHostnames;
+	}
+
+	/** yet another guard.... */
+	class NetApiBufferFreeGuard {
+		void *ptr_;
+	public:
+		NetApiBufferFreeGuard(void *ptr=NULL):ptr_(ptr){}
+		~NetApiBufferFreeGuard(){if(ptr_)NetApiBufferFree(ptr_);}
+	};
+
+	/**
+	 * Determines whether the given SID is "local".  A local SID
+	 * is a non-account SID, or is prefixed by the local computer SID.
+	 */
+	bool isLocal(PSID sid);
+
+	/**
+	 * A copy of WindowsCommon::GetSIDForTrusteeName() which uses
+	 * wide strings.  This simplifies code which has a wide string
+	 * trustee name: you don't have to narrow it.  Also, this version
+	 * returns NULL if the trustee isn't found, rather than throwing
+	 * an exception.  Other errors still cause an exception.
+	 *
+	 * \param trusteeName the trustee to look up
+	 * \return The SID for the trustee, or NULL if none was found.  If
+	 *   a SID is returned, the caller must free() it.
+	 */
+	PSID GetSIDForTrusteeNameW(const wstring &trusteeName);
+}
+
+void WindowsCommon::init() {
+
+	/** Make it easy to rollback changes on error. */
+	class ErrorRollback {
+		bool success_;
+	public:
+		ErrorRollback():success_(false){}
+		~ErrorRollback() {
+			if (success_) return;
+			// For now, this should work even on partial initialization.
+			// CHANGEME if this is no longer the case!
+			try{ WindowsCommon::uninit(); }
+			// An exception here only would occur while rolling back
+			// partial initialization.  And initialization only partially
+			// completes and requires rollback when there's already 
+			// been another error.  So let's not confuse the issue by
+			// printing more errors about failure to rollback partial
+			// initialization... make sense??
+			catch(...) { }
+		}
+		void success(){success_=true;}
+	} errorRollback;
+
+	// Get computer name
+	DWORD err;
+	FreeGuard<WCHAR> compName;
+	DWORD compNameSz = 0;
+	if (!GetComputerNameExW(ComputerNamePhysicalDnsHostname,
+		NULL, &compNameSz)) {
+		err = GetLastError();
+		if (err != ERROR_MORE_DATA)
+			throw Exception("Couldn't get computer name: GetComputerNameEx: " +
+				GetErrorMessage(err));
+
+		if (!compName.realloc(compNameSz * sizeof(WCHAR)))
+			throw Exception("Out of memory!");
+
+		if (!GetComputerNameExW(ComputerNamePhysicalDnsHostname,
+			compName.get(), &compNameSz))
+			throw Exception("Couldn't get computer name: GetComputerNameEx: " +
+				GetErrorMessage(GetLastError()));
+
+		globals::computerName = compName.get();
+	}
+
+	// Get computer SID
+	globals::computerSID = GetSIDForTrusteeNameW(globals::computerName);
+	if (!globals::computerSID)
+		// can this actually happen?
+		throw Exception("Couldn't find SID for computer name: " +
+		UnicodeToAsciiString(globals::computerName));
+
+	// Get join info
+	LPWSTR joinInfo;
+	NETSETUP_JOIN_STATUS njs;
+
+	NET_API_STATUS nas = NetGetJoinInformation(
+		NULL,
+		&joinInfo,
+		&njs);
+
+	if (nas)
+		throw Exception("Couldn't get domain join info: NetGetJoinInformation: " +
+			GetErrorMessage(nas));
+
+	if (njs == NetSetupDomainName) {
+		globals::domainName = joinInfo;
+		NetApiBufferFree(joinInfo);
+	} else if (njs == NetSetupWorkgroupName)
+		// don't care about workgroups!
+		NetApiBufferFree(joinInfo);
+
+	// stop here if not joined to a domain.
+	if (njs != NetSetupDomainName)
+		return;
+
+	// Get domain SID
+	globals::domainSID = GetSIDForTrusteeNameW(globals::domainName);
+	if (!globals::domainSID)
+		// can this actually happen?
+		throw Exception("Couldn't find SID for domain name: " +
+		UnicodeToAsciiString(globals::domainName));
+
+	// disable rollback, since we finished successfully
+	errorRollback.success();
+}
+
+void WindowsCommon::uninit() {
+	globals::computerName.clear();
+	if (globals::computerSID) {
+		free(globals::computerSID);
+		globals::computerSID = NULL;
+	}
+
+	globals::domainName.clear();
+	if (globals::domainSID) {
+		free(globals::domainSID);
+		globals::domainSID = NULL;
+	}
+
+	globals::domainControllerHostnames.clear();
+}
 
 bool WindowsCommon::DisableAllPrivileges() {
 
@@ -232,23 +404,22 @@ bool WindowsCommon::GetTextualSid(PSID pSid, string* TextualSid) {
 
 bool WindowsCommon::ExpandGroup(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup) {
 
-	// Need to determine if a local or global group.
-	bool groupExists = false;
-	
-	try {
-		groupExists = WindowsCommon::GetLocalGroupMembers(groupName, members, includeSubGroups, resolveSubGroup);
-	} catch(Exception lex) {
-		Log::Info("Problem retrieving local group members for " + groupName + ":" + lex.GetErrorMessage());
-	}
+	FreeGuard<> groupSid(GetSIDForTrusteeName(groupName));
 
-	if(!groupExists) {
-		
-		try {
-			groupExists = WindowsCommon::GetGlobalGroupMembers(groupName, members, includeSubGroups, resolveSubGroup);	
-		} catch(Exception gex) {
-			Log::Info("Problem retrieving global group members for " + groupName + ":" + gex.GetErrorMessage());
-		}			
-	}	
+	// I think GetSIDForTrusteeName() always either throws or
+	// returns a SID, so this can't happen.  But just in case...
+	if (!groupSid.get())
+		return false;
+	
+	// Need to determine if a local or global group.
+	bool isLocalGroup = isLocal(groupSid.get());
+
+	bool groupExists;
+
+	if (isLocalGroup)
+		groupExists = WindowsCommon::GetLocalGroupMembers(groupName, members, includeSubGroups, resolveSubGroup);
+	else
+		groupExists = WindowsCommon::GetGlobalGroupMembers(groupName, members, includeSubGroups, resolveSubGroup);	
 
 	return groupExists;
 }
@@ -449,17 +620,8 @@ bool WindowsCommon::GetLocalGroupMembers(string groupName, StringSet* members, b
 					
 						bool isGroup = WindowsCommon::IsGroup(trusteeName);
 
-						if(isGroup && resolveSubGroup) {
-
-							if(!WindowsCommon::GetLocalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
-								
-								// May be a global group so go that route
-								if(!WindowsCommon::GetGlobalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
-									isGroup = false;
-									Log::Debug("Could not find group " + trusteeName + " when looking up group members.");	
-								}
-							}
-						} 
+						if(isGroup && resolveSubGroup)
+							ExpandGroup(trusteeName, members, includeSubGroups, resolveSubGroup);
 
 						if(!isGroup || includeSubGroups) {
 							members->insert(trusteeName);
@@ -516,99 +678,65 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 	string shortGroupName;
 	bool groupExists = false;
 	wstring globalgroupname;
-	LPCWSTR domainControllerName = NULL;
+	wstring domainControllerName;
 	GROUP_USERS_INFO_0* userInfo = NULL; 
 
 	WindowsCommon::SplitTrusteeName(groupName, &domainName, &shortGroupName);
 
-	try {
+	domainControllerName = WindowsCommon::GetDomainControllerName(domainName);
+	globalgroupname = WindowsCommon::StringToWide(shortGroupName);
 
-			domainControllerName = WindowsCommon::GetDomainControllerName(domainName);
-			globalgroupname = WindowsCommon::StringToWide(shortGroupName);
+	res = NetGroupGetUsers(
+		domainControllerName.empty() ? NULL : domainControllerName.c_str(),
+		globalgroupname.c_str(),
+		0,
+		(LPBYTE*) &userInfo,
+		MAX_PREFERRED_LENGTH,
+		&entriesread,
+		&totalentries,
+		NULL);
 
-			res = NetGroupGetUsers((LPCWSTR)domainControllerName,		// server name NULL == localhost
-								   globalgroupname.c_str(),				// group name
-								   0,									// level LOCALGROUP_MEMBERS_INFO_3
-								   (unsigned char**) &userInfo,
-								   MAX_PREFERRED_LENGTH,
-								   &entriesread,
-								   &totalentries,
-								   NULL);
+	NetApiBufferFreeGuard nabfg1(userInfo);
 
-			// was there an error?
-			if(res == NERR_Success) {
+	// was there an error?
+	if(res == NERR_Success) {
 
-				// Loop through each user.
-				for (unsigned int i=0; i<entriesread; i++) {
-					// Get the account information.
-					string trusteeName = UnicodeToAsciiString(userInfo[i].grui0_name);
-
-					// get sid for trustee name
-					PSID pSid = WindowsCommon::GetSIDForTrusteeName(trusteeName);
-
-					// get formatted trustee name
-					trusteeName = WindowsCommon::GetFormattedTrusteeName(pSid);
-
-					bool isGroup = WindowsCommon::IsGroup(trusteeName);
-
-					if(isGroup && resolveSubGroup) {
-						try {
-							if(!WindowsCommon::GetGlobalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
-									
-								if(!WindowsCommon::GetLocalGroupMembers(trusteeName, members, includeSubGroups, resolveSubGroup)) {
-									isGroup = false;
-									Log::Debug("Could not find group " + trusteeName + " when looking up group members.");
-								}
-							}
-						} catch (Exception gEx) {
-							Log::Info("Error retrieving group members for global group " + trusteeName + ":" + gEx.GetErrorMessage());
-						}
-					}
+		// Loop through each user.
+		for (unsigned int i=0; i<entriesread; i++) {
 					
-					if(!isGroup || includeSubGroups) {
-						members->insert(trusteeName);
-					}
-				}
+			FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName(domainName +
+				'\\' + UnicodeToAsciiString(userInfo[i].grui0_name)));
+			string trusteeName = WindowsCommon::GetFormattedTrusteeName(pSid.get());
 
-				groupExists = true;
-			} else {
-				if(res == NERR_InvalidComputer) {
-					// throw this error
-					throw Exception("Unable to expand global group: " + groupName + ". The computer name is invalid.");
-				} else if(res == ERROR_MORE_DATA) {
-					// throw this error
-					throw Exception("Unable to expand global group: " + groupName + ". More entries are available. Specify a large enough buffer to receive all entries. This error message should never occure since the api call is made with MAX_PREFERRED_LENGTH for the size of the buffer.");
-				} else if(res == NERR_GroupNotFound) {
-					groupExists = false;
-					// no action here
-					Log::Debug("GetGlobalGroupMembers - The global group name: " + groupName + " could not be found.");			
-				} else if(res == ERROR_ACCESS_DENIED) {
-					// throw this error???
-					throw Exception("Unable to expand global group: " + groupName + ". The user does not have access to the requested information.");			
-				} else {
-					throw Exception("Unable to expand global group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
-				}
-			}
+			bool isGroup = WindowsCommon::IsGroup(trusteeName);
 
-	} catch(...) {
-		if(domainControllerName != NULL) {
-			NetApiBufferFree((LPVOID)domainControllerName);
+			if(isGroup && resolveSubGroup)
+				ExpandGroup(trusteeName, members, includeSubGroups, resolveSubGroup);
+					
+			if(!isGroup || includeSubGroups)
+				members->insert(trusteeName);
 		}
 
-		if(userInfo != NULL) {
-			NetApiBufferFree(userInfo);
+		groupExists = true;
+	} else {
+		if(res == NERR_InvalidComputer) {
+			// throw this error
+			throw Exception("Unable to expand global group: " + groupName + ". The computer name is invalid.");
+		} else if(res == ERROR_MORE_DATA) {
+			// throw this error
+			throw Exception("Unable to expand global group: " + groupName + ". More entries are available. Specify a large enough buffer to receive all entries. This error message should never occure since the api call is made with MAX_PREFERRED_LENGTH for the size of the buffer.");
+		} else if(res == NERR_GroupNotFound) {
+			groupExists = false;
+			// no action here
+			Log::Debug("GetGlobalGroupMembers - The global group name: " + groupName + " could not be found.");			
+		} else if(res == ERROR_ACCESS_DENIED) {
+			// throw this error???
+			throw Exception("Unable to expand global group: " + groupName + ". The user does not have access to the requested information.");			
+		} else {
+			throw Exception("Unable to expand global group: " + groupName + ". " + WindowsCommon::GetErrorMessage(res));
 		}
-
-		throw;
 	}
 
-	if(domainControllerName != NULL) {
-		NetApiBufferFree((LPVOID)domainControllerName);
-	}
-
-	if(userInfo != NULL) {
-		NetApiBufferFree(userInfo);
-	}
 
 	return groupExists;
 }
@@ -681,9 +809,9 @@ StringSet* WindowsCommon::GetAllTrusteeSIDs() {
 		StringSet::iterator iterator;
 		for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 		
-			PSID pSid = WindowsCommon::GetSIDForTrusteeName((*iterator));
+			FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName((*iterator)));
 			string sidStr;
-			if (WindowsCommon::GetTextualSid(pSid, &sidStr))
+			if (WindowsCommon::GetTextualSid(pSid.get(), &sidStr))
 				WindowsCommon::allTrusteeSIDs->insert(sidStr);
 			else {
 				delete WindowsCommon::allTrusteeSIDs;
@@ -1724,7 +1852,7 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&userName);
 	
 	wstring userNameApi = WindowsCommon::StringToWide(userNameIn);
-	LPCWSTR serverName = WindowsCommon::GetDomainControllerName(domain);	
+	wstring serverName;
 	DWORD dwEntriesRead;
 	DWORD dwTotalEntries;
 	DWORD dwLevel=0;
@@ -1732,15 +1860,23 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	LPGROUP_USERS_INFO_0 pBuf = NULL;
 	string shortGroupName;
 
-	
+	// don't get a controller if the domain is the local computer.
+	// There is no controller for that.
+	if (!domain.empty()) {
+		wstring domainWide = StringToWide(domain);
+		if (!Common::EqualsIgnoreCase(domainWide, globals::computerName))
+			 serverName = WindowsCommon::GetDomainControllerName(domain);
+	}
+
 	// Call the NetUserGetGroups function, specifying level 0.
-	NET_API_STATUS nStatus = NetUserGetGroups(serverName,
-								userNameApi.c_str(),
-								dwLevel,
-								(LPBYTE*)&pBuf,
-								dwPrefMaxLen,
-								&dwEntriesRead,
-								&dwTotalEntries);
+	NET_API_STATUS nStatus = NetUserGetGroups(
+		serverName.empty() ? NULL : serverName.c_str(),
+		userNameApi.c_str(),
+		dwLevel,
+		(LPBYTE*)&pBuf,
+		dwPrefMaxLen,
+		&dwEntriesRead,
+		&dwTotalEntries);
 
 	// If the call succeeds,
 	if (nStatus == NERR_Success) {
@@ -1777,12 +1913,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		if (dwEntriesRead < dwTotalEntries) {
 			
 			// Free the allocated buffer.
-			if (serverName != NULL) {
-				NetApiBufferFree((LPVOID)serverName);
-				serverName = NULL;
-			}
-			
-			// Free the allocated buffer.
 			if (pBuf != NULL) {
 				NetApiBufferFree(pBuf);
 				pBuf = NULL;
@@ -1794,12 +1924,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	} else if(nStatus == NERR_UserNotFound) {
 		// do nothing
 	} else {
-
-		// Free the allocated buffer.
-		if (serverName != NULL) {
-			NetApiBufferFree((LPVOID)serverName);
-			serverName = NULL;
-		}
 
 		if (pBuf != NULL) {
 			NetApiBufferFree(pBuf);
@@ -1889,12 +2013,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 				
 				if (pLocalTmpBuf == NULL) {
 					
-					// Free the allocated buffer.
-					if (serverName != NULL) {
-						NetApiBufferFree((LPVOID)serverName);
-						serverName = NULL;
-					}
-
 					// Free the allocated memory.
 					if (pBuf != NULL) {
 						NetApiBufferFree(pBuf);
@@ -1913,12 +2031,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		// report an error if all groups are not listed
 		if (dwEntriesRead < dwTotalEntries) {
 
-			// Free the allocated buffer.
-			if (serverName != NULL) {
-				NetApiBufferFree((LPVOID)serverName);
-				serverName = NULL;
-			}
-
 			// Free the allocated memory.
 			if (pBuf != NULL) {
 				NetApiBufferFree(pBuf);
@@ -1931,12 +2043,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	} else if (nStatus == NERR_UserNotFound){
 		// do nothing
 	} else {
-
-		// Free the allocated buffer.
-		if (serverName != NULL) {
-			NetApiBufferFree((LPVOID)serverName);
-			serverName = NULL;
-		}
 
 		if (pBuf != NULL) {
 			NetApiBufferFree(pBuf);
@@ -1981,12 +2087,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 		throw Exception(errMsg);
 	}
 
-	// Free the allocated buffer.
-	if (serverName != NULL) {
-		NetApiBufferFree((LPVOID)serverName);
-		serverName = NULL;
-	}
-
 	// Free the allocated memory.
 	if (pBuf != NULL) {
 		NetApiBufferFree(pBuf);
@@ -2001,10 +2101,18 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	string accountName;                                               // Used to hold the account name portion of the username
 	bool enabled = true;											  // Initialize user enabled to true
 	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&accountName); // Split into domain and account name components
-	LPCWSTR serverName = WindowsCommon::GetDomainControllerName(domain);  // Retrieve the server name for the specified domain
+	wstring serverName;												  // Retrieve the server name for the specified domain
 	wstring userNameApi = WindowsCommon::StringToWide(accountName);   // Convert account name into wide string for use in the api
 	DWORD dwLevel = 23;                                               // Need USER_INFO_23  to get enabled flag
 	LPUSER_INFO_23 pBuf = NULL;                                       // Will be used to hold the user info 
+
+	// don't get a controller if the domain is the local computer.
+	// There is no controller for that.
+	if (!domain.empty()) {
+		wstring domainWide = StringToWide(domain);
+		if (!Common::EqualsIgnoreCase(domainWide, globals::computerName))
+			 serverName = WindowsCommon::GetDomainControllerName(domain);
+	}
 
 	// Call the NetUserGetInfo function
 	//
@@ -2012,16 +2120,11 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 	// host only. This will prevent the interpreter from trying to get user
 	// information for users that are not defined on the local host.
 	//
-	NET_API_STATUS nStatus = NetUserGetInfo(serverName,
-							userNameApi.c_str(),
-							dwLevel,
-							(LPBYTE *)&pBuf);
-
-	// Free the allocated buffer.
-	if (serverName != NULL) {
-		NetApiBufferFree((LPVOID)serverName);
-		serverName = NULL;
-	}
+	NET_API_STATUS nStatus = NetUserGetInfo(
+		serverName.empty() ? NULL : serverName.c_str(),
+		userNameApi.c_str(),
+		dwLevel,
+		(LPBYTE *)&pBuf);
 
 	// If the call succeeds, print the user information.
 	if (nStatus == NERR_Success) {
@@ -2480,15 +2583,33 @@ string WindowsCommon::GetObjectType ( SE_OBJECT_TYPE objectType ) {
     }
 }
 
-LPCWSTR WindowsCommon::GetDomainControllerName(string domainName){
+wstring WindowsCommon::GetDomainControllerName(string domainName){
 
+	// backward compatibility... but maybe it doesn't make sense
+	// to call this method on an empty string??
+	if (domainName.empty())
+		return L"";
+
+	wstring domainNameWide = StringToWide(domainName);
+	globals::DomainControllerMap::const_iterator iter = 
+		globals::domainControllerHostnames.find(domainNameWide);
+	if (iter != globals::domainControllerHostnames.end())
+		return iter->second;
+
+	wstring dc;
 	LPBYTE domainControllerName = NULL;
-	wstring wDomainName = WindowsCommon::StringToWide(domainName);
-	if( domainName.compare("") == 0 || NetGetAnyDCName(NULL, wDomainName.c_str(), &domainControllerName) != NERR_Success) {
-		domainControllerName = NULL;
-	}
+	NET_API_STATUS nas;
+	nas = NetGetAnyDCName(NULL, domainNameWide.c_str(), &domainControllerName);
+	if(nas == NERR_Success) {
+		dc =  (LPWSTR)domainControllerName;
+		NetApiBufferFree(domainControllerName);
+	} else
+		Log::Debug("Couldn't get controller for domain \"" + domainName + 
+			"\": NetGetAnyDCName: " + GetErrorMessage(nas));
 
-	return (LPCWSTR)domainControllerName;
+	globals::domainControllerHostnames[domainNameWide] = dc;
+
+	return dc;
 }
 
 string WindowsCommon::GetActualPathWithCase(const string &path) {
@@ -2612,4 +2733,84 @@ BitnessView WindowsCommon::behavior2view(BehaviorVector *bv) {
 		return schemaDefault;
 
 	return behavior2view(viewStr);
+}
+
+namespace {
+	bool isLocal(PSID sid) {
+		// initialization must have completed first!
+		assert(globals::computerSID);
+
+		DWORD err;
+		FreeGuard<> thisSidsDomain;
+		DWORD thisSidsDomainSize = 0;
+		if (!GetWindowsAccountDomainSid(sid, NULL, &thisSidsDomainSize))
+		{
+			err = GetLastError();
+			if (err == ERROR_NON_ACCOUNT_SID)
+				return true;
+			else if (err != ERROR_INSUFFICIENT_BUFFER)
+				throw Exception("GetWindowsAccountDomainSid: " +
+					WindowsCommon::GetErrorMessage(err));
+			
+			if (!thisSidsDomain.realloc(thisSidsDomainSize))
+				throw Exception("Out of memory!");
+		}
+
+		bool local;
+		if (GetWindowsAccountDomainSid(sid, thisSidsDomain.get(), &thisSidsDomainSize))
+			// !! eliminates warning C4800.  Docs also say you could append "!= 0"...
+			local = !!EqualSid(globals::computerSID, thisSidsDomain.get());
+
+		else {
+			err = GetLastError();
+			// but wouldn't we have already caught this error above??
+			if (err != ERROR_NON_ACCOUNT_SID)
+				throw Exception("GetWindowsAccountDomainSid: " +
+					WindowsCommon::GetErrorMessage(err));
+
+			local = true;
+		}
+
+		return local;
+	}
+
+	PSID GetSIDForTrusteeNameW(const wstring &trusteeName) {
+
+		DWORD sidSize = 128;
+		DWORD domainSize = 128;
+		SID_NAME_USE sidUse;
+		BOOL retVal = FALSE;
+		FreeGuard<> pSid; // PSID is actually void*...
+		FreeGuard<WCHAR> domain;
+		DWORD err;
+	
+		do {
+			// Initial memory allocations for the SID and DOMAIN.
+			if (!pSid.realloc(sidSize))
+				throw Exception(string("realloc: ")+strerror(errno));
+
+			if (!domain.realloc(domainSize * sizeof(WCHAR)))
+				throw Exception(string("realloc: ")+strerror(errno));
+
+			// Call LookupAccountName to get the SID.
+			retVal = LookupAccountNameW(NULL,				// system name NULL == localhost
+									trusteeName.c_str(),	// account name
+									pSid.get(),				// security identifier
+									&sidSize,				// size of security identifier
+									domain.get(),			// domain name
+									&domainSize,			// size of domain name
+									&sidUse);				// SID-type indicator
+			err = GetLastError();
+
+		} while (!retVal && err == ERROR_INSUFFICIENT_BUFFER);
+
+		if (!retVal) {
+			if (err == ERROR_NONE_MAPPED)
+				return NULL;
+			throw Exception("LookupAccountName failed: " + 
+				WindowsCommon::GetErrorMessage(err));
+		}
+
+		return pSid.release();
+	}
 }

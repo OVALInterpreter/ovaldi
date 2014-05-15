@@ -309,6 +309,9 @@ class Common {
 		/** Returns whether the two strings are equal, ignoring case. */
 		static bool EqualsIgnoreCase(const std::string &s1, const std::string &s2);
 
+		/** Returns whether the two strings are equal, ignoring case. */
+		static bool EqualsIgnoreCase(const std::wstring &s1, const std::wstring &s2);
+
 		/**
 		 * If the given path ends with a trailing path separator, this method
 		 * in most cases returns the path with that separator stripped off.  The exception

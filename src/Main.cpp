@@ -224,6 +224,45 @@ int main(int argc, char* argv[]) {
 		exit( EXIT_SUCCESS );
 	}
 
+#ifdef WIN32
+	// Init WindowsCommon.  I want to wait until some of the startup
+	// junk is complete, so we're not looking for windows domain controllers
+	// and stuff every time someone just wants some commandline help...
+
+	/**
+	 * Protect WindowsCommon startup/shutdown in a guard, so we make sure
+	 * its always shut down.
+	 */
+	class WindowsCommonSetupGuard {
+	public:
+		WindowsCommonSetupGuard() {
+			try {
+				WindowsCommon::init();
+			} catch (Exception &e) {
+				Log::Fatal("Initialization failure: " + e.GetErrorMessage());
+				exit(EXIT_FAILURE);
+			}
+		}
+
+		~WindowsCommonSetupGuard() {
+			// just in case... let no exceptions out!
+			// Maybe on uninit errors, I'll just let the
+			// app continue; it's probably already shutting
+			// down anyway...
+			try {
+				WindowsCommon::uninit();
+			} catch (Exception &e) {
+				Log::Fatal("Uninitialization failed: " +
+					e.GetErrorMessage());
+				//exit(EXIT_FAILURE);
+			} catch (...) {
+				Log::Fatal("Uninitialization failed!");
+				//exit(EXIT_FAILURE);
+			}
+		}
+	} windowsCommonSetupGuard;
+#endif
+
 	//////////////////////////////////////////////////////
 	//////////////  Disable All Privileges  //////////////
 	//////////////////////////////////////////////////////
