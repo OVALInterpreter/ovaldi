@@ -268,6 +268,9 @@ Item* RegKeyAuditedPermissionsProbe::GetAuditedPermissions ( HKEY keyHandle, con
     try {
         // Get the sid for the trustee name.
         pSid = WindowsCommon::GetSIDForTrusteeName ( trusteeNameStr );
+		if (!pSid)
+			return NULL;
+
         // The registry key exists and trustee name seems good so we can create the new item now.
         item = this->CreateItem();
         item->SetStatus ( OvalEnum::STATUS_EXISTS );

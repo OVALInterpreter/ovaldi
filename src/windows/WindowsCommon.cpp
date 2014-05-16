@@ -406,8 +406,6 @@ bool WindowsCommon::ExpandGroup(string groupName, StringSet* members, bool inclu
 
 	FreeGuard<> groupSid(GetSIDForTrusteeName(groupName));
 
-	// I think GetSIDForTrusteeName() always either throws or
-	// returns a SID, so this can't happen.  But just in case...
 	if (!groupSid.get())
 		return false;
 	
@@ -702,10 +700,13 @@ bool WindowsCommon::GetGlobalGroupMembers(string groupName, StringSet* members, 
 	if(res == NERR_Success) {
 
 		// Loop through each user.
-		for (unsigned int i=0; i<entriesread; i++) {
+		for (DWORD i=0; i<entriesread; i++) {
 					
 			FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName(domainName +
 				'\\' + UnicodeToAsciiString(userInfo[i].grui0_name)));
+			if (!pSid.get())
+				continue;
+
 			string trusteeName = WindowsCommon::GetFormattedTrusteeName(pSid.get());
 
 			bool isGroup = WindowsCommon::IsGroup(trusteeName);
@@ -810,6 +811,9 @@ StringSet* WindowsCommon::GetAllTrusteeSIDs() {
 		for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 		
 			FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName((*iterator)));
+			if (!pSid.get())
+				continue;
+
 			string sidStr;
 			if (WindowsCommon::GetTextualSid(pSid.get(), &sidStr))
 				WindowsCommon::allTrusteeSIDs->insert(sidStr);
@@ -911,10 +915,12 @@ StringSet* WindowsCommon::GetAllLocalGroups() {
 			// Group account names are limited to 256 characters.
 
 			// Loop through each group.
-			for (unsigned int i=0; i<recordsEnumerated; i++) {
+			for (DWORD i=0; i<recordsEnumerated; i++) {
 				string groupName = UnicodeToAsciiString(localGroupInfo[i].lgrpi0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
+				if (!pSid)
+					continue;
 				// get formatted trustee name
 				groupName = WindowsCommon::GetFormattedTrusteeName(pSid);
 				allGroups->insert(groupName);
@@ -997,10 +1003,12 @@ StringSet* WindowsCommon::GetAllGlobalGroups() {
 			// Group account names are limited to 256 characters.
 
 			// Loop through each group.
-			for (unsigned int i=0; i<recordsEnumerated; i++) {
+			for (DWORD i=0; i<recordsEnumerated; i++) {
 				string groupName = UnicodeToAsciiString(globalGroupInfo[i].grpi0_name);
 				// get sid for trustee name
 				PSID pSid = WindowsCommon::GetSIDForTrusteeName(groupName);
+				if (!pSid)
+					continue;
 				// get formatted trustee name
 				groupName = WindowsCommon::GetFormattedTrusteeName(pSid);
 				allGroups->insert(groupName);
@@ -1042,6 +1050,10 @@ void WindowsCommon::ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, Str
 	for(iterator = trusteeNames->begin(); iterator != trusteeNames->end(); iterator++) {
 	
 		FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName(*iterator));
+		if (!pSid.get()) {
+			Log::Info("ConvertTrusteeNamesToSidStrings: trustee not found: " + *iterator);
+			continue;
+		}
 		string sidStr;
 
 		if (!WindowsCommon::GetTextualSid(pSid.get(), &sidStr)) {
@@ -1133,12 +1145,12 @@ void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 				// Get the account information.
 				string userName = UnicodeToAsciiString(userInfo[i].usri0_name);
 				// get sid for trustee name
-				PSID pSid = WindowsCommon::GetSIDForTrusteeName(userName);
+				FreeGuard<> pSid(WindowsCommon::GetSIDForTrusteeName(userName));
+				if (!pSid.get())
+					continue;
 				// get formatted trustee name
-				userName = WindowsCommon::GetFormattedTrusteeName(pSid);
+				userName = WindowsCommon::GetFormattedTrusteeName(pSid.get());
 				allUsers->insert(userName);
-			
-				
 			}
 
 		} else {
@@ -1245,6 +1257,7 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 	BOOL retVal = FALSE;
 	FreeGuard<> pSid; // PSID is actually void*...
 	FreeGuard<TCHAR> domain;
+	DWORD err;
 	
 	do {
 		// Initial memory allocations for the SID and DOMAIN.
@@ -1262,15 +1275,16 @@ PSID WindowsCommon::GetSIDForTrusteeName(string trusteeName) {
 								domain.get(),									// domain name
 								&domainSize,							// size of domain name
 								&sidUse);								// SID-type indicator
+		err = GetLastError();
 
-	} while (!retVal && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+	} while (!retVal && err == ERROR_INSUFFICIENT_BUFFER);
 
-	if (!retVal)
-		throw Exception("LookupAccountName failed: " + GetErrorMessage(GetLastError()));
-
-	// check the sid
-	if (!IsValidSid(pSid.get()))
-		throw Exception("A sid was found for " + trusteeName + " but it was invalid!");
+	if (!retVal) {
+		if (err == ERROR_NONE_MAPPED)
+			return NULL;
+		throw Exception("LookupAccountName(" + trusteeName + ") failed: " +
+			GetErrorMessage(GetLastError()));
+	}
 
 	return pSid.release();
 }
@@ -2621,7 +2635,7 @@ string WindowsCommon::GetActualPathWithCase(const string &path) {
 	ArrayGuard<char> shortBuf(new char[sz]);
 
 	// This is hard-coded to use the 'A' versions of the functions... since we
-	// don't actually use wide-char strings anywhere do we?
+	// don't need wide-char paths I don't think.
 	sz2 = GetShortPathNameA(path.c_str(), shortBuf.get(), sz);
 	if (sz2 > sz) {
 		sz = sz2;

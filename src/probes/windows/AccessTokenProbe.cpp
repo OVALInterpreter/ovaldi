@@ -217,6 +217,8 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 
 			// Get the SID.
 			PSID psid = WindowsCommon::GetSIDForTrusteeName(currentAccountName);
+			if (!psid)
+				continue;
 
 			// Enumerate Access Rights
 			PLSA_UNICODE_STRING userRights = NULL;
