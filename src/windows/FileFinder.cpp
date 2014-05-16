@@ -124,9 +124,10 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes.
-		constPortion = Common::StripTrailingSeparators(
-			WindowsCommon::GetActualPathWithCase(
-				this->fileMatcher->RemoveExtraSlashes(constPortion)));
+		string tmp = this->fileMatcher->RemoveExtraSlashes(constPortion);
+		if (!WindowsCommon::GetActualPathWithCase(tmp, &constPortion))
+			return;
+		constPortion = Common::StripTrailingSeparators(constPortion);
 	}
 
 	// Found a constant portion
@@ -241,7 +242,9 @@ StringVector* FileFinder::GetDrives() {
 
 			// Only fixed drives.
 			if(GetDriveType(drive) == DRIVE_FIXED) {
-				drives->push_back(WindowsCommon::GetActualPathWithCase(drive));
+				string casedDrive;
+				if (WindowsCommon::GetActualPathWithCase(drive, &casedDrive))
+					drives->push_back(casedDrive);
 			}
 
 			index += strlen(drive) + 1; // skip over the '\0' too
@@ -494,9 +497,13 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 			CloseHandle(hFile); 
 		}
 
-		if (exists && actualPath != NULL)
-			*actualPath = Common::StripTrailingSeparators(
-				WindowsCommon::GetActualPathWithCase(path));
+		if (exists && actualPath != NULL) {
+			string casedPath;
+			if (WindowsCommon::GetActualPathWithCase(path, &casedPath))
+				*actualPath = Common::StripTrailingSeparators(casedPath);
+			else
+				exists = false; // file disappeared??
+		}
 
 	} catch(Exception ex) {
 		if (hFile != INVALID_HANDLE_VALUE)
@@ -566,10 +573,13 @@ bool FileFinder::FileNameExists(string path, string fileName, string *actualFile
 		}
 
 		if (exists && actualFileName != NULL) {
-			string actualFilepath = WindowsCommon::GetActualPathWithCase(filePath);
-			auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
-			if (split.get())
-				*actualFileName = split->second;
+			string actualFilepath;
+			if (WindowsCommon::GetActualPathWithCase(filePath, &actualFilepath)) {
+				auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
+				if (split.get())
+					*actualFileName = split->second;
+			} else
+				exists = false; // file disappeared??
 		}
 
 	} catch(Exception ex) {

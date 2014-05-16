@@ -2626,12 +2626,23 @@ wstring WindowsCommon::GetDomainControllerName(string domainName){
 	return dc;
 }
 
-string WindowsCommon::GetActualPathWithCase(const string &path) {
+bool WindowsCommon::GetActualPathWithCase(const string &path, string *casedPath) {
 
-	if (path.empty())
-		return path;
+	if (path.empty()) {
+		casedPath->clear();
+		return true;
+	}
+
+// make not-found error detection consistent and cleaner...
+// would be good to make use of this idea in the
+// filefinder too, I think...
+#define IS_NOT_FOUND_ERROR(err) \
+	((err) == ERROR_FILE_NOT_FOUND || \
+	(err) == ERROR_PATH_NOT_FOUND || \
+	(err) == ERROR_NOT_READY)
 
 	DWORD sz = 100, sz2;
+	DWORD err;
 	ArrayGuard<char> shortBuf(new char[sz]);
 
 	// This is hard-coded to use the 'A' versions of the functions... since we
@@ -2641,16 +2652,23 @@ string WindowsCommon::GetActualPathWithCase(const string &path) {
 		sz = sz2;
 		shortBuf.reset(new char[sz]);
 		sz2 = GetShortPathNameA(path.c_str(), shortBuf.get(), sz);
-		if (sz2 == 0)
+		if (sz2 == 0) {
+			err = GetLastError();
+			if (IS_NOT_FOUND_ERROR(err))
+				return false;
 			throw Exception("GetShortPathName("+path+"): "+
-				WindowsCommon::GetErrorMessage(GetLastError()));
-		else if (sz2 > sz)
+				WindowsCommon::GetErrorMessage(err));
+		} else if (sz2 > sz)
 			// really shouldn't happen right???
 			throw Exception("GetShortPathName("+path+
 				"): incorrectly predicted space requirements");
-	} else if (sz2 == 0)
+	} else if (sz2 == 0) {
+		err = GetLastError();
+		if (IS_NOT_FOUND_ERROR(err))
+			return false;
 		throw Exception("GetShortPathName("+path+"): "+
-			WindowsCommon::GetErrorMessage(GetLastError()));
+			WindowsCommon::GetErrorMessage(err));
+	}
 
 	sz = 100;
 	ArrayGuard<char> longBuf(new char[sz]);
@@ -2660,16 +2678,23 @@ string WindowsCommon::GetActualPathWithCase(const string &path) {
 		sz = sz2;
 		longBuf.reset(new char[sz]);
 		sz2 = GetLongPathNameA(shortBuf.get(), longBuf.get(), sz);
-		if (sz2 == 0)
+		if (sz2 == 0) {
+			err = GetLastError();
+			if (IS_NOT_FOUND_ERROR(err))
+				return false;
 			throw Exception("GetLongPathName("+path+"): "+
-				WindowsCommon::GetErrorMessage(GetLastError()));
-		else if (sz2 > sz)
+				WindowsCommon::GetErrorMessage(err));
+		} else if (sz2 > sz)
 			// really shouldn't happen right???
 			throw Exception("GetLongPathName("+path+
 				"): incorrectly predicted space requirements");
-	} else if (sz2 == 0)
+	} else if (sz2 == 0) {
+		err = GetLastError();
+		if (IS_NOT_FOUND_ERROR(err))
+			return false;
 		throw Exception("GetLongPathName("+path+"): "+
-			WindowsCommon::GetErrorMessage(GetLastError()));
+			WindowsCommon::GetErrorMessage(err));
+	}
 
 	// The short->long conversion doesn't seem to affect drive letters.
 	// So let's just decide they should all be uppercase.
@@ -2678,7 +2703,10 @@ string WindowsCommon::GetActualPathWithCase(const string &path) {
 		longBuf[1] == ':')
 		longBuf[0] = static_cast<char>(toupper(longBuf[0]));
 
-	return string(longBuf.get());
+	*casedPath = longBuf.get();
+	return true;
+
+#undef IS_NOT_FOUND_ERROR
 }
 
 bool WindowsCommon::IsWow64Process()

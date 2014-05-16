@@ -385,8 +385,10 @@ public:
 	 * which you can get filename info.  If that can be made to work, it would
 	 * much simpler than any of the above techniques.  But we must stay
 	 * compatible with XP.
+	 * \return false if the file did not exist; true on success.  Throws on other
+	 *   errors.
 	 */
-	static std::string GetActualPathWithCase(const std::string &path);
+	static bool GetActualPathWithCase(const std::string &path, std::string *casedString);
 
 	/**
 	 * Returns true if this process is running under WoW64.
