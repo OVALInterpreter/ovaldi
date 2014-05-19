@@ -76,7 +76,7 @@
 #  include <map>
 #  include <memory>
 #  include <string>
-
+#  include <unistd.h>
 #  include <Log.h>
 #  include <VectorPtrGuard.h>
 #endif
