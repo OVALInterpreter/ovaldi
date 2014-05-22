@@ -68,7 +68,6 @@
 #include "AccountInfoProbe.h"
 #include "InetListeningServer510Probe.h"
 #include "PwPolicy59Probe.h"
-#include "DiskutilProbe.h"
 
 #include "ProbeFactory.h"
 
@@ -141,8 +140,6 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = InetListeningServer510Probe::Instance();
 	} else if(objectName.compare("pwpolicy59_object") == 0) {
 		probe = PwPolicy59Probe::Instance();
-	} else if(objectName.compare("diskutil_object") == 0) {
-		probe = DiskutilProbe::Instance();
 	}
 
 //Not applicable
