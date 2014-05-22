@@ -1,27 +1,28 @@
 #ifndef COMMANDREADER_H
 #define COMMANDREADER_H
 
-#include <stdio.h>
+#include <cstdio> // for FILE
 #include <string>
-#include <Log.h>
-#include "Common.h"
 
-using namespace std;
+#include <StdTypedefs.h>
 
 class CommandReader {
 
 public:
-	CommandReader(std::string command);
+	explicit CommandReader(const std::string &command);
 
-	virtual ~CommandReader();
+	~CommandReader();
 
 	StringVector Read();
 
-	static StringVector* Split(const std::string &s, char delim);
+	static StringVector Split(const std::string &s, char delim);
 	
-	static StringVector* Split(const std::string &s, const std::string &delim);
+	static StringVector Split(const std::string &s, const std::string &delim);
 	
-	static StringVector GetResponse(std::string command);
+	static StringVector GetResponse(const std::string &command) {
+		CommandReader cr(command);
+		return cr.Read();
+	}
 
 private:
 	FILE *ifp;

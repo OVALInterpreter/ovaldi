@@ -116,12 +116,12 @@ Item* AccountInfoProbe::FillItem(string username) {
 			realname = line;
 			Common::TrimString(realname);
 		}
-		StringVector* elems = CommandReader::Split(line, ' ');
-		StringVector::iterator it = elems->begin();
+		StringVector elems = CommandReader::Split(line, ' ');
+		StringVector::iterator it = elems.begin();
 		name = *it;
 		it++;
 		Common::TrimString(name);
-		if (it != elems->end()) {
+		if (it != elems.end()) {
 			if (name.compare("dsAttrTypeNative:gid:") == 0)
 				gid = *it;
 			if (name.compare("dsAttrTypeNative:home:") == 0)
@@ -137,7 +137,6 @@ Item* AccountInfoProbe::FillItem(string username) {
 				multiline = 1;
 			}
 		}
-		delete elems;
 	}
 
 	Item* item = this->CreateItem();

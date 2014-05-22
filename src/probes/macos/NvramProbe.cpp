@@ -133,14 +133,13 @@ void NvramProbe::GetAllVars() {
 
 	for (StringVector::iterator it = lines.begin(); it != lines.end(); it++) {
 		string line = *it;
-		StringVector* elems = CommandReader::Split(line, '\t');
-		if (elems->size() > 1) {
-			StringVector::iterator it = elems->begin();
+		StringVector elems = CommandReader::Split(line, '\t');
+		if (elems.size() > 1) {
+			StringVector::iterator it = elems.begin();
 			name = *it++;
 			value = *it;
 			vars->push_back(new StringPair(name, value));
 		}
-		delete elems;
 	}
 }
 

@@ -198,8 +198,8 @@ LsofRecord* InetListeningServer510Probe::ParseLine(const std::string &line) {
 	std::string name, pr, la, lp, lfa, pn, fa, fp, ffa, p, u, tmp1, tmp2, tmp3, tmp4;
 	std::size_t found, fport;
 
-	StringVector* elems = CommandReader::Split(line, ' ');
-	StringVector::iterator it = elems->begin();
+	StringVector elems = CommandReader::Split(line, ' ');
+	StringVector::iterator it = elems.begin();
 	pn = *it++;
 	p = *it++;
 	u = *it++;
@@ -209,8 +209,6 @@ LsofRecord* InetListeningServer510Probe::ParseLine(const std::string &line) {
 	tmp4 = *it++;
 	pr = *it++;
 	name = *it;
-	
-	delete elems;
 	
     found = name.find("->");
 	if (found!=std::string::npos) {

@@ -161,12 +161,12 @@ PwPolicyMap PwPolicy59Probe::GetRecord(string targetUser, ObjectEntity* username
 	if (lines.size() > 0) {
 		StringVector::iterator it = lines.begin();
 		string line = *it;
-		StringVector* elems = CommandReader::Split(line, " ");
-		for (it = elems->begin(); it != elems->end(); it++) {
+		StringVector elems = CommandReader::Split(line, " ");
+		for (it = elems.begin(); it != elems.end(); it++) {
 			string elem = *it;
-			StringVector* keyvalues = CommandReader::Split(elem, "=");
-			if (keyvalues->size() > 1) {
-				StringVector::iterator keyit = keyvalues->begin();
+			StringVector keyvalues = CommandReader::Split(elem, "=");
+			if (keyvalues.size() > 1) {
+				StringVector::iterator keyit = keyvalues.begin();
 				string key = *keyit++;
 				string value = *keyit;
 				// convert booleans to integers for elements that expect integer values
@@ -180,9 +180,7 @@ PwPolicyMap PwPolicy59Probe::GetRecord(string targetUser, ObjectEntity* username
 				}
 				record[key] = value;
 			}
-			delete keyvalues;
 		}
-		delete elems;
 	}
 	return record;
 }
@@ -203,4 +201,3 @@ ObjectEntity* PwPolicy59Probe::ValidateStringOperations(ObjectEntity* stringOp) 
 	}
 	return stringOp;
 }
-
