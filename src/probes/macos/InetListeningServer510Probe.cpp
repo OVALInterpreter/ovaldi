@@ -206,17 +206,26 @@ void InetListeningServer510Probe::GetAllRecords() {
 
 	DeleteRecords(); // just in case
 	records = new LsofRecordVector();
-	for (StringVector::iterator it = lines.begin(); it != lines.end(); it++) {
-		if (it->find("COMMAND") == string::npos)
-			records->push_back(this->ParseLine(*it));
-	}
+	for (StringVector::iterator it = lines.begin(); it != lines.end(); it++)
+		this->ParseLine(*it);
 }
 
-InetListeningServer510Probe::LsofRecord InetListeningServer510Probe::ParseLine(const string &line) {
+void InetListeningServer510Probe::ParseLine(const string &line) {
 	string pr, la, lp, lfa, pn, fa, fp="0", ffa, p, u;
 	size_t arrow, colon;
 
+	// skip the header line
+	if (line.find("COMMAND") != string::npos)
+		return;
+	
 	StringVector elems = CommandReader::Split(line, ' ');
+
+	// unexpected format... should print these lines
+	// out, I think, so I know if it happens.
+	if (elems.size() < 9) {
+		Log::Debug("Unexpected format in 'lsof' output line:\n\t\"" + line + '\"');
+		return;
+	}
 
 	const string &name = elems[8];
     arrow = name.find("->");
@@ -252,7 +261,7 @@ InetListeningServer510Probe::LsofRecord InetListeningServer510Probe::ParseLine(c
 	stripBrackets(&la);
 	stripBrackets(&fa);
 
-	return LsofRecord(
+	records->push_back(LsofRecord(
 		elems[7],
 		la,
 		lp,
@@ -262,7 +271,7 @@ InetListeningServer510Probe::LsofRecord InetListeningServer510Probe::ParseLine(c
 		fp,
 		ffa,
 		elems[1],
-		elems[2]);
+		elems[2]));
 }
 
 void InetListeningServer510Probe::DeleteRecords() {

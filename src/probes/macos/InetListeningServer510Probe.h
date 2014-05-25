@@ -100,7 +100,12 @@ private:
 	
 	void GetAllRecords();
 	
-	LsofRecord ParseLine(const std::string &line);
+	/**
+	 * Processes lsof output line \p line and adds a record to
+	 * InetListeningServer510Probe::records if processing was
+	 * successful.
+	 */
+	void ParseLine(const std::string &line);
 
 	void DeleteRecords();
 };
