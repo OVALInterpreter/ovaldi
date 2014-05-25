@@ -28,23 +28,32 @@
 //
 //****************************************************************************************//
 
-#include "InetListeningServer510Probe.h"
 #include <VectorPtrGuard.h>
 #include "CommandReader.h"
 
+#include "InetListeningServer510Probe.h"
+
 using namespace std;
+
+namespace {
+	/**
+	 * ipv6 addresses get pulled outta 'lsof' output with square brackets around
+	 * them.  This function strips them off.
+	 */
+	void stripBrackets(string *addr);
+}
+
 
 //****************************************************************************************//
 //								InetListeningServer510Probe Class						  //
 //****************************************************************************************//
 InetListeningServer510Probe *InetListeningServer510Probe::instance = NULL;
 
-InetListeningServer510Probe::InetListeningServer510Probe() {
-	records = NULL;
+InetListeningServer510Probe::InetListeningServer510Probe() : records(NULL) {
 }
 
 InetListeningServer510Probe::~InetListeningServer510Probe() {
-    instance = NULL;
+	instance = NULL;
 	InetListeningServer510Probe::DeleteRecords();
 }
 
@@ -62,7 +71,6 @@ AbsProbe* InetListeningServer510Probe::Instance() {
 
 ItemVector* InetListeningServer510Probe::CollectItems(Object *object) {
 	bool protocolCheck, localAddressCheck, localPortCheck = false;
-	long long port1, port2;
 
 	ObjectEntity* protocol = this->ValidateStringOperations(object->GetElementByName("protocol"));
 	ObjectEntity* localAddress = this->ValidateStringOperations(object->GetElementByName("local_address"));
@@ -75,32 +83,25 @@ ItemVector* InetListeningServer510Probe::CollectItems(Object *object) {
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	LsofRecordVector::iterator it;
+	ItemEntity protocolIe("protocol");
+	ItemEntity localAddressIe("local_address");
+	ItemEntity localPortIe("local_port", "", OvalEnum::DATATYPE_INTEGER);
 	for(it = records->begin(); it != records->end(); it++) {
-		LsofRecord* record = *it;
-		Item* item = this->FillItem(record);
 		
-		if (item != NULL) {
-			Common::FromString(record->local_port, &port1);
-			Common::FromString(localPort->GetValue(), &port2);
-			
-			auto_ptr<ItemEntity> protocolIe(new ItemEntity("protocol", record->protocol));
-			protocolCheck = (protocol->Analyze(protocolIe.get()) == OvalEnum::RESULT_TRUE);
+		protocolIe.SetValue(it->protocol);
+		protocolCheck = (protocol->Analyze(&protocolIe) == OvalEnum::RESULT_TRUE);
 
-			auto_ptr<ItemEntity> localAddressIe(new ItemEntity("local_address", record->local_address));
-			localAddressCheck = (localAddress->Analyze(localAddressIe.get()) == OvalEnum::RESULT_TRUE);
+		localAddressIe.SetValue(it->local_address);
+		localAddressCheck = (localAddress->Analyze(&localAddressIe) == OvalEnum::RESULT_TRUE);
 
-			auto_ptr<ItemEntity> localPortIe(new ItemEntity("local_port", record->local_port, OvalEnum::DATATYPE_INTEGER));
-			ItemEntity* tmp = this->CreateItemEntity(localPort);
-			tmp->SetValue(record->local_port);
-			if (record->local_port == "") {
-				tmp->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			}
-			localPortCheck = (localPort->Analyze(tmp) == OvalEnum::RESULT_TRUE);
-			if (protocolCheck && localAddressCheck && localPortCheck) {
-				collectedItems->push_back(item);
-			} else {
-				delete item;
-			}
+		localPortIe.SetValue(it->local_port);
+		localPortIe.SetStatus(it->local_port.empty() ?
+							  OvalEnum::STATUS_DOES_NOT_EXIST : OvalEnum::STATUS_EXISTS);
+		localPortCheck = (localPort->Analyze(&localPortIe) == OvalEnum::RESULT_TRUE);
+
+		if (protocolCheck && localAddressCheck && localPortCheck) {
+			Item* item = this->FillItem(*it);
+			collectedItems->push_back(item);
 		}
 	}
 	return collectedItems.release();
@@ -121,25 +122,38 @@ Item* InetListeningServer510Probe::CreateItem() {
 	return item;
 }
 
-Item* InetListeningServer510Probe::FillItem(LsofRecord *record) {
+Item* InetListeningServer510Probe::FillItem(const LsofRecord &record) {
+
+#define ADD_ENTITY_TYPE(name_, type_) \
+	item->AppendElement(new ItemEntity(#name_, record.name_, OvalEnum::DATATYPE_ ## type_))
+
+// a bit briefer for most of the entities, which are string-typed.
+#define ADD_ENTITY(name_) ADD_ENTITY_TYPE(name_, STRING)
 
 	Item* item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("protocol", record->protocol, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("local_address", record->local_address, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	if (record->local_port == "") {
-		item->AppendElement(new ItemEntity("local_port", record->local_port, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST));
+
+	ADD_ENTITY(protocol);
+	ADD_ENTITY(local_address);
+	
+	if (record.local_port.empty()) {
+		item->AppendElement(new ItemEntity("local_port", record.local_port, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST));
 	} else {
-		item->AppendElement(new ItemEntity("local_port", record->local_port, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("local_port", record.local_port, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 	}
-	item->AppendElement(new ItemEntity("local_full_address", record->local_full_address, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("program_name", record->program_name, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("foreign_address", record->foreign_address, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("foreign_port", record->foreign_port, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("foreign_full_address", record->foreign_full_address, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("pid", record->pid, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("user_id", record->user_id, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
+
+	ADD_ENTITY(local_full_address);
+	ADD_ENTITY(program_name);
+	ADD_ENTITY(foreign_address);
+	ADD_ENTITY_TYPE(foreign_port, INTEGER);
+	ADD_ENTITY(foreign_full_address);
+	ADD_ENTITY_TYPE(pid, INTEGER);
+	ADD_ENTITY_TYPE(user_id, INTEGER);
+
 	return item;
+
+#undef ADD_ENTITY
+#undef ADD_ENTITY_TYPE
 }
 
 ObjectEntity* InetListeningServer510Probe::ValidateStringOperations(ObjectEntity* stringOp) {
@@ -182,72 +196,90 @@ ObjectEntity* InetListeningServer510Probe::ValidateIntOperations(ObjectEntity* i
 }
 
 void InetListeningServer510Probe::GetAllRecords() {
-	StringVector lines = CommandReader::GetResponse("/usr/sbin/lsof -i -P -n -l");
-	REGEX regex;
+/*
+// for testing
+	StringVector lines;
+	lines.push_back("airportd     80        0   22u  IPv4 0xac2b914e6c494e79    0t0    UDP *:*");
+*/
 
+	StringVector lines = CommandReader::GetResponse("/usr/sbin/lsof -i -P -n -l");
+
+	DeleteRecords(); // just in case
 	records = new LsofRecordVector();
 	for (StringVector::iterator it = lines.begin(); it != lines.end(); it++) {
-		string line = *it;
-		if (regex.IsMatch("COMMAND", line.c_str()) == false) {
-			records->push_back(this->ParseLine(line));
-		}
+		if (it->find("COMMAND") == string::npos)
+			records->push_back(this->ParseLine(*it));
 	}
 }
 
-LsofRecord* InetListeningServer510Probe::ParseLine(const std::string &line) {
-	std::string name, pr, la, lp, lfa, pn, fa, fp, ffa, p, u, tmp1, tmp2, tmp3, tmp4;
-	std::size_t found, fport;
+InetListeningServer510Probe::LsofRecord InetListeningServer510Probe::ParseLine(const string &line) {
+	string pr, la, lp, lfa, pn, fa, fp="0", ffa, p, u;
+	size_t arrow, colon;
 
 	StringVector elems = CommandReader::Split(line, ' ');
-	StringVector::iterator it = elems.begin();
-	pn = *it++;
-	p = *it++;
-	u = *it++;
-	tmp1 = *it++;
-	tmp2 = *it++;
-	tmp3 = *it++;
-	tmp4 = *it++;
-	pr = *it++;
-	name = *it;
-	
-    found = name.find("->");
-	if (found!=std::string::npos) {
-		lfa = name.substr(0, found);
-		ffa = name.substr(found+2);
-		fport = ffa.find_last_of(":");
-		if (fport!=std::string::npos) {
-			fa = ffa.substr(0, fport);
-			fp = ffa.substr(fport+1);
-			if (fp.compare("*") == 0) {
-				fp = "";
+
+	const string &name = elems[8];
+    arrow = name.find("->");
+	if (arrow!=string::npos) {
+		lfa = name.substr(0, arrow);
+		ffa = name.substr(arrow+2);
+		colon = ffa.find_last_of(':');
+		if (colon!=string::npos) {
+			fa = ffa.substr(0, colon);
+			fp = ffa.substr(colon+1);
+			if (fp == "*") {
+				fp = "0";
 			}
 		} else {
 			fa = ffa;
-			fp = "";
 		}
 	} else {
 		lfa = name;
 	}
-	fport = lfa.find_last_of(":");
-	if (fport!=std::string::npos) {
-		la = lfa.substr(0, fport);
-		lp = lfa.substr(fport+1);
-		if (lp.compare("*") == 0) {
-			lp = "";
+	colon = lfa.find_last_of(':');
+	if (colon!=string::npos) {
+		la = lfa.substr(0, colon);
+		lp = lfa.substr(colon+1);
+		if (lp == "*") {
+			lp.clear(); // ok, other code handles this
 		}
 	} else {
 		la = lfa;
-		lp = "";
 	}
-	LsofRecord* record = new LsofRecord(pr, la, lp, lfa, pn, fa, fp, ffa, p, u);
-	return record;
+
+	// ipv6 addresses get surrounded in brackets;
+	// strip those off.  E.g. "[::1]"
+	stripBrackets(&la);
+	stripBrackets(&fa);
+
+	return LsofRecord(
+		elems[7],
+		la,
+		lp,
+		lfa, 
+		elems[0],
+		fa,
+		fp,
+		ffa,
+		elems[1],
+		elems[2]);
 }
 
 void InetListeningServer510Probe::DeleteRecords() {
-	if (records == NULL) return;
+	if (records) {
+		delete records;
+		records = NULL;
+	}
+}
 
-	for(LsofRecordVector::iterator it = records->begin(); it != records->end(); it++)
-		delete *it;
-
-	delete records;
+namespace {
+	void stripBrackets(string *addr) {
+		// assert(addr!=NULL)
+		if (!addr->empty()) {
+			if ((*addr)[0] == '[')
+				addr->erase(0, 1);
+			if (!addr->empty() && (*addr)[addr->size()-1] == ']')
+				addr->erase(addr->size()-1);
+		}
+	}
 }
