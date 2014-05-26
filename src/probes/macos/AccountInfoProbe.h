@@ -58,7 +58,7 @@ private:
 	virtual Item* CreateItem();
 
 	/** Return a new Item filled with user informaton */
-	Item* FillItem(std::string);
+	Item* FillItem(const std::string &);
 	
 	ObjectEntity* ValidateStringOperations(ObjectEntity* stringOp);
 

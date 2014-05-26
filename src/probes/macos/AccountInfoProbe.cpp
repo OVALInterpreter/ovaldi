@@ -28,11 +28,12 @@
 //
 //****************************************************************************************//
 
-#include "AccountInfoProbe.h"
 #include <sstream>
 #include <VectorPtrGuard.h>
 #include <Log.h>
 #include "CommandReader.h"
+
+#include "AccountInfoProbe.h"
 
 using namespace std;
 
@@ -65,24 +66,22 @@ ItemVector* AccountInfoProbe::CollectItems(Object *object) {
 	// get the name from the provided object
 	ObjectEntity* name = this->ValidateStringOperations(object->GetElementByName("username"));
 
-	if (names.size() == 0) {
+	if (names.empty()) {
 		names = CommandReader::GetResponse("/usr/bin/dscl . -list /Users");
 	}
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
+	ItemEntity nameIe("username");
 	StringVector::iterator it;
 	for(it = names.begin(); it != names.end(); it++) {
-		string username = *it;
-		Item* item = this->FillItem(username);
-		if (item != NULL) {
-			auto_ptr<ItemEntity> nameIe(new ItemEntity("username", username));
-			if (name->Analyze(nameIe.get()) == OvalEnum::RESULT_TRUE) {
+		nameIe.SetValue(*it);
+		if (name->Analyze(&nameIe) == OvalEnum::RESULT_TRUE) {
+			Item* item = this->FillItem(*it);
+			if (item)
 				collectedItems->push_back(item);
-			} else {
-				delete item;
-			}
 		}
 	}
+
 	return collectedItems.release();
 }
 
@@ -101,41 +100,53 @@ Item* AccountInfoProbe::CreateItem() {
 	return item;
 }
 
-Item* AccountInfoProbe::FillItem(string username) {
+Item* AccountInfoProbe::FillItem(const string &username) {
 
     std::string name, value, passwd, uid, gid, realname, home, shell;
 
 	StringVector lines = CommandReader::GetResponse("/usr/bin/dscl . -read /Users/" + username + " passwd uid gid realname home shell");
+	if (lines.empty())
+		return NULL;
 	
 	StringVector::iterator it;
-	unsigned int multiline = 0;
+	bool multiline = false;
 	for (it = lines.begin(); it != lines.end(); it++) {
 		string line = *it;
-		if (multiline == 1) {
-			multiline = 0;
+		if (multiline) {
+			multiline = false;
 			realname = line;
 			Common::TrimString(realname);
+			continue;
 		}
+
 		StringVector elems = CommandReader::Split(line, ' ');
-		StringVector::iterator it = elems.begin();
-		name = *it;
-		it++;
+		if (elems.empty()) {
+			Log::Debug("Unexpected 'dscl' output format:\n\t\"" + line + '\"');
+			continue;
+		}
+
+		name = elems[0];
 		Common::TrimString(name);
-		if (it != elems.end()) {
-			if (name.compare("dsAttrTypeNative:gid:") == 0)
-				gid = *it;
-			if (name.compare("dsAttrTypeNative:home:") == 0)
-				home = *it;
-			if (name.compare("dsAttrTypeNative:uid:") == 0)
-				uid = *it;
-			if (name.compare("dsAttrTypeNative:passwd:") == 0)
-				passwd = *it;
-			if (name.compare("dsAttrTypeNative:shell:") == 0)
-				shell = *it;
+		if (elems.size() > 1) {
+			if (name == "dsAttrTypeNative:gid:")
+				gid = elems[1];
+			else if (name == "dsAttrTypeNative:home:")
+				home = elems[1];
+			else if (name == "dsAttrTypeNative:uid:")
+				uid = elems[1];
+			else if (name == "dsAttrTypeNative:passwd:")
+				passwd = elems[1];
+			else if (name == "dsAttrTypeNative:shell:")
+				shell = elems[1];
+			else if (name == "dsAttrTypeNative:realname:")
+				realname = elems[1];
+			else
+				Log::Debug("Unexpected 'dscl' output format:\n\t\"" + line +'\"');
 		} else {
-			if (name.compare("dsAttrTypeNative:realname:") == 0) {
-				multiline = 1;
-			}
+			if (name == "dsAttrTypeNative:realname:") {
+				multiline = true;
+			} else
+				Log::Debug("Unexpected 'dscl' output format:\n\t\"" + line +'\"');
 		}
 	}
 
