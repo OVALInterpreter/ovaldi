@@ -30,10 +30,12 @@
 #ifndef NVRAMPROBE_H
 #define NVRAMPROBE_H
 
+#include <utility>
+#include <vector>
+
 #include "AbsProbe.h"
 #include <Item.h>
 #include <Object.h>
-#include <Log.h>
 
 /**
 	This class is responsible for collecting variable information from the nvram command.
@@ -59,7 +61,7 @@ private:
 	virtual Item* CreateItem();
 
 	/** Return a new filled Item created for storing variable information */
-	Item* FillItem(std::string, std::string);
+	Item* FillItem(const std::string&, const std::string&);
 
 	ObjectEntity* ValidateStringOperations(ObjectEntity* stringOp);
 
@@ -68,7 +70,8 @@ private:
 	/** Delete the vector of nvram variables. */
 	void DeleteVars();
 	
-	StringPairVector* vars;
+	typedef std::vector<std::pair<std::string, std::string> > CachedVarsType;
+	CachedVarsType *vars;
 };
 
 #endif

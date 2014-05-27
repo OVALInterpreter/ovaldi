@@ -28,9 +28,11 @@
 //
 //****************************************************************************************//
 
-#include "NvramProbe.h"
+#include <Log.h>
 #include <VectorPtrGuard.h>
 #include "CommandReader.h"
+
+#include "NvramProbe.h"
 
 using namespace std;
 
@@ -39,8 +41,7 @@ using namespace std;
 //****************************************************************************************//
 NvramProbe *NvramProbe::instance = NULL;
 
-NvramProbe::NvramProbe() {
-	vars = NULL;
+NvramProbe::NvramProbe() : vars(NULL) {
 }
 
 NvramProbe::~NvramProbe() {
@@ -71,15 +72,14 @@ ItemVector* NvramProbe::CollectItems(Object *object) {
 	
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 	bool nameCheck = false;
+	ItemEntity nameIe("nvram_var");
 	// loop through all vars if they are a regex match on name create item and return it
-	StringPairVector::iterator iterator;
+	CachedVarsType::iterator iterator;
 	for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
-		string first = (*iterator)->first;
-		string second = (*iterator)->second;
-		auto_ptr<ItemEntity> nameIe(new ItemEntity("nvram_var", first));
-		nameCheck = (name->Analyze(nameIe.get()) == OvalEnum::RESULT_TRUE);
+		nameIe.SetValue(iterator->first);
+		nameCheck = (name->Analyze(&nameIe) == OvalEnum::RESULT_TRUE);
 		if (nameCheck) {
-			collectedItems->push_back(this->FillItem(first, second));
+			collectedItems->push_back(this->FillItem(iterator->first, iterator->second));
 		}
 	}
 	return collectedItems.release();
@@ -100,11 +100,11 @@ Item* NvramProbe::CreateItem() {
 	return item;
 }
 
-Item* NvramProbe::FillItem(string first, string second) {
+Item* NvramProbe::FillItem(const string &var, const string &value) {
 	Item* item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("nvram_var", first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	item->AppendElement(new ItemEntity("nvram_value", second, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("nvram_var", var, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("nvram_value", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	return item;
 }
 
@@ -126,28 +126,22 @@ ObjectEntity* NvramProbe::ValidateStringOperations(ObjectEntity* stringOp) {
 }
 
 void NvramProbe::GetAllVars() {
-	vars = new StringPairVector();
-	string name, value;
+	vars = new CachedVarsType();
 
 	StringVector lines = CommandReader::GetResponse("/usr/sbin/nvram -p");
 
 	for (StringVector::iterator it = lines.begin(); it != lines.end(); it++) {
-		string line = *it;
-		StringVector elems = CommandReader::Split(line, '\t');
-		if (elems.size() > 1) {
-			StringVector::iterator it = elems.begin();
-			name = *it++;
-			value = *it;
-			vars->push_back(new StringPair(name, value));
-		}
+		StringVector elems = CommandReader::Split(*it, '\t');
+		if (elems.size() > 1)
+			vars->push_back(make_pair(elems[0], elems[1]));
+		else
+			Log::Debug("Unrecognized nvram output format: " + *it);
 	}
 }
 
 void NvramProbe::DeleteVars() {
-	if (vars == NULL) return;
-	
-	for(StringPairVector::iterator it = vars->begin(); it != vars->end(); it++)
-		delete *it;
-
-	delete vars;
+	if (vars) {
+		delete vars;
+		vars = NULL;
+	}
 }
