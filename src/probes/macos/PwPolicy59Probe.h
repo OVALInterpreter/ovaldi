@@ -33,10 +33,7 @@
 #include "AbsProbe.h"
 #include <Item.h>
 #include <Object.h>
-#include <Log.h>
 #include <map>
-
-typedef std::map<std::string, std::string> PwPolicyMap;
 
 /**
 	This class is responsible for collecting variable information from the pwpolicy command.
@@ -54,6 +51,8 @@ public:
 	
 private:
 
+	typedef std::map<std::string, std::string> PwPolicyMap;
+
 	static PwPolicy59Probe *instance;
 
 	PwPolicy59Probe();
@@ -62,11 +61,11 @@ private:
 	virtual Item* CreateItem();
 
 	/** Return a new filled Item created for storing variable information */
-	Item* FillItem(PwPolicyMap record);
+	Item* FillItem(const PwPolicyMap &record);
 
-	ItemEntity* FillItemEntity(std::string name, std::string value, OvalEnum::Datatype datatype);
+	ItemEntity* FillItemEntity(const PwPolicyMap &record, const std::string &name, OvalEnum::Datatype datatype);
 	
-	PwPolicyMap GetRecord(std::string targetUser, ObjectEntity* username, ObjectEntity* userpass, ObjectEntity* directoryNode);
+	PwPolicyMap GetRecord(const std::string &targetUser);
 	
 	ObjectEntity* ValidateStringOperations(ObjectEntity* stringOp);
 

@@ -28,9 +28,11 @@
 //
 //****************************************************************************************//
 
-#include "PwPolicy59Probe.h"
+#include <Log.h>
 #include <VectorPtrGuard.h>
 #include "CommandReader.h"
+
+#include "PwPolicy59Probe.h"
 
 using namespace std;
 
@@ -66,17 +68,23 @@ ItemVector* PwPolicy59Probe::CollectItems(Object *object) {
 	ObjectEntity* userpass = this->ValidateStringOperations(object->GetElementByName("userpass"));
 	ObjectEntity* directoryNode = this->ValidateStringOperations(object->GetElementByName("directory_node"));
 
-	if (names.size() == 0) {
+	if (names.empty()) {
 		names = CommandReader::GetResponse("/usr/bin/dscl . -list /Users");
 	}
 
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 	StringVector::iterator it;
+	ItemEntity nameIe("target_user");
 	for(it = names.begin(); it != names.end(); it++) {
 		string targetUser = *it;
-		auto_ptr<ItemEntity> nameIe(new ItemEntity("target_user", targetUser));
-		if (name->Analyze(nameIe.get()) == OvalEnum::RESULT_TRUE) {
-			collectedItems->push_back(this->FillItem(this->GetRecord(targetUser, username, userpass, directoryNode)));
+		nameIe.SetValue(targetUser);
+		if (name->Analyze(&nameIe) == OvalEnum::RESULT_TRUE) {
+			Item *item = this->FillItem(this->GetRecord(targetUser));
+			if (!username->GetNil() || !userpass->GetNil() || !directoryNode->GetNil())
+				item->AppendMessage(new OvalMessage("Warning: due to security "
+					"concerns, non-nil username, userpass, and directory_node "
+					"object entities are ignored.", OvalEnum::LEVEL_WARNING));
+			collectedItems->push_back(item);
 		}
 	}
 	return collectedItems.release();
@@ -97,89 +105,88 @@ Item* PwPolicy59Probe::CreateItem() {
 	return item;
 }
 
-Item* PwPolicy59Probe::FillItem(PwPolicyMap record) {
+Item* PwPolicy59Probe::FillItem(const PwPolicyMap &record) {
 	Item* item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(this->FillItemEntity("target_user", record["target_user"], OvalEnum::DATATYPE_STRING));
-	item->AppendElement(this->FillItemEntity("username", record["username"], OvalEnum::DATATYPE_STRING));
-	item->AppendElement(this->FillItemEntity("userpass", record["userpass"], OvalEnum::DATATYPE_STRING));
-	item->AppendElement(this->FillItemEntity("directory_node", record["directory_node"], OvalEnum::DATATYPE_STRING));
-	item->AppendElement(this->FillItemEntity("maxChars", record["maxChars"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("maxFailedLoginAttempts", record["maxFailedLoginAttempts"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("minChars", record["minChars"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("passwordCannotBeName", record["passwordCannotBeName"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("requiresAlpha", record["requiresAlpha"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("requiresNumeric", record["requiresNumeric"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("maxMinutesUntilChangePassword", record["maxMinutesUntilChangePassword"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("minMinutesUntilChangePassword", record["minMinutesUntilChangePassword"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("requiresMixedCase", record["requiresMixedCase"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("requiresSymbol", record["requiresSymbol"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("minutesUntilFailedLoginReset", record["minutesUntilFailedLoginReset"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("usingHistory", record["usingHistory"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("canModifyPasswordforSelf", record["canModifyPasswordforSelf"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("usingExpirationDate", record["usingExpirationDate"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("usingHardExpirationDate", record["usingHardExpirationDate"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("expirationDateGMT", record["expirationDateGMT"], OvalEnum::DATATYPE_STRING));
-	item->AppendElement(this->FillItemEntity("hardExpireDateGMT", record["hardExpireDateGMT"], OvalEnum::DATATYPE_STRING));
-	item->AppendElement(this->FillItemEntity("maxMinutesUntilDisabled", record["maxMinutesUntilDisabled"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("maxMinutesOfNonUse", record["maxMinutesOfNonUse"], OvalEnum::DATATYPE_INTEGER));
-	item->AppendElement(this->FillItemEntity("newPasswordRequired", record["newPasswordRequired"], OvalEnum::DATATYPE_BOOLEAN));
-	item->AppendElement(this->FillItemEntity("notGuessablePattern", record["notGuessablePattern"], OvalEnum::DATATYPE_BOOLEAN));
+
+#define ADD_ENTITY(name_, type_) \
+	item->AppendElement(this->FillItemEntity(record, #name_, OvalEnum::DATATYPE_ ## type_))
+
+	ADD_ENTITY(target_user, STRING);
+// we don't support these next entities being non-nil...
+	item->AppendElement(new ItemEntity("username", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
+	item->AppendElement(new ItemEntity("userpass", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
+	item->AppendElement(new ItemEntity("directory_node", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
+	ADD_ENTITY(maxChars, INTEGER);
+	ADD_ENTITY(maxFailedLoginAttempts, INTEGER);
+	ADD_ENTITY(minChars, INTEGER);
+	ADD_ENTITY(passwordCannotBeName, BOOLEAN);
+	ADD_ENTITY(requiresAlpha, BOOLEAN);
+	ADD_ENTITY(requiresNumeric, BOOLEAN);
+	ADD_ENTITY(maxMinutesUntilChangePassword, INTEGER);
+	ADD_ENTITY(minMinutesUntilChangePassword, INTEGER);
+	ADD_ENTITY(requiresMixedCase, BOOLEAN);
+	ADD_ENTITY(requiresSymbol, BOOLEAN);
+	ADD_ENTITY(minutesUntilFailedLoginReset, INTEGER);
+	ADD_ENTITY(usingHistory, INTEGER);
+	ADD_ENTITY(canModifyPasswordforSelf, BOOLEAN);
+	ADD_ENTITY(usingExpirationDate, BOOLEAN);
+	ADD_ENTITY(usingHardExpirationDate, BOOLEAN);
+	ADD_ENTITY(expirationDateGMT, STRING);
+	ADD_ENTITY(hardExpireDateGMT, STRING);
+	ADD_ENTITY(maxMinutesUntilDisabled, INTEGER);
+	ADD_ENTITY(maxMinutesOfNonUse, INTEGER);
+	ADD_ENTITY(newPasswordRequired, BOOLEAN);
+	ADD_ENTITY(notGuessablePattern, BOOLEAN);
+
 	return item;
+	
+#undef ADD_ENTITY
+
 }
 
-ItemEntity* PwPolicy59Probe::FillItemEntity(string name, string value, OvalEnum::Datatype datatype) {
+ItemEntity* PwPolicy59Probe::FillItemEntity(const PwPolicyMap &record, const string &name, OvalEnum::Datatype datatype) {
 	ItemEntity* itemEntity;
-	if (value == "") {
-		itemEntity = new ItemEntity(name, value, datatype, OvalEnum::STATUS_DOES_NOT_EXIST);
+	PwPolicyMap::const_iterator iter = record.find(name);
+	if (iter == record.end()) {
+		itemEntity = new ItemEntity(name, "", datatype, OvalEnum::STATUS_DOES_NOT_EXIST);
 	} else {
-		itemEntity = new ItemEntity(name, value, datatype, OvalEnum::STATUS_EXISTS);
+		itemEntity = new ItemEntity(name, iter->second, datatype, OvalEnum::STATUS_EXISTS);
 	}
 	return itemEntity;
 }
 
-PwPolicyMap PwPolicy59Probe::GetRecord(string targetUser, ObjectEntity* username, ObjectEntity* userpass, ObjectEntity* directoryNode) {
+PwPolicy59Probe::PwPolicyMap PwPolicy59Probe::GetRecord(const string &targetUser) {
 
 	string command = "/usr/bin/pwpolicy --get-effective-policy -u " + targetUser;
 	PwPolicyMap record;
 	REGEX regex;
 
-
 	record["target_user"] = targetUser;	
-	if (!(username->GetNil() || userpass->GetNil())) {
-		command += " -a " + username->GetValue() + " -p " + userpass->GetValue();
-		record["username"] = username->GetValue();
-		record["userpass"] = userpass->GetValue();
-	}
-	if (!directoryNode->GetNil()) {
-		command += " -n " + directoryNode->GetValue();
-		record["directory_node"] = directoryNode->GetValue();
-	}
-
 	StringVector lines = CommandReader::GetResponse(command);
 
-	if (lines.size() > 0) {
-		StringVector::iterator it = lines.begin();
-		string line = *it;
+	if (!lines.empty()) {
+		string &line = lines[0];
 		StringVector elems = CommandReader::Split(line, " ");
-		for (it = elems.begin(); it != elems.end(); it++) {
-			string elem = *it;
-			StringVector keyvalues = CommandReader::Split(elem, "=");
+		for (StringVector::iterator it = elems.begin(); it != elems.end(); it++) {
+			StringVector keyvalues = CommandReader::Split(*it, "=");
 			if (keyvalues.size() > 1) {
-				StringVector::iterator keyit = keyvalues.begin();
-				string key = *keyit++;
-				string value = *keyit;
+				string key = keyvalues[0];
+				string value = keyvalues[1];
 				// convert booleans to integers for elements that expect integer values
 				if ((regex.IsMatch("^max.*", key.c_str()) == true) || (regex.IsMatch("^min.*", key.c_str()) == true)) {
-					if (value.compare("false") == 0) {
+					if (value == "false") {
 						value = "0";
 					}
-					if (value.compare("true") == 0) {
+					if (value == "true") {
 						value = "1";
 					}
 				}
 				record[key] = value;
-			}
+			} else
+				Log::Debug("Unexpected format in pwpolicy output:\nkey/value:\n\t" +
+						   *it+"\nFrom line:\n\t" + line);
+			
 		}
 	}
 	return record;
