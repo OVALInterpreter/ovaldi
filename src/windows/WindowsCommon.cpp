@@ -1733,9 +1733,9 @@ bool WindowsCommon::NormalizeTrusteeName(const string &trusteeName,
 		if(trusteeType == SidTypeUser) {
 			// all user accounts are prefixed by their domain or the local system name.
 			// ... except for this requested hackage: leave the domain part off the
-			// standard Administrator and Guest accounts!
-			if (IsWellKnownSid(sid.get(), WinAccountAdministratorSid) ||
-				IsWellKnownSid(sid.get(), WinAccountGuestSid))
+			// local standard Administrator and Guest accounts!
+			if ((IsWellKnownSid(sid.get(), WinAccountAdministratorSid) ||
+				IsWellKnownSid(sid.get(), WinAccountGuestSid)) && isLocal(sid.get()))
 				*normFormattedName = normNameBuf.get();
 			else
 				*normFormattedName = string(domain.get()) + '\\' + normNameBuf.get();
