@@ -30,10 +30,13 @@
 #ifndef PWPOLICY59PROBE_H
 #define PWPOLICY59PROBE_H
 
+#include <map>
+#include <utility>
+#include <vector>
+
 #include "AbsProbe.h"
 #include <Item.h>
 #include <Object.h>
-#include <map>
 
 /**
 	This class is responsible for collecting variable information from the pwpolicy command.
@@ -63,16 +66,12 @@ private:
 	/** Return a new filled Item created for storing variable information */
 	Item* FillItem(const PwPolicyMap &record);
 
-	ItemEntity* FillItemEntity(const PwPolicyMap &record, const std::string &name, OvalEnum::Datatype datatype);
-	
 	PwPolicyMap GetRecord(const std::string &targetUser);
 	
 	ObjectEntity* ValidateStringOperations(ObjectEntity* stringOp);
 
-	/** Get all the usernames from the system */
-	//StringVector GetCommandResponse(std::string command);
-	
 	StringVector names;
+	std::vector<std::pair<std::string, OvalEnum::Datatype> > propTypes;
 };
 
 #endif

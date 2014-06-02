@@ -42,6 +42,28 @@ using namespace std;
 PwPolicy59Probe *PwPolicy59Probe::instance = NULL;
 
 PwPolicy59Probe::PwPolicy59Probe() {
+	// put these in the order they must appear in items!
+	propTypes.push_back(make_pair("maxChars", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("maxFailedLoginAttempts", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("minChars", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("passwordCannotBeName", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("requiresAlpha", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("requiresNumeric", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("maxMinutesUntilChangePassword", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("minMinutesUntilChangePassword", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("requiresMixedCase", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("requiresSymbol", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("minutesUntilFailedLoginReset", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("usingHistory", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("canModifyPasswordforSelf", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("usingExpirationDate", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("usingHardExpirationDate", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("expirationDateGMT", OvalEnum::DATATYPE_STRING));
+	propTypes.push_back(make_pair("hardExpireDateGMT", OvalEnum::DATATYPE_STRING));
+	propTypes.push_back(make_pair("maxMinutesUntilDisabled", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("maxMinutesOfNonUse", OvalEnum::DATATYPE_INTEGER));
+	propTypes.push_back(make_pair("newPasswordRequired", OvalEnum::DATATYPE_BOOLEAN));
+	propTypes.push_back(make_pair("notGuessablePattern", OvalEnum::DATATYPE_BOOLEAN));
 }
 
 PwPolicy59Probe::~PwPolicy59Probe() {
@@ -106,54 +128,88 @@ Item* PwPolicy59Probe::CreateItem() {
 }
 
 Item* PwPolicy59Probe::FillItem(const PwPolicyMap &record) {
-	Item* item = this->CreateItem();
+
+	auto_ptr<Item> item(this->CreateItem());
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
 
-#define ADD_ENTITY(name_, type_) \
-	item->AppendElement(this->FillItemEntity(record, #name_, OvalEnum::DATATYPE_ ## type_))
+	// record should always have target_user!
+	PwPolicyMap::const_iterator mapIter = record.find("target_user");
+	if (mapIter == record.end()) throw ProbeException("Internal error, target_user missing!");
+	item->AppendElement(new ItemEntity("target_user", mapIter->second));
 
-	ADD_ENTITY(target_user, STRING);
-// we don't support these next entities being non-nil...
-	item->AppendElement(new ItemEntity("username", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
-	item->AppendElement(new ItemEntity("userpass", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
-	item->AppendElement(new ItemEntity("directory_node", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
-	ADD_ENTITY(maxChars, INTEGER);
-	ADD_ENTITY(maxFailedLoginAttempts, INTEGER);
-	ADD_ENTITY(minChars, INTEGER);
-	ADD_ENTITY(passwordCannotBeName, BOOLEAN);
-	ADD_ENTITY(requiresAlpha, BOOLEAN);
-	ADD_ENTITY(requiresNumeric, BOOLEAN);
-	ADD_ENTITY(maxMinutesUntilChangePassword, INTEGER);
-	ADD_ENTITY(minMinutesUntilChangePassword, INTEGER);
-	ADD_ENTITY(requiresMixedCase, BOOLEAN);
-	ADD_ENTITY(requiresSymbol, BOOLEAN);
-	ADD_ENTITY(minutesUntilFailedLoginReset, INTEGER);
-	ADD_ENTITY(usingHistory, INTEGER);
-	ADD_ENTITY(canModifyPasswordforSelf, BOOLEAN);
-	ADD_ENTITY(usingExpirationDate, BOOLEAN);
-	ADD_ENTITY(usingHardExpirationDate, BOOLEAN);
-	ADD_ENTITY(expirationDateGMT, STRING);
-	ADD_ENTITY(hardExpireDateGMT, STRING);
-	ADD_ENTITY(maxMinutesUntilDisabled, INTEGER);
-	ADD_ENTITY(maxMinutesOfNonUse, INTEGER);
-	ADD_ENTITY(newPasswordRequired, BOOLEAN);
-	ADD_ENTITY(notGuessablePattern, BOOLEAN);
+	// these are always nil in this implementation
+	item->AppendElement(new ItemEntity("username", "", OvalEnum::DATATYPE_STRING,
+									   OvalEnum::STATUS_NOT_COLLECTED, true));
+	item->AppendElement(new ItemEntity("userpass", "", OvalEnum::DATATYPE_STRING,
+									   OvalEnum::STATUS_NOT_COLLECTED, true));
+	item->AppendElement(new ItemEntity("directory_node", "", OvalEnum::DATATYPE_STRING,
+									   OvalEnum::STATUS_NOT_COLLECTED, true));
 
-	return item;
-	
-#undef ADD_ENTITY
+	// validate the formatting of values as we go.  There was a report that the
+	// 'pwpolicy' command can sometimes return weird values for properties,
+	// e.g. "true" or "false" for integer-valued properties.
+	int tmpInt;
+	bool tmpBool;
+	for (size_t i=0; i<propTypes.size(); ++i) {
+		mapIter = record.find(propTypes[i].first);
 
-}
+		if (mapIter != record.end()) {
+			switch (propTypes[i].second) {
+			case OvalEnum::DATATYPE_INTEGER:
+				if (Common::FromString(mapIter->second, &tmpInt)) {
+					item->AppendElement(new ItemEntity(mapIter->first,
+													   mapIter->second,
+													   OvalEnum::DATATYPE_INTEGER));
+				} else {
+					
+					item->AppendMessage(new OvalMessage(
+						"Invalid integer value for password policy property \"" + 
+						mapIter->first + "\": " + mapIter->second, 
+						OvalEnum::LEVEL_ERROR));
 
-ItemEntity* PwPolicy59Probe::FillItemEntity(const PwPolicyMap &record, const string &name, OvalEnum::Datatype datatype) {
-	ItemEntity* itemEntity;
-	PwPolicyMap::const_iterator iter = record.find(name);
-	if (iter == record.end()) {
-		itemEntity = new ItemEntity(name, "", datatype, OvalEnum::STATUS_DOES_NOT_EXIST);
-	} else {
-		itemEntity = new ItemEntity(name, iter->second, datatype, OvalEnum::STATUS_EXISTS);
+					item->AppendElement(new ItemEntity(mapIter->first, 
+													   "",
+													   OvalEnum::DATATYPE_INTEGER,
+													   OvalEnum::STATUS_ERROR));
+				}
+
+				break;
+
+			case OvalEnum::DATATYPE_BOOLEAN:
+				if (Common::FromString(mapIter->second, &tmpBool)) {
+					item->AppendElement(new ItemEntity(mapIter->first,
+													   tmpBool ? "true":"false",
+													   OvalEnum::DATATYPE_BOOLEAN));
+				} else {
+					
+					item->AppendMessage(new OvalMessage(
+						"Invalid boolean value for password policy property \"" + 
+						mapIter->first + "\": " + mapIter->second, 
+						OvalEnum::LEVEL_ERROR));
+
+					item->AppendElement(new ItemEntity(mapIter->first, 
+													   "",
+													   OvalEnum::DATATYPE_BOOLEAN,
+													   OvalEnum::STATUS_ERROR));
+				}
+
+
+				break;
+
+			default:
+				// strings: anything's ok.
+				item->AppendElement(new ItemEntity(mapIter->first, mapIter->second,
+												   propTypes[i].second));
+			}
+
+		} else
+			item->AppendElement(new ItemEntity(propTypes[i].first, "",
+											   propTypes[i].second,
+											   OvalEnum::STATUS_DOES_NOT_EXIST));
+		
 	}
-	return itemEntity;
+
+	return item.release();
 }
 
 PwPolicy59Probe::PwPolicyMap PwPolicy59Probe::GetRecord(const string &targetUser) {
@@ -171,24 +227,15 @@ PwPolicy59Probe::PwPolicyMap PwPolicy59Probe::GetRecord(const string &targetUser
 		for (StringVector::iterator it = elems.begin(); it != elems.end(); it++) {
 			StringVector keyvalues = CommandReader::Split(*it, "=");
 			if (keyvalues.size() > 1) {
-				string key = keyvalues[0];
-				string value = keyvalues[1];
-				// convert booleans to integers for elements that expect integer values
-				if ((regex.IsMatch("^max.*", key.c_str()) == true) || (regex.IsMatch("^min.*", key.c_str()) == true)) {
-					if (value == "false") {
-						value = "0";
-					}
-					if (value == "true") {
-						value = "1";
-					}
-				}
+				string &key = keyvalues[0];
+				string &value = keyvalues[1];
 				record[key] = value;
 			} else
 				Log::Debug("Unexpected format in pwpolicy output:\nkey/value:\n\t" +
 						   *it+"\nFrom line:\n\t" + line);
-			
 		}
 	}
+
 	return record;
 }
 
