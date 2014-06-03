@@ -73,6 +73,7 @@
 #  include <WindowsCommon.h>
 #  undef _NTDEF_
 #elif defined DARWIN
+#  include <unistd.h>
 #  include <map>
 #  include <memory>
 #  include <string>
