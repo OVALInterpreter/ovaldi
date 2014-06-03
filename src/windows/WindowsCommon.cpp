@@ -38,6 +38,7 @@
 #include <time.h>
 #include <tchar.h>
 
+#include <cassert>
 #include <cctype>
 #include <cstring>
 #include <map>
