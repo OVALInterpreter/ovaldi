@@ -198,7 +198,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 
 					StringSet trusteeSIDs = GetTrusteesForWindowsObject(
 						SE_FILE_OBJECT, fileHandle, trusteeSID, true, 
-						resolveGroupBehavior, includeGroupBehavior);
+						resolveGroupBehavior, includeGroupBehavior, true);
 
                     if ( !trusteeSIDs.empty() ) {
                         for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {

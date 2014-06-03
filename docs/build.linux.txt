@@ -83,7 +83,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 -- II -- BUILD INSTRUCTIONS --
 
 The following instructions describe how to build the OVAL Interpreter on a
-Linux system.  The OVAL Interpreter has been built and tested on the 32-bit version
+Linux system.  The OVAL Interpreter has been built and tested on the 32-bit and 64-bit versions
 of Red Hat Enterprise Linux 5. The source distribution includes a Makefile that 
 can be used to build the OVAL Interpreter on Linux systems. Before the OVAL 
 Interpreter can be built, the supporting libraries must be installed. Follow the 
@@ -263,7 +263,7 @@ the Xerces Web site:
   Foundation (http://www.apache.org/)."
 
 The Xerces library is under the Apache 2.0 License and is re-distributed
-in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result, 
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.[arch].rpm. As a result, 
 a copy of the license (LICENCE.xerces_xalan) has been provided.    
   
 For more information about Xerces visit:
@@ -282,7 +282,7 @@ the Xalan Web site:
   Foundation (http://www.apache.org/)."
 
 The Xalan library is under the Apache 2.0 License and is re-distributed
-in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result,
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.[arch].rpm. As a result,
 a copy of the license (LICENCE.xerces_xalan) has been provided.
   
 For more information about Xalan visit:

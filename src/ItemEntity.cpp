@@ -193,7 +193,10 @@ void ItemEntity::Parse(DOMElement* itemEntityElm) {
 	this->SetName(XmlCommon::GetElementName(itemEntityElm));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(itemEntityElm, "datatype")));
 	this->SetStatus(OvalEnum::ToSCStatus(XmlCommon::GetAttributeByName(itemEntityElm, "status")));
-	
+	if(XmlCommon::GetAttributeByName(itemEntityElm, "xsi:nil").compare("true") == 0) {
+		this->SetNil(true);
+	}
+
 	// The datatype is not 'record' so we can just grab the string value in the element.
 	if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
 		this->SetValue(XmlCommon::GetDataNodeValue(itemEntityElm));

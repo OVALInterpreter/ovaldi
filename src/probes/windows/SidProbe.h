@@ -56,12 +56,11 @@ private:
 
 	/** Get account information for the specified account name.
 		Support behaviors. Resulting Items are pushed on to the 
-		items vector.
-		Return false if the set of items in not complete.
-
-		TODO: how can I set the colleced object flag correctly?
+		items vector.  This assumes \p accountName is formatted
+		properly.  If it isn't, you'll get an incorrect item.
 	*/
-	bool GetAccountInformation(std::string accountName,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
+	void GetAccountInformation(const std::string &accountName,
+		bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
 
 };
 

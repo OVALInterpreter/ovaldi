@@ -32,6 +32,19 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 7    ---
+---------------------------------------
+
+* Fixed a bug with the new Xerces library that caused issues with utilizing OVAL Directives and Definition evaluation-ids. Fixed in revision #1714.
+* Changed output of cmdlet probe to use "true" and "false" instead of "True" and "False". Fixed in revision #1719.
+* Sets the nil attribute when parsing Item entities. Fixed in revision #1721.
+* Enabled large file support in Linux PartitionProbe. Fixed in revision #1723
+* Fixes an issue with the Sid probe by normalizing trustee names. No longer copies entity values from SID Object to Item. Fixed in revision #1725.
+* Updated Linux Makefile, RPM .spec file, and included libraries to support a 64-bit build of OVALDI. Fixed in revision #1729.
+* Updated Windows OS detection. Fixed in revision #1730.
+* Fixed other various memory leaks. 
+
+---------------------------------------
 ---       Version 5.10.1 build 6    ---
 ---------------------------------------
 

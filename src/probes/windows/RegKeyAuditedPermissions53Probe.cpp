@@ -153,7 +153,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 				StringSet trusteeSIDs = this->GetTrusteesForWindowsObject(
 					SE_REGISTRY_KEY, keyHandle,
 					trusteeSIDEntity, true, resolveGroupBehavior,
-					includeGroupBehavior);
+					includeGroupBehavior, true);
 
                 if ( !trusteeSIDs.empty() ) {
                     for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {

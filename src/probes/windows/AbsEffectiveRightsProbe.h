@@ -63,11 +63,12 @@ class AbsEffectiveRightsProbe : public AbsProbe {
 			@param isSID A boolean value that specifies whether or not the trusteeEntity is a SID.
             @param resolveGroupBehavior A boolean value that specifies whether or not groups should be resolved.
             @param includeGroupBehavior A boolean value that specifies whether or not groups should be included in the resulting set of trustees.
+			@param useSacl true if trustees should be obtained from the SACL, false if they should be obtained from the DACL.
             @return A pointer to a StringSet containing all of the trustees that match the specified trustee ObjectEntity.
         */
 		StringSet GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, 
 			HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,
-			bool resolveGroupBehavior, bool includeGroupBehavior );
+			bool resolveGroupBehavior, bool includeGroupBehavior, bool useSacl = false );
 
 		/** Search the input vector of all trustees and return the set of trustees the match the specified criteria.
             @param trusteePatternStr A string value that contains the trustee pattern to be matched.

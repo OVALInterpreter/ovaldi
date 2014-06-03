@@ -454,8 +454,8 @@ StringVector* WMI57Probe::GetWqlFields(string wqlIn, WQLFieldType wqlFieldType) 
 			string errorMessage = _com_error(hResult).ErrorMessage();
 			throw ProbeException("(WMI57Probe) Failed to create IWbemQuery object.  " + errorMessage, ERROR_FATAL);
 	}
-	ArrayGuard<WCHAR> wWqlIn(WindowsCommon::StringToWide(wqlIn));
-	if ( (hResult = wqlQuery->Parse(L"WQL", wWqlIn.get(),0)) == WBEM_S_NO_ERROR ){
+	wstring wWqlIn = WindowsCommon::StringToWide(wqlIn);
+	if ( (hResult = wqlQuery->Parse(L"WQL", wWqlIn.c_str(),0)) == WBEM_S_NO_ERROR ){
 		SWbemRpnEncodedQuery* wqlAnalysis = NULL;
 		if ( (hResult = wqlQuery->GetAnalysis(WMIQ_ANALYSIS_RPN_SEQUENCE,0,(LPVOID *)&wqlAnalysis)) == WBEM_S_NO_ERROR ){
 			switch(wqlFieldType){

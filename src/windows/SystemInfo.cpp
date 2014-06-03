@@ -28,21 +28,38 @@
 //
 //****************************************************************************************//
 
-#include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <cassert>
 #include <windows.h>
 #include <Iphlpapi.h>
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 
+#include "AutoCloser.h"
+#include "WindowsCommon.h"
 #include "XmlCommon.h"
+#include "Common.h"
 #include "Log.h"
 
 #include "SystemInfo.h"
 
 using namespace std;
 using namespace xercesc;
+
+
+namespace {
+	/**
+	 * Gets version and build from the registry.  Key
+	 *   HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion
+	 * is consulted, with names "CurrentBuild" and "CurrentVersion".
+	 * 
+	 * \param[out] build receives the build number, must be non-NULL
+	 * \param[out] version receives the version, must be non-NULL
+	 * \return true on success, false on failure (check GetLastError()).
+	 */
+	bool getBuildAndVersionFromRegistry(string *build, string *version);
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~		Class SystemInfo		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -54,7 +71,6 @@ SystemInfo::SystemInfo() {
 	os_version = "";
 	architecture = "";
 	primary_host_name = "";
-	interfaces;
 }
 
 SystemInfo::~SystemInfo() {
@@ -132,19 +148,19 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	// Make a call GetSystemInfo to get architecture
 	SYSTEM_INFO siSysInfo;
 	GetNativeSystemInfo(&siSysInfo);
-	if(siSysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_UNKNOWN) {
-		sysInfo->architecture = "unknown";
-
-	} else if(siSysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL) {
+	switch(siSysInfo.wProcessorArchitecture) {
+	case PROCESSOR_ARCHITECTURE_INTEL:
 		sysInfo->architecture = "INTEL32";
-
-	} else if(siSysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64) {
+		break;
+	case PROCESSOR_ARCHITECTURE_IA64:
 		sysInfo->architecture = "IA64";
-
-	} else if(siSysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
+		break;
+	case PROCESSOR_ARCHITECTURE_AMD64:
 		sysInfo->architecture = "AMD64";
+		break;
+	default:
+		sysInfo->architecture = "unknown";
 	}
-
 
 	//////////////////////////////////////////////////////////
 	/////////////	Get os version and name	//////////////////
@@ -155,305 +171,140 @@ void SystemInfoCollector::GetOSInfo(SystemInfo *sysInfo) {
 	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
 	// If that fails, try using the OSVERSIONINFO structure.
 	OSVERSIONINFOEX osvi;
-	BOOL bOsVersionInfoEx;	// flag to indicate that the OSVERSIONINFOEX strucutre was used
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	
-	bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
+
+	BOOL bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
 	if(!bOsVersionInfoEx) {
-
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		
-		if (!GetVersionEx((OSVERSIONINFO*)&osvi)) {
-			sysInfo->os_name = "unknown";
-			sysInfo->os_version = "unknown";
-			return;
-		}
-	}
-	
-	// Allocate memory for the version number string
-	const int verNumSize = 16;
-	char *verNum = (char*)malloc(sizeof(char)*verNumSize);
-	if(verNum == NULL) {
-		throw SystemInfoException("Error: Unable to allocate memeory while gathering Operating System information.");
+		sysInfo->os_name = "unknown";
+		sysInfo->os_version = "unknown";
+		Log::Message("Couldn't get Windows version: " + WindowsCommon::GetErrorMessage(GetLastError()));
+		return;
 	}
 
-	switch (osvi.dwPlatformId) {
-
-	case VER_PLATFORM_WIN32_NT:
-			// Test for the specific product.
-			if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && osvi.wProductType == VER_NT_WORKSTATION) {
-				sysInfo->os_name = "Microsoft Windows 7";	
-			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
-				sysInfo->os_name = "Microsoft Server 2008 R2";	
-			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
-				sysInfo->os_name = "Microsoft Server 2008";	
-			} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && osvi.wProductType == VER_NT_WORKSTATION) {
-				sysInfo->os_name = "Microsoft Windows Vista";	
-			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 && (osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER)) {
-				sysInfo->os_name = "Microsoft Windows Server 2003";	
-			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
-				sysInfo->os_name = "Microsoft Windows XP";
-			} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
-				sysInfo->os_name = "Microsoft Windows 2000";
-			} else if(osvi.dwMajorVersion <= 4) {
-					sysInfo->os_name = "Microsoft Windows NT";
-			} else {
-				sysInfo->os_name = "unknown";
-			}
-
-			// Test for specific product on Windows NT 4.0 SP6 and later.
-			// using OSVERSIONINFOEX
-			if(bOsVersionInfoEx) {
-
-				// Test for the workstation type.
-				if(osvi.wProductType == VER_NT_WORKSTATION) {
-					if( osvi.dwMajorVersion == 4 ) {
-						sysInfo->os_name.append(" Workstation 4.0");
-					} else if(osvi.wSuiteMask & VER_SUITE_PERSONAL) {
-						sysInfo->os_name.append(" Home Edition");
-					} else {
-						sysInfo->os_name.append(" Professional");
-					}
-
-				// Test for the server type.
-				} else if(osvi.wProductType == VER_NT_SERVER || osvi.wProductType == VER_NT_DOMAIN_CONTROLLER) {
-				
-					if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
-						
-						if(osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-							sysInfo->os_name.append(" Datacenter Edition");
-						} else if(osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-							sysInfo->os_name.append(" Enterprise Edition");
-						} else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
-							sysInfo->os_name.append(" Web Edition");
-						} else {
-							sysInfo->os_name.append(" Standard Edition");
-						}
-					
-					} else if( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 ) {
-						if(osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-							sysInfo->os_name.append(" Datacenter Server");
-						} else if( osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-							sysInfo->os_name.append(" Advanced Server");
-						} else {
-							sysInfo->os_name.append(" Server");
-						}
-					}
-
-				// Windows NT 4.0
-				} else {
-					if(osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-						sysInfo->os_name.append(" Server 4.0, Enterprise Edition");
-					} else {
-						sysInfo->os_name.append(" Server 4.0");
-					}
-				}
-
-				// Get Version number
-				_itoa(osvi.dwMajorVersion, verNum, 10);
-				sysInfo->os_version = verNum;
-				ZeroMemory(verNum, verNumSize);
-				_itoa(osvi.dwMinorVersion, verNum, 10);
-				sysInfo->os_version.append(".");
-				sysInfo->os_version.append(verNum);
-				ZeroMemory(verNum, verNumSize);
-				_itoa(osvi.dwBuildNumber, verNum, 10);
-				sysInfo->os_version.append(".");
-				sysInfo->os_version.append(verNum);				
-				
-		
-			// Test for specific product on Windows NT 4.0 SP5 and earlier
-			// using OSVERSIONINFO
-			} else {  
-
-				HKEY hKey;
-				const int BUFSIZE = 80;
-				char szProductType[BUFSIZE];
-				DWORD dwBufLen=BUFSIZE;
-				LONG lRet;
-
-				lRet = RegOpenKeyEx( HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\ProductOptions", 0, KEY_QUERY_VALUE, &hKey );
-				if(lRet != ERROR_SUCCESS) {
-					sysInfo->os_name = "unknown";
-					sysInfo->os_version = "unknown";
-					break;
-				}
-
-				lRet = RegQueryValueEx( hKey, "ProductType", NULL, NULL, (LPBYTE) szProductType, &dwBufLen);
-				if((lRet != ERROR_SUCCESS) || (dwBufLen > BUFSIZE)) {
-					sysInfo->os_name = "unknown";
-					sysInfo->os_version = "unknown";
-					break;
-				}
-
-				RegCloseKey(hKey);
-
-				if(lstrcmpi( "WINNT", szProductType) == 0) {
-					sysInfo->os_name.append(" Workstation");
-				}else if(lstrcmpi( "LANMANNT", szProductType) == 0) {
-					sysInfo->os_name.append(" Server");
-				}else if(lstrcmpi( "SERVERNT", szProductType) == 0) {
-					sysInfo->os_name.append(" Advanced Server");
-				}
-
-				// Get Version number
-				_itoa(osvi.dwMajorVersion, verNum, 10);
-				sysInfo->os_version = verNum;
-				ZeroMemory(verNum, verNumSize);
-				_itoa(osvi.dwMinorVersion, verNum, 10);
-				sysInfo->os_version.append(".");
-				sysInfo->os_version.append(verNum);
-			}
-
-			// Display service pack (if any) and build number.
-			if(osvi.dwMajorVersion == 4 && lstrcmpi(osvi.szCSDVersion, "Service Pack 6") == 0) {
-				HKEY hKey;
-				LONG lRet;
-
-				// Test for SP6 versus SP6a.
-				lRet = RegOpenKeyEx( HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009", 0, KEY_QUERY_VALUE, &hKey );
-				if(lRet == ERROR_SUCCESS) {
-					sysInfo->os_name.append(" Service Pack 6a");
-					
-				
-				// Windows NT 4.0 prior to SP6a
-				} else {
-					sysInfo->os_name.append(" ");
-					sysInfo->os_name.append(osvi.szCSDVersion);
-				}
-				RegCloseKey(hKey);
-
-				// Add the build number to the version string
-				sysInfo->os_version.append(".");
-				_itoa((osvi.dwBuildNumber & 0xFFFF), verNum, 10);
-				sysInfo->os_version.append(verNum);       
-			
-			// not Windows NT 4.0 
-			} else {
-				sysInfo->os_name.append(" ");
-				sysInfo->os_name.append(osvi.szCSDVersion);
-			}
-
-			break;
-
-		// Test for the Windows Me/98/95.
-		case VER_PLATFORM_WIN32_WINDOWS:
-
-			// Look for Win 95
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
-				sysInfo->os_name = "Microsoft Windows 95";
-			}else if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
-				sysInfo->os_name.append(" OSR2");
-			} 
-
-			// Look for Win 98
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
-				sysInfo->os_name = "Microsoft Windows 98";
-			
-				if (osvi.szCSDVersion[1] == 'A')
-					sysInfo->os_name.append(" SE");
-			} 
-
-			// Look for Win Me
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
-				sysInfo->os_name = "Microsoft Windows Millennium Edition";
-			} 
-			
-			// Get Version number
-			_itoa(osvi.dwMajorVersion, verNum, 10);
-			sysInfo->os_version = verNum;
-			ZeroMemory(verNum, verNumSize);
-			_itoa(osvi.dwMinorVersion, verNum, 10);
-			sysInfo->os_version.append(".");
-			sysInfo->os_version.append(verNum);
-			ZeroMemory(verNum, verNumSize);
-			_itoa((osvi.dwBuildNumber & 0xFFFF), verNum, 10);
-			sysInfo->os_version.append(".");
-			sysInfo->os_version.append(verNum);
-
-			break;
-
-		case VER_PLATFORM_WIN32s:
-
-			sysInfo->os_name = "Microsoft Win32s";
-
-			// Get Version number
-			_itoa(osvi.dwMajorVersion, verNum, 10);
-			sysInfo->os_version = verNum;
-			ZeroMemory(verNum, verNumSize);
-			_itoa(osvi.dwMinorVersion, verNum, 10);
-			sysInfo->os_version.append(".");
-			sysInfo->os_version.append(verNum);
-			ZeroMemory(verNum, verNumSize);
-			_itoa((osvi.dwBuildNumber & 0xFFFF), verNum, 10);
-			sysInfo->os_version.append(".");
-			sysInfo->os_version.append(verNum);		
-
-			break;
-
-		default:
-			sysInfo->os_name = "unknown";
-			sysInfo->os_version = "unknown";
-			break;
-
-	} // end switch
-
-	free(verNum);
-
-	//////////////////////////////////////////////////////////
-	//////////	 Get fully qulaified host name	//////////////
-	//////////////////////////////////////////////////////////
-	
-	// NOTE: the gethostbyname() method is depricated. 
-	// This should be replaced with the new methods
-  
-	WORD version = MAKEWORD(2,2);
-	WSADATA wsaData;
-	
-	if(WSAStartup(version, &wsaData) != 0) {
-		sysInfo->primary_host_name = "unknown";	
-		throw SystemInfoException("Error: Unable to get hostname. Sockets could not be initialized.");
+	if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT || osvi.dwMajorVersion < 5) {
+		sysInfo->os_name = "unknown";
+		sysInfo->os_version = "unknown";
+		Log::Message("This version of Windows is too old!");
+		return;
 	}
 
-	// Confirm that the WinSock DLL supports 2.2.  Note that if the DLL supports versions
-	// greater than 2.2 in addition to 2.2, it will still return 2.2 in wVersion since that
-	// is the version we requested.
-	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2 ) {
-		sysInfo->primary_host_name = "unknown";	
-		WSACleanup();
-		throw SystemInfoException("Error: Unable to get hostname. Could not find a usable version of the WinSock DLL.");
+	// The additional checks which depend on registry values were contributed
+	// by a user.
+	string regBuild, regVersion;
+	if (!getBuildAndVersionFromRegistry(&regBuild, &regVersion)) {
+		regBuild.clear();
+		regVersion.clear();
+		// we'll just have to handle empty values below...
+		// not sure we need to give up entirely, just because the
+		// registry lookups failed...
 	}
 
-	// First get the host name
-	char *host_name;
-	const int size = 256;
-	host_name = (char*)malloc(sizeof(char)*size);
-	if(host_name == NULL) {
-		sysInfo->primary_host_name = "unknown";
-		free(host_name);
-		throw SystemInfoException("Error: Unable to allocate memeory while gathering Operating System information.");
-	}
+// a server version check, intended to be used on 
+// OSVERSIONINFOEX::wProductType.  Possibly another way to do this is just
+// check _x != VER_NT_WORKSTATION... but I am trying to keep my changes
+//minimal...
+#define IS_SERVER(_x) ((_x) == VER_NT_SERVER || (_x) == VER_NT_DOMAIN_CONTROLLER)
 
-	int res = gethostname(host_name, size);
-	if (res != 0) {
-		res = WSAGetLastError();
-		sysInfo->primary_host_name = "unknown";
-		Log::Debug("Unable to get short hostname from system");
+	// Test for the specific product.
+	if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 && osvi.wProductType == VER_NT_WORKSTATION) {
+		sysInfo->os_name = "Microsoft Windows 8";
+		if (regVersion == "6.3") // in case GetVersionEx() lied...
+			sysInfo->os_name += ".1";
+	} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 && IS_SERVER(osvi.wProductType)) {
+		sysInfo->os_name = "Microsoft Windows Server 2012";
+		if (regVersion == "6.3")
+			sysInfo->os_name += " R2";
+	} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && osvi.wProductType == VER_NT_WORKSTATION) {
+		sysInfo->os_name = "Microsoft Windows 7";	
+	} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 && IS_SERVER(osvi.wProductType)) {
+		sysInfo->os_name = "Microsoft Windows Server 2008 R2";	
+	} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && IS_SERVER(osvi.wProductType)) {
+		sysInfo->os_name = "Microsoft Windows Server 2008";	
+	} else if(osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && osvi.wProductType == VER_NT_WORKSTATION) {
+		sysInfo->os_name = "Microsoft Windows Vista";	
+	} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 && IS_SERVER(osvi.wProductType)) {
+		sysInfo->os_name = "Microsoft Windows Server 2003";	
+	} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
+		sysInfo->os_name = "Microsoft Windows XP";
+	} else if(osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
+		sysInfo->os_name = "Microsoft Windows 2000";
 	} else {
-		// next get the fully qualified host name
-		hostent *remoteHost;
-		remoteHost = gethostbyname(host_name);
-		if(remoteHost != NULL) {
-			sysInfo->primary_host_name = remoteHost->h_name;	
-		} else {
-			sysInfo->primary_host_name = host_name;
-			Log::Debug("Unable to resolve system FQDN.  Using short hostname instead.");
-		}
+		sysInfo->os_name = "unknown";
+		sysInfo->os_version = "unknown";
+		Log::Message("This version of Windows is unrecognized.");
+		return;
 	}
 
-	free(host_name);
+	// Test for the workstation type.
+	if(osvi.wProductType == VER_NT_WORKSTATION) {
+		if(osvi.wSuiteMask & VER_SUITE_PERSONAL) {
+			sysInfo->os_name.append(" Home Edition");
+		} else {
+			sysInfo->os_name.append(" Professional");
+		}
+
+	// Test for the server type.
+	} else if(IS_SERVER(osvi.wProductType)) {
+
+		if((osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) ||
+			(osvi.dwMajorVersion == 6 && 0 <= osvi.dwMinorVersion && osvi.dwMinorVersion <= 2)) {
+
+			if(osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+				sysInfo->os_name.append(" Datacenter Edition");
+			} else if(osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+				sysInfo->os_name.append(" Enterprise Edition");
+			} else if (osvi.wSuiteMask & VER_SUITE_BLADE) {
+				sysInfo->os_name.append(" Web Edition");
+			} else {
+				sysInfo->os_name.append(" Standard Edition");
+			}
+
+		} else if( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 ) {
+			if(osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+				sysInfo->os_name.append(" Datacenter Server");
+			} else if( osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+				sysInfo->os_name.append(" Advanced Server");
+			} else {
+				sysInfo->os_name.append(" Server");
+			}
+		}
+	} // else, just leave os_name as-is, I guess
+
+#undef IS_SERVER
+
+	// Get Version number
+	if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 && regVersion == "6.3") {
+		// ignore GetVersionEx() if it lied...
+		sysInfo->os_version = regVersion;
+		if (!regBuild.empty())
+			sysInfo->os_version += "." + regBuild;
+	} else {
+		sysInfo->os_version =
+			Common::ToString(osvi.dwMajorVersion) + '.' +
+			Common::ToString(osvi.dwMinorVersion) + '.' +
+			Common::ToString(osvi.dwBuildNumber);
+	}
+
+	if (osvi.szCSDVersion[0] != 0) {
+		sysInfo->os_version += string(" ") +
+		osvi.szCSDVersion;
+	}
+
+	//////////////////////////////////////////////////////////
+	//////////	 Get fully qualified host name	//////////////
+	//////////////////////////////////////////////////////////
+  
+	char host_name[256];
+	DWORD bufSz = sizeof(host_name);
+	if (GetComputerNameEx(ComputerNamePhysicalDnsFullyQualified,
+		host_name, &bufSz))
+		sysInfo->primary_host_name = host_name;
+	else {
+		sysInfo->primary_host_name = "unknown";
+		Log::Debug("Unable to get hostname from system");
+	}
 }
 
 IfDataVector SystemInfoCollector::GetInterfaces() {
@@ -596,4 +447,92 @@ SystemInfoException::SystemInfoException(string errMsgIn, int severity, Exceptio
 
 SystemInfoException::~SystemInfoException() {
 	// Do nothing for now
+}
+
+namespace {
+	bool getBuildAndVersionFromRegistry(string *build, string *version) {
+
+		assert(build && version);
+
+#define CV_KEY_PATH "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+
+		HKEY cvKey;
+		LONG err = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
+			CV_KEY_PATH,
+			0,
+			KEY_READ,
+			&cvKey);
+
+		if (err) {
+			Log::Message("Couldn't open registry key HKLM\\" CV_KEY_PATH ": "+
+				WindowsCommon::GetErrorMessage(err));
+			return false;
+		}
+
+		AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyCloser(
+			cvKey,
+			RegCloseKey,
+			"Registry key HKLM\\" CV_KEY_PATH);
+
+
+		DWORD valType;
+		BYTE val[20];
+		DWORD valSize;
+
+		// --- CurrentBuild
+		valSize = sizeof(val);
+		err = RegQueryValueExA(
+			cvKey,
+			"CurrentBuild",
+			NULL,
+			&valType,
+			val,
+			&valSize
+			);
+
+		if (err) {
+			Log::Message("Couldn't read from registry key HKLM\\" CV_KEY_PATH " value \"CurrentBuild\": "+
+				WindowsCommon::GetErrorMessage(err));
+			return false;
+		}
+
+		if (valSize == 0)
+			build->clear();
+		else if (val[valSize-1] == 0)
+			// careful of null-termination...
+			build->assign(reinterpret_cast<char*>(&val[0]), valSize-1);
+		else
+			build->assign(reinterpret_cast<char*>(&val[0]), valSize);
+
+
+		// --- CurrentVersion
+		valSize = sizeof(val);
+		err = RegQueryValueExA(
+			cvKey,
+			"CurrentVersion",
+			NULL,
+			&valType,
+			val,
+			&valSize
+			);
+
+		if (err) {
+			Log::Message("Couldn't read from registry key HKLM\\" CV_KEY_PATH " value \"CurrentVersion\": "+
+				WindowsCommon::GetErrorMessage(err));
+			return false;
+		}
+
+		if (valSize == 0)
+			version->clear();
+		else if (val[valSize-1] == 0)
+			// careful of null-termination...
+			version->assign(reinterpret_cast<char*>(&val[0]), valSize-1);
+		else
+			version->assign(reinterpret_cast<char*>(&val[0]), valSize);
+
+		return true;
+
+#undef CV_KEY_PATH
+
+	}
 }

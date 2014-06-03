@@ -99,8 +99,11 @@ string  Common::definitionIdsFile              = "";
 const string Common::REGEX_CHARS = "^$\\.[](){}*+?|";
 
 namespace {
-	bool caseInsensitiveCmpChars(char c1, char c2) {
+	bool caseInsensitiveCmpCharsA(char c1, char c2) {
 		return tolower(c1) == tolower(c2);
+	}
+	bool caseInsensitiveCmpCharsW(wchar_t c1, wchar_t c2) {
+		return towlower(c1) == towlower(c2);
 	}
 }
 
@@ -705,7 +708,13 @@ string Common::GetFullPath(string path) {
 bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
 	if (s1.size() != s2.size())
 		return false;
-	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
+	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpCharsA);
+}
+
+bool Common::EqualsIgnoreCase(const wstring &s1, const wstring &s2) {
+	if (s1.size() != s2.size())
+		return false;
+	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpCharsW);
 }
 
 string Common::StripTrailingSeparators(const string &path) {

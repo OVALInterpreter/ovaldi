@@ -423,8 +423,8 @@ OvalEnum::Flag OvalEnum::CombineFlags(vector<int>* flags) {
 		combinedFlag = OvalEnum::FLAG_COMPLETE;
 
 	} else if(errorCount == 0 
-		&& completeCount > 0 
-		&& incompleteCount == 0 
+		&& completeCount >= 0 
+		&& incompleteCount >= 1 
 		&& doesNotExistCount == 0 
 		&& notCollectedCount == 0 
 		&& notApplicableCount == 0) {

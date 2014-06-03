@@ -42,6 +42,15 @@
 class WindowsCommon {
 
 public:
+	/** Do some one-time setup. */
+	static void init();
+
+	/**
+	 * Release resources acquired in init().
+	 * I'm letting this throw... so be careful when calling
+	 * from destructors.
+	 */
+	static void uninit();
 	/** Disable all the privileges associated with the current process token.
 		If a specific privilege is needed later, it can be enabled by calling
 		AdjustTokenPrivileges() again.
@@ -190,6 +199,23 @@ public:
 	 */
 	static bool LookUpTrusteeSid(std::string sidStr, std::string* pAccountNameStr, std::string* pDomainStr, bool *isGroup);
 
+	/**
+	 * Normalizes the given trustee name.  Any of the out-params may be NULL,
+	 * if you don't need that particular value.
+	 *
+	 * \param[in] trusteeName the name to look up
+	 * \param[out] normName the normalized trustee name, or NULL
+	 * \param[out] normDomain the normalized domain name, or NULL
+	 * \param[out] normFormattedName the normalized formatted name, or NULL
+	 * \param[out] sidStr the SID, as a string, for the given trustee, or NULL
+	 * \param[out] isGroup whether the given trustee refers to a group
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool NormalizeTrusteeName(const std::string &trusteeName, 
+		std::string *normName, std::string *normDomain, 
+		std::string *normFormattedName, std::string *sidStr,
+		bool *isGroup);
+
 	/** Convert a vector of trustee names to a vector of corresponding SID strings */
 	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);
 
@@ -260,7 +286,7 @@ public:
      *  @param str A std:string that want to convert to a null-terminated string of Unicode characters (16-bit).
      *  @return A null-terminated string of Unicode characters (16-bit).
      */
-	static LPWSTR StringToWide(std::string s);
+	static std::wstring StringToWide(std::string s);
 
 	/** Converts a wide-character string of Unicode characters into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
@@ -359,8 +385,10 @@ public:
 	 * which you can get filename info.  If that can be made to work, it would
 	 * much simpler than any of the above techniques.  But we must stay
 	 * compatible with XP.
+	 * \return false if the file did not exist; true on success.  Throws on other
+	 *   errors.
 	 */
-	static std::string GetActualPathWithCase(const std::string &path);
+	static bool GetActualPathWithCase(const std::string &path, std::string *casedString);
 
 	/**
 	 * Returns true if this process is running under WoW64.
@@ -402,8 +430,6 @@ public:
 
 private:
 	
-	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
-
 	/** Split Trustee name between domain and account portion */
 	static void SplitTrusteeName(std::string trusteeName, std::string *domainName, std::string *accountName);
 
@@ -437,14 +463,11 @@ private:
 	*/
 	static void GetWellKnownTrusteeNames();
 
-	/** Look up the local system name. */
-	static std::string LookUpLocalSystemName();
-
 	/** Retrieve the domain controller name for the specified domain name.
 	  @param domainName A string that represents the domain name.
 	  @return A LPCWSTR representing the domain controller name or NULL if the domain name is the empty string or if the domain controller name lookup failed.
 	*/
-	static LPCWSTR GetDomainControllerName(std::string domainName);
+	static std::wstring GetDomainControllerName(std::string domainName);
 
 	static StringSet* allTrusteeNames;
 	static StringSet* allTrusteeSIDs;

@@ -31,6 +31,7 @@
 #include <memory>
 #include <FreeGuard.h>
 
+#include <ArrayGuard.h>
 #include <AutoCloser.h>
 #include <FreeGuard.h>
 #include "Log.h"
@@ -420,10 +421,10 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
 		bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY
 		: 0;
 #endif
-    LPWSTR lpSubKey = WindowsCommon::StringToWide(subKeyStr);
-    LONG status = RegOpenKeyExW ( superKey, lpSubKey,
+    wstring lpSubKey = WindowsCommon::StringToWide(subKeyStr);
+    LONG status = RegOpenKeyExW ( superKey, lpSubKey.c_str(),
 		0, access | view, keyHandle );
-	delete[] lpSubKey;
+
     return status;
 }
 
@@ -521,17 +522,14 @@ bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr 
     if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
-	LPWSTR wNameStr = WindowsCommon::StringToWide ( nameStr );
-    if ( RegQueryValueExW ( keyHandle, wNameStr, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
-        return false;
-    }
-	delete[] wNameStr;
 
-	LONG err;
-    if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
-        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key " +
-			hiveStr + '\\' + keyStr + ". Microsoft System Error " +
-			Common::ToString(err) + ") - " + WindowsCommon::GetErrorMessage(err) );
+	AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+		"Registry key "+hiveStr+'\\'+keyStr);
+
+	wstring wNameStr = WindowsCommon::StringToWide ( nameStr );
+
+    if ( RegQueryValueExW ( keyHandle, wNameStr.c_str(), NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
+        return false;
     }
 
     return true;

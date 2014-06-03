@@ -252,6 +252,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
 				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				break;
 			} else {
 				// We have a result.  Create an ItemEntity for it and add it to the

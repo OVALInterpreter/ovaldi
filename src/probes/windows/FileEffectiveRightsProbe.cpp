@@ -329,7 +329,8 @@ namespace {
 
 			// Get the sid for the trustee name
 			pSid = WindowsCommon::GetSIDForTrusteeName(trusteeName);
-		
+			if (!pSid)
+				return NULL;
 
 			// the file exists and trustee name seems good so we can create the new item now.
 			item = ::CreateItem();
