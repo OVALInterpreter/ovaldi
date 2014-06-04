@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -29,10 +29,19 @@
 //****************************************************************************************//using namespace std;
 
 #include <memory>
-#include "State.h"
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+
+#include "XmlCommon.h"
+#include "Log.h"
 #include "StateEntity.h"
+#include "DocumentManager.h"
+#include "Common.h"
+
+#include "State.h"
 
 using namespace std;
+using namespace xercesc;
 
 AbsStateMap State::processedStatesMap;
 
@@ -76,8 +85,32 @@ OvalEnum::ResultEnumeration State::Analyze(Item* item) {
 	for(stateElements = this->GetElements()->begin(); stateElements != this->GetElements()->end(); stateElements++) {
 		StateEntity* stateElm = (StateEntity*)(*stateElements);
 
+		/*******************************************************
+		 Ugly hackage to make user_sid states match their items.
+		 This is done by checking for a particular entity of a
+		 particular state, and if found, we replace it with a
+		 dupe state entity with a changed name, for the purposes
+		 of the subsequent analysis.
+		 *******************************************************/
+		auto_ptr<StateEntity> fakedSidStateEntity;
+		if (GetXmlns() == "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" &&
+			GetName() == "user_sid_state") {
+		  if (stateElm->GetName() == "user") {
+			fakedSidStateEntity.reset(new StateEntity(*stateElm));
+			fakedSidStateEntity->SetName("user_sid");
+			stateElm = fakedSidStateEntity.get();
+		  } else if (stateElm->GetName() == "group") {
+			fakedSidStateEntity.reset(new StateEntity(*stateElm));
+			fakedSidStateEntity->SetName("group_sid");
+			stateElm = fakedSidStateEntity.get();
+		  }
+		}
+		/******************************************************
+		 End ugly hackage
+		 ******************************************************/
+
 		// locate matching elements in the item
-		string stateElmName = stateElm->GetName(); 
+		string stateElmName = stateElm->GetName();
 		// i think the vector needs deleting, but the item retains ownership
 		// of the vector's contents.
 		auto_ptr<ItemEntityVector> scElements(item->GetElementsByName(stateElmName));
@@ -114,13 +147,19 @@ void State::Parse(DOMElement* stateElm) {
 	this->SetId(XmlCommon::GetAttributeByName(stateElm, "id"));
 	this->SetXmlns(XmlCommon::GetNamespace(stateElm));
 	string versionStr = XmlCommon::GetAttributeByName(stateElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
+
+	// if the operator attribute is specified let's set it. otherwise we will use the default operator set in the constructor.
+        string operatorStr = XmlCommon::GetAttributeByName(stateElm, "operator");
+        if (operatorStr.compare("") != 0){
+          this->SetOperator(OvalEnum::ToOperator(operatorStr));
+        }
 
 	// loop over all elements
 	DOMNodeList *stateChildren = stateElm->getChildNodes();

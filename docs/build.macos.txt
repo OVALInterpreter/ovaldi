@@ -4,7 +4,7 @@
 
           Build Instructions - Mac OS
 
-  Copyright (c) 2002-2012, The MITRE Corporation
+  Copyright (c) 2002-2014, The MITRE Corporation
 
 ****************************************************
 
@@ -104,58 +104,54 @@ install the supporting libraries.
 
   B. Xerces Library
 
-       The OVAL Interpreter uses the open source Xerces library.  The following
-       instructions are slightly different between OSX 10.6 and 10.7 due to
-       compatibility problems with xerces 2.8 on OSX 10.7.
+       The OVAL Interpreter uses the open source Xerces library.  The
+       binary was compiled with version 3.1.1 of the xerces-c library.  From
+       the Xerces Web site:
 
-       OSX 10.7:
+         "This product includes software developed by the Apache Software
+	     Foundation (http://www.apache.org/)."
 
-       The macports version of xerces 2.8.0 was causing ovaldi to crash, so we
-       built our own binaries from source.  To make the build work, we applied
-       the "macsvn.diff" patch, which is available from
+       For more information about Xerces visit:
 
-       https://issues.apache.org/jira/browse/XERCESC-1772
-       or
-       https://trac.macports.org/ticket/22287
+         http://xerces.apache.org
 
-       OSX 10.6:
+       The source code is also available at http://www.apache.org/dist/xerces/c/.
+	
+           To compile and install the Xerces-C library from source, simply run the following commands.
 
-       We built xerces 2.7 from source.  No patching was required.
-
-       In either case, the source code for the Xerces-C library can be
-       downloaded from the following link.
-
-           http://archive.apache.org/dist/xml/xerces-c/ (for 2.7)
-           or
-           http://xerces.apache.org/xerces-c/download.cgi (for 2.8)
-
-       To compile and install the Xerces-C library (this example builds 32-bit
-       xerces 2.7), simply run the following commands.
-
-           export XERCESCROOT='<path to xerces-c>/xerces-c-src_2_7_0'
-           cd $XERCESCROOT/src/xercesc
-           ./runConfigure -p macosx -n native -b 32 -c gcc -x g++ -P 'install path'
+           cd <xerces source dir>
+           ./configure
            make
            sudo -E make install
-
-       Building xerces 2.8 on OSX 10.7 after having applied the patch, is 
-       analogous.
 
   C. Xalan Library
 
        The OVAL Interpreter uses the open source Xalan library.  The
-       binary was compiled with version 1.10.0 of the xalan-c library.
+       binary was compiled with version 1.11.0 of the xalan-c library.  From
+       the Xalan Web site:
+
+         "This product includes software developed by the Apache Software
+	     Foundation (http://www.apache.org/)."
+
+       For more information about Xalan visit:
+
+         http://xalan.apache.org
 	   
        The source code for the Xalan-C library can be downloaded from the following link.
 	   
-           http://www.apache.org/dyn/closer.cgi/xml/xalan-c
+           http://www.apache.org/dyn/mirrors/mirrors.cgi/xalan/xalan-c/sources
 	   
-       To compile and install the Xalan-C library simply run the following commands.
+       Before compiling, you may optionally apply xalan_optional_patch.txt, 
+       which resolves two issues.  One of them can cause a crash on OSX, the
+       other was only observed to cause a crash on Windows, but the patch is 
+       harmless on other OS's.
+
+       Then, simply run the following commands.
 	   
-           export XALANCROOT='<path to xalan-c>/xml-xalan/c'
-	       export XERCESCROOT='<install path of xerces-c>'
+           export XALANCROOT=<path to xalan-c>/xml-xalan/c
+           export XERCESCROOT=<install path of xerces-c>
            cd $XALANCROOT
-           ./runConfigure -p macosx -c gcc -x g++ -P 'install path'
+           ./runConfigure -p macosx -c gcc -x g++
            make
            sudo -E make install
 
@@ -224,7 +220,7 @@ site:
 -- IV -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.7.0 of the xerces-c library.  From
+binary was compiled with version 3.1.1 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
@@ -232,7 +228,7 @@ the Xerces Web site:
 
 For more information about Xerces visit:
 
-    http://xml.apache.org
+    http://xerces.apache.org
 
 The source code is also available at the above Web site.
 
@@ -247,7 +243,7 @@ the Xalan Web site:
 
 For more information about Xalan visit:
 
-    http://xml.apache.org
+    http://xalan.apache.org
 
 The source code is also available at the above Web site.
 
@@ -307,6 +303,6 @@ OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland
 Security. OVAL and the OVAL logo are trademarks of The MITRE
-Corporation. Copyright 2002-2012, The MITRE Corporation (www.mitre.org).
+Corporation. Copyright 2002-2014, The MITRE Corporation (www.mitre.org).
 
 

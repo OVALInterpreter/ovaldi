@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Common.h"
+#include "ObjectFactory.h"
+#include "AbsObject.h"
+#include "State.h"
+#include "Object.h"
+#include "XmlCommon.h"
+
 #include "SetObject.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									SetObject Class										  //	
@@ -44,7 +55,7 @@ SetObject::SetObject(string id, string comment, string name, int version, string
 	// -----------------------------------------------------------------------
 
 	this->type = "SetObject";
-
+	this->set = NULL;
 }
 
 SetObject::~SetObject() {
@@ -55,7 +66,8 @@ SetObject::~SetObject() {
 	//
 	// -----------------------------------------------------------------------
 	
-	delete(this->set);
+	if (this->set)
+		delete(this->set);
 }
 
 // ***************************************************************************************	//
@@ -83,21 +95,15 @@ void SetObject::SetSet(Set* set) {
 	this->set = set;
 }
 
-VariableValueVector* SetObject::GetVariableValues() {
+VariableValueVector SetObject::GetVariableValues() {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Return a vector of all variable values used in this SetObject
 	//
 	// -----------------------------------------------------------------------
-	
-	VariableValueVector* varValues = NULL;
 
-	// This call is ok because the Set creates a new VariableValueVector 
-	// and returns it to the caller 
-	varValues = this->GetSet()->GetVariableValues();
-
-	return varValues;
+	return this->GetSet()->GetVariableValues();
 }
 
 void SetObject::Parse(DOMElement* setObjectElm) {
@@ -113,11 +119,11 @@ void SetObject::Parse(DOMElement* setObjectElm) {
 	this->SetComment(XmlCommon::GetAttributeByName(setObjectElm, "comment"));
 	this->SetXmlns(XmlCommon::GetNamespace(setObjectElm));
 	string versionStr = XmlCommon::GetAttributeByName(setObjectElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 

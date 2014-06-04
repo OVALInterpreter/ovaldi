@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,27 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
+#include "VariableComponent.h"
+#include "LiteralComponent.h"
+#include "ObjectComponent.h"
+#include "SubstringFunction.h"
+#include "ConcatFunction.h"
+#include "EscapeRegexFunction.h"
+#include "BeginFunction.h"
+#include "EndFunction.h"
+#include "SplitFunction.h"
+#include "RegexCaptureFunction.h"
+#include "ArithmeticFunction.h"
+#include "TimeDifferenceFunction.h"
+#include "CountFunction.h"
+#include "UniqueFunction.h"
+
 #include "ComponentFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 // ***************************************************************************************	//
 //								 Public members												//
@@ -39,7 +57,6 @@ AbsComponent* ComponentFactory::GetComponent(DOMElement* componentElm) {
 
 	AbsComponent* absComponent = NULL;
 
-	// determine if this is a set object or a simple object
 	string elmName = XmlCommon::GetElementName(componentElm);
 	if(elmName.compare("variable_component")  == 0) {
 		absComponent = new VariableComponent();

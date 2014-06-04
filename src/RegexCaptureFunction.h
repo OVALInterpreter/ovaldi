@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,11 +31,11 @@
 #ifndef REGEXCAPTUREFUNCTION_H
 #define REGEXCAPTUREFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
-#include "REGEX.h"
+#include <string>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsFunctionComponent.h"
+#include "VariableValue.h"
+#include "REGEX.h"
 
 /**
 	This class represents a RegexCaptureFunction component in a local_variable in the oval definition schema.
@@ -49,22 +49,28 @@ class RegexCaptureFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete RegexCaptureFunction object. */
-	RegexCaptureFunction(std::string pattern = "");
-	~RegexCaptureFunction();
+	RegexCaptureFunction(std::string pattern = "") : pattern(pattern)
+	{}
+	virtual ~RegexCaptureFunction()
+	{}
 
 	/** Parse the substring element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the pattern field's value. */
-	std::string GetPattern();
+	std::string GetPattern() const {
+		return this->pattern;
+	}
 	/** Set the pattern field's value. */
-	void SetPattern(std::string pattern);
+	void SetPattern(std::string pattern) {
+		this->pattern = pattern;
+	}
 
 private:
 	std::string pattern;

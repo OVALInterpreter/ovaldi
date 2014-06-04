@@ -1,6 +1,6 @@
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,7 +27,21 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
+//#include <Winldap.h>
+#include <LM.h>
+#include <dsgetdc.h>
+#include <activeds.h>
+#include <Sddl.h>
+#include <iomanip>
+
+#include "Log.h"
+#include "Common.h"
+#include "WindowsCommon.h"
+
 #include "ActiveDirectoryProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              ActiveDirectoryProbe Class                                //
@@ -39,8 +53,11 @@ const string ActiveDirectoryProbe::NAMING_CONTEXT_TYPE_SCHEMA = "schema";
 const string ActiveDirectoryProbe::GET_ALL_ATTRIBUTES = "GET_ALL_ATTRIBUTES";
 const string ActiveDirectoryProbe::GET_ALL_DISTINGUISHED_NAMES = "GET_ALL_DISTINGUISHED_NAMES";
 const string ActiveDirectoryProbe::OBJECT_EXISTS = "OBJECT_EXISTS";
-const string ActiveDirectoryProbe::OBJECT_CLASS_ATTRIBUTE = "objectClass";
-const string ActiveDirectoryProbe::DISTINGUISHED_NAME_ATTRIBUTE = "distinguishedName";
+
+#define DISTINGUISHED_NAME_ATTRIBUTE L"distinguishedName"
+#define OBJECT_CLASS_ATTRIBUTE_A "objectClass"
+#define OBJECT_CLASS_ATTRIBUTE L"objectClass"
+
 const string ActiveDirectoryProbe::LDAP_PROTOCOL = "LDAP://";
 ActiveDirectoryProbe* ActiveDirectoryProbe::instance = NULL;
 
@@ -163,10 +180,10 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                 item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                 item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
-								item->AppendElement ( new ItemEntity ( "attribute" , attributeEntity->GetValue()  , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
+								item->AppendElement ( new ItemEntity ( "attribute" , "", OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
 
                                 if ( objectClassStr.compare ( "" ) == 0 ) {
-                                    item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                    item->AppendElement ( new ItemEntity ( "object_class" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
                                 } else {
                                     item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -175,15 +192,16 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                                 collectedItems->push_back ( new Item ( *item ) );
 
                             } else {
-                                for ( VariableValueVector::iterator iterator = attributeEntity->GetVarRef()->GetValues()->begin() ; iterator != attributeEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+								VariableValueVector vals = attributeEntity->GetVarRef()->GetValues();
+                                for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                                     Item* item = this->CreateItem();
                                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                                     item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                     item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
-                                    item->AppendElement ( new ItemEntity ( "attribute" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
+                                    item->AppendElement ( new ItemEntity ( "attribute" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
 
                                     if ( objectClassStr.compare ( "" ) == 0 ) {
-                                        item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                                        item->AppendElement ( new ItemEntity ( "object_class" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
                                     } else {
                                         item->AppendElement ( new ItemEntity ( "object_class" , objectClassStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
@@ -205,15 +223,16 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnEntity->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
+                        item->AppendElement ( new ItemEntity ( "relative_dn" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
                         collectedItems->push_back ( item );
 
                     } else {
-                        for ( VariableValueVector::iterator iterator = relativeDnEntity->GetVarRef()->GetValues()->begin() ; iterator != relativeDnEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+						VariableValueVector vals = relativeDnEntity->GetVarRef()->GetValues();
+                        for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                             Item* item = this->CreateItem();
                             item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                             item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
-                            item->AppendElement ( new ItemEntity ( "relative_dn" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
+                            item->AppendElement ( new ItemEntity ( "relative_dn" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
                             collectedItems->push_back ( item );
                         }
                     }
@@ -229,14 +248,15 @@ ItemVector* ActiveDirectoryProbe::CollectItems ( Object* object ) {
             if ( namingContextEntity->GetVarRef() == NULL ) {
                 Item* item = this->CreateItem();
                 item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "naming_context" , namingContextEntity->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                item->AppendElement ( new ItemEntity ( "naming_context" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( item );
 
             } else {
-                for ( VariableValueVector::iterator iterator = namingContextEntity->GetVarRef()->GetValues()->begin() ; iterator != namingContextEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
+				VariableValueVector vals = namingContextEntity->GetVarRef()->GetValues();
+                for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                     Item* item = this->CreateItem();
                     item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                    item->AppendElement ( new ItemEntity ( "naming_context" , ( *iterator )->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                    item->AppendElement ( new ItemEntity ( "naming_context" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                     collectedItems->push_back ( item );
                 }
             }
@@ -489,9 +509,10 @@ StringSet* ActiveDirectoryProbe::GetNamingContexts ( ObjectEntity* namingContext
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all naming contexts
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = namingContextEntity->GetVarRef()->GetValues()->begin() ; iterator != namingContextEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->NamingContextExists ( ( *iterator )->GetValue() ) ) {
-                    allNamingContexts->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = namingContextEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->NamingContextExists ( iterator->GetValue() ) ) {
+                    allNamingContexts->insert ( iterator->GetValue() );
                 }
             }
 
@@ -580,9 +601,10 @@ StringSet* ActiveDirectoryProbe::GetRelativeDns ( string namingContextStr , Obje
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all relative distinguished names
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = relativeDnEntity->GetVarRef()->GetValues()->begin() ; iterator != relativeDnEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->RelativeDnExists ( namingContextStr , ( *iterator )->GetValue() ) ) {
-                    allRelativeDns->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = relativeDnEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->RelativeDnExists ( namingContextStr , iterator->GetValue() ) ) {
+                    allRelativeDns->insert ( iterator->GetValue() );
                 }
             }
 
@@ -692,9 +714,10 @@ StringSet* ActiveDirectoryProbe::GetAttributes ( string namingContextStr , strin
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all attributes
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = attributeEntity->GetVarRef()->GetValues()->begin() ; iterator != attributeEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->AttributeExists ( namingContextStr , relativeDnStr , ( *iterator )->GetValue() ) ) {
-                    allAttributes->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = attributeEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->AttributeExists ( namingContextStr , relativeDnStr , iterator->GetValue() ) ) {
+                    allAttributes->insert ( iterator->GetValue() );
                 }
             }
 
@@ -768,9 +791,8 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
         pathNameStr.append ( "/" );
         pathNameStr.append ( distinguishedNameStr );
     }
-	LPWSTR wPathNameStr = WindowsCommon::StringToWide ( pathNameStr );
-    hResult = ADsOpenObject (wPathNameStr , NULL , NULL , ADS_SECURE_AUTHENTICATION , IID_IDirectorySearch, ( void ** ) & adsiSearch );
-	delete[] wPathNameStr;
+	wstring wPathNameStr = WindowsCommon::StringToWide ( pathNameStr );
+    hResult = ADsOpenObject (wPathNameStr.c_str() , NULL , NULL , ADS_SECURE_AUTHENTICATION , IID_IDirectorySearch, ( void ** ) & adsiSearch );
     if ( SUCCEEDED ( hResult ) ) {
         if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::GET_ALL_ATTRIBUTES ) == 0 ) {
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_PAGESIZE;
@@ -797,17 +819,20 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
             }
 
         } else if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::GET_ALL_DISTINGUISHED_NAMES ) == 0 ) {
-            LPWSTR distinguishedNameAttributeStr = WindowsCommon::StringToWide ( ActiveDirectoryProbe::DISTINGUISHED_NAME_ATTRIBUTE );
+
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_PAGESIZE;
             searchPreferences[0].vValue.dwType = ADSTYPE_INTEGER;
             searchPreferences[0].vValue.Integer = MAXDWORD;
             hResult = adsiSearch->SetSearchPreference ( searchPreferences, 1 );
-            hResult = adsiSearch->ExecuteSearch ( NULL, &distinguishedNameAttributeStr , 1, &hSearch );
+
+			LPWSTR attrNames[] = { DISTINGUISHED_NAME_ATTRIBUTE };
+
+            hResult = adsiSearch->ExecuteSearch ( NULL, attrNames, 1, &hSearch );
 
             if ( SUCCEEDED ( hResult ) ) {
                 while ( ( hResult = adsiSearch->GetNextRow ( hSearch ) ) != S_ADS_NOMORE_ROWS ) {
                     exists = true;
-                    hResult = adsiSearch->GetColumn ( hSearch , distinguishedNameAttributeStr , &adsiColumn );
+                    hResult = adsiSearch->GetColumn ( hSearch , DISTINGUISHED_NAME_ATTRIBUTE , &adsiColumn );
 
                     if ( SUCCEEDED ( hResult ) ) {
 
@@ -819,7 +844,6 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                     }
                 }
             }
-			delete distinguishedNameAttributeStr;
 
         } else if ( activeDirectoryOperationStr.compare ( ActiveDirectoryProbe::OBJECT_EXISTS ) == 0 ) {
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
@@ -835,23 +859,22 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
             }
 
         } else {
-            LPWSTR attributeArray[2] ;
+
             searchPreferences[0].dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
             searchPreferences[0].vValue.dwType = ADSTYPE_INTEGER;
             searchPreferences[0].vValue.Integer = ADS_SCOPE_BASE;
             hResult = adsiSearch->SetSearchPreference ( searchPreferences, 1 );
-            attributeArray[0] = WindowsCommon::StringToWide ( ActiveDirectoryProbe::OBJECT_CLASS_ATTRIBUTE );
+			LPWSTR attributeArray[] = {OBJECT_CLASS_ATTRIBUTE, NULL};
 
             if ( activeDirectoryOperationStr.compare ( "" ) == 0 ) {
-                attributeArray[1] = NULL;
                 hResult = adsiSearch->ExecuteSearch ( NULL , attributeArray , 1 , &hSearch );
 
             } else {
-                attributeArray[1] = WindowsCommon::StringToWide ( activeDirectoryOperationStr );
+				// references I've seen say this is ok.  The c_str() pointer is only
+				// invalidated if the string is modified, which we aren't doing.
+				attributeArray[1] = (LPWSTR)activeDirectoryOperationStr.c_str();
                 hResult = adsiSearch->ExecuteSearch ( NULL , attributeArray , 2 , &hSearch );
             }
-			delete attributeArray[0];
-			delete attributeArray[1];
 
             if ( SUCCEEDED ( hResult ) ) {
                 while ( adsiSearch->GetNextRow ( hSearch ) != S_ADS_NOMORE_ROWS ) {
@@ -862,12 +885,11 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
 
                         if ( SUCCEEDED ( hResult ) ) {
                             StringVector* values = new StringVector();
-                            string attributeStr = WindowsCommon::UnicodeToAsciiString ( columnName );
                             string attributeAdsTypeStr = ActiveDirectoryProbe::GetAdsType ( adsiColumn.dwADsType );
                             OvalMessage* message = NULL;
 
                             for ( unsigned int i = 0; i < adsiColumn.dwNumValues ; i++ ) {
-                                if ( attributeStr.compare ( OBJECT_CLASS_ATTRIBUTE ) == 0 ) {
+								if (!wcscmp(columnName, OBJECT_CLASS_ATTRIBUTE)) {
                                     objectClassValue.append ( WindowsCommon::UnicodeToAsciiString ( adsiColumn.pADsValues[i].CaseIgnoreString ) );
                                     objectClassValue.append ( ";" );
                                 }
@@ -915,7 +937,7 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                                     }
                                     case 8: {
                                         //ADSTYPE_OCTET_STRING
-                                        string octetStr = ActiveDirectoryProbe::ConvertOctetString ( attributeStr, &adsiColumn.pADsValues[i].OctetString );
+                                        string octetStr = ActiveDirectoryProbe::ConvertOctetString ( columnName, &adsiColumn.pADsValues[i].OctetString );
 
                                         if ( octetStr.compare ( "" ) == 0 ) {
                                             message = new OvalMessage ( "Error: The adstype value '" + attributeAdsTypeStr + "' is currently only supported for the objectSid and objectGUID attributes." );
@@ -1031,14 +1053,16 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                                         break;
                                     }
                                 }
-                            }
+                            } // for ( unsigned int i = 0; i < adsiColumn.dwNumValues ..
 
-                            if ( attributeStr.compare ( OBJECT_CLASS_ATTRIBUTE ) != 0 || activeDirectoryOperationStr.compare ( OBJECT_CLASS_ATTRIBUTE ) == 0 || activeDirectoryOperationStr.compare ( "" ) == 0 ) {
+                            if ( wcscmp(columnName, OBJECT_CLASS_ATTRIBUTE ) != 0 || activeDirectoryOperationStr.compare ( OBJECT_CLASS_ATTRIBUTE_A ) == 0 || activeDirectoryOperationStr.empty() ) {
                                 Item* item = this->CreateItem();
                                 item->SetStatus ( OvalEnum::STATUS_EXISTS );
                                 item->AppendElement ( new ItemEntity ( "naming_context" , namingContextStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
 
-                                if ( ! ( relativeDnStr.compare ( "" ) == 0 ) ) {
+								string attributeStr = WindowsCommon::UnicodeToAsciiString(columnName);
+
+								if ( ! ( relativeDnStr.compare ( "" ) == 0 ) ) {
                                     item->AppendElement ( new ItemEntity ( "relative_dn" , relativeDnStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
                                 }
 
@@ -1078,10 +1102,10 @@ bool ActiveDirectoryProbe::QueryActiveDirectory ( string namingContextStr , stri
                             values->clear();
                             delete values;
                             adsiSearch->FreeColumn ( &adsiColumn );
-                        }
-                    }
-                }
-            }
+                        } // if ( SUCCEEDED ( hResult ) )
+                    } // while ( ( hResult = adsiSearch->GetNextColumnName ...
+                } // while ( adsiSearch->GetNextRow ...
+            } // if ( SUCCEEDED ( hResult ) )
         }
 
         adsiSearch->CloseSearchHandle ( hSearch );
@@ -1114,20 +1138,20 @@ string ActiveDirectoryProbe::BuildUTCTimeString ( SYSTEMTIME* time ) {
     timeStr.append ( Common::ToString ( time->wSecond ) );
     return timeStr;
 }
-string ActiveDirectoryProbe::ConvertOctetString ( string attributeStr , ADS_OCTET_STRING* octetString ) {
+string ActiveDirectoryProbe::ConvertOctetString ( LPCWSTR attributeStr , ADS_OCTET_STRING* octetString ) {
     string octetStr = "";
     PSID objectSID = NULL;
     LPOLESTR sid = NULL;
     LPOLESTR guid = new WCHAR [39];
     LPGUID objectGUID = NULL;
 
-    if ( attributeStr.compare ( "objectSid" ) == 0 ) {
+    if ( wcscmp(attributeStr, L"objectSid" ) == 0 ) {
         objectSID = ( PSID ) ( octetString->lpValue );
         ConvertSidToStringSid ( objectSID, ( LPSTR* ) &sid );
         octetStr = ( LPSTR ) sid;
         LocalFree ( sid );
 
-    } else if ( attributeStr.compare ( "objectGUID" ) == 0 ) {
+    } else if ( wcscmp(attributeStr, L"objectGUID" ) == 0 ) {
         objectGUID = ( LPGUID ) ( octetString->lpValue );
         StringFromGUID2 ( *objectGUID, guid, 39 );
         octetStr = WindowsCommon::UnicodeToAsciiString ( ( wchar_t* ) guid );

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -47,7 +47,7 @@
  * There are a couple different closer function prototypes I've seen,
  * and I decided to support both:
  * <ol>
- *   <li>BOOL (WINAPI *CloserType1)(_HandleType)</lib>
+ *   <li>BOOL (WINAPI *CloserType1)(_HandleType)</li>
  *   <li>LONG (WINAPI *CloserType2)(_HandleType)</li>
  * </ol>
  * The first returns FALSE on error, and the error code is obtained

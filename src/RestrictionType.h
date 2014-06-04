@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,9 +31,9 @@
 #ifndef RESTRICTIONTYPE_H
 #define RESTRICTIONTYPE_H
 
-#include "Common.h"
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "OvalEnum.h"
-#include "EntityComparator.h"
 
 
 /**
@@ -47,7 +47,7 @@ public:
 	~RestrictionType();
 
 	/** Parses a valid RestrictionType element as defined in the oval definitions schema. */
-	void Parse(DOMElement* restrictionTypeElm);
+	void Parse(xercesc::DOMElement* restrictionTypeElm);
 
 	/** Ensure that the specified value matches the criteria specified by this restriction. */
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);

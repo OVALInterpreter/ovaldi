@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,10 +28,12 @@
 //
 //****************************************************************************************//
 
-
 #include <memory>
+
 #include <AutoCloser.h>
 #include <FsRedirectionGuard.h>
+#include <EntityComparator.h>
+#include "WindowsCommon.h"
 
 #include "FileFinder.h"
 
@@ -122,9 +124,10 @@ void FileFinder::FindPaths(string queryVal, StringVector* paths, OvalEnum::Opera
 	if (op == OvalEnum::OPERATION_PATTERN_MATCH && !queryVal.empty() && queryVal[0] == '^') {		
 		this->fileMatcher->GetConstantPortion(queryVal, Common::fileSeperator, &patternOut, &constPortion);
 		// Remove extra slashes.
-		constPortion = Common::StripTrailingSeparators(
-			WindowsCommon::GetActualPathWithCase(
-				this->fileMatcher->RemoveExtraSlashes(constPortion)));
+		string tmp = this->fileMatcher->RemoveExtraSlashes(constPortion);
+		if (!WindowsCommon::GetActualPathWithCase(tmp, &constPortion))
+			return;
+		constPortion = Common::StripTrailingSeparators(constPortion);
 	}
 
 	// Found a constant portion
@@ -239,7 +242,9 @@ StringVector* FileFinder::GetDrives() {
 
 			// Only fixed drives.
 			if(GetDriveType(drive) == DRIVE_FIXED) {
-				drives->push_back(WindowsCommon::GetActualPathWithCase(drive));
+				string casedDrive;
+				if (WindowsCommon::GetActualPathWithCase(drive, &casedDrive))
+					drives->push_back(casedDrive);
 			}
 
 			index += strlen(drive) + 1; // skip over the '\0' too
@@ -481,7 +486,7 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 				}
 			} else {
 				string errorMessage =
-					"(FileProbe) Unable to open a handle to the directory '" +
+					"(FileFinder) Unable to open a handle to the directory '" +
 					path +
 					"': " +
 					WindowsCommon::GetErrorMessage(errorNum);
@@ -492,9 +497,13 @@ bool FileFinder::PathExists(const string &path, string *actualPath) {
 			CloseHandle(hFile); 
 		}
 
-		if (exists && actualPath != NULL)
-			*actualPath = Common::StripTrailingSeparators(
-				WindowsCommon::GetActualPathWithCase(path));
+		if (exists && actualPath != NULL) {
+			string casedPath;
+			if (WindowsCommon::GetActualPathWithCase(path, &casedPath))
+				*actualPath = Common::StripTrailingSeparators(casedPath);
+			else
+				exists = false; // file disappeared??
+		}
 
 	} catch(Exception ex) {
 		if (hFile != INVALID_HANDLE_VALUE)
@@ -564,10 +573,13 @@ bool FileFinder::FileNameExists(string path, string fileName, string *actualFile
 		}
 
 		if (exists && actualFileName != NULL) {
-			string actualFilepath = WindowsCommon::GetActualPathWithCase(filePath);
-			auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
-			if (split.get())
-				*actualFileName = split->second;
+			string actualFilepath;
+			if (WindowsCommon::GetActualPathWithCase(filePath, &actualFilepath)) {
+				auto_ptr<StringPair> split(Common::SplitFilePath(actualFilepath));
+				if (split.get())
+					*actualFileName = split->second;
+			} else
+				exists = false; // file disappeared??
 		}
 
 	} catch(Exception ex) {

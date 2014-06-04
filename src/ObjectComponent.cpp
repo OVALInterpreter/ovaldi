@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -29,49 +29,22 @@
 //****************************************************************************************//
 
 #include "ItemFieldEntityValue.h"
+#include "AbsDataCollector.h"
+#include "XmlCommon.h"
+#include "AbsObjectCollector.h"
+#include "ObjectReader.h"
 
 #include "ObjectComponent.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ObjectComponent Class									  //	
 //****************************************************************************************//
-ObjectComponent::ObjectComponent(string objectId, string itemField, string recordField) : AbsComponent() {
-	this->SetObjectId(objectId);
-	this->SetItemField(itemField);
-	this->SetRecordField(recordField);
-}
-
-ObjectComponent::~ObjectComponent() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string ObjectComponent::GetObjectId() {
-	return this->objectId;
-}
-
-void ObjectComponent::SetObjectId(string objectId) {
-	this->objectId = objectId;
-}
-
-string ObjectComponent::GetItemField() {
-	return this->itemField;
-}
-
-void ObjectComponent::SetItemField(string itemField) {
-	this->itemField = itemField;
-}
-
-string ObjectComponent::GetRecordField() {
-	return this->recordField;
-}
-
-void ObjectComponent::SetRecordField(string recordField) {
-	this->recordField = recordField;
-}
 
 ComponentValue* ObjectComponent::ComputeValue() {
 
@@ -214,15 +187,12 @@ void ObjectComponent::Parse(DOMElement* ObjectComponentElm) {
 	this->SetRecordField(XmlCommon::GetAttributeByName(ObjectComponentElm, "record_field"));
 }
 
-VariableValueVector* ObjectComponent::GetVariableValues() {
+VariableValueVector ObjectComponent::GetVariableValues() {
 
-    VariableValueVector* values = NULL;
 	if(AbsDataCollector::GetIsRunning()) {
 		CollectedObject* collectedObject = AbsObjectCollector::Instance()->Run(this->GetObjectId());
-		values = collectedObject->GetVariableValues();
+		return collectedObject->GetVariableValues();
 	} else {
-		values = ObjectReader::GetVariableValuesForObject(this->GetObjectId());
+		return ObjectReader::GetVariableValuesForObject(this->GetObjectId());
 	}
-	
-	return values;
 }

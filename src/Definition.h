@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,13 +31,11 @@
 #ifndef DEFINITION_H
 #define DEFINITION_H
 #include <map>
+#include <vector>
 #include <utility>
-#include "AbsCriteria.h"
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "Criteria.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class Criteria;
 
 class Definition;
 
@@ -81,7 +79,7 @@ public:
 		Writes a Definition element to the results document.
 		Calls criteria->Write()
 	*/
-	void Write(DOMElement* parent);
+	void Write(xercesc::DOMElement* parent);
 	/**
 		Parses a definition from a oval-definitions document.
 		Parses Definition elm to a Definition obj
@@ -89,7 +87,7 @@ public:
 		The final parsed Definition object is stored in the
 		cache of processed definitions.
 	*/
-	void Parse(DOMElement* DefinitionElm);
+	void Parse(xercesc::DOMElement* DefinitionElm);
 
 	/** 
 		Analyze the definition and return the result.

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -40,6 +40,9 @@
 #  define FS_REDIRECT_GUARD_BEGIN(x)
 #  define FS_REDIRECT_GUARD_END
 #endif
+
+#include "FileFinder.h"
+#include "Log.h"
 
 #include "FileMd5Probe.h"
 
@@ -111,18 +114,14 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 				Item* item = NULL;
 
 				// check if the code should report that the filename does not exist.
-				StringVector fileNames;
-				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
-					StringVector::iterator iterator;
-					for(iterator = fileNames.begin(); iterator != fileNames.end(); iterator++) {
+				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName)) {
 
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						ADD_WINDOWS_VIEW_ENTITY
-						collectedItems->push_back(item);
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 					
 				} else {
 
@@ -152,19 +151,14 @@ ItemVector* FileMd5Probe::CollectItems(Object* object) {
 
 	} else {
 		// if no filepaths check if the code should report that the path does not exist
-		StringVector paths;
-		if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+		if(fileFinder.ReportPathDoesNotExist(path)) {
 
 			Item* item = NULL;
-			StringVector::iterator iterator;
-			for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-
-				item = this->CreateItem();
-				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-				ADD_WINDOWS_VIEW_ENTITY
-				collectedItems->push_back(item);
-			}
+			item = this->CreateItem();
+			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+			item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+			ADD_WINDOWS_VIEW_ENTITY
+			collectedItems->push_back(item);
 		}
 	}
 	delete filePaths;

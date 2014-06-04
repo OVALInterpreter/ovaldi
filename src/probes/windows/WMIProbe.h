@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,41 +31,9 @@
 #ifndef WMIPROBE_H
 #define WMIPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-/***********************************************************************/
-// The comdef.h include statment is needed for the code in this probe to
-// work. However, comdef.h includes comdefsp.h which utilizes a DOMDocument.
-// This application uses Xerces for xml parsing. Xerces defines a DOMDocument
-// This application also uses windows apis which include references to MsXml.h
-// MsXml.h defines a DOMDocument as well. Either Microsoft or Xerces is not 
-// correctly qualifying thier classes. this causes the following error message:
-/*
-c:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\include\comdefsp.h(1305) : error C2872: 'DOMDocument' : ambiguous symbol
-        could be 'c:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Include\MsXml.h(161) : DOMDocument'
-        or       'c:\xerces-c_2_6_0-windows_nt-msvc_60\include\xercesc\dom\DOMDocument.hpp(63) : xercesc_2_6::DOMDocument'
-*/
-// One solution would be to edit comdefsp.h by simply commenting out line
-// 1305 allowing you to compile and run the aplication.  The line to
-// comment looks like:
-//   _COM_SMARTPTR_TYPEDEF(DOMDocument, __uuidof(DOMDocument));
-//
-// Jean-François Dubé pointed out that a better solution is to add a
-// #undef to undefine DOMDocument.  Thanks!
-//
-/***********************************************************************/
-
-#undef __DOMDocument_FWD_DEFINED__
-#include <comdef.h>
-#include <Dsgetdc.h>
-#include <Lm.h>
-#include <Wbemidl.h>
-#include <windows.h>
-
-using namespace std;
 
 /**
 	This class is responsible for collecting information from WMI.
@@ -107,7 +75,7 @@ private:
 		name of the field.  If we cannot get the field, return false
 		and fieldName is set to an error message.
 	*/
-	bool GetWqlField(string wqlIn, string* fieldName);
+	bool GetWqlField(std::string wqlIn, std::string* fieldName);
 };
 
 #endif

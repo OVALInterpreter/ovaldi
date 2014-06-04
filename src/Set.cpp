@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,19 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "ObjectFactory.h"
+#include "Common.h"
+#include "XmlCommon.h"
+
 #include "Set.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									Set Class											  //	
@@ -140,84 +150,44 @@ void Set::AppendFilter(Filter* filter) {
 	this->filters.push_back(filter);
 }
 
-VariableValueVector* Set::GetVariableValues() {
+VariableValueVector Set::GetVariableValues() {
 
-	VariableValueVector* varValues = new VariableValueVector();
-	VariableValue* varValue = NULL;
+	VariableValueVector varValues, tmpVarValues;
     
 	if(this->GetIsSimpleSet()) {
 		// get the variable values used in each filter 
 		FilterVector::iterator iterator;
 		for(iterator = this->GetFilters()->begin(); iterator != this->GetFilters()->end(); iterator++) {
 			Filter* filter = *iterator;
-			VariableValueVector* filterVarValues = filter->GetVariableValues();
+			tmpVarValues = filter->GetVariableValues();
 			// copy the state's var values to the set's vector of var values
-			VariableValueVector::iterator vit;
-			for(vit = filterVarValues->begin(); vit != filterVarValues->end(); vit++) {
-				varValue = (*vit);
-				varValues->push_back(varValue);
-			}
-			
-			delete filterVarValues;
-			filterVarValues = NULL;
+			copy(tmpVarValues.begin(), tmpVarValues.end(), back_inserter(varValues));
 		}
 
 		// get the variable values used by reference one if it exists
-		VariableValueVector* refVarValues = NULL;
-		VariableValueVector::iterator rit;
 		if(this->GetReferenceOne() != NULL) {
-			refVarValues = this->GetReferenceOne()->GetVariableValues();
-			// copy the reference's var values to the set's vector of var values
-			for(rit = refVarValues->end(); rit != refVarValues->end(); rit++) {
-				varValue = (*rit);
-				varValues->push_back(varValue);
-			}
-			
-			delete refVarValues;
-			refVarValues = NULL;
+			tmpVarValues = this->GetReferenceOne()->GetVariableValues();
+			copy(tmpVarValues.begin(), tmpVarValues.end(), back_inserter(varValues));
 		}
 
 		// get the variable values used by reference 2 if it exists
 		if(this->GetReferenceTwo() != NULL) {
-			refVarValues = this->GetReferenceTwo()->GetVariableValues();
-			// copy the reference's var values to the set's vector of var values
-			for(rit = refVarValues->end(); rit != refVarValues->end(); rit++) {
-				varValue = (*rit);
-				varValues->push_back(varValue);
-			}
-			
-			delete refVarValues;
-			refVarValues = NULL;
+			tmpVarValues = this->GetReferenceTwo()->GetVariableValues();
+			copy(tmpVarValues.begin(), tmpVarValues.end(), back_inserter(varValues));
 		}
 
 	} else {
 
 		// Get the variable values used by set one if it exists
-		VariableValueVector* setVarValues = NULL;
-		VariableValueVector::iterator sit;
 		if(this->GetSetOne() != NULL) {
-			setVarValues = this->GetSetOne()->GetVariableValues();
-			// copy the child set's var values to the set's vector of var values
-			for(sit = setVarValues->end(); sit != setVarValues->end(); sit++) {
-				varValue = (*sit);
-				varValues->push_back(varValue);
-			}
-			
-			delete setVarValues;
-			setVarValues = NULL;
+			tmpVarValues = this->GetSetOne()->GetVariableValues();
+			copy(tmpVarValues.begin(), tmpVarValues.end(), back_inserter(varValues));
 		}
 
 		// Get the variable values used by set two if it exists
 		if(this->GetSetTwo() != NULL) {
-			setVarValues = this->GetSetTwo()->GetVariableValues();
-			// copy the child set's var values to the set's vector of var values
-			for(sit = setVarValues->end(); sit != setVarValues->end(); sit++) {
-				varValue = (*sit);
-				varValues->push_back(varValue);
-			}
-			
-			delete setVarValues;
-			setVarValues = NULL;
+			tmpVarValues = this->GetSetTwo()->GetVariableValues();
+			copy(tmpVarValues.begin(), tmpVarValues.end(), back_inserter(varValues));
 		}
 	}
 

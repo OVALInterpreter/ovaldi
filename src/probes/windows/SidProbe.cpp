@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <iterator>
+#include <algorithm>
+
+#include "WindowsCommon.h"
+#include "Log.h"
+#include <VectorPtrGuard.h>
+
 #include "SidProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								SidProbe Class											  //	
@@ -124,12 +133,7 @@ ItemVector* SidProbe::CollectItems(Object *object) {
 		throw ProbeException("Error: invalid data type specified on trustee_name. Found: " + OvalEnum::DatatypeToString(trusteeName->GetDatatype()));
 	}	
 
-	// check operation - only allow  equals, not equals and pattern match
-	if(trusteeName->GetOperation() != OvalEnum::OPERATION_EQUALS && trusteeName->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && trusteeName->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
-		throw ProbeException("Error: invalid operation specified on trustee_name. Found: " + OvalEnum::OperationToString(trusteeName->GetOperation()));
-	}
-
-	ItemVector *collectedItems = new ItemVector();
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	// support behaviors - init with defaults.
 	bool includeGroupBehavior = true;
@@ -153,46 +157,58 @@ ItemVector* SidProbe::CollectItems(Object *object) {
         }
 	}
 
-	// get the SID data
-	if(trusteeName->GetVarRef() == NULL) {
-		if(trusteeName->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			this->GetAccountInformation(trusteeName->GetValue(), resolveGroupBehavior, includeGroupBehavior, collectedItems);
-		} else {
+	StringVector specifiedTrusteeNames;
+	StringVector candidateTrusteeNames;
+	StringSet *allTrusteeNames;
+	string normFormattedName;
 
-			bool isRegex = false;
-			if(trusteeName->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH)
-				isRegex = true;
+	switch (trusteeName->GetOperation()) {
+	case OvalEnum::OPERATION_EQUALS:
+	case OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS:
+		// In this case, we don't restrict ourselves to the narrower scope
+		// implemented in WindowsCommon::GetAllTrusteeNames().  If the trustee
+		// name matches and exists, we'll get the info.
+		trusteeName->GetEntityValues(specifiedTrusteeNames);
 
-			// Get all trustee_names on the system...
-			StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
-			
-			// Get the set of trustee names that match the ItemEntity.
-			StringSet::iterator iterator;
-			for(iterator = allTrusteeNames->begin(); iterator != allTrusteeNames->end(); iterator++) {
-				string curr = (*iterator);
-				if(this->IsMatch(trusteeName->GetValue(), (*iterator), isRegex)) {
-					this->GetAccountInformation((*iterator), resolveGroupBehavior, includeGroupBehavior, collectedItems);
+		// normalize what the user gave us...
+		for (StringVector::iterator iter = specifiedTrusteeNames.begin();
+			iter != specifiedTrusteeNames.end();
+			++iter) {
+				if (WindowsCommon::NormalizeTrusteeName(*iter, NULL, NULL,
+					&normFormattedName, NULL, NULL))
+					candidateTrusteeNames.push_back(normFormattedName);
+				else {
+					Item* item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("trustee_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					collectedItems->push_back(item);
 				}
-			}
 		}
 
-	} else {
-		// Get all trustee_names on the system...
-		StringSet* allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+		break;
 
-		// loop through all trustee names on the system
-		// only keep those that match operation and value and var check
-		StringSet::iterator it;
-		ItemEntity* tmp = this->CreateItemEntity(trusteeName);
-		for(it = allTrusteeNames->begin(); it != allTrusteeNames->end(); it++) {
-			tmp->SetValue((*it));
-			if(trusteeName->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				this->GetAccountInformation((*it), resolveGroupBehavior, includeGroupBehavior, collectedItems);
-			}
+	default:
+		// We rely on GetAllTrusteeNames() returning properly formatted/
+		// capitalized trustee names.  It also scopes searches narrowly,
+		// to avoid hammering active directory servers.
+		allTrusteeNames = WindowsCommon::GetAllTrusteeNames();
+		copy(allTrusteeNames->begin(), allTrusteeNames->end(), back_inserter(candidateTrusteeNames));
+
+		break;
+	}
+
+	ItemEntity trusteeNameIe("trustee_name");
+	for (StringVector::iterator iter = candidateTrusteeNames.begin();
+		iter != candidateTrusteeNames.end();
+		++iter) {
+		trusteeNameIe.SetValue(*iter);
+		if (trusteeName->Analyze(&trusteeNameIe) == OvalEnum::RESULT_TRUE) {
+			this->GetAccountInformation(*iter,
+				resolveGroupBehavior, includeGroupBehavior, collectedItems.get());
 		}
 	}
 
-	return collectedItems;
+	return collectedItems.release();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -210,23 +226,17 @@ Item* SidProbe::CreateItem() {
 	return item;
 }
 
-bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items) {
-
-	bool isComplete = true;
+void SidProbe::GetAccountInformation(const string &accountName,
+	bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items) {
 
 	// lookup the trustee name
+	string sidStr, normDomain;
+	bool isGroup;
+	if (!WindowsCommon::NormalizeTrusteeName(accountName, NULL, &normDomain, 
+		NULL, &sidStr, &isGroup))
+		return;
+
 	try {
-		string domainStr = "";
-		string sidStr = "";
-		bool isGroup;
-		
-		if (!WindowsCommon::LookUpTrusteeName(&accountName, &sidStr, &domainStr, &isGroup)) {
-			Item* item = this->CreateItem();
-			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-			items->push_back(item);
-			return false;
-		}
 
 		// if a group
 		// handle behaviors
@@ -237,7 +247,7 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 				item->SetStatus(OvalEnum::STATUS_EXISTS);
 				item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-				item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+				item->AppendElement(new ItemEntity("trustee_domain", normDomain, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				items->push_back(item);
 			} 
 			
@@ -248,9 +258,8 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 			for(iterator = groupMembers->begin(); iterator != groupMembers->end(); iterator++) {
 				// make recursive call...
 				try {
-					isComplete = this->GetAccountInformation((*iterator), resolveGroupBehavior, includeGroupBehavior, items);
+					this->GetAccountInformation((*iterator), resolveGroupBehavior, includeGroupBehavior, items);
 				} catch (Exception ex) {
-					isComplete = false;
 					Log::Debug(ex.GetErrorMessage());
 				}
 			}
@@ -261,7 +270,7 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
 			item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("trustee_domain", domainStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+			item->AppendElement(new ItemEntity("trustee_domain", normDomain, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			items->push_back(item);
 		}
 
@@ -272,12 +281,10 @@ bool SidProbe::GetAccountInformation(string accountName,  bool resolveGroupBehav
 		if(ex.GetSeverity() == ERROR_NOTICE) {
 			Item* item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-			item->AppendElement(new ItemEntity("trustee_name", accountName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("trustee_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 			items->push_back(item);
 		} else {
-			throw ex;
+			throw;
 		}
 	}
-
-	return isComplete;
 }

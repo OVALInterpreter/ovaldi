@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
 #include "OvalMessage.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								OvalMessage Class										  //	
@@ -82,11 +85,13 @@ string OvalMessage::ToString() {
 	return msgStr;
 }
 
-void OvalMessage::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc, DOMElement* parentElm, string prefix) {
+void OvalMessage::Write(DOMDocument* doc, DOMElement* parentElm, string prefix, string ns) {
 
 	// Create new item element
-	string elementName = prefix + ":message";
-	DOMElement* newOvalMessageElem = XmlCommon::CreateElement(doc, elementName, this->GetValue().c_str());
+	string elementName = "message";
+	if (!prefix.empty())
+		elementName = prefix+':'+elementName;
+	DOMElement* newOvalMessageElem = XmlCommon::CreateElementNS(doc, ns, elementName, this->GetValue().c_str());
 	parentElm->appendChild(newOvalMessageElem);
 
 	// Add the attributes

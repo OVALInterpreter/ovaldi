@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,17 +31,12 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <vector>
-//#include "Analyzer.h"
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "TestedItem.h"
 #include "VariableValue.h"
-#include "Log.h"
-#include "State.h"
 #include "Object.h"
 #include "OvalMessage.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 class Test;
 
@@ -75,7 +70,7 @@ public:
 		calls testedObject->Write() 
 		calls testedVariable->Write() for each tested var.
 	*/
-	void Write(DOMElement* parent);
+	void Write(xercesc::DOMElement* parent);
 
 
 	/** Evaluate the test and return the result. 
@@ -178,12 +173,15 @@ public:
 	void AppendTestedItem(TestedItem* testedItem);
 
 	/** Return the testedVariables field's value **/
-	VariableValueVector* GetTestedVariables();
+	VariableValueVector GetTestedVariables() const
+	{ return testedVariables; }
 
 	/** Set the testedVariables field's value **/
-	void SetTestedVariables(VariableValueVector* testedVariables);
+	void SetTestedVariables(const VariableValueVector &testedVariables)
+	{ this->testedVariables = testedVariables; }
+
 	/** Add the specified TestedVariable to the set of tested variables **/
-	void AppendTestedVariable(VariableValue* testedVariable);
+	void AppendTestedVariable(const VariableValue &testedVariable);
 
     /** mark all the tested items as not evaluated. **/
     void MarkTestedItemsNotEvaluated();
@@ -217,7 +215,7 @@ private:
 	/** Parse the Test element into a Test object. 
 		The resulting object is cached.
 	*/
-	void Parse(DOMElement* testElm);
+	void Parse(xercesc::DOMElement* testElm);
 
 	/** Search the cache of Tests for the specified Test. 
 	    Return NULL if not found 

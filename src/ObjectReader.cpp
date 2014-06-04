@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,18 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "Common.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+
 #include "ObjectReader.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ObjectReader Class										  //	
@@ -104,11 +113,11 @@ ItemVector* ObjectReader::GetItemsForObject(string objectId) {
 	return items;
 }
 
-VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
+VariableValueVector ObjectReader::GetVariableValuesForObject(string objectId) {
 
 	DOMElement* collectedObjectsElm = XmlCommon::FindElement(DocumentManager::GetSystemCharacteristicsDocument(), "collected_objects");
 	
-	VariableValueVector* values = new VariableValueVector();
+	VariableValueVector values;
 	if(collectedObjectsElm != NULL) {
         DOMElement* objectElm = XmlCommon::FindElement(collectedObjectsElm, "object", "id", objectId);
 		if(objectElm != NULL) {
@@ -131,23 +140,19 @@ VariableValueVector* ObjectReader::GetVariableValuesForObject(string objectId) {
 						if(childName.compare("variable_value") == 0) {
 							string varId = XmlCommon::GetAttributeByName(objectChild, "variable_id");
 							string varValue = XmlCommon::GetDataNodeValue(objectChild);
-							VariableValue* var = new VariableValue(varId, varValue);
-							values->push_back(var);
+							values.push_back(VariableValue(varId, varValue));
 						}
 					}
 					index ++;
 				}
 
 			} else {
-				delete values;
 				throw Exception("Error: The flag attribute value must be \'complete\'. Found: " + OvalEnum::FlagToString(flag));
 			}
 		} else {
-			delete values;
 			throw Exception("Error: The specified object was not found in the provided System Characteristics document.");
 		}
 	} else {
-		delete values;
 		throw Exception("Error: Unable to locate collected_object element in provided System Characteristics document.");
 	}
 	return values;

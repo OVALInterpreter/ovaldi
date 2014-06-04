@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,18 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+
+#include "AbsObject.h"
+#include "SetObject.h"
+#include "Object.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+
 #include "ObjectFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 // ***************************************************************************************	//
 //								 Public members												//
@@ -44,7 +53,7 @@ AbsObject* ObjectFactory::GetObjectById(string objectId) {
 	//	populated AbsObject
 	// -----------------------------------------------------------------------
 
-	AbsObject* absObject = NULL;
+	auto_ptr<AbsObject> absObject;
 
 	// get the specified object element
 	DOMElement* objectsElm = XmlCommon::FindElementNS(DocumentManager::GetDefinitionDocument(), "objects");
@@ -53,13 +62,13 @@ AbsObject* ObjectFactory::GetObjectById(string objectId) {
 	// determine if this is a set object or a simple object
 	DOMElement* setElm = XmlCommon::FindElementNS(objectElm, "set");
 	if(setElm == NULL) {
-		absObject = new Object();
+		absObject.reset(new Object());
 		absObject->Parse(objectElm);
 	} else {
-		absObject = new SetObject();
+		absObject.reset(new SetObject());
 		absObject->Parse(objectElm);
 	}
 
-	return absObject;
+	return absObject.release();
 }
 

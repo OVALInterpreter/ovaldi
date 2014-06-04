@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,8 +28,12 @@
 //
 //****************************************************************************************//
 
-#include "StateOrObjectFieldEntityValue.h"
+#include "Log.h"
 #include "VariableFactory.h"
+#include "EntityComparator.h"
+#include "XmlCommon.h"
+
+#include "StateOrObjectFieldEntityValue.h"
 
 using namespace std;
 using namespace xercesc;
@@ -203,27 +207,27 @@ OvalEnum::ResultEnumeration StateOrObjectFieldEntityValue::Analyze(ItemFieldEnti
 			IntVector results;
 			// check the flag on the variable
 			if(this->GetVarRef()->GetFlag() == OvalEnum::FLAG_COMPLETE) { 
-				VariableValueVector* values = this->GetVarRef()->GetValues();
-				for(VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++) {
+				VariableValueVector values = this->GetVarRef()->GetValues();
+				for(VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++) {
 					OvalEnum::ResultEnumeration tmp = OvalEnum::RESULT_ERROR;
 					if(this->GetDatatype() == OvalEnum::DATATYPE_BINARY) {
-						tmp = EntityComparator::CompareBinary(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareBinary(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_BOOLEAN) {
-						tmp = EntityComparator::CompareBoolean(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareBoolean(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_EVR_STRING) {
-						tmp = EntityComparator::CompareEvrString(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareEvrString(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_FLOAT) {
-						tmp = EntityComparator::CompareFloat(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareFloat(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_INTEGER) {
-						tmp = EntityComparator::CompareInteger(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareInteger(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_IOS_VERSION) {
-						tmp = EntityComparator::CompareIosVersion(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareIosVersion(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_STRING) {
-						tmp = EntityComparator::CompareString(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareString(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
-						tmp = EntityComparator::CompareVersion(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareVersion(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
-						tmp = EntityComparator::CompareIpv4Address(this->GetOperation(), (*iterator)->GetValue(), scField->GetValue());
+						tmp = EntityComparator::CompareIpv4Address(this->GetOperation(), iterator->GetValue(), scField->GetValue());
 					}
 
 					results.push_back(tmp);

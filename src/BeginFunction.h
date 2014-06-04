@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,10 @@
 #ifndef BEGINFUNCTION_H
 #define BEGINFUNCTION_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a BeginFunction component in a local_variable in the oval definition schema.
@@ -48,22 +48,28 @@ class BeginFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete BeginFunction object. */
-	BeginFunction(std::string charIn = "");
-	~BeginFunction();
+	BeginFunction(std::string charIn = "") : character(charIn)
+	{}
+	virtual ~BeginFunction()
+	{}
 
 	/** Parse the begin element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the character field's value. */
-	std::string GetCharacter();
+	std::string GetCharacter() const {
+		return this->character;
+	}
 	/** Set the character field's value. */
-	void SetCharacter(std::string charIn);
+	void SetCharacter(std::string charIn) {
+		this->character = charIn;
+	}
 
 private:
 	std::string character;

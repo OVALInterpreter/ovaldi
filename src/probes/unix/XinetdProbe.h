@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,24 +30,18 @@
 #ifndef XINETDPROBE_H
 #define XINETDPROBE_H
 
-#include <AbsProbe.h>
-#include <Common.h>
-#include <Item.h>
 #include <map>
-#include <Object.h>
-#include <ObjectEntity.h>
-#include <REGEX.h>
 #include <set>
 #include <string>
 
-class XinetdParam;
+#include <AbsProbe.h>
+#include <Common.h>
+#include <Item.h>
+#include <Object.h>
+#include <ObjectEntity.h>
+#include <REGEX.h>
 
-// You will probably notice that there is no 'using namespace std' at the
-// top of this file, and I spelled out the namespace for all the stl types
-// I used below.  It seems to me that people wouldn't want headers
-// importing types from other namespaces and possibly clashing with their
-// own types.  So to me, 'using namespace ...' seems more appropriate for
-// an impl file, not a header.
+class XinetdParam;
 
 /**
  * The probe for analyzing xinetd config files.
@@ -201,6 +195,26 @@ class XinetdProbe : public AbsProbe {
 					   const std::string& paramName,
 					   const std::string& entityName,
 					   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
+
+	/**
+         * Adds an unbounded entity to the given item with the given name, from the service param
+         * of the same name from the given service.
+         */
+        void AddUnboundedItemEntity(Item *item,
+			   const ServiceEntryMap& service,
+			   const std::string& paramName,
+			   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
+
+        /**
+         * Adds an unbounded entity to the given item with the given name, from the service param
+         * of the given name from the given service.  In this one, the entity is named
+         * differently from the service param name.
+         */
+        void AddUnboundedItemEntity(Item *item,
+			   const ServiceEntryMap& service,
+			   const std::string& paramName,
+			   const std::string& entityName,
+			   OvalEnum::Datatype dataType=OvalEnum::DATATYPE_STRING);
 
 	/**
 	 * Reads the contents of the given file into the given string.

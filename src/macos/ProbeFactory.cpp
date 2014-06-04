@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,11 +28,53 @@
 //
 //****************************************************************************************//
 
+#include <set>
+
+//	include the probe classes
+#include "FileProbe.h"
+#include "FileMd5Probe.h"
+#include "FileHashProbe.h"
+#include "FileHash58Probe.h"
+#include "FamilyProbe.h"
+#include "UnameProbe.h"
+//Not applicable
+//#ifdef PACKAGE_RPM
+//#include "RPMInfoProbe.h"
+//#endif
+//#ifdef PACKAGE_DPKG
+//#include "DPKGInfoProbe.h"
+//#endif
+//Not ported yet
+//#include "InetListeningServersProbe.h"
+#include "ProcessProbe.h"
+#include "Process58Probe.h"
+//Not ported yet
+//#include "ShadowProbe.h"
+#include "PasswordProbe.h"
+#include "InterfaceProbe.h"
+#include "PasswordProbe.h"
+#include "EnvironmentVariableProbe.h"
+#include "EnvironmentVariable58Probe.h"
+#include "XmlFileContentProbe.h"
+#include "TextFileContentProbe.h"
+#include "TextFileContent54Probe.h"
+#include "VariableProbe.h"
+//Mac OS has no notion of runlevels
+//#include "RunLevelProbe.h"
+#include "XinetdProbe.h"
+#include "InetdProbe.h"
+#include "LDAPProbe.h"
+#include "NvramProbe.h"
+#include "AccountInfoProbe.h"
+#include "InetListeningServer510Probe.h"
+#include "PwPolicy59Probe.h"
+
 #include "ProbeFactory.h"
 
 using namespace std;
 
-AbsProbeSet ProbeFactory::_probes;
+typedef set<AbsProbe*> AbsProbeSet;
+static AbsProbeSet _probes;
 
 
 // ***************************************************************************************	//
@@ -49,11 +91,11 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = FileMd5Probe::Instance();
 	} else if(objectName.compare("filehash_object") == 0) {
 		probe = FileHashProbe::Instance();
-	}else if(objectName.compare("filehash58_object") == 0) {
-	        probe = FileHash58Probe::Instance();
-        } else if(objectName.compare("environmentvariable_object") == 0) {
+	} else if(objectName.compare("filehash58_object") == 0) {
+		probe = FileHash58Probe::Instance();
+	} else if(objectName.compare("environmentvariable_object") == 0) {
 		probe = EnvironmentVariableProbe::Instance();
-        } else if(objectName.compare("environmentvariable58_object") == 0) {
+	} else if(objectName.compare("environmentvariable58_object") == 0) {
 		probe = EnvironmentVariable58Probe::Instance();
 	} else if(objectName.compare("textfilecontent_object") == 0) {
 		probe = TextFileContentProbe::Instance();
@@ -79,17 +121,25 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 	} else if(objectName.compare("process_object") == 0) {
 		probe = ProcessProbe::Instance();
 	} else if(objectName.compare("process58_object") == 0) {
-	        probe = Process58Probe::Instance();
-        } else if(objectName.compare("runlevel_object") == 0) {
-	        //Mac OS has no notion of runlevels
-	        //probe = RunLevelProbe::Instance();
+		probe = Process58Probe::Instance();
+	} else if(objectName.compare("runlevel_object") == 0) {
+		//Mac OS has no notion of runlevels
+		//probe = RunLevelProbe::Instance();
 	} else if(objectName.compare("sccs_object") == 0) {
 		// Not currently implemented for any unix systems
 	} else if(objectName.compare("shadow_object") == 0) {
-	        // Not ported yet
+		// Not ported yet
 		//probe = ShadowProbe::Instance();
 	} else if(objectName.compare("uname_object") == 0) {
 		probe = UnameProbe::Instance();
+	} else if(objectName.compare("nvram_object") == 0) {
+		probe = NvramProbe::Instance();
+	} else if(objectName.compare("accountinfo_object") == 0) {
+		probe = AccountInfoProbe::Instance();
+	} else if(objectName.compare("inetlisteningserver510_object") == 0) {
+		probe = InetListeningServer510Probe::Instance();
+	} else if(objectName.compare("pwpolicy59_object") == 0) {
+		probe = PwPolicy59Probe::Instance();
 	}
 
 //Not applicable

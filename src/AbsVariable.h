@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -33,18 +33,15 @@
 
 //	other includes
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 #include <map>
 #include <utility>
 
-#include "Common.h"
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "StdTypedefs.h"
 #include "Exception.h"
 #include "OvalEnum.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 class AbsVariable;
 
@@ -66,50 +63,85 @@ typedef std::map <std::string, AbsVariable* > AbsVariableMap;
 class AbsVariable {
 public:
 	/** delete the messages */
-	virtual ~AbsVariable();
+	virtual ~AbsVariable() {
+		if (msgs) delete msgs;
+	}
 
-	virtual void Parse(DOMElement*) = 0;
+	virtual void Parse(xercesc::DOMElement*) = 0;
 
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual VariableValueVector GetVariableValues() const = 0;
 	
 	/** Return the id field's value. */
-	std::string GetId();
+	std::string GetId() const {
+		return this->id;
+	}
 	/** Set the id field's value. */
-	void SetId(std::string id);
+	void SetId(std::string id) {
+		this->id = id;
+	}
 	
 	/** Return the datatype field's value. */
-	OvalEnum::Datatype GetDatatype();
+	OvalEnum::Datatype GetDatatype() const {
+		return this->datatype;
+	}
 	/** Set the datatype field's value. */
-	void SetDatatype(OvalEnum::Datatype datatype);
+	void SetDatatype(OvalEnum::Datatype datatype) {
+		this->datatype = datatype;
+	}
 
 	/** Return the flag field's value. */
-	OvalEnum::Flag GetFlag();
+	OvalEnum::Flag GetFlag() const {
+		return this->flag;
+	}
 	/** Set the flag field's value. */
-	void SetFlag(OvalEnum::Flag flag);
+	void SetFlag(OvalEnum::Flag flag) {
+		this->flag = flag;
+	}
 
 	/** Return the name field's value. */
-	std::string GetName();
+	std::string GetName() const {
+		return this->name;
+	}
 	/** Set the name field's value. */
-	void SetName(std::string name);
+	void SetName(std::string name) {
+		this->name = name;
+	}
 
-	/** Return the values field's value. */
-	VariableValueVector* GetValues();
+	/** Return this variable's values. */
+	VariableValueVector GetValues() const
+	{ return values; }
 	/** Set the values field's value. */
-	void SetValues(VariableValueVector* value);
+	void SetValues(const VariableValueVector &values)
+	{ this->values = values; }
 	/** Add a value to the set of values associated with this variable. */
-	void AppendVariableValue(VariableValue* value);
+	void AppendVariableValue(const VariableValue &value) {
+		this->values.push_back(value);
+	}
+	void AppendVariableValue(const std::string &varId, const std::string &varValue) {
+		this->values.push_back(VariableValue(varId, varValue));
+	}
 
 	/** Return the version field's value. */
-	int GetVersion();
+	int GetVersion() const {
+		return this->version;
+	}
 	/** Set the version field's value. */
-	void SetVersion(int version);
+	void SetVersion(int version) {
+		this->version = version;
+	}
 
 	/** Return the msgs field's value. */
-	StringVector* GetMessages();
+	const StringVector* GetMessages() const {
+		return this->msgs;
+	}
 	/** Set the msgs field's value. */
-	void SetMessages(StringVector* msgs);
+	void SetMessages(StringVector* msgs) {
+		this->msgs = msgs;
+	}
 	/** Add a msg to the end of the msgs vector. */
-	void AppendMessage(std::string msg);
+	void AppendMessage(std::string msg) {
+		this->msgs->push_back(msg);
+	}
 	/** Add a newMsgs to the end of the msgs vector. */
 	void AppendMessages(StringVector* newMsgs);
 	/** Create a string listing of all messages. */
@@ -127,7 +159,14 @@ public:
 	static void Cache(AbsVariable* var);
 
 protected:
-	AbsVariable(std::string id = "", std::string name = "", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
+	AbsVariable(std::string id = "", std::string name = "", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector())
+		: id(id), 
+		flag(OvalEnum::FLAG_ERROR),
+		name(name),
+		version(version),
+		datatype(datatype),
+		msgs(msgs)
+	{}
 
 private:
 

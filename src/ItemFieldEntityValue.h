@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,9 +31,14 @@
 #ifndef ITEMFIELDENTITYVALUE_H
 #define ITEMFIELDENTITYVALUE_H
 
-#include "AbsEntityValue.h"
+#include <string>
+#include <vector>
 
-XERCES_CPP_NAMESPACE_USE
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "OvalEnum.h"
+#include "AbsEntityValue.h"
 
 /**
 	This class represents a field entity in an item entity that has a datatype of record as defined in the OVAL systems characteristics schema.
@@ -60,7 +65,7 @@ public:
 	/** Return the name value of the field.
 	 *  @return A string representing the name value of the field.
 	 */
-	std::string GetName();
+	std::string GetName() const;
 
 	/** Set the name field's value.
 	 *  @param name A string value representing the field's name.
@@ -71,7 +76,7 @@ public:
 	/** Return the datatype of the field.
  	 *  @return A value from the OvalEnum::Datatype enumeration representing the datatype of the field.
 	 */
-	OvalEnum::Datatype GetDatatype();
+	OvalEnum::Datatype GetDatatype() const;
 
 	/** Set the datatype of the field.
 	 *  @param datatype A OvalEnum::Datatype enumeration value representing the datatype of the field.
@@ -82,7 +87,7 @@ public:
 	/** Return the status of the ItemFieldEntityValue.
 	 *  @return A OvalEnum::SCStatus value representing the status of the ItemFieldEntityValue.
 	 */
-	OvalEnum::SCStatus GetStatus();
+	OvalEnum::SCStatus GetStatus() const;
 
 	/** Set the status of the ItemFieldEntityValue.
 	    @param status The status of the ItemFieldEntityValue.  
@@ -95,13 +100,13 @@ public:
 	 *  @param itemEntityElm A pointer to a DOMDocument that specifies the entity for which the ItemFieldEntityValue should be written to.
 	 *  @return Void.
 	 */
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemEntityElm);
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* itemEntityElm);
 	
 	/** Parse the specified entity to retrieve its field entity value.
 	 *  @param entityElm A pointer to a DOMElement from which the field entity value should be retrieved.  This value should then be used to initialize the ItemFieldEntityValue. 
 	 *  @return Void.
 	 */
-	void Parse(DOMElement* entityElm);
+	void Parse(xercesc::DOMElement* entityElm);
 
 private:
 	std::string name;
@@ -116,4 +121,3 @@ private:
 typedef std::vector < ItemFieldEntityValue* > ItemFieldEntityValueVector;
 
 #endif
-

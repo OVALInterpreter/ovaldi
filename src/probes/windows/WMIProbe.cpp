@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <windows.h>
+#include <comdef.h>
+#include <Wbemidl.h>
+
+#include "Log.h"
+#include <VectorPtrGuard.h>
+
 #include "WMIProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								WMIProbe Class											  //	
@@ -78,15 +88,19 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 		throw ProbeException("Error: invalid operation specified on wql. Found: " + OvalEnum::OperationToString(wmi_wql->GetOperation()));
 	}
 
-	ItemVector* collectedItems = new ItemVector();
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	// get all the namespaces
-	ItemEntityVector* namespaces = this->GetNamespaces(wmi_namespace);
+	// Note that the namespaces and wqls vectors don't own their contents.
+	// Their contents are shared with AbsProbe::createdItemEntities, which
+	// is the real owner.  We only need to make sure the vector itself is
+	// deleted.
+	auto_ptr<ItemEntityVector> namespaces(this->GetNamespaces(wmi_namespace));
 	ItemEntityVector::iterator namespaceIt;
 	for(namespaceIt=namespaces->begin(); namespaceIt!=namespaces->end(); namespaceIt++) {
 		
 			// get all the wql queries
-			ItemEntityVector* wqls = this->GetWQLs(wmi_wql);
+			auto_ptr<ItemEntityVector> wqls(this->GetWQLs(wmi_wql));
 			ItemEntityVector::iterator wqlIt;
 			for(wqlIt=wqls->begin(); wqlIt!=wqls->end(); wqlIt++) {
 
@@ -97,11 +111,9 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 					collectedItems->push_back(item);
 				}
 			}
-			delete wqls;
 	}
-	delete namespaces;
 
-	return collectedItems;
+	return collectedItems.release();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -134,16 +146,16 @@ ItemEntityVector* WMIProbe::GetNamespaces(ObjectEntity* wmi_namespace) {
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = wmi_namespace->GetVariableValues();
+		VariableValueVector vars = wmi_namespace->GetVariableValues();
 
 		// we may need to add a check to see if the namespace exists here?
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(wmi_namespace);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			namespaces->push_back(tmp);
 		}
 	}
@@ -165,14 +177,14 @@ ItemEntityVector* WMIProbe::GetWQLs(ObjectEntity* wmi_wql) {
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = wmi_wql->GetVariableValues();
+		VariableValueVector vars = wmi_wql->GetVariableValues();
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(wmi_wql);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			wqls->push_back(tmp);
 		}
 	}
@@ -240,6 +252,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
 				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 				break;
 			} else {
 				// We have a result.  Create an ItemEntity for it and add it to the

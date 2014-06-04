@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,14 +31,11 @@
 #ifndef REGKEYEFFECTIVRIGHTSPROBE_H
 #define REGKEYEFFECTIVRIGHTSPROBE_H
 
-#pragma warning(disable:4786)
+#include <windows.h>
 
 #include "RegistryFinder.h"
 #include "AbsEffectiveRightsProbe.h"
 #include "WindowsCommon.h"
-
-#include <aclapi.h>
-#include <windows.h>
 
 /**
     This class is responsible for collecting registry key information for windows registrykeyeffectiverights_objects.

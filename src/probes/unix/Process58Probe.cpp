@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -188,12 +188,13 @@ ItemVector* Process58Probe::CollectItems(Object* object) {
 
 			} else {
 
+				VariableValueVector vals = command->GetVarRef()->GetValues();
 				VariableValueVector::iterator iterator;
-				for(iterator = command->GetVarRef()->GetValues()->begin(); iterator != command->GetVarRef()->GetValues()->end(); iterator++) {
+				for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("command_line",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("command_line",  iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -324,7 +325,7 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	uid_t ruid, *ruidp=&ruid, euid, *euidp=&euid;
 	pid_t pid, ppid;
 	long priority = 0;
-	unsigned long starttime = 0;
+	unsigned long starttime = 0, policy = 0;
 	pid_t sessionId;
 	uid_t loginuid;
 	uint64_t effCap, *effCapp=&effCap;
@@ -366,7 +367,7 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	// message and status, but keep looking for other information).
 	
 	statStatus = RetrieveStatFile(pidStr, &ppid, &priority, 
-								  &starttime, &sessionId, &errMsg);
+				      &starttime, &sessionId, &policy,  &errMsg);
 	if (statStatus == PROC_TERMINATED) {
 		Log::Debug("Process "+pidStr+" went away (stat), skipping...");
 		return;
@@ -460,8 +461,39 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	} else
 		item->AppendElement(new ItemEntity("ruid", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 
-	item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
-
+	if (statStatus == PROC_OK){
+	  string p = "";
+	  // From sched_setscheduler man page:
+	  // "Currently, the following three scheduling policies are supported under Linux: SCHED_FIFO, SCHED_RR, SCHED_OTHER,  and  SCHED_BATCH;"
+	  // These values are defined in bits/sched.h, however, I used the numeric values because SCHED_BATCH requires that __USE_GNU is defined.
+	  // Hopefully, this will make the code more portable.	 
+	  switch(policy){
+	    case 0:{
+	      p = "TS";   
+	      break;
+	    }
+	    case 1:{
+	      p = "FF";
+	      break;
+	    }
+	    case 2:{
+              p = "RR";
+              break;
+            }
+	    case 3:{  
+              p = "B";
+              break;
+            }
+	    default:{
+	      item->AppendMessage(new OvalMessage("Could not determine the scheduling class."));
+	    }
+	  }
+	  
+	  item->AppendElement(new ItemEntity("scheduling_class",  p, OvalEnum::DATATYPE_STRING, (p.compare("") != 0)?OvalEnum::STATUS_EXISTS:OvalEnum::STATUS_ERROR));
+	  
+	}else{ // some other error occurred
+	  item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+	}
 	if (statStatus == PROC_OK)
 		item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr));
 
@@ -504,7 +536,7 @@ void Process58Probe::GetPSInfo(string command, string pidStr, ItemVector* items)
 	items->push_back(item.release());
 }
 
-Process58Probe::ProcStatus Process58Probe::RetrieveStatFile(const string &process, int *ppid, long *priority, unsigned long *starttime, pid_t *session, string *errMsg) {
+Process58Probe::ProcStatus Process58Probe::RetrieveStatFile(const string &process, int *ppid, long *priority, unsigned long *starttime, pid_t *session, unsigned long *policy, string *errMsg) {
 
 	// Stat File parameters.  While we're really only concerned with gathering the parameters
 	// that are passed in, these variables are good placeholders in case we decide to collect
@@ -513,7 +545,7 @@ Process58Probe::ProcStatus Process58Probe::RetrieveStatFile(const string &proces
 	pid_t pid; // obviously we already know this...
 	int pgrp, tty, tpgid, exit_signal, processor = 0;
 	long cutime, cstime, nice, placeholder, itrealvalue, rss = 0;
-	unsigned long flags, minflt, cminflt, majflt, cmajflt, utime, stime, vsize, rlim = 0;
+	unsigned long flags, minflt, cminflt, majflt, cmajflt, utime, stime, vsize, rt_priority, rlim = 0;
 	unsigned long startcode, endcode, startstack, kstkesp, kstkeip, signal, blocked, sigignore = 0;
 	unsigned long sigcatch, wchan, nswap, cnswap = 0;
 	char comm[PATH_MAX];
@@ -535,7 +567,7 @@ Process58Probe::ProcStatus Process58Probe::RetrieveStatFile(const string &proces
 	} else {
 
 		// Linux gives us a nicely formatted file for fscanf to pull in
-		fscanf(statFile, "%d %s %c %d %d %d %d %d %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %lu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d", &pid, comm, &state, ppid, &pgrp, session, &tty, &tpgid, &flags, &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime, &cutime, &cstime, priority, &nice, &placeholder, &itrealvalue, starttime, &vsize, &rss, &rlim, &startcode, &endcode, &startstack, &kstkesp, &kstkeip, &signal, &blocked, &sigignore, &sigcatch, &wchan, &nswap, &cnswap, &exit_signal, &processor);
+	  fscanf(statFile, "%d %s %c %d %d %d %d %d %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %lu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d %lu %lu", &pid, comm, &state, ppid, &pgrp, session, &tty, &tpgid, &flags, &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime, &cutime, &cstime, priority, &nice, &placeholder, &itrealvalue, starttime, &vsize, &rss, &rlim, &startcode, &endcode, &startstack, &kstkesp, &kstkeip, &signal, &blocked, &sigignore, &sigcatch, &wchan, &nswap, &cnswap, &exit_signal, &processor, &rt_priority, policy);
 
 	}
 
@@ -1318,3 +1350,4 @@ void Process58Probe::DeleteCommands(StringPairVector *commands) {
 
 	delete commands;
 }
+

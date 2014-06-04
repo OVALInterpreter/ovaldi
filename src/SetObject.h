@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,18 +31,9 @@
 #ifndef SETOBJECT_H
 #define SETOBJECT_H
 
-#include "Common.h"
-#include "ObjectFactory.h"
-#include "AbsObject.h"
-#include "State.h"
-#include "Object.h"
 #include "Set.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class Set;
-typedef std::vector < Set* > SetVector;
-
+#include "VariableValue.h"
+#include "AbsObject.h"
 
 /**
 	This class represents an SetObject in an oval definition schema.
@@ -51,10 +42,10 @@ class SetObject : public AbsObject {
 
 public:
 	SetObject(std::string id = "", std::string comment = "", std::string name = "", int version = 1, std::string xmlns = "");
-	~SetObject();
+	virtual ~SetObject();
 
-	void Parse(DOMElement* setObjectElm);
-	VariableValueVector* GetVariableValues();
+	virtual void Parse(xercesc::DOMElement* setObjectElm);
+	virtual VariableValueVector GetVariableValues();
 	
 	Set* GetSet();
 	void SetSet(Set* set);

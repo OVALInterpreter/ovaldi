@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,11 @@
 #ifndef SPLITFUNCTION_H
 #define SPLITFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "ComponentValue.h"
+#include "AbsFunctionComponent.h"
 
 /**
 	This class represents a SplitFunction component in a local_variable in the oval definition schema.
@@ -50,22 +51,28 @@ class SplitFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete SplitFunction object. */
-	SplitFunction(std::string delimiter = "");
-	~SplitFunction();
+	SplitFunction(std::string delimiter = "") : delimiter(delimiter)
+	{}
+	virtual ~SplitFunction()
+	{}
 
 	/** Parse the substring element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substrings and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the delimiter field's value. */
-	std::string GetDelimiter();
+	std::string GetDelimiter() const {
+		return this->delimiter;
+	}
 	/** Set the delimiter field's value. */
-	void SetDelimiter(std::string delimiter);
+	void SetDelimiter(std::string delimiter) {
+		this->delimiter = delimiter;
+	}
 
 private:
 	std::string delimiter;

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,14 +30,11 @@
 #ifndef AUDITEVENTPOLICYSUBCATEGORIESPROBE_H
 #define AUDITEVENTPOLICYSUBCATEGORIESPROBE_H
 
-#pragma warning(disable:4786)
-
-#include <initguid.h>
+#include <string>
+#include <guiddef.h>
 
 #include "AbsProbe.h"
 #include "WindowsCommon.h"
-
-using namespace std;
 
 /** 
     This class is responsible for collecting information for windows auditeventpolicysubcategories_object.
@@ -70,7 +67,7 @@ private:
 
 	void Init();
 
-	void InsertIntoGuidItemEntityNameMapping(GUID guid, string itemEntityName);
+	void InsertIntoGuidItemEntityNameMapping(GUID guid, std::string itemEntityName);
 
 	StringSet* GetItemEntityNameFromGuid(GUID guid);
 };

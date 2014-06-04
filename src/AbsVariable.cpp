@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -37,69 +37,10 @@ AbsVariableMap AbsVariable::processedVariableCache;
 //****************************************************************************************//
 //									AbsVariable Class									  //	
 //****************************************************************************************//
-AbsVariable::AbsVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) {
-
-	this->SetId(id);
-	this->SetDatatype(datatype);
-	this->SetName(name);
-	this->SetVersion(version);
-	this->SetFlag(OvalEnum::FLAG_ERROR);
-	this->SetMessages(msgs);
-}
-
-AbsVariable::~AbsVariable() {
-
-	delete msgs;
-}
 
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-
-OvalEnum::Datatype AbsVariable::GetDatatype() {
-
-	return this->datatype;
-}
-
-void AbsVariable::SetDatatype(OvalEnum::Datatype datatype) {
-
-	this->datatype = datatype;
-}
-
-OvalEnum::Flag AbsVariable::GetFlag() {
-
-	return this->flag;
-}
-
-void AbsVariable::SetFlag(OvalEnum::Flag flag) {
-
-	this->flag = flag;
-}
-
-string AbsVariable::GetId() {
-
-	return this->id;
-}
-
-void AbsVariable::SetId(string id) {
-
-	this->id = id;
-}
-
-StringVector* AbsVariable::GetMessages() {
-
-	return this->msgs;
-}
-
-void AbsVariable::SetMessages(StringVector* msgs) {
-
-	this->msgs = msgs;
-}
-
-void AbsVariable::AppendMessage(string msg) {
-
-	this->msgs->push_back(msg);
-}
 
 void AbsVariable::AppendMessages(StringVector* newMsgs) {
 
@@ -127,41 +68,6 @@ string AbsVariable::ListMessages() {
 		messages.append("\t- No Messages found");
 	}
 	return messages;
-}
-
-string AbsVariable::GetName() {
-
-	return this->name;
-}
-
-void AbsVariable::SetName(string name) {
-
-	this->name = name;
-}
-
-VariableValueVector* AbsVariable::GetValues() {
-
-	return &this->values;
-}
-
-void AbsVariable::SetValues(VariableValueVector* values) {
-
-	this->values = (*values);
-}
-
-void AbsVariable::AppendVariableValue(VariableValue* value) {
-
-	this->values.push_back(value);
-}
-
-int AbsVariable::GetVersion() {
-
-	return this->version;
-}
-
-void AbsVariable::SetVersion(int version) {
-
-	this->version = version;
 }
 
 AbsVariable* AbsVariable::SearchCache(string id) {

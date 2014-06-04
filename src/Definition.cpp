@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+#include "Common.h"
+#include "Analyzer.h"
+
 #include "Definition.h"
 
 using namespace std;
+using namespace xercesc;
 
 DefinitionMap Definition::processedDefinitionsMap;
 
@@ -186,10 +194,10 @@ void Definition::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new definition element
-		DOMElement* definitionElm = XmlCommon::AddChildElement(resultDoc, parentElm, "definition");
+		DOMElement* definitionElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "definition");
 
 		// add the attributes
 		XmlCommon::AddAttribute(definitionElm, "definition_id", this->GetId());
@@ -215,7 +223,8 @@ void Definition::Parse(DOMElement* definitionElm) {
 	// get the attributes
 	this->SetId(XmlCommon::GetAttributeByName(definitionElm, "id"));
 	string versionStr = XmlCommon::GetAttributeByName(definitionElm, "version");
-	int versionInt = atoi(versionStr.c_str());
+	int versionInt = 0;
+	Common::FromString(versionStr, &versionInt);
 	this->SetVersion(versionInt);
 	
 	// parse the criteria

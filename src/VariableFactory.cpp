@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,15 +28,22 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "Log.h"
+#include "LocalVariable.h"
+#include "ConstantVariable.h"
+#include "ExternalVariable.h"
 
 #include "VariableFactory.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableFactory Class									  //
 //****************************************************************************************//
-DOMElement* VariableFactory::variablesElm = NULL;
+
 // ***************************************************************************************	//
 //								Public members												//
 // ***************************************************************************************	//

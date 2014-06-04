@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,16 +31,7 @@
 #ifndef DATACOLLECTOR_H
 #define DATACOLLECTOR_H
 
-#include <windows.h>
-#include <iphlpapi.h>
-#include <vector>
-
 #include "AbsDataCollector.h"
-#include "ObjectCollector.h"
-#include "SystemInfo.h"
-
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
 
 /**
 	The windows specific data collector

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,18 +31,9 @@
 #ifndef OBJECTCOLLECTOR_H
 #define OBJECTCOLLECTOR_H
 
-#include <windows.h>
-#include <iphlpapi.h>
-#include <vector>
-
 //	include the parent class.
 #include "AbsObjectCollector.h"
-#include "ProbeFactory.h"
-
-
-//	namespaces
-XERCES_CPP_NAMESPACE_USE
-using namespace std;
+#include "AbsProbe.h"
 
 /**
 	The object collector for windows definitions.

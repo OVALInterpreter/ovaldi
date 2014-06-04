@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,58 +28,19 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
 #include "LiteralComponent.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								LiteralComponent Class									  //	
 //****************************************************************************************//
-LiteralComponent::LiteralComponent(string value) : AbsComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete LiteralComponent object
-	//
-	// -----------------------------------------------------------------------
-
-	this->SetValue(value);
-}
-
-LiteralComponent::~LiteralComponent() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Do nothing for now
-	//
-	// -----------------------------------------------------------------------
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string LiteralComponent::GetValue() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the value field's value
-	//
-	// -----------------------------------------------------------------------
-
-	return this->value;
-}
-
-void LiteralComponent::SetValue(string value) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the value field's value
-	//
-	// -----------------------------------------------------------------------
-
-	this->value = value;
-}
-
 
 ComponentValue* LiteralComponent::ComputeValue() {
 	// -----------------------------------------------------------------------
@@ -105,17 +66,4 @@ void LiteralComponent::Parse(DOMElement* componentElm) {
 	// -----------------------------------------------------------------------
     
 	this->SetValue(XmlCommon::GetDataNodeValue(componentElm));
-}
-
-VariableValueVector* LiteralComponent::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this component's value
-	// in this case just an empty vector.
-	// -----------------------------------------------------------------------
-	
-	VariableValueVector* values = new VariableValueVector();
-
-	return values;
 }

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,19 +31,13 @@
 #ifndef SERVICEEFFECTIVRIGHTSPROBE_H
 #define SERVICEEFFECTIVRIGHTSPROBE_H
 
-#pragma warning(disable:4786)
-
-#include <memory>
-#include <AutoCloser.h>
-#include "AbsEffectiveRightsProbe.h"
-#include "WindowsCommon.h"
-
-#include <aclapi.h>
 #include <windows.h>
-using namespace std;
+
+#include "AbsEffectiveRightsProbe.h"
+#include <AutoCloser.h>
 
 /**
-    This class is responsible for collecting service information for Windows serviceeffictiverights_objects.
+    This class is responsible for collecting service information for Windows serviceeffectiverights_objects.
 */
 class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 
@@ -70,7 +64,7 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
          *  @param trusteeSIDStr A string that contains the trusteeSID of the service that you want to get the effective rights of.
          *  @return The item that contains the service effective rights of the specified service and trustee SID.
          */
-        Item* GetEffectiveRights ( SC_HANDLE serviceHandle, string serviceNameStr, string trusteeSID );
+        Item* GetEffectiveRights ( SC_HANDLE serviceHandle, std::string serviceNameStr, std::string trusteeSID );
 
         /** Get the set of all services on the system that match the object.
          *  @param serviceNameEntity A ObjectEntity that represents the service_name entity in an Object as defined in the OVAL Definition Schema.
@@ -83,13 +77,13 @@ class ServiceEffectiveRightsProbe : public AbsEffectiveRightsProbe {
          *  @param isRegex A boolean value that specifies whether or not the pattern is a regular expression.
          *  @return A StringSet containing all of the matching services.
          */
-        StringSet* GetMatchingServices ( string patternStr , bool isRegex );
+        StringSet* GetMatchingServices ( std::string patternStr , bool isRegex );
 
         /** Determine if the service exists on the system.
          *  @param serviceNameStr A string that contains the name of the service whose existenc you want to check.
          *  @return A boolean value that specifies whether or not the service exists on the system.
          */
-        bool ServiceExists ( string serviceNameStr );
+        bool ServiceExists ( std::string serviceNameStr );
 
         /** Retrieve all of the services on the system.
          *  @return A pointer to a StringSet that contains all of the services on the system.

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,9 +32,11 @@
 #define ITEMENTITY_H
 
 #include <string>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+
 #include "OvalEnum.h"
 #include "AbsEntityValue.h"
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents an entity in an Item as defined in the oval system characteristics schema.
@@ -61,22 +63,13 @@ public:
 	    Inserts this ItemEntity as the last child of the specified
 		itemElm.
 	*/
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm);
-
-    /** Create a unique string representation of the ItemEntity.
-        A unique string can be created for an ItemEntity by concatenating the results of each of the following:
-        <ul>
-            <li>getting the ItemEntity name</li>
-            <li>getting the ItemEntity value</li>
-        </ul>
-    */
-    std::string UniqueString();
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* itemElm, const std::string &ns);
 
 	/** Parse the provided entity element */
-	void Parse(DOMElement* entityElm);
+	void Parse(xercesc::DOMElement* entityElm);
 
 	/** Return the status field's value. */
-	OvalEnum::SCStatus GetStatus();
+	OvalEnum::SCStatus GetStatus() const;
 
 	/** Set the status of the ItemEntity.
 	 *  @param status A string value representing the status of the ItemEntity.
@@ -87,7 +80,7 @@ public:
 	/** Return the name value of the ItemEntity.
 	 *  @return A string representing the name value of the ItemEntity.
 	 */
-	std::string GetName();
+	std::string GetName() const;
 
 	/** Set the name of the ItemEntity.
 	 *  @param name A string value representing the name of the ItemEntity.
@@ -98,7 +91,7 @@ public:
 	/** Return the value of the ItemEntity.
 	 *  @return A string representing the value of the ItemEntity.
 	 */
-	std::string GetValue();
+	std::string GetValue() const;
 
 	/** Set the value of the ItemEntity.
 	 *  @param value A string representation of the value of the ItemEntity.
@@ -109,7 +102,7 @@ public:
 	/** Return the values of the ItemEntity.
   	 *  @return A AbsEntityValueVector containing the values of the ItemEntity.
 	 */
-	AbsEntityValueVector GetValues();
+	AbsEntityValueVector GetValues() const;
 
 	/** Set the values of the ItemEntity.
 	 *  @param values A AbsEntityValueVector that contains the values for the ItemEntity.
@@ -117,10 +110,17 @@ public:
 	 */
 	void SetValues(AbsEntityValueVector values);
 
+	/**
+	 * Get the number of "values" in this item entity.  This is 1
+	 * for all non-record item entities, and the number of record
+	 * fields for all record item entities.
+	 */
+	size_t GetNumValues() const { return value.size(); }
+
 	/** Return the datatype of the ItemEntity.
  	 *  @return A value from the OvalEnum::Datatype enumeration representing the datatype of the ItemEntity.
 	 */
-	OvalEnum::Datatype GetDatatype();
+	OvalEnum::Datatype GetDatatype() const;
 
 	/** Set the datatype of the ItemEntity.
 	 *  @param datatype A value from the OvalEnum::Datatype enumeration representing the datatype of the ItemEntity.
@@ -137,7 +137,7 @@ public:
 	/** Return true if the xsi:nil is set to true.
 	 *  @return A boolean value indicating whether or not the entity has a nil value.
 	 */
-	bool GetNil();
+	bool GetNil() const;
 
 private:
 	OvalEnum::SCStatus scStatus;

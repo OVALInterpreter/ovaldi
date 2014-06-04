@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,11 +28,53 @@
 //
 //****************************************************************************************//
 
-#include "Main.h"
+//	other includes
+#include <time.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <xercesc/util/PlatformUtils.hpp>
+
+#ifdef WIN32
+	#include <comdef.h>
+	#include "WindowsCommon.h"
+#endif
+
+#include "Digest.h"
+#include "XmlProcessor.h"
+#include "AbsDataCollector.h"
+#include "Version.h"
+#include "Analyzer.h"
+#include "DocumentManager.h"
+#include "DataCollector.h"
+#include "XslCommon.h"
+#include "XmlCommon.h"
+#include "EntityComparator.h"
+#include "OvalEnum.h"
+#include "Directive.h"
+#include "Log.h"
+#include "Noncopyable.h"
+
+#define EXIT_SUCCESS	0
+#define	EXIT_FAILURE	1
+#define BUFFER_SIZE 4096
 
 using namespace std;
+using namespace xercesc;
 
 namespace {
+	/** 
+	 *  Processes the commandline arguments and enforces required arguments. 
+	 *  There must be at least two arguments.  The program name and the xmlfile hash. (or
+	 *  the -m flag signifing no hash is required)
+	 */
+	void ProcessCommandLine(int argc, char* argv[]);
+
+	/** Prints out a list of option flags that can be used with this exe. */
+	void Usage();
+
 #ifdef WIN32
 	/**
 	 * Checks if we're a 32-bit process running under 64-bit
@@ -46,6 +88,19 @@ namespace {
 	 * \return true if validation succeeded, false if validation failed.
 	 */
 	bool SchematronValidate(const string &fileToValidate, const string &schematronXSLFile);
+
+	/**
+	 * Enables exception-safe init/de-init of Xerces.
+	 */
+	class XercesInitializer : private Noncopyable {
+	public:
+		XercesInitializer() {
+			XMLPlatformUtils::Initialize();
+		}
+		~XercesInitializer() {
+			XMLPlatformUtils::Terminate();
+		}
+	};
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -85,7 +140,7 @@ int main(int argc, char* argv[]) {
 	headerMessage.append("OVAL Definition Interpreter\n");
     headerMessage.append("Version: " + Version::GetVersion() + " Build: " + Version::GetBuild() +"\n");
     headerMessage.append("Build date: " + Version::GetBuildDate() + "\n");
-	headerMessage.append("Copyright (c) 2002-2012 - The MITRE Corporation\n");
+	headerMessage.append("Copyright (c) 2002-2014 - The MITRE Corporation\n");
 	headerMessage.append("----------------------------------------------------\n");
 	headerMessage.append("\nStart Time: ");
 	headerMessage.append(timeBuffer);
@@ -169,6 +224,45 @@ int main(int argc, char* argv[]) {
 		exit( EXIT_SUCCESS );
 	}
 
+#ifdef WIN32
+	// Init WindowsCommon.  I want to wait until some of the startup
+	// junk is complete, so we're not looking for windows domain controllers
+	// and stuff every time someone just wants some commandline help...
+
+	/**
+	 * Protect WindowsCommon startup/shutdown in a guard, so we make sure
+	 * its always shut down.
+	 */
+	class WindowsCommonSetupGuard {
+	public:
+		WindowsCommonSetupGuard() {
+			try {
+				WindowsCommon::init();
+			} catch (Exception &e) {
+				Log::Fatal("Initialization failure: " + e.GetErrorMessage());
+				exit(EXIT_FAILURE);
+			}
+		}
+
+		~WindowsCommonSetupGuard() {
+			// just in case... let no exceptions out!
+			// Maybe on uninit errors, I'll just let the
+			// app continue; it's probably already shutting
+			// down anyway...
+			try {
+				WindowsCommon::uninit();
+			} catch (Exception &e) {
+				Log::Fatal("Uninitialization failed: " +
+					e.GetErrorMessage());
+				//exit(EXIT_FAILURE);
+			} catch (...) {
+				Log::Fatal("Uninitialization failed!");
+				//exit(EXIT_FAILURE);
+			}
+		}
+	} windowsCommonSetupGuard;
+#endif
+
 	//////////////////////////////////////////////////////
 	//////////////  Disable All Privileges  //////////////
 	//////////////////////////////////////////////////////
@@ -230,8 +324,7 @@ int main(int argc, char* argv[]) {
 		// This means that without the second check, if the supplied datafile hash is only
 		// the first character of the real hash, then the test will succeed.
 
-		if ((STRNICMP(hashBuf.c_str(), Common::GetXMLfileMD5().c_str(), Common::GetXMLfileMD5().length()) != 0) ||
-			(STRNICMP(Common::GetXMLfileMD5().c_str(), hashBuf.c_str(), hashBuf.length()) != 0))
+		if (!Common::EqualsIgnoreCase(hashBuf, Common::GetXMLfileMD5()))
 		{
 			string errorMessage = "";
 
@@ -245,6 +338,9 @@ int main(int argc, char* argv[]) {
 			exit( EXIT_FAILURE );
 		}
 	}
+
+	// Important: gotta initialize Xerces to do any XML processing!
+	XercesInitializer xercesInit;
 
 	//////////////////////////////////////////////////////
 	////////////  parse oval.xml file	//////////////////
@@ -517,6 +613,8 @@ int main(int argc, char* argv[]) {
 	return 0;
 
 }
+
+namespace {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Functions  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -980,8 +1078,6 @@ void Usage() {
 	cout << "   -z           = return md5 of current oval-definitions file." << endl;
 	cout << endl;
 }
-
-namespace {
 
 #ifdef WIN32
 	void CheckWow64() {

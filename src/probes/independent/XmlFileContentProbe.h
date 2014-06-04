@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,43 +31,9 @@
 #ifndef XMLFILECONTENTPROBE_H
 #define XMLFILECONTENTPROBE_H
 
-#ifdef WIN32
-	#pragma warning(disable:4786)
-#endif
-
 #include "AbsProbe.h"
-#include "FileFinder.h"
 
 #include <string>
-#include <vector>
-
-// Xalan and Xerces includes
-#include <xalanc/Include/PlatformDefinitions.hpp>
-#include <cassert>
-
-#if defined(XALAN_CLASSIC_IOSTREAMS)
-#include <iostream.h>
-#else
-#include <iostream>
-#endif
-
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/framework/LocalFileInputSource.hpp>
-#include <xalanc/PlatformSupport/XSLException.hpp>
-#include <xalanc/DOMSupport/XalanDocumentPrefixResolver.hpp>
-#include <xalanc/XPath/XObject.hpp>
-#include <xalanc/XPath/NodeRefList.hpp>
-#include <xalanc/XPath/XPathEvaluator.hpp>
-#include <xalanc/XalanSourceTree/XalanSourceTreeDOMSupport.hpp>
-#include <xalanc/XalanSourceTree/XalanSourceTreeInit.hpp>
-#include <xalanc/XalanSourceTree/XalanSourceTreeParserLiaison.hpp>
-#include <xercesc/sax/EntityResolver.hpp>
-#include <xercesc/sax/InputSource.hpp>
-#include <xercesc/util/BinInputStream.hpp>
-
-// end xalan and xerces includes
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class encapsulates common functionality for the XmlFileContentProbe. 
@@ -106,37 +72,6 @@ private:
 
 	/** Return an Item for the specified xpath if is succeeds otherwise return NULL. */
 	Item* EvaluateXpath(std::string path, std::string fileName, std::string xpath);
-};
-
-/**
- * This class is an entity resolver that disables DTD resolution when
- * parsing an XML document.  This prevents unwanted network accesses.
- */
-class DummyEntityResolver : public EntityResolver
-{
-public:
-    virtual InputSource* resolveEntity(const XMLCh *const publicId, const XMLCh *const systemId);
-
-private:
-    /**
-     * An InputSource implementation which always returns a DoNothingBinInputStream.
-     */
-    class NoOpInputSource : public InputSource
-    {
-    public:
-        virtual BinInputStream* makeStream() const;
-    };
-
-    /**
-     * A BinInputStream implementation which does nothing.  Both of its methods
-     * simply return 0.
-     */
-    class DoNothingBinInputStream : public BinInputStream
-    {
-    public:
-        virtual unsigned int curPos() const;
-        virtual unsigned int readBytes(XMLByte *const toFill, const unsigned int maxToRead);
-    };
 };
 
 #endif

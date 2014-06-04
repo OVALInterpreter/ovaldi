@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,11 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <aclapi.h>
+#include <imagehlp.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tchar.h>
+
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
 #include <FsRedirectionGuard.h>
 #include <iomanip>
 #include <sstream>
+
+#include <WindowsCommon.h>
 
 #include "FileProbe.h"
 
@@ -51,199 +60,8 @@ namespace {
 //								FileProbe Class											  //	
 //****************************************************************************************//
 FileProbe* FileProbe::instance = NULL;
-map<WORD,string> FileProbe::langMap;
 
 FileProbe::FileProbe() {
-	if(langMap.size() == 0){
-		langMap[1078] = "Afrikaans";
-		langMap[1052] = "Albanian";
-		langMap[1118] = "Amharic";
-		langMap[5121] = "Arabic - Algeria";
-		langMap[15361] = "Arabic - Bahrain";
-		langMap[3073] = "Arabic - Egypt";
-		langMap[2049] = "Arabic - Iraq";
-		langMap[11265] = "Arabic - Jordan";
-		langMap[13313] = "Arabic - Kuwait";
-		langMap[12289] = "Arabic - Lebanon";
-		langMap[4097] = "Arabic - Libya";
-		langMap[6145] = "Arabic - Morocco";
-		langMap[8193] = "Arabic - Oman";
-		langMap[16385] = "Arabic - Qatar";
-		langMap[1025] = "Arabic - Saudi Arabia";
-		langMap[10241] = "Arabic - Syria";
-		langMap[7169] = "Arabic - Tunisia";
-		langMap[14337] = "Arabic - United Arab Emirates";
-		langMap[9217] = "Arabic - Yemen";
-		langMap[1067] = "Armenian";
-		langMap[1101] = "Assamese";
-		langMap[2092] = "Azeri - Cyrillic";
-		langMap[1068] = "Azeri - Latin";
-		langMap[1069] = "Basque";
-		langMap[1059] = "Belarusian";
-		langMap[2117] = "Bengali - Bangladesh";
-		langMap[1093] = "Bengali - India";
-		langMap[5146] = "Bosnian";
-		langMap[1026] = "Bulgarian";
-		langMap[1109] = "Burmese";
-		langMap[1027] = "Catalan";
-		langMap[2052] = "Chinese - China";
-		langMap[3076] = "Chinese - Hong Kong SAR";
-		langMap[5124] = "Chinese - Macau SAR";
-		langMap[4100] = "Chinese - Singapore";
-		langMap[1028] = "Chinese - Taiwan";
-		langMap[1050] = "Croatian";
-		langMap[1029] = "Czech";
-		langMap[1030] = "Danish";
-		langMap[1125] = "Divehi";
-		langMap[2067] = "Dutch - Belgium";
-		langMap[1043] = "Dutch - Netherlands";
-		langMap[1126] = "Edo";
-		langMap[3081] = "English - Australia";
-		langMap[10249] = "English - Belize";
-		langMap[4105] = "English - Canada";
-		langMap[9225] = "English - Caribbean";
-		langMap[2057] = "English - Great Britain";
-		langMap[16393] = "English - India";
-		langMap[6153] = "English - Ireland";
-		langMap[8201] = "English - Jamaica";
-		langMap[5129] = "English - New Zealand";
-		langMap[13321] = "English - Phillippines";
-		langMap[7177] = "English - Southern Africa";
-		langMap[11273] = "English - Trinidad";
-		langMap[1033] = "English - United States";
-		langMap[12297] = "English - Zimbabwe";
-		langMap[1061] = "Estonian";
-		langMap[1080] = "Faroese";
-		langMap[1065] = "Farsi - Persian";
-		langMap[1124] = "Filipino";
-		langMap[1035] = "Finnish";
-		langMap[2060] = "French - Belgium";
-		langMap[11276] = "French - Cameroon";
-		langMap[3084] = "French - Canada";
-		langMap[9228] = "French - Congo";
-		langMap[12300] = "French - Cote d'Ivoire";
-		langMap[1036] = "French - France";
-		langMap[5132] = "French - Luxembourg";
-		langMap[13324] = "French - Mali";
-		langMap[6156] = "French - Monaco";
-		langMap[14348] = "French - Morocco";
-		langMap[10252] = "French - Senegal";
-		langMap[4108] = "French - Switzerland";
-		langMap[7180] = "French - West Indies";
-		langMap[1122] = "Frisian - Netherlands";
-		langMap[1071] = "FYRO Macedonia";
-		langMap[2108] = "Gaelic - Ireland";
-		langMap[1084] = "Gaelic - Scotland";
-		langMap[1110] = "Galician";
-		langMap[1079] = "Georgian";
-		langMap[3079] = "German - Austria";
-		langMap[1031] = "German - Germany";
-		langMap[5127] = "German - Liechtenstein";
-		langMap[4103] = "German - Luxembourg";
-		langMap[2055] = "German - Switzerland";
-		langMap[1032] = "Greek";
-		langMap[1140] = "Guarani - Paraguay";
-		langMap[1095] = "Gujarati";
-		langMap[1037] = "Hebrew";
-		langMap[1279] = "HID (Human Interface Device)";
-		langMap[1081] = "Hindi";
-		langMap[1038] = "Hungarian";
-		langMap[1039] = "Icelandic";
-		langMap[1136] = "Igbo - Nigeria";
-		langMap[1057] = "Indonesian";
-		langMap[1040] = "Italian - Italy";
-		langMap[2064] = "Italian - Switzerland";
-		langMap[1041] = "Japanese";
-		langMap[1099] = "Kannada";
-		langMap[1120] = "Kashmiri";
-		langMap[1087] = "Kazakh";
-		langMap[1107] = "Khmer";
-		langMap[1111] = "Konkani";
-		langMap[1042] = "Korean";
-		langMap[1088] = "Kyrgyz - Cyrillic";
-		langMap[1108] = "Lao";
-		langMap[1142] = "Latin";
-		langMap[1062] = "Latvian";
-		langMap[1063] = "Lithuanian";
-		langMap[2110] = "Malay - Brunei";
-		langMap[1086] = "Malay - Malaysia";
-		langMap[1100] = "Malayalam";
-		langMap[1082] = "Maltese";
-		langMap[1112] = "Manipuri";
-		langMap[1153] = "Maori";
-		langMap[1102] = "Marathi";
-		langMap[2128] = "Mongolian";
-		langMap[1104] = "Mongolian";
-		langMap[1121] = "Nepali";
-		langMap[1044] = "Norwegian - Bokml";
-		langMap[2068] = "Norwegian - Nynorsk";
-		langMap[1096] = "Oriya";
-		langMap[1045] = "Polish";
-		langMap[1046] = "Portuguese - Brazil";
-		langMap[2070] = "Portuguese - Portugal";
-		langMap[1094] = "Punjabi";
-		langMap[1047] = "Raeto-Romance";
-		langMap[2072] = "Romanian - Moldova";
-		langMap[1048] = "Romanian - Romania";
-		langMap[1049] = "Russian";
-		langMap[2073] = "Russian - Moldova";
-		langMap[1083] = "Sami Lappish";
-		langMap[1103] = "Sanskrit";
-		langMap[3098] = "Serbian - Cyrillic";
-		langMap[2074] = "Serbian - Latin";
-		langMap[1072] = "Sesotho (Sutu)";
-		langMap[1074] = "Setsuana";
-		langMap[1113] = "Sindhi";
-		langMap[1115] = "Sinhala";
-		langMap[1051] = "Slovak";
-		langMap[1060] = "Slovenian";
-		langMap[1143] = "Somali";
-		langMap[1070] = "Sorbian";
-		langMap[11274] = "Spanish - Argentina";
-		langMap[16394] = "Spanish - Bolivia";
-		langMap[13322] = "Spanish - Chile";
-		langMap[9226] = "Spanish - Colombia";
-		langMap[5130] = "Spanish - Costa Rica";
-		langMap[7178] = "Spanish - Dominican Republic";
-		langMap[12298] = "Spanish - Ecuador";
-		langMap[17418] = "Spanish - El Salvador";
-		langMap[4106] = "Spanish - Guatemala";
-		langMap[18442] = "Spanish - Honduras";
-		langMap[2058] = "Spanish - Mexico";
-		langMap[19466] = "Spanish - Nicaragua";
-		langMap[6154] = "Spanish - Panama";
-		langMap[15370] = "Spanish - Paraguay";
-		langMap[10250] = "Spanish - Peru";
-		langMap[20490] = "Spanish - Puerto Rico";
-		langMap[1034] = "Spanish - Spain (Traditional)";
-		langMap[14346] = "Spanish - Uruguay";
-		langMap[8202] = "Spanish - Venezuela";
-		langMap[1089] = "Swahili";
-		langMap[2077] = "Swedish - Finland";
-		langMap[1053] = "Swedish - Sweden";
-		langMap[1114] = "Syriac";
-		langMap[1064] = "Tajik";
-		langMap[1097] = "Tamil";
-		langMap[1092] = "Tatar";
-		langMap[1098] = "Telugu";
-		langMap[1054] = "Thai";
-		langMap[1105] = "Tibetan";
-		langMap[1073] = "Tsonga";
-		langMap[1055] = "Turkish";
-		langMap[1090] = "Turkmen";
-		langMap[1058] = "Ukrainian";
-		langMap[0] = "Unicode";
-		langMap[1056] = "Urdu";
-		langMap[2115] = "Uzbek - Cyrillic";
-		langMap[1091] = "Uzbek - Latin";
-		langMap[1075] = "Venda";
-		langMap[1066] = "Vietnamese";
-		langMap[1106] = "Welsh";
-		langMap[1076] = "Xhosa";
-		langMap[1085] = "Yiddish";
-		langMap[1077] = "Zulu";
-
-	}
 }
 
 FileProbe::~FileProbe() {
@@ -296,21 +114,20 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 				Item* item = NULL;
 
 				// check if the code should report that the filename does not exist.
-				StringVector fileNames;
-				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
+				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName)) {
 
-					StringVector::iterator iterator;
-					for(iterator = fileNames.begin(); iterator != fileNames.end(); iterator++) {
-
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath",Common::BuildFilePath(fp->first,*iterator),OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("windows_view",
-							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-						collectedItems->push_back(item);
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);					
+					ItemEntity* filepath = new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
+					item->AppendElement(filepath);
+					ItemEntity* path = new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);	
+					item->AppendElement(path);
+					ItemEntity* filename = new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);	
+					item->AppendElement(filename);
+							
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+					collectedItems->push_back(item);
 					
 				} else {
 
@@ -345,24 +162,30 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 		if ( filePath != NULL ){
 			StringVector fpaths;
 			if (fileFinder.ReportFilePathDoesNotExist(filePath,&fpaths)){
-				StringVector statusValues;
 				Item* item = NULL;
 				StringPair* fpComponents = NULL;
 
 				// build path ObjectEntity to pass to ReportPathDoesNotExist to retrieve the status of the path value
 				ObjectEntity* pathStatus = new ObjectEntity("path","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
-				// build filename ObjectEntity to pass to ReportFileNameDoesNotExist to retrieve the status of the filename value
-				ObjectEntity* fileNameStatus = new ObjectEntity("filename","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
 				
 				for(StringVector::iterator iterator = fpaths.begin(); iterator != fpaths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
-					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					ItemEntity* filepath = new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
+					item->AppendElement(filepath);
+					bool pathDoesntExist = fileFinder.ReportPathDoesNotExist(pathStatus);
+					ItemEntity *path;
+					if (pathDoesntExist)
+						path = new ItemEntity("path", "", 
+							OvalEnum::DATATYPE_STRING, 
+							OvalEnum::STATUS_DOES_NOT_EXIST);
+					else
+						path = new ItemEntity("path", fpComponents->first);	
+					item->AppendElement(path);
+					ItemEntity* filename = new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(filename);
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
@@ -377,24 +200,17 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 					delete pathStatus;
 					pathStatus = NULL;
 				}
-				if ( fileNameStatus != NULL ){
-					delete fileNameStatus;
-					fileNameStatus = NULL;
-				}
 			}
 		}else{
-			StringVector paths;
-			if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+			if(fileFinder.ReportPathDoesNotExist(path)) {
 				Item* item = NULL;
-				StringVector::iterator iterator;
-				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("windows_view",
-						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-					collectedItems->push_back(item);
-				}
+				item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				ItemEntity* path = new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
+				item->AppendElement(path);
+				item->AppendElement(new ItemEntity("windows_view",
+					(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+				collectedItems->push_back(item);
 			}
 		}
 	}
@@ -590,71 +406,44 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		/////////////////////  FileSize  /////////////////////
 		//////////////////////////////////////////////////////
 
-		struct _stat statusBuffer;
-		int result;
- 
-		// Get status information associated with the file.
+		// Get size of file.
+		WIN32_FILE_ATTRIBUTE_DATA wfad;
 		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-		result = _stat(filePath.c_str(), &statusBuffer);
+		ok = GetFileAttributesEx(filePath.c_str(), GetFileExInfoStandard, &wfad);
 		FS_REDIRECT_GUARD_END
-		if (result < 0) {
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get status information ");
-			errorMessage.append("associated with the file: '");
-			errorMessage.append(filePath);
-			errorMessage.append("'.");
-			
-			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
+		if (!ok) {
+			string errorMessage = string("Unable to get file attributes: ") +
+				WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage(errorMessage));
-			
-		} else {
-			item->AppendElement(new ItemEntity("size", Common::ToString(statusBuffer.st_size), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-		}
 
-
-		//////////////////////////////////////////////////////
-		/////////////////////  File Times  ///////////////////
-		//////////////////////////////////////////////////////
-		FILETIME creationTime;
-		FILETIME lastAccessTime;
-		FILETIME writeTime;
-
-		BOOL timeRes = GetFileTime(	hFile,
-									&creationTime,   //c_time
-									&lastAccessTime, //a_time
-									&writeTime);     //m_time
-
-		if(!timeRes) {
-
+			item->AppendElement(new ItemEntity("size", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
 			ItemEntity* aTime = new ItemEntity("a_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
 			item->AppendElement(aTime);
             ItemEntity* cTime = new ItemEntity("c_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(cTime);
 			ItemEntity* mTime = new ItemEntity("m_time",  "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR);
             item->AppendElement(mTime);
-			string lastError = WindowsCommon::GetErrorMessage(GetLastError());
-			item->AppendMessage(new OvalMessage("Unable to file times for file. " + lastError, OvalEnum::LEVEL_ERROR));
-
 		} else {
-			
+			item->AppendElement(new ItemEntity("size",
+				Common::ToString((((UINT64)wfad.nFileSizeHigh)<<32) | wfad.nFileSizeLow),
+				OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 			//////////////////////////////////////////////////////
 			/////////////////////  Accessed  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(lastAccessTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
+			ItemEntity* aTime = new ItemEntity("a_time", WindowsCommon::ToString(wfad.ftLastAccessTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(aTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Created  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(creationTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
+			ItemEntity* cTime = new ItemEntity("c_time", WindowsCommon::ToString(wfad.ftCreationTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(cTime);
 
 			//////////////////////////////////////////////////////
 			/////////////////////  Modified  /////////////////////
 			//////////////////////////////////////////////////////
-			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(writeTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
+			ItemEntity* mTime = new ItemEntity("m_time", WindowsCommon::ToString(wfad.ftLastWriteTime), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS);
 			item->AppendElement(mTime);
-
 		}
 
 		//////////////////////////////////////////////////////
@@ -745,12 +534,18 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 				WORD* langInfo;        
 				UINT cbLang;
 				VerQueryValue(versionbuf, _T("\\VarFileInfo\\Translation"),(LPVOID*)&langInfo, &cbLang);  
-				
-				if(langMap.count(langInfo[0]) > 0){
-					language->SetValue(langMap[langInfo[0]]);
+				DWORD lcid = langInfo[0];
+				LPTSTR szLang = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * 100 );
+				if(VerLanguageName(lcid, szLang, 100) != 0){
+					language->SetValue(Common::ToString(szLang));
 					language->SetStatus(OvalEnum::STATUS_EXISTS);
+					
 				}else{
 					language->SetStatus(OvalEnum::STATUS_ERROR);
+				}
+				if ( szLang != NULL ) {
+					free ( szLang );
+					szLang = NULL;
 				}
 
 				//////////////////////////////////////////////////////
@@ -818,7 +613,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		/////////////////////  FileType  /////////////////////
 		//////////////////////////////////////////////////////
 
-		this->GetType(hFile, filePath, item, type, fileFinder);
+		this->GetType(hFile, filePath, item, type, wfad);
 
 		//////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////
@@ -874,27 +669,19 @@ void FileProbe::GetVersion(LPVOID versionbuf, string filePath, Item *item, ItemE
 	}
 }
 
-void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder) {
+void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* type,
+		const WIN32_FILE_ATTRIBUTE_DATA &lpFileInformation) {
 
 	DWORD res = GetFileType(hFile);
-
-	BOOL gfaRes;
-	WIN32_FILE_ATTRIBUTE_DATA lpFileInformation;
 
 	switch (res) {
 
 		case FILE_TYPE_DISK:
 
-			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-			gfaRes = GetFileAttributesEx(filePath.c_str(),				// file or directory name
-										 GetFileExInfoStandard,			// attribute class
-										 (LPVOID)&lpFileInformation);	// attribute information 
-			FS_REDIRECT_GUARD_END
-
-			if (lpFileInformation.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+			if (lpFileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				type->SetValue("FILE_ATTRIBUTE_DIRECTORY");
 			else
-					type->SetValue("FILE_TYPE_DISK");
+				type->SetValue("FILE_TYPE_DISK");
 
 			type->SetStatus(OvalEnum::STATUS_EXISTS);
 
@@ -912,18 +699,7 @@ void FileProbe::GetType(HANDLE hFile, string filePath, Item *item, ItemEntity* t
 			type->SetStatus(OvalEnum::STATUS_EXISTS);
 			break;
 
-		case FILE_TYPE_UNKNOWN:
-			{
-				string errorMessage = "";
-				errorMessage.append("(FileProbe) No file type information available for the file: '");
-				errorMessage.append(filePath);
-				errorMessage.append("'");
-				item->AppendMessage(new OvalMessage(errorMessage));
-				type->SetStatus(OvalEnum::STATUS_ERROR);
-			}
-			
-			break;
-
+		/* case FILE_TYPE_UNKNOWN: */
 		default:
 			{
 				string errorMessage = "";

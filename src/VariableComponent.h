@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,27 +32,29 @@
 #define VARIABLECOMPONENT_H
 
 #include "AbsComponent.h"
-#include "VariableFactory.h"
 #include "AbsVariable.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a VariableComponent in a local_variable in the oval definition schema.
 */
 class VariableComponent : public AbsComponent {
 public:
-	VariableComponent(AbsVariable* varRef = NULL);
-	~VariableComponent();
+	VariableComponent(AbsVariable* varRef = NULL) : varRef(varRef)
+	{}
+	virtual ~VariableComponent()
+	{}
 
-	void Parse(DOMElement* componentElm); 
-	ComponentValue* ComputeValue();
+	virtual void Parse(xercesc::DOMElement* componentElm); 
+	virtual ComponentValue* ComputeValue();
 
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
-	AbsVariable* GetVarRef();
-	void SetVarRef(AbsVariable* varRef);
+	const AbsVariable* GetVarRef() const {
+		return this->varRef;
+	}
+	void SetVarRef(AbsVariable* varRef) {
+		this->varRef = varRef;
+	}
 
 private:
 	AbsVariable* varRef;

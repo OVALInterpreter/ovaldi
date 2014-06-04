@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -73,6 +73,7 @@
 #  include <WindowsCommon.h>
 #  undef _NTDEF_
 #elif defined DARWIN
+#  include <unistd.h>
 #  include <map>
 #  include <memory>
 #  include <string>
@@ -579,7 +580,7 @@ namespace {
 			// search for '='
 			const CType *eq = beg;
 			while (*eq && *eq != CType('=')) ++eq;
-			if (eq) {
+			if (*eq) {
 				env[SType(beg, eq)] = SType(eq+1);
 				beg = eq;
 				while (*beg) ++beg; // skip to the end of the entry

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,20 +30,16 @@
 #ifndef LDAPPROBE_H
 #define LDAPPROBE_H
 
-#include "AbsProbe.h"
-#include "REGEX.h"
-
 #ifdef WIN32
 #include "Winldap.h"
-#include "Winber.h"
-#include "Dsgetdc.h"
-#include "Lm.h"
 #endif
 
 #if defined LINUX || defined SUNOS || defined DARWIN
 #include "ldap.h"
 typedef int ULONG;
 #endif
+
+#include "AbsProbe.h"
 
 /**
 	This class is responsible for collecting ldap information for ldap_objects.

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
+#include "XmlCommon.h"
+
 #include "StringEntityValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								StringEntityValue Class										  //	
@@ -48,7 +54,7 @@ StringEntityValue::~StringEntityValue(){
 
 }
 
-void StringEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* entityElm){
+void StringEntityValue::Write(DOMDocument* scFile, DOMElement* entityElm){
     XMLCh *name = XMLString::transcode(this->GetValue().c_str());
 	DOMText* newItemEntityElemValue = scFile->createTextNode(name);
 	entityElm->appendChild(newItemEntityElemValue);

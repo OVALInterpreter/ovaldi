@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,13 +31,11 @@
 #ifndef ABSCOMPONENT_H
 #define ABSCOMPONENT_H
 
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
 #include "VariableValue.h"
 #include "ComponentValue.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This calss is the base class for all types of variable components.
@@ -48,14 +46,16 @@ XERCES_CPP_NAMESPACE_USE
 class AbsComponent {
 public:
 	/** Create complete AbsComponent. */
-	AbsComponent();
+	AbsComponent()
+	{}
 
-	virtual ~AbsComponent();
+	virtual ~AbsComponent()
+	{}
 
 	/** Parse a compnent element.
 		Each concrete component has a slightly different corresponding element to parse.
 	*/
-	virtual void Parse(DOMElement* componentElm) = 0;
+	virtual void Parse(xercesc::DOMElement* componentElm) = 0;
     /**
      * Compute the value for the AbsComponent.
      * Each concrete component computes its value differently.  However, there are
@@ -73,7 +73,7 @@ public:
 	/** Return the variable values used to compute the concrete component's value.
 		Each concrete component uses variables differently and will return this set differently.
 	*/
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual VariableValueVector GetVariableValues() = 0;
 };
 
 /**

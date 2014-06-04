@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -155,15 +155,15 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 								collectedItems->push_back(item);
 
 							} else {
-
+								VariableValueVector vals = localPort->GetVarRef()->GetValues();
 								VariableValueVector::iterator iterator;
-								for(iterator = localPort->GetVarRef()->GetValues()->begin(); iterator != localPort->GetVarRef()->GetValues()->end(); iterator++) {
+								for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 									Item* item = this->CreateItem();
 									item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 									item->AppendElement(new ItemEntity("protocol",  protocolStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 									item->AppendElement(new ItemEntity("local_address",  localAddressStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-									item->AppendElement(new ItemEntity("local_port", (*iterator)->GetValue(), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST));
+									item->AppendElement(new ItemEntity("local_port", iterator->GetValue(), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST));
 									collectedItems->push_back(item);
 								}
 							}
@@ -187,14 +187,14 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 						collectedItems->push_back(item);
 
 					} else {
-
+						VariableValueVector vals = localAddress->GetVarRef()->GetValues();
 						VariableValueVector::iterator iterator;
-						for(iterator = localAddress->GetVarRef()->GetValues()->begin(); iterator != localAddress->GetVarRef()->GetValues()->end(); iterator++) {
+						for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 							Item* item = this->CreateItem();
 							item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 							item->AppendElement(new ItemEntity("protocol",  protocolStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-							item->AppendElement(new ItemEntity("local_address",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+							item->AppendElement(new ItemEntity("local_address",  iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 							collectedItems->push_back(item);
 						}
 					}
@@ -217,13 +217,13 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 				collectedItems->push_back(item);
 
 			} else {
-
+				VariableValueVector vals = protocol->GetVarRef()->GetValues();
 				VariableValueVector::iterator iterator;
-				for(iterator = protocol->GetVarRef()->GetValues()->begin(); iterator != protocol->GetVarRef()->GetValues()->end(); iterator++) {
+				for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("protocol",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("protocol", iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -298,11 +298,12 @@ StringVector* InetListeningServersProbe::GetProtocols(ObjectEntity* protocol) {
 			// in the case of equals simply loop through all the 
 			// variable values and add them to the set of all names
 			// if they exist on the system
+			VariableValueVector vals = protocol->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for(iterator = protocol->GetVarRef()->GetValues()->begin(); iterator != protocol->GetVarRef()->GetValues()->end(); iterator++) {
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 				
-				if(this->ProtocolExists((*iterator)->GetValue())) {
-					allProtocols.push_back((*iterator)->GetValue());
+				if(this->ProtocolExists(iterator->GetValue())) {
+					allProtocols.push_back(iterator->GetValue());
 				}
 			}
 
@@ -410,11 +411,12 @@ StringVector* InetListeningServersProbe::GetLocalAddresses(string protocolStr, O
 			// in the case of equals simply loop through all the 
 			// variable values and add them to the set of all names
 			// if they exist on the system
+			VariableValueVector vals = localAddress->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for(iterator = localAddress->GetVarRef()->GetValues()->begin(); iterator != localAddress->GetVarRef()->GetValues()->end(); iterator++) {
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 				
-				if(this->LocalAddressExists(protocolStr, (*iterator)->GetValue())) {
-					allLocalAddresses.push_back((*iterator)->GetValue());
+				if(this->LocalAddressExists(protocolStr, iterator->GetValue())) {
+					allLocalAddresses.push_back(iterator->GetValue());
 				}
 			}
 
@@ -526,11 +528,12 @@ StringVector* InetListeningServersProbe::GetLocalPorts(string protocolStr, strin
 			// in the case of equals simply loop through all the 
 			// variable values and add them to the set of all names
 			// if they exist on the system
+			VariableValueVector vals = localPort->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for(iterator = localPort->GetVarRef()->GetValues()->begin(); iterator != localPort->GetVarRef()->GetValues()->end(); iterator++) {
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 				
-				if(this->LocalPortExists(protocolStr, localAddressStr, (*iterator)->GetValue())) {
-					allLocalPorts.push_back((*iterator)->GetValue());
+				if(this->LocalPortExists(protocolStr, localAddressStr, iterator->GetValue())) {
+					allLocalPorts.push_back(iterator->GetValue());
 				}
 			}
 

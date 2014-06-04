@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,8 +28,33 @@
 //
 //****************************************************************************************//
 
+#include <ntstatus.h>
+
+// prevents winnt.h from redefining a bunch of NTSTATUS
+// constants (which causes compiler warnings), which we are
+// instead getting from ntstatus.h.  I chose to get them from
+// ntstatus.h since it defines STATUS_SUCCESS which
+// some security APIs are documented to return.  For whatever 
+// reason, winnt.h defines a bunch of ntstatus constants, but not
+// that one!
+#define WIN32_NO_STATUS
+
+#include <Windows.h>
+
+// This seems to define DEFINE_GUID (used in ntsecapi.h) to create
+// exported symbols for audit policy subcategories, rather than
+// imports.  Why don't they define them in one of their
+// own DLLs and provide them to us??
+#include <InitGuid.h>
+
+#include <NTSecAPI.h>
+
 #include <Common.h>
+#include "Log.h"
+
 #include "AuditEventPolicySubcategoriesProbe.h"
+
+using namespace std;
 
 typedef pair<GUID, string> GuidString;
 vector<GuidString> _guidItemElementNameVector;
@@ -84,20 +109,16 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 					&lsahPolicyHandle				// Receives the policy handle.
 					);
 
-		Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - After call to LsaOpenPolicy()");
-
-		if (ntsResult != ERROR_SUCCESS) {
+		if (ntsResult != STATUS_SUCCESS) {
 			DWORD errorCode = LsaNtStatusToWinError(ntsResult);
 			if(errorCode == ERROR_MR_MID_NOT_FOUND) {
-				throw ProbeException("Error obtaining audit event policy information - (win32) " + Common::ToString(LsaNtStatusToWinError(ntsResult)));
+				throw ProbeException("Error obtaining audit event policy information - (win32) " + Common::ToString(ntsResult));
 			} else {
 				throw ProbeException("Error obtaining audit event policy information - (win32) " + WindowsCommon::GetErrorMessage(errorCode));
 			}
 		} 
 
-		ntsResult = ERROR_SUCCESS;
-
-		Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - About to call LsaQueryInformationPolicy()");
+		ntsResult = STATUS_SUCCESS;
 
 		ntsResult = LsaQueryInformationPolicy(
 					lsahPolicyHandle,                // Open handle to a Policy object.
@@ -105,9 +126,7 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 					(PVOID *)&pPAEInfo               // Storage for the information.
 					);
 
-		Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - After call to LsaQueryInformationPolicy()");
-
-		if (ntsResult == ERROR_SUCCESS) {  
+		if (ntsResult == STATUS_SUCCESS) {  
 
 			item = this->CreateItem();
 			item->SetStatus(OvalEnum::STATUS_EXISTS);
@@ -121,7 +140,6 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 
 			// if auditing is turned on loop through the auditing options
 			if(pPAEInfo->AuditingMode) {
-				Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - pPAEInfo->AuditingMode is true");
 
 				// Cycle through event categories, 
 				// in each category collect the subcategory setting and stuff into the item			
@@ -130,22 +148,17 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 					GUID auditCategoryId;
 					ULONG subCategoryCount = 0;
 
-					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditLookupCategoryGuidFromCategoryId()");
 					if(AuditLookupCategoryGuidFromCategoryId((POLICY_AUDIT_EVENT_TYPE)policyAuditEventType, &auditCategoryId) == FALSE) {
 						throw ProbeException("Error retrieving category GUID.  ErrorCode:" + Common::ToString(GetLastError()));
 					}
 
-					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditLookupCategoryGuidFromCategoryId()");
 					if(AuditEnumerateSubCategories(&auditCategoryId, FALSE, &pAuditSubCategoryGuids, &subCategoryCount) == FALSE) {
 						throw ProbeException("Error enumerating audit event policy subcategories.  Error Code:" + Common::ToString(GetLastError()));
 					}
 
-					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before call to AuditQuerySystemPolicy()");
 					if(AuditQuerySystemPolicy(pAuditSubCategoryGuids, subCategoryCount, &pAuditPolicies) == FALSE) {
 						throw ProbeException("Error retrieving policy information for audit event policy subcategories.  Error Code:" + Common::ToString(GetLastError()));
 					}
-
-					Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - Before subcategories loop.  Count=" + Common::ToString(subCategoryCount));
 
 					// Probe each subcategory in the category
 					for(ULONG subcategoryIndex = 0; subcategoryIndex < subCategoryCount; subcategoryIndex++) {
@@ -156,7 +169,6 @@ ItemVector* AuditEventPolicySubcategoriesProbe::CollectItems(Object* /*object*/)
 							for(StringSet::iterator it = itemEntityNames->begin(); it != itemEntityNames->end(); it++){
 								string itemEntityName = *it;
 								if(itemEntityName.compare("") != 0) {
-									Log::Debug("AuditEventPolicySubcategoriesProbe::CollectItems() - itemEntityName=" + itemEntityName);
 									ItemEntity *pItemEntity = NULL;
 									//loop through, grab reference to ItemEntity in-place
 									for(ItemEntityVector::iterator itemEntityIterator = (item->GetElements())->begin(); itemEntityIterator != item->GetElements()->end(); itemEntityIterator++) {

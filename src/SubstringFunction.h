@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,9 +32,6 @@
 #define SUBSTRINGFUNCTION_H
 
 #include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a SubstringFunction component in a local_variable in the oval definition schema.
@@ -43,27 +40,38 @@ class SubstringFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete SubstringFunction object. */
-	SubstringFunction(int start = 0, int length = 0);
-	~SubstringFunction();
+	SubstringFunction(int start = 0, int length = 0)
+		: start(start), length(length)
+	{}
+	virtual ~SubstringFunction()
+	{}
 
 	/** Parse the substring element and its child component elements. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the values. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the start field's value. */
-	int GetStart();
+	int GetStart() const {
+		return this->start;
+	}
 	/** Set the start field's value. */
-	void SetStart(int start);
+	void SetStart(int start) {
+		this->start = start;
+	}
 
 	/** Get the length field's value. */
-	int GetLength();
+	int GetLength() const {
+		return this->length;
+	}
 	/** Set the length field's value. */
-	void SetLength(int length);
+	void SetLength(int length) {
+		this->length = length;
+	}
 
 private:
 	int start;

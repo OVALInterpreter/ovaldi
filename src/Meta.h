@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,6 +30,12 @@
 
 #ifndef META_H
 #define META_H
+
+// to give us a wchar_t type, which we need
+// since ovaldi is built without wchar_t being
+// builtin type.  I tried to choose a small
+// header that has the typedef....
+#include <BaseTyps.h>
 
 /**
  * \file

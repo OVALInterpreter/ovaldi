@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,9 +31,10 @@
 #ifndef POSSIBLEVALUETYPE_H
 #define POSSIBLEVALUETYPE_H
 
-#include "Common.h"
+#include <vector>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "OvalEnum.h"
-#include "EntityComparator.h"
 
 class PossibleValueType;
 
@@ -46,20 +47,30 @@ class PossibleValueType {
 public:
 
 	/** Create a PossibleValueType. */
-	PossibleValueType();
-	~PossibleValueType();
+	PossibleValueType()
+	{}
+	~PossibleValueType()
+	{}
 
 	/** Parses a valid PossibleValueType element as defined in the oval definitions schema. */
-	void Parse(DOMElement* possibleElm);
+	void Parse(xercesc::DOMElement* possibleElm);
 
 	/** Ensure that the specified value matches the criteria specified by this possible_value element. */
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
-	void SetHint(std::string hint);
-	std::string GetHint();
+	void SetHint(std::string hint) {
+		this->hint = hint;
+	}
+	std::string GetHint() const {
+		return this->hint;
+	}
 
-	void SetValue(std::string value);
-	std::string GetValue();
+	void SetValue(std::string value) {
+		this->value = value;
+	}
+	std::string GetValue() const {
+		return this->value;
+	}
 
 private:
 	std::string hint;

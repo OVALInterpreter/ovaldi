@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,21 +30,11 @@
 #ifndef DNSCACHEPROBE_H
 #define DNSCACHEPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include <windns.h>
-
-typedef struct _DnsCacheEntry{
-    struct _DnsCacheEntry* pNext;  // Pointer to next entry
-    PWSTR pszName;                 // DNS Record Name
-    unsigned short wType;          // DNS Record Type
-    unsigned short wDataLength;    // Not referenced
-    unsigned long  dwFlags;        // DNS Record Flags
-}DNSCACHEENTRY;
-
-typedef BOOL (WINAPI DnsGetCacheDataTableAddress)(DNSCACHEENTRY** ppCacheEntry);
+#include "Item.h"
+#include "Object.h"
 
 /**
 	This class is responsible for collecting information for windows dnscache_objects.
@@ -83,7 +73,7 @@ private:
 	/** Retrieve the IP addresses and TTL for the specified domain name and create a Item with them.
 		@return A Item for the specified domain name. 
 	*/
-	Item* GetDnsCacheItem(string domainName);
+	Item* GetDnsCacheItem(std::string domainName);
 };
 
 #endif

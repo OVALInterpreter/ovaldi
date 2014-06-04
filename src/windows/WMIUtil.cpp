@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,23 @@
 //
 //****************************************************************************************//
 
+#include <windows.h>
+#include <comdef.h>
+#include <Dsgetdc.h>
+#include <Lm.h>
+#include <Wbemidl.h>
+
+#include "Common.h"
+#include "Exception.h"
+#include "Log.h"
+
 #include "WMIUtil.h"
+
+using namespace std;
+
+namespace {
+	string GetStringFromVariant(VARIANT value);
+}
 
 static IEnumWbemClassObject* pEnumerator = NULL;
 static IWbemLocator *pLoc = NULL;
@@ -153,61 +169,66 @@ void WMIUtil::Close() {
 	}
 }
 
-std::string WMIUtil::GetStringFromVariant(VARIANT value) {
+namespace {
 
-	std::string stringValue = "";
+	string GetStringFromVariant(VARIANT value) {
 
-	if ((V_VT(&value) == VT_BSTR)) {
-		char* szChar = NULL;
-		size_t size = 0;
-		if((size = wcstombs(0, value.bstrVal, 0)) != -1) 
-		{
-			szChar = new char[size + 1];
-			szChar[size] = NULL;
-			wcstombs(szChar, value.bstrVal, size);
-			stringValue = szChar;		
+		string stringValue = "";
+
+		if ((V_VT(&value) == VT_BSTR)) {
+			char* szChar = NULL;
+			size_t size = 0;
+			if((size = wcstombs(0, value.bstrVal, 0)) != -1) 
+			{
+				szChar = new char[size + 1];
+				szChar[size] = NULL;
+				wcstombs(szChar, value.bstrVal, size);
+				stringValue = szChar;		
 						
-			delete(szChar);
+				delete(szChar);
+			} else {
+				// TODO - currently logging the error, but should an exception be thrown?
+				Log::Debug("WMIUtil::GetStringFromVariant() - Error converting value to string.");
+			}
+		} else if ((V_VT(&value) == VT_UINT)) {
+			unsigned int intValue = V_INT(&value);
+			stringValue = Common::ToString(intValue);
+		} else if ((V_VT(&value) == VT_BOOL)) {
+			BOOL boolValue = V_BOOL(&value);
+			if(boolValue == FALSE) {
+				stringValue = "0";
+			} else {
+				stringValue = "1";
+			}
+		} else if ((V_VT(&value) == VT_DATE)) {
+			//TODO - need to format VT_DATE
+		} else if ((V_VT(&value) == VT_DECIMAL)) {
+			//TODO - need to format VT_DECIMAL
+		} else if ((V_VT(&value) == VT_FILETIME)) {
+			//TODO - need to format VT_FILETIME
+		} else if ((V_VT(&value) == VT_INT)) {
+			int intValue = V_INT(&value);
+			stringValue = Common::ToString(intValue);
+		} else if ((V_VT(&value) == VT_I1)) {
+			char charValue = V_I1(&value);
+			stringValue += charValue;
+		} else if ((V_VT(&value) == VT_I2)) {
+			int intValue = V_I2(&value);
+			stringValue = Common::ToString(intValue);
+		} else if ((V_VT(&value) == VT_I4)) {
+			char valBuf[20];
+			long longValue = V_I4(&value);
+			stringValue = _ltoa(longValue, valBuf, 10);
+		} else if ((V_VT(&value) == VT_I8)) {
+			// TODO - need to format VT_I8
+		} else if ((V_VT(&value) == VT_NULL)) {
+			// TODO - Not sure what to do with VT_NULL
 		} else {
-			// TODO - currently logging the error, but should an exception be thrown?
-			Log::Debug("WMIUtil::GetStringFromVariant() - Error converting value to string.");
+			// TODO Unsupported data type
 		}
-	} else if ((V_VT(&value) == VT_UINT)) {
-		unsigned int intValue = V_INT(&value);
-        stringValue = Common::ToString(intValue);
-	} else if ((V_VT(&value) == VT_BOOL)) {
-		BOOL boolValue = V_BOOL(&value);
-		if(boolValue == FALSE) {
-			stringValue = "0";
-		} else {
-			stringValue = "1";
-		}
-	} else if ((V_VT(&value) == VT_DATE)) {
-		//TODO - need to format VT_DATE
-	} else if ((V_VT(&value) == VT_DECIMAL)) {
-		//TODO - need to format VT_DECIMAL
-	} else if ((V_VT(&value) == VT_FILETIME)) {
-		//TODO - need to format VT_FILETIME
-	} else if ((V_VT(&value) == VT_INT)) {
-		int intValue = V_INT(&value);
-		stringValue = Common::ToString(intValue);
-	} else if ((V_VT(&value) == VT_I1)) {
-		char charValue = V_I1(&value);
-		stringValue += charValue;
-	} else if ((V_VT(&value) == VT_I2)) {
-		int intValue = V_I2(&value);
-		stringValue = Common::ToString(intValue);
-	} else if ((V_VT(&value) == VT_I4)) {
-		char valBuf[20];
-		long longValue = V_I4(&value);
-		stringValue = _ltoa(longValue, valBuf, 10);
-	} else if ((V_VT(&value) == VT_I8)) {
-		// TODO - need to format VT_I8
-	} else if ((V_VT(&value) == VT_NULL)) {
-		// TODO - Not sure what to do with VT_NULL
-	} else {
-		// TODO Unsupported data type
+
+		return stringValue;
 	}
 
-	return stringValue;
 }
+

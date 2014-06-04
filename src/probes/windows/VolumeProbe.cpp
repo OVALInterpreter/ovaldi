@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,21 @@
 //
 //****************************************************************************************//
 
+#include "WindowsCommon.h"
+
 #include "VolumeProbe.h"
+
+using namespace std;
+
+namespace {
+	/**
+	* Convert a DriveTypeEnumeration into a string
+	*
+	* @param OvalEnum::DriveTypeEnumeration driveTypeEnum
+	* @return std::string
+	**/
+	string DriveTypeToString(UINT driveType);
+}
 
 //****************************************************************************************//
 //                              VolumeProbe Class                                         //
@@ -130,7 +144,7 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
 			
 			if ( error == ERROR_PATH_NOT_FOUND ){
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST));				
+				item->AppendElement(new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST));				
 			}else{
 				item->SetStatus(OvalEnum::STATUS_ERROR);
 				item->AppendElement(new ItemEntity ( "rootpath" , rootPathStr , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ));
@@ -219,7 +233,7 @@ Item* VolumeProbe::BuildVolumeObject ( string rootPathStr ) {
 			( rootPathStr.compare("") == 0 ) ? item->AppendElement ( new ItemEntity ( "rootpath" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "rootpath" , rootPathStr, OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS )  );
             ( fileSystemNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "file_system" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "file_system" , fileSystemNameBuffer , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS )  );
             ( volumeNameBuffer == NULL ) ? item->AppendElement ( new ItemEntity ( "name" , "" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_ERROR )  ) : item->AppendElement ( new ItemEntity ( "name" , volumeNameBuffer , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS )  );
-			item->AppendElement ( new ItemEntity ( "drive_type" , this->DriveTypeToString ( driveType ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
+			item->AppendElement ( new ItemEntity ( "drive_type" , DriveTypeToString ( driveType ) , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "volume_max_component_length" , Common::ToString ( maximumComponentLength ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "serial_number" , Common::ToString ( volumeSerialNumber ) , OvalEnum::DATATYPE_INTEGER , OvalEnum::STATUS_EXISTS ) );
             item->AppendElement ( new ItemEntity ( "file_case_sensitive_search" , Common::ToString ( fileCaseSensistiveSearch ) , OvalEnum::DATATYPE_BOOLEAN , OvalEnum::STATUS_EXISTS ) );
@@ -338,31 +352,33 @@ void VolumeProbe::GetAllVolumes(StringSet &volumes) {
     }
 }
 
-std::string VolumeProbe::DriveTypeToString(UINT driveType) {
-	switch(driveType) {
-		case (DRIVE_UNKNOWN):
-			return "DRIVE_UNKNOWN";
-			break;
-		case (DRIVE_NO_ROOT_DIR):
-			return "DRIVE_NO_ROOT_DIR";
-			break;
-		case (DRIVE_REMOVABLE):
-			return "DRIVE_REMOVABLE";
-			break;
-		case (DRIVE_FIXED):
-			return "DRIVE_FIXED";
-			break;
-		case (DRIVE_REMOTE):
-			return "DRIVE_REMOTE";
-			break;
-		case (DRIVE_CDROM):
-			return "DRIVE_CDROM";
-			break;
-		case (DRIVE_RAMDISK):
-			return "DRIVE_RAMDISK";
-			break;
-		default:
-			throw Exception("VolumeProbe::DriveTypeToString - Error unsupported driveType value.");
-			break;
+namespace {
+	string DriveTypeToString(UINT driveType) {
+		switch(driveType) {
+			case (DRIVE_UNKNOWN):
+				return "DRIVE_UNKNOWN";
+				break;
+			case (DRIVE_NO_ROOT_DIR):
+				return "DRIVE_NO_ROOT_DIR";
+				break;
+			case (DRIVE_REMOVABLE):
+				return "DRIVE_REMOVABLE";
+				break;
+			case (DRIVE_FIXED):
+				return "DRIVE_FIXED";
+				break;
+			case (DRIVE_REMOTE):
+				return "DRIVE_REMOTE";
+				break;
+			case (DRIVE_CDROM):
+				return "DRIVE_CDROM";
+				break;
+			case (DRIVE_RAMDISK):
+				return "DRIVE_RAMDISK";
+				break;
+			default:
+				throw Exception("VolumeProbe::DriveTypeToString - Error unsupported driveType value.");
+				break;
+		}
 	}
 }

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,10 @@
 #ifndef ARITHMETICFUNCTION_H
 #define ARITHMETICFUNCTION_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsFunctionComponent.h"
 #include "ComponentFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a ArithmeticFunction component in a local_variable in the 
@@ -49,22 +49,29 @@ class ArithmeticFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete ArithmeticFunction object. */
-    ArithmeticFunction(OvalEnum::ArithmeticOperation op = OvalEnum::ARITHMETIC_ADD);
-	~ArithmeticFunction();
+    ArithmeticFunction(OvalEnum::ArithmeticOperation op = OvalEnum::ARITHMETIC_ADD)
+		: arithmeticOperation(op)
+	{}
+	virtual ~ArithmeticFunction()
+	{}
 
 	/** Parse the begin element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/** Get the arithmetic_operation field's value. */
-	OvalEnum::ArithmeticOperation GetArithmeticOperation();
+	OvalEnum::ArithmeticOperation GetArithmeticOperation() const {
+		return this->arithmeticOperation;
+	}
 	/** Set the arithmetic_operation field's value. */
-	void SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn);
+	void SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn) {
+		this->arithmeticOperation = opIn;
+	}
 
 private:
     /**

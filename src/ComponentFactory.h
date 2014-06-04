@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,22 +31,9 @@
 #ifndef COMPONENTFACTORY_H
 #define COMPONENTFACTORY_H
 
-#include "VariableComponent.h"
-#include "LiteralComponent.h"
-#include "ObjectComponent.h"
-#include "SubstringFunction.h"
-#include "ConcatFunction.h"
-#include "EscapeRegexFunction.h"
-#include "BeginFunction.h"
-#include "EndFunction.h"
-#include "SplitFunction.h"
-#include "RegexCaptureFunction.h"
-#include "ArithmeticFunction.h"
-#include "TimeDifferenceFunction.h"
-#include "CountFunction.h"
-#include "UniqueFunction.h"
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsComponent.h"
 
 /**
 	This class is a Factory class for getting parsed components of a local variable.
@@ -57,7 +44,7 @@ class ComponentFactory {
 
 public:
 	/** Return the appropriate component based on the specified component element.*/
-	static AbsComponent* GetComponent(DOMElement* componentElm);
+	static AbsComponent* GetComponent(xercesc::DOMElement* componentElm);
 };
 
 #endif

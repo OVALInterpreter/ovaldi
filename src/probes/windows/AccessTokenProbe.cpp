@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <aclapi.h>
+#include <lm.h>
+#include <Ntsecapi.h>
+
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "AccessTokenProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								AccessTokenProbe Class									  //	
@@ -167,7 +176,7 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 	if (!WindowsCommon::LookUpTrusteeName(&accountNameIn, &sidStr, &domainStr, &isGroup)) {
 		Item* item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("security_principle", accountNameIn, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("security_principle", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		items->push_back(item);
 		return false;
 	}
@@ -208,6 +217,8 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 
 			// Get the SID.
 			PSID psid = WindowsCommon::GetSIDForTrusteeName(currentAccountName);
+			if (!psid)
+				continue;
 
 			// Enumerate Access Rights
 			PLSA_UNICODE_STRING userRights = NULL;
@@ -445,7 +456,7 @@ bool AccessTokenProbe::GetAccountInformation(string accountNameIn,  bool resolve
 
 		Item* item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("security_principle", accountNameIn, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("security_principle", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		items->push_back(item);
 
 	}

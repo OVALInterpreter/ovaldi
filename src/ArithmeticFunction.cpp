@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,33 +28,25 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Common.h"
+#include "XmlCommon.h"
+
 #include "ArithmeticFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-ArithmeticFunction::ArithmeticFunction(OvalEnum::ArithmeticOperation op) : AbsFunctionComponent() {
-
-    this->SetArithmeticOperation(op);
-}
-
-ArithmeticFunction::~ArithmeticFunction() {
-}
-
 // ***************************************************************************************	//
 //                                  Public members                                          //
 // ***************************************************************************************	//
-
-OvalEnum::ArithmeticOperation ArithmeticFunction::GetArithmeticOperation() {
-	return this->arithmeticOperation;
-}
-
-void ArithmeticFunction::SetArithmeticOperation(OvalEnum::ArithmeticOperation opIn) {
-
-	this->arithmeticOperation = opIn;
-}
 
 ComponentValue* ArithmeticFunction::ComputeValue() {
 
@@ -110,23 +102,15 @@ void ArithmeticFunction::Parse(DOMElement* componentElm) {
 	}
 }
 
-VariableValueVector* ArithmeticFunction::GetVariableValues() {
+VariableValueVector ArithmeticFunction::GetVariableValues() {
 	
-	VariableValueVector* values = new VariableValueVector();
+	VariableValueVector values;
 	AbsComponentVector* components = this->GetComponents();
 	AbsComponentVector::iterator iterator;
 	for(iterator = components->begin(); iterator != components->end(); iterator++) {
 		AbsComponent* component = (AbsComponent*)(*iterator);
-		VariableValueVector* tmp = component->GetVariableValues();
-		VariableValueVector::iterator varIterator;
-		for(varIterator = tmp->begin(); varIterator != tmp->end(); varIterator++) {
-			values->push_back((*varIterator));
-		}
-		// BUG - These can not currently be deleted. 
-		// The code is not consistant here. In places a new vector is returned
-		// in others a reference to a vector that is managed by other code is returned.
-		//delete tmp;
-		//tmp = NULL;
+		VariableValueVector tmp = component->GetVariableValues();
+		copy(tmp.begin(), tmp.end(), back_inserter(values));
 	}
 
 	return values;
@@ -160,9 +144,11 @@ ComponentValue* ArithmeticFunction::CombineTwoComponentValues(ComponentValue* co
     for (values1Iter = values1->begin(); values1Iter != values1->end(); ++values1Iter) {
         for (values2Iter = values2->begin(); values2Iter != values2->end(); ++values2Iter) {
 
-            double value1 = atof(values1Iter->c_str());
-            double value2 = atof(values2Iter->c_str());
+            double value1 = 0;
+            double value2 = 0;
             double result;
+			Common::FromString(*values1Iter, &value1);
+			Common::FromString(*values2Iter, &value2);
 
             switch (op) {
             case OvalEnum::ARITHMETIC_ADD:

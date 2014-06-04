@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,8 +30,6 @@
 
 #ifndef REGKEYAUDITEDPERMISSIONS53PROBE_H
 #define REGKEYAUDITEDPERMISSIONS53PROBE_H
-
-#pragma warning(disable:4786)
 
 #include <string>
 #include "RegistryFinder.h"

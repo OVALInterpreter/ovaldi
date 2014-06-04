@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMAttr.hpp>
+#include <xercesc/dom/DOMNamedNodeMap.hpp>
+
+#include "XmlCommon.h"
+
 #include "Behavior.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Behavior Class											  //	

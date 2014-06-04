@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,18 +32,8 @@
 #define OBJECTFACTORY_H
 
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 
-#include "Common.h"
-#include "AbsDataCollector.h"
 #include "AbsObject.h"
-#include "SetObject.h"
-#include "Object.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class is a Factory class for getting parsed objects.

@@ -2,7 +2,7 @@
 
 OVAL Interpreter (ovaldi)
 
-Copyright (c) 2002-2012, The MITRE Corporation
+Copyright (c) 2002-2014, The MITRE Corporation
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -32,13 +32,53 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This document contains a log of all changes made to the OVAL Interpreter (ovaldi) since version 5.0 was released.
 
 ---------------------------------------
+---       Version 5.10.1 build 7    ---
+---------------------------------------
+
+* Fixed a bug with the new Xerces library that caused issues with utilizing OVAL Directives and Definition evaluation-ids. Fixed in revision #1714.
+* Changed output of cmdlet probe to use "true" and "false" instead of "True" and "False". Fixed in revision #1719.
+* Sets the nil attribute when parsing Item entities. Fixed in revision #1721.
+* Enabled large file support in Linux PartitionProbe. Fixed in revision #1723
+* Fixes an issue with the Sid probe by normalizing trustee names. No longer copies entity values from SID Object to Item. Fixed in revision #1725.
+* Updated Linux Makefile, RPM .spec file, and included libraries to support a 64-bit build of OVALDI. Fixed in revision #1729.
+* Updated Windows OS detection. Fixed in revision #1730.
+* Fixed other various memory leaks. 
+
+---------------------------------------
+---       Version 5.10.1 build 6    ---
+---------------------------------------
+
+* Fixed a bug in State::Parse() where it was not parsing the operator attribute even if it was specified. As a result, the state operator attribute was not being considered and was always set to the default value of "AND". This bug was fixed in revision #1677.
+* Fixed a bug in the Windows AbsEffectiveRightsProbe which could crash upon collection of domain accounts while disconnected from the network. This bug was fixed in revision #1681.
+* Updated Xerces to version 3.1.1 and Xalan to version 1.11.
+* Updated UniqueString function to improve de-duping items. Fixed in revision #1650.
+* Fixed memory leaks related to variable values.
+
+---------------------------------------
+---       Version 5.10.1 build 5    ---
+---------------------------------------
+
+* Improved robustness in getting the signature_keyid entity in rpminfo_item's.  It should no longer get "(not a blob)" for any rpm's.
+* Added support for the ipv6_address datatype.  Ipv6 addresses aren't actually collected yet.
+* Changed the format of values of the language entity of win-def:file_item's.  It used to be hard-coded; now, the VerLanguageName() function is used, which means the OS chooses the format. 
+
+---------------------------------------
 ---       Version 5.10.1 build 4    ---
 ---------------------------------------
 
+* Resolved the unknown error message in the win-def:process58_test. This addresses bug #3428326.
 * Fixed a bug causing a crash when a deprecated definition was analyzed which
   didn't have any criteria.
 * Fixed error message display bugs in registry-related probes, which caused
   nonsensical error messages when RegCloseKey() failed.
+* Updated the unix-def:xinetd_test to support unbounded item entities (flags, no_access, and only_from). This addresses bug #3495448.
+* Fixed the linked libraries in the linux makefile to include -lselinux, and 
+  not include -lpopt unless the RPM probes were being built.  This addresses
+  bug #3568359.  Thanks to Michael Wiegand of Greenbone Networks GmbH
+  (http://www.greenbone.net/) for reporting this issue and providing a patch.
+* Fixed a bug when collecting the has_extended_acl entity in the unix-def:file_test so that we are assigning a value of 'false' when a file does not have an ACL or it matches the standard UNIX permissions. This addresses bug #3597938.
+* Added support for the scheduling_class entity in the unix-def:process_test and the unix-def:process58_test. This addresses feature request tracker #3597952.
+* Fixed a bug where we were outputting invalid OVAL Results when messages were included on tests. This addresses bug #3596906.
 
 ---------------------------------------
 ---       Version 5.10.1 build 3    ---

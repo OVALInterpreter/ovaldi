@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
+#include "XmlCommon.h"
+
 #include "ItemFieldEntityValue.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ItemFieldEntityValue Class								  //	
@@ -56,7 +62,7 @@ ItemFieldEntityValue::~ItemFieldEntityValue() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string ItemFieldEntityValue::GetName() {
+string ItemFieldEntityValue::GetName() const {
 
 	return this->name;
 }
@@ -66,7 +72,7 @@ void ItemFieldEntityValue::SetName(string name) {
 	this->name = name;
 }
 
-OvalEnum::Datatype ItemFieldEntityValue::GetDatatype() {
+OvalEnum::Datatype ItemFieldEntityValue::GetDatatype() const {
 
 	return this->datatype;
 }
@@ -76,7 +82,7 @@ void ItemFieldEntityValue::SetDatatype(OvalEnum::Datatype datatype) {
 	this->datatype = datatype;
 }
 
-OvalEnum::SCStatus ItemFieldEntityValue::GetStatus() {
+OvalEnum::SCStatus ItemFieldEntityValue::GetStatus() const {
 
 	return this->scStatus;
 }
@@ -86,11 +92,9 @@ void ItemFieldEntityValue::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-void ItemFieldEntityValue::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemEntityElm) {
+void ItemFieldEntityValue::Write(DOMDocument* scFile, DOMElement* itemEntityElm) {
 	// Create new field element
-	XMLCh* scField = XMLString::transcode("oval-sc:field");
-	DOMElement* newEntityValueElem = scFile->createElement(scField);
-	XMLString::release(&scField);
+	DOMElement* newEntityValueElem = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "oval-sc:field");
 	itemEntityElm->appendChild(newEntityValueElem);
 
 	// Add the attributes

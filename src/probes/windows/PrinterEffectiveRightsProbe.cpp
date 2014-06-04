@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -29,7 +29,11 @@
 //****************************************************************************************//
 
 #include <AutoCloser.h>
+#include <WindowsCommon.h>
+
 #include "PrinterEffectiveRightsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              PrinterEffectiveRightsProbe Class                         //
@@ -149,16 +153,13 @@ ItemVector* PrinterEffectiveRightsProbe::CollectItems ( Object* object ) {
                 }
             } else {
                 Log::Debug ( "No matching SIDs found when getting the effective rights for object: " + object->GetId() );
-                StringSet* trusteeSIDs = new StringSet();
 
-				if ( this->ReportTrusteeDoesNotExist( trusteeSIDEntity, trusteeSIDs, true ) ) {
-                    for ( StringSet::iterator iterator2 = trusteeSIDs->begin(); iterator2 != trusteeSIDs->end(); iterator2++ ) {
-                        Item* item = this->CreateItem();
-                        item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "printer_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
-                        collectedItems->push_back ( item );
-                    }
+				if ( this->ReportTrusteeDoesNotExist( trusteeSIDEntity, true ) ) {
+                    Item* item = this->CreateItem();
+                    item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+                    item->AppendElement ( new ItemEntity ( "printer_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                    item->AppendElement ( new ItemEntity ( "trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                    collectedItems->push_back ( item );
                 }
             }
 
@@ -360,11 +361,12 @@ StringSet* PrinterEffectiveRightsProbe::GetPrinters ( ObjectEntity* printerNameE
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all printers
             // if they exist on the system
+			VariableValueVector vals = printerNameEntity->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
 
-            for ( iterator = printerNameEntity->GetVarRef()->GetValues()->begin() ; iterator != printerNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->PrinterExists ( ( *iterator )->GetValue() ) ) {
-                    allPrinters->insert ( ( *iterator )->GetValue() );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->PrinterExists ( iterator->GetValue() ) ) {
+                    allPrinters->insert ( iterator->GetValue() );
                 }
             }
 

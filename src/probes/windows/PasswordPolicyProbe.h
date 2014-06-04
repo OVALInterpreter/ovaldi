@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,17 +31,11 @@
 #ifndef PASSWORDPOLICYPROBE_H
 #define PASSWORDPOLICYPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "REGEX.h"
-
-#include <aclapi.h>
-#include <windows.h>
-#include <lm.h>
-
-using namespace std;
+#include "Item.h"
+#include "Object.h"
 
 class PasswordPolicyProbe : public AbsProbe {
 public:

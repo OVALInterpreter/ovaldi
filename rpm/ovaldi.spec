@@ -1,6 +1,12 @@
 %define name	ovaldi
-%define version	5.10.1.3
+%define version	5.10.1.7
 %define release	1
+%ifarch x86_64
+  %define arch	x86_64
+%else
+  %define arch	i386
+%endif
+
 
 Summary:	The reference interpreter for the Open Vulnerability and Assessment Language
 Name:		%{name}
@@ -11,7 +17,7 @@ License:	BSD
 Group:		System/Configuration/Other
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 Prefix:		%{_prefix}
-BuildArch: 	i386
+BuildArch: 	%{arch}
 
 %description
 The OVAL Interpreter is a freely available reference 
@@ -77,9 +83,15 @@ make
 /bin/cp xml/*.xsd $RPM_BUILD_ROOT/usr/share/ovaldi
 
 if grep "release 5" /etc/redhat-release &> /dev/null ; then
-  /bin/cp project/linux/EL5/libxerces-c.so.27.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL5/libxalan-c.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
-  /bin/cp project/linux/EL5/libxalanMsg.so.110.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  %ifarch x86_64
+    /bin/cp project/linux/EL5/64/libxerces-c-3.1.so $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/64/libxalan-c.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/64/libxalanMsg.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  %else
+    /bin/cp project/linux/EL5/32/libxerces-c-3.1.so $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/32/libxalan-c.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+    /bin/cp project/linux/EL5/32/libxalanMsg.so.111.0 $RPM_BUILD_ROOT%{_libdir}/ovaldi
+  %endif
 else
   echo "Unsupported Redhat version. Exiting."
   exit 1
@@ -100,20 +112,20 @@ fi
 %preun libs
 if [ $1 = 0 ]; then
     #// Do stuff specific to uninstalls
-    if [ -e %{_libdir}/ovaldi/libxerces-c.so.27 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxerces-c.so.27
+    if [ -e %{_libdir}/ovaldi/libxerces-c-3.1.so ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxerces-c-3.1.so
     fi
     if [ -e %{_libdir}/ovaldi/libxerces-c.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxerces-c.so
     fi
-    if [ -e %{_libdir}/ovaldi/libxalan-c.so.110 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxalan-c.so.110
+    if [ -e %{_libdir}/ovaldi/libxalan-c.so.111 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalan-c.so.111
     fi
     if [ -e %{_libdir}/ovaldi/libxalan-c.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxalan-c.so
     fi
-    if [ -e %{_libdir}/ovaldi/libxalanRMsg.so.110 ] ; then
-        /bin/rm %{_libdir}/ovaldi/libxalanMsg.so.110
+    if [ -e %{_libdir}/ovaldi/libxalanMsg.so.111 ] ; then
+        /bin/rm %{_libdir}/ovaldi/libxalanMsg.so.111
     fi
     if [ -e %{_libdir}/ovaldi/libxalanMsg.so ] ; then
         /bin/rm %{_libdir}/ovaldi/libxalanMsg.so
@@ -137,7 +149,7 @@ if [ $1 = 1 ]; then
 fi
 
 %files 
-%defattr(-,root,root,0700)
+%defattr(-,root,root,0755)
 %doc docs/terms.txt docs/README.txt docs/version.txt
 %doc %{_mandir}/man1/ovaldi.1.gz
 %defattr(-,root,root,0600)
@@ -151,11 +163,17 @@ fi
 /usr/share/ovaldi/*.xsd
 
 %files libs
-%{_libdir}/ovaldi/libxerces-c.so.27.0
-%{_libdir}/ovaldi/libxalan-c.so.110.0
-%{_libdir}/ovaldi/libxalanMsg.so.110.0
+%{_libdir}/ovaldi/libxerces-c-3.1.so
+%{_libdir}/ovaldi/libxalan-c.so.111.0
+%{_libdir}/ovaldi/libxalanMsg.so.111.0
 
 %changelog
+
+* Fri Mar 25 2014 David Rothenberg <drothenberg@mitre.org> 5.10.1.7-1.0
+* Updated with architecture conditional statements to build correct 32/64-bit environment.
+
+* Fri Jan 3 2014 David Rothenberg <drothenberg@mitre.org> 5.10.1.6-1.0
+* Updated for libxerces-c-3.1.so, libxalan-c.so.111.0, and libxalanMsg.so.111.0
 
 * Thu Jul 28 2011 Danny Haynes <dhaynes@mitre.org> 5.9.2-1.0
 * Updated to include oval-system-characteristics-schematron.xsl and oval-results-schematron.xsl

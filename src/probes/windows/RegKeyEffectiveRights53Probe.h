@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,14 +31,9 @@
 #ifndef REGKEYEFFECTIVRIGHTS53PROBE_H
 #define REGKEYEFFECTIVRIGHTS53PROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
-#include "RegistryFinder.h"
 #include "AbsEffectiveRightsProbe.h"
-#include "WindowsCommon.h"
-
-#include <aclapi.h>
-#include <windows.h>
 
 /**
     This class is responsible for collecting registry key information for windows registrykeyeffectiverights53_objects.
@@ -68,7 +63,7 @@ class RegKeyEffectiveRights53Probe : public AbsEffectiveRightsProbe {
          *  @param trusteeSIDStr A string that contains the trustee SID of the registry key that you want to get the effective rights of.
          *  @return The item that contains the registry key effective rights of the specified hive, key, and trustee name.
          */
-        Item* GetEffectiveRights ( HKEY keyHandle, const RegKey *regKey, string trusteeSIDStr );
+        Item* GetEffectiveRights ( HKEY keyHandle, const RegKey *regKey, std::string trusteeSIDStr );
 
         /** The static instance of the RegKeyEffectiveRights53Probe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.

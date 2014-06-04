@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -35,6 +35,7 @@
 
 #include <FreeGuard.h>
 #include <VectorPtrGuard.h>
+#include "WindowsCommon.h"
 
 #include "InterfaceProbe.h"
 
@@ -102,7 +103,7 @@ ItemVector* InterfaceProbe::CollectItems ( Object* object ) {
             } else {
                 aInterface = this->CreateItem();
                 aInterface->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                aInterface->AppendElement ( new ItemEntity ( "name" , name->GetValue() , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                aInterface->AppendElement ( new ItemEntity ( "name" ,"" , OvalEnum::DATATYPE_STRING , OvalEnum::STATUS_DOES_NOT_EXIST ) );
                 collectedItems->push_back ( aInterface );
             }
 
@@ -242,6 +243,7 @@ void InterfaceProbe::GetAllInterfaces() {
 				break;
 
 		Item *item = CreateItem();
+		item->SetStatus(OvalEnum::STATUS_EXISTS);
 		interfaces->push_back(item);
 
 		PMIB_IFROW ifRow = &ifTable->table[ifIdx];

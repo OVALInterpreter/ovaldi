@@ -2,7 +2,7 @@
 
                   OVAL Interpreter
 
- Copyright (c) 2002 - 2012 - The MITRE Corporation
+ Copyright (c) 2002 - 2014 - The MITRE Corporation
 
 ****************************************************
 
@@ -98,9 +98,9 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        ovaldi - OVAL Interpreter binary
 
        Libraries:
-       libxerces-c.so.27.0 - Xerces XML library
-       libxalan-c.so.110.0 - Xalan XSL library
-       libxalanMsg.so.110.0 - Xalan Message library
+       libxerces-c-3.1.so - Xerces XML library
+       libxalan-c.so.111.0 - Xalan XSL library
+       libxalanMsg.so.111.0 - Xalan Message library
        libpcre.so.0.0.1 - PCRE Regular Expression library
 
        Documentation:
@@ -152,13 +152,13 @@ INTERPRETER.  SEE THE TERMS.TXT FILE INCLUDED WITH THE OVAL INTERPRETER.
        ovaldi.exe - OVAL Interpreter binary
 
        Libraries:
-       xerces-c_2_7_0.dll - Xerces XML library
+       xerces-c_3_1.dll - Xerces XML library
        msvcr100.dll - Microsoft C Runtime Library
        pcre.dll - Perl-compatible regular-expression library
-       Xalan-C_1_10.dll - Xalan XSLT library
-       XalanMessages_1_10.dll - Xalan XSLT library
-	   libgcrypt-11.dll - Libgcrypt library
-	   libgpg-error-0.dll - GnuPG error code library
+       Xalan-C_1_11.dll - Xalan XSLT library
+       XalanMessages_1_11.dll - Xalan XSLT library
+	  libgcrypt-11.dll - Libgcrypt library
+	  libgpg-error-0.dll - GnuPG error code library
 	   
 
        Documentation:
@@ -727,5 +727,5 @@ Making Security Measurable - http://msm.mitre.org/
 
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland Security. OVAL
-and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2012,
+and the OVAL logo are trademarks of The MITRE Corporation. Copyright 2002-2014,
 The MITRE Corporation (www.mitre.org).

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,6 +30,8 @@
 
 #ifndef ENTITYCOMPARATOR_H
 #define ENTITYCOMPARATOR_H
+
+#include <vector>
 
 #include "OvalEnum.h"
 #include "AbsEntityValue.h"
@@ -90,6 +92,10 @@ public:
 		@return Returns the result of the comparison.
 	*/
 	static OvalEnum::ResultEnumeration CompareIpv4Address(OvalEnum::Operation op, std::string defValue, std::string scValue);
+	/** Compare two ipv6_address strings based on the input operation. 
+		@return Returns the result of the comparison.
+	*/
+	static OvalEnum::ResultEnumeration CompareIpv6Address(OvalEnum::Operation op, std::string defValue, std::string scValue);
 private:
 
 	/** 
@@ -100,7 +106,7 @@ private:
 		If a given component of the version string can not be converted to an integer an error is thrown.
 		If a delimiter is found but no integer components are found an error is thrown.		
 	*/
-	static LongLongVector* ParseVersionStr(std::string versionStr);
+	static std::vector<long long>* ParseVersionStr(std::string versionStr);
 
 	// copied from lib/rpmvercmp.c
 	static int rpmvercmp(const char * a, const char * b);

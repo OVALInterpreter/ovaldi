@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,36 +31,15 @@
 #ifndef PROCESSPROBE_H
 #define PROCESSPROBE_H
 
-#include "AbsProbe.h"
-
-#include <cerrno>
-#include <strings.h>
-#include <dirent.h>
-#include <pwd.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <iostream>
-#include <sstream>
-#include <iomanip>
 #include <string>
+#include <sys/types.h>
 
 #ifdef SUNOS
-#include <fstream>
-#include <procfs.h>
-#include <ftw.h>
-#include <algorithm>
-#include <cctype>
+#  include <procfs.h>
 #endif
 
-#ifdef DARWIN
-#include <sys/sysctl.h>
-#endif
+#include "AbsProbe.h"
 
-// Define some buffer lengths
-#define CMDLINE_LEN 1024
-#define TTY_LEN PATH_MAX
 
 /**
 	Data collector for process test.
@@ -123,7 +102,7 @@ private:
 	/**
 		Read the stat file for a specific process
 	*/
-	int RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, std::string *errMsg);
+	int RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, unsigned long *policy, std::string *errMsg);
 
 	/**
 	 * Reads uid's from the /proc/pid/status file.  This file supposedly contains

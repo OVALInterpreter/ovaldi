@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -34,42 +34,16 @@
 
 //	other includes
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
-#include <typeinfo>
 
-#include "Common.h"
 #include "OvalEnum.h"
 #include "Filter.h"
 #include "Object.h"
 #include "SetObject.h"
+#include "Set.h"
 #include "Item.h"
 #include "CollectedObject.h"
 #include "CollectedSet.h"
 #include "AbsProbe.h"
-
-// forward declarations
-class AbsProbe;
-class SetObject;
-class Object;
-class Set;
-class CollectedObject;
-class CollectedSet;
-class Filter;
-class AbsState;
-typedef std::vector < AbsState* > AbsStateVector;
-
-
-struct probe_comparator {
-  bool operator() ( AbsProbe * p1, AbsProbe * p2 ) {
-    return p1 < p2;
-  }
-};
-
-
-typedef std::set<AbsProbe *, probe_comparator> AbsProbeSet;
-
 
 /**
 	This class acts a base class for all platform specific object collectors.
@@ -153,7 +127,7 @@ protected:
 	    Comparing items based on their ids assumes that Item ids are only
 	    assigned to unique items. This is ensured when probes return Items.
 	*/
-	bool ExistsInSet(ItemVector* itemSet, Item* item);
+	bool ExistsInSet(const ItemVector* itemSet, Item* item);
 
 	/** Return a single set that contains all unique items in both sets. */
 	CollectedSet* Union(CollectedSet* collectedSet1, CollectedSet* collectedSet2);

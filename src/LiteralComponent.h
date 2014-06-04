@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,26 +31,33 @@
 #ifndef LITERALCOMPONENT_H
 #define LITERALCOMPONENT_H
 
+#include <string>
+
 #include "AbsComponent.h"
-
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a LiteralComponent in a local_variable in the oval definition schema
 */
 class LiteralComponent : public AbsComponent {
 public:
-	LiteralComponent(std::string value = "");
-	~LiteralComponent();
+	LiteralComponent(const std::string &value = "") : value(value)
+	{}
+	virtual ~LiteralComponent()
+	{}
 
-	void Parse(DOMElement* componentElm); 
-	ComponentValue* ComputeValue();
+	virtual void Parse(xercesc::DOMElement* componentElm); 
+	virtual ComponentValue* ComputeValue();
 
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues() {
+		return VariableValueVector();
+	}
 
-	std::string GetValue();
-	void SetValue(std::string value);
+	std::string GetValue() const {
+		return this->value;
+	}
+	void SetValue(std::string value) {
+		this->value = value;
+	}
 
 private:
 	std::string value;

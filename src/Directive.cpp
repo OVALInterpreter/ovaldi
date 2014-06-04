@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,10 +27,19 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <iostream>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "DocumentManager.h"
+#include "Log.h"
+#include "XmlCommon.h"
+
 #include "Directive.h"
 
 using namespace std;
-XERCES_CPP_NAMESPACE_USE
+using namespace xercesc;
 
 //
 // Static members
@@ -49,7 +58,7 @@ void Directive::SetDirective(OvalEnum::ClassEnumeration classEnum, OvalEnum::Res
 
 void Directive::LoadDirectives() {
 	// Load the configuration XML.  If it can not be loaded, load defaults and return.
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* config;
+	DOMDocument* config;
 
     if(directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE] != NULL)
         delete directives[OvalEnum::CLASS_DEFAULT][OvalEnum::RESULT_TRUE];
@@ -80,7 +89,7 @@ void Directive::LoadDirectives() {
 
 	// Read the XML and create appropriate Directive objects.
 	
-	DOMElement* directivesElem = XmlCommon::FindElementNS(config, "oval_directives");
+	DOMElement* directivesElem = config->getDocumentElement();
 	DOMNodeList* directiveClassNodes = directivesElem->getChildNodes();
 	for (unsigned int j = 0; j < directiveClassNodes->getLength(); j++) {
 		DOMNode* classNode = directiveClassNodes->item(j);
@@ -124,7 +133,7 @@ void Directive::LoadDirectives() {
 	}
 }
 
-void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc) {
+void Directive::ApplyAll(DOMDocument* resultsDoc) {
 	//
 	// Update <directives> tag in results with correct settings
 	//
@@ -164,12 +173,12 @@ void Directive::ApplyAll(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultsDoc)
 		}
 		
 		skip = false;
-		DOMElement* classElem = XmlCommon::CreateElement(resultsDoc, "class_directives");
+		DOMElement* classElem = XmlCommon::CreateElementNS(resultsDoc, XmlCommon::resNS, "class_directives");
 		XmlCommon::AddAttribute(classElem, "class", OvalEnum::ClassToString(defClass));
 		ovalResultsElem->insertBefore(classElem, ovalElem);
 		for (DirectiveMap::iterator j = i->second.begin(); j != i->second.end(); j++) {
 			string defType = OvalEnum::ResultToDirectiveString(j->first);
-			DOMElement* defElem = XmlCommon::AddChildElement(resultsDoc, classElem, defType);
+			DOMElement* defElem = XmlCommon::AddChildElementNS(resultsDoc, classElem, XmlCommon::resNS, defType);
 			XmlCommon::AddAttribute(defElem, "content", OvalEnum::ResultContentToString(j->second->GetResultContent()));
 			XmlCommon::AddAttribute(defElem, "reported", j->second->GetReported() ? "true" : "false");
 		}

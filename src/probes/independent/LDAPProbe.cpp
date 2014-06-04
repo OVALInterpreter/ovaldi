@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,6 +30,17 @@
 
 #include <sstream>
 #include <iomanip>
+
+#ifdef WIN32
+#  include <Windows.h> // defines symbols needed by <LM.h>
+#  include <LM.h>
+#  include <Dsgetdc.h>
+#  include <Winldap.h> // defines symbols needed by <Winber.h>
+#  include <Winber.h>
+#endif
+
+#include "REGEX.h"
+#include "Log.h"
 
 #include "LDAPProbe.h"
 
@@ -112,14 +123,14 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 				}
 				if ( !attributeEntity->GetNil() ) {
 					item->AppendElement ( new ItemEntity ( "attribute", attributeStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, attributeEntity->GetNil() ) );
-					item->AppendElement ( new ItemEntity ( "object_class", objectClassStr, OvalEnum::DATATYPE_STRING, ( objectClassStr.compare ( "" ) ==0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
+					item->AppendElement ( new ItemEntity ( "object_class", "", OvalEnum::DATATYPE_STRING, ( objectClassStr.compare ( "" ) ==0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 					this->GetLdapItem ( suffixStr, relativeDnStr, attributeStr,item );
 					if ( item != NULL ) {
 						collectedItems->push_back ( new Item ( *item ) );
 					}
 				} else {
 					item->AppendElement ( new ItemEntity ( "attribute", attributeStr, OvalEnum::DATATYPE_STRING, (attributeEntity->GetNil()?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), attributeEntity->GetNil() ) );
-					item->AppendElement ( new ItemEntity ( "object_class", objectClassStr, OvalEnum::DATATYPE_STRING, ( objectClassStr.compare ( "" ) ==0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
+					item->AppendElement ( new ItemEntity ( "object_class", "", OvalEnum::DATATYPE_STRING, ( objectClassStr.compare ( "" ) ==0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 					collectedItems->push_back ( new Item ( *item ) );
 				}
 			}
@@ -133,8 +144,8 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 						item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 						item->AppendElement ( new ItemEntity ( "suffix", suffixStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
 						item->AppendElement ( new ItemEntity ( "relative_dn", relativeDnStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, relativeDnEntity->GetNil() ) );
-						item->AppendElement ( new ItemEntity ( "attribute", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
-						item->AppendElement ( new ItemEntity ( "object_class", objectClassStr, OvalEnum::DATATYPE_STRING, ( objectClassStr.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
+						item->AppendElement ( new ItemEntity ( "attribute", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, attributeEntity->GetNil() ) );
+						item->AppendElement ( new ItemEntity ( "object_class", "", OvalEnum::DATATYPE_STRING, ( objectClassStr.compare ( "" ) == 0 ) ? OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS ) );
 						collectedItems->push_back ( item );
 					}
 				}
@@ -147,7 +158,7 @@ ItemVector* LDAPProbe::CollectItems ( Object *object ) {
 				Item* item = this->CreateItem();
 				item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
 				item->AppendElement ( new ItemEntity ( "suffix", suffixStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-				item->AppendElement ( new ItemEntity ( "relative_dn", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
+				item->AppendElement ( new ItemEntity ( "relative_dn", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, relativeDnEntity->GetNil() ) );
 				collectedItems->push_back ( item );
 			}
 		}
@@ -409,6 +420,7 @@ string LDAPProbe::GetObjectClass ( string suffixStr, string relativeDnStr ) {
 string LDAPProbe::GetLDAPServerLocation() {
 	
 	#ifdef WIN32
+
 	DOMAIN_CONTROLLER_INFO* DomainControllerInfo = NULL;
 	DWORD dReturn = 0L;
 	ULONG dcFlags;
@@ -424,9 +436,9 @@ string LDAPProbe::GetLDAPServerLocation() {
 	} else {
 		throw ProbeException ( "Error: DsGetDcName() was unable to retrieve the name of the specified domain controller." );
 	}
-	#endif
 
-	#if defined (LINUX) || defined (DARWIN)
+	#elif defined (LINUX) || defined (DARWIN)
+
 	string pathStr = "/etc/";
 	string fileNameStr = "ldap.conf";
 	string bufferStr;
@@ -455,6 +467,11 @@ string LDAPProbe::GetLDAPServerLocation() {
 	}
 
 	return "";
+
+	#else
+
+	return "";
+	
 	#endif
 }
 
@@ -716,10 +733,11 @@ bool LDAPProbe::ReportSuffixDoesNotExist ( ObjectEntity *suffixEntity, StringVec
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = suffixEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for ( iterator = suffixEntity->GetVarRef()->GetValues()->begin(); iterator != suffixEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->SuffixExists ( ( *iterator )->GetValue() ) ) {
-					suffixesDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->SuffixExists ( iterator->GetValue() ) ) {
+					suffixesDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}
@@ -737,10 +755,11 @@ bool LDAPProbe::ReportRelativeDnDoesNotExist ( string suffixStr, ObjectEntity *r
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = relativeDnEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for ( iterator = relativeDnEntity->GetVarRef()->GetValues()->begin(); iterator != relativeDnEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->RelativeDnExists ( suffixStr, ( *iterator )->GetValue() ) ) {
-					relativeDnsDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->RelativeDnExists ( suffixStr, iterator->GetValue() ) ) {
+					relativeDnsDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}
@@ -758,10 +777,11 @@ bool LDAPProbe::ReportAttributeDoesNotExist ( string suffixStr, string relativeD
 				result = true;
 			}
 		} else {
+			VariableValueVector vals = attributeEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for ( iterator = attributeEntity->GetVarRef()->GetValues()->begin(); iterator != attributeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( !this->AttributeExists ( suffixStr, relativeDnStr, ( *iterator )->GetValue() ) ) {
-					attributesDne->push_back ( ( *iterator )->GetValue() );
+			for ( iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( !this->AttributeExists ( suffixStr, relativeDnStr, iterator->GetValue() ) ) {
+					attributesDne->push_back ( iterator->GetValue() );
 					result = true;
 				}
 			}

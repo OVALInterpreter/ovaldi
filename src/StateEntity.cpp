@@ -1,7 +1,7 @@
 //
 // 
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,35 +28,23 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "VariableFactory.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
+#include "XmlCommon.h"
 
 #include "StateEntity.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								StateEntity Class						     			  //	
 //****************************************************************************************//
-StateEntity::StateEntity(StateEntity* orig) : AbsEntity() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Copy constructor.
-	//	Create a complete StateEntity object based on the specified obj.
-	//
-	// -----------------------------------------------------------------------
-
-	this->SetDatatype(orig->GetDatatype());
-	this->SetEntityCheck(orig->GetEntityCheck());
-	this->SetName(orig->GetName());
-	this->SetNil(orig->GetNil());
-	this->SetOperation(orig->GetOperation());
-	this->SetValue(orig->GetValue());
-	this->SetVarCheck(orig->GetVarCheck());
-	this->SetVarRef(orig->GetVarRef());
-}
-
 StateEntity::StateEntity(string name, string value, OvalEnum::Datatype datatype, OvalEnum::Operation operation, AbsVariable* varRef, OvalEnum::Check entityCheck, OvalEnum::Check varCheck, bool nil)
 									: AbsEntity(name, value, datatype, operation, varRef, varCheck, nil) {
 	// -----------------------------------------------------------------------

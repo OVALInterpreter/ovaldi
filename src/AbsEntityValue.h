@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,9 +31,11 @@
 #ifndef ABSENTITYVALUE_H
 #define ABSENTITYVALUE_H
 
+#include <string>
+#include <vector>
+
 #include "OvalEnum.h"
 
-XERCES_CPP_NAMESPACE_USE
 /**
 	This class represents an entity value in an entity as defined in the oval system characteristics schema.
 */
@@ -51,7 +53,7 @@ public:
 	/** Return the value of the entity.
 	 *  @return A string representing the value of the entity.
 	 */
-	std::string GetValue();
+	std::string GetValue() const;
 
 	/** Set the value of the entity.
 	 *  @param value A string representation of the value of the entity.

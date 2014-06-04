@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,15 +32,14 @@
 #define OBJECT_H
 
 #include <map>
+#include <utility>
+#include <string>
 
 #include "AbsObject.h"
 #include "ObjectEntity.h"
 #include "Behavior.h"
 #include "Filter.h"
 
-XERCES_CPP_NAMESPACE_USE
-
-class ObjectEntity;
 class Object;
 
 /**	
@@ -62,13 +61,13 @@ class Object : public AbsObject {
 public:
     /** Create a complete object */
 	Object(std::string id = "", std::string comment = "", std::string xmlns = "", std::string name = "", int version = 1);
-	~Object();
+	virtual ~Object();
 
     /** Parse the provided object element into an object. */
-	void Parse(DOMElement* objectElm);
+	virtual void Parse(xercesc::DOMElement* objectElm);
 
     /** Return a vector of variable values that were used for this object. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 	
     /** Set the behaviors field's value. */
 	BehaviorVector* GetBehaviors();

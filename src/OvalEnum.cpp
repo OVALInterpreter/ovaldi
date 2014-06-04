@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,6 +27,8 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include "Exception.h"
 
 #include "OvalEnum.h"
 
@@ -224,7 +226,7 @@ string OvalEnum::DatatypeToString(OvalEnum::Datatype datatype){
 	//	Conver the Datatype value to a string
 	// -----------------------------------------------------------------------
 
-	string datatypeStr = "";
+	string datatypeStr;
 
 	switch(datatype) {
 		case (DATATYPE_STRING):
@@ -256,6 +258,9 @@ string OvalEnum::DatatypeToString(OvalEnum::Datatype datatype){
 			break;
 		case (DATATYPE_IPV4_ADDRESS):
 			datatypeStr = "ipv4_address";
+			break;
+		case (DATATYPE_IPV6_ADDRESS):
+			datatypeStr = "ipv6_address";
 			break;
 		default:	
 			throw Exception("OvalEnum::DatatypeToString - Error unsupported datatype.");
@@ -295,6 +300,8 @@ OvalEnum::Datatype OvalEnum::ToDatatype(string datatypeStr){
 		datatype = DATATYPE_RECORD;
 	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_IPV4_ADDRESS)) == 0) {
 		datatype = DATATYPE_IPV4_ADDRESS;
+	} else if(datatypeStr.compare(OvalEnum::DatatypeToString(DATATYPE_IPV6_ADDRESS)) == 0) {
+		datatype = DATATYPE_IPV6_ADDRESS;
 	} else {
 		throw Exception("OvalEnum::ToDatatype - Error unsupported datatype value: " + datatypeStr);
 	}
@@ -365,7 +372,7 @@ OvalEnum::Flag OvalEnum::ToFlag(string flagStr){
 	return flag;
 }
 
-OvalEnum::Flag OvalEnum::CombineFlags(IntVector* flags) {
+OvalEnum::Flag OvalEnum::CombineFlags(vector<int>* flags) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -386,7 +393,7 @@ OvalEnum::Flag OvalEnum::CombineFlags(IntVector* flags) {
 	int doesNotExistCount = 0;
 	int notCollectedCount = 0;
 	int notApplicableCount = 0;
-	IntVector::iterator flag;
+	vector<int>::iterator flag;
 	for (flag=flags->begin(); flag!=flags->end(); flag++) {
 
 		if((*flag) == OvalEnum::FLAG_ERROR) {
@@ -416,8 +423,8 @@ OvalEnum::Flag OvalEnum::CombineFlags(IntVector* flags) {
 		combinedFlag = OvalEnum::FLAG_COMPLETE;
 
 	} else if(errorCount == 0 
-		&& completeCount > 0 
-		&& incompleteCount == 0 
+		&& completeCount >= 0 
+		&& incompleteCount >= 1 
 		&& doesNotExistCount == 0 
 		&& notCollectedCount == 0 
 		&& notApplicableCount == 0) {
@@ -770,7 +777,7 @@ string OvalEnum::ResultToDirectiveString(OvalEnum::ResultEnumeration result) {
 	return resultStr;
 }
 
-OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(IntVector* results, OvalEnum::Check check) {
+OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(vector<int>* results, OvalEnum::Check check) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -797,7 +804,7 @@ OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(IntVector* results, 
 	int errorCount = 0;
 	int notEvaluatedCount = 0;
 	int notApplicableCount = 0;
-	IntVector::iterator result;
+	vector<int>::iterator result;
 	for (result=results->begin(); result!=results->end(); result++) {
 
 		if((*result) == OvalEnum::RESULT_TRUE) {
@@ -876,7 +883,7 @@ OvalEnum::ResultEnumeration OvalEnum::CombineResultsByCheck(IntVector* results, 
 	return combinedResult;
 }
 
-OvalEnum::ResultEnumeration OvalEnum::CombineResultsByOperator(IntVector* results, OvalEnum::Operator op) {
+OvalEnum::ResultEnumeration OvalEnum::CombineResultsByOperator(vector<int>* results, OvalEnum::Operator op) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -903,7 +910,7 @@ OvalEnum::ResultEnumeration OvalEnum::CombineResultsByOperator(IntVector* result
 	int errorCount = 0;
 	int notEvaluatedCount = 0;
 	int notApplicableCount = 0;
-	IntVector::iterator result;
+	vector<int>::iterator result;
 	for (result=results->begin(); result!=results->end(); result++) {
 
 		if((*result) == OvalEnum::RESULT_TRUE) {
@@ -1055,28 +1062,31 @@ OvalEnum::ResultContent OvalEnum::CombineResultContent(OvalEnum::ResultContent r
 	}
 }
 
-
-std::string OvalEnum::SCStatusToString(OvalEnum::SCStatus status){
+string OvalEnum::SCStatusToString(OvalEnum::SCStatus status){
+	// -----------------------------------------------------------------------
+	//	Abstract
+	//
+	//	Convert the SCStatus value to a string
+	//
+	// -----------------------------------------------------------------------
 	string statusStr = "";
 
-	switch(status){
-	case(OvalEnum::STATUS_DOES_NOT_EXIST):
-		statusStr = "does not exist";
-		break;
-	case(OvalEnum::STATUS_ERROR):
-		statusStr = "error";
-		break;
-	case(OvalEnum::STATUS_EXISTS):
-		statusStr = "exists";
-		break;
-	case(OvalEnum::STATUS_NOT_COLLECTED):
-		statusStr = "not collected";
-		break;
+	switch(status) {
+		case (OvalEnum::STATUS_DOES_NOT_EXIST):
+			statusStr = "does not exist";
+			break;
+		case (OvalEnum::STATUS_ERROR):
+			statusStr = "error";
+			break;
+		case (OvalEnum::STATUS_EXISTS):
+			statusStr = "exists";
+			break;
+		case (OvalEnum::STATUS_NOT_COLLECTED):
+			statusStr = "not collected";
+			break;
 	}
-
 	return statusStr;
 }
-
 
 OvalEnum::SCStatus OvalEnum::ToSCStatus(string statusStr){
 	// -----------------------------------------------------------------------

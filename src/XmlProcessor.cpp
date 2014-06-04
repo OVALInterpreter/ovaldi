@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <fstream>
+
 //	required xerces	includes
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMException.hpp>
@@ -35,7 +37,9 @@
 // for dom Writer
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMImplementationLS.hpp>
-#include <xercesc/dom/DOMWriter.hpp>
+#include <xercesc/dom/DOMLSSerializer.hpp>
+#include <xercesc/dom/DOMLSOutput.hpp>
+#include <xercesc/dom/DOMLocator.hpp>
 #include <xercesc/framework/StdOutFormatTarget.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xercesc/util/XMLUni.hpp>
@@ -44,8 +48,10 @@
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 
-#include "Common.h" 
+#include "XmlCommon.h"
+#include "Common.h"
 #include "XmlProcessor.h"
+#include "Log.h"
 
 using namespace std;
 using namespace xercesc;
@@ -54,7 +60,11 @@ using namespace xercesc;
 //			DataDirResolver Class                                   					  //	
 //****************************************************************************************//
 
-DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const /*publicId*/, const XMLCh *const systemId, const XMLCh *const /*baseURI*/) {
+DOMLSInput* DataDirResolver::resolveResource(const XMLCh *const /*resourceType*/,
+											const XMLCh *const /*namespaceUri*/,
+											const XMLCh *const /*publicId*/,
+											const XMLCh *const systemId,
+											const XMLCh *const /*baseURI*/) {
 	string path = "";
 	size_t last;
 	string schemapath = Common::GetSchemaPath();
@@ -68,9 +78,8 @@ DOMInputSource* DataDirResolver::resolveEntity (const XMLCh *const /*publicId*/,
 		schemapath.erase(last, 1);  
 	}
 
-
     if(schemapath[schemapath.length()-1] != Common::fileSeperator) {
-		schemapath = schemapath + Common::fileSeperatorStr;
+		schemapath += Common::fileSeperatorStr;
 	}
 
 	string systemIDFilename = XmlCommon::ToString(systemId);
@@ -121,13 +130,12 @@ XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 	}
 
     try  {
-        XMLPlatformUtils::Initialize();
 
 		parser = makeParser(schemaLocation);
 		parserWithCallerAdoption = makeParser(schemaLocation);
 		// add one extra feature on this parser to prevent it from
 		// taking ownership of its documents.
-		parserWithCallerAdoption->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+		parserWithCallerAdoption->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
 
     } catch (const XMLException& toCatch) {
         string errMsg = "Error:  An error occured durring initialization of the xml utilities:\n";
@@ -144,7 +152,6 @@ XmlProcessor::XmlProcessor() : parserWithCallerAdoption(NULL), parser(NULL) {
 XmlProcessor::~XmlProcessor() {
 
     XmlProcessor::instance = NULL;
-	//  Delete the parser itself.  Must be done prior to calling Terminate, below.
 
 	if(parser != NULL){
 		parser->release();
@@ -153,35 +160,35 @@ XmlProcessor::~XmlProcessor() {
 	if (parserWithCallerAdoption != NULL){
 		parserWithCallerAdoption->release();
     }
-	XMLPlatformUtils::Terminate();
 }
 
-DOMBuilder *XmlProcessor::makeParser(const string &schemaLocation) {
+DOMLSParser *XmlProcessor::makeParser(const string &schemaLocation) {
     // Instantiate the DOM parser.
 	static const XMLCh gLS[] = { chLatin_L, chLatin_S, chNull };
 	DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(gLS);
 
-	DOMBuilder *parser = ((DOMImplementationLS*)impl)->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+	DOMLSParser *parser = ((DOMImplementationLS*)impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, XMLUni::fgDOMXMLSchemaType);
 
 	///////////////////////////////////////////////////////
 	//	Set features on the builder
 	///////////////////////////////////////////////////////
+	DOMConfiguration *domCfg = parser->getDomConfig();
 
-	parser->setFeature(XMLUni::fgDOMComments, false); // Discard Comment nodes in the document. 
-	parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true); // Let the validation process do its datatype normalization that is defined in the used schema language.  
-	parser->setFeature(XMLUni::fgDOMNamespaces, true); //  Perform Namespace processing
-	parser->setFeature(XMLUni::fgDOMValidation, true); // Report all validation errors.  
-	parser->setFeature(XMLUni::fgXercesSchema, true); //  Enable the parser's schema support.
-	parser->setFeature(XMLUni::fgXercesSchemaFullChecking, true); //  Enable full schema constraint checking, including checking which may be time-consuming or memory intensive. Currently, particle unique attribution constraint checking and particle derivation restriction checking are controlled by this option.  
-	parser->setFeature(XMLUni::fgXercesValidationErrorAsFatal, true); //  The parser will treat validation error as fatal and will exit  
-	parser->setFeature(XMLUni::fgXercesDOMHasPSVIInfo, true); // Enable storing of PSVI information in element and attribute nodes.
+	domCfg->setParameter(XMLUni::fgDOMComments, false); // Discard Comment nodes in the document. 
+	domCfg->setParameter(XMLUni::fgDOMDatatypeNormalization, true); // Let the validation process do its datatype normalization that is defined in the used schema language.  
+	domCfg->setParameter(XMLUni::fgDOMNamespaces, true); //  Perform Namespace processing
+	domCfg->setParameter(XMLUni::fgDOMValidate, true); // Report all validation errors.  
+	domCfg->setParameter(XMLUni::fgXercesSchema, true); //  Enable the parser's schema support.
+	domCfg->setParameter(XMLUni::fgXercesSchemaFullChecking, true); //  Enable full schema constraint checking, including checking which may be time-consuming or memory intensive. Currently, particle unique attribution constraint checking and particle derivation restriction checking are controlled by this option.  
+	domCfg->setParameter(XMLUni::fgXercesValidationErrorAsFatal, true); //  The parser will treat validation error as fatal and will exit  
+	domCfg->setParameter(XMLUni::fgXercesDOMHasPSVIInfo, true); // Enable storing of PSVI information in element and attribute nodes.
 
 	///////////////////////////////////////////////////////
 //****************************************************************************************//
 //			The following code was added to handle air-gap operation					  //	
 //****************************************************************************************//
 	/* Look for XML schemas in local directory instead of Internet */
-	parser->setEntityResolver (&resolver);
+	domCfg->setParameter(XMLUni::fgDOMResourceResolver, &resolver);
 //****************************************************************************************//
 //			End of air-gap code															  //	
 //****************************************************************************************//
@@ -189,7 +196,7 @@ DOMBuilder *XmlProcessor::makeParser(const string &schemaLocation) {
 	///////////////////////////////////////////////////////
 	//	Add an Error Handler
 	///////////////////////////////////////////////////////
-	parser->setErrorHandler(&errHandler);
+	domCfg->setParameter(XMLUni::fgDOMErrorHandler, &errHandler);
 
 	// Fix a schema location if possible, so instance documents don't
 	// have to set the schemaLocation attribute.  And if they do, this
@@ -197,16 +204,16 @@ DOMBuilder *XmlProcessor::makeParser(const string &schemaLocation) {
 	// overriding of the value in instance documents.
 	if (!schemaLocation.empty()) {
 		XMLCh *schemaLocationCstr = XMLString::transcode(schemaLocation.c_str());
-		parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation, schemaLocationCstr);
+		domCfg->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, schemaLocationCstr);
 		XMLString::release(&schemaLocationCstr);
 	}
 
 	return parser;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string filePathIn, bool callerAdopts) {
+DOMDocument* XmlProcessor::ParseFile(string filePathIn, bool callerAdopts) {
 	
-    XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *resultDocument = NULL;
+    DOMDocument *resultDocument = NULL;
 
     try  {
 		errHandler.resetErrors();
@@ -245,25 +252,25 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::ParseFile(string fileP
 	return resultDocument;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocument(string root) {
+DOMDocument* XmlProcessor::CreateDOMDocument(string root) {
 
 	XMLCh *xmlRoot = XMLString::transcode(root.c_str());
 	XMLCh* core = XMLString::transcode ("Core");
 	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(core);
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc = impl->createDocument(0, xmlRoot, 0);
+	DOMDocument* doc = impl->createDocument(0, xmlRoot, 0);
 	//Free memory allocated by XMLString::transcode(char*)
 	XMLString::release(&xmlRoot);
 	XMLString::release(&core);
 	return(doc);
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocumentNS(string namespaceURI, string qualifiedName) {
+DOMDocument* XmlProcessor::CreateDOMDocumentNS(string namespaceURI, string qualifiedName) {
 
 	XMLCh *uri = XMLString::transcode(namespaceURI.c_str());
 	XMLCh *name = XMLString::transcode(qualifiedName.c_str());
 	XMLCh *core = XMLString::transcode ("Core");
 	DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(core);
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc = impl->createDocument(uri, name, NULL);
+	DOMDocument* doc = impl->createDocument(uri, name, NULL);
 	//Free memory allocated by XMLString::transcode(char*)
 	XMLString::release(&uri);
 	XMLString::release(&name);
@@ -271,31 +278,32 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* XmlProcessor::CreateDOMDocumentNS(st
 	return(doc);
 }
 
-void XmlProcessor::WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* doc,  string filePath, bool writeToFile) {
+void XmlProcessor::WriteDOMDocument(DOMDocument* doc,  string filePath, bool writeToFile) {
+
+	DOMLSOutput *out = NULL;
+	XMLFormatTarget *myFormTarget = NULL;
+	DOMLSSerializer *theSerializer = NULL;
 
 	try
 	{
 		// get a serializer, an instance of DOMWriter
-		XMLCh tempStr[100];
-		XMLString::transcode("LS", tempStr, 99);
-		DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
-		DOMWriter *theSerializer = ((DOMImplementationLS*)impl)->createDOMWriter();
+		static const XMLCh gLS[] = { chLatin_L, chLatin_S, chNull };
+		DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(gLS);
+		theSerializer = ((DOMImplementationLS*)impl)->createLSSerializer();
+		DOMConfiguration *domCfg = theSerializer->getDomConfig();
 
 		// set feature if the serializer supports the feature/mode
-		if (theSerializer->canSetFeature(XMLUni::fgDOMWRTSplitCdataSections, true))
-			theSerializer->setFeature(XMLUni::fgDOMWRTSplitCdataSections, true);
+		if (domCfg->canSetParameter(XMLUni::fgDOMWRTSplitCdataSections, true))
+			domCfg->setParameter(XMLUni::fgDOMWRTSplitCdataSections, true);
 
-		if (theSerializer->canSetFeature(XMLUni::fgDOMWRTDiscardDefaultContent, true))
-			theSerializer->setFeature(XMLUni::fgDOMWRTDiscardDefaultContent, true);
+		if (domCfg->canSetParameter(XMLUni::fgDOMWRTDiscardDefaultContent, true))
+			domCfg->setParameter(XMLUni::fgDOMWRTDiscardDefaultContent, true);
 
-		if (theSerializer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true))
-			theSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+		if (domCfg->canSetParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true))
+			domCfg->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true);
 
-		if (theSerializer->canSetFeature(XMLUni::fgDOMWRTBOM, false))
-			theSerializer->setFeature(XMLUni::fgDOMWRTBOM, false);
-
-		//if (theSerializer->canSetFeature(XMLUni::fgDOMWRTDiscardDefaultContent, true))
-		//	theSerializer->setFeature(XMLUni::fgDOMWRTBOM, true);
+		if (domCfg->canSetParameter(XMLUni::fgDOMWRTBOM, false))
+			domCfg->setParameter(XMLUni::fgDOMWRTBOM, false);
 
 		//
 		// Plug in a format target to receive the resultant
@@ -304,17 +312,20 @@ void XmlProcessor::WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* 
 		// StdOutFormatTarget prints the resultant XML stream
 		// to stdout once it receives any thing from the serializer.
 		//
-		XMLFormatTarget *myFormTarget;
 		if (writeToFile)
 			myFormTarget = new LocalFileFormatTarget(filePath.c_str());
 		else
 			myFormTarget = new StdOutFormatTarget();
 
+		DOMLSOutput *out = impl->createLSOutput();
+		out->setByteStream(myFormTarget);
+
 		//
 		// do the serialization through DOMWriter::writeNode();
 		//
-		theSerializer->writeNode(myFormTarget, *doc);
+		theSerializer->write(doc, out);
 
+		out->release();
 		theSerializer->release();
 		delete myFormTarget;
 	}
@@ -329,6 +340,10 @@ void XmlProcessor::WriteDOMDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* 
 		{
 			error.append("Error while writing Document to screen");
 		}
+
+		if (myFormTarget) delete myFormTarget;
+		if (out) out->release();
+		if (theSerializer) theSerializer->release();
 
 		throw XmlProcessorException(error);
 	}
@@ -377,8 +392,8 @@ bool XmlProcessorErrorHandler::handleError(const DOMError& domError) {
 
 	string msg =  XmlCommon::ToString(domError.getMessage());
 	string file = XmlCommon::ToString(domError.getLocation()->getURI());
-	long line = domError.getLocation()->getLineNumber();
-	long at = domError.getLocation()->getColumnNumber();
+	XMLFileLoc line = domError.getLocation()->getLineNumber();
+	XMLFileLoc at = domError.getLocation()->getColumnNumber();
 
 	errorMessages.append("\n\tMessage: " + msg);
 	errorMessages.append("\n\tFile: " + file);

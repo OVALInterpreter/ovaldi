@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,37 +28,44 @@
 //
 //****************************************************************************************//
 
+#include <iostream>
+
+#include "XmlProcessor.h"
+#include "Common.h"
+#include "Log.h"
+
 
 #include "DocumentManager.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								DocumentManager Class									  //
 //****************************************************************************************//
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::definitionDoc = NULL;
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::systemCharacteristicsDoc = NULL;
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::resultDoc = NULL;
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::externalVariableDoc = NULL;
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::evaluationIdDoc = NULL;
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::directivesConfigDoc = NULL;
+DOMDocument* DocumentManager::definitionDoc = NULL;
+DOMDocument* DocumentManager::systemCharacteristicsDoc = NULL;
+DOMDocument* DocumentManager::resultDoc = NULL;
+DOMDocument* DocumentManager::externalVariableDoc = NULL;
+DOMDocument* DocumentManager::evaluationIdDoc = NULL;
+DOMDocument* DocumentManager::directivesConfigDoc = NULL;
 
 // ***************************************************************************************	//
 //								Public members												//
 // ***************************************************************************************	//
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDefinitionDocument() {
+DOMDocument* DocumentManager::GetDefinitionDocument() {
 	return DocumentManager::definitionDoc;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetResultDocument() {
+DOMDocument* DocumentManager::GetResultDocument() {
 	return DocumentManager::resultDoc;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetSystemCharacteristicsDocument() {
+DOMDocument* DocumentManager::GetSystemCharacteristicsDocument() {
 	return DocumentManager::systemCharacteristicsDoc;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariableDocument() {
+DOMDocument* DocumentManager::GetExternalVariableDocument() {
 
 	if(DocumentManager::externalVariableDoc == NULL) {
 		string varFile = Common::GetExternalVariableFile();
@@ -82,7 +89,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetExternalVariable
 	return DocumentManager::externalVariableDoc;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetEvaluationIdDocument() {
+DOMDocument* DocumentManager::GetEvaluationIdDocument() {
 
 	if(DocumentManager::evaluationIdDoc == NULL) {
 		string idFile = Common::GetDefinitionIdsFile();
@@ -106,7 +113,7 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetEvaluationIdDocu
 	return DocumentManager::evaluationIdDoc;
 }
 
-XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDirectivesConfigDocument() {
+DOMDocument* DocumentManager::GetDirectivesConfigDocument() {
 
 	if(DocumentManager::directivesConfigDoc == NULL) {
 		string varFile = Common::GetDirectivesConfigFile();
@@ -134,22 +141,22 @@ XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* DocumentManager::GetDirectivesConfig
 	return DocumentManager::directivesConfigDoc;
 }
 
-void DocumentManager::SetSystemCharacteristicsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* sc) {
+void DocumentManager::SetSystemCharacteristicsDocument(DOMDocument* sc) {
 	DocumentManager::systemCharacteristicsDoc = sc;
 }
 
-void DocumentManager::SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* r) {
+void DocumentManager::SetResultDocument(DOMDocument* r) {
 	DocumentManager::resultDoc = r;
 }
 
-void DocumentManager::SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
+void DocumentManager::SetDefinitionDocument(DOMDocument* d) {
 	DocumentManager::definitionDoc = d;
 }
 
-void DocumentManager::SetExternalVariableDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
+void DocumentManager::SetExternalVariableDocument(DOMDocument* d) {
 	DocumentManager::externalVariableDoc = d;
 }
 
-void DocumentManager::SetDirectivesConfigDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* d) {
+void DocumentManager::SetDirectivesConfigDocument(DOMDocument* d) {
 	DocumentManager::directivesConfigDoc = d;
 }

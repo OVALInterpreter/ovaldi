@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,6 +27,22 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <time.h>
+#include <algorithm>
+#include <iostream>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "REGEX.h"
+
+#ifdef WIN32
+	#include <windows.h>
+#endif
 
 #include "Common.h"
 
@@ -83,8 +99,11 @@ string  Common::definitionIdsFile              = "";
 const string Common::REGEX_CHARS = "^$\\.[](){}*+?|";
 
 namespace {
-	bool caseInsensitiveCmpChars(char c1, char c2) {
+	bool caseInsensitiveCmpCharsA(char c1, char c2) {
 		return tolower(c1) == tolower(c2);
+	}
+	bool caseInsensitiveCmpCharsW(wchar_t c1, wchar_t c2) {
+		return towlower(c1) == towlower(c2);
 	}
 }
 
@@ -342,7 +361,8 @@ void Common::SetResultsSchematronPath(string path) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 StringVector* Common::ParseDefinitionIdsFile() {
-		
+	using namespace xercesc;
+
 	string definitinIdsFile = Common::GetDefinitionIdsFile();
 
 	Log::Debug("Parsing definition id file for limited definition evaluation. \"" + definitinIdsFile + "\"");
@@ -357,9 +377,14 @@ StringVector* Common::ParseDefinitionIdsFile() {
 	} else {
 		
         definitionIds = new StringVector();
-
+		xercesc::DOMDocument* idDocument;
+		try{
+			idDocument = DocumentManager::GetEvaluationIdDocument();
+		} catch (Exception e) {
+			throw Exception("Error: Failed to read definitions id file.");
+		}
 		// parse the file to get the set of ids
-		DOMElement* definitionsElm = XmlCommon::FindElementNS(DocumentManager::GetEvaluationIdDocument(), "evalutation-definition-ids");
+		DOMElement* definitionsElm = idDocument->getDocumentElement();
 		if(definitionsElm != NULL) {
 
 			DOMNodeList* definitionElms = definitionsElm->getChildNodes();
@@ -391,9 +416,8 @@ StringVector* Common::ParseDefinitionIdsString() {
 	Log::UnalteredMessage(logMessage);
 
 	// validate the format of the string
-	REGEX* regex = new REGEX();
-	if(!regex->IsMatch(Common::DEFINITION_ID_LIST.c_str(), definitionIdsString.c_str())) {
-		delete regex;
+	REGEX regex;
+	if(!regex.IsMatch(Common::DEFINITION_ID_LIST.c_str(), definitionIdsString.c_str())) {
 		throw Exception("Error: Invalid parameter format. Expected a comma separated list of definition ids. No spaces are allowed.");
 	}
 
@@ -409,7 +433,6 @@ StringVector* Common::ParseDefinitionIdsString() {
 		if(theString != NULL) {
 			free(theString);
 		}
-		delete regex;
 		delete definitionIds;
 		throw Exception("Error parsing definition id list. A delimiter was found, but no definition ids were found. Input version string: \'" + definitionIdsString + "\'");
 	} else {
@@ -419,12 +442,11 @@ StringVector* Common::ParseDefinitionIdsString() {
 			string tokenStr = token;
 			
 			// make sure it is a valid dafinition id
-			if(!regex->IsMatch(Common::DEFINITION_ID.c_str(), definitionIdsString.c_str())) {
+			if(!regex.IsMatch(Common::DEFINITION_ID.c_str(), definitionIdsString.c_str())) {
 				if(theString != NULL) {
 					free(theString);
 				}	
 				delete definitionIds;
-				delete regex;
 				throw Exception("Error: Invalid parameter format. Expected a comma separated list of definition ids. No spaces are allowed. Found invalid definition id");
 			}
 
@@ -439,7 +461,6 @@ StringVector* Common::ParseDefinitionIdsString() {
 	if(theString != NULL) {
 		free(theString);
 	}
-	delete regex;
 
 	return definitionIds;
 }
@@ -687,7 +708,13 @@ string Common::GetFullPath(string path) {
 bool Common::EqualsIgnoreCase(const string &s1, const string &s2) {
 	if (s1.size() != s2.size())
 		return false;
-	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpChars);
+	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpCharsA);
+}
+
+bool Common::EqualsIgnoreCase(const wstring &s1, const wstring &s2) {
+	if (s1.size() != s2.size())
+		return false;
+	return equal(s1.begin(), s1.end(), s2.begin(), caseInsensitiveCmpCharsW);
 }
 
 string Common::StripTrailingSeparators(const string &path) {

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -38,13 +38,9 @@
 #define DATACOLLECTOR_H
 
 #include "AbsDataCollector.h"
-#include "ObjectCollector.h"
-#include "SystemInfo.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
-	The red hat specific data collector
+	The solaris specific data collector
 */
 class DataCollector : public AbsDataCollector {
 public:

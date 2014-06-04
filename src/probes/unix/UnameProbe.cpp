@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,7 +27,18 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#ifdef SUNOS
+#  include <sys/systeminfo.h>
+#endif
+
+#include <sys/utsname.h>
+#include <errno.h>
+#include <string>
+
 #include "UnameProbe.h"
+
+using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  UnameProbe Class  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -60,45 +71,37 @@ ItemVector* UnameProbe::CollectItems(Object *object) {
 
 	struct utsname tmpName;
 	
-	if (uname(&tmpName) > -1) {
-
-		collectedItems = new ItemVector();
-
-		// create a new uname item
-		Item* item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		collectedItems->push_back(item);
-
-		item->AppendElement(new ItemEntity("machine_class",  tmpName.machine, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("node_name",  tmpName.nodename, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("os_name",  tmpName.sysname, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("os_release",  tmpName.release, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("os_version",  tmpName.version, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		// These two appear to be the same on a Linux system
-		item->AppendElement(new ItemEntity("processor_type",  tmpName.machine, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-
-	} else {
-		throw ProbeException("Error: UnameProbe() unable to get uname information");
+	if (uname(&tmpName) == -1) {
+		throw ProbeException(string("uname() error: ") + strerror(errno));
 	}
 
-	//I am laving this Solaris condition here for reference use
-	//When I have to write a Solaris uname probe. I will just use this probe as a template
-	/*#ifdef SUNOS
+#ifdef SUNOS
+	char sysinfoBuf[257];
+	if (sysinfo(SI_ARCHITECTURE_NATIVE, sysinfoBuf, 
+				sizeof(sysinfoBuf)) == -1) {
+		throw ProbeException(string("sysinfo() error: ") + strerror(errno));
+	}
+#endif
 
-	char buf[64];
-	
-	memset(buf, '\0', sizeof(buf));
-	if (sysinfo(SI_ARCHITECTURE, buf, sizeof(buf)) > -1) 
-	{
-		processorType = buf;
-	}
-	
-	memset(buf, '\0', sizeof(buf));
-	if (sysinfo(SI_PLATFORM, buf, sizeof(buf)) > -1) 
-	{
-		hardwarePlatform = buf;
-	}
-	#endif*/
+	collectedItems = new ItemVector();
+
+	// create a new uname item
+	Item* item = this->CreateItem();
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	collectedItems->push_back(item);
+
+	item->AppendElement(new ItemEntity("machine_class",  tmpName.machine, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("node_name",  tmpName.nodename, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("os_name",  tmpName.sysname, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("os_release",  tmpName.release, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	item->AppendElement(new ItemEntity("os_version",  tmpName.version, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+
+#ifdef SUNOS
+	item->AppendElement(new ItemEntity("processor_type",  sysinfoBuf, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+#else
+	// These two appear to be the same on a Linux system
+	item->AppendElement(new ItemEntity("processor_type",  tmpName.machine, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+#endif
 
 	return collectedItems;
 }

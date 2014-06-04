@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -37,6 +37,8 @@
 #include <fstream>
 #include <Log.h>
 #include <netdb.h>
+#include <limits.h> // for PATH_MAX
+
 #include <ObjectEntity.h>
 #include <OvalEnum.h>
 #include <sys/stat.h>
@@ -546,9 +548,9 @@ Item* XinetdProbe::Service2Item(const ServiceEntryMap& service,
 	item->AppendElement(nameItemEntity);
 
 	// the rest are optional
-	this->AddItemEntity(item, service, "flags");
-	this->AddItemEntity(item, service, "no_access");
-	this->AddItemEntity(item, service, "only_from");
+	this->AddUnboundedItemEntity(item, service, "flags");
+	this->AddUnboundedItemEntity(item, service, "no_access");
+	this->AddUnboundedItemEntity(item, service, "only_from");
 	this->AddItemEntity(item, service, "port", OvalEnum::DATATYPE_INTEGER);
 	this->AddItemEntity(item, service, "server");
 	this->AddItemEntity(item, service, "server_args", "server_arguments");
@@ -674,8 +676,31 @@ void XinetdProbe::AddItemEntity(Item *item,
 
 	ServiceEntryMap::const_iterator iter;
 	if ((iter = service.find(paramName)) != service.end())
-		item->AppendElement(new ItemEntity(entityName.c_str(), iter->second[0].str(),
+		item->AppendElement(new ItemEntity(entityName, iter->second[0].str(),
 										   dataType));
+}
+
+void XinetdProbe::AddUnboundedItemEntity(Item *item,
+				const ServiceEntryMap& service,
+				const std::string& paramName,
+				OvalEnum::Datatype dataType) {
+  this->AddUnboundedItemEntity(item, service, paramName, paramName, dataType);
+}
+
+void XinetdProbe::AddUnboundedItemEntity(Item *item,
+				const ServiceEntryMap& service,
+				const std::string& paramName,
+				const std::string& entityName,
+				OvalEnum::Datatype dataType) {
+
+  ServiceEntryMap::const_iterator iter;
+  if ((iter = service.find(paramName)) != service.end()){
+    StringVector values = iter->second[0].paramValues;
+    for(StringVector::const_iterator vIter = values.begin();vIter != values.end();vIter++){
+      item->AppendElement(new ItemEntity(entityName, *vIter,
+					 dataType));
+    }
+  }
 }
 
 void XinetdProbe::ReadFileToString(const string& fileName, string &contents) {

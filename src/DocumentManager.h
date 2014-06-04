@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,10 +30,7 @@
 #ifndef DOCUMENTMANAGER_H
 #define DOCUMENTMANAGER_H
 
-#include "XmlProcessor.h"
-#include "Common.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include <xercesc/dom/DOMDocument.hpp>
 
 /**
 	This class manages all documents in the application.
@@ -43,46 +40,46 @@ XERCES_CPP_NAMESPACE_USE
 class DocumentManager {
 public:
 	/** Return the definition document. */
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetDefinitionDocument();
+	static xercesc::DOMDocument* GetDefinitionDocument();
 	/** Return the systemCharacteristicsDoc document. */
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetSystemCharacteristicsDocument();
+	static xercesc::DOMDocument* GetSystemCharacteristicsDocument();
 	/** Return the resultDoc document. */
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetResultDocument();
+	static xercesc::DOMDocument* GetResultDocument();
 	/** Return the externalVariableDoc document.
 	 *  If the document has not yet been parsed parse it.
 	 */
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetExternalVariableDocument();
+	static xercesc::DOMDocument* GetExternalVariableDocument();
 
 	/** Get the evaluation id docuement.
 		If the evaluation id doc has not been parsed parse it.
 		@return Returns a DOMDocument.
 	*/
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetEvaluationIdDocument();
+	static xercesc::DOMDocument* GetEvaluationIdDocument();
 
 	/** Return the config document.
 		If the config doc has not been parsed parse it.
 		@return Returns a DOMDocument.
 	*/
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* GetDirectivesConfigDocument();
+	static xercesc::DOMDocument* GetDirectivesConfigDocument();
 
 	/** Set the definitionDoc document. */
-	static void SetDefinitionDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	static void SetDefinitionDocument(xercesc::DOMDocument*);
 	/** Set the systemCharacteristicsDoc document. */
-	static void SetSystemCharacteristicsDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	static void SetSystemCharacteristicsDocument(xercesc::DOMDocument*);
 	/** Set the resultDoc document. */
-	static void SetResultDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	static void SetResultDocument(xercesc::DOMDocument*);
 	/** Set the externalVariableDoc document. */
-	static void SetExternalVariableDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	static void SetExternalVariableDocument(xercesc::DOMDocument*);
 	/** Set the configDoc document. */
-	static void SetDirectivesConfigDocument(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument*);
+	static void SetDirectivesConfigDocument(xercesc::DOMDocument*);
 
 private:
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* systemCharacteristicsDoc;
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* definitionDoc;
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc;
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* externalVariableDoc;
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* evaluationIdDoc;
-	static XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* directivesConfigDoc;
+	static xercesc::DOMDocument* systemCharacteristicsDoc;
+	static xercesc::DOMDocument* definitionDoc;
+	static xercesc::DOMDocument* resultDoc;
+	static xercesc::DOMDocument* externalVariableDoc;
+	static xercesc::DOMDocument* evaluationIdDoc;
+	static xercesc::DOMDocument* directivesConfigDoc;
 };
 
 #endif

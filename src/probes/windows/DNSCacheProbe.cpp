@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,25 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
+#include <windns.h>
+
+#include "WindowsCommon.h"
+
 #include "DNSCacheProbe.h"
+
+using namespace std;
+
+typedef struct _DnsCacheEntry{
+    struct _DnsCacheEntry* pNext;  // Pointer to next entry
+    PWSTR pszName;                 // DNS Record Name
+    unsigned short wType;          // DNS Record Type
+    unsigned short wDataLength;    // Not referenced
+    unsigned long  dwFlags;        // DNS Record Flags
+}DNSCACHEENTRY;
+
+typedef BOOL (WINAPI DnsGetCacheDataTableAddress)(DNSCACHEENTRY** ppCacheEntry);
+
 
 //****************************************************************************************//
 //								DNSCacheProbe Class											  //	
@@ -162,7 +180,7 @@ Item* DNSCacheProbe::GetDnsCacheItem(string domainName){
 		if ( dnsStatus == DNS_ERROR_RECORD_DOES_NOT_EXIST ){
 			//If the domain name cannot be found report that it does not exist.
 			item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);	
-			item->AppendElement(new ItemEntity("domain_name",domainName,OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
+			item->AppendElement(new ItemEntity("domain_name","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_DOES_NOT_EXIST));
 		}else{
 			//Otherwise an error has occurred report error for entity and item.
 			item->AppendElement(new ItemEntity("domain_name","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_ERROR));

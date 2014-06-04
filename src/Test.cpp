@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,19 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "Test.h"
 
 using namespace std;
+using namespace xercesc;
 
 TestMap Test::processedTestsMap;
 //****************************************************************************************//
@@ -111,19 +121,9 @@ void Test::AppendTestedItem(TestedItem* testedItem) {
 	this->GetTestedItems()->push_back(testedItem);
 }
 
-VariableValueVector* Test::GetTestedVariables() {
-
-	return &this->testedVariables;
-}
-
-void Test::SetTestedVariables(VariableValueVector* testedVariables) {
-
-	this->testedVariables = (*testedVariables);
-}
-
-void Test::AppendTestedVariable(VariableValue* testedVariable) {
+void Test::AppendTestedVariable(const VariableValue &testedVariable) {
 	
-	this->GetTestedVariables()->push_back(testedVariable);
+	this->testedVariables.push_back(testedVariable);
 }
 
 string Test::GetId() {
@@ -276,10 +276,10 @@ void Test::Write(DOMElement* parentElm) {
 		this->SetWritten(true);
 
 		// get the parent document
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+		DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 		// create a new Test element
-		DOMElement* testElm = XmlCommon::AddChildElement(resultDoc, parentElm, "test");
+		DOMElement* testElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "test");
 
 		// add the attributes
 		XmlCommon::AddAttribute(testElm, "test_id", this->GetId());
@@ -293,6 +293,15 @@ void Test::Write(DOMElement* parentElm) {
 			XmlCommon::AddAttribute(testElm, "variable_instance", Common::ToString(this->GetVariableInstance()));
 		}	
 
+		OvalMessage* currentMessage = NULL;
+		unsigned int sizeOfMessageList = this->GetMessages()->size();
+		unsigned int msgCounter = 0;
+		while(msgCounter < sizeOfMessageList) {
+			currentMessage = this->GetMessages()->at(msgCounter);
+			currentMessage->Write(resultDoc,testElm,"oval-res", XmlCommon::resNS);
+			msgCounter++;
+		}
+
 		TestedItem* currentElement = NULL;
 		unsigned int sizeOfItemList = this->GetTestedItems()->size();
 		unsigned int itemCounter = 0;
@@ -304,17 +313,8 @@ void Test::Write(DOMElement* parentElm) {
 
 		// loop through all variable values and call write method
 		VariableValueVector::iterator iterator1;
-		for(iterator1 = this->GetTestedVariables()->begin(); iterator1 != this->GetTestedVariables()->end(); iterator1++) {
-			(*iterator1)->WriteTestedVariable(testElm);
-		}
-
-		OvalMessage* currentMessage = NULL;
-		unsigned int sizeOfMessageList = this->GetMessages()->size();
-		unsigned int msgCounter = 0;
-		while(msgCounter < sizeOfMessageList) {
-			currentMessage = this->GetMessages()->at(msgCounter);
-			currentMessage->Write(resultDoc,testElm,"oval");	 
-			msgCounter++;
+		for(iterator1 = this->testedVariables.begin(); iterator1 != this->testedVariables.end(); iterator1++) {
+			iterator1->WriteTestedVariable(testElm);
 		}
 
 		// loop through all vars in the states
@@ -323,12 +323,10 @@ void Test::Write(DOMElement* parentElm) {
 		    State* tmpState = State::SearchCache((*it));
 		    if(tmpState != NULL) { 
 			    VariableValueVector::iterator iterator2;
-			    VariableValueVector* stateVars = tmpState->GetVariableValues();
-			    for(iterator2 = stateVars->begin(); iterator2 != stateVars->end(); iterator2++) {
-				    (*iterator2)->WriteTestedVariable(testElm);
+			    VariableValueVector stateVars = tmpState->GetVariableValues();
+			    for(iterator2 = stateVars.begin(); iterator2 != stateVars.end(); iterator2++) {
+				    iterator2->WriteTestedVariable(testElm);
 			    }
-                stateVars->clear();
-                delete stateVars;
 		    }		    
         }
 	}
@@ -342,7 +340,9 @@ void Test::Parse(DOMElement* testElm) {
 	// get the attributes
 	this->SetId(XmlCommon::GetAttributeByName(testElm, "id"));
 	this->SetName(XmlCommon::GetElementName(testElm));
-	this->SetVersion(atoi(XmlCommon::GetAttributeByName(testElm, "version").c_str()));
+	int vers = 0;
+	Common::FromString(XmlCommon::GetAttributeByName(testElm, "version"), &vers);
+	this->SetVersion(vers);
 	this->SetCheckExistence(OvalEnum::ToExistence(XmlCommon::GetAttributeByName(testElm, "check_existence")));
 	this->SetCheck(OvalEnum::ToCheck(XmlCommon::GetAttributeByName(testElm, "check")));
     this->SetStateOperator(OvalEnum::ToOperator(XmlCommon::GetAttributeByName(testElm, "state_operator")));
@@ -410,7 +410,7 @@ OvalEnum::ResultEnumeration Test::Analyze() {
                 // Get the component name from the first part of the test name
 				// NOTE: Due to the inconsistent OVAL object, test, items names this won't work for inetlisteningserver(s)
 				string componentName;
-                string::size_type loc = this->name.find("_", 0);
+                string::size_type loc = this->name.find_last_of('_');
 				if( loc != string::npos ) {
 					componentName = this->name.substr(0, loc);
 				}
@@ -496,8 +496,8 @@ OvalEnum::ResultEnumeration Test::Analyze() {
 						
 						} else if(childName.compare("variable_value") == 0) {
 							// create a new tested variable
-							VariableValue* testedVar = new VariableValue();
-							testedVar->Parse(collectedObjChildElm);
+							VariableValue testedVar;
+							testedVar.Parse(collectedObjChildElm);
 							this->AppendTestedVariable(testedVar);
 						} 
 					}

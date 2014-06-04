@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -29,9 +29,20 @@
 //****************************************************************************************//
 
 #include <algorithm>
+#include <typeinfo>
+#include <vector>
+
+#include "Common.h"
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "Log.h"
+#include "ObjectFactory.h"
+#include "VariableFactory.h"
+
 #include "AbsObjectCollector.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //							AbsObjectCollector Class									  //	
@@ -84,7 +95,7 @@ CollectedObject* AbsObjectCollector::Run(string objectId) {
 			collectedObject->SetFlag(ex.GetVariable()->GetFlag());
 			
 			// add all the messages reported with the AbsVariable
-			StringVector::iterator iterator;
+			StringVector::const_iterator iterator;
 			for(iterator = ex.GetVariable()->GetMessages()->begin(); iterator != ex.GetVariable()->GetMessages()->end(); iterator++) {
 				collectedObject->AppendOvalMessage(new OvalMessage((*iterator)));
 			}
@@ -153,11 +164,11 @@ void AbsObjectCollector::ApplyFilters(ItemVector* items, FilterVector* filters) 
 			items->end());
 }
 
-bool AbsObjectCollector::ExistsInSet(ItemVector* itemSet, Item* item) {
+bool AbsObjectCollector::ExistsInSet(const ItemVector* itemSet, Item* item) {
 
 	bool exists = false;
 	
-	for(ItemVector::iterator iterator = itemSet->begin(); iterator != itemSet->end(); iterator++) {
+	for(ItemVector::const_iterator iterator = itemSet->begin(); iterator != itemSet->end(); iterator++) {
 		if(item->GetId() == (*iterator)->GetId()) {
 			exists = true;
 			break;
@@ -170,10 +181,10 @@ CollectedSet* AbsObjectCollector::Union(CollectedSet* collectedSet1, CollectedSe
 	
 	ItemVector* resultItems = new ItemVector();
 
-	ItemVector* itemSet1 = collectedSet1->GetItems();
-	ItemVector* itemSet2 = collectedSet2->GetItems();
+	const ItemVector* itemSet1 = collectedSet1->GetItems();
+	const ItemVector* itemSet2 = collectedSet2->GetItems();
 
-	ItemVector::iterator iterator;
+	ItemVector::const_iterator iterator;
 	for(iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(!this->ExistsInSet(resultItems, (*iterator))) {
 			resultItems->push_back((*iterator));
@@ -196,11 +207,11 @@ CollectedSet* AbsObjectCollector::Intersection(CollectedSet* collectedSet1, Coll
 
 	ItemVector* resultItems = new ItemVector();
 
-	ItemVector* itemSet1 = collectedSet1->GetItems();
-	ItemVector* itemSet2 = collectedSet2->GetItems();
+	const ItemVector* itemSet1 = collectedSet1->GetItems();
+	const ItemVector* itemSet2 = collectedSet2->GetItems();
 
 	// Add the items from set 1 that exist in set 2
-	for(ItemVector::iterator iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
+	for(ItemVector::const_iterator iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(this->ExistsInSet(itemSet2, (*iterator))) {
 			resultItems->push_back((*iterator));
 		}
@@ -216,10 +227,10 @@ CollectedSet* AbsObjectCollector::Compelement(CollectedSet* collectedSet1, Colle
 
 	ItemVector* resultItems = new ItemVector();
 
-	ItemVector* itemSet1 = collectedSet1->GetItems();
-	ItemVector* itemSet2 = collectedSet2->GetItems();
+	const ItemVector* itemSet1 = collectedSet1->GetItems();
+	const ItemVector* itemSet2 = collectedSet2->GetItems();
 
-	ItemVector::iterator iterator;
+	ItemVector::const_iterator iterator;
 	for(iterator = itemSet1->begin(); iterator != itemSet1->end(); iterator++) {
 		if(!this->ExistsInSet(itemSet2, (*iterator))) {
 			resultItems->push_back((*iterator));
@@ -281,8 +292,7 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 			ItemVector* itemSet1 = refOneCollectedObj->GetReferences();
 			ItemVector filteredItems(*itemSet1);
 			this->ApplyFilters(&filteredItems, set->GetFilters());
-			VariableValueVector* set1Vars = refOneCollectedObj->GetVariableValues();
-			collectedSet1->AppendVariableValues(set1Vars);
+			collectedSet1->AppendVariableValues(refOneCollectedObj->GetVariableValues());
 			collectedSet1->SetFlag(refOneCollectedObj->GetFlag());
 			collectedSet1->SetItems(&filteredItems);
 		}
@@ -293,8 +303,7 @@ CollectedSet* AbsObjectCollector::ProcessSet(Set* set) {
 			ItemVector* itemSet2 = refTwoCollectedObj->GetReferences();
 			ItemVector filteredItems(*itemSet2);
 			this->ApplyFilters(&filteredItems, set->GetFilters());
-			VariableValueVector* set2Vars = refTwoCollectedObj->GetVariableValues();
-			collectedSet2->AppendVariableValues(set2Vars);
+			collectedSet2->AppendVariableValues(refTwoCollectedObj->GetVariableValues());
 			collectedSet2->SetFlag(refTwoCollectedObj->GetFlag());
 			collectedSet2->SetItems(&filteredItems);
 		}
@@ -359,6 +368,7 @@ CollectedObject* AbsObjectCollector::ProcessObject(Object* object) {
 				collectedObject = CollectedObject::Create(object);
 				collectedObject->AppendVariableValues(object->GetVariableValues());
 				collectedObject->AppendReferencesAndComputeFlag(items);
+				delete items;
 			} else {
 				
 				// because we first check if the object is supported the code should never get here.

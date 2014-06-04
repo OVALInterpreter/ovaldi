@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,67 +32,8 @@
 #define PROBEFACTORY_H
 
 #include <string>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 
-#include "AbsDataCollector.h"
-
-
-//	include the probe classes
-#include "ActiveDirectoryProbe.h"
-#include "FileProbe.h"
-#include "FileMd5Probe.h"
-#include "FileHashProbe.h"
-#include "FileHash58Probe.h"
-#include "DNSCacheProbe.h"
-#include "FamilyProbe.h"
-#include "RegistryProbe.h"
-#include "EnvironmentVariableProbe.h"
-#include "TextFileContentProbe.h"
-#include "XmlFileContentProbe.h"
-#include "VariableProbe.h"
-#include "WMIProbe.h"
-#include "WMI57Probe.h"
-#include "PasswordPolicyProbe.h"
-#include "LockoutPolicyProbe.h"
-#include "AuditEventPolicyProbe.h"
-#include "SidProbe.h"
-#include "SidSidProbe.h"
-#include "FileEffectiveRightsProbe.h"
-#include "FileEffectiveRights53Probe.h"
-#include "AccessTokenProbe.h"
-#include "GroupProbe.h"
-#include "UserProbe.h"
-#include "WindowsServicesProbe.h"
-#include "AuditEventPolicySubcategoriesProbe.h"
-#include "WUAUpdateSearcherProbe.h"
-#include "UserSidProbe.h"
-#include "UserSid55Probe.h"
-#include "SharedResourceProbe.h"
-#include "VolumeProbe.h"
-#include "InterfaceProbe.h"
-#include "PortProbe.h"
-#include "ProcessProbe.h"
-#include "Process58Probe.h"
-#include "PrinterEffectiveRightsProbe.h"
-#include "ServiceEffectiveRightsProbe.h"
-#include "RegKeyEffectiveRightsProbe.h"
-#include "RegKeyEffectiveRights53Probe.h"
-#include "TextFileContent54Probe.h"
-#include "GroupSidProbe.h"
-#include "FileAuditedPermissionsProbe.h"
-#include "FileAuditedPermissions53Probe.h"
-#include "RegKeyAuditedPermissionsProbe.h"
-#include "RegKeyAuditedPermissions53Probe.h"
-#include "MetabaseProbe.h"
-#include "LDAPProbe.h"
-#include "CmdletProbe.h"
-#include "EnvironmentVariable58Probe.h"
-
-using namespace std;
-
-class AbsProbe;
+#include "AbsProbe.h"
 
 /**
 	This class is a Factory class for getting probes for an object in an oval definitions file. 
@@ -112,16 +53,12 @@ public:
 		@param objectName a string taht corresponds to the name of an object in the oval definition schema.
 		@return The probe for the specified object or NULL.
 	*/
-	static AbsProbe* GetProbe(string objectName);
+	static AbsProbe* GetProbe(std::string objectName);
 
 	/** 
 		Shutdown the ProbeFactory.
 	*/
 	static void Shutdown();
-
-
-private:
-  static AbsProbeSet _probes;
 };
 
 #endif

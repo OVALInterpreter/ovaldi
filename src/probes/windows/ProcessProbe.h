@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,12 +30,10 @@
 #ifndef PROCESSPROBE_H
 #define PROCESSPROBE_H
 
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "WMIUtil.h"
-#include <Psapi.h>
-#include <tlhelp32.h>
+#include <map>
+#include <Tlhelp32.h> // for PROCESSENTRY32
 
+#include "AbsProbe.h"
 
 /** This class is responsible for collecting Windows 32-bit process data.  It is important to note that
  *  the OpenProcess() API call does not have access to all of the processes on the system.  Most
@@ -46,9 +44,6 @@
  *  http://msdn.microsoft.com/en-us/library/ms684320(VS.85).aspx
  *
  */
-
-typedef multimap<string, string> StringStringMultiMap;
-
 class ProcessProbe : public AbsProbe {
 
     public:
@@ -78,7 +73,7 @@ class ProcessProbe : public AbsProbe {
          *  @param commandLineStr A string that contains the command line of a Windows process.
          *  @return The Item object whose command line matches the specified value.
          */
-        Item* GetProcess ( string commandLineStr );
+        Item* GetProcess ( std::string commandLineStr );
 
         /** Build a process Item from the data collected using the various Windows APIs.  All Items are placed in the processes ItemVector.
          *  @param processHandle A HANDLE which specifies the process that you are building the Item for.
@@ -119,6 +114,9 @@ class ProcessProbe : public AbsProbe {
 
         /** The ItemVector that holds the information about all of the Windows processes on the local system. */
         ItemVector* processes;
+
+
+		typedef std::multimap<std::string, std::string> StringStringMultiMap;
 
         /** The StringStringMultiMap that holds the mapping between the device drives and the logical drives. */
         StringStringMultiMap* pathMap;

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,15 +31,10 @@
 #ifndef FILEFINDER_H
 #define FILEFINDER_H
 
+#include <string>
+
+#include "StdTypedefs.h"
 #include "AbsFileFinder.h"
-
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-
-#include <dirent.h>
-#include <limits.h>
 
 /**
 	This class is the linux file searching implmentation used by this application

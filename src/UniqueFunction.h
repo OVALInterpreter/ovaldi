@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -41,17 +41,19 @@
 */
 class UniqueFunction : public AbsFunctionComponent {
 public:
-	UniqueFunction();
-	~UniqueFunction();
+	UniqueFunction()
+	{}
+	virtual ~UniqueFunction()
+	{}
 
 	/** Parse the count element and its child component elements. */
-	void Parse(xercesc::DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Perform the count and return the result. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 };
 

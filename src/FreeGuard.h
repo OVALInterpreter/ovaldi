@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -90,7 +90,7 @@ public:
 	 * left alone.  Calling realloc(0) on a guard that is
 	 * not protecting anything is a no-op.
 	 *
-	 * \param newSize the size to reallocate the block to.
+	 * \param newSize the size, in bytes, to reallocate the block to.
 	 *   If zero, the block is freed.  This is not considered
 	 *   an error (true is returned).
 	 * \return true if the reallocation succeeded, or false if

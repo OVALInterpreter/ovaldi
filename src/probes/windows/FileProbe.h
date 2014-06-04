@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,20 +31,15 @@
 #ifndef FILEPROBE_H
 #define FILEPROBE_H
 
-#pragma warning(disable:4786)
-
-#include "FileFinder.h"
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-#include <TCHAR.H>
-#include <aclapi.h>
-#include <imagehlp.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <windows.h>
 #include <string>
+#include <map>
+
+#include "Item.h"
+#include "Object.h"
+#include "FileFinder.h"
+#include "AbsProbe.h"
+
 
 /**
 	This class is responsible for collecting file information for windows file_objects.
@@ -75,10 +70,8 @@ private:
 	/** Get the version of the file. */
 	void GetVersion(LPVOID versionbuf, std::string filePath, Item *item, ItemEntity* version);
 	/** Get the type of the file. */
-	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type, FileFinder &fileFinder);
-
-	/* holds the language mappings for the file language data */
-	static std::map<WORD,string> langMap;
+	void GetType(HANDLE hFile, std::string filePath, Item *item, ItemEntity* type,
+		const WIN32_FILE_ATTRIBUTE_DATA &lpFileInformation);
 };
 
 #endif

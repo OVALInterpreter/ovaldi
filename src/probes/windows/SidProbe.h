@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,13 +30,9 @@
 #ifndef SIDPROBE_H
 #define SIDPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-using namespace std;
-
 
 /**
 	This class is responsible for collecting information for windows sid_objects.
@@ -60,12 +56,11 @@ private:
 
 	/** Get account information for the specified account name.
 		Support behaviors. Resulting Items are pushed on to the 
-		items vector.
-		Return false if the set of items in not complete.
-
-		TODO: how can I set the colleced object flag correctly?
+		items vector.  This assumes \p accountName is formatted
+		properly.  If it isn't, you'll get an incorrect item.
 	*/
-	bool GetAccountInformation(string accountName,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
+	void GetAccountInformation(const std::string &accountName,
+		bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
 
 };
 

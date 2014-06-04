@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,6 +31,12 @@
 #ifndef POSSIBLERESTRICTIONTYPE_H
 #define POSSIBLERESTRICTIONTYPE_H
 
+#include <string>
+#include <vector>
+
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "OvalEnum.h"
 #include "RestrictionType.h"
 
 class PossibleRestrictionType;
@@ -44,20 +50,30 @@ class PossibleRestrictionType {
 public:
 
 	/** Create a new PossibleRestrictionType. */
-	PossibleRestrictionType();
-	~PossibleRestrictionType();
+	PossibleRestrictionType()
+	{}
+	~PossibleRestrictionType()
+	{}
 
-	void SetHint(std::string hint);
-	std::string GetHint();
+	void SetHint(std::string hint) {
+		this->hint = hint;
+	}
+	std::string GetHint() const {
+		return this->hint;
+	}
 
 	/** Parses a valid PossibleRestrictionType element as defined int eh oval definitions schema. */
-	void Parse(DOMElement* possibleRestrictionElm);
+	void Parse(xercesc::DOMElement* possibleRestrictionElm);
 
 	/** Ensure that the specified value matches the criteria specified by this possible_restriction element. */
 	bool ValidateValue(OvalEnum::Datatype datatype, std::string externalValue);
 
-	RestrictionTypeVector* GetRestrictionTypes();
-	void AppendRestrictionType(RestrictionType* rt);
+	const RestrictionTypeVector* GetRestrictionTypes() const {
+		return &this->restrictionTypes;
+	}
+	void AppendRestrictionType(RestrictionType* rt) {
+		this->restrictionTypes.push_back(rt);
+	}
 
 private:
 

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,11 +32,7 @@
 #define TIMEDIFFERENCEFUNCTION_H
 
 #include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
-#include <math.h>
 
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents a TimeDifferenceFunction component in a local_variable in the oval definition schema.
@@ -71,17 +67,20 @@ class TimeDifferenceFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete TimeDifferenceFunction object. */
-    TimeDifferenceFunction(OvalEnum::DateTimeFormat format1 = OvalEnum::DATETIME_YEAR_MONTH_DAY, OvalEnum::DateTimeFormat format2 = OvalEnum::DATETIME_YEAR_MONTH_DAY);
-	~TimeDifferenceFunction();
+    TimeDifferenceFunction(OvalEnum::DateTimeFormat format1 = OvalEnum::DATETIME_YEAR_MONTH_DAY, OvalEnum::DateTimeFormat format2 = OvalEnum::DATETIME_YEAR_MONTH_DAY)
+		: format1(format1), format2(format2)
+	{}
+	virtual ~TimeDifferenceFunction()
+	{}
 
 	/** Parse the substring element and its child component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired substring and return the value. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	
 
@@ -91,14 +90,22 @@ private:
     OvalEnum::DateTimeFormat format2;
 
 	/** Get the format1 field's value. */
-	OvalEnum::DateTimeFormat GetFormat1();
+	OvalEnum::DateTimeFormat GetFormat1() const {
+		return this->format1;
+	}
 	/** Set the format1 field's value. */
-	void SetFormat1(OvalEnum::DateTimeFormat format1);
+	void SetFormat1(OvalEnum::DateTimeFormat format1) {
+		this->format1 = format1;
+	}
 
     /** Get the format2 field's value. */
-	OvalEnum::DateTimeFormat GetFormat2();
+	OvalEnum::DateTimeFormat GetFormat2() const {
+		return this->format2;
+	}
 	/** Set the format2 field's value. */
-	void SetFormat2(OvalEnum::DateTimeFormat format2);
+	void SetFormat2(OvalEnum::DateTimeFormat format2) {
+		this->format2 = format2;
+	}
 	
 	/** Convert a DateTime_YEAR_MONTH_DAY format date-time value to seconds **/
 	time_t YearMonthDayValueToSeconds(std::string dateTimeValue);

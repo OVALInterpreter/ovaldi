@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,12 +31,12 @@
 #ifndef OBJECTREADER_H
 #define OBJECTREADER_H
 
-#include "Common.h"
-#include "DocumentManager.h"
+#include <string>
+
+#include "OvalEnum.h"
 #include "Item.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
+#include "StdTypedefs.h"
 
 /**
 	This class reads collected objects in a system characteristics files.
@@ -57,7 +57,7 @@ public:
 	static ItemVector* GetItemsForObject(std::string objectId);
 
 	/** Return the set of variable values used to collect the specified object. */
-	static VariableValueVector* GetVariableValuesForObject(std::string objectId);
+	static VariableValueVector GetVariableValuesForObject(std::string objectId);
 	static StringVector* GetMessagesForObject(std::string objectId);
 };
 

@@ -4,7 +4,7 @@
 
           Build Instructions - Linux
 
-  Copyright (c) 2002-2012, The MITRE Corporation
+  Copyright (c) 2002-2014, The MITRE Corporation
 
 ****************************************************
 
@@ -83,7 +83,7 @@ Download the appropriate installation files from the OVAL Interpreter SourceForg
 -- II -- BUILD INSTRUCTIONS --
 
 The following instructions describe how to build the OVAL Interpreter on a
-Linux system.  The OVAL Interpreter has been built and tested on the 32-bit version
+Linux system.  The OVAL Interpreter has been built and tested on the 32-bit and 64-bit versions
 of Red Hat Enterprise Linux 5. The source distribution includes a Makefile that 
 can be used to build the OVAL Interpreter on Linux systems. Before the OVAL 
 Interpreter can be built, the supporting libraries must be installed. Follow the 
@@ -95,11 +95,14 @@ instruction below to setup and install the supporting libraries.
        library.  If it has not been installed your system, it is easiest
        to simply install the pcre-devel RPM, available from Red Hat via
        your install media or Internet download method.
+	   
+	   Alternatively, this library and required headers may be installed with
+	   your default package manager (rpm, yum) by installing the "pcre-devel" package.
 
   B. Xerces Library
 
        The OVAL Interpreter uses the open source Xerces library.  The
-       binary was compiled with version 2.7.0 of the xerces-c library.  From
+       binary was compiled with version 3.1.1 of the xerces-c library.  From
        the Xerces Web site:
 
          "This product includes software developed by the Apache Software
@@ -107,28 +110,52 @@ instruction below to setup and install the supporting libraries.
 
        For more information about Xerces visit:
 
-         http://xml.apache.org
+         http://xerces.apache.org
 
-       The source code is also available at the above Web site.
+       The source code is also available at http://www.apache.org/dist/xerces/c/.
+	
+	   To compile and install the Xerces-C library from source, simply run the following commands.
+
+	   cd <xerces source dir>
+	   ./configure
+           make
+           sudo -E make install
 
        Note: Our ovaldi RPM places a pre-compiled copy of this library into
-             /usr/lib/ovaldi to reduce the dependencies that an unsophisticated
-             user would need to resolve.
+          /usr/lib/ovaldi to reduce the dependencies that an unsophisticated
+          user would need to resolve.
+
+	   Alternatively, this library and required headers may be installed with
+	   your default package manager (rpm, yum) by installing the "xerces-c-devel" package.
 
   C. Xalan Library
 
        The OVAL Interpreter uses the open source Xalan library.  The
-       binary was compiled with version 1.10.0 of the xalan-c library.  From
+       binary was compiled with version 1.11.0 of the xalan-c library.  From
        the Xalan Web site:
 
          "This product includes software developed by the Apache Software
 	     Foundation (http://www.apache.org/)."
 
-       For more information about Xerces visit:
+       For more information about Xalan visit:
 
-         http://xml.apache.org
+         http://xalan.apache.org
 
-       The source code is also available at the above Web site.
+       Before compiling, you may optionally apply xalan_optional_patch.txt, 
+       which resolves two issues.  One of them can cause a crash on Linux, the
+       other was only observed to cause a crash on Windows, but the patch is 
+       harmless on other OS's.
+
+       Then, simply run the following commands.
+
+         export XALANCROOT=<path to xalan-c>/c
+         export XERCESCROOT=<install path of xerces-c>
+         cd $XALANCROOT
+         ./runConfigure -p linux -c gcc -x g++
+         make
+         sudo -E make install
+
+         Note: The default install path for 'xerces-c' using a package manager would be /usr.
 
        Note: Our ovaldi RPM places a pre-compiled copy of this library into
              /usr/lib/ovaldi to reduce the dependencies that an unsophisticated
@@ -143,7 +170,10 @@ instruction below to setup and install the supporting libraries.
 
       For more information about RPM please visit:
         http://www.rpm.org
-
+		
+	   Alternatively, this library and required headers may be installed with
+	   your default package manager (rpm, yum) by installing the "rpm-devel" package.
+		
   E. APT
 
       The OVAL Interpreter can be compiled to utilize libraries provided by 
@@ -166,6 +196,9 @@ instruction below to setup and install the supporting libraries.
        For more information about Libgcrypt please visit:
          http://www.gnupg.org/related_software/libraries.en.html#lib-libgcrypt
 		 
+	   Alternatively, this library and required headers may be installed with
+	   your default package manager (rpm, yum) by installing the "libgcrypt-devel" package.
+		 
   G. OpenLDAP Library
   
       The OVAL Interpreter utilizes the open source OpenLDAP library to
@@ -182,6 +215,9 @@ instruction below to setup and install the supporting libraries.
         http://www.openldap.org/
 
       The source code is also available at the above Web site.	
+	  
+	   Alternatively, this library and required headers may be installed with
+	   your default package manager (rpm, yum) by installing the "openldap-devel" package.
   	
   H. Building the OVAL Interpreter
 
@@ -213,50 +249,47 @@ To download the source code for PCRE, please use the following FTP
 site:
 
     ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+	
+Alternatively, this library and required headers may be installed with
+your default package manager (rpm, yum) by installing the "pcre-devel" package.
 
 -- IV -- XERCES --
 
 The OVAL Interpreter uses the open source Xerces library.  The
-binary was compiled with version 2.7.0 of the xerces-c library.  From
+binary was compiled with version 3.1.1 of the xerces-c library.  From
 the Xerces Web site:
 
   "This product includes software developed by the Apache Software
   Foundation (http://www.apache.org/)."
 
 The Xerces library is under the Apache 2.0 License and is re-distributed
-in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result, 
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.[arch].rpm. As a result, 
 a copy of the license (LICENCE.xerces_xalan) has been provided.    
   
 For more information about Xerces visit:
 
-    http://xml.apache.org
+    http://xerces.apache.org
 
-The source code is also available at the above Web site.
-
-
-    Note: Our ovaldi RPM places a pre-compiled copy of this library into
-          /usr/lib/ovaldi to reduce the dependencies that an unsophisticated
-          user would need to resolve.
-
+The source code is also available at http://archive.apache.org/dist/xml/xerces-c/.
 
 -- V -- XALAN --
 
 The OVAL Interpreter uses the open source Xalan library.  The
-binary was compiled with version 1.10.0 of the xalan-c library.  From
+binary was compiled with version 1.11.0 of the xalan-c library.  From
 the Xalan Web site:
 
   "This product includes software developed by the Apache Software
   Foundation (http://www.apache.org/)."
 
 The Xalan library is under the Apache 2.0 License and is re-distributed
-in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.i386.rpm. As a result,
+in ovaldi-x.x.x-setup.exe and ovaldi-libs-x.x.x-1.[arch].rpm. As a result,
 a copy of the license (LICENCE.xerces_xalan) has been provided.
   
 For more information about Xalan visit:
 
-    http://xml.apache.org
-
-The source code is also available at the above Web site.
+    http://xalan.apache.org
+	
+The source code is also available at http://archive.apache.org/dist/xml/xalan-c/.
 
 -- VI -- LIBGCRYPT --
 
@@ -313,6 +346,6 @@ OVAL Interpreter Wiki -- http://sourceforge.net/apps/mediawiki/ovaldi/index.php?
 ----------------------------------------------------------
 OVAL is sponsored by US-CERT at the U.S. Department of Homeland
 Security. OVAL and the OVAL logo are trademarks of The MITRE
-Corporation. Copyright 2002-2012, The MITRE Corporation (www.mitre.org).
+Corporation. Copyright 2002-2014, The MITRE Corporation (www.mitre.org).
 
 

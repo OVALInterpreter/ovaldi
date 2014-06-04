@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,33 +28,25 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
+
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "XmlCommon.h"
+
 #include "EndFunction.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								Component Class											  //	
 //****************************************************************************************//
-EndFunction::EndFunction(string charIn) : AbsFunctionComponent() {
-
-	this->SetCharacter(charIn);
-}
-
-EndFunction::~EndFunction() {
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string EndFunction::GetCharacter() {
-	return this->character;
-}
-
-void EndFunction::SetCharacter(string charIn) {
-
-	this->character = charIn;
-}
-
 ComponentValue* EndFunction::ComputeValue() {
 
 	StringVector* values = NULL;
@@ -122,24 +114,15 @@ void EndFunction::Parse(DOMElement* componentElm) {
 	}
 }
 
-VariableValueVector* EndFunction::GetVariableValues() {
+VariableValueVector EndFunction::GetVariableValues() {
 	
-	VariableValueVector* values = new VariableValueVector();
+	VariableValueVector values;
 	AbsComponentVector* components = this->GetComponents();
 	AbsComponentVector::iterator iterator;
 	for(iterator = components->begin(); iterator != components->end(); iterator++) {
 		AbsComponent* component = (AbsComponent*)(*iterator);
-		VariableValueVector* tmp = component->GetVariableValues();
-		VariableValueVector::iterator varIterator;
-		for(varIterator = tmp->begin(); varIterator != tmp->end(); varIterator++) {
-			values->push_back((*varIterator));
-		}
-		// BUG - These can not currenrtly be deleted. 
-		// The code is no consistant here. In places a new vector is returned
-		// in others a reference to a vector that is managed by other code is returned.
-		//delete tmp;
-		//tmp = NULL;
+		VariableValueVector tmp = component->GetVariableValues();
+		copy(tmp.begin(), tmp.end(), back_inserter(values));
 	}
-
 	return values;
 }

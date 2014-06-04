@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,6 +28,11 @@
 //
 //****************************************************************************************//
 
+// This enables additional large-filesystem variants
+// of certain functions, so we can handle larger
+// filesystems.
+#define _LARGEFILE64_SOURCE
+
 #include <cerrno>
 #include <fstream>
 #include <sstream>
@@ -36,9 +41,11 @@
 // we'll use libblkid to figure out UUIDs of partitions
 #include <blkid/blkid.h>
 
-#include "PartitionProbe.h"
 #include <OvalMessage.h>
 #include <OvalEnum.h>
+#include <Log.h>
+
+#include "PartitionProbe.h"
 
 using namespace std;
 
@@ -146,7 +153,7 @@ void PartitionProbe::CachePartitions() {
 	ifstream in(MTAB_FILE_NAME);
 	string line;
 	string device, mountPoint, mountOpts, fsType;
-	struct statfs buf;
+	struct statfs64 buf;
 	BlkidCacheGuard blkidCache;
 
 	if (!in)
@@ -163,8 +170,8 @@ void PartitionProbe::CachePartitions() {
 		// replace any octal escape sequences...
 		this->DecodeMtabMountPoint(&mountPoint);
 		
-		if (statfs(mountPoint.c_str(), &buf))
-			throw ProbeException("statfs() error occurred on "+mountPoint+": "+strerror(errno));
+		if (statfs64(mountPoint.c_str(), &buf))
+			throw ProbeException("statfs64() error occurred on "+mountPoint+": "+strerror(errno));
 
 		re.GetAllMatchingSubstrings("[^,]+", mountOpts, mountOptMatches);
 
@@ -201,7 +208,7 @@ void PartitionProbe::CachePartitions() {
 
 		item->AppendElement(new ItemEntity("total_space", Common::ToString(buf.f_blocks), OvalEnum::DATATYPE_INTEGER));
 
-		// statfs() does not directly give you used space; it must be derived
+		// statfs64() does not directly give you used space; it must be derived
 		// from free and total space.  I chose the values I did to mimic the
 		// 'df' command.  The man page claims f_bfree is number of free blocks,
 		// whereas f_bavail is the number of free blocks available to non-

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,21 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
+#include <memory>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "DocumentManager.h"
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "Object.h"
 
 using namespace std;
+using namespace xercesc;
 
 ObjectMap Object::objectCache;
 
@@ -112,23 +124,16 @@ ObjectEntity* Object::GetElementByName(string elementName) {
 	return matchingElm;
 }
 
-VariableValueVector* Object::GetVariableValues() {
+VariableValueVector Object::GetVariableValues() {
 
-	VariableValueVector* varValues = new VariableValueVector();
+	VariableValueVector varValues, tmpValues;
 
 	// get the variable values used on each element
 	AbsEntityVector::iterator iterator;
 	for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
 		ObjectEntity* entity = (ObjectEntity*)(*iterator);
-		VariableValueVector* values = entity->GetVariableValues();
-		VariableValueVector::iterator varValueIt;
-		for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
-			VariableValue* var = (*varValueIt);
-			varValues->push_back(var);
-		}
-
-		delete values;
-		values = NULL;
+		tmpValues = entity->GetVariableValues();
+		copy(tmpValues.begin(), tmpValues.end(), back_inserter(varValues));
 	}
 
 	return varValues;
@@ -145,11 +150,11 @@ void Object::Parse(DOMElement* objectElm) {
 	this->SetComment(XmlCommon::GetAttributeByName(objectElm, "comment"));
 	this->SetXmlns(XmlCommon::GetNamespace(objectElm));
 	string versionStr = XmlCommon::GetAttributeByName(objectElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 
@@ -176,9 +181,9 @@ void Object::Parse(DOMElement* objectElm) {
 			} else if (childName == "filter") {
 				this->filters.push_back(new Filter(objectChild));
 			} else {
-                ObjectEntity* objectEntity = new ObjectEntity();
+                auto_ptr<ObjectEntity> objectEntity(new ObjectEntity());
 				objectEntity->Parse(objectChild);
-				this->AppendElement(objectEntity);
+				this->AppendElement(objectEntity.release());
 			}
 		}
 	}
@@ -219,8 +224,32 @@ bool Object::Analyze(Item* item) {
 
 			// Loop through all elements in the object
 			AbsEntityVector::iterator iterator;
-            for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end() && overallResult == OvalEnum::RESULT_TRUE; iterator++) {
+            for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
 				ObjectEntity* objectEntity = (ObjectEntity*)(*iterator);
+
+				/*******************************************************
+				 Ugly hackage to make user_sid objects match their items.
+				 This is done by checking for a particular entity of a
+				 particular object, and if found, we replace it with a
+				 dupe object entity with a changed name, for the purposes
+				 of the subsequent analysis.
+				 *******************************************************/
+				auto_ptr<ObjectEntity> fakedSidObjectEntity;
+				if (GetXmlns() == "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" &&
+					GetName() == "user_sid_object") {
+				  if (objectEntity->GetName() == "user") {
+					fakedSidObjectEntity.reset(new ObjectEntity(*objectEntity));
+					fakedSidObjectEntity->SetName("user_sid");
+					objectEntity = fakedSidObjectEntity.get();
+				  } else if (objectEntity->GetName() == "group") {
+					fakedSidObjectEntity.reset(new ObjectEntity(*objectEntity));
+					fakedSidObjectEntity->SetName("group_sid");
+					objectEntity = fakedSidObjectEntity.get();
+				  }
+				}
+				/******************************************************
+				 End ugly hackage
+				 ******************************************************/
 
 				// locate matching elements in the item
 				string objectElmName = objectEntity->GetName(); 
@@ -250,9 +279,8 @@ bool Object::Analyze(Item* item) {
                 scElements->clear();
 				delete scElements;
 			}
-
 			// compute the overall result
-            overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
+			overallResult = OvalEnum::CombineResultsByOperator(&iResults, OvalEnum::OPERATOR_AND);
 		}
 	}
 

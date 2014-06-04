@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,7 @@
 #ifndef REGKEYAUDITEDPERMISSIONSPROBE_H
 #define REGKEYAUDITEDPERMISSIONSPROBE_H
 
-#pragma warning(disable:4786)
-
 #include <Windows.h> // for HKEY
-#include "RegistryFinder.h"
 #include "AbsEffectiveRightsProbe.h"
 
 /**

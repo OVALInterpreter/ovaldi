@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -48,7 +48,7 @@ AbsEntityValue::AbsEntityValue(string value){
 	this->value = value;
 }
 
-string AbsEntityValue::GetValue(){
+string AbsEntityValue::GetValue() const {
 	return this->value;
 }
 

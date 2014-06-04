@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "WindowsCommon.h"
+#include "Log.h"
+
 #include "SidSidProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								SidSidProbe Class										  //	
@@ -221,7 +226,7 @@ bool SidSidProbe::GetAccountInformation(string sidStr,  bool resolveGroupBehavio
 	if (!WindowsCommon::LookUpTrusteeSid(sidStr, &accountNameStr, &domainStr, &isGroup)) {
 		Item* item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("trustee_sid", sidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 		items->push_back(item);
 		return false;
 	}

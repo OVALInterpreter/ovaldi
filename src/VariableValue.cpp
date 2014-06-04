@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,26 +28,27 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMText.hpp>
+
+#include "XmlCommon.h"
+
 #include "VariableValue.h"
 
 using namespace std;
-
-VariableValueVector VariableValue::vars;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableValue Class										  //	
 //****************************************************************************************//
-VariableValue::VariableValue(string id, string value) {
+VariableValue::VariableValue(string id, string value) : id(id), value(value) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Create a complete VariableValue object
 	//
 	// -----------------------------------------------------------------------
-
-	this->SetId(id);
-	this->SetValue(value);
-	VariableValue::vars.push_back(this);
 }
 
 VariableValue::~VariableValue() {
@@ -57,7 +58,7 @@ VariableValue::~VariableValue() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string VariableValue::GetId() {
+string VariableValue::GetId() const {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -79,7 +80,7 @@ void VariableValue::SetId(string id) {
 	this->id = id;
 }
 
-string VariableValue::GetValue() {
+string VariableValue::GetValue() const {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -101,7 +102,7 @@ void VariableValue::SetValue(string value) {
 	this->value = value;
 }
 
-void VariableValue::Write(DOMElement* collectedObjectElm) {
+void VariableValue::Write(DOMElement* collectedObjectElm) const {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -109,12 +110,8 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 	// -----------------------------------------------------------------------
 
 	// Create new item element
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
-	string elementName = "variable_value";
-	XMLCh* name = XMLString::transcode(elementName.c_str());
-	DOMElement* newVariableValueElem = scFile->createElement(name);
-	//Free memory allocated by XMLString::transcode(char*)
-	XMLString::release(&name);
+	DOMDocument* scFile = collectedObjectElm->getOwnerDocument();
+	DOMElement* newVariableValueElem = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "variable_value");
 	collectedObjectElm->appendChild(newVariableValueElem);
 
 	// Add the attributes
@@ -122,7 +119,7 @@ void VariableValue::Write(DOMElement* collectedObjectElm) {
 	XmlCommon::AddAttribute(newVariableValueElem, "variable_id", this->GetId());
 
 	// Add the value
-	if(this->GetValue().compare("") != 0) {
+	if(!this->GetValue().empty()) {
 		XMLCh* value = XMLString::transcode(this->GetValue().c_str());
 		DOMText* newVariableValueElemValue = scFile->createTextNode(value);
 		//Free memory allocated by XMLString::transcode(char*)
@@ -139,10 +136,10 @@ void VariableValue::WriteTestedVariable(DOMElement* parentElm) {
 	// -----------------------------------------------------------------------
 
 	// get the parent document
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* resultDoc = parentElm->getOwnerDocument();
+	DOMDocument* resultDoc = parentElm->getOwnerDocument();
 
 	// create a new tested_item element
-	DOMElement* testedVarElm = XmlCommon::AddChildElement(resultDoc, parentElm, "tested_variable", this->GetValue());
+	DOMElement* testedVarElm = XmlCommon::AddChildElementNS(resultDoc, parentElm, XmlCommon::resNS, "tested_variable", this->GetValue());
 
 	// add the attributes
 	XmlCommon::AddAttribute(testedVarElm, "variable_id", this->GetId());
@@ -164,19 +161,15 @@ void VariableValue::Parse(DOMElement* variableValueElm) {
 	this->SetValue(XmlCommon::GetDataNodeValue(variableValueElm));
 }
 
-void VariableValue::ClearCache() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	delete all items in the cache
-	//
-	// -----------------------------------------------------------------------
+bool VariableValue::operator<(const VariableValue &other) const {
+	int cmp = id.compare(other.id);
+	if (cmp < 0)
+		return true;
+	else if (cmp > 0)
+		return false;
 
-	VariableValue* variableValue = NULL;
-	while(VariableValue::vars.size() != 0) {
-	  	variableValue = VariableValue::vars[VariableValue::vars.size()-1];
-	  	VariableValue::vars.pop_back();
-	  	delete variableValue;
-	  	variableValue = NULL;
-	}
+	cmp = value.compare(other.value);
+	if (cmp < 0)
+		return true;
+	return false;
 }

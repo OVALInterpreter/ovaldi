@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,13 +30,11 @@
 #ifndef GROUPPROBE_H
 #define GROUPPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-using namespace std;
-
+#include "Item.h"
+#include "Object.h"
 
 /**
 	This class is responsible for collecting information for windows group_objects.
@@ -63,7 +61,7 @@ private:
 	virtual Item* CreateItem();
 
 	/** Return a populated Item if the group exists and has any members. */
-	Item* GetGroupMembers(string groupName);
+	Item* GetGroupMembers(std::string groupName);
 
 };
 

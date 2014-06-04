@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,6 +28,22 @@
 //
 //****************************************************************************************//
 
+// Xalan and Xerces includes
+#include <xercesc/framework/LocalFileInputSource.hpp>
+#include <xercesc/sax/EntityResolver.hpp>
+#include <xercesc/sax/SAXException.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
+#include <xercesc/sax/InputSource.hpp>
+#include <xercesc/util/BinInputStream.hpp>
+#include <xalanc/PlatformSupport/XSLException.hpp>
+#include <xalanc/DOMSupport/XalanDocumentPrefixResolver.hpp>
+#include <xalanc/XPath/XObject.hpp>
+#include <xalanc/XPath/NodeRefList.hpp>
+#include <xalanc/XPath/XPathEvaluator.hpp>
+#include <xalanc/XalanSourceTree/XalanSourceTreeDOMSupport.hpp>
+#include <xalanc/XalanSourceTree/XalanSourceTreeInit.hpp>
+#include <xalanc/XalanSourceTree/XalanSourceTreeParserLiaison.hpp>
+
 #ifdef WIN32
 #  include <FsRedirectionGuard.h>
 #  include <PrivilegeGuard.h>
@@ -41,12 +57,48 @@
 #  define FS_REDIRECT_GUARD_END
 #endif
 
-#include <xercesc/sax/SAXException.hpp>
-#include <xercesc/sax/SAXParseException.hpp>
+#include "XmlCommon.h"
+#include "FileFinder.h"
 
 #include "XmlFileContentProbe.h"
 
 using namespace std;
+using namespace xercesc;
+using namespace xalanc;
+
+namespace {
+	/**
+	 * This class is an entity resolver that disables DTD resolution when
+	 * parsing an XML document.  This prevents unwanted network accesses.
+	 */
+	class DummyEntityResolver : public xercesc::EntityResolver
+	{
+	public:
+		virtual xercesc::InputSource* resolveEntity(const XMLCh *const publicId, const XMLCh *const systemId);
+
+	private:
+		/**
+		 * An InputSource implementation which always returns a DoNothingBinInputStream.
+		 */
+		class NoOpInputSource : public xercesc::InputSource
+		{
+		public:
+			virtual xercesc::BinInputStream* makeStream() const;
+		};
+
+		/**
+		 * A BinInputStream implementation which does nothing.  Both of its methods
+		 * simply return 0.
+		 */
+		class DoNothingBinInputStream : public xercesc::BinInputStream
+		{
+		public:
+			virtual XMLFilePos curPos() const;
+			virtual XMLSize_t readBytes(XMLByte *const toFill, const XMLSize_t maxToRead);
+			virtual const XMLCh *getContentType() const;
+		};
+	};
+}
 
 XmlFileContentProbe* XmlFileContentProbe::instance = NULL;
 
@@ -113,19 +165,15 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 				Item* item = NULL;
 
 				// check if the code should report that the filename does not exist.
-				StringVector fileNames;
-				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName, &fileNames)) {
-					StringVector::iterator iterator;
-					for(iterator = fileNames.begin(); iterator != fileNames.end(); iterator++) {
+				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName)) {
 
-						item = this->CreateItem();
-						item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-						item->AppendElement(new ItemEntity("filename", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-						ADD_WINDOWS_VIEW_ENTITY
-						collectedItems->push_back(item);
-					}
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					ADD_WINDOWS_VIEW_ENTITY
+					collectedItems->push_back(item);
 					
 				} else {
 
@@ -157,24 +205,20 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 		if ( filePath != NULL ){
 			StringVector fpaths;
 			if (fileFinder.ReportFilePathDoesNotExist(filePath,&fpaths)){
-				StringVector statusValues;
 				Item* item = NULL;
 				StringPair* fpComponents = NULL;
 
 				// build path ObjectEntity to pass to ReportPathDoesNotExist to retrieve the status of the path value
 				ObjectEntity* pathStatus = new ObjectEntity("path","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
-				// build filename ObjectEntity to pass to ReportFileNameDoesNotExist to retrieve the status of the filename value
-				ObjectEntity* fileNameStatus = new ObjectEntity("filename","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
 				
 				for(StringVector::iterator iterator = fpaths.begin(); iterator != fpaths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
-					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					ADD_WINDOWS_VIEW_ENTITY
 					collectedItems->push_back(item);
 					
@@ -188,23 +232,15 @@ ItemVector* XmlFileContentProbe::CollectItems(Object* object) {
 					delete pathStatus;
 					pathStatus = NULL;
 				}
-				if ( fileNameStatus != NULL ){
-					delete fileNameStatus;
-					fileNameStatus = NULL;
-				}
 			}
 		}else{
-			StringVector paths;
-			if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+			if(fileFinder.ReportPathDoesNotExist(path)) {
 				Item* item = NULL;
-				StringVector::iterator iterator;
-				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					ADD_WINDOWS_VIEW_ENTITY
-					collectedItems->push_back(item);
-				}
+				item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				ADD_WINDOWS_VIEW_ENTITY
+				collectedItems->push_back(item);
 			}
 		}
 	}
@@ -222,25 +258,8 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 
 	string contextNode = "/";
 
-	string filePath = Common::BuildFilePath((const string)path, (const string)fileName);
+	string filePath = Common::BuildFilePath(path, fileName);
 
-    XALAN_USING_XALAN(XSLException)
-	XALAN_USING_XERCES(XMLPlatformUtils)
-	XALAN_USING_XALAN(XPathEvaluator)
-	XALAN_USING_XERCES(LocalFileInputSource)
-	XALAN_USING_XALAN(NodeRefList)
-	XALAN_USING_XALAN(XalanDocument)
-	XALAN_USING_XALAN(XalanDocumentPrefixResolver)
-	XALAN_USING_XALAN(XalanDOMString)
-	XALAN_USING_XALAN(XalanNode)
-	XALAN_USING_XALAN(XalanSourceTreeInit)
-	XALAN_USING_XALAN(XalanSourceTreeDOMSupport)
-	XALAN_USING_XALAN(XalanSourceTreeParserLiaison)
-	XALAN_USING_XALAN(XObjectPtr)
-	XALAN_USING_XALAN(CharVectorType)	
-	XALAN_USING_XALAN(XObject)	
-
-	XMLPlatformUtils::Initialize();
 	XPathEvaluator::initialize();
 
 	// Initialize the XalanSourceTree subsystem...
@@ -380,7 +399,6 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 	}
 	
 	XPathEvaluator::terminate();
-	XMLPlatformUtils::Terminate();
 
 	} catch(const XSLException& theException) {
 		
@@ -390,28 +408,24 @@ Item* XmlFileContentProbe::EvaluateXpath(string path, string fileName, string xp
 		string errMsg = m.str();
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw ProbeException("Error while evaluating an xpath. " + errMsg);
 
 	} catch(ProbeException ex) {
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw;
 
 	} catch(Exception ex) {
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw;
 
 	} catch(...) {
 
 		XPathEvaluator::terminate();
-		XMLPlatformUtils::Terminate();
 
 		throw ProbeException("Error: XmlFileContentProbe() An unknown error occured while collecting data.");
 	}
@@ -438,22 +452,30 @@ Item* XmlFileContentProbe::CreateItem() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DummyEntityResolver methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-InputSource* DummyEntityResolver::resolveEntity(const XMLCh *const /*publicId*/, const XMLCh *const /*systemId*/)
-{
-    return new DummyEntityResolver::NoOpInputSource();
+namespace {
+	InputSource* DummyEntityResolver::resolveEntity(const XMLCh *const /*publicId*/, const XMLCh *const /*systemId*/)
+	{
+		return new DummyEntityResolver::NoOpInputSource();
+	}
+
+	BinInputStream* DummyEntityResolver::NoOpInputSource::makeStream() const
+	{
+		return new DummyEntityResolver::DoNothingBinInputStream();
+	}
+
+	XMLFilePos DummyEntityResolver::DoNothingBinInputStream::curPos() const
+	{
+		return 0;
+	}
+
+	XMLSize_t DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const /*toFill*/, const XMLSize_t /*maxToRead*/)
+	{
+		return 0;
+	}
+
+	const XMLCh *DummyEntityResolver::DoNothingBinInputStream::getContentType() const
+	{
+		return NULL;
+	}
 }
 
-BinInputStream* DummyEntityResolver::NoOpInputSource::makeStream() const
-{
-    return new DummyEntityResolver::DoNothingBinInputStream();
-}
-
-unsigned int DummyEntityResolver::DoNothingBinInputStream::curPos() const
-{
-    return 0;
-}
-
-unsigned int DummyEntityResolver::DoNothingBinInputStream::readBytes(XMLByte *const /*toFill*/, const unsigned int /*maxToRead*/)
-{
-    return 0;
-}

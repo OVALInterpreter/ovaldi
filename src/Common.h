@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -38,64 +38,18 @@
 #define COMMON_H
 
 #ifdef WIN32
-	#pragma warning(disable:4786)
-	#include <aclapi.h>
-	#include <windows.h>
-	#include <lmerr.h>
 	#include <Meta.h>
 #endif
 
 #include "Exception.h"
-#include "Log.h"
-#include "REGEX.h"
-#include "math.h"
-#include "errno.h"
 
-#include <iostream>
 #include <string>
-#include <cstring>
 #include <vector>
 #include <set>
-#include <time.h>
 #include <sstream>
-#include <algorithm>
-#include <utility>
-#include <functional>
 #include <cctype>
 
-
-#include "XmlCommon.h"
-#include "DocumentManager.h"
-
-/**
-	A vector for storing strings.
-*/
-typedef std::vector < std::string > StringVector;
-
-/**
-    A set for storing unique strings.
-*/
-typedef std::set < std::string > StringSet;
-
-/**
-	A vector for storing integers.
-*/
-typedef std::vector < int > IntVector;
-
-/**
-	A vector for storing long long integers.
-*/
-typedef std::vector < long long > LongLongVector;
-
-/**	
-	A pair for storing two related strings.
-*/
-typedef std::pair < std::string, std::string > StringPair;
-
-/**	
-	A vector for storing pairs of strings.
-*/
-typedef std::vector < StringPair* > StringPairVector;
+#include "StdTypedefs.h"
 
 // Default filenames for various input and output files
 #define DEFAULT_DEFINITION_SCHEMATRON_FILENAME "oval-definitions-schematron.xsl"
@@ -354,6 +308,9 @@ class Common {
 
 		/** Returns whether the two strings are equal, ignoring case. */
 		static bool EqualsIgnoreCase(const std::string &s1, const std::string &s2);
+
+		/** Returns whether the two strings are equal, ignoring case. */
+		static bool EqualsIgnoreCase(const std::wstring &s1, const std::wstring &s2);
 
 		/**
 		 * If the given path ends with a trailing path separator, this method

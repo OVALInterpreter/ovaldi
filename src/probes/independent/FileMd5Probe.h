@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,8 @@
 #ifndef FILEMD5PROBE_H
 #define FILEMD5PROBE_H
 
-#include "FileFinder.h"
 #include "AbsProbe.h"
 #include <Digest.h>
-
 
 /**
 	This class is responsible for collecting file md5 data.

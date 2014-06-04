@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,11 @@
 //
 //****************************************************************************************//
 
+#include "WindowsCommon.h"
+
 #include "GroupSidProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              GroupSidProbe Class                                       //
@@ -137,7 +141,7 @@ Item* GroupSidProbe::GetGroupSidInfo ( string groupSidStr ) {
 
     } else {
         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-        item->AppendElement ( new ItemEntity ( "group_sid", groupSidStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+        item->AppendElement ( new ItemEntity ( "group_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
 
         if ( WindowsCommon::IsGroupSID ( groupSidStr ) == 0 ) {
             item->AppendMessage ( new OvalMessage ( "The specified SID is not a group SID." ) );

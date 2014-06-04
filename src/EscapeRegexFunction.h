@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,9 @@
 #ifndef ESCAPEREGEXFUNCTION_H
 #define ESCAPEREGEXFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsFunctionComponent.h"
 
 /**
 	This class represents a EscapeRegexFunction component in a local_variable in the oval definition schema.
@@ -53,17 +52,19 @@ class EscapeRegexFunction : public AbsFunctionComponent {
 public:
 
 	/** Create a complete Component object. */
-	EscapeRegexFunction();
-	~EscapeRegexFunction();
+	EscapeRegexFunction()
+	{}
+	virtual ~EscapeRegexFunction()
+	{}
 
 	/** parse the component element. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the value by escaping all the values of the associated component. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 };
 
 #endif

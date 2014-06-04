@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "XmlCommon.h"
+#include "DocumentManager.h"
+#include "VariableFactory.h"
+
 #include "VariableProbe.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								VariableProbe Class										  //	
@@ -202,13 +210,12 @@ Item* VariableProbe::GetItemForVarId(string varId) {
 		
 	AbsVariable* var = VariableFactory::GetVariable(varId);
 
-	VariableValueVector* varValues = var->GetValues();
+	VariableValueVector varValues = var->GetValues();
 
 	// loop through all values
 	VariableValueVector::iterator iterator;
-	for(iterator = varValues->begin(); iterator != varValues->end(); iterator++) { 		
-		string value = (*iterator)->GetValue();	
-		item->AppendElement(new ItemEntity("value", value, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	for(iterator = varValues.begin(); iterator != varValues.end(); iterator++) { 		
+		item->AppendElement(new ItemEntity("value", iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	}
 
 	return item;

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,11 +28,9 @@
 //
 //****************************************************************************************//
 
-//SOLARIS PORT NOTICE:
-
-//This code is copied from the linux version of this file. I assume that in this case there
-//are is no need to change this code to run on solaris os. When a port to solaris is provided 
-//this code needs to be tested.
+#include "ObjectCollector.h"
+#include "SystemInfo.h"
+#include "DocumentManager.h"
 
 #include "DataCollector.h"
 

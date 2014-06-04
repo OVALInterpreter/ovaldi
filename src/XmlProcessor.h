@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source	and	binary forms, with or without modification,	are
@@ -31,34 +31,31 @@
 #ifndef	XMLPROCESSOR_H
 #define	XMLPROCESSOR_H
 
-#ifdef WIN32
-#pragma	warning(disable:4786)
-#endif
-
 #include <string>
 
 //	required xerces	includes
-#include <xercesc/dom/DOMBuilder.hpp>
+#include <xercesc/dom/DOMLSParser.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>
 #include <xercesc/dom/DOMError.hpp>
 
 // for entity resolver
-#include <xercesc/dom/DOMEntityResolver.hpp>
-#include <xercesc/dom/DOMInputSource.hpp>
+#include <xercesc/dom/DOMLSResourceResolver.hpp>
 
 #include "Exception.h"
 
 /** 
-	This class extends the default DOMEntityResolver and implments the resolve entity method 
-	to support 
-*/
-class DataDirResolver : public xercesc::DOMEntityResolver {
+ * A resource resolver that directs schema resolution for namespaces
+ * to local files.
+ */
+class DataDirResolver : public xercesc::DOMLSResourceResolver {
 public:
-	/**
-     *     
-	*/
-	xercesc::DOMInputSource *resolveEntity (const XMLCh *const publicId, const XMLCh *const systemId, const XMLCh *const baseURI);
+
+	virtual xercesc::DOMLSInput* resolveResource(const XMLCh *const resourceType,
+												const XMLCh *const namespaceUri,
+												const XMLCh *const publicId,
+												const XMLCh *const systemId,
+												const XMLCh *const baseURI);
 };
 
 /**
@@ -135,7 +132,7 @@ private:
 	/**
 	 * Has the common code for creating an XML parser.
 	 */
-	xercesc::DOMBuilder *makeParser(const std::string &schemaLocation = "");
+	xercesc::DOMLSParser *makeParser(const std::string &schemaLocation = "");
 
 	static XmlProcessor* instance;
 
@@ -144,7 +141,7 @@ private:
 	 * owns the documents it builds.  Users must manually destroy
 	 * those documents.
 	 */
-	xercesc::DOMBuilder *parserWithCallerAdoption;
+	xercesc::DOMLSParser *parserWithCallerAdoption;
 
 	/**
 	 * This parser doesn't have user-adoption switched on, so it
@@ -156,7 +153,7 @@ private:
 	 * appear to ever be switched off.  So to make sure this isn't
 	 * leaking memory, I have created separate parsers.
 	 */
-	xercesc::DOMBuilder *parser;
+	xercesc::DOMLSParser *parser;
 
 	/** The entity resolver for both parsers. */
 	DataDirResolver resolver;

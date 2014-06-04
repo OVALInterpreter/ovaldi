@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,20 +28,17 @@
 //
 //****************************************************************************************//
 
+#include "EntityComparator.h"
+#include "XmlCommon.h"
+
 #include "PossibleValueType.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									PossibleValueType Class								  //	
 //****************************************************************************************//
-
-PossibleValueType::PossibleValueType() {
-}
-
-PossibleValueType::~PossibleValueType() {
-
-}
 
 // ***************************************************************************************	//
 //								 Public members												//
@@ -56,22 +53,6 @@ void PossibleValueType::Parse(DOMElement* possibleValueTypeElm) {
 	
 	this->SetHint(XmlCommon::GetAttributeByName(possibleValueTypeElm, "hint"));
 	this->SetValue(XmlCommon::GetDataNodeValue(possibleValueTypeElm));
-}
-
-void PossibleValueType::SetHint(string hint) {
-	this->hint = hint;
-}
-
-string PossibleValueType::GetHint() {
-	return this->hint;
-}
-
-void PossibleValueType::SetValue(string value) {
-	this->value = value;
-}
-
-string PossibleValueType::GetValue() {
-	return this->value;
 }
 
 bool PossibleValueType::ValidateValue(OvalEnum::Datatype datatype, string externalValue) {

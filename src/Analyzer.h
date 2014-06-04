@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,12 +31,11 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 // other includes
-#include "Common.h"
-#include "Definition.h"
-#include "DocumentManager.h"
-#include "Version.h"
-#include "Item.h"
+#include "Exception.h"
+#include "StdTypedefs.h"
 
 /**
 	The Analyzer class is the starting point for the oval analysis.
@@ -62,13 +61,13 @@ public:
 	void Run(StringVector* definitionIds);
 
 	/** Return a ptr to the tests element in the results doc. **/
-	static DOMElement* GetResultsSystemTestsElm();
+	static xercesc::DOMElement* GetResultsSystemTestsElm();
 	/** Return a ptr to the definitions element in the results document. **/
-	static DOMElement* GetResultsSystemDefinitionsElm();
+	static xercesc::DOMElement* GetResultsSystemDefinitionsElm();
 	/** Return a ptr to the system element in the results document. **/
-	static DOMElement* GetResultsSystemElm();
+	static xercesc::DOMElement* GetResultsSystemElm();
 	/** Return a ptr to the results element in the results document. **/
-	static DOMElement* GetResultsElm();
+	static xercesc::DOMElement* GetResultsElm();
 
 	/** Print the results of the analysis. */
 	void PrintResults();
@@ -97,10 +96,10 @@ private:
 	/** Finialize the results document copying the sc and definitions files into their appropriate locations. */
 	void FinializeResultsDocument();
 
-	static DOMElement* definitionsElm;
-	static DOMElement* testsElm;
-	static DOMElement* resultsSystemElm;
-	static DOMElement* resultsElm;
+	static xercesc::DOMElement* definitionsElm;
+	static xercesc::DOMElement* testsElm;
+	static xercesc::DOMElement* resultsSystemElm;
+	static xercesc::DOMElement* resultsElm;
 
 	static StringPairVector trueResults;
 	static StringPairVector falseResults;

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,8 +28,16 @@
 //
 //****************************************************************************************//
 
+#include <AclAPI.h>
+
+#include "WindowsCommon.h"
+#include "RegistryFinder.h"
+#include <FileFinder.h>
 #include <AutoCloser.h>
+
 #include "AbsEffectiveRightsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              AbsEffectiveRightsProbe Class                         //
@@ -45,7 +53,7 @@ AbsEffectiveRightsProbe::~AbsEffectiveRightsProbe() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  Public Members  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,  bool resolveGroupBehavior, bool includeGroupBehavior ) {
+StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE objectType, HANDLE objectHandle, ObjectEntity* trusteeEntity, bool isSID,  bool resolveGroupBehavior, bool includeGroupBehavior, bool useSacl ) {
     PACL pdacl = NULL;
     PSID owner;
     PSID primaryGroup;
@@ -57,23 +65,40 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
     try {
         // Start by getting the sids from the dacl, owner, and primary group off the object's security descriptor
         string baseErrMsg = "Error: unable to get trustees for " + WindowsCommon::GetObjectType ( objectType ) + ".";
-        DWORD res = GetSecurityInfo ( objectHandle,                                // Object name
-                                      objectType,                                  // Object type
-                                      DACL_SECURITY_INFORMATION |                  // Information type
-                                      GROUP_SECURITY_INFORMATION |
-                                      OWNER_SECURITY_INFORMATION,
-                                      &owner,                                      // Owner
-                                      &primaryGroup,                               // Primary group
-                                      &pdacl,                                      // DACL
-                                      NULL,                                        // SACL
-                                      &pSD );                                      // Security Descriptor
+
+		DWORD res;
+		if (useSacl)
+			res = GetSecurityInfo ( objectHandle,      // Object name
+				objectType,                            // Object type
+				SACL_SECURITY_INFORMATION |            // Information type
+				GROUP_SECURITY_INFORMATION |
+				OWNER_SECURITY_INFORMATION,
+				&owner,                                // Owner
+				&primaryGroup,                         // Primary group
+				NULL,                                  // DACL
+				&pdacl,                                // SACL
+				&pSD );                                // Security Descriptor
+		else
+			res = GetSecurityInfo ( objectHandle,      // Object name
+				objectType,                            // Object type
+				DACL_SECURITY_INFORMATION |            // Information type
+				GROUP_SECURITY_INFORMATION |
+				OWNER_SECURITY_INFORMATION,
+				&owner,                                // Owner
+				&primaryGroup,                         // Primary group
+				&pdacl,                                // DACL
+				NULL,                                  // SACL
+				&pSD );                                // Security Descriptor
+
         if ( res != ERROR_SUCCESS ) {
             throw Exception ( baseErrMsg + " Unable to retrieve a copy of the security descriptor. Microsoft System Error (" + Common::ToString ( res ) + ") - " + WindowsCommon::GetErrorMessage ( res ) );
         }
 
         // Get sids from the dacl and insert the owner and primary group sids
 		if ( isSID ){
-			WindowsCommon::GetSidsFromPACL ( pdacl, &allTrustees );
+			// ACL's can be NULL (missing from a securable object).
+			if (pdacl)
+				WindowsCommon::GetSidsFromPACL ( pdacl, &allTrustees );
 			string sidStr;
 			if (!WindowsCommon::GetTextualSid(owner, &sidStr))
 				throw Exception("GetTrusteesForWindowsObject: Couldn't convert SID to string: "+
@@ -84,7 +109,9 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 					WindowsCommon::GetErrorMessage(GetLastError()));
 			allTrustees.insert(sidStr);
 		}else{
-			WindowsCommon::GetTrusteeNamesFromPACL(pdacl, &allTrustees);
+			// ACL's can be NULL (missing from a securable object).
+			if (pdacl)
+				WindowsCommon::GetTrusteeNamesFromPACL(pdacl, &allTrustees);
 			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(owner));
 			allTrustees.insert(WindowsCommon::GetFormattedTrusteeName(primaryGroup));
 		}
@@ -108,10 +135,11 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 
         } else {
             if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
+				VariableValueVector vals = trusteeEntity->GetVarRef()->GetValues();
                 // In the case of equals simply loop through all the variable values and add them to the set of all sids if they exist on the system
-                for ( VariableValueVector::iterator iterator = trusteeEntity->GetVarRef()->GetValues()->begin(); iterator != trusteeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-					if ( ( isSID && WindowsCommon::TrusteeSIDExists ( ( *iterator )->GetValue() ) ) || ( !isSID && WindowsCommon::TrusteeNameExists ( ( *iterator )->GetValue() ) ) ) {
-                        allTrustees.insert ( ( *iterator )->GetValue() );
+                for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+					if ( ( isSID && WindowsCommon::TrusteeSIDExists ( iterator->GetValue() ) ) || ( !isSID && WindowsCommon::TrusteeNameExists ( iterator->GetValue() ) ) ) {
+                        allTrustees.insert ( iterator->GetValue() );
                     }
                 }
             }
@@ -130,25 +158,25 @@ StringSet AbsEffectiveRightsProbe::GetTrusteesForWindowsObject ( SE_OBJECT_TYPE 
 
         // Apply the behaviors
         for ( StringSet::iterator it = workingTrustees.begin(); it != workingTrustees.end(); it++ ) {
-            // Is this a group
-            bool isGroup;
+            
+            if ( resolveGroupBehavior ) {
+				// Is this a group
+				bool isGroup;
+				if ( isSID ) isGroup = WindowsCommon::IsGroupSID ( ( *it ) );
+				else isGroup = WindowsCommon::IsGroup ( ( *it ) );
+				if( isGroup ) {
+					if ( includeGroupBehavior ) {
+						resultingTrustees.insert ( ( *it ) );
+					}
 
-			if ( isSID ) isGroup = WindowsCommon::IsGroupSID ( ( *it ) );
-			else isGroup = WindowsCommon::IsGroup ( ( *it ) );
-
-            if ( isGroup && resolveGroupBehavior ) {
-                if ( includeGroupBehavior ) {
-                    resultingTrustees.insert ( ( *it ) );
-                }
-
-                // Get the group members and add them to the set
-                StringSet groupMembers;
-                if ( isSID ) WindowsCommon::ExpandGroupBySID ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
-				else  WindowsCommon::ExpandGroup ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
-                for ( StringSet::iterator iterator = groupMembers.begin(); iterator != groupMembers.end(); iterator++ ) {
-                    resultingTrustees.insert ( ( *iterator ) );
-                }
-
+					// Get the group members and add them to the set
+					StringSet groupMembers;
+					if ( isSID ) WindowsCommon::ExpandGroupBySID ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
+					else  WindowsCommon::ExpandGroup ( ( *it ), &groupMembers, includeGroupBehavior, resolveGroupBehavior );
+					for ( StringSet::iterator iterator = groupMembers.begin(); iterator != groupMembers.end(); iterator++ ) {
+						resultingTrustees.insert ( ( *iterator ) );
+					}
+				}
             } else {
                 resultingTrustees.insert ( ( *it ) );
             }
@@ -178,21 +206,21 @@ void AbsEffectiveRightsProbe::GetMatchingTrustees ( string trusteePatternStr, St
     }
 }
 
-bool AbsEffectiveRightsProbe::ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, StringSet* trustees, bool isSID ) {
+bool AbsEffectiveRightsProbe::ReportTrusteeDoesNotExist ( ObjectEntity *trusteeEntity, bool isSID ) {
     bool result = false;
 
     if ( trusteeEntity->GetOperation() == OvalEnum::OPERATION_EQUALS && !trusteeEntity->GetNil() ) {
         if ( trusteeEntity->GetVarRef() == NULL ) {
             if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( trusteeEntity->GetValue() ) ) || (!isSID && !WindowsCommon::TrusteeNameExists ( trusteeEntity->GetValue() ) ) ) {
-                trustees->insert ( trusteeEntity->GetValue() );
                 result = true;
             }
 
         } else {
-            for ( VariableValueVector::iterator iterator = trusteeEntity->GetVarRef()->GetValues()->begin(); iterator != trusteeEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-				if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( (*iterator)->GetValue() ) ) || ( !isSID && !WindowsCommon::TrusteeNameExists ( (*iterator)->GetValue() ) ) ) {
-                    trustees->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = trusteeEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+				if ( ( isSID && !WindowsCommon::TrusteeSIDExists ( iterator->GetValue() ) ) || ( !isSID && !WindowsCommon::TrusteeNameExists ( iterator->GetValue() ) ) ) {
                     result = true;
+					break;
                 }
             }
         }

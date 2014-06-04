@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,7 +28,11 @@
 //
 //****************************************************************************************//
 
+#include "WindowsCommon.h"
+
 #include "GroupProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								GroupProbe Class											  //	
@@ -148,7 +152,7 @@ Item* GroupProbe::GetGroupMembers(string groupName) {
 		// create an item to report that a group was looked up and it did not exist
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("group", groupName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 	}
 
 	delete members;

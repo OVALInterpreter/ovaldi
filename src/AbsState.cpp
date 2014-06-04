@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,6 +28,8 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
 #include "AbsState.h"
 
 using namespace std;
@@ -227,7 +229,7 @@ void AbsState::AppendElement(AbsEntity* absEntity) {
 	this->elements.push_back(absEntity);
 }
 
-VariableValueVector* AbsState::GetVariableValues() {
+VariableValueVector AbsState::GetVariableValues() {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -235,20 +237,14 @@ VariableValueVector* AbsState::GetVariableValues() {
 	//
 	// -----------------------------------------------------------------------
 
-	VariableValueVector* varValues = new VariableValueVector();
+	VariableValueVector varValues;
 
 	AbsEntityVector::iterator iterator;
 	for(iterator = this->GetElements()->begin(); iterator != this->GetElements()->end(); iterator++) {
 		AbsEntity* entity = (AbsEntity*)(*iterator);
 		if(entity->GetVarRef() != NULL) {
-			VariableValueVector* values = entity->GetVariableValues();
-			VariableValueVector::iterator varValueIt;
-			for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
-				varValues->push_back((*varValueIt));
-			}
-
-			delete values;
-			values = NULL;
+			VariableValueVector values = entity->GetVariableValues();
+			copy(values.begin(), values.end(), back_inserter(varValues));
 		}
 	}
 	return varValues;

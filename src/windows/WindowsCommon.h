@@ -1,6 +1,6 @@
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,39 +30,27 @@
 #ifndef WINDOWSCOMMON_H
 #define WINDOWSCOMMON_H
 
-#define STRNICMP _strnicmp
-
-#pragma warning(disable:4786)
+#include <Windows.h> // for lots of windows types, e.g. DWORD
+#include <AccCtrl.h> // for SE_OBJECT_TYPE
+#include <string>
 
 #include "Exception.h"
-#include "Log.h"
 #include <Behavior.h>
-
-#include <aclapi.h>
-#include <lm.h>
-#include <Ntsecapi.h>
-#include <windows.h>
-#include <Sddl.h>
-#include <Authz.h>
-#undef __DOMDocument_FWD_DEFINED__
-#include <comdef.h>
-#include <DelayImp.h>
-
-
-using namespace std;
-
-/**
- * Which "view" to search, on a 64-bit OS.  Applicable to the registry and
- * filesystem.
- */
-enum BitnessView {
-	BIT_32, ///< well, 32_BIT isn't a valid identifier...
-	BIT_64
-};
+#include <Stdtypedefs.h>
+#include "BitnessView.h"
 
 class WindowsCommon {
 
 public:
+	/** Do some one-time setup. */
+	static void init();
+
+	/**
+	 * Release resources acquired in init().
+	 * I'm letting this throw... so be careful when calling
+	 * from destructors.
+	 */
+	static void uninit();
 	/** Disable all the privileges associated with the current process token.
 		If a specific privilege is needed later, it can be enabled by calling
 		AdjustTokenPrivileges() again.
@@ -70,7 +58,7 @@ public:
 	static bool DisableAllPrivileges();
 
 	/** Enable the specified privilege. */
-	static bool EnablePrivilege(string);
+	static bool EnablePrivilege(std::string);
 
 	/** Convert the provded PSID to a string in the SID string format. 
 
@@ -120,7 +108,7 @@ public:
 	static bool GetTextualSid(PSID pSid, std::string* TextualSid);
 
 	/** Return the string error massge for the specified error code. */
-	static string GetErrorMessage(DWORD dwLastError);
+	static std::string GetErrorMessage(DWORD dwLastError);
 
 	/** Expand the group returning all members. 
 		If the group does not exist return false. 
@@ -131,7 +119,7 @@ public:
 		@param includeSubGroups When true include subgroups in the set of groups that are reported.
 		@param resolveSubGroup When true recurse into any subgroups and expand them too.
 	*/
-	static bool ExpandGroup(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
+	static bool ExpandGroup(std::string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
 
 	/** Return true if the group exists add all the group member's SIDs to the memberSIDs parameter. 
 		
@@ -140,7 +128,7 @@ public:
 		@param includeSubGroups When true include subgroups in the set of groups that are reported.
 		@param resolveSubGroup When true recurse into any subgroups and expand them too.
 	*/
-	static bool ExpandGroupBySID(string groupSID, StringSet* memberSIDs, bool includeSubGroups, bool resolveSubGroup);
+	static bool ExpandGroupBySID(std::string groupSID, StringSet* memberSIDs, bool includeSubGroups, bool resolveSubGroup);
 
 
 	/** Get all trustee names on the system. 
@@ -161,21 +149,21 @@ public:
 	static StringSet* GetAllTrusteeSIDs();
 
 	/** Get the trustee name for the specified sid formatted for oval useage. */
-	static string GetFormattedTrusteeName(PSID pSid);
+	static std::string GetFormattedTrusteeName(PSID pSid);
 
 	/** Get the SID for the specified trustee name. 
 		TrusteeName should be a fully qualified account name. 
 		For more info see:
 		http://msdn.microsoft.com/en-us/library/aa379159.aspx
 	*/
-	static PSID GetSIDForTrusteeName(string trusteeName);
+	static PSID GetSIDForTrusteeName(std::string trusteeName);
 
 	/** Get the SID for the specified trustee sid string. 
 		TrusteeSID is a complete sid string formated as the 
 		For more info see:
 		http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthz/security/lookupaccountname.asp
 	*/
-	static PSID GetSIDForTrusteeSID(string trusteeSID);
+	static PSID GetSIDForTrusteeSID(std::string trusteeSID);
 
 	/** Retrieve the set of SIDS as strings from an ACL.
 		
@@ -199,7 +187,7 @@ public:
 	 * \param[out] isGroup receives true if the \p accountNameStr refers to a group, false otherwise
 	 * \return true if the account was found, false if it was not found.
 	 */
-	static bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr, bool *isGroup);
+	static bool LookUpTrusteeName(std::string* accountNameStr, std::string* sidStr, std::string* domainStr, bool *isGroup);
 
 	/**
 	 * Get the account and domain string for the specified trustee sid.
@@ -209,7 +197,24 @@ public:
 	 * \param[out] isGroup receives true if the \p sidStr refers to a group, false otherwise
 	 * \return true if the account was found, false if it was not found.
 	 */
-	static bool LookUpTrusteeSid(string sidStr, string* pAccountNameStr, string* pDomainStr, bool *isGroup);
+	static bool LookUpTrusteeSid(std::string sidStr, std::string* pAccountNameStr, std::string* pDomainStr, bool *isGroup);
+
+	/**
+	 * Normalizes the given trustee name.  Any of the out-params may be NULL,
+	 * if you don't need that particular value.
+	 *
+	 * \param[in] trusteeName the name to look up
+	 * \param[out] normName the normalized trustee name, or NULL
+	 * \param[out] normDomain the normalized domain name, or NULL
+	 * \param[out] normFormattedName the normalized formatted name, or NULL
+	 * \param[out] sidStr the SID, as a string, for the given trustee, or NULL
+	 * \param[out] isGroup whether the given trustee refers to a group
+	 * \return true if the account was found, false if it was not found.
+	 */
+	static bool NormalizeTrusteeName(const std::string &trusteeName, 
+		std::string *normName, std::string *normDomain, 
+		std::string *normFormattedName, std::string *sidStr,
+		bool *isGroup);
 
 	/** Convert a vector of trustee names to a vector of corresponding SID strings */
 	static void ConvertTrusteeNamesToSidStrings(StringSet *trusteeNames, StringSet *sidStrings);
@@ -218,14 +223,14 @@ public:
 	static StringSet* GetAllLocalUserSids();
 
 	/** Retrieves the last login time from a local username */
-	static DWORD GetLastLogonTimeStamp(string username);
+	static DWORD GetLastLogonTimeStamp(std::string username);
 
 	
 	/** Return true if the SID corresponds to a group. */
-	static bool IsGroupSID(string sid);
+	static bool IsGroupSID(std::string sid);
 
 	/** Returns true if the trustee name corresponds to a group. */
-	static bool IsGroup(string trusteeName);
+	static bool IsGroup(std::string trusteeName);
 
 	/** Return a StringSet* of all local groups. */
 	static StringSet* GetAllLocalGroups();
@@ -246,16 +251,16 @@ public:
 	    @param userName The name of the user to get groups for.
 		@param groups A pointer to a StringSet that will be populated with the groups that the user is a member of.
 	*/
-	static bool GetGroupsForUser(string userName, StringSet* groups);
+	static bool GetGroupsForUser(std::string userName, StringSet* groups);
 
 	/** Get 'enabled flag' for user with specified name 
 		If the user name is provided with a leading doamin name or host name
 		the user name is extracted and provided to the NetUserGetInfo api.
 	*/
-	static bool GetEnabledFlagForUser(string userNameIn);
+	static bool GetEnabledFlagForUser(std::string userNameIn);
 
 	/** Convert the FILETIME structure to an integer. */
-	static string ToString(FILETIME fTime);
+	static std::string ToString(FILETIME fTime);
 
 	/** Convert the PSID to a string. 
 		Attempts to return a string representation of the input PSID. If
@@ -281,20 +286,20 @@ public:
      *  @param str A std:string that want to convert to a null-terminated string of Unicode characters (16-bit).
      *  @return A null-terminated string of Unicode characters (16-bit).
      */
-	static LPWSTR StringToWide(string s);
+	static std::wstring StringToWide(std::string s);
 
 	/** Converts a wide-character string of Unicode characters into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that you would like to convert into a string of ASCII characters.
      *  @return A string of ASCII characters.
     */
-	static string UnicodeToAsciiString ( const wchar_t* unicodeCharStr );
+	static std::string UnicodeToAsciiString ( const wchar_t* unicodeCharStr );
 
 	/**
 	 * Provided for symmetry with UnicodeToAsciiString(const string &).
 	 * Having this also makes your code cleaner, so you don't have to
 	 * call c_str() all the time.....
 	 */
-	static string UnicodeToAsciiString ( const wstring &wstr );
+	static std::string UnicodeToAsciiString ( const std::wstring &wstr );
 
 	/**
 	 * This seems like a pointless method to have, but it's helpful when
@@ -304,7 +309,7 @@ public:
 	 * <p>
 	 * This method just returns \p str.
 	 */
-	static string UnicodeToAsciiString ( const string &str );
+	static std::string UnicodeToAsciiString ( const std::string &str );
 
 	/** Return true if a wide-character string of Unicode characters would convert into a string of ASCII characters.
      *  @param unicodeCharStr Pointer to the wide-character string of Unicode characters that are checked for validity as ASCII characters.
@@ -314,12 +319,12 @@ public:
     /** Return true if the specfied trustee name exists.		
 		@param trusteeNameIn The SID to look for.
 	*/
-    static bool TrusteeNameExists(const string trusteeNameIn);
+    static bool TrusteeNameExists(const std::string trusteeNameIn);
     
     /** Return true if the specfied trustee SID exists.		
 		@param trusteeSIDIn The SID to look for.
 	*/
-    static bool TrusteeSIDExists(const string trusteeSIDIn);
+    static bool TrusteeSIDExists(const std::string trusteeSIDIn);
 
 	/** Return the access mask for the Windows object for the specified SID. */
 	static void GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights);
@@ -343,7 +348,7 @@ public:
 		@param objectType The SE_OBJECT_TYPE value that you want to get the string representation of.
         @return A string representation of the specified SE_OBJECT_TYPE.
 	*/
-	static string GetObjectType ( SE_OBJECT_TYPE objectType );
+	static std::string GetObjectType ( SE_OBJECT_TYPE objectType );
 
 	/**
 	 * Windows (NTFS anyway, afaik) is case-insensitive, but case-aware.  We
@@ -380,8 +385,10 @@ public:
 	 * which you can get filename info.  If that can be made to work, it would
 	 * much simpler than any of the above techniques.  But we must stay
 	 * compatible with XP.
+	 * \return false if the file did not exist; true on success.  Throws on other
+	 *   errors.
 	 */
-	static std::string GetActualPathWithCase(const std::string &path);
+	static bool GetActualPathWithCase(const std::string &path, std::string *casedString);
 
 	/**
 	 * Returns true if this process is running under WoW64.
@@ -423,10 +430,8 @@ public:
 
 private:
 	
-	//static LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers);
-
 	/** Split Trustee name between domain and account portion */
-	static void SplitTrusteeName(string trusteeName, string *domainName, string *accountName);
+	static void SplitTrusteeName(std::string trusteeName, std::string *domainName, std::string *accountName);
 
 	/** Return a StringSet* of all global groups. */
 	static StringSet* GetAllGlobalGroups();
@@ -438,7 +443,7 @@ private:
 		@param includeSubGroups When true include subgroups in the set of groups that are reported.
 		@param resolveSubGroup When true recurse into any subgroups and expand them too.
 	*/
-	static bool GetLocalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
+	static bool GetLocalGroupMembers(std::string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
 
 	/** Get the members of the specified global group.
 
@@ -448,7 +453,7 @@ private:
 		@param resolveSubGroup When true recurse into any subgroups and expand them too.
         @return True if the specified group exists.
 	*/
-	static bool GetGlobalGroupMembers(string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
+	static bool GetGlobalGroupMembers(std::string groupName, StringSet* members, bool includeSubGroups, bool resolveSubGroup);
 
 	/** Get the set of all trustee names on the system for the well knowns SIDS.
 		These are sids that are not returend by a call to NetUserEnum, 
@@ -458,14 +463,11 @@ private:
 	*/
 	static void GetWellKnownTrusteeNames();
 
-	/** Look up the local system name. */
-	static string LookUpLocalSystemName();
-
 	/** Retrieve the domain controller name for the specified domain name.
 	  @param domainName A string that represents the domain name.
 	  @return A LPCWSTR representing the domain controller name or NULL if the domain name is the empty string or if the domain controller name lookup failed.
 	*/
-	static LPCWSTR GetDomainControllerName(string domainName);
+	static std::wstring GetDomainControllerName(std::string domainName);
 
 	static StringSet* allTrusteeNames;
 	static StringSet* allTrusteeSIDs;
@@ -473,7 +475,7 @@ private:
 	static StringSet* allLocalUserSIDs;
 	static StringSet* allLocalGroupSIDs;
 
-	static inline bool IsAccountGroup(SID_NAME_USE sidType, string accountName);	
+	static inline bool IsAccountGroup(SID_NAME_USE sidType, std::string accountName);	
 };
 
 #endif

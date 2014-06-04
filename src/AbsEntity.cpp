@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,11 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
 #include <cassert>
+#include <iterator>
 
-#include "AbsEntity.h"
+#include "Log.h"
+#include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "StringEntityValue.h"
+#include "AbsEntity.h"
+
+#include "AbsEntity.h"
 
 using namespace std;
 
@@ -50,25 +56,11 @@ AbsEntity::AbsEntity(string name, string value, OvalEnum::Datatype datatype, Ova
 	this->SetNil(nil);
 }
 
-AbsEntity::~AbsEntity() {
-
-}
-
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
 
-string AbsEntity::GetName() {
-
-	return this->name;
-}
-
-void AbsEntity::SetName(string name) {
-
-	this->name = name;
-}
-
-string AbsEntity::GetValue() {
+string AbsEntity::GetValue() const {
 	if ( this->value.empty() ){
 		return "";
 	}else{
@@ -84,88 +76,20 @@ void AbsEntity::SetValue(string value) {
 	}
 }
 
-void AbsEntity::SetValues(AbsEntityValueVector value){
-	this->value = value;
-}
+VariableValueVector AbsEntity::GetVariableValues() {
 
-AbsEntityValueVector AbsEntity::GetValues(){
-	return this->value;
-}
-
-OvalEnum::Datatype AbsEntity::GetDatatype() {
-
-	return this->datatype;
-}
-
-void AbsEntity::SetDatatype(OvalEnum::Datatype datatype) {
-
-	this->datatype = datatype;
-}
-
-OvalEnum::Check AbsEntity::GetVarCheck() {
-
-	return this->varCheck;
-}
-
-void AbsEntity::SetVarCheck(OvalEnum::Check varCheck) {
-
-	this->varCheck = varCheck;
-}
-
-bool AbsEntity::GetNil() {
-
-	return this->nil;
-}
-
-void AbsEntity::SetNil(bool nil) {
-
-	this->nil = nil;
-}
-
-OvalEnum::Operation AbsEntity::GetOperation() {
-
-	return this->operation;
-}
-
-void AbsEntity::SetOperation(OvalEnum::Operation operation) {
-
-	this->operation = operation;
-}
-
-AbsVariable* AbsEntity::GetVarRef() {
-
-	return this->varRef;
-}
-
-void AbsEntity::SetVarRef(AbsVariable* varRef) {
-
-	this->varRef = varRef;
-}
-
-VariableValueVector* AbsEntity::GetVariableValues() {
-
-	VariableValueVector* varValues = new VariableValueVector();
+	VariableValueVector varValues;
 
 	if(this->GetVarRef() != NULL) {
 		AbsVariable* varRef = this->GetVarRef();
 
 		// get the values of the variable
-		VariableValueVector* values = varRef->GetValues();
-		VariableValueVector::iterator varValueIt;
-		for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
-			varValues->push_back((*varValueIt));
-		}
+		VariableValueVector values = varRef->GetValues();
+		copy(values.begin(), values.end(), back_inserter(varValues));
 
 		// get any variable values that were used for determining the value of this variable
 		values = varRef->GetVariableValues();
-		for(varValueIt = values->begin(); varValueIt != values->end(); varValueIt ++) {
-			varValues->push_back((*varValueIt));
-		}
-		// BUG - These can not currently be deleted. 
-		// The code is not consistant here. In places a new vector is returned
-		// in others a reference to a vector that is managed by other code is returned.
-		//delete values;
-		//values = NULL;
+		copy(values.begin(), values.end(), back_inserter(varValues));
 	}
 
 	return varValues;
@@ -208,6 +132,8 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 				result = EntityComparator::CompareRecord(this->GetOperation(), this->GetValues(), scElement->GetValues());
 			} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
 				result = EntityComparator::CompareIpv4Address(this->GetOperation(), this->GetValue(), scElement->GetValue());
+			} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV6_ADDRESS) {
+				result = EntityComparator::CompareIpv6Address(this->GetOperation(), this->GetValue(), scElement->GetValue());
 			}
 
 		} else {
@@ -216,29 +142,29 @@ OvalEnum::ResultEnumeration AbsEntity::Analyze(ItemEntity* scElement) {
 			IntVector results;
 			// check the flag on the variable
 			if(this->GetVarRef()->GetFlag() == OvalEnum::FLAG_COMPLETE) { 
-				VariableValueVector* values = this->GetVarRef()->GetValues();
-				for(VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++) {
+				VariableValueVector values = this->GetVarRef()->GetValues();
+				for(VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++) {
 					OvalEnum::ResultEnumeration tmp = OvalEnum::RESULT_ERROR;
 					if(this->GetDatatype() == OvalEnum::DATATYPE_BINARY) {
-						tmp = EntityComparator::CompareBinary(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareBinary(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_BOOLEAN) {
-						tmp = EntityComparator::CompareBoolean(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareBoolean(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_EVR_STRING) {
-						tmp = EntityComparator::CompareEvrString(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareEvrString(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_FLOAT) {
-						tmp = EntityComparator::CompareFloat(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareFloat(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_INTEGER) {
-						tmp = EntityComparator::CompareInteger(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareInteger(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_IOS_VERSION) {
-						tmp = EntityComparator::CompareIosVersion(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareIosVersion(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_STRING) {
-						tmp = EntityComparator::CompareString(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareString(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_VERSION) {
-						tmp = EntityComparator::CompareVersion(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareVersion(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_RECORD) {
 						throw Exception("Error: A var_ref attribute is not allowed on an entity with a datatype of 'record'.");
 					} else if(this->GetDatatype() == OvalEnum::DATATYPE_IPV4_ADDRESS) {
-						tmp = EntityComparator::CompareIpv4Address(this->GetOperation(), (*iterator)->GetValue(), scElement->GetValue());
+						tmp = EntityComparator::CompareIpv4Address(this->GetOperation(), iterator->GetValue(), scElement->GetValue());
 					}
 
 					results.push_back(tmp);
@@ -275,9 +201,9 @@ OvalEnum::Flag AbsEntity::GetEntityValues(StringVector &values) {
 
 		if (flagResult == OvalEnum::FLAG_COMPLETE) {
 
-			VariableValueVector *vvv = var->GetValues();
-			for(VariableValueVector::iterator iter = vvv->begin(); iter != vvv->end(); ++iter)
-				values.push_back((*iter)->GetValue());
+			VariableValueVector vvv = var->GetValues();
+			for(VariableValueVector::iterator iter = vvv.begin(); iter != vvv.end(); ++iter)
+				values.push_back(iter->GetValue());
 
         } else if (flagResult == OvalEnum::FLAG_ERROR) {
             throw Exception ("Unable to calculate variable values for variable: " + var->GetId());
@@ -311,9 +237,9 @@ OvalEnum::Flag AbsEntity::GetEntityValues(std::map<std::string, StringVector> &v
 			fieldFlags.push_back(var->GetFlag());
 
 			if (var->GetFlag() == OvalEnum::FLAG_COMPLETE) {
-				VariableValueVector *vvv = var->GetValues();
-				for(VariableValueVector::iterator iter = vvv->begin(); iter != vvv->end(); ++iter)
-					values[fieldName].push_back((*iter)->GetValue());
+				VariableValueVector vvv = var->GetValues();
+				for(VariableValueVector::iterator iter = vvv.begin(); iter != vvv.end(); ++iter)
+					values[fieldName].push_back(iter->GetValue());
 			}
 		} else {
 			fieldFlags.push_back(OvalEnum::FLAG_COMPLETE);

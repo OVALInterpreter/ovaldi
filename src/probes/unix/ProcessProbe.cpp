@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,6 +27,34 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <fstream>
+#include <cerrno>
+#include <strings.h>
+#include <dirent.h>
+#include <pwd.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#include <sstream>
+#include <iomanip>
+#include <string>
+
+#ifdef SUNOS
+#include <ftw.h>
+#include <algorithm>
+#include <cctype>
+#endif
+
+#ifdef DARWIN
+#include <sys/sysctl.h>
+#endif
+
+#include <Log.h>
+
+// Define some buffer lengths
+#define CMDLINE_LEN 1024
+#define TTY_LEN PATH_MAX
 
 #include "ProcessProbe.h"
 
@@ -118,13 +146,13 @@ ItemVector* ProcessProbe::CollectItems(Object* object) {
 				collectedItems->push_back(item);
 
 			} else {
-
+				VariableValueVector vals = command->GetVarRef()->GetValues();
 				VariableValueVector::iterator iterator;
-				for(iterator = command->GetVarRef()->GetValues()->begin(); iterator != command->GetVarRef()->GetValues()->end(); iterator++) {
+				for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 					Item* item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("command",  (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("command",  iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item);
 				}
 			}
@@ -238,7 +266,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 
 	int ruid, euid, pid, ppid;
 	long priority = 0;
-	unsigned long starttime = 0;
+	unsigned long starttime = 0, policy = 0;
 
 	int status = 0;
 
@@ -279,7 +307,7 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 		item->AppendElement(new ItemEntity("command",  command, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 
 		// Read the 'stat' and 'status' files for the remaining process parameters
-		status = RetrieveStatFile(pidStr.c_str(), &pid, &ppid, &priority, &starttime, &errMsg);
+		status = RetrieveStatFile(pidStr.c_str(), &pid, &ppid, &priority, &starttime, &policy, &errMsg);
 		if (status==0) status = RetrieveStatusFile(pidStr.c_str(), &ruid, &euid, &errMsg);
 		if(status < 0) {
 			item->AppendMessage(new OvalMessage(errMsg));
@@ -313,17 +341,44 @@ void ProcessProbe::GetPSInfo(string command, string pidStr, ItemVector* items) {
 			item->AppendElement(new ItemEntity("ppid", Common::ToString(ppid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("priority", Common::ToString(priority), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("ruid", Common::ToString(ruid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-			item->AppendElement(new ItemEntity("scheduling_class",  "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED));
+			
+			string p = "";
+			// From sched_setscheduler man page:
+			// "Currently, the following three scheduling policies are supported under Linux: SCHED_FIFO, SCHED_RR, SCHED_OTHER,  and  SCHED_BATCH;"
+			// These values are defined in bits/sched.h, however, I used the numeric values because SCHED_BATCH requires that __USE_GNU is defined.
+			// Hopefully, this will make the code more portable.
+			switch(policy){
+			  case 0:{
+			    p = "TS";
+			    break;
+			  }
+			  case 1:{
+			    p = "FF";
+			    break;
+			  }
+			  case 2:{
+			    p = "RR";
+			    break;
+			  }
+			  case 3:{
+			    p = "B";
+			    break;
+			  }
+			  default:{
+			    item->AppendMessage(new OvalMessage("Could not determine the scheduling class."));
+			  }
+			}  			  
+			item->AppendElement(new ItemEntity("scheduling_class", p, OvalEnum::DATATYPE_STRING, (p.compare("") != 0)?OvalEnum::STATUS_EXISTS:OvalEnum::STATUS_ERROR));
 			item->AppendElement(new ItemEntity("start_time", adjustedStartTimeStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("tty", ttyName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 			item->AppendElement(new ItemEntity("user_id", Common::ToString(euid), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 		}
-
-		items->push_back(item); 
+		
+			items->push_back(item); 
 	}
 }
 
-int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, string *errMsg) {
+int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, long *priority, unsigned long *starttime, unsigned long *policy, string *errMsg) {
 
   // Stat File parameters.  While we're really only concerned with gathering the parameters
   // that are passed in, these variables are good placeholders in case we decide to collect
@@ -331,7 +386,7 @@ int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, lon
   //
   int pgrp, session, tty, tpgid, exit_signal, processor = 0;
   long cutime, cstime, nice, placeholder, itrealvalue, rss = 0;
-  unsigned long flags, minflt, cminflt, majflt, cmajflt, utime, stime, vsize, rlim = 0;
+  unsigned long flags, minflt, cminflt, majflt, cmajflt, utime, stime, vsize, rt_priority, rlim = 0;
   unsigned long startcode, endcode, startstack, kstkesp, kstkeip, signal, blocked, sigignore = 0;
   unsigned long sigcatch, wchan, nswap, cnswap = 0;
   char comm[PATH_MAX];
@@ -353,7 +408,7 @@ int ProcessProbe::RetrieveStatFile(const char *process, int *pid, int *ppid, lon
   } else {
 
     // Linux gives us a nicely formatted file for fscanf to pull in
-    fscanf(statFile, "%d %s %c %d %d %d %d %d %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %lu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d", pid, comm, &state, ppid, &pgrp, &session, &tty, &tpgid, &flags, &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime, &cutime, &cstime, priority, &nice, &placeholder, &itrealvalue, starttime, &vsize, &rss, &rlim, &startcode, &endcode, &startstack, &kstkesp, &kstkeip, &signal, &blocked, &sigignore, &sigcatch, &wchan, &nswap, &cnswap, &exit_signal, &processor);
+    fscanf(statFile, "%d %s %c %d %d %d %d %d %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %lu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d %lu %lu", pid, comm, &state, ppid, &pgrp, &session, &tty, &tpgid, &flags, &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime, &cutime, &cstime, priority, &nice, &placeholder, &itrealvalue, starttime, &vsize, &rss, &rlim, &startcode, &endcode, &startstack, &kstkesp, &kstkeip, &signal, &blocked, &sigignore, &sigcatch, &wchan, &nswap, &cnswap, &exit_signal, &processor, &rt_priority, policy);
 
   }
   fclose(statFile);

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -27,6 +27,11 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //****************************************************************************************//
+
+#include <iostream>
+
+#include "Common.h"
+#include "Exception.h"
 
 #include "Log.h"
 
@@ -127,7 +132,8 @@ void Log::Fatal(string msg) {
 
 void Log::SetLevel(string strLevel) {
 	
-	int tmpLevel = atoi(strLevel.c_str());
+	int tmpLevel = 0;
+	Common::FromString(strLevel, &tmpLevel);
 	if(tmpLevel > Log::FATAL || tmpLevel < Log::DEBUG) {
 		string msg = "Error setting Log level. A log level between " + Common::ToString((int)Log::FATAL) + " and " + Common::ToString((int)Log::DEBUG) + " must be specified. Setting Log level to " + Common::ToString((int)Log::DEBUG) + ". Note that this message has not been written to the log file.";
 		cout << Common::GetTimeStamp() + " : MESSAGE : " << msg << endl;

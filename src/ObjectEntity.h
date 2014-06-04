@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,12 +31,10 @@
 #ifndef OBJECTENTITY_H
 #define OBJECTENTITY_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsEntity.h"
-#include "VariableFactory.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class ObjectEntity;
 
 /**
 	This class represents an entity in an ObjectEntity as defined in the oval definition schema. 
@@ -44,11 +42,6 @@ class ObjectEntity;
 */
 class ObjectEntity : public AbsEntity {
 public:
-	/**
-		Copy constructor. Creates a new ObjectEntity based on the specified ObjectEntity. 
-		@param orig a ObjectEntity* to be copied
-	*/
-	ObjectEntity(ObjectEntity* orig);
 
 	/** Create a complete ObjectEntity object. */
 	ObjectEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
@@ -60,7 +53,7 @@ public:
 	 *	@param entityElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.
 	 */
-	void Parse(DOMElement* entityElm);
+	void Parse(xercesc::DOMElement* entityElm);
 };
 
 #endif

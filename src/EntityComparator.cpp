@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,24 +32,33 @@
 #include <memory>
 #include <typeinfo>
 #include <ostream>
+#include <cstring>  // for strerror(), memcmp()
+#include <iomanip>
+#include <sstream>
+#include <cctype>
+#include <iostream>
 
 #ifdef WIN32
-// stupid windows doesn't have stdint.h.... sigh
-#  include <BaseTsd.h> // for UINT32
-#  define uint32_t UINT32
-#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  include <cstdint>
+
+#  include <WindowsCommon.h>
 #else
-#  include <stdint.h>
-#  include <netinet/in.h>
+#  include <stdint.h> // our rhel5 gcc doesn't have <cstdint>.
 #  include <arpa/inet.h>
+#  include <cerrno>
 #endif
 
 #include "REGEX.h"
-#include "EntityComparator.h"
 #include "StateOrObjectFieldEntityValue.h"
 #include "ItemFieldEntityValue.h"
+#include "Log.h"
+
+#include "EntityComparator.h"
 
 using namespace std;
+
+typedef vector<long long> LongLongVector;
 
 namespace {
 	/**
@@ -147,12 +156,127 @@ namespace {
 		size_t prefixSize;
 	};
 
+	/**
+	 * Represents the ipv6 address of a host or network.  A prefix size
+	 * can be specified in CIDR-notation.  A host address has a prefix size of
+	 * 128.  Bits outside the prefix are ignored.  Addresses in in6_addr structs
+	 * passed in and out of methods of this class are assumed to be in network
+	 * byte order.  I think ipv6 addresses are likely to be treated as byte 
+	 * arrays rather than grouped into multibyte types (e.g. uint32_t), and it
+	 * is more intuitive for byte 0 to be the msb(yte).  This is not consistent
+	 * with Ipv4Address, but seems like the right thing to do...
+	 * <p>
+	 * One might think this class could be useful in other areas of the code.
+	 * I hope someone factors (or allows me to factor) it out, if necessary.
+	 */
+	class Ipv6Address {
+
+	public:
+		explicit Ipv6Address(const string &addrStr) {
+			setFromString(addrStr);
+		}
+
+		/**
+		 * Two ipv4 addresses are equal if their prefix sizes are equal.
+		 * Address bits outside the prefix are ignored.
+		 */
+		bool operator==(const Ipv6Address &other) const;
+
+		/**
+		 * Two ipv4 addresses are unequal if they are not equal.
+		 */
+		bool operator!=(const Ipv6Address &other) const {
+			return !(*this == other);
+		}
+
+		/**
+		 * Returns the number of bits in the prefix.  (== number
+		 * of 1 bits in the netmask.)
+		 */
+		size_t getPrefixSize() const {
+			return prefixSize_;
+		}
+
+		/**
+		 * Gets a prefix netmask, i.e. an ipv6 address such that
+		 * some contiguous sequence of high-order bits are all 1,
+		 * and all remaining bits are 0.
+		 */
+		in6_addr getNetmask() const {
+			return netmask_;
+		}
+
+		/**
+		 * Gets the address part as an in6_addr struct.
+		 */
+		in6_addr getAddress() const {
+			return addr_;
+		}
+
+		/**
+		 * Returns true if \p otherAddr is a prefix of or equal to this
+		 * address.
+		 */
+		bool subsetOf(const Ipv6Address &otherAddr) const;
+
+		/**
+		 * Returns true if this address is a prefix of or equal to
+		 * otherAddr.
+		 */
+		bool supersetOf(const Ipv6Address &otherAddr) const {
+			return otherAddr.subsetOf(*this);
+		}
+
+	private:
+
+		void setFromString(const string &addrStr);
+
+		in6_addr addr_;
+
+		// the following two of course must be kept in sync!
+		// It's faster to keep both than repeatedly compute one
+		// from the other.
+		in6_addr netmask_;
+		size_t prefixSize_;
+	};
+
 	in_addr dottedQuadToInAddr(const string &addrStr);
-	
+
+#ifdef WIN32
+	/**
+	 * Convert the given string representation of an ipv6 address
+	 * to an in6_addr struct.
+	 * \throw Exception if the address is syntactically invalid.
+	 */
+	in6_addr toIn6Addr(const string &addrStr);
+#endif
+
 	template<typename T>
 	OvalEnum::ResultEnumeration CompareIntOperation(T defInt, T scInt, OvalEnum::Operation op);
 	
 	ostream &operator<<(ostream &out, const Ipv4Address &addr);
+	ostream &operator<<(ostream &out, const Ipv6Address &addr);
+
+	/**
+	 * These operators help us compare raw ipv6 addresses.
+	 * The Ipv6Address class includes a prefix size, and these
+	 * comparisons don't make sense if the prefix sizes of the
+	 * operands are different, so Ipv6Address objects are not
+	 * universally comparable with these operators.  If one 
+	 * wanted to implement these operators for Ipv6Address 
+	 * objects (which would have to throw exceptions under
+	 * some circumstances), these could be useful in their
+	 * implementation.
+	 * \{ */
+	bool operator<(const in6_addr &op1, const in6_addr &op2);
+	bool operator<=(const in6_addr &op1, const in6_addr &op2);
+	inline bool operator>(const in6_addr &op1, const in6_addr &op2) {
+		return op2 < op1;
+	}
+	inline bool operator>=(const in6_addr &op1, const in6_addr &op2) {
+		return op2 <= op1;
+	}
+	/** \} */
 }
 
 //****************************************************************************************//
@@ -922,6 +1046,67 @@ OvalEnum::ResultEnumeration EntityComparator::CompareIpv4Address(OvalEnum::Opera
 	return result;
 }
 
+OvalEnum::ResultEnumeration EntityComparator::CompareIpv6Address(OvalEnum::Operation op, string defValue, string scValue) {
+
+	OvalEnum::ResultEnumeration result = OvalEnum::RESULT_ERROR;
+	Ipv6Address defAddr(defValue), scAddr(scValue);
+
+	switch (op) {
+	case OvalEnum::OPERATION_EQUALS:
+		result = scAddr == defAddr ? 
+			OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_NOT_EQUAL:
+		result = scAddr == defAddr ? 
+			OvalEnum::RESULT_FALSE : OvalEnum::RESULT_TRUE;
+		break;
+
+	case OvalEnum::OPERATION_GREATER_THAN:
+		result = scAddr.getPrefixSize() != defAddr.getPrefixSize() ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getAddress() > defAddr.getAddress() ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_GREATER_THAN_OR_EQUAL:
+		result = scAddr.getPrefixSize() != defAddr.getPrefixSize() ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getAddress() >= defAddr.getAddress() ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_LESS_THAN:
+		result = scAddr.getPrefixSize() != defAddr.getPrefixSize() ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getAddress() < defAddr.getAddress() ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_LESS_THAN_OR_EQUAL:
+		result = scAddr.getPrefixSize() != defAddr.getPrefixSize() ?
+			OvalEnum::RESULT_ERROR :
+				scAddr.getAddress() <= defAddr.getAddress() ?
+					OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_SUBSET_OF:
+		result = scAddr.subsetOf(defAddr) ? 
+			OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	case OvalEnum::OPERATION_SUPERSET_OF:
+		result = scAddr.supersetOf(defAddr) ? 
+			OvalEnum::RESULT_TRUE : OvalEnum::RESULT_FALSE;
+		break;
+
+	default:
+		throw Exception("Error: Invalid operation. Operation: " + OvalEnum::OperationToString(op));
+	}
+
+	return result;
+}
+
 namespace {
 
 	template<typename T>
@@ -1065,6 +1250,82 @@ namespace {
 		this->addr.s_addr &= this->netmask.s_addr;
 	}
 
+	bool Ipv6Address::operator==(const Ipv6Address &other) const {
+		if (getPrefixSize() != other.getPrefixSize())
+			return false;
+
+		return memcmp(&addr_.s6_addr, &other.addr_.s6_addr, 16) == 0;
+	}
+
+	bool Ipv6Address::subsetOf(const Ipv6Address &otherAddr) const {
+		if (getPrefixSize() < otherAddr.getPrefixSize())
+			return false;
+
+		// here, otherAddr must have an equal or shorter prefix.
+		// If the first otherAddr.prefixSize_ bits of the two
+		// addresses are the same, this is a subset.  Else, it
+		// isn't.
+		size_t bytes = otherAddr.getPrefixSize() / 8,
+			bits = otherAddr.getPrefixSize() % 8;
+
+		for (size_t i=0; i<bytes; ++i)
+			if (getAddress().s6_addr[i] != otherAddr.getAddress().s6_addr[i])
+				return false;
+
+		if (bytes < 16 && bits)
+			return (getAddress().s6_addr[bytes] & otherAddr.getNetmask().s6_addr[bytes]) ==
+				(otherAddr.getAddress().s6_addr[bytes] & otherAddr.getNetmask().s6_addr[bytes]);
+
+		return true;
+	}
+
+	void Ipv6Address::setFromString(const string &addrStr) {
+		string prefixSizePart, ipPart;
+
+		size_t slashOffset = addrStr.find('/');
+		if (slashOffset == string::npos) 
+			ipPart = addrStr;
+		else {
+			if (slashOffset < addrStr.size()-1)
+				prefixSizePart = addrStr.substr(slashOffset+1);
+			ipPart = addrStr.substr(0, slashOffset);
+		}
+
+		// ---- IP part
+#ifdef WIN32
+		// No ipv6 conversion functions are available on XP! :(
+		addr_ = toIn6Addr(ipPart);
+#else
+		int err = inet_pton(AF_INET6, ipPart.c_str(), &addr_);
+		if (!err)
+			throw Exception("Invalid ipv6 address: \""+addrStr+'"');
+		if (err < 0)
+			throw Exception("Error parsing ipv6 address \""+addrStr+"\": " +
+				strerror(errno)
+			);
+#endif
+
+		// ---- prefix part
+		if (prefixSizePart.empty())
+			prefixSize_ = 128;
+		else if (!Common::FromString(prefixSizePart, &prefixSize_) || prefixSize_ > 128)
+			throw Exception("Invalid prefix size: "+prefixSizePart);
+
+		// number of 0xFF bytes, and number of bits
+		// in the following partially 1's byte, if any.
+		size_t bytes = prefixSize_ / 8,
+			bits = prefixSize_ % 8;
+
+		memset(&netmask_, 0, sizeof(netmask_));
+		memset(&netmask_.s6_addr, 0xFF, bytes);
+		if (bytes < 16 && bits)
+			netmask_.s6_addr[bytes] = ~((1U << (8-bits)) - 1);
+
+		// zero out bits of the address which are outside the prefix.
+		for (size_t i=bytes; i<16; ++i)
+			addr_.s6_addr[i] &= netmask_.s6_addr[i];
+	}
+
 	in_addr dottedQuadToInAddr(const string &addrStr) {
 		REGEX re;
 		if (!re.IsMatch("^\\d+\\.\\d+\\.\\d+\\.\\d+$", addrStr.c_str()))
@@ -1097,6 +1358,149 @@ namespace {
 		return result;
 	}
 
+#ifdef WIN32
+	in6_addr toIn6Addr(const string &addrStr) {
+
+		// sanity checks and special cases
+
+		if (addrStr.size() < 2)
+			throw Exception("Invalid IPv6 address: \""+addrStr+'"');
+
+		size_t firstDblColonIdx = addrStr.find("::");
+		size_t lastDblColonIdx = addrStr.rfind("::");
+		if (firstDblColonIdx != string::npos &&
+			firstDblColonIdx != lastDblColonIdx)
+			throw Exception("Invalid IPv6 address: \"::\" may only occur once.");
+
+		if (addrStr[0] == ':' && addrStr[1] != ':')
+			throw Exception("Invalid IPv6 address: may not start with a single colon: " +
+				addrStr);
+		if (addrStr[addrStr.size()-1] == ':' && addrStr[addrStr.size()-2] != ':')
+			throw Exception("Invalid IPv6 address: may not end with a single colon: " +
+				addrStr);
+
+		// Rough outline:
+		// this algorithm first zeros out the address,
+		// then sets bytes starting at the beginning, according
+		// to addrStr, until "::" is found, then sets them
+		// starting at the end moving backward, according to
+		// addrStr, until "::" is found.
+
+		in6_addr addr;
+		memset(&addr, 0, sizeof(addr));
+
+		size_t strIdx = 0, component;
+		int fwdAddrIdx = 0;
+		istringstream iss; iss >> hex;
+
+		// the going-forward part.  If the addr starts with
+		// "::", there is no going-forward part; just skip
+		// to the reverse part.
+		//
+		// The strIdx invariant is that at the beginning of a loop
+		// iteration (and therefore, after the loop breaks), it should
+		// always point to the beginning of a component (or where the
+		// beginning would be), i.e. either the beginning of the string,
+		// right after a ':', or 1-past the end of the string.  If a 
+		// "::" is encountered, it should point to the second ':'.
+		if (addrStr[0]==':' && addrStr[1]==':')
+			strIdx = 1;
+		else
+			while (strIdx < addrStr.size() && addrStr[strIdx] != ':') {
+				if (fwdAddrIdx > 15)
+					throw Exception("Invalid IPv6 address: address is too long: " +
+						addrStr);
+
+				size_t chunkStart = strIdx;
+				while (strIdx < addrStr.size() && isxdigit(addrStr[strIdx]))
+					++strIdx;
+
+				if (strIdx < addrStr.size() && addrStr[strIdx] != ':')
+					throw Exception("Invalid IPv6 address: invalid char found at " +
+						Common::ToString(strIdx) + ": " + addrStr);
+
+				size_t chunkSize = strIdx - chunkStart;
+
+				if (chunkSize > 4)
+					throw Exception("Invalid IPv6 address: found component with > 4 chars: " + 
+						addrStr);
+
+				iss.clear();  // clears state flags so we can reuse the stream
+				iss.str(addrStr.substr(chunkStart, chunkSize));
+				iss >> component;
+				if (!iss)
+					throw Exception("Invalid component value at " + 
+						Common::ToString(strIdx) + ": " + addrStr);
+
+				addr.s6_addr[fwdAddrIdx++] = static_cast<uint8_t>(component >> 8);
+				addr.s6_addr[fwdAddrIdx++] = static_cast<uint8_t>(component & 0xFF);
+
+				++strIdx;
+			}
+
+		// got through the whole thing without finding a
+		// "::"?
+		if (strIdx >= addrStr.size()) {
+			// make sure we got a full 16 bytes...
+			if (fwdAddrIdx < 16)
+				throw Exception("Invalid IPv6 address: address is too short: " + addrStr);
+			return addr;
+		}
+
+		size_t colonIdx = strIdx;
+		strIdx = addrStr.size() - 1;
+		int bwdAddrIdx = 15;
+
+		// the going-backward part
+		while (strIdx > colonIdx) {
+			if (bwdAddrIdx <= fwdAddrIdx)
+				throw Exception("Invalid IPv6 address: address is too long: " +
+					addrStr);
+
+			size_t chunkEnd = strIdx;
+			while (strIdx > colonIdx && isxdigit(addrStr[strIdx]))
+				--strIdx;
+
+			if (addrStr[strIdx] != ':')
+				throw Exception("Invalid IPV6 address: invalid char found at " +
+					Common::ToString(strIdx) + ": " + addrStr);
+
+			size_t chunkSize = chunkEnd - strIdx;
+			
+			if (chunkSize > 4)
+				throw Exception("Invalid IPv6 address: found component with > 4 chars: " + 
+					addrStr);
+
+			iss.clear();  // clears state flags so we can reuse the stream
+			iss.str(addrStr.substr(strIdx + 1, chunkSize));
+			iss >> component;
+			if (!iss)
+				throw Exception("Invalid component value at " + 
+					Common::ToString(strIdx) + ": " + addrStr);
+
+			addr.s6_addr[bwdAddrIdx--] = static_cast<uint8_t>(component & 0xFF);
+			addr.s6_addr[bwdAddrIdx--] = static_cast<uint8_t>(component >> 8);
+
+			--strIdx;
+		}
+
+		// At this point, fwdAddrIdx points to the place the next
+		// byte would have gone in the forward phase, and similar
+		// for bwdAddrIdx.  The indices traveled from the ends
+		// toward the middle, and in the most extreme case (the "::"
+		// only represented a single 0 component) they should
+		// have met in the middle.  If they crossed, that means
+		// the address is too long.  There's a similar check
+		// inside the going-backward loop; this catches a corner
+		// case where an address that's too long begins with "::".
+		if (bwdAddrIdx < fwdAddrIdx)
+			throw Exception("Invalid IPv6 address: address is too long: " +
+				addrStr);
+
+		return addr;
+	}
+#endif
+
 	ostream &operator<<(ostream &out, const Ipv4Address &addr) {
 		// inet_ntoa is gonna expect network byte order, so I gotta
 		// flip the bytes.
@@ -1107,4 +1511,182 @@ namespace {
 			out << '/' << addr.getPrefixSize();
 		return out;
 	}
+
+	ostream &operator<<(ostream &out, const Ipv6Address &addr) {
+
+
+		// store and then restore original stream flags
+		ios::fmtflags oldFlags = out.flags();
+		out << hex;
+
+// No ipv6 conversion functions are available on XP! :(
+#ifdef WIN32
+
+/* A very simple straightforward format: 4 chars per component,
+   all uppercase letters, no "::".
+
+		// set some stream settings, saving the old ones
+		ios::fmtflags origFlags = out.flags();
+		char oldFill = out.fill('0');
+
+		out << hex << uppercase;
+
+		out << setw(2) << static_cast<unsigned>(addr.getAddress().s6_addr[0]) 
+			<< setw(2) << static_cast<unsigned>(addr.getAddress().s6_addr[1]);
+		for (int i=2; i<16;) {
+			out << ':' << setw(2) << static_cast<unsigned>(addr.getAddress().s6_addr[i++]);
+			out << setw(2) << static_cast<unsigned>(addr.getAddress().s6_addr[i++]);
+		}
+
+		// restore the old settings
+		out.flags(origFlags);
+		out.fill(oldFill);
+*/
+
+		// A more complex RFC5952-compliant format (I hope).
+		// This doesn't handle any "special" addresses specially,
+		// e.g. IPv4-mapped IPv6 addresses.
+
+		// Need to figure out where the longest run of
+		// zeros is.  If it's greater than one component
+		// (a 16-bit chunk), we condense it to "::".
+		// Ties go to earlier runs.
+
+		// These indices are in terms of bytes.  The end index
+		// is one-past.  So the start idx can range from 0-15,
+		// and the end from 1-16 (for valid ranges).
+		int zerosStartIdx, bestZerosStartIdx, bestZerosEndIdx,
+			bestZerosLength;
+		bool inZerosRun = false;
+
+		zerosStartIdx = bestZerosStartIdx = bestZerosEndIdx = 
+			bestZerosLength = 0;
+
+		for (int byteIdx = 0; byteIdx < 16; byteIdx += 2) {
+			if (addr.getAddress().s6_addr[byteIdx] == 0 &&
+				addr.getAddress().s6_addr[byteIdx+1] == 0) {
+				if (!inZerosRun) {
+					inZerosRun = true;
+					zerosStartIdx = byteIdx;
+				}
+			} else if (inZerosRun) {
+				inZerosRun = false;
+				if (byteIdx - zerosStartIdx > bestZerosLength) {
+					bestZerosStartIdx = zerosStartIdx;
+					bestZerosEndIdx = byteIdx;
+					bestZerosLength = bestZerosEndIdx - bestZerosStartIdx;
+				}
+			}
+		}
+
+		if (inZerosRun) {
+			// zeros run ran off the end
+			if (16 - zerosStartIdx > bestZerosLength) {
+				bestZerosStartIdx = zerosStartIdx;
+				bestZerosEndIdx = 16;
+				bestZerosLength = 16 - bestZerosStartIdx;
+			}
+		}
+
+
+		for (int byteIdx = 0; byteIdx < 16; ) {
+			if (bestZerosLength > 2 && byteIdx == bestZerosStartIdx) {
+				out << "::";
+				byteIdx = bestZerosEndIdx;
+
+			} else {
+				// write the ':' if we didn't just write "::", and if
+				// this isn't the first component.
+				if (byteIdx > 0 && !(bestZerosLength > 2 && byteIdx == bestZerosEndIdx))
+					out << ':';
+
+				out << 
+					((((unsigned)addr.getAddress().s6_addr[byteIdx]) << 8) |
+					  ((unsigned)addr.getAddress().s6_addr[byteIdx+1]));
+
+				byteIdx += 2;
+			}
+		}
+
+
+#else
+
+		char addrStr[INET6_ADDRSTRLEN];
+		in6_addr addrStruct = addr.getAddress();
+		if (!inet_ntop(AF_INET6, &addrStruct, addrStr, sizeof(addrStr))) {
+			out.flags(oldFlags);
+			// surely this is highly unlikely... :-P
+			throw Exception(string("Error converting ipv6 address to string: ")+
+							strerror(errno));
+		}
+		
+		
+		out << addrStr;
+
+#endif
+
+		if (addr.getPrefixSize() < 128)
+			out << '/' << dec << addr.getPrefixSize();
+
+		out.flags(oldFlags);
+
+		return out;
+	}
+
+	bool operator<(const in6_addr &op1, const in6_addr &op2) {
+		for (int i=0; i<16; ++i)
+			if (op1.s6_addr[i] > op2.s6_addr[i])
+				return false;
+			else if (op1.s6_addr[i] < op2.s6_addr[i])
+				return true;
+
+		return false; // they were equal
+	}
+
+	bool operator<=(const in6_addr &op1, const in6_addr &op2) {
+		for (int i=0; i<16; ++i)
+			if (op1.s6_addr[i] > op2.s6_addr[i])
+				return false;
+			else if (op1.s6_addr[i] < op2.s6_addr[i])
+				return true;
+
+		return true; // they were equal
+	}
 }
+
+
+
+
+/*
+ipv6 test code... in case I need to tweak a part of the ipv6 impl
+and want to retest... I wish we had a way to do unit tests...
+
+	try{Ipv6Address a("");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a(":");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("::");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("1::");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("::1");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a(":1:");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("1::1");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("1234");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("asdf");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("ffffffffffffffffffffffffffffffffffffffff");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("f:f:f:f:f:f:f:f:f:f:f:f:f:f");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("11:22:33:44::55:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("::11:22:33:44:55:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("11:22:33:44:55:66:77:88::");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("11:22:33:44:00:66:77:88");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:0:0:dd:0:0:0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:0:0:0:dd:0:0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0/0");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0/16");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0/112");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0/128");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0/999");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("0ab0:000f:ee:0:0:dd:0:0/-999");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	try{Ipv6Address a("/64");Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+	for(int i=0; i<129; ++i)
+		try{Ipv6Address a("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/"+Common::ToString(i));Log::Debug(Common::ToString(a));}catch(Exception e){Log::Debug(e.GetErrorMessage());}
+*/
+

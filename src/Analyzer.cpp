@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,23 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "Log.h"
+#include "Definition.h"
+#include "DocumentManager.h"
+#include "Version.h"
+#include "Item.h"
+#include "XmlCommon.h"
+#include "Common.h"
+#include "Test.h"
+
 #include "Analyzer.h"
 
 using namespace std;
+using namespace xercesc;
 
 DOMElement* Analyzer::definitionsElm = NULL;
 DOMElement* Analyzer::testsElm = NULL;
@@ -94,7 +108,7 @@ DOMElement* Analyzer::GetResultsElm() {
 DOMElement* Analyzer::GetResultsSystemElm() {	
 
 	if(Analyzer::resultsSystemElm == NULL) {
-		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), Analyzer::GetResultsElm(), "system");
+		DOMElement *elm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), Analyzer::GetResultsElm(), XmlCommon::resNS, "system");
 		Analyzer::resultsSystemElm = elm;
 	}
 	return Analyzer::resultsSystemElm;
@@ -103,7 +117,7 @@ DOMElement* Analyzer::GetResultsSystemElm() {
 DOMElement* Analyzer::GetResultsSystemDefinitionsElm() {	
 
 	if(Analyzer::definitionsElm == NULL) {
-		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), Analyzer::GetResultsSystemElm(), "definitions");
+		DOMElement *elm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), Analyzer::GetResultsSystemElm(), XmlCommon::resNS, "definitions");
 		Analyzer::definitionsElm = elm;
 	}
 	return Analyzer::definitionsElm;
@@ -112,7 +126,7 @@ DOMElement* Analyzer::GetResultsSystemDefinitionsElm() {
 DOMElement* Analyzer::GetResultsSystemTestsElm() {
 	
 	if(Analyzer::testsElm == NULL) {
-		DOMElement *elm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), Analyzer::GetResultsSystemElm(), "tests");
+		DOMElement *elm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), Analyzer::GetResultsSystemElm(), XmlCommon::resNS, "tests");
 		Analyzer::testsElm = elm;
 	}
 	return Analyzer::testsElm;
@@ -207,7 +221,6 @@ void Analyzer::Run() {
 		Test::ClearCache();
 		Item::ClearCache();
 		State::ClearCache();
-		VariableValue::ClearCache();
 
 		this->FinializeResultsDocument();
 
@@ -324,7 +337,6 @@ void Analyzer::Run(StringVector* definitionIds) {
 		Test::ClearCache();
 		Item::ClearCache();
 		State::ClearCache();
-		VariableValue::ClearCache();
 
 		this->FinializeResultsDocument();
 
@@ -426,42 +438,42 @@ void Analyzer::InitResultsDocument() {
 
 	// add the generator element
 	DOMElement *ovalResultsElm = DocumentManager::GetResultDocument()->getDocumentElement();
-	DOMElement *generatorElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), ovalResultsElm, "generator");
-	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:product_name", "cpe:/a:mitre:ovaldi:" + Version::GetVersion() + "." + Version::GetBuild());
-	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
-	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:schema_version", Version::GetSchemaVersion());
-	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "oval:timestamp", Common::GetTimeStamp());
+	DOMElement *generatorElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), ovalResultsElm, XmlCommon::resNS, "generator");
+	XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), generatorElm, XmlCommon::comNS, "oval:product_name", "cpe:/a:mitre:ovaldi:" + Version::GetVersion() + "." + Version::GetBuild());
+	XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), generatorElm, XmlCommon::comNS, "oval:product_version", Version::GetVersion() + " Build: " + Version::GetBuild());
+	XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), generatorElm, XmlCommon::comNS, "oval:schema_version", Version::GetSchemaVersion());
+	XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), generatorElm, XmlCommon::comNS, "oval:timestamp", Common::GetTimeStamp());
 	XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), generatorElm, "vendor", Version::GetVendor());
 
 	// add the directives
-	DOMElement *directivesElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), ovalResultsElm, "directives");
+	DOMElement *directivesElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), ovalResultsElm, XmlCommon::resNS, "directives");
 	
-	DOMElement* defTrueElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), directivesElm, "definition_true");
+	DOMElement* defTrueElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), directivesElm, XmlCommon::resNS, "definition_true");
 	XmlCommon::AddAttribute(defTrueElm, "reported", "true");
 	XmlCommon::AddAttribute(defTrueElm, "content", "full");
 	
-	DOMElement* defFalseElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), directivesElm, "definition_false");
+	DOMElement* defFalseElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), directivesElm, XmlCommon::resNS, "definition_false");
 	XmlCommon::AddAttribute(defFalseElm, "reported", "true");
 	XmlCommon::AddAttribute(defFalseElm, "content", "full");
 
-	DOMElement* defUnknownElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), directivesElm, "definition_unknown");
+	DOMElement* defUnknownElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), directivesElm, XmlCommon::resNS, "definition_unknown");
 	XmlCommon::AddAttribute(defUnknownElm, "reported", "true");
 	XmlCommon::AddAttribute(defUnknownElm, "content", "full");
 
-	DOMElement* defErrorElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), directivesElm, "definition_error");
+	DOMElement* defErrorElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), directivesElm, XmlCommon::resNS, "definition_error");
 	XmlCommon::AddAttribute(defErrorElm, "reported", "true");
 	XmlCommon::AddAttribute(defErrorElm, "content", "full");
 
-	DOMElement* defNotEvalElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), directivesElm, "definition_not_evaluated");
+	DOMElement* defNotEvalElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), directivesElm, XmlCommon::resNS, "definition_not_evaluated");
 	XmlCommon::AddAttribute(defNotEvalElm, "reported", "true");
 	XmlCommon::AddAttribute(defNotEvalElm, "content", "full");
 
-	DOMElement* defNotAppElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), directivesElm, "definition_not_applicable");
+	DOMElement* defNotAppElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), directivesElm, XmlCommon::resNS, "definition_not_applicable");
 	XmlCommon::AddAttribute(defNotAppElm, "reported", "true");
 	XmlCommon::AddAttribute(defNotAppElm, "content", "full");
 
 	// add the results element
-	DOMElement *resultsElm = XmlCommon::AddChildElement(DocumentManager::GetResultDocument(), ovalResultsElm, "results");
+	DOMElement *resultsElm = XmlCommon::AddChildElementNS(DocumentManager::GetResultDocument(), ovalResultsElm, XmlCommon::resNS, "results");
 	Analyzer::resultsElm = resultsElm;
 }
 

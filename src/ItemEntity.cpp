@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,15 +28,19 @@
 //
 //****************************************************************************************//
 
-#include <stdlib.h>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
-#include "Common.h"
+#include "XmlCommon.h"
 #include "ItemFieldEntityValue.h"
 #include "StringEntityValue.h"
 
 #include "ItemEntity.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								ItemEntity Class										  //	
@@ -95,7 +99,7 @@ ItemEntity::~ItemEntity() {
 // ***************************************************************************************	//
 //								 Public members												//
 // ***************************************************************************************	//
-string ItemEntity::GetName() {
+string ItemEntity::GetName() const {
 
 	return this->name;
 }
@@ -105,7 +109,7 @@ void ItemEntity::SetName(string name) {
 	this->name = name;
 }
 
-string ItemEntity::GetValue() {
+string ItemEntity::GetValue() const {
 	if ( this->value.empty() ){
 		return "";
 	}else{
@@ -125,11 +129,11 @@ void ItemEntity::SetValues(AbsEntityValueVector value){
 	this->value = value;
 }
 
-AbsEntityValueVector ItemEntity::GetValues(){
+AbsEntityValueVector ItemEntity::GetValues() const {
 	return this->value;
 }
 
-OvalEnum::Datatype ItemEntity::GetDatatype() {
+OvalEnum::Datatype ItemEntity::GetDatatype() const {
 
 	return this->datatype;
 }
@@ -139,7 +143,7 @@ void ItemEntity::SetDatatype(OvalEnum::Datatype datatype) {
 	this->datatype = datatype;
 }
 
-OvalEnum::SCStatus ItemEntity::GetStatus() {
+OvalEnum::SCStatus ItemEntity::GetStatus() const {
 
 	return this->scStatus;
 }
@@ -149,12 +153,12 @@ void ItemEntity::SetStatus(OvalEnum::SCStatus scStatus) {
 	this->scStatus = scStatus;
 }
 
-void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* itemElm) {
+void ItemEntity::Write(DOMDocument* scFile, DOMElement* itemElm, const string &ns) {
 
 	// Create new item element
-	XMLCh* nameValue = XMLString::transcode(this->GetName().c_str());
-	DOMElement* newItemEntityElem = scFile->createElement(nameValue);
-	XMLString::release(&nameValue);
+
+	DOMElement* newItemEntityElem = XmlCommon::CreateElementNS(scFile, ns,
+		this->GetName());
 	itemElm->appendChild(newItemEntityElem);
 
 	// Add the attributes
@@ -168,7 +172,7 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
         XmlCommon::AddAttribute(newItemEntityElem, "status", strStatus);
 
 	if (this->GetNil()) {
-		XmlCommon::AddAttribute(newItemEntityElem, "xsi:nil", "true");
+		XmlCommon::AddAttributeNS(newItemEntityElem, XmlCommon::xsiNS, "xsi:nil", "true");
 	}
 
 	// Add the value(s)
@@ -184,25 +188,15 @@ void ItemEntity::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMEl
 	}
 }
 
-string ItemEntity::UniqueString() {
-	string valueStr = "";
-	AbsEntityValueVector allValues = this->GetValues();
-	for(AbsEntityValueVector::iterator it = allValues.begin(); it != allValues.end(); it++){
-		// If a record append the name of each field before its value
-		if ( this->GetDatatype() == OvalEnum::DATATYPE_RECORD ){
-			valueStr.append(((ItemFieldEntityValue*)(*it))->GetName());
-		}
-		valueStr.append((*it)->GetValue());
-	}
-	return this->GetName() + valueStr;
-}
-
 void ItemEntity::Parse(DOMElement* itemEntityElm) {
 	
 	this->SetName(XmlCommon::GetElementName(itemEntityElm));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(itemEntityElm, "datatype")));
 	this->SetStatus(OvalEnum::ToSCStatus(XmlCommon::GetAttributeByName(itemEntityElm, "status")));
-	
+	if(XmlCommon::GetAttributeByName(itemEntityElm, "xsi:nil").compare("true") == 0) {
+		this->SetNil(true);
+	}
+
 	// The datatype is not 'record' so we can just grab the string value in the element.
 	if ( this->GetDatatype() != OvalEnum::DATATYPE_RECORD ){
 		this->SetValue(XmlCommon::GetDataNodeValue(itemEntityElm));
@@ -240,6 +234,6 @@ void ItemEntity::SetNil(bool isNil) {
 	this->nil = isNil;
 }
 
-bool ItemEntity::GetNil() {
+bool ItemEntity::GetNil() const {
 	return this->nil;
 }

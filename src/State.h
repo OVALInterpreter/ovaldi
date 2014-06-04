@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,11 +31,12 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
+#include "Item.h"
+#include "OvalEnum.h"
 #include "AbsState.h"
-
-XERCES_CPP_NAMESPACE_USE
-
-class Item;
 
 /**
 	This class represents a state in the oval definition schema.
@@ -46,7 +47,7 @@ class State : public AbsState {
 
 public:
 
-	~State();
+	virtual ~State();
 
 	/** Analyze the specified Item return the Result value for the Item.
 	
@@ -58,7 +59,7 @@ public:
 	OvalEnum::ResultEnumeration Analyze(Item* item);
 
 	/** Parse the provided state element from a oval definition file into a State object. */
-	void Parse(DOMElement* stateElm);
+	virtual void Parse(xercesc::DOMElement* stateElm);
 
 	/** Sarch the cache of States for the specified State. 
 		Return NULL if not found

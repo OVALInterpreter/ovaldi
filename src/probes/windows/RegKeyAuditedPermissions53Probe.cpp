@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,7 +30,11 @@
 
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
+#include "WindowsCommon.h"
+
 #include "RegKeyAuditedPermissions53Probe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              RegKeyAuditedPermissions53Probe Class                     //
@@ -149,7 +153,7 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
 				StringSet trusteeSIDs = this->GetTrusteesForWindowsObject(
 					SE_REGISTRY_KEY, keyHandle,
 					trusteeSIDEntity, true, resolveGroupBehavior,
-					includeGroupBehavior);
+					includeGroupBehavior, true);
 
                 if ( !trusteeSIDs.empty() ) {
                     for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
@@ -177,25 +181,22 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
                     }
                 } else {
                     Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
-                    StringSet trusteeSIDs;
 
-                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, &trusteeSIDs, true ) ) {
-                        for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
-                            Item* item = this->CreateItem();
-                            item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                            item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-							if (keyEntity->GetNil()){
-								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
-							}
-							else
-							{
-								item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false));
-							}
-                            item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
-							item->AppendElement(new ItemEntity("windows_view",
-								(registryFinder.GetView()== BIT_32 ? "32_bit" : "64_bit")));
-                            collectedItems->push_back ( item );
-                        }
+                    if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, true ) ) {
+                        Item* item = this->CreateItem();
+                        item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+                        item->AppendElement ( new ItemEntity ( "hive", registryKey->GetHive(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+						if (keyEntity->GetNil()){
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true));
+						}
+						else
+						{
+							item->AppendElement(new ItemEntity("key", registryKey->GetKey(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false));
+						}
+                        item->AppendElement ( new ItemEntity ( "trustee_sid","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+						item->AppendElement(new ItemEntity("windows_view",
+							(registryFinder.GetView()== BIT_32 ? "32_bit" : "64_bit")));
+                        collectedItems->push_back ( item );
                     }
                 }
             } catch ( ProbeException ex ) {
@@ -213,48 +214,27 @@ ItemVector* RegKeyAuditedPermissions53Probe::CollectItems ( Object* object ) {
         }
 
     } else {
-        StringSet* hives = NULL;
-
-        if ( ( hives = registryFinder.ReportHiveDoesNotExist ( hiveEntity ) ) != NULL ) {
-            for ( StringSet::iterator iterator1 = hives->begin(); iterator1 != hives->end(); iterator1++ ) {
-                Item* item = NULL;
-                item = this->CreateItem();
-                item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
-				item->AppendElement(new ItemEntity("windows_view",
-					(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-                collectedItems->push_back ( item );
-            }
-
-            if ( hives != NULL ) {
-                hives->clear();
-                delete hives;
-                hives = NULL;
-            }
-
+        if ( registryFinder.ReportHiveDoesNotExist ( hiveEntity ) ) {
+            Item* item = NULL;
+            item = this->CreateItem();
+            item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+            item->AppendElement ( new ItemEntity ( "hive", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+			item->AppendElement(new ItemEntity("windows_view",
+				(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+            collectedItems->push_back ( item );
         } else {
             Item* item = NULL;
             StringSet* hives = registryFinder.GetHives ( hiveEntity );
 
             for ( StringSet::iterator iterator1 = hives->begin(); iterator1 != hives->end() ; iterator1++ ) {
-                StringSet* keys = NULL;
-
-                if ( ( keys = registryFinder.ReportKeyDoesNotExist ( *iterator1, keyEntity ) ) != NULL ) {
-                    for ( StringSet::iterator iterator2 = keys->begin(); iterator2 != keys->end(); iterator2++ ) {
-                        item = this->CreateItem();
-                        item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-                        item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "key", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, keyEntity->GetNil() ) );
-						item->AppendElement(new ItemEntity("windows_view",
-							(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-                        collectedItems->push_back ( item );
-                    }
-                }
-
-                if ( keys != NULL ) {
-                    keys->clear();
-                    delete keys;
-                    keys = NULL;
+                if ( registryFinder.ReportKeyDoesNotExist ( *iterator1, keyEntity ) ) {
+                    item = this->CreateItem();
+                    item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+                    item->AppendElement ( new ItemEntity ( "hive", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                    item->AppendElement ( new ItemEntity ( "key","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, keyEntity->GetNil() ) );
+					item->AppendElement(new ItemEntity("windows_view",
+						(registryFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+                    collectedItems->push_back ( item );
                 }
             }
 

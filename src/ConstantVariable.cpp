@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,31 +28,20 @@
 //
 //****************************************************************************************//
 
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "XmlCommon.h"
+#include "Common.h"
+
 #include "ConstantVariable.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									ConstantVariable Class								  //	
 //****************************************************************************************//
-
-ConstantVariable::ConstantVariable(string id, string name, int version, OvalEnum::Datatype datatype, StringVector* msgs) : AbsVariable (id, name, version, datatype, msgs) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Create a complete ConstantVariable
-	//
-	// -----------------------------------------------------------------------
-
-}
-
-ConstantVariable::~ConstantVariable() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	// -----------------------------------------------------------------------
-
-}
 
 // ***************************************************************************************	//
 //								 Public members												//
@@ -68,11 +57,11 @@ void ConstantVariable::Parse(DOMElement* constantVariableElm) {
 	this->SetId(XmlCommon::GetAttributeByName(constantVariableElm, "id"));
 	this->SetDatatype(OvalEnum::ToDatatype(XmlCommon::GetAttributeByName(constantVariableElm, "datatype")));
 	string versionStr = XmlCommon::GetAttributeByName(constantVariableElm, "version");
-	int version;
-	if(versionStr.compare("") == 0) {
+	int version = 0;
+	if(versionStr.empty()) {
 		version = 1;
 	} else {
-		version = atoi(versionStr.c_str());
+		Common::FromString(versionStr, &version);
 	}
 	this->SetVersion(version);
 
@@ -85,33 +74,20 @@ void ConstantVariable::Parse(DOMElement* constantVariableElm) {
 		if (tmpNode->getNodeType() == DOMNode::ELEMENT_NODE) {
 			DOMElement *childElm = (DOMElement*)tmpNode;
 
-			if(XmlCommon::GetElementName(childElm).compare("value") == 0) {
+			if(XmlCommon::GetElementName(childElm) == "value") {
 				foundValue = true;
 				string elmValue = XmlCommon::GetDataNodeValue(childElm);
 				// get and save the value.
-				VariableValue* varValue = new VariableValue(this->GetId(), elmValue);
-				this->AppendVariableValue(varValue);
-				this->SetFlag(OvalEnum::FLAG_COMPLETE);
+				this->AppendVariableValue(this->GetId(), elmValue);
 			}
 		}
 		index ++;
 	}
-	if(!foundValue) {
+
+	if (foundValue)
+		this->SetFlag(OvalEnum::FLAG_COMPLETE);
+	else {
 		this->SetFlag(OvalEnum::FLAG_ERROR);
 		this->AppendMessage("Error a value was not found for the constant variable.");
 	}
-
-}
-
-VariableValueVector* ConstantVariable::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return the variable values used to compute this variable's value
-	//	in this case just an empty vector.
-	// -----------------------------------------------------------------------
-	
-	VariableValueVector* values = new VariableValueVector();
-
-	return values;
 }

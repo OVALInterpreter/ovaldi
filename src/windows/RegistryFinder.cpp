@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,7 +31,17 @@
 #include <memory>
 #include <FreeGuard.h>
 
+#include <ArrayGuard.h>
+#include <AutoCloser.h>
+#include <FreeGuard.h>
+#include "Log.h"
+#include "Common.h"
+#include "ItemEntity.h"
+#include "WindowsCommon.h"
+
 #include "RegistryFinder.h"
+
+using namespace std;
 
 char RegistryFinder::keySeparator = '\\';
 
@@ -109,9 +119,10 @@ StringSet* RegistryFinder::GetHives ( ObjectEntity* hiveEntity ) {
             // in the case of equals simply loop through all the
             // variable values and add them to the set of all hives
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = hiveEntity->GetVarRef()->GetValues()->begin(); iterator != hiveEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( this->HiveExists ( ( *iterator )->GetValue() ) ) {
-                    hives->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = hiveEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( this->HiveExists ( iterator->GetValue() ) ) {
+                    hives->insert ( iterator->GetValue() );
                 }
             }
 
@@ -120,14 +131,14 @@ StringSet* RegistryFinder::GetHives ( ObjectEntity* hiveEntity ) {
             // any of the variable values. Then analyze each hive found on
             // the system against the variable values
             // loop through all variable values and call FindHives()
-            VariableValueVector* values = hiveEntity->GetVariableValues();
+            VariableValueVector values = hiveEntity->GetVariableValues();
 
-            for ( VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++ ) {
+            for ( VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++ ) {
                 if ( hiveEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                    this->FindHives ( ( *iterator )->GetValue(), allHives, false );
+                    this->FindHives ( iterator->GetValue(), allHives, false );
 
                 } else {
-                    this->FindHives ( ( *iterator )->GetValue(), allHives, true );
+                    this->FindHives ( iterator->GetValue(), allHives, true );
                 }
             }
         }
@@ -181,9 +192,10 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
             // in the case of equals simply loop through all the
             // variable values and add them to the set of all keys
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = keyEntity->GetVarRef()->GetValues()->begin(); iterator != keyEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( this->KeyExists ( hiveStr, ( *iterator )->GetValue() ) ) {
-                    keys->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = keyEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( this->KeyExists ( hiveStr, iterator->GetValue() ) ) {
+                    keys->insert ( iterator->GetValue() );
                 }
             }
 
@@ -192,14 +204,14 @@ StringSet* RegistryFinder::GetKeys ( string hiveStr, ObjectEntity* keyEntity, Be
             // any of the variable values. Then analyze each key found on
             // the system against the variable values
             // loop through all variable values and call FindKeys
-            VariableValueVector* values = keyEntity->GetVariableValues();
+            VariableValueVector values = keyEntity->GetVariableValues();
 
-            for ( VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++ ) {
+            for ( VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++ ) {
                 if ( keyEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                    this->FindKeys ( hiveStr, ( *iterator )->GetValue(), allKeys, false );
+                    this->FindKeys ( hiveStr, iterator->GetValue(), allKeys, false );
 
                 } else {
-                    this->FindKeys ( hiveStr, ( *iterator )->GetValue(), allKeys, true );
+                    this->FindKeys ( hiveStr, iterator->GetValue(), allKeys, true );
                 }
             }
         }
@@ -264,9 +276,10 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
             // in the case of equals simply loop through all the
             // variable values and add them to the set of all names
             // if they exist on the system
-            for ( VariableValueVector::iterator iterator = nameEntity->GetVarRef()->GetValues()->begin(); iterator != nameEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( this->NameExists ( hiveStr, keyStr, ( *iterator )->GetValue() ) ) {
-                    names->insert ( ( *iterator )->GetValue() );
+			VariableValueVector vals = nameEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( this->NameExists ( hiveStr, keyStr, iterator->GetValue() ) ) {
+                    names->insert ( iterator->GetValue() );
                 }
             }
 
@@ -275,14 +288,14 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
             // any of the variable values. Then analyze each name found on
             // the system against the variable values
             // loop through all variable values and call FindNames
-            VariableValueVector* values = nameEntity->GetVariableValues();
+            VariableValueVector values = nameEntity->GetVariableValues();
 
-            for ( VariableValueVector::iterator iterator = values->begin(); iterator != values->end(); iterator++ ) {
+            for ( VariableValueVector::iterator iterator = values.begin(); iterator != values.end(); iterator++ ) {
                 if ( nameEntity->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL ) {
-                    this->FindNames ( hiveStr, keyStr, ( *iterator )->GetValue(), allNames, false );
+                    this->FindNames ( hiveStr, keyStr, iterator->GetValue(), allNames, false );
 
                 } else {
-                    this->FindNames ( hiveStr, keyStr, ( *iterator )->GetValue(), allNames, true );
+                    this->FindNames ( hiveStr, keyStr, iterator->GetValue(), allNames, true );
                 }
             }
         }
@@ -305,82 +318,55 @@ StringSet* RegistryFinder::GetNames ( string hiveStr, string keyStr, ObjectEntit
     return names;
 }
 
-StringSet* RegistryFinder::ReportHiveDoesNotExist ( ObjectEntity *hiveEntity ) {
-    StringSet* hives = NULL;
-
+bool RegistryFinder::ReportHiveDoesNotExist ( ObjectEntity *hiveEntity ) {
     if ( hiveEntity->GetOperation() == OvalEnum::OPERATION_EQUALS ) {
         if ( hiveEntity->GetVarRef() == NULL ) {
-            if ( !this->HiveExists ( hiveEntity->GetValue() ) ) {
-                hives = new StringSet();
-                hives->insert ( hiveEntity->GetValue() );
-            }
-
+            if ( !this->HiveExists ( hiveEntity->GetValue() ) )
+				return true;
         } else {
-            for ( VariableValueVector::iterator iterator = hiveEntity->GetVarRef()->GetValues()->begin(); iterator != hiveEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->HiveExists ( ( *iterator )->GetValue() ) ) {
-                    if ( hives == NULL ) {
-                        hives = new StringSet();
-                    }
-
-                    hives->insert ( ( *iterator )->GetValue() );
-                }
+			VariableValueVector vals = hiveEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( !this->HiveExists ( iterator->GetValue() ) )
+					return true;
             }
         }
     }
 
-    return hives;
+    return false;
 }
 
-StringSet* RegistryFinder::ReportKeyDoesNotExist ( string hiveStr, ObjectEntity *keyEntity ) {
-    StringSet* keys = NULL;
-
+bool RegistryFinder::ReportKeyDoesNotExist ( string hiveStr, ObjectEntity *keyEntity ) {
     if ( keyEntity->GetOperation() == OvalEnum::OPERATION_EQUALS && !keyEntity->GetNil() ) {
         if ( keyEntity->GetVarRef() == NULL ) {
-            if ( !this->KeyExists ( hiveStr, keyEntity->GetValue() ) ) {
-                keys = new StringSet();
-                keys->insert ( keyEntity->GetValue() );
-            }
-
+            if ( !this->KeyExists ( hiveStr, keyEntity->GetValue() ) )
+				return true;
         } else {
-            for ( VariableValueVector::iterator iterator = keyEntity->GetVarRef()->GetValues()->begin(); iterator != keyEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->KeyExists ( hiveStr, ( *iterator )->GetValue() ) ) {
-                    if ( keys == NULL ) {
-                        keys = new StringSet();
-                    }
-
-                    keys->insert ( ( *iterator )->GetValue() );
-                }
+			VariableValueVector vals = keyEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( !this->KeyExists ( hiveStr, iterator->GetValue() ) )
+					return true;
             }
         }
     }
 
-    return keys;
+    return false;
 }
 
-StringSet* RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keyStr, ObjectEntity *nameEntity ) {
-    StringSet* names = NULL;
-
+bool RegistryFinder::ReportNameDoesNotExist ( string hiveStr, string keyStr, ObjectEntity *nameEntity ) {
     if ( nameEntity->GetOperation() == OvalEnum::OPERATION_EQUALS && !nameEntity->GetNil() ) {
         if ( nameEntity->GetVarRef() == NULL ) {
-            if ( !this->NameExists ( hiveStr, keyStr, nameEntity->GetValue() ) ) {
-                names = new StringSet();
-                names->insert ( nameEntity->GetValue() );
-            }
-
+            if ( !this->NameExists ( hiveStr, keyStr, nameEntity->GetValue() ) )
+				return true;
         } else {
-            for ( VariableValueVector::iterator iterator = nameEntity->GetVarRef()->GetValues()->begin(); iterator != nameEntity->GetVarRef()->GetValues()->end(); iterator++ ) {
-                if ( !this->NameExists ( hiveStr, keyStr, ( *iterator )->GetValue() ) ) {
-                    if ( names == NULL ) {
-                        names = new StringSet();
-                    }
-
-                    names->insert ( ( *iterator )->GetValue() );
-                }
+			VariableValueVector vals = nameEntity->GetVarRef()->GetValues();
+            for ( VariableValueVector::iterator iterator = vals.begin(); iterator != vals.end(); iterator++ ) {
+                if ( !this->NameExists ( hiveStr, keyStr, iterator->GetValue() ) )
+					return true;
             }
         }
     }
 
-    return names;
+    return false;
 }
 
 LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, string hiveStr, string keyStr, REGSAM access ) {
@@ -435,10 +421,10 @@ LONG RegistryFinder::GetHKeyHandle ( HKEY *keyHandle, HKEY superKey, string subK
 		bitnessView == BIT_64 ? KEY_WOW64_64KEY : KEY_WOW64_32KEY
 		: 0;
 #endif
-    LPWSTR lpSubKey = WindowsCommon::StringToWide(subKeyStr);
-    LONG status = RegOpenKeyExW ( superKey, lpSubKey,
+    wstring lpSubKey = WindowsCommon::StringToWide(subKeyStr);
+    LONG status = RegOpenKeyExW ( superKey, lpSubKey.c_str(),
 		0, access | view, keyHandle );
-	delete[] lpSubKey;
+
     return status;
 }
 
@@ -536,17 +522,14 @@ bool RegistryFinder::NameExists ( string hiveStr, string keyStr, string nameStr 
     if ( GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
         return false;
     }
-	LPWSTR wNameStr = WindowsCommon::StringToWide ( nameStr );
-    if ( RegQueryValueExW ( keyHandle, wNameStr, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
-        return false;
-    }
-	delete[] wNameStr;
 
-	LONG err;
-    if ( (err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
-        throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key " +
-			hiveStr + '\\' + keyStr + ". Microsoft System Error " +
-			Common::ToString(err) + ") - " + WindowsCommon::GetErrorMessage(err) );
+	AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyGuard(keyHandle, RegCloseKey,
+		"Registry key "+hiveStr+'\\'+keyStr);
+
+	wstring wNameStr = WindowsCommon::StringToWide ( nameStr );
+
+    if ( RegQueryValueExW ( keyHandle, wNameStr.c_str(), NULL, NULL, NULL, NULL ) != ERROR_SUCCESS ) {
+        return false;
     }
 
     return true;
@@ -651,15 +634,15 @@ StringSet* RegistryFinder::GetAllSubKeys ( string hiveStr, string keyStr ) {
 
 StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
     auto_ptr<StringSet> names(new StringSet());
-    LPWSTR name = ( LPWSTR ) malloc ( sizeof ( WCHAR ) * MAX_PATH );
+    FreeGuard<WCHAR> name(malloc ( sizeof ( WCHAR ) * MAX_PATH ));
     HKEY keyHandle;
     DWORD index = 0;
     DWORD size = MAX_PATH;
     string nameStr = "";
 
     if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
-        while ( RegEnumValueW ( keyHandle, index, name, &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
-            nameStr = WindowsCommon::UnicodeToAsciiString ( name );
+        while ( RegEnumValueW ( keyHandle, index, name.get(), &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
+            nameStr = WindowsCommon::UnicodeToAsciiString ( name.get() );
             names->insert ( nameStr );
             size = MAX_PATH;
             ++index;
@@ -671,11 +654,6 @@ StringSet* RegistryFinder::GetAllNames ( string hiveStr, string keyStr ) {
 				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
 				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
-    }
-
-    if ( name != NULL ) {
-        free ( name );
-        name = NULL;
     }
 
     return names.release();
@@ -719,7 +697,7 @@ StringSet* RegistryFinder::ProcessKeyBehaviors ( string hiveStr, StringSet* keys
 }
 
 void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, string regexStr, StringSet *keys, bool isRegex ) {
-    if ( ( ( keyStr.empty() == true ) || ( keyStr == "" ) ) ) {
+    if (keyStr.empty()) {
         return;
     }
 
@@ -742,11 +720,14 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
 		throw RegistryFinderException("Out of memory, trying to allocate " +
 			Common::ToString(sizeof ( WCHAR ) * MAX_PATH) + " bytes");
 
-    HKEY keyHandle;
+    HKEY keyHandle = NULL;
     DWORD index = 0;
     DWORD size = MAX_PATH;
 
     if ( !GetHKeyHandle ( &keyHandle, hiveStr, keyStr ) ) {
+		AutoCloser<HKEY, LONG(WINAPI&)(HKEY)> keyCloser(keyHandle, 
+			RegCloseKey, keyStr);
+
         while ( RegEnumKeyExW ( keyHandle, index, name.get(), &size, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS ) {
             if(!WindowsCommon::UnicodeIsValidASCII(name.get())){
 				Log::Info("Skipping registry key found with invalid Unicode values.");
@@ -760,13 +741,6 @@ void RegistryFinder::GetRegistriesForPattern ( string hiveStr, string keyStr, st
 			this->GetRegistriesForPattern( hiveStr, newKeyStr , regexStr, keys , isRegex );
             size = MAX_PATH;
             ++index;
-        }
-
-		LONG err;
-        if ((err = RegCloseKey ( keyHandle )) != ERROR_SUCCESS ) {
-            throw RegistryFinderException ( "Error: RegCloseKey() was unable to close a handle to key "+
-				hiveStr + '\\' + keyStr + ". Microsoft System Error " +
-				Common::ToString (err) + ") - " + WindowsCommon::GetErrorMessage (err) );
         }
     }
 }

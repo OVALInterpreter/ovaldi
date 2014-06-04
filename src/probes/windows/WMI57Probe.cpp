@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,10 +28,22 @@
 //
 //****************************************************************************************//
 
+#include <comdef.h>
+#include <Dsgetdc.h>
+#include <Lm.h>
+#include <Wbemidl.h>
+#include <Wmiutils.h>
+#include <windows.h>
+
+#include "AbsEntityValue.h"
 #include <ArrayGuard.h>
 #include <ItemFieldEntityValue.h>
+#include "WindowsCommon.h"
+#include "Log.h"
 
 #include "WMI57Probe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //								WMI57Probe Class											  //	
@@ -138,16 +150,16 @@ ItemEntityVector* WMI57Probe::GetNamespaces(ObjectEntity* wmi_namespace) {
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = wmi_namespace->GetVariableValues();
+		VariableValueVector vars = wmi_namespace->GetVariableValues();
 
 		// we may need to add a check to see if the namespace exists here?
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(wmi_namespace);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			namespaces->push_back(tmp);
 		}
 	}
@@ -169,14 +181,14 @@ ItemEntityVector* WMI57Probe::GetWQLs(ObjectEntity* wmi_wql) {
 	} else {
 
 		// retrieve all the variable values that match the supplied var_ref.
-		VariableValueVector* vars = wmi_wql->GetVariableValues();
+		VariableValueVector vars = wmi_wql->GetVariableValues();
 
 		// loop through all values
 		VariableValueVector::iterator iterator;
-		for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
+		for(iterator = vars.begin(); iterator != vars.end(); iterator++) {
 
 			ItemEntity* tmp = this->CreateItemEntity(wmi_wql);
-			tmp->SetValue((*iterator)->GetValue());
+			tmp->SetValue(iterator->GetValue());
 			wqls->push_back(tmp);
 		}
 	}
@@ -246,7 +258,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 			
 			if((uReturn == 0) || (enumhRes == WBEM_S_FALSE)) {
 				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				item->AppendElement(new ItemEntity("result", fieldEntityValues, OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("result", "", OvalEnum::DATATYPE_RECORD, OvalEnum::STATUS_DOES_NOT_EXIST));
 				break;
 			}else {
 				
@@ -281,17 +293,14 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									long long value = 0;
 									if (pvtType == CIM_SINT8) {
 										value = V_I1(&vtProp);
-										strFieldValue += value;
-									} else {
-										if (pvtType == CIM_SINT16) {
-											value = V_I2(&vtProp);
-										} else if (pvtType == CIM_SINT32) {
-											value = V_I4(&vtProp);
-										} else if (pvtType == CIM_SINT64) {
-											value = V_I8(&vtProp);
-										}
-										strFieldValue = Common::ToString(value);
+									} else if (pvtType == CIM_SINT16) {
+										value = V_I2(&vtProp);
+									} else if (pvtType == CIM_SINT32) {
+										value = V_I4(&vtProp);
+									} else if (pvtType == CIM_SINT64) {
+										value = V_I8(&vtProp);
 									}
+									strFieldValue = Common::ToString(value);
 									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 									break;
 								}
@@ -302,17 +311,14 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 									unsigned long long value = 0;
 									if (pvtType == CIM_UINT8) {
 										value = V_UI1(&vtProp);
-										strFieldValue += value;
-									} else {
-										if (pvtType == CIM_UINT16) {
-											value = V_UI2(&vtProp);
-										} else if (pvtType == CIM_UINT32) {
-											value = V_UI4(&vtProp);
-										} else if (pvtType == CIM_UINT64) {
-											value = V_UI8(&vtProp);
-										}
-										strFieldValue = Common::ToString(value);
+									} else if (pvtType == CIM_UINT16) {
+										value = V_UI2(&vtProp);
+									} else if (pvtType == CIM_UINT32) {
+										value = V_UI4(&vtProp);
+									} else if (pvtType == CIM_UINT64) {
+										value = V_UI8(&vtProp);
 									}
+									strFieldValue = Common::ToString(value);
 									fieldEntityValues.push_back(new ItemFieldEntityValue(fieldName, strFieldValue, OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
 									break;
 								}
@@ -388,7 +394,7 @@ Item* WMI57Probe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					if ( fieldEntityValues.size() ){
 						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_EXISTS));
 					}else{
-						item->AppendElement(new ItemEntity("result",fieldEntityValues,OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));
+						item->AppendElement(new ItemEntity("result","",OvalEnum::DATATYPE_RECORD,OvalEnum::STATUS_DOES_NOT_EXIST));
 					}
 				}else {
 					/*
@@ -448,8 +454,8 @@ StringVector* WMI57Probe::GetWqlFields(string wqlIn, WQLFieldType wqlFieldType) 
 			string errorMessage = _com_error(hResult).ErrorMessage();
 			throw ProbeException("(WMI57Probe) Failed to create IWbemQuery object.  " + errorMessage, ERROR_FATAL);
 	}
-	ArrayGuard<WCHAR> wWqlIn(WindowsCommon::StringToWide(wqlIn));
-	if ( (hResult = wqlQuery->Parse(L"WQL", wWqlIn.get(),0)) == WBEM_S_NO_ERROR ){
+	wstring wWqlIn = WindowsCommon::StringToWide(wqlIn);
+	if ( (hResult = wqlQuery->Parse(L"WQL", wWqlIn.c_str(),0)) == WBEM_S_NO_ERROR ){
 		SWbemRpnEncodedQuery* wqlAnalysis = NULL;
 		if ( (hResult = wqlQuery->GetAnalysis(WMIQ_ANALYSIS_RPN_SEQUENCE,0,(LPVOID *)&wqlAnalysis)) == WBEM_S_NO_ERROR ){
 			switch(wqlFieldType){

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -151,7 +151,7 @@ private:
 	*/
 	ProcStatus RetrieveStatFile(const std::string &process, pid_t *ppid, 
 						 long *priority, unsigned long *starttime,
-						 pid_t *session, std::string *errMsg);
+				    pid_t *session, unsigned long *policy, std::string *errMsg);
 
 	/**
 	 * Reads uid's from the /proc/pid/status file.  This file supposedly contains

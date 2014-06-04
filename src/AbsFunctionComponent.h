@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -33,8 +33,6 @@
 
 #include "AbsComponent.h"
 
-XERCES_CPP_NAMESPACE_USE
-
 /**
 	This class represents abstract function component in a local_variable in the oval definition schema.
 	The oval definition schema defines a set of funtions for use in local_variables. All functions have 
@@ -44,18 +42,36 @@ class AbsFunctionComponent : public AbsComponent {
 public:
 
     /** Create a complete AbsFunctionComponent object. */
-	AbsFunctionComponent();
-	virtual ~AbsFunctionComponent();
+	AbsFunctionComponent()
+	{}
+	virtual ~AbsFunctionComponent()	{
+		DestroyComponents();
+	}
 
     /** Return the components field's value. */
-	AbsComponentVector* GetComponents();
+	AbsComponentVector* GetComponents() {
+		return &this->components;
+	}
     /** Set the components field's value. */
-	void SetComponents(AbsComponentVector* components);
+	void SetComponents(AbsComponentVector* components) {
+		DestroyComponents();
+		this->components = (*components);
+	}
 
-    /** Appned the input componenet to the list of componenets. */
-	void AppendComponent(AbsComponent* component);
+    /** Append the input componenet to the list of componenets. */
+	void AppendComponent(AbsComponent* component) {
+		this->GetComponents()->push_back(component);
+	}
 
 private:
+	void DestroyComponents() {
+		for (AbsComponentVector::iterator iter = components.begin();
+			iter != components.end();
+			++iter)
+			if (*iter)
+				delete *iter;
+	}
+
 	AbsComponentVector components;
 };
 

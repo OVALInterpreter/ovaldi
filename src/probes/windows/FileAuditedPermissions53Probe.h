@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,13 +31,7 @@
 #ifndef FILEAUDITEDPERMISSIONS53PROBE_H
 #define FILEAUDITEDPERMISSIONS53PROBE_H
 
-#pragma warning(disable:4786)
-
-#include "FileFinder.h"
 #include "AbsEffectiveRightsProbe.h"
-
-using namespace std;
-
 
 /**
     This class is responsible for collecting file information for windows fileauditedpermissions53_objects.
@@ -67,14 +61,7 @@ class FileAuditedPermissions53Probe : public AbsEffectiveRightsProbe {
          *  @param trusteeSID A string that contains the trustee SID of the file that you want to get the audited permissions of.
          *  @return The item that contains the file audited permissions of the specified path, filename, and trustee SID.
          */
-        Item* GetAuditedPermissions ( HANDLE fileHandle, string path, string fileName, string trusteeSID );
-
-        /** Get the string representation of the audited permissions.
-         *  @param success An ACCESS_MASK that represents the successful audit permissions.
-         *  @param failure An ACCESS_MASK that represents the failure audit permissions.
-         *  @return The string representation of the audited permissions.
-         */
-        string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
+        Item* GetAuditedPermissions ( HANDLE fileHandle, std::string path, std::string fileName, std::string trusteeSID );
 
         /** The static instance of the FileAuditedPermissions53Probe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.

@@ -330,12 +330,6 @@
     <ClCompile Include="..\..\..\src\XslCommon.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\AbsComponent.cpp">
-      <Filter>Source Files\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\AbsFunctionComponent.cpp">
-      <Filter>Source Files\variables</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\AbsVariable.cpp">
       <Filter>Source Files\variables</Filter>
     </ClCompile>
@@ -507,9 +501,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\ItemFieldEntityValue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Object.h">
@@ -866,8 +857,11 @@
     <ClInclude Include="..\..\..\src\windows\FsRedirectionGuard.h">
       <Filter>Header Files\windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\probes\windows\WindowsServicesProbe.h">
-      <Filter>Header Files\probes</Filter>
+    <ClInclude Include="..\..\..\src\StdTypedefs.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\windows\BitnessView.h">
+      <Filter>Header Files\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

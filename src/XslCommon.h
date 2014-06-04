@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,18 +31,7 @@
 #ifndef XSLCOMMON_H
 #define XSLCOMMON_H
 
-
-// See: 
-// http://xml.apache.org/xalan-c/usagepatterns.html#xalantransformer
-// for info about how to use the XalanTransformer C++ API
-
-//	required xalan includes 
-
-#include <xalanc/XalanTransformer/XalanCAPI.h>
-
-
-//	other includes
-#include "Log.h"
+#include <string>
 
 /**
 	This class encapsulates a set of static methods for applying an xsl to an xml file

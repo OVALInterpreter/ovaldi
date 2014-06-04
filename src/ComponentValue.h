@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,8 @@
 #ifndef COMPONENTVALUE_H
 #define COMPONENTVALUE_H
 
-#include "Common.h"
 #include "OvalEnum.h"
-
-
+#include "StdTypedefs.h"
 
 /**
 	This class represents a the value of a variable component.

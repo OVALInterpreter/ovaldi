@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,12 +31,10 @@
 #ifndef PRINTEREFFECTIVRIGHTSPROBE_H
 #define PRINTEREFFECTIVRIGHTSPROBE_H
 
-#pragma warning(disable:4786)
-
-#include <Windows.h> // for HANDLE
-#include "AbsEffectiveRightsProbe.h"
 #include <string>
+#include <Windows.h> // for HANDLE
 
+#include "AbsEffectiveRightsProbe.h"
 
 /**
 	This class is responsible for collecting printer information for Windows printereffictiverights_objects.
@@ -91,7 +89,7 @@ class PrinterEffectiveRightsProbe : public AbsEffectiveRightsProbe {
 		 *  @return The item that contains the printer effective rights of the specified printer and trustee SID.
 		 */
 		Item* GetEffectiveRights(HANDLE printerHandle, 
-				const std::string &printerNameStr, string trusteeSIDStr);
+				const std::string &printerNameStr, std::string trusteeSIDStr);
 		
 		HANDLE GetHandleToPrinter(const std::string &printerName);
 

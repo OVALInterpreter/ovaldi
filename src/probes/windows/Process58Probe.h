@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,12 +30,9 @@
 #ifndef PROCESS58PROBE_H
 #define PROCESS58PROBE_H
 
-#include "AbsProbe.h"
-#include "WindowsCommon.h"
-#include "WMIUtil.h"
-#include <Psapi.h>
-#include <tlhelp32.h>
+#include <map>
 
+#include "AbsProbe.h"
 
 /** This class is responsible for collecting Windows 32-bit process data.  It is important to note that
  *  the OpenProcess() API call does not have access to all of the processes on the system.  Most
@@ -46,10 +43,6 @@
  *  http://msdn.microsoft.com/en-us/library/ms684320(VS.85).aspx
  *
  */
-
-typedef multimap<string, string> StringStringMultiMap;
-typedef multimap<DWORD, string> DwordStringMultiMap;
-
 class Process58Probe : public AbsProbe {
 
     public:
@@ -74,14 +67,12 @@ class Process58Probe : public AbsProbe {
          */
         void GetAllProcesses();
 
-		static BOOL CALLBACK EnumWindowsProc(HWND hwnd,LPARAM lParam);
-
 
         /** Retrieve a particular Item from the ItemVector processes using the process' command line as the key.
          *  @param commandLineStr A string that contains the command line of a Windows process.
          *  @return The Item object whose command line matches the specified value.
          */
-        Item* GetProcess ( string commandLineStr );
+        Item* GetProcess ( std::string commandLineStr );
 
         /** Build a process Item from the data collected using the various Windows APIs.  All Items are placed in the processes ItemVector.
          *  @param processEntry  A PROCESSENTRY32 which contains data about the process whose Item you are building.
@@ -122,6 +113,9 @@ class Process58Probe : public AbsProbe {
 
         /** The ItemVector that holds the information about all of the Windows processes on the local system. */
         ItemVector* processes;
+
+		typedef std::multimap<std::string, std::string> StringStringMultiMap;
+		typedef std::multimap<DWORD, std::string> DwordStringMultiMap;
 
         /** The StringStringMultiMap that holds the mapping between the device drives and the logical drives. */
         StringStringMultiMap* pathMap;

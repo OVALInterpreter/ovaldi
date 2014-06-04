@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,10 +32,7 @@
 #define OVALENUM_H
 
 #include <string>
-#include <iostream>
-#include <stdlib.h>
-
-#include "Common.h"
+#include <vector>
 
 /**
 	This class stores all the enumerations that are common to more than one oval schema.
@@ -80,7 +77,8 @@ public:
 					DATATYPE_FLOAT,
 					DATATYPE_VERSION,
 					DATATYPE_RECORD,
-					DATATYPE_IPV4_ADDRESS};
+					DATATYPE_IPV4_ADDRESS,
+					DATATYPE_IPV6_ADDRESS};
 	static std::string DatatypeToString(OvalEnum::Datatype datatype);
 	static OvalEnum::Datatype ToDatatype(std::string datatypeStr);
 
@@ -102,7 +100,7 @@ public:
 				FLAG_NOT_APPLICABLE};
 	static std::string FlagToString(OvalEnum::Flag flag);
 	static OvalEnum::Flag ToFlag(std::string flagStr);
-	static OvalEnum::Flag CombineFlags(IntVector* flags);
+	static OvalEnum::Flag CombineFlags(std::vector<int>* flags);
 
 	/** An enum to define the acceptable levels. */
 	enum Level	{LEVEL_DEBUG,
@@ -150,8 +148,8 @@ public:
 	static std::string ResultToString(OvalEnum::ResultEnumeration result);
 	static std::string ResultToDirectiveString(OvalEnum::ResultEnumeration result);
 
-	static OvalEnum::ResultEnumeration CombineResultsByOperator(IntVector* results, OvalEnum::Operator op);    
-	static OvalEnum::ResultEnumeration CombineResultsByCheck(IntVector* results, OvalEnum::Check check);
+	static OvalEnum::ResultEnumeration CombineResultsByOperator(std::vector<int>* results, OvalEnum::Operator op);    
+	static OvalEnum::ResultEnumeration CombineResultsByCheck(std::vector<int>* results, OvalEnum::Check check);
 	static OvalEnum::ResultEnumeration NegateResult(OvalEnum::ResultEnumeration);
 
 	/** An enum to define result content.  Start at 1 and continue using powers of two so that

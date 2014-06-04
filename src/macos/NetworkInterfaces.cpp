@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -45,6 +45,8 @@
 #include <OutOfMemoryException.h>
 #include <SocketGuard.h>
 #include <Log.h>
+#include <Common.h>
+
 #include <NetworkInterfaces.h>
 
 using namespace std;

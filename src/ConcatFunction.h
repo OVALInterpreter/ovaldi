@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,27 +31,28 @@
 #ifndef CONCATFUNCTION_H
 #define CONCATFUNCTION_H
 
-#include "AbsFunctionComponent.h"
-#include "ComponentFactory.h"
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "AbsFunctionComponent.h"
 
 /**
 	This class represents a ConcatFunction component in a local_variable in the oval definition schema.
 */
 class ConcatFunction : public AbsFunctionComponent {
 public:
-	ConcatFunction();
-	~ConcatFunction();
+	ConcatFunction()
+	{}
+	virtual ~ConcatFunction()
+	{}
 
 	/** Parse the concat element and its child component elements. */
-	void Parse(DOMElement* componentElm); 
+	virtual void Parse(xercesc::DOMElement* componentElm); 
 
 	/** Compute the desired concatenated strings and return the values. */
-	ComponentValue* ComputeValue();
+	virtual ComponentValue* ComputeValue();
 
 	/** Return the variable values used to compute this function's value. */
-	VariableValueVector* GetVariableValues();
+	virtual VariableValueVector GetVariableValues();
 
 	/**
 		Recursively process all components of this function starting

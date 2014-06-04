@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -33,21 +33,14 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
 #include <map>
 #include <utility>
 
-#include "Common.h"
 #include "AbsObject.h"
 #include "OvalMessage.h"
 #include "Item.h"
 #include "VariableValue.h"
-#include "AbsDataCollector.h"
 #include "OvalEnum.h"
-
-XERCES_CPP_NAMESPACE_USE
-
 
 class CollectedObject;
 
@@ -68,9 +61,6 @@ typedef std::pair <std::string, CollectedObject* > CollectedObjectPair;
 	Stores only pointers to the objects. 
 */
 typedef std::map <std::string, CollectedObject* > CollectedObjectMap;
-
-class Item;
-typedef std::vector < Item* > ItemVector;
 
 /**
 	This class represents an object in a oval sytem characteristics schema.
@@ -96,7 +86,7 @@ public:
     */
 	static void WriteCollectedObjects();
 
-	void Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* collectObjectsElm);
+	void Write(xercesc::DOMDocument* scFile, xercesc::DOMElement* collectObjectsElm);
 	
 	OvalEnum::Flag GetFlag();
 	void SetFlag(OvalEnum::Flag flag);
@@ -111,13 +101,15 @@ public:
 	void SetMessages(OvalMessageVector* messages);
 
 	ItemVector* GetReferences();
-	void SetReferences(ItemVector* references);
+	void SetReferences(const ItemVector* references);
 
 	int GetVariableInstance();
 	void SetVariableInstance(int variableInstance);
-	
-	VariableValueVector* GetVariableValues();
-	void SetVariableValues(VariableValueVector* variableValues);
+
+	VariableValueVector GetVariableValues() const
+	{ return variableValues; }
+	void SetVariableValues(const VariableValueVector &variableValues)
+	{ this->variableValues = variableValues; }
 
 	int GetVersion();
 	void SetVersion(int version);
@@ -127,18 +119,16 @@ public:
 
 	/** Creates references to the set of input items and computes the flag value of this object based on the set. */
 	void AppendReferencesAndComputeFlag(ItemVector* references);
-	
-	void AppendVariableValue(VariableValue* variableValue);
-	void AppendVariableValues(VariableValueVector* variableValues);
-    
+
+	void AppendVariableValue(const VariableValue &variableValue);
+	void AppendVariableValues(const VariableValueVector &variableValues);
+
 private:
 
 	/** Creates references to the set of input items. */
 	void AppendReferences(ItemVector* references);
 
 	CollectedObject(std::string id = "", std::string comment = "", int version = 1, int variableInstance = 0, OvalEnum::Flag flag = OvalEnum::FLAG_ERROR);
-	/** Ensure that a given variable value for a variable id is only written once. */
-	bool IsWritten(StringPairVector* varIdValuePairs, std::string varId, std::string value);
 	/** Ensure that references are only written once. */
 	bool IsWritten(IntVector* itemIds, int itemId);
 	

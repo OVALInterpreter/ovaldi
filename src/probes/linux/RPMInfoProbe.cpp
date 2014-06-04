@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,13 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <cerrno>
 #include <memory>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 
 #include <linux/RpmGuards.h>
 #include <VectorPtrGuard.h>
+#include <Log.h>
+
 #include "RPMInfoProbe.h"
 
 using namespace std;
@@ -42,6 +46,16 @@ using namespace std;
 namespace {
 	auto_ptr<Item> CreateItem();
 }
+
+// Path to the 'rpm' tool.
+// Make sure this is an absolute path, to make
+// sure you are not accidentally running a
+// malicious app!
+#define RPM_PATH "/bin/rpm"
+
+#define RPM_COMMANDLINE RPM_PATH " -q --qf '%{SIGGPG:pgpsig}'"
+
+static char rpmSigkeyidBuf[1024];
 
 //****************************************************************************************//
 //								RPMInfoProbe Class										  //
@@ -52,6 +66,13 @@ RPMInfoProbe::RPMInfoProbe() {
 	/* Read in the RPM config files */
 	if (rpmReadConfigFiles( (const char*) NULL, (const char*) NULL))
 		throw ProbeException("Error: (RPMInfoProbe) Could not read RPM config files, which is necessary to read the RPM database.");
+
+	// make sure the rpm tool to run exists.
+	struct stat st;
+	if (stat(RPM_PATH, &st) == -1) {
+		throw ProbeException(string("The 'rpm' tool is required to get signature_keyid values.  "
+									"stat(\"" RPM_PATH "\"): ") + strerror(errno));
+	}	
 }
 
 RPMInfoProbe::~RPMInfoProbe() {
@@ -106,13 +127,13 @@ ItemVector* RPMInfoProbe::CollectItems(Object* object) {
 				collectedItems->push_back(item.release());
 
 			} else {
-
+				VariableValueVector vals = name->GetVarRef()->GetValues();
 				VariableValueVector::iterator iterator;
-				for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
+				for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
 					auto_ptr<Item> item = ::CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("name", (*iterator)->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					item->AppendElement(new ItemEntity("name", iterator->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
 					collectedItems->push_back(item.release());
 				}
 			}
@@ -165,11 +186,12 @@ void RPMInfoProbe::GetRPMNames(ObjectEntity* name, StringVector *names) {
 			// in the case of equals simply loop through all the
 			// variable values and add them to the set of all names
 			// if they exist on the system
+			VariableValueVector vals = name->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
-			for(iterator = name->GetVarRef()->GetValues()->begin(); iterator != name->GetVarRef()->GetValues()->end(); iterator++) {
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
 
-				if(this->RPMExists((*iterator)->GetValue())) {
-					names->push_back((*iterator)->GetValue());
+				if(this->RPMExists(iterator->GetValue())) {
+					names->push_back(iterator->GetValue());
 				}
 			}
 
@@ -389,217 +411,58 @@ int_32 RPMInfoProbe::readHeaderInt32(Header header, int_32 tag_id) {
   return( -1 );
 }
 
-void RPMInfoProbe::ChildGetSigKeyId(int writeErrh, int writeh, string rpmName) {
-	//------------------------------------------------------------------------------------//
-	//  ABSTRACT
-	//
-	//  Redirect stdout and stderr to the provided pipes (writeh, and writeErrh).
-	//  Execute rpm query with the correct options.
-	//  see: http://fedora.redhat.com/docs/drafts/rpm-guide-en/ch15s05.html
-	//
-	//------------------------------------------------------------------------------------//
-
-	// Point STDOUT and STDERR of child at pipe.  When exec program, output and
-	// all error messages will be sent down pipe instead of to screen.
-	if (writeh != STDOUT_FILENO) {
-		if (dup2(writeh, STDOUT_FILENO) != STDOUT_FILENO)
-			exit(-1);
-	}
-
-	if (writeErrh != STDERR_FILENO) {
-		if (dup2(writeErrh, STDERR_FILENO) != STDERR_FILENO)
-			exit(-1);
-	}
-
-	// Output redirected (duplicated), no longer need pipe
-	close (writeh);
-	close (writeErrh);
-
-	/////////////////////////////////////////////////////
-	////////     Call the rpmcli query code  ////////////
-	/////////////////////////////////////////////////////
-
-	// recreate a set of command line args for rpmcli functions
-	int count = 4;
-	char* arg0 = "blah";
-	char* arg1 = "-q";
-	char* arg2 = "--queryformat=\"%{SIGGPG:pgpsig}\"";
-	char arg3[128] = "";
-	strcat(arg3, rpmName.c_str());
-	char* args[count];
-	args[0] = arg0;
-	args[1] = arg1;
-	args[2] = arg2;
-	args[3] = arg3;
-
-	/* Set up a table of options. */
-	struct poptOption optionsTable[] = {
-		{ NULL, '\0', POPT_ARG_INCLUDE_TABLE, rpmcliAllPoptTable, 0, "Common options for all rpm modes and executables:", NULL },
-		{ NULL, '\0', POPT_ARG_INCLUDE_TABLE, rpmQueryPoptTable, 0, "Query options (with -q or --query):", NULL },
-		POPT_AUTOALIAS
-		POPT_AUTOHELP
-		POPT_TABLEEND
-	};
-
-	poptContext context;
-	QVA_t qva = &rpmQVKArgs;
-	int ec;
-	context = rpmcliInit(count, args, optionsTable);
-
-    if (context == NULL) {
-		/*poptPrintUsage(context, stderr, 0);
-		  exit(EXIT_FAILURE);*/
-		cerr << "Error: rpmcliInit returned a null context." << endl;
-    }
-
-	RpmtsGuard ts;
-
-	/* Check for query mode. */
-    if (qva->qva_mode == 'q') {
-
-		/* Make sure there's something to do. */
-		if (qva->qva_source != RPMQV_ALL && !poptPeekArg(context)) {
-			fprintf(stderr, "no arguments given for --query");
-			exit(EXIT_FAILURE);
-		}
-		ec = rpmcliQuery(ts, qva, (const char **) poptGetArgs(context));
-
-	} else {
-		cerr << "Unable to get sig key id for rpm: " << rpmName << endl;
-    }
-
-    context = rpmcliFini(context);
-
-	/////////////////////////////////////////////////////
-	////////////  end rpmcliquery code   ////////////////
-	/////////////////////////////////////////////////////
-
-	exit(0);
-}
-
-string RPMInfoProbe::ParentGetSigKeyId(int readErrh, int readh, int pid) {
-
-  int bytes = 0;
-  int maxFDS = 0;
-  char *buf = NULL;
-  fd_set readfds;
-  bool errComplete = false;
-  bool stdComplete = false;
-  string errText = "";
-  string text = "";
-
-  // Allocate memory for  buf
-  buf = (char*)malloc(sizeof(char)*1024);
-  if(buf == NULL) {
-
-    // Wait for the child process to complete
-    waitpid (pid, NULL, 0);
-
-    // Close the pipes
-    close (readh);
-    close (readErrh);
-
-    // Set an error message
-	throw ProbeException("Error: unable to allocate memory to read rpm query data into.");
-  }
-
-  // Init the maxFDS value
-  if(readh >= readErrh) {
-    maxFDS = readh + 1;
-  } else {
-    maxFDS = readErrh + 1;
-  }
-
-  // Loop over the call to select without using a timmer
-  // Only stop looping when select fails. select will
-  // fail when the file descriptors are closed by the
-  // child process.
-  while(!errComplete || !stdComplete) {
-
-    // Reset the fd_set
-    FD_ZERO(&readfds);
-    FD_SET(readErrh, &readfds);
-    FD_SET(readh, &readfds);
-
-    if(select(maxFDS, &readfds, NULL, NULL, NULL) != -1) {
-      if(FD_ISSET(readErrh, &readfds)) {
-		// Read some error output from command.
-		memset(buf, '\0', 1024);
-		bytes = read(readErrh, buf, 1023);
-		errText.append(buf);
-		  if(bytes == 0)
-		    errComplete = true;
-	  }
-
-      if(FD_ISSET(readh, &readfds)) {
-	    // Read allsome std output from command.
-	    memset(buf, '\0', 1024);
-	    bytes = read(readh, buf, 1023);
-	    text.append(buf);
-
-	    if(bytes == 0)
-	      stdComplete = true;
-      }
-    } else {
-       break;
-    }
-  }
-
-  free(buf);
-
-  // Wait for the child process to complete
-  if(waitpid (pid, NULL, 0) == -1) {
-    errText.append("Execution of rpm query in child process failed.");
-    throw ProbeException(errText);
-  }
-
-  // Close the pipes
-  close (readh);
-  close (readErrh);
-
-  if(errText.compare("") != 0) {
-	  throw ProbeException("Error running rpm query in child process: " + errText);
-  }
-  return text;
-}
-
 string RPMInfoProbe::GetSigKeyId(string rpmName) {
 
-	string sigKeyId = "";
-	int fd1[2];
-	int fd2[2];
-	int pid = 0;
+ 	string sigKeyId;
+	FILE *rpmFp;
+	string completeCommandLine = RPM_COMMANDLINE + (" " + rpmName);
 
-	// Open communication pipes between processes
-	if (pipe(fd1) < 0 || pipe(fd2) < 0)
-		throw ProbeException("Error: (RPMInfoProbe) Could not open pipe.");
+	Log::Debug("Running: "+completeCommandLine);
 
-	if ((pid = fork()) < 0) {
-		throw ProbeException("Error: (RPMInfoProbe) fork error before running rpm query.");
-
-	// Child process
-	} else if (pid == 0) {
-
-		// Close unnecessary pipes
-		close (fd1[0]);
-		close (fd2[0]);
-
-		this->ChildGetSigKeyId(fd1[1], fd2[1], rpmName);
-
-	// Parent process
-	} else {
-
-		// Close unnecessary pipes
-		close (fd1[1]);
-		close (fd2[1]);
-
-		// Get the results of the rpm query
-		string text = this->ParentGetSigKeyId(fd1[0], fd2[0], pid);
-		// parse the string and get just the key id portion - just the last 16
-		// chars minus the quotation mark
-		if (text.size() > 16)
-			sigKeyId = text.substr(text.length()-17, 16);
+	if ((rpmFp = popen(completeCommandLine.c_str(), "r")) == NULL) {
+		throw ProbeException("While getting signature_keyid: popen(" +
+							 completeCommandLine + "): " +
+							 strerror(errno));
 	}
+	
+	if (fgets(rpmSigkeyidBuf, sizeof(rpmSigkeyidBuf), rpmFp) == NULL) {
+		int origErrno = errno;
+		// lets slurp up any remaining data from the stream,
+		// ignoring errors...
+		while(fgetc(rpmFp) != EOF) ;
+		// just log a pclose error since we already have a
+		// different one to report...
+		if (pclose(rpmFp) == -1)
+			Log::Debug("pclose(" + completeCommandLine + ") error: " +
+					   strerror(errno));
+		throw ProbeException("Error reading output of " + completeCommandLine +
+							 ": " + strerror(origErrno));
+	}
+
+	//Log::Debug(string("Got result: ") + rpmSigkeyidBuf);
+
+	// same cleanup code as above...
+	// except this time, pclose() error will result in
+	// a thrown exception.
+	while(fgetc(rpmFp) != EOF) ;
+	if (pclose(rpmFp) == -1)
+		throw ProbeException("pclose(" + completeCommandLine + ") error: " +
+					   strerror(errno));
+	
+	size_t len = strlen(rpmSigkeyidBuf);
+	if (len >= 16) {
+		// the 'rpm' tool can print out all sorts of
+		// messages; find a key ID in it.
+		REGEX re;
+		vector<StringVector> matches;
+		re.GetAllMatchingSubstrings(
+			"Key ID ([0-9a-fA-F]{16})",
+			rpmSigkeyidBuf,
+			matches);
+		if (!matches.empty() && matches[0].size() > 1)
+			sigKeyId = matches[0][1];
+	}
+
 	return sigKeyId;
 }
 

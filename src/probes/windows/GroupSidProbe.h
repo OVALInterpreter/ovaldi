@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,12 +30,11 @@
 #ifndef GROUPSIDPROBE_H
 #define GROUPSIDPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-using namespace std;
+#include "Item.h"
+#include "Object.h"
 
 /**
     This class is responsible for collecting information for Windows group_sid_objects.
@@ -64,7 +63,7 @@ class GroupSidProbe : public AbsProbe {
          *  @param groupSIDStr A string that contains the SID of the group whose users you would like to enumerate.
          *  @return The Item object whose SID matches the specified value.
          */
-        Item* GetGroupSidInfo ( string groupSidStr );
+        Item* GetGroupSidInfo ( std::string groupSidStr );
 
         /** The static instance of the GroupSidProbe.
          *  All Probes are singletons. The ProbeFactory is responsible for managing instances of Probes.

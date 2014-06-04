@@ -2,7 +2,7 @@
 #
 #
 #****************************************************************************************//
-# Copyright (c) 2002-2010, The MITRE Corporation
+# Copyright (c) 2002-2014, The MITRE Corporation
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are
@@ -47,10 +47,10 @@ EXECUTABLE = $(OUTDIR)/ovaldi
 # General options that should be used by g++.
 CPPFLAGS = -Wall -DLINUX $(INCDIRS)
 
-LIBDIR = -L/usr/local/lib -L/usr/lib
+LIBDIR = -L/usr/local/lib -L/usr/lib64 -L/usr/lib
 
 # What libraries do we need?
-LIBS = -lxerces-c -lxalan-c -lpcre -lpopt -lgcrypt -lldap -llber -lblkid -lacl
+LIBS = -lxerces-c -lxalan-c -lxalanMsg -lpcre -lgcrypt -lldap -llber -lblkid -lacl -lselinux
 
 # Determine what package management system is being used 
 PACKAGE_RPM  = $(shell /usr/bin/env rpm  --version 2>/dev/null)
@@ -61,7 +61,7 @@ CPP_FILES := $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
 
 # Selectively enable/disable packages rather than assume presence is mutually exclusive.
 ifneq (${PACKAGE_RPM}, )
-	LIBS += -lrpm -lrpmdb -lrpmio
+	LIBS += -lrpm -lrpmdb -lrpmio -lpopt
 	CPPFLAGS += -DPACKAGE_RPM
 else
 	CPP_FILES := $(filter-out %RPMInfoProbe.cpp, $(CPP_FILES))

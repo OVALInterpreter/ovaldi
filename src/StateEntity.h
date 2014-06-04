@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,10 +31,11 @@
 #ifndef STATEENTITY_H
 #define STATEENTITY_H
 
-#include "AbsEntity.h" 
-#include "VariableFactory.h"
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
 
-XERCES_CPP_NAMESPACE_USE
+#include "OvalEnum.h"
+#include "AbsEntity.h" 
 
 /**
 	This class represents an entity in the State as definted in the oval definition schema. 
@@ -43,11 +44,6 @@ XERCES_CPP_NAMESPACE_USE
 */
 class StateEntity : public AbsEntity {
 public:
-	/**
-		Copy constructor. Creates a new StateEntity based on the specified StateEntity. 
-		@param orig a StateEntity* to be copied
-	*/
-	StateEntity(StateEntity* orig);
 	/** Create a complete StateEntity object. */
 	StateEntity(std::string name = "", std::string value = "", OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, OvalEnum::Operation operation = OvalEnum::OPERATION_EQUALS, AbsVariable* varRef = NULL, OvalEnum::Check entityCheck = OvalEnum::CHECK_ALL, OvalEnum::Check varCheck = OvalEnum::CHECK_ALL, bool nil = false);
 
@@ -58,7 +54,7 @@ public:
 	 *	@param entitiyElm a DOMElement* that represents the xml version of an entity.
 	 *	@return Void.
 	 */
-	void Parse(DOMElement* entitiyElm);
+	void Parse(xercesc::DOMElement* entitiyElm);
 
 	/** Return the entity check value.
  	 *  @return A value from the OvalEnum::Check enumeration representing the entity check value of the state entity.

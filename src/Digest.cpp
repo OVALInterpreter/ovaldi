@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,6 +31,15 @@
 // this #define makes sure we're using an up-to-date API
 #define GCRYPT_NO_DEPRECATED
 
+#include<iomanip>
+#include<fstream>
+#include<sstream>
+
+#ifdef WIN32
+	// silences some warnings coming from gcrypt
+	#pragma warning(disable:4505)
+#endif
+
 // Important: libgcrypt uses winsock2, and unless we include winsock2 first, we
 // will indirectly include winsock1 via subsequent headers, before including
 // winsock2, causing a header clash.  (I guess winsock1 knows to not include if
@@ -38,13 +47,10 @@
 // be included before any ovaldi headers.
 #include <gcrypt.h>
 
-#include "Digest.h"
-
-#include<iomanip>
-#include<fstream>
-#include<sstream>
 #include "Common.h"
 #include "Log.h"
+
+#include "Digest.h"
 
 #if defined SUNOS
 // for backward compatibility... I want to use a non-deprecated API

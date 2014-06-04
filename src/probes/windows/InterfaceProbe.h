@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,7 +32,6 @@
 
 #include <string>
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
 
 /** This class is responsible for collecting Windows Interface data. */
 class InterfaceProbe : public AbsProbe {
@@ -68,7 +67,7 @@ class InterfaceProbe : public AbsProbe {
          *  @param type A DWORD value that contains a bitmask of flags that represent the type of the Windows interface.
          *  @return A string representing the type of the Windows interface.
          */
-        string GetInterfaceType ( DWORD interfaceType );
+        std::string GetInterfaceType ( DWORD interfaceType );
 
         /** Get the address type of a IPV4 address.
          *  @param type A DWORD value that contains a bitmask of flags that represent the type of the Windows interface address.

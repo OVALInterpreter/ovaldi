@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -32,21 +32,6 @@
 #define UNAMEPROBE_H
 
 #include "AbsProbe.h"
-
-#ifdef LINUX
-#include <sys/sysinfo.h>
-#endif
-
-#ifdef SUNOS
-#include <sys/systeminfo.h>
-#endif
-
-#include <sys/utsname.h>
-
-#include <iostream>
-#include <string>
-#include <vector>
-
 
 class UnameProbe : public AbsProbe {
 public:

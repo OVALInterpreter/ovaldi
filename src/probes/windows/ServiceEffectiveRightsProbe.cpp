@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,8 +28,14 @@
 //
 //****************************************************************************************//
 
-#include <AutoCloser.h>
+#include <memory>
+#include <aclapi.h>
+
+#include "WindowsCommon.h"
+
 #include "ServiceEffectiveRightsProbe.h"
+
+using namespace std;
 
 //****************************************************************************************//
 //                              ServiceEffectiveRightsProbe Class                         //
@@ -159,14 +165,13 @@ ItemVector* ServiceEffectiveRightsProbe::CollectItems ( Object* object ) {
                 }
             } else {
                 Log::Debug ( "No matching SIDs found when getting the effective rights for object: " + object->GetId() );
-                StringSet trusteeSIDs;
 
-                if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, &trusteeSIDs, true ) ) {
+                if ( this->ReportTrusteeDoesNotExist ( trusteeSIDEntity, true ) ) {
                     for ( StringSet::iterator iterator2 = trusteeSIDs.begin(); iterator2 != trusteeSIDs.end(); iterator2++ ) {
                         Item* item = this->CreateItem();
                         item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
                         item->AppendElement ( new ItemEntity ( "service_name", ( *iterator1 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator2 ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+                        item->AppendElement ( new ItemEntity ( "trustee_sid","", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
                         collectedItems->push_back ( item );
                     }
                 }
@@ -371,11 +376,12 @@ StringSet* ServiceEffectiveRightsProbe::GetServices ( ObjectEntity* serviceNameE
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all services
             // if they exist on the system
+			VariableValueVector vals = serviceNameEntity->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
 
-            for ( iterator = serviceNameEntity->GetVarRef()->GetValues()->begin() ; iterator != serviceNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->ServiceExists ( ( *iterator )->GetValue() ) ) {
-                    allServices->insert ( ( *iterator )->GetValue() );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->ServiceExists ( iterator->GetValue() ) ) {
+                    allServices->insert ( iterator->GetValue() );
                 }
             }
 

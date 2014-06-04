@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,10 +28,12 @@
 //
 //****************************************************************************************//
 
+#include "XmlCommon.h"
+
 #include "Filter.h"
 
-XERCES_CPP_NAMESPACE_USE
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //									Filter Class										  //	
@@ -50,7 +52,9 @@ bool Filter::DoFilter(Item* item) {
 
 	// for a filter really want to convert the result to a boolean
 	if (result != OvalEnum::RESULT_TRUE && result != OvalEnum::RESULT_FALSE)
-		throw AbsStateException("Filter::ApplyFilter method unable to convert result value to a boolean. Found result: " + OvalEnum::ResultToString(result));
+		throw AbsStateException("Filtering failed: analysis of an item did "
+			"not result in a true/false result.  Found result: " +
+			OvalEnum::ResultToString(result));
 
 	return (result == OvalEnum::RESULT_TRUE && !this->IsExcluding()) ||
 		(result == OvalEnum::RESULT_FALSE && this->IsExcluding());

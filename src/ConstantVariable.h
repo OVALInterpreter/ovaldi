@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,6 +31,9 @@
 #ifndef CONSTANTVARIABLE_H
 #define CONSTANTVARIABLE_H
 
+#include <string>
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "AbsVariable.h"
 
 /**
@@ -39,12 +42,18 @@
 class ConstantVariable : public AbsVariable {
 public:
 
-	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector());
-	~ConstantVariable();
+	ConstantVariable(std::string id = "", std::string name = "constant_variable", int version = 1, OvalEnum::Datatype datatype = OvalEnum::DATATYPE_STRING, StringVector* msgs = new StringVector())
+		: AbsVariable (id, name, version, datatype, msgs)
+	{}
 
-	void Parse(DOMElement* constantVariableElm);
+	virtual ~ConstantVariable()
+	{}
 
-	VariableValueVector* GetVariableValues();	
+	virtual void Parse(xercesc::DOMElement* constantVariableElm);
+
+	virtual VariableValueVector GetVariableValues() const {
+		return VariableValueVector();
+	}
 };
 
 #endif

@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,10 +28,27 @@
 //
 //****************************************************************************************//
 
+#include <Windows.h>
 #include <memory>
+
 #include <AutoCloser.h>
 #include <PrivilegeGuard.h>
+#include "FileFinder.h"
+#include "WindowsCommon.h"
+
 #include "FileAuditedPermissions53Probe.h"
+
+using namespace std;
+
+namespace {
+
+    /** Get the string representation of the audited permissions.
+    *  @param success An ACCESS_MASK that represents the successful audit permissions.
+    *  @param failure An ACCESS_MASK that represents the failure audit permissions.
+    *  @return The string representation of the audited permissions.
+    */
+    string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure );
+}
 
 //****************************************************************************************//
 //                              FileAuditedPermissions53Probe Class                       //
@@ -127,24 +144,19 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
             StringPair* fp = ( *iterator );
 
             // If there is no file name and the fileName ObjectEntity is not set to nil.
-            if ( fp->second.compare ( "" ) == 0 && !fileName->GetNil() ) {
+            if ( fp->second.compare ( "" ) == 0 && fileName && !fileName->GetNil() ) {
                 Item* item = NULL;
                 // Check if the code should report that the filename does not exist.
-                StringVector fileNames;
+                if ( fileFinder.ReportFileNameDoesNotExist ( fp->first, fileName ) ) {
 
-                if ( fileFinder.ReportFileNameDoesNotExist ( fp->first, fileName, &fileNames ) ) {
-                    StringVector::iterator iterator;
-
-                    for ( iterator = fileNames.begin(); iterator != fileNames.end(); iterator++ ) {
-                        item = this->CreateItem();
-                        item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-						item->AppendElement(new ItemEntity("filepath", Common::BuildFilePath(fp->first, *iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-                        item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-                        item->AppendElement ( new ItemEntity ( "filename", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
-						item->AppendElement(new ItemEntity("windows_view",
-							(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-                        collectedItems->push_back ( item );
-                    }
+					item = this->CreateItem();
+                    item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+                    item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+                    item->AppendElement ( new ItemEntity ( "filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST, fileName->GetNil() ) );
+					item->AppendElement(new ItemEntity("windows_view",
+						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+                    collectedItems->push_back ( item );
 
                 } else {
                     item = this->CreateItem();
@@ -186,7 +198,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 
 					StringSet trusteeSIDs = GetTrusteesForWindowsObject(
 						SE_FILE_OBJECT, fileHandle, trusteeSID, true, 
-						resolveGroupBehavior, includeGroupBehavior);
+						resolveGroupBehavior, includeGroupBehavior, true);
 
                     if ( !trusteeSIDs.empty() ) {
                         for ( StringSet::iterator iterator = trusteeSIDs.begin(); iterator != trusteeSIDs.end(); iterator++ ) {
@@ -194,7 +206,7 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                                 Item* item = this->GetAuditedPermissions ( fileHandle, fp->first, fp->second, ( *iterator ) );
 
                                 if ( item != NULL ) {
-									if (fileName->GetNil()) {
+									if (fileName && fileName->GetNil()) {
 										auto_ptr<ItemEntityVector> fileNameVector(item->GetElementsByName("filename"));
 										if (fileNameVector->size() > 0) {
 											fileNameVector->at(0)->SetNil(true);
@@ -215,25 +227,18 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
                         }
                     } else {
                         Log::Debug ( "No matching trustees found when getting audited permissions for object: " + object->GetId() );
-                        StringSet* trusteeSIDs = new StringSet();
 
-                        if ( this->ReportTrusteeDoesNotExist ( trusteeSID, trusteeSIDs, true ) ) {
-                            for ( StringSet::iterator iterator = trusteeSIDs->begin(); iterator != trusteeSIDs->end(); iterator++ ) {
-                                Item* item = this->CreateItem();
-                                item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
-								item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-                                item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
-								item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
-                                item->AppendElement ( new ItemEntity ( "trustee_sid", ( *iterator ), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
-								item->AppendElement(new ItemEntity("windows_view",
-									(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-                                collectedItems->push_back ( item );
-                            }
+                        if ( this->ReportTrusteeDoesNotExist ( trusteeSID, true ) ) {
+                            Item* item = this->CreateItem();
+                            item->SetStatus ( OvalEnum::STATUS_DOES_NOT_EXIST );
+							item->AppendElement(new ItemEntity("filepath", filePathStr, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+                            item->AppendElement ( new ItemEntity ( "path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS ) );
+							item->AppendElement (new ItemEntity ("filename", fp->second, OvalEnum::DATATYPE_STRING, ((fileName->GetNil())?OvalEnum::STATUS_NOT_COLLECTED : OvalEnum::STATUS_EXISTS), fileName->GetNil() ) );
+                            item->AppendElement ( new ItemEntity ( "trustee_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST ) );
+							item->AppendElement(new ItemEntity("windows_view",
+								(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+                            collectedItems->push_back ( item );
                         }
-
-                        trusteeSIDs->clear();
-                        delete trusteeSIDs;
-                        trusteeSIDs = NULL;
                     }
 
                 } catch ( ProbeException ex ) {
@@ -255,24 +260,23 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
         if ( filePath != NULL ){
 			StringVector fpaths;
 			if (fileFinder.ReportFilePathDoesNotExist(filePath,&fpaths)){
-				StringVector statusValues;
 				Item* item = NULL;
 				StringPair* fpComponents = NULL;
 
 				// build path ObjectEntity to pass to ReportPathDoesNotExist to retrieve the status of the path value
 				ObjectEntity* pathStatus = new ObjectEntity("path","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
-				// build filename ObjectEntity to pass to ReportFileNameDoesNotExist to retrieve the status of the filename value
-				ObjectEntity* fileNameStatus = new ObjectEntity("filename","",OvalEnum::DATATYPE_STRING,OvalEnum::OPERATION_EQUALS,NULL,OvalEnum::CHECK_ALL,false);
 				
 				for(StringVector::iterator iterator = fpaths.begin(); iterator != fpaths.end(); iterator++) {
 					item = this->CreateItem();
 					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 					fpComponents = Common::SplitFilePath(*iterator);
 					pathStatus->SetValue(fpComponents->first);
-					fileNameStatus->SetValue(fpComponents->second);
-					item->AppendElement(new ItemEntity("filepath", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("path", fpComponents->first, OvalEnum::DATATYPE_STRING, (fileFinder.ReportPathDoesNotExist(pathStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
-					item->AppendElement(new ItemEntity("filename", fpComponents->second, OvalEnum::DATATYPE_STRING, (fileFinder.ReportFileNameDoesNotExist(fpComponents->first,fileNameStatus,&statusValues))?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					
+					bool pathDne  = fileFinder.ReportPathDoesNotExist(pathStatus);
+					item->AppendElement(new ItemEntity("path", (pathDne)?"":fpComponents->first, OvalEnum::DATATYPE_STRING, (pathDne)?OvalEnum::STATUS_DOES_NOT_EXIST:OvalEnum::STATUS_EXISTS));
+					item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+					
 					item->AppendElement(new ItemEntity("windows_view",
 						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
 					collectedItems->push_back(item);
@@ -287,24 +291,16 @@ ItemVector* FileAuditedPermissions53Probe::CollectItems ( Object* object ) {
 					delete pathStatus;
 					pathStatus = NULL;
 				}
-				if ( fileNameStatus != NULL ){
-					delete fileNameStatus;
-					fileNameStatus = NULL;
-				}
 			}
 		}else{
-			StringVector paths;
-			if(fileFinder.ReportPathDoesNotExist(path, &paths)) {
+			if(fileFinder.ReportPathDoesNotExist(path)) {
 				Item* item = NULL;
-				StringVector::iterator iterator;
-				for(iterator = paths.begin(); iterator != paths.end(); iterator++) {
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-					item->AppendElement(new ItemEntity("path", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-					item->AppendElement(new ItemEntity("windows_view",
-						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-					collectedItems->push_back(item);
-				}
+				item = this->CreateItem();
+				item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+				item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+				item->AppendElement(new ItemEntity("windows_view",
+					(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+				collectedItems->push_back(item);
 			}
 		}
     }
@@ -443,14 +439,18 @@ Item* FileAuditedPermissions53Probe::GetAuditedPermissions ( HANDLE fileHandle, 
     return item;
 }
 
-string FileAuditedPermissions53Probe::ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure ) {
-    if ( success && failure ) return "AUDIT_SUCCESS_FAILURE";
+namespace {
 
-    else if ( success && !failure ) return "AUDIT_SUCCESS";
+	string ConvertPermissionsToStringValue ( ACCESS_MASK success , ACCESS_MASK failure ) {
+		if ( success && failure ) return "AUDIT_SUCCESS_FAILURE";
 
-    else if ( !success && failure ) return "AUDIT_FAILURE";
+		else if ( success && !failure ) return "AUDIT_SUCCESS";
 
-    else if ( !success && !failure ) return "AUDIT_NONE";
+		else if ( !success && failure ) return "AUDIT_FAILURE";
 
-    else return "";
+		else if ( !success && !failure ) return "AUDIT_NONE";
+
+		else return "";
+	}
+
 }

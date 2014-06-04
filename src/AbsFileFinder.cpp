@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,6 +30,9 @@
 
 #include <memory>
 #include <algorithm>
+
+#include "Log.h"
+
 #include "AbsFileFinder.h"
 
 using namespace std;
@@ -94,7 +97,7 @@ StringVector* AbsFileFinder::GetPaths(ObjectEntity* path, BehaviorVector* behavi
 
 	// make a copy of the path so I can switch its operation without
 	// affecting the original.
-	ObjectEntity tmpPath(path);
+	ObjectEntity tmpPath(*path);
 
 #ifdef WIN32
 	// On windows, always ignore case sensitivity.
@@ -327,7 +330,7 @@ StringVector* AbsFileFinder::GetFileNames(string path, ObjectEntity* fileName) {
 
 	// make a copy of the path so I can switch its operation without
 	// affecting the original.
-	ObjectEntity tmpFileName(fileName);
+	ObjectEntity tmpFileName(*fileName);
 
 #ifdef WIN32
 	// On windows, always ignore case sensitivity.
@@ -395,7 +398,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 
 	// make a copy of the filepath so I can switch the operation on the
 	// copy without affecting the original.
-	ObjectEntity tmpFilePath(filePath);
+	ObjectEntity tmpFilePath(*filePath);
 
 #ifdef WIN32
 	// On windows, always ignore case sensitivity.
@@ -450,7 +453,7 @@ StringVector* AbsFileFinder::GetFilePaths(ObjectEntity* filePath) {
 	return filePathsFound.release();
 }
 
-bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* paths) {
+bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path) {
 
 	bool result = false;
 	
@@ -458,14 +461,17 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 		path->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {		
 		
 		if(path->GetVarRef() == NULL) {
-			paths->push_back(path->GetValue());
-			result = true;
-		} else {
-
-			VariableValueVector::iterator iterator;
-			for(iterator = path->GetVarRef()->GetValues()->begin(); iterator != path->GetVarRef()->GetValues()->end(); iterator++) {
-				paths->push_back((*iterator)->GetValue());
+			if(!this->PathExists(path->GetValue())) {
 				result = true;
+			}
+		} else {
+			VariableValueVector vals = path->GetVarRef()->GetValues();
+			VariableValueVector::iterator iterator;
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
+				if(!this->PathExists(iterator->GetValue())) {
+					result = true;
+					break;
+				}
 			}
 		}
 	}
@@ -473,7 +479,7 @@ bool AbsFileFinder::ReportPathDoesNotExist(ObjectEntity *path, StringVector* pat
 	return  result;
 }
 
-bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileName, StringVector *fileNames) {
+bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileName) {
 
 	bool result = false;
 	
@@ -482,15 +488,18 @@ bool AbsFileFinder::ReportFileNameDoesNotExist(string path, ObjectEntity *fileNa
 		!fileName->GetNil()) {		
 		
 		if(fileName->GetVarRef() == NULL) {
-			fileNames->push_back(fileName->GetValue());
-			result = true;
+			if(!this->FileNameExists(path, fileName->GetValue())) {
+				result = true;
+			}
 		} else {
-
 			
 			VariableValueVector::iterator iterator;
-			for(iterator = fileName->GetVarRef()->GetValues()->begin(); iterator != fileName->GetVarRef()->GetValues()->end(); iterator++) {
-				fileNames->push_back((*iterator)->GetValue());
-				result = true;
+			VariableValueVector vals = fileName->GetVarRef()->GetValues();
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
+				if(!this->FileNameExists(path, iterator->GetValue())) {
+					result = true;
+					break;
+				}
 			}
 		}
 	}
@@ -506,14 +515,19 @@ bool AbsFileFinder::ReportFilePathDoesNotExist(ObjectEntity *filePath, StringVec
 		filePath->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS) {		
 		
 		if(filePath->GetVarRef() == NULL) {
-			filePaths->push_back(filePath->GetValue());
-			result = true;
+			if(!this->FilePathExists(filePath->GetValue())) {
+				filePaths->push_back(filePath->GetValue());
+				result = true;
+			}
 		} else {
 
 			VariableValueVector::iterator iterator;
-			for(iterator = filePath->GetVarRef()->GetValues()->begin(); iterator != filePath->GetVarRef()->GetValues()->end(); iterator++) {
-				filePaths->push_back((*iterator)->GetValue());
-				result = true;
+			VariableValueVector vals = filePath->GetVarRef()->GetValues();
+			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
+				if(!this->FilePathExists(iterator->GetValue())) {
+					filePaths->push_back(iterator->GetValue());
+					result = true;
+				}
 			}
 		}
 	}

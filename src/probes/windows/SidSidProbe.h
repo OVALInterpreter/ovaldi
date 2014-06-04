@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,13 +30,9 @@
 #ifndef SIDSIDPROBE_H
 #define SIDSIDPROBE_H
 
-#pragma warning(disable:4786)
+#include <string>
 
 #include "AbsProbe.h"
-#include "WindowsCommon.h"
-
-using namespace std;
-
 
 /**
 	This class is responsible for collecting information for windows sid_sid_objects.
@@ -65,13 +61,13 @@ private:
 
 		TODO: how can I set the colleced object flag correctly?
 	*/
-	bool GetAccountInformation(string accountName,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
+	bool GetAccountInformation(std::string accountName,  bool resolveGroupBehavior, bool includeGroupBehavior, ItemVector* items);
 
 	/** Look up the specified trustee name. 
 		Get the domain and the SID string.
 		Return true if the account is a group.
 	*/
-	bool LookUpTrusteeName(string* accountNameStr, string* sidStr, string* domainStr);
+	bool LookUpTrusteeName(std::string* accountNameStr, std::string* sidStr, std::string* domainStr);
 
 };
 

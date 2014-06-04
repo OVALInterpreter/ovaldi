@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -31,17 +31,12 @@
 #ifndef ABSOBJECT_H
 #define ABSOBJECT_H
 
-
-//	other includes
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
+#include <xercesc/dom/DOMElement.hpp>
 
-#include "Common.h"
+#include "Exception.h"
 #include "VariableValue.h"
-
-XERCES_CPP_NAMESPACE_USE
 
 /**
 	This class represents an AbsObject in an oval definition file.
@@ -51,8 +46,8 @@ class AbsObject {
 public:
 	virtual ~AbsObject();
 
-	virtual void Parse(DOMElement*) = 0;
-	virtual VariableValueVector* GetVariableValues() = 0;
+	virtual void Parse(xercesc::DOMElement*) = 0;
+	virtual VariableValueVector GetVariableValues() = 0;
 	
 	std::string GetId();
 	void SetId(std::string id);

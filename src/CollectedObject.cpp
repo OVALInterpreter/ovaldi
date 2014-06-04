@@ -1,7 +1,7 @@
 //
 //
 //****************************************************************************************//
-// Copyright (c) 2002-2012, The MITRE Corporation
+// Copyright (c) 2002-2014, The MITRE Corporation
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -28,9 +28,17 @@
 //
 //****************************************************************************************//
 
+#include <algorithm>
+#include <iterator>
+#include "Common.h"
+#include "XmlCommon.h"
+#include "AbsDataCollector.h"
+#include "DocumentManager.h"
+
 #include "CollectedObject.h"
 
 using namespace std;
+using namespace xercesc;
 
 //****************************************************************************************//
 //								CollectedObject Class									  //	
@@ -68,9 +76,6 @@ CollectedObject::~CollectedObject() {
 	  	delete msg;
 	  	msg = NULL;
 	}
-
-	// Don't delete variable values they are shared and cached. There is a clear 
-	// cache method in the var value class taht is called at the end of run time
 }
 
 // ***************************************************************************************	//
@@ -287,7 +292,7 @@ ItemVector* CollectedObject::GetReferences() {
 	return &this->references;
 }
 
-void CollectedObject::SetReferences(ItemVector* references) {
+void CollectedObject::SetReferences(const ItemVector* references) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -318,28 +323,6 @@ void CollectedObject::SetVariableInstance(int variableInstance) {
 	// -----------------------------------------------------------------------
 
 	this->variableInstance = variableInstance;
-}
-
-VariableValueVector* CollectedObject::GetVariableValues() {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Return the variableValues field's value
-	//
-	// -----------------------------------------------------------------------
-
-	return &this->variableValues;
-}
-
-void CollectedObject::SetVariableValues(VariableValueVector* variableValues) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	Set the variableValues field's value
-	//
-	// -----------------------------------------------------------------------
-
-	this->variableValues = (*variableValues);
 }
 
 int CollectedObject::GetVersion() {
@@ -460,7 +443,7 @@ void CollectedObject::AppendReferences(ItemVector* references) {
 	}
 }
 
-void CollectedObject::AppendVariableValue(VariableValue* variableValue) {
+void CollectedObject::AppendVariableValue(const VariableValue &variableValue) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -471,22 +454,18 @@ void CollectedObject::AppendVariableValue(VariableValue* variableValue) {
 	this->variableValues.push_back(variableValue);
 }
 
-void CollectedObject::AppendVariableValues(VariableValueVector* vars) {
+void CollectedObject::AppendVariableValues(const VariableValueVector &vars) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
-	//	Add a variable value to the end of the variable values vector
+	//	Add some variable values to the end of the variable values vector
 	//
 	// -----------------------------------------------------------------------
 
-	VariableValueVector::iterator iterator;
-	for(iterator = vars->begin(); iterator != vars->end(); iterator++) {
-		VariableValue* var = (*iterator);
-		this->variableValues.push_back(var);
-	}
+	copy(vars.begin(), vars.end(), back_inserter(variableValues));
 }
 
-void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, DOMElement* collectedObjectsElm) {
+void CollectedObject::Write(DOMDocument* scFile, DOMElement* collectedObjectsElm) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -496,7 +475,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 	// -----------------------------------------------------------------------
 
 	// Create a new object element
-	DOMElement *newCollectedObjectElem = XmlCommon::AddChildElement(scFile, collectedObjectsElm, "object");
+	DOMElement *newCollectedObjectElem = XmlCommon::AddChildElementNS(scFile, collectedObjectsElm, XmlCommon::scNS, "object");
 
 	// Add the attributes
 	// handling defaults in the schema
@@ -517,29 +496,17 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 		OvalMessageVector::iterator messageIterator;
 		for(messageIterator = this->GetMessages()->begin(); messageIterator != this->GetMessages()->end(); messageIterator++) {
 			OvalMessage* message = (*messageIterator);
-			message->Write(scFile, newCollectedObjectElem, "oval-sc");
+			message->Write(scFile, newCollectedObjectElem, "", XmlCommon::scNS);
 		}
 	}
 
 	// Call the write method for each variable_value - ensure that each var value is only written once
-	if(this->GetVariableValues()->size() > 0) {
-		StringPairVector varIdValuePairs;
-		VariableValueVector::iterator variableValueIterator;
-		for(variableValueIterator = this->GetVariableValues()->begin(); variableValueIterator != this->GetVariableValues()->end(); variableValueIterator++) {
-			VariableValue* variableValue = (*variableValueIterator);
-			if(!this->IsWritten(&varIdValuePairs, variableValue->GetId(), variableValue->GetValue())) {
-				StringPair* pair = new StringPair();
-				pair->first = variableValue->GetId();
-				pair->second = variableValue->GetValue();
-				varIdValuePairs.push_back(pair);
-				variableValue->Write(newCollectedObjectElem);
-			}
+	if(!this->variableValues.empty()) {
+		set<VariableValue> uniqueVars(variableValues.begin(), variableValues.end());
+		set<VariableValue>::iterator variableValueIterator;
+		for(variableValueIterator = uniqueVars.begin(); variableValueIterator != uniqueVars.end(); variableValueIterator++) {
+			variableValueIterator->Write(newCollectedObjectElem);
 		}
-
-        for(StringPairVector::iterator varIdIterator = varIdValuePairs.begin(); varIdIterator != varIdValuePairs.end(); varIdIterator++)
-            delete (*varIdIterator);
-
-        varIdValuePairs.clear();
 	}
 
 	// Add each reference - ensure that each reference is only written once.
@@ -556,11 +523,7 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 				reference->Write(scFile, AbsDataCollector::Instance()->GetSCSystemDataElm());
 
 				// add the reference to the collected obj element
-				string refElementName = "reference";
-				XMLCh* name = XMLString::transcode(refElementName.c_str());
-				DOMElement *newReferenceElm = scFile->createElement(name);
-				//Free memory allocated by XMLString::transcode(char*)
-				XMLString::release(&name);
+				DOMElement *newReferenceElm = XmlCommon::CreateElementNS(scFile, XmlCommon::scNS, "reference");
 				newCollectedObjectElem->appendChild(newReferenceElm);
 				string idStr = Common::ToString(reference->GetId());
 				XmlCommon::AddAttribute(newReferenceElm, "item_ref", idStr);
@@ -572,30 +535,6 @@ void CollectedObject::Write(XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* scFile, 
 // ***************************************************************************************	//
 //								 Private members											//
 // ***************************************************************************************	//
-bool CollectedObject::IsWritten(StringPairVector* varIdValuePairs, string varId, string varValue) {
-	// -----------------------------------------------------------------------
-	//	Abstract
-	//
-	//	return true if the specified variable value has not already been written
-	//  must check the pair of var id and value.
-	// -----------------------------------------------------------------------
-
-	bool result = false;
-
-	StringPairVector::iterator iterator;
-	for(iterator = varIdValuePairs->begin(); iterator != varIdValuePairs->end(); iterator++) {
-		string id = (*iterator)->first;
-		if(id.compare(varId) == 0) {
-			string value = (*iterator)->second;
-			if(value.compare(varValue) == 0) {
-				result = true;
-                break;
-			}
-		}
-	}
-	return result;
-}
-
 bool CollectedObject::IsWritten(IntVector* itemIds, int itemId) {
 	// -----------------------------------------------------------------------
 	//	Abstract
