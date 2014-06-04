@@ -148,6 +148,8 @@ AbsProbe* ProbeFactory::GetProbe(string objectName) {
 		probe = LDAPProbe::Instance();
 	} else if(objectName.compare("cmdlet_object") == 0) {
 		probe = CmdletProbe::Instance();
+	} else if(objectName.compare("service_object") == 0) {
+		probe = WindowsServicesProbe::Instance();
 	} else {
 		Log::Info(objectName + " is not currently supported.");
 	}
