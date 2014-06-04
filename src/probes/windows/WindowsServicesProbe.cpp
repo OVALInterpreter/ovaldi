@@ -28,8 +28,15 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+#include <sstream>  //for std::istringstream
+#include <iterator> //for std::istream_iterator
+
+#include <EntityComparator.h>
+#include <WindowsCommon.h>
 #include <VectorPtrGuard.h>
 #include <PrivilegeGuard.h>
+
 #include "WindowsServicesProbe.h"
 
 using namespace std;
@@ -152,20 +159,21 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
             // In the case of equals simply loop through all the
             // variable values and add them to the set of all services
             // if they exist on the system
+			VariableValueVector vals = serviceNameEntity->GetVarRef()->GetValues();
             VariableValueVector::iterator iterator;
-
-            for ( iterator = serviceNameEntity->GetVarRef()->GetValues()->begin() ; iterator != serviceNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->ServiceExists ( ( *iterator )->GetValue(), false ) ) {
-                    allServices->insert ( ( *iterator )->GetValue(), false );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->ServiceExists ( iterator->GetValue(), false ) ) {
+                    allServices->insert ( iterator->GetValue(), false );
                 }
             }
 
         } else if ( serviceNameEntity->GetOperation() == OvalEnum::OPERATION_CASE_INSENSITIVE_EQUALS ) {
+			VariableValueVector vals = serviceNameEntity->GetVarRef()->GetValues();
 			VariableValueVector::iterator iterator;
 
-            for ( iterator = serviceNameEntity->GetVarRef()->GetValues()->begin() ; iterator != serviceNameEntity->GetVarRef()->GetValues()->end() ; iterator++ ) {
-                if ( this->ServiceExists ( ( *iterator )->GetValue(), true ) ) {
-                    allServices->insert ( ( *iterator )->GetValue(), false );
+            for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
+                if ( this->ServiceExists ( iterator->GetValue(), true ) ) {
+                    allServices->insert ( iterator->GetValue(), false );
                 }
             }
 		} else {

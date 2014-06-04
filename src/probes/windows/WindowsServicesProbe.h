@@ -30,16 +30,11 @@
 #ifndef WINDOWSSERVICESPROBE_H
 #define WINDOWSSERVICESPROBE_H
 
-#include <memory>
 #include <string>
 #include <vector>
 #include <set>
-#include <sstream>  //for std::istringstream
-#include <iterator> //for std::istream_iterator
-
 
 #include "AbsProbe.h"
-#include <windows.h>
 #include <AutoCloser.h>
 #include "EntityComparator.h"
 #include "WindowsCommon.h"

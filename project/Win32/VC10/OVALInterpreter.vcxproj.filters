@@ -863,6 +863,9 @@
     <ClInclude Include="..\..\..\src\windows\BitnessView.h">
       <Filter>Header Files\windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\WindowsServicesProbe.h">
+      <Filter>Header Files\probes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Version.h">
