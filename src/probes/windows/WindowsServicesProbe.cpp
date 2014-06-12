@@ -28,36 +28,37 @@
 //
 //****************************************************************************************//
 
+#include <cassert>
 #include <memory>
-#include <sstream>  //for std::istringstream
-#include <iterator> //for std::istream_iterator
 
 #include <EntityComparator.h>
 #include <WindowsCommon.h>
 #include <VectorPtrGuard.h>
-#include <PrivilegeGuard.h>
+#include <ArrayGuard.h>
 
 #include "WindowsServicesProbe.h"
 
 using namespace std;
+
+// convenience macros since there's a lot of bit and enum checking
+// in this code...
+#define BIT2STRING(bit_)	if (bitmask & (bit_)) bitStrings.push_back(#bit_);
+// this one is specifically designed for use inside switch
+// statements.
+#define ENUM2STRING(enum_)	case (enum_): *enumString = #enum_; break;
 
 //****************************************************************************************//
 //                              WindowsServicesProbe Class                                //
 //****************************************************************************************//
 WindowsServicesProbe* WindowsServicesProbe::instance = NULL;
 
-WindowsServicesProbe::WindowsServicesProbe() {
-	services = NULL;
+WindowsServicesProbe::WindowsServicesProbe() : services(NULL), serviceMgr(NULL) {
 
-    SC_HANDLE serviceHandle = NULL;
-    serviceHandle = OpenSCManager(NULL,NULL,SC_MANAGER_ALL_ACCESS);
-    if ( serviceHandle == NULL ) {
-        throw ProbeException ( "Error: The function OpenSCManager() was unable to retrieve the handle for the service control manager database. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+    serviceMgr = OpenSCManager(NULL,NULL,SC_MANAGER_ALL_ACCESS);
+    if ( serviceMgr == NULL ) {
+        throw ProbeException("Couldn't open service control manager: " + 
+			WindowsCommon::GetErrorMessage(GetLastError()));
     }
-
-	this->serviceMgr.reset(
-		new AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)>(
-			serviceHandle, CloseServiceHandle, "service control manager"));
 
 	services = GetAllServices();
 }
@@ -66,6 +67,8 @@ WindowsServicesProbe::~WindowsServicesProbe() {
     instance = NULL;
 	if (services)
 		delete services;
+	if (serviceMgr)
+		CloseServiceHandle(serviceMgr);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -225,56 +228,64 @@ auto_ptr<StringSet> WindowsServicesProbe::GetMatchingServices (ObjectEntity* ser
 }
 
 StringSet* WindowsServicesProbe::GetAllServices() {
-    StringSet* allServices = new StringSet();
+    auto_ptr<StringSet> allServices(new StringSet());
 	DWORD dwBytesNeeded = 0;
     DWORD dwServicesReturned = 0;
     DWORD dwResumedHandle = 0;
-    DWORD dwServiceType = SERVICE_WIN32 | SERVICE_DRIVER;
+	DWORD currBufferSize = 0;
+	DWORD errorCode;
+	ArrayGuard<char> services;
 	
     // Query services
-    BOOL retVal = EnumServicesStatus(serviceMgr->get(), dwServiceType, SERVICE_STATE_ALL, NULL, sizeof(ENUM_SERVICE_STATUS), &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle);
-	DWORD errorCode = GetLastError();
+    BOOL retVal = EnumServicesStatus(serviceMgr,
+		SERVICE_WIN32 | SERVICE_DRIVER,
+		SERVICE_STATE_ALL,
+		NULL,
+		sizeof(ENUM_SERVICE_STATUS),
+		&dwBytesNeeded,
+		&dwServicesReturned,
+		&dwResumedHandle);
+	errorCode = GetLastError();
 
 	// Need big buffer
 	while (!retVal && (ERROR_MORE_DATA == errorCode)) {
 
-		// Set the buffer
-		ENUM_SERVICE_STATUS* pServices = (ENUM_SERVICE_STATUS*)new char[dwBytesNeeded];
+		// Enlarge the buffer if necessary.  No need to shrink it.
+		if (dwBytesNeeded > currBufferSize) {
+			services.reset(new char[dwBytesNeeded]);
+			currBufferSize = dwBytesNeeded;
+		}
 
-		retVal = EnumServicesStatus(serviceMgr->get(), SERVICE_WIN32 | SERVICE_DRIVER, SERVICE_STATE_ALL, pServices, dwBytesNeeded, &dwBytesNeeded, &dwServicesReturned, &dwResumedHandle);
+		retVal = EnumServicesStatus(serviceMgr,
+			SERVICE_WIN32 | SERVICE_DRIVER,
+			SERVICE_STATE_ALL,
+			(LPENUM_SERVICE_STATUS)services.get(),
+			currBufferSize,
+			&dwBytesNeeded,
+			&dwServicesReturned,
+			&dwResumedHandle);
 		errorCode = GetLastError();
 
-		// If the call failed for any other reason than more data
-		if(!retVal && (ERROR_MORE_DATA != errorCode)){
-			delete [] pServices;
-			pServices = NULL; 
-
-			delete allServices;
-			allServices = NULL;
-
-			throw ProbeException ( "ERROR: The function EnumServicesStatusEx() could not enumerate the services on the system. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() ) );
+		if(retVal || errorCode == ERROR_MORE_DATA) {
+			// now traverse each service to get information
+			LPENUM_SERVICE_STATUS svcsAsArray = (LPENUM_SERVICE_STATUS)services.get();
+			for (unsigned iIndex = 0; iIndex < dwServicesReturned; iIndex++) {
+				allServices->insert(svcsAsArray[iIndex].lpServiceName);
+			}
 		}
-
-		// now traverse each service to get information
-		for (unsigned iIndex = 0; iIndex < dwServicesReturned; iIndex++) {
-				string serviceName = (pServices + iIndex)->lpServiceName;
-				allServices->insert(serviceName);
-		}
- 
-		delete [] pServices;
-		pServices = NULL;
 	}
 
-    return allServices;
+	if (!retVal && errorCode)
+		throw ProbeException("Couldn't enum services: EnumServicesStatus(): " + WindowsCommon::GetErrorMessage(errorCode));
+
+    return allServices.release();
 }
 
 bool WindowsServicesProbe::ServiceExists ( string serviceNameStr, bool caseInsensitive ) {
 	if(caseInsensitive){
 		
 		for ( StringSet::iterator it = WindowsServicesProbe::services->begin(); it != WindowsServicesProbe::services->end(); it++ ) {
-
-			string temp = (string)(*it);
-			if(Common::EqualsIgnoreCase(serviceNameStr, temp)){
+			if(Common::EqualsIgnoreCase(serviceNameStr, *it)){
 				return true;
 			}
 		}
@@ -290,236 +301,303 @@ bool WindowsServicesProbe::ServiceExists ( string serviceNameStr, bool caseInsen
 }
 
 Item* WindowsServicesProbe::GetService ( string serviceName ) {
-	Item* item = NULL;
-    SC_HANDLE schService;
-	SC_HANDLE schService2;
-	SERVICE_STATUS_PROCESS ssStatus;
-    LPQUERY_SERVICE_CONFIG lpsc = NULL; 
-    LPSERVICE_DESCRIPTION lpsd = NULL;
     DWORD dwBytesNeeded = 0;
-	DWORD cbBufSize = 0;
 	DWORD dwError = 0; 
-	vector<string> serviceType;
-	vector<string> controlType;
-	string startType;
-	string path;
-	string startName;
+	ArrayGuard<BYTE> byteBuffer;
+	BOOL ret;
 
-	// Giving ourselves this privilege seems to gain us access
-	// to a lot more processes.
-	PrivilegeGuard pg(SE_DEBUG_NAME, false);
-
-	item = this->CreateItem();
+	auto_ptr<Item> item(this->CreateItem());
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
 
+	VectorPtrGuard<ItemEntity> itemEntities(new vector<ItemEntity*>());
+
+	// The following code throws the collection of entities
+	// that will go into the item into the itemEntities vector,
+	// rather than directly into the item.  This makes them
+	// easier to use in the following code.
+	//
+	// It assigns a separate variable to also point to each 
+	// element of the vector, which makes each entity easy to
+	// access in a readable way (rather than just hard-coding
+	// vector indices).
+	//
+	// All entities default to status=error, and as the
+	// following syscalls succeed, will be switched to status=exists.
+	//
+	// The reason for this design is because the success/failure of
+	// subsequent syscalls will affect non-contiguous sets of
+	// entities.  E.g. GetServiceFoo() might yield info for entities
+	// 1, 2, 5, and 7, so that particular subset gets success/failure
+	// depending on whether the call succeeded.  So I need to be able
+	// to pick and choose in a readable maintainable way particular
+	// entities.  Defaulting to status=error means that syscall errors
+	// require no work (other than maybe adding a message): the entities
+	// are already set up correctly.  I only have to do work on 
+	// successes (and any other non-error condition).
+
+// factor out var naming to make it easier to change
+#define IE_VAR_NAME(ieName_) ieName_ ## Ie
+// this macro lets you specify the oval type
+#define INIT_ITEM_ENTITY_TYPE(ieName_, type_) \
+	ItemEntity *IE_VAR_NAME(ieName_); \
+	itemEntities->push_back(IE_VAR_NAME(ieName_) = new ItemEntity(#ieName_, "", OvalEnum::DATATYPE_ ## type_, OvalEnum::STATUS_ERROR));
+// a simpler macro which uses datatype=string, which is
+// what most entities are.
+#define INIT_ITEM_ENTITY(ieName_) INIT_ITEM_ENTITY_TYPE(ieName_, STRING)
+
+// Need an iterator to the middle of the entity vector, when the
+// time comes to insert entities into the middle.  This is necessary
+// for those entities which must be repeated for multiple values.
+// So this code must scan through the vector until it finds an 
+// address which matches the corresponding entity variable.  The 
+// entity variables for those entities will wind up pointing to the
+// first of possibly several entities with the same name, to be
+// added later.
+#define IE_ITER_NAME(ieName_) ieName_ ## Iter
+#define ITEM_ENTITY_ITERATOR_FOR(ieName_) \
+	vector<ItemEntity*>::iterator IE_ITER_NAME(ieName_) = \
+		itemEntities.get()->begin(); \
+	while (IE_ITER_NAME(ieName_) != itemEntities.get()->end() && \
+			*IE_ITER_NAME(ieName_) != IE_VAR_NAME(ieName_)) \
+		++IE_ITER_NAME(ieName_); \
+	assert(IE_ITER_NAME(ieName_) != itemEntities.get()->end());
+
+	INIT_ITEM_ENTITY(service_name)
+	INIT_ITEM_ENTITY(display_name)
+	INIT_ITEM_ENTITY(description)
+	INIT_ITEM_ENTITY(service_type) // multiple allowed
+	INIT_ITEM_ENTITY(start_type)
+	INIT_ITEM_ENTITY(current_state)
+	INIT_ITEM_ENTITY(controls_accepted) // multiple allowed
+	INIT_ITEM_ENTITY(start_name)
+	INIT_ITEM_ENTITY(path)
+	INIT_ITEM_ENTITY_TYPE(pid, INTEGER)
+	INIT_ITEM_ENTITY_TYPE(service_flag, BOOLEAN)
+	INIT_ITEM_ENTITY(dependencies) // multiple allowed
+
+	IE_VAR_NAME(service_name)->SetValue(serviceName);
+	IE_VAR_NAME(service_name)->SetStatus(OvalEnum::STATUS_EXISTS);
+
     // open service
-    schService = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_CONFIG); 
+    SC_HANDLE schService = OpenService(serviceMgr, serviceName.c_str(), 
+		SERVICE_QUERY_CONFIG|SERVICE_QUERY_STATUS); 
     AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schServiceCloser(schService, CloseServiceHandle, "ServiceCloser");
 
-    if (schService == NULL){  
-		 string logMsg = "ERROR: The function OpenService() could not access a service on the system. Microsoft System Error " + Common::ToString (GetLastError()) + " - " + WindowsCommon::GetErrorMessage(GetLastError());
-		 Log::Info(logMsg);
-
-		item->SetStatus(OvalEnum::STATUS_ERROR);
-		item->AppendMessage(new OvalMessage(logMsg));
-		return item;
-    }
-
-    // Get the configuration information.
-    if( !QueryServiceConfig(schService, NULL, 0, &dwBytesNeeded)){
-        dwError = GetLastError();
-        if( ERROR_INSUFFICIENT_BUFFER == dwError ){
-            cbBufSize = dwBytesNeeded;
-            lpsc = (LPQUERY_SERVICE_CONFIG) malloc(cbBufSize);
-
-			if(lpsc == NULL){
-				string logMsg = "ERROR: The function malloc() failed due to insufficient system memory.";
-				Log::Info(logMsg);
-				
-				item->SetStatus(OvalEnum::STATUS_ERROR);
-				item->AppendMessage(new OvalMessage(logMsg));
-				return item;
-			}
-
-        }else{
-			string logMsg = "ERROR: The function QueryServiceConfig() failed.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
-			Log::Info(logMsg);
-
-				item->SetStatus(OvalEnum::STATUS_ERROR);
-				item->AppendMessage(new OvalMessage(logMsg));
-				return item;
-		}
-    }
-  
-    if( !QueryServiceConfig(schService, lpsc, cbBufSize, &dwBytesNeeded) ) {
-		string logMsg = "ERROR: The function QueryServiceConfig() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
+    if (schService == NULL) {
+		string logMsg = "Error accessing service: OpenService(): " +
+			WindowsCommon::GetErrorMessage(GetLastError());
 		Log::Info(logMsg);
-		free(lpsc);
 
 		item->SetStatus(OvalEnum::STATUS_ERROR);
-		item->AppendMessage(new OvalMessage(logMsg));
-		return item;
-	}
-
-    if( !QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &dwBytesNeeded)){
-        dwError = GetLastError();
-        if( ERROR_INSUFFICIENT_BUFFER == dwError ){
-            cbBufSize = dwBytesNeeded;
-            lpsd = (LPSERVICE_DESCRIPTION) malloc(cbBufSize);
-
-			if(lpsd == NULL){
-				string logMsg = "ERROR: The function malloc() failed due to insufficient system memory.";
-				Log::Info(logMsg);
-				free(lpsc);
-
-				item->SetStatus(OvalEnum::STATUS_ERROR);
-				item->AppendMessage(new OvalMessage(logMsg));
-				return item;
-			}
-
-		}else{
-			string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
-			Log::Info(logMsg);
-			free(lpsc);
-
-			item->SetStatus(OvalEnum::STATUS_ERROR);
-			item->AppendMessage(new OvalMessage(logMsg));
-			return item;
-		}
+		item->AppendMessage(new OvalMessage(logMsg, OvalEnum::LEVEL_ERROR));
+		item->SetElements(itemEntities.get());
+		itemEntities->clear();
+		return item.release();
     }
- 
-    if (! QueryServiceConfig2( schService, SERVICE_CONFIG_DESCRIPTION, (LPBYTE) lpsd, cbBufSize,  &dwBytesNeeded) ) {
-		string logMsg = "ERROR: The function QueryServiceConfig2() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
+
+	dwBytesNeeded = 0;
+	byteBuffer.reset();
+	do {
+		if (dwBytesNeeded)
+			byteBuffer.reset(new BYTE[dwBytesNeeded]);
+		ret = QueryServiceConfigA(schService, 
+			(LPQUERY_SERVICE_CONFIGA)byteBuffer.get(), dwBytesNeeded,
+			&dwBytesNeeded);
+		dwError = GetLastError();
+	} while (!ret && ERROR_INSUFFICIENT_BUFFER == dwError);
+
+	if (!ret) {
+		string logMsg = "Error querying service: QueryServiceConfig(): " +
+			WindowsCommon::GetErrorMessage(dwError);
 		Log::Info(logMsg);
-		free(lpsc);
-		free(lpsd);
 
-		item->SetStatus(OvalEnum::STATUS_ERROR);
-		item->AppendMessage(new OvalMessage(logMsg));
-		return item;
-	 }
-	
-	item->AppendElement(new ItemEntity("service_name", serviceName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	
-	if(lpsc->lpDisplayName != NULL && lpsc->lpDisplayName[0]){
-		item->AppendElement(new ItemEntity("display_name", lpsc->lpDisplayName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	}else{
-		item->AppendElement(new ItemEntity("display_name", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The DisplayName could not be determined or was unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
-	}
+		item->AppendMessage(new OvalMessage(logMsg, OvalEnum::LEVEL_ERROR));
+	} else {
 
-	if(lpsd->lpDescription != NULL && lpsd->lpDescription[0]){
-		item->AppendElement(new ItemEntity("description", lpsd->lpDescription, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	}else{
-		item->AppendElement(new ItemEntity("description", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-	}
-
-	serviceType = WindowsServicesProbe::ServiceTypeToString(lpsc->dwServiceType);
-	if(!serviceType.empty()){
-
-		for(vector<string>::iterator it = serviceType.begin(); it != serviceType.end(); ++it) {
-
-			item->AppendElement(new ItemEntity("service_type", *it, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		LPQUERY_SERVICE_CONFIGA lpsc = (LPQUERY_SERVICE_CONFIGA)byteBuffer.get();
+		if(lpsc->lpDisplayName) {
+			IE_VAR_NAME(display_name)->SetValue(lpsc->lpDisplayName);
+			IE_VAR_NAME(display_name)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			// not sure this is possible...
+			IE_VAR_NAME(display_name)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
 		}
 
-	}else{
-		item->AppendElement(new ItemEntity("service_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The ServiceType could not be determined or was unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
-	}	
-
-	startType = WindowsServicesProbe::StartTypeToString(lpsc->dwStartType);
-	if(!startType.empty()){
-		item->AppendElement(new ItemEntity("start_type", startType, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	}else{
-		item->AppendElement(new ItemEntity("start_type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-		string errorMessage = "The StartType could not be determined or was unrecognized.";
-		item->AppendMessage(new OvalMessage(errorMessage));
-	}
-
-	if(lpsc->lpBinaryPathName != NULL && lpsc->lpBinaryPathName[0]){
-		path = Common::ToString(lpsc->lpBinaryPathName);
-	}
-
-	if(lpsc->lpServiceStartName != NULL && lpsc->lpServiceStartName[0]){
-		startName = lpsc->lpServiceStartName;
-	}else{
-		startName = "";
-	}
-
-	istringstream ss(lpsc->lpDependencies);
-    istream_iterator<string> begin(ss), end;
-    vector<string> depArrayTokens(begin, end); 
-
-    free(lpsc); 
-    free(lpsd);
-	
-	// open service for status query
-    schService2 = OpenService(serviceMgr->get(), serviceName.c_str(), SERVICE_QUERY_STATUS); 
-	AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> schService2Closer(schService2, CloseServiceHandle, "ServiceCloser");
-    if (schService2 == NULL){  
-		 string logMsg = "ERROR: The function OpenService() could not access a service on the system.  Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
-		 Log::Info(logMsg);
-
-		 item->SetStatus(OvalEnum::STATUS_ERROR);
-		 item->AppendMessage(new OvalMessage(logMsg));
-		 return item;
-    }
-
-	if (!QueryServiceStatusEx( 
-				schService2,                     // handle to service 
-				SC_STATUS_PROCESS_INFO,         // information level
-				(LPBYTE) &ssStatus,             // address of structure
-				sizeof(SERVICE_STATUS_PROCESS), // size of structure
-				&dwBytesNeeded ) )              // size needed if buffer is too small
-		{
-			string logMsg = "ERROR: The function QueryServiceStatusEx() failed. Microsoft System Error " + Common::ToString ( GetLastError() ) + ") - " + WindowsCommon::GetErrorMessage ( GetLastError() );
-			Log::Info(logMsg);
-
-			item->SetStatus(OvalEnum::STATUS_ERROR);
-			item->AppendMessage(new OvalMessage(logMsg));
-			return item;
-	}
-	
-	item->AppendElement(new ItemEntity("current_state", CurrentStateToString(ssStatus.dwCurrentState), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	
-	controlType = WindowsServicesProbe::ControlToString(ssStatus.dwControlsAccepted);
-	if(!controlType.empty()){
-		for(vector<string>::iterator it = controlType.begin(); it != controlType.end(); ++it) {
-			item->AppendElement(new ItemEntity("controls_accepted", *it, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		vector<string> serviceType = WindowsServicesProbe::ServiceTypeToString(lpsc->dwServiceType);
+		if (serviceType.empty())
+			IE_VAR_NAME(service_type)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		else {
+			vector<string>::iterator valIter = serviceType.begin();
+			// the first val goes into the existing item entity; any 
+			// remaining vals go into new item entities we insert
+			// next to the existing one.
+			IE_VAR_NAME(service_type)->SetValue(*valIter);
+			IE_VAR_NAME(service_type)->SetStatus(OvalEnum::STATUS_EXISTS);
+			++valIter;
+			ITEM_ENTITY_ITERATOR_FOR(service_type)
+			for(;valIter != serviceType.end(); ++valIter)
+				IE_ITER_NAME(service_type) = itemEntities->insert(
+					IE_ITER_NAME(service_type),
+					new ItemEntity("service_type", *valIter));
 		}
-	}else{
-		item->AppendElement(new ItemEntity("controls_accepted", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-	}
 
-	// startName can be blank, so we don't check its length like we do with the other entities
-	item->AppendElement(new ItemEntity("start_name", startName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	
-	if(!path.empty()){
-		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-	}else{
-		item->AppendElement(new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));	
-	}
-
-	item->AppendElement(new ItemEntity("pid", Common::ToString(ssStatus.dwProcessId), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-
-	bool serviceFlag =  false;
-	serviceFlag = WindowsServicesProbe::ServiceFlagToBool(ssStatus.dwServiceFlags);
-	item->AppendElement(new ItemEntity("service_flag", Common::ToString(serviceFlag), OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
-
-	if(!depArrayTokens.empty()){
-		for(size_t i=0; i < depArrayTokens.size(); i++){
-			item->AppendElement(new ItemEntity("dependencies", depArrayTokens.at(i), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		string startType;
+		if (WindowsServicesProbe::StartTypeToString(lpsc->dwStartType, &startType)) {
+			IE_VAR_NAME(start_type)->SetValue(startType);
+			IE_VAR_NAME(start_type)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			item->AppendMessage(new OvalMessage("Unrecognized start type: " + 
+				Common::ToString(lpsc->dwStartType)));
 		}
-	}else{
-		item->AppendElement(new ItemEntity("dependencies", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+
+		if (lpsc->lpBinaryPathName) {
+			IE_VAR_NAME(path)->SetValue(lpsc->lpBinaryPathName);
+			IE_VAR_NAME(path)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			// not sure this is possible...
+			IE_VAR_NAME(path)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		}
+
+		if (lpsc->lpServiceStartName) {
+			IE_VAR_NAME(start_name)->SetValue(lpsc->lpServiceStartName);
+			IE_VAR_NAME(start_name)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			// not sure this is possible...
+			IE_VAR_NAME(start_name)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		}
+
+		vector<string> depArrayTokens;
+		char *subVal = lpsc->lpDependencies;
+		while (subVal && *subVal) {
+			depArrayTokens.push_back(subVal);
+			while (*subVal) ++subVal;
+			++subVal;
+		}
+
+		if (depArrayTokens.empty()) {
+			IE_VAR_NAME(dependencies)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		} else {
+			vector<string>::iterator valIter = depArrayTokens.begin();
+			IE_VAR_NAME(dependencies)->SetValue(*valIter);
+			IE_VAR_NAME(dependencies)->SetStatus(OvalEnum::STATUS_EXISTS);
+			++valIter;
+			ITEM_ENTITY_ITERATOR_FOR(dependencies)
+			for (; valIter != depArrayTokens.end(); ++valIter)
+				IE_ITER_NAME(dependencies) = itemEntities->insert(
+					IE_ITER_NAME(dependencies),
+					new ItemEntity("dependencies", *valIter));
+		}
+	} // if (!ret){...} else {
+
+	byteBuffer.reset();
+	dwBytesNeeded = 0;
+	do {
+		if (dwBytesNeeded)
+			byteBuffer.reset(new BYTE[dwBytesNeeded]);
+		ret = QueryServiceConfig2(schService, SERVICE_CONFIG_DESCRIPTION, 
+			byteBuffer.get(), dwBytesNeeded, &dwBytesNeeded);
+		dwError = GetLastError();
+	} while (!ret && ERROR_INSUFFICIENT_BUFFER == dwError);
+
+	if (!ret) {
+		// I saw ERROR_FILE_NOT_FOUND happen here... docs say these error
+		// codes can also come from registry functions which 
+		// QueryServiceConfig2() calls.  In fact, the file specified in 
+		// lpsc->lpBinaryPathName didn't exist, and it must have tried to get
+		// the description from the file.  You could treat it as 
+		// status=does not exist, but maybe we should still flag an error in
+		// that case?
+		string logMsg = "Error querying service: QueryServiceConfig2(): " +
+			WindowsCommon::GetErrorMessage(dwError);
+		Log::Info(logMsg);
+
+		item->AppendMessage(new OvalMessage(logMsg, OvalEnum::LEVEL_ERROR));
+	} else {
+		LPSERVICE_DESCRIPTION lpsd = (LPSERVICE_DESCRIPTION)byteBuffer.get();
+		if (lpsd->lpDescription) {
+			IE_VAR_NAME(description)->SetValue(lpsd->lpDescription);
+			IE_VAR_NAME(description)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			// this one is possible
+			IE_VAR_NAME(description)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		}
 	}
 
-	return item;
+	byteBuffer.reset();
+	dwBytesNeeded = 0;
+	do {
+		if (dwBytesNeeded)
+			byteBuffer.reset(new BYTE[dwBytesNeeded]);
+		ret = QueryServiceStatusEx(schService, SC_STATUS_PROCESS_INFO, 
+			byteBuffer.get(), dwBytesNeeded, &dwBytesNeeded);
+		dwError = GetLastError();
+	} while (!ret && ERROR_INSUFFICIENT_BUFFER == dwError);
+
+	if (!ret) {
+		string logMsg = "Error querying service: QueryServiceStatusEx(): " +
+			WindowsCommon::GetErrorMessage(dwError);
+		Log::Info(logMsg);
+
+		item->AppendMessage(new OvalMessage(logMsg, OvalEnum::LEVEL_ERROR));
+	} else {
+		LPSERVICE_STATUS_PROCESS ssStatus = (LPSERVICE_STATUS_PROCESS)byteBuffer.get();
+
+		string currState;
+		if (CurrentStateToString(ssStatus->dwCurrentState, &currState)) {
+			IE_VAR_NAME(current_state)->SetValue(currState);
+			IE_VAR_NAME(current_state)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			item->AppendMessage(new OvalMessage("Unrecognized service state: " +
+				Common::ToString(ssStatus->dwCurrentState), 
+				OvalEnum::LEVEL_ERROR));
+		}
+
+		vector<string> controlType = WindowsServicesProbe::ControlToString(ssStatus->dwControlsAccepted);
+		if (controlType.empty()) {
+			IE_VAR_NAME(controls_accepted)->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+		} else {
+			vector<string>::iterator valIter = controlType.begin();
+			IE_VAR_NAME(controls_accepted)->SetValue(*valIter);
+			IE_VAR_NAME(controls_accepted)->SetStatus(OvalEnum::STATUS_EXISTS);
+			++valIter;
+			ITEM_ENTITY_ITERATOR_FOR(controls_accepted)
+			for(; valIter != controlType.end(); ++valIter)
+				IE_ITER_NAME(controls_accepted) = itemEntities->insert(
+					IE_ITER_NAME(controls_accepted),
+					new ItemEntity("controls_accepted", *valIter));
+		}
+
+		IE_VAR_NAME(pid)->SetValue(Common::ToString(ssStatus->dwProcessId));
+		IE_VAR_NAME(pid)->SetStatus(OvalEnum::STATUS_EXISTS);
+
+		bool serviceFlag;
+		if (ServiceFlagToBool(ssStatus->dwServiceFlags, &serviceFlag)) {
+			IE_VAR_NAME(service_flag)->SetValue(serviceFlag ? "true":"false");
+			IE_VAR_NAME(service_flag)->SetStatus(OvalEnum::STATUS_EXISTS);
+		} else {
+			item->AppendMessage(new OvalMessage("Unrecognized service flag: " +
+				Common::ToString(ssStatus->dwServiceFlags),
+				OvalEnum::LEVEL_ERROR));
+		}
+	}
+
+	item->SetElements(itemEntities.get());
+	// SetElements() call above causes the item to take ownership
+	// of the vector contents, but not the vector itself...
+	// so we'll clear out the contents from our guarded vector
+	// so the guard cleans up the vector but not the contents.
+	itemEntities->clear();
+
+	return item.release();
+
+#undef ITEM_ENTITY_ITERATOR_FOR
+#undef IE_ITER_NAME
+#undef INIT_ITEM_ENTITY
+#undef INIT_ITEM_ENTITY_TYPE
+#undef IE_VAR_NAME
 }
 
-vector<string> WindowsServicesProbe::ServiceTypeToString(DWORD type){
+vector<string> WindowsServicesProbe::ServiceTypeToString(DWORD bitmask) {
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
@@ -527,185 +605,116 @@ vector<string> WindowsServicesProbe::ServiceTypeToString(DWORD type){
 	//
 	// ----------------------------------------------------------------------- 
 
-	vector<string> typeStrings;
+	vector<string> bitStrings;
 
-	if(type & SERVICE_KERNEL_DRIVER){
-			typeStrings.push_back("SERVICE_KERNEL_DRIVER");
-	}
+	BIT2STRING(SERVICE_KERNEL_DRIVER)
+	BIT2STRING(SERVICE_FILE_SYSTEM_DRIVER)
+	BIT2STRING(SERVICE_WIN32_OWN_PROCESS)
+	BIT2STRING(SERVICE_WIN32_SHARE_PROCESS)
+	BIT2STRING(SERVICE_INTERACTIVE_PROCESS)
 
-	if(type & SERVICE_FILE_SYSTEM_DRIVER){
-		typeStrings.push_back("SERVICE_FILE_SYSTEM_DRIVER");
-	}
-
-	if(type & SERVICE_WIN32_OWN_PROCESS){
-		typeStrings.push_back("SERVICE_WIN32_OWN_PROCESS");
-	}
-
-	if(type & SERVICE_WIN32_SHARE_PROCESS){
-		typeStrings.push_back("SERVICE_WIN32_SHARE_PROCESS");
-	}
-
-	if(type & SERVICE_INTERACTIVE_PROCESS){
-		typeStrings.push_back("SERVICE_INTERACTIVE_PROCESS");
-	}
-
-	return typeStrings;
+	return bitStrings;
 }
 
-string WindowsServicesProbe::StartTypeToString(DWORD type){
+bool WindowsServicesProbe::StartTypeToString(DWORD type, string *enumString){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the StartType value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr;
+
+	bool ok = true;
 
 	switch(type) {
-		case (SERVICE_BOOT_START):
-			typeStr = "SERVICE_BOOT_START";
-			break;
-		case (SERVICE_SYSTEM_START):
-			typeStr = "SERVICE_SYSTEM_START";
-			break;
-		case (SERVICE_AUTO_START):
-			typeStr = "SERVICE_AUTO_START";
-			break;
-		case (SERVICE_DEMAND_START):
-			typeStr = "SERVICE_DEMAND_START";
-			break;
-		case(SERVICE_DISABLED):
-			typeStr = "SERVICE_DISABLED";
-			break;
+		ENUM2STRING(SERVICE_BOOT_START)
+		ENUM2STRING(SERVICE_SYSTEM_START)
+		ENUM2STRING(SERVICE_AUTO_START)
+		ENUM2STRING(SERVICE_DEMAND_START)
+		ENUM2STRING(SERVICE_DISABLED)
+
 		default:
-			string logMsg = "WindowsServicesProbe::StartTypeToString - Error unsupported service start type value.";
-			Log::Info(logMsg);
+			ok = false;
 			break;
 	}
 
-	return typeStr;
+	return ok;
 }
 
-string WindowsServicesProbe::CurrentStateToString(DWORD type){
+bool WindowsServicesProbe::CurrentStateToString(DWORD state, string *enumString){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the CurrentStateType value to a string
 	//
 	// -----------------------------------------------------------------------
-	string typeStr;
 
-	switch(type) {
-		case (SERVICE_STOPPED):
-			typeStr = "SERVICE_STOPPED";
-			break;
-		case (SERVICE_START_PENDING):
-			typeStr = "SERVICE_START_PENDING";
-			break;
-		case (SERVICE_STOP_PENDING):
-			typeStr = "SERVICE_STOP_PENDING";
-			break;
-		case (SERVICE_RUNNING):
-			typeStr = "SERVICE_RUNNING";
-			break;
-		case(SERVICE_CONTINUE_PENDING):
-			typeStr = "SERVICE_CONTINUE_PENDING";
-			break;
-		case(SERVICE_PAUSE_PENDING):
-			typeStr = "SERVICE_PAUSE_PENDING";
-			break;
-		case(SERVICE_PAUSED):
-			typeStr = "SERVICE_PAUSED";
-			break;
+	bool ok = true;
+
+	switch(state) {
+
+		ENUM2STRING(SERVICE_STOPPED)
+		ENUM2STRING(SERVICE_START_PENDING)
+		ENUM2STRING(SERVICE_STOP_PENDING)
+		ENUM2STRING(SERVICE_RUNNING)
+		ENUM2STRING(SERVICE_CONTINUE_PENDING)
+		ENUM2STRING(SERVICE_PAUSE_PENDING)
+		ENUM2STRING(SERVICE_PAUSED)
+
 		default:
-			string logMsg = "WindowsServicesProbe::CurrentStateToString - Error unsupported service start type value.";
-			Log::Info(logMsg);
+			ok = false;
 			break;
 	}
 
-	return typeStr;
+	return ok;
 }
 
-vector<string> WindowsServicesProbe::ControlToString(DWORD type){
+vector<string> WindowsServicesProbe::ControlToString(DWORD bitmask){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the ControlsAcceptedType value to a vector of strings
 	//
 	// -----------------------------------------------------------------------
-	vector<string> typeStrings;
+	vector<string> bitStrings;
 
+	BIT2STRING(SERVICE_ACCEPT_STOP)
+	BIT2STRING(SERVICE_ACCEPT_PAUSE_CONTINUE)
+	BIT2STRING(SERVICE_ACCEPT_SHUTDOWN)
+	BIT2STRING(SERVICE_ACCEPT_PARAMCHANGE)
+	BIT2STRING(SERVICE_ACCEPT_NETBINDCHANGE)
+	BIT2STRING(SERVICE_ACCEPT_HARDWAREPROFILECHANGE)
+	BIT2STRING(SERVICE_ACCEPT_POWEREVENT)
+	BIT2STRING(SERVICE_ACCEPT_SESSIONCHANGE)
+	BIT2STRING(SERVICE_ACCEPT_PRESHUTDOWN)
+	BIT2STRING(SERVICE_ACCEPT_TIMECHANGE)
+	BIT2STRING(SERVICE_ACCEPT_TRIGGEREVENT)
 
-	if(type & SERVICE_ACCEPT_STOP) {
-			typeStrings.push_back("SERVICE_ACCEPT_STOP");
-	}
-
-	if(type & SERVICE_ACCEPT_PAUSE_CONTINUE){
-		typeStrings.push_back("SERVICE_ACCEPT_PAUSE_CONTINUE");
-	}
-
-	if(type & SERVICE_ACCEPT_SHUTDOWN){
-		typeStrings.push_back("SERVICE_ACCEPT_SHUTDOWN");
-	}
-
-	if(type & SERVICE_ACCEPT_PARAMCHANGE){
-		typeStrings.push_back("SERVICE_ACCEPT_PARAMCHANGE");
-	}
-	
-	if(type & SERVICE_ACCEPT_NETBINDCHANGE){
-		typeStrings.push_back("SERVICE_ACCEPT_NETBINDCHANGE");
-	}
-
-	if(type & SERVICE_ACCEPT_HARDWAREPROFILECHANGE){
-		typeStrings.push_back("SERVICE_ACCEPT_HARDWAREPROFILECHANGE");
-	}	
-	
-	if(type & SERVICE_ACCEPT_POWEREVENT){
-		typeStrings.push_back("SERVICE_ACCEPT_POWEREVENT");
-	}	
-		
-	if(type & SERVICE_ACCEPT_SESSIONCHANGE){
-		typeStrings.push_back("SERVICE_ACCEPT_SESSIONCHANGE");
-	}	
-
-	if(type & SERVICE_ACCEPT_PRESHUTDOWN){
-		typeStrings.push_back("SERVICE_ACCEPT_PRESHUTDOWN");
-	}	
-	
-	if(type & SERVICE_ACCEPT_TIMECHANGE){
-		typeStrings.push_back("SERVICE_ACCEPT_TIMECHANGE");
-	}	
-		
-	if(type & SERVICE_ACCEPT_TRIGGEREVENT){
-		typeStrings.push_back("SERVICE_ACCEPT_TRIGGEREVENT");
-	}
-		
-	return typeStrings;
+	return bitStrings;
 }
 
-bool WindowsServicesProbe::ServiceFlagToBool(DWORD type){
+bool WindowsServicesProbe::ServiceFlagToBool(DWORD type, bool *serviceFlag){
 	// -----------------------------------------------------------------------
 	//	Abstract
 	//
 	//	Convert the Service Flag value to a bool
 	//
 	// -----------------------------------------------------------------------
-	bool serviceFlag = false;
+	bool ok = true;
 
 	switch(type) {
-		case (WindowsServicesProbe::SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG):
-			serviceFlag = false;
+		case 0:
+			*serviceFlag = false;
 			break;
-		case (WindowsServicesProbe::SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG):
-			serviceFlag = true;
+		case SERVICE_RUNS_IN_SYSTEM_PROCESS:
+			*serviceFlag = true;
 			break;
 		
 		default:
-			string logMsg = "WindowsServicesProbe::ServiceFlagToString - Error unsupported service flag value.";
-			Log::Info(logMsg);
+			ok = false;
 			break;
 	}
 
-	return serviceFlag;
+	return ok;
 }
 

@@ -39,10 +39,9 @@
 #include "EntityComparator.h"
 #include "WindowsCommon.h"
 
-/** This class is responsible for collecting Windows Services data.
- *
+/**
+ * This class is responsible for collecting Windows Services data.
  */
-
 class WindowsServicesProbe : public AbsProbe {
 
     public:
@@ -101,29 +100,26 @@ class WindowsServicesProbe : public AbsProbe {
          */
         StringSet* GetAllServices();
 
+		static std::vector<std::string> ServiceTypeToString(DWORD type);
+		
+		static bool StartTypeToString(DWORD type, std::string *typeStr);
+		
+		static bool CurrentStateToString(DWORD type, std::string *stateStr);
+
+		static std::vector<std::string> ControlToString(DWORD type);
+
+		bool ServiceFlagToBool(DWORD type, bool *serviceFlag);
+		
+
         /** The StringSet that holds the information about all of the Windows services on the local system. */
         StringSet* services;
 
 		/**
-		 * Holds a handle to the service control manager which we can use
+		 * A handle to the service control manager which we can use
 		 * to query info about services.  We open it once when the probe
 		 * singleton is created, and close it when the singleton is deleted.
 		 */
-		std::auto_ptr<AutoCloser<SC_HANDLE, BOOL(WINAPI&)(SC_HANDLE)> > serviceMgr;
-		
-		static std::vector<std::string> ServiceTypeToString(DWORD type);
-		
-		static std::string StartTypeToString(DWORD type);
-		
-		static std::string CurrentStateToString(DWORD type);
-
-		static std::vector<std::string> ControlToString(DWORD type);
-
-		enum WindowsServiceFlag {SERVICE_NOT_IN_SYSTEM_PROCESS_FLAG=0,
-								SERVICE_RUNS_IN_SYSTEM_PROCESS_FLAG=1};
-
-		bool ServiceFlagToBool(DWORD type);
-		
-	};
+		SC_HANDLE serviceMgr;
+};
 
 #endif
