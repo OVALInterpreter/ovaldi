@@ -300,6 +300,12 @@ ItemEntityVector* Item::GetElements() {
 }
 
 void Item::SetElements(ItemEntityVector* elements) {
+	for (ItemEntityVector::iterator iter = this->elements.begin();
+		iter != this->elements.end();
+		++iter)
+		if (*iter)
+			delete *iter;
+
 	this->elements = (*elements);
 }
 
@@ -524,22 +530,17 @@ Item* Item::GetItemById(string itemId) {
 //								 Private members											//
 // ***************************************************************************************	//
 void Item::DeleteElements() {
-	ItemEntity* currentElement = NULL;
-	while(elements.size() != 0) {
-        
-	  	currentElement = elements[elements.size()-1];
-	  	elements.pop_back();
-	  	delete currentElement;
-	  	currentElement = NULL;
-	}
-	OvalMessage* currentMsg = NULL;
-	while(messages.size() != 0) {
-        
-	  	currentMsg = messages[messages.size()-1];
-	  	messages.pop_back();
-	  	delete currentMsg;
-	  	currentMsg = NULL;
-	}
+	for (ItemEntityVector::iterator iter = elements.begin();
+		iter != elements.end();
+		++iter)
+		if (*iter)
+			delete *iter;
+
+	for (OvalMessageVector::iterator iter = messages.begin();
+		iter != messages.end();
+		++iter)
+		if (*iter)
+			delete *iter;
 }
 
 Item* Item::SearchCache(int id) {
