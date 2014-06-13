@@ -103,7 +103,7 @@ ItemVector* WindowsServicesProbe::CollectItems ( Object* object ) {
 	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	auto_ptr<StringSet> allServices( WindowsServicesProbe::GetServices ( serviceNameEntity ));
-		
+
 	for ( StringSet::iterator it = allServices->begin(); it != allServices->end(); it++ ) {
 		Item * theItem = this->GetService(*it);
 		if(theItem != NULL){
@@ -166,7 +166,7 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
             VariableValueVector::iterator iterator;
             for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                 if ( this->ServiceExists ( iterator->GetValue(), false ) ) {
-                    allServices->insert ( iterator->GetValue(), false );
+                    allServices->insert ( iterator->GetValue() );
                 }
             }
 
@@ -176,23 +176,19 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
 
             for ( iterator = vals.begin() ; iterator != vals.end() ; iterator++ ) {
                 if ( this->ServiceExists ( iterator->GetValue(), true ) ) {
-                    allServices->insert ( iterator->GetValue(), false );
+                    allServices->insert ( iterator->GetValue() );
                 }
             }
 		} else {
             allServices = this->GetMatchingServices ( serviceNameEntity );
         }
 
-        // Loop through all services on the system
-        // only keep services that match operation and value and var check
-        ItemEntity* tmp = this->CreateItemEntity ( serviceNameEntity );
-        StringSet::iterator it;
-
+        ItemEntity tmp("service_name");
         for ( it = allServices->begin() ; it != allServices->end() ; it++ ) {
-            tmp->SetValue ( ( *it ) );
+            tmp.SetValue(*it);
 
-            if ( serviceNameEntity->Analyze ( tmp ) == OvalEnum::RESULT_TRUE ) {
-                theServices->insert ( ( *it ) );
+            if ( serviceNameEntity->Analyze (&tmp ) == OvalEnum::RESULT_TRUE ) {
+                theServices->insert(*it);
             }
         }
     }
@@ -350,9 +346,8 @@ Item* WindowsServicesProbe::GetService ( string serviceName ) {
 // for those entities which must be repeated for multiple values.
 // So this code must scan through the vector until it finds an 
 // address which matches the corresponding entity variable.  The 
-// entity variables for those entities will wind up pointing to the
-// first of possibly several entities with the same name, to be
-// added later.
+// entity variables for those entities will wind up pointing to one
+// of possibly several entities with the same name, to be added later.
 #define IE_ITER_NAME(ieName_) ieName_ ## Iter
 #define ITEM_ENTITY_ITERATOR_FOR(ieName_) \
 	vector<ItemEntity*>::iterator IE_ITER_NAME(ieName_) = \
