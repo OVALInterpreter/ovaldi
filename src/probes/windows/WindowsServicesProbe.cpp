@@ -184,7 +184,7 @@ StringSet* WindowsServicesProbe::GetServices ( ObjectEntity* serviceNameEntity )
         }
 
         ItemEntity tmp("service_name");
-        for ( it = allServices->begin() ; it != allServices->end() ; it++ ) {
+        for (StringSet::iterator it = allServices->begin() ; it != allServices->end() ; it++) {
             tmp.SetValue(*it);
 
             if ( serviceNameEntity->Analyze (&tmp ) == OvalEnum::RESULT_TRUE ) {
