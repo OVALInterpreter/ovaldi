@@ -435,6 +435,9 @@
     <ClCompile Include="..\..\..\src\windows\FsRedirectionGuard.cpp">
       <Filter>Source Files\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\probes\windows\WindowsServicesProbe.cpp">
+      <Filter>Source Files\probes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\AbsCriteria.h">
@@ -859,6 +862,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\windows\BitnessView.h">
       <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\probes\windows\WindowsServicesProbe.h">
+      <Filter>Header Files\probes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -339,6 +339,7 @@
     <ClCompile Include="..\..\..\src\OvalEnum.cpp" />
     <ClCompile Include="..\..\..\src\OvalMessage.cpp" />
     <ClCompile Include="..\..\..\src\probes\independent\EnvironmentVariable58Probe.cpp" />
+    <ClCompile Include="..\..\..\src\probes\windows\WindowsServicesProbe.cpp" />
     <ClCompile Include="..\..\..\src\Set.cpp" />
     <ClCompile Include="..\..\..\src\SetObject.cpp" />
     <ClCompile Include="..\..\..\src\State.cpp" />
@@ -476,6 +477,7 @@
     <ClInclude Include="..\..\..\src\OvalEnum.h" />
     <ClInclude Include="..\..\..\src\OvalMessage.h" />
     <ClInclude Include="..\..\..\src\probes\independent\EnvironmentVariable58Probe.h" />
+    <ClInclude Include="..\..\..\src\probes\windows\WindowsServicesProbe.h" />
     <ClInclude Include="..\..\..\src\Set.h" />
     <ClInclude Include="..\..\..\src\SetObject.h" />
     <ClInclude Include="..\..\..\src\State.h" />
