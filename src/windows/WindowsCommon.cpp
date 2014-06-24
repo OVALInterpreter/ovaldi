@@ -1083,34 +1083,6 @@ StringSet* WindowsCommon::GetAllLocalUserSids() {
 	return WindowsCommon::allLocalUserSIDs;
 }
 
-DWORD WindowsCommon::GetLastLogonTimeStamp(string username){
-	LPUSER_INFO_2 uBuf = NULL;
-	NET_API_STATUS nStatus;
-	size_t found;
-	int position = 0;
-
-	found = username.find("\\");
-	position = (int)found;
-
-	if(position > 0){
-		username = username.substr(position+1);
-	}
-
-	LPWSTR ws = new wchar_t[username.size()+1]; // +1 for zero at the end 
-	copy( username.begin(), username.end(), ws ); 
-	ws[username.size()] = 0; // zero at the end 
-	
-	nStatus = NetUserGetInfo(NULL,ws,2,(LPBYTE *)& uBuf);
-	delete[] ws;
-
-	if(nStatus == NERR_Success){
-		DWORD lastLogon = uBuf->usri2_last_logon;
-		return (int)lastLogon;
-	}else{
-		return 0;
-	}
-}
-
 void WindowsCommon::GetAllLocalUsers(StringSet* allUsers) {
 
 	NET_API_STATUS nas;
@@ -1872,12 +1844,13 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	string userName;
 	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&userName);
 	
-	wstring userNameApi = WindowsCommon::StringToWide(userNameIn);
+	// original form might be qualified or unqualified.
+	wstring originalFormUserName = WindowsCommon::StringToWide(userNameIn);
+	// ... so this might be the same as originalFormUserName.
+	wstring unqualifiedUserName = WindowsCommon::StringToWide(userName);
 	wstring serverName;
 	DWORD dwEntriesRead;
 	DWORD dwTotalEntries;
-	DWORD dwLevel=0;
-	DWORD dwPrefMaxLen=MAX_PREFERRED_LENGTH;
 	LPGROUP_USERS_INFO_0 pBuf = NULL;
 	string shortGroupName;
 
@@ -1890,115 +1863,55 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	}
 
 	// Call the NetUserGetGroups function, specifying level 0.
+	// This function doesn't support a domain prefix on the
+	// username.
 	NET_API_STATUS nStatus = NetUserGetGroups(
 		serverName.empty() ? NULL : serverName.c_str(),
-		userNameApi.c_str(),
-		dwLevel,
+		unqualifiedUserName.c_str(),
+		0,
 		(LPBYTE*)&pBuf,
-		dwPrefMaxLen,
+		MAX_PREFERRED_LENGTH,
 		&dwEntriesRead,
 		&dwTotalEntries);
 
+	NetApiBufferFreeGuard globalGrpDataGuard(pBuf);
+
 	// If the call succeeds,
 	if (nStatus == NERR_Success) {
+
+		// report an error if all groups are not listed.
+		if (dwEntriesRead < dwTotalEntries)
+			throw Exception("Unable to get all global groups for user: " + userNameIn);
+
 		userExists = true;
-
-		LPGROUP_USERS_INFO_0 pTmpBuf;
-		DWORD i;
-		DWORD dwTotalCount = 0;
-
-		if ((pTmpBuf = pBuf) != NULL) {
+		if (pBuf != NULL) {
 
 			// Loop through the entries; 
 			//  print the name of the global groups 
 			//  to which the user belongs.
-			for (i = 0; i < dwEntriesRead; i++) {
-				
-				if (pTmpBuf == NULL) {
-					// Free the allocated buffer.
-					if (pBuf != NULL) {
-						NetApiBufferFree(pBuf);
-						pBuf = NULL;
-					}
+			for (DWORD i = 0; i < dwEntriesRead; i++) {
+				// These trustees were found on the domain controller,
+				// if one was given, so surely they're all domain groups
+				// which require the same domain-qualification.
+				string tmpName = UnicodeToAsciiString(pBuf[i].grui0_name);
+				if (!domain.empty())
+					tmpName = domain + '\\' + tmpName;
 
-					throw Exception("An access violation has occurred while getting groups for user: " + userName);
-				}
-
-				groups->insert(UnicodeToAsciiString(pTmpBuf->grui0_name));
-				pTmpBuf++;
-				dwTotalCount++;
+				string normName;
+				if (NormalizeTrusteeName(tmpName, NULL, NULL, &normName,
+					NULL, NULL))
+					groups->insert(normName);
 			}
 		}
-
-		// report an error if all groups are not listed.
-		if (dwEntriesRead < dwTotalEntries) {
-			
-			// Free the allocated buffer.
-			if (pBuf != NULL) {
-				NetApiBufferFree(pBuf);
-				pBuf = NULL;
-			}
-
-			throw Exception("Unable to get all global groups for user: " + userName);
-		}
-	
-	} else if(nStatus == NERR_UserNotFound) {
-		// do nothing
-	} else {
-
-		if (pBuf != NULL) {
-			NetApiBufferFree(pBuf);
-			pBuf = NULL;
-		}
-
-		string errMsg = "Unable to get all global groups for user: " + userName + ". Windows Api NetUserGetGroups failed with error: ";
-
-		if(nStatus == ERROR_ACCESS_DENIED) {
-			errMsg = errMsg + "The user does not have access rights to the requested information.";
- 
-		} else if(nStatus == ERROR_BAD_NETPATH) {
-			errMsg = errMsg + "The network path was not found. This error is returned if the servername parameter could not be found.";
- 
-		} else if(nStatus == ERROR_INVALID_LEVEL) {
-			errMsg = errMsg + "The system call level is not correct. This error is returned if the level parameter was specified as a value other than 0 or 1.";
- 
-		} else if(nStatus == NERR_InvalidComputer) {
-			errMsg = errMsg + "The computer name is invalid."; 
- 
-		} else if(nStatus == ERROR_INVALID_NAME) {
-			errMsg = errMsg + "The name syntax is incorrect. This error is returned if the servername parameter has leading or trailing blanks or contains an illegal character.";
-
-		} else if(nStatus == ERROR_MORE_DATA) {
-			errMsg = errMsg + "More entries are available. Specify a large enough buffer to receive all entries.";
-
-		} else if(nStatus == ERROR_NOT_ENOUGH_MEMORY) {
-			errMsg = errMsg + "Insufficient memory was available to complete the operation.";
-
-		} else if(nStatus == NERR_InternalError) {
-			errMsg = errMsg + "An internal error occurred.";
-
-		} else if (nStatus == ERROR_NO_SUCH_DOMAIN) {
-			errMsg = errMsg + "The domain '"+domain+"' does not exist or could not be contacted.";
-		}else {
-			errMsg = errMsg + "Unknown error.";
-		} 
-
-		throw Exception(errMsg);
-	}
-
-	// Free the allocated buffer.
-	if (pBuf != NULL) {
-		NetApiBufferFree(pBuf);
-		pBuf = NULL;
+	} else if(nStatus != NERR_UserNotFound) {
+		throw Exception("Unable to get all global groups for user " + userNameIn + ": NetUserGetGroups: " +
+			GetErrorMessage(nStatus));
 	}
 
 	//
 	// get the local groups for the user
 	//
 	LPLOCALGROUP_USERS_INFO_0 pLocalBuf = NULL;
-	dwLevel = 0;
-	DWORD dwFlags = LG_INCLUDE_INDIRECT ;
-	dwPrefMaxLen = MAX_PREFERRED_LENGTH;
 	dwEntriesRead = 0;
 	dwTotalEntries = 0;
 
@@ -2008,124 +1921,58 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 	//   The LG_INCLUDE_INDIRECT flag specifies that the 
 	//   function should also return the names of the local 
 	//   groups in which the user is indirectly a member.
+	//
+	// This function does support a domain prefix on the username.
 	nStatus = NetUserGetLocalGroups(NULL,
-									userNameApi.c_str(),
-									dwLevel,
-									dwFlags,
+									originalFormUserName.c_str(),
+									0,
+									LG_INCLUDE_INDIRECT,
 									(LPBYTE *) &pLocalBuf,
-									dwPrefMaxLen,
+									MAX_PREFERRED_LENGTH,
 									&dwEntriesRead,
 									&dwTotalEntries);
 	
+	NetApiBufferFreeGuard localGrpDataGuard(pLocalBuf);
+
 	// If the call succeeds
 	if (nStatus == NERR_Success) {
 		userExists = true;
 
-		LPLOCALGROUP_USERS_INFO_0 pLocalTmpBuf;
-		DWORD i;
-		DWORD dwTotalCount = 0;
-
-		if ((pLocalTmpBuf = pLocalBuf) != NULL) {
+		if (pLocalBuf != NULL) {
 
 			//  Loop through the entries and 
 			//  print the names of the local groups 
 			//  to which the user belongs. 
-			for (i = 0; i < dwEntriesRead; i++) {
-				
-				if (pLocalTmpBuf == NULL) {
-					
-					// Free the allocated memory.
-					if (pBuf != NULL) {
-						NetApiBufferFree(pBuf);
-						pBuf = NULL;
-					}
-
-					throw Exception("An access violation has occurred while getting local groups for user: " + userName);
-				}
-
-				groups->insert(UnicodeToAsciiString(pLocalTmpBuf->lgrui0_name));
-				pLocalTmpBuf++;
-				dwTotalCount++;
+			for (DWORD i = 0; i < dwEntriesRead; i++) {
+				string normName;
+				if (NormalizeTrusteeName(
+					UnicodeToAsciiString(pLocalBuf[i].lgrui0_name),
+					NULL, NULL, &normName, NULL, NULL))
+					groups->insert(normName);
 			}
 		}
 		
 		// report an error if all groups are not listed
 		if (dwEntriesRead < dwTotalEntries) {
-
-			// Free the allocated memory.
-			if (pBuf != NULL) {
-				NetApiBufferFree(pBuf);
-				pBuf = NULL;
-			}
-
 			throw Exception("Unable to get all local groups for user: " + userName);
 		}
 
-	} else if (nStatus == NERR_UserNotFound){
-		// do nothing
-	} else {
-
-		if (pBuf != NULL) {
-			NetApiBufferFree(pBuf);
-			pBuf = NULL;
-		}
-
-		string errMsg = "Unable to get all local groups for user: " + userName + ". Windows Api NetUserGetLocalGroups failed with error: ";
-
-		if(nStatus == ERROR_ACCESS_DENIED) {
-			errMsg = errMsg + "The user does not have access rights to the requested information. This error is also returned if the servername parameter has a trailing blank.";
- 
-		} else if(nStatus == ERROR_INVALID_LEVEL) {
-			errMsg = errMsg + "The system call level is not correct. This error is returned if the level parameter was not specified as 0.";
-
-		} else if(nStatus == ERROR_INVALID_PARAMETER) {
-			errMsg = errMsg + "A parameter is incorrect. This error is returned if the flags parameter contains a value other than LG_INCLUDE_INDIRECT.";
-
-		} else if(nStatus == ERROR_MORE_DATA) {
-			errMsg = errMsg + "More entries are available. Specify a large enough buffer to receive all entries.";
-
-		} else if(nStatus == ERROR_NOT_ENOUGH_MEMORY) {
-			errMsg = errMsg + "Insufficient memory was available to complete the operation.";
-
-		} else if(nStatus == NERR_DCNotFound) {
-			errMsg = errMsg + "The domain controller could not be found."; 
-
-		} else if(nStatus == NERR_InvalidComputer) {
-			errMsg = errMsg + "The computer name is not valid. This error is returned on Windows NT 4.0 and earlier if the servername parameter does not begin with \\."; 
-  
-		} else if(nStatus == NERR_InvalidComputer) {
-			errMsg = errMsg + "The computer name is not valid. This error is returned on Windows NT 4.0 and earlier if the servername parameter does not begin with \\."; 
- 
-		} else if(nStatus == RPC_S_SERVER_UNAVAILABLE) {
-			errMsg = errMsg + "The RPC server is unavailable. This error is returned if the servername parameter could not be found.";
-
-		} else if (nStatus == ERROR_NO_SUCH_DOMAIN) {
-			errMsg = errMsg + "The domain '"+domain+"' does not exist or could not be contacted.";
-		}else {
-			errMsg = errMsg + "Unknown error.";
-		} 
-
-		throw Exception(errMsg);
-	}
-
-	// Free the allocated memory.
-	if (pBuf != NULL) {
-		NetApiBufferFree(pBuf);
-		pBuf = NULL;
+	} else if (nStatus != NERR_UserNotFound &&
+				nStatus != ERROR_NO_SUCH_DOMAIN) {
+		throw Exception("Unable to get all local groups for user " + 
+			userName + ": NetUserGetLocalGroups: " + GetErrorMessage(nStatus));
 	}
 
 	return userExists;
 }
 
-bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
-	string domain;                                                    // Used to hold the domain portion of the username
-	string accountName;                                               // Used to hold the account name portion of the username
-	bool enabled = true;											  // Initialize user enabled to true
-	WindowsCommon::SplitTrusteeName(userNameIn,&domain,&accountName); // Split into domain and account name components
-	wstring serverName;												  // Retrieve the server name for the specified domain
-	wstring userNameApi = WindowsCommon::StringToWide(accountName);   // Convert account name into wide string for use in the api
-	DWORD dwLevel = 23;                                               // Need USER_INFO_23  to get enabled flag
-	LPUSER_INFO_23 pBuf = NULL;                                       // Will be used to hold the user info 
+bool WindowsCommon::GetAccountInfo(const string &accountName, bool *enabled, DWORD *lastLogon) {
+	string domain;
+	string username;
+	WindowsCommon::SplitTrusteeName(accountName,&domain,&username);
+	wstring serverName;
+	wstring usernameWide = WindowsCommon::StringToWide(username);
+	LPUSER_INFO_2 pBuf = NULL;
 
 	// don't get a controller if the domain is the local computer.
 	// There is no controller for that.
@@ -2135,57 +1982,29 @@ bool WindowsCommon::GetEnabledFlagForUser(string userNameIn) {
 			 serverName = WindowsCommon::GetDomainControllerName(domain);
 	}
 
-	// Call the NetUserGetInfo function
-	//
-	// Pass in NULL for the server portion since we are running on the local
-	// host only. This will prevent the interpreter from trying to get user
-	// information for users that are not defined on the local host.
-	//
 	NET_API_STATUS nStatus = NetUserGetInfo(
 		serverName.empty() ? NULL : serverName.c_str(),
-		userNameApi.c_str(),
-		dwLevel,
+		usernameWide.c_str(),
+		2,
 		(LPBYTE *)&pBuf);
 
-	// If the call succeeds, print the user information.
-	if (nStatus == NERR_Success) {
-		if (pBuf != NULL) {			
-			// now read the flags
-			if(pBuf->usri23_flags & UF_ACCOUNTDISABLE) {
-				enabled = false;
-			}
-		}
-	} else {
-		string errMsg = "Windows Api NetUserGetinfo failed with error: ";
+	NetApiBufferFreeGuard userInfoGuard(pBuf);
 
-		if(nStatus == ERROR_ACCESS_DENIED) {
-			errMsg = errMsg + "The user does not have access to the requested information.";
- 
-		} else if(nStatus == ERROR_BAD_NETPATH) {
-			errMsg = errMsg + "The network path specified in the servername parameter was not found.";
- 
-		} else if(nStatus == ERROR_INVALID_LEVEL) {
-			errMsg = errMsg + "The value specified for the level parameter is invalid.";
- 
-		} else if(nStatus == NERR_InvalidComputer) {
-			errMsg = errMsg + "he computer name is invalid."; 
- 
-		} else if(nStatus == NERR_UserNotFound) {
-			errMsg = errMsg + "The user name could not be found.";
-
-		} else {
-			errMsg = errMsg + "Unknown error.";
-		}
-
-		throw Exception("Error while getting user enabled flag. " + errMsg);
+	if (nStatus) {
+		if (nStatus == NERR_UserNotFound)
+			return false;
+		throw Exception("Error getting account info for " + 
+			accountName + ": NetUserGetInfo: " + GetErrorMessage(nStatus));
 	}
-	
-	// Free the allocated memory.
-	if (pBuf != NULL)
-		NetApiBufferFree(pBuf);
 
-    return enabled;
+	if (enabled)
+		*enabled = !(pBuf->usri2_flags & UF_ACCOUNTDISABLE);
+	if (lastLogon)
+		*lastLogon = pBuf->usri2_last_logon;
+
+	return true;
 }
+
 
 void WindowsCommon::GetEffectiveRightsForWindowsObject(SE_OBJECT_TYPE objectType, PSID pSid, HANDLE objHandle, PACCESS_MASK pAccessRights) {	
 

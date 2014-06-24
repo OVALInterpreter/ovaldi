@@ -135,7 +135,13 @@ Item* UserSidProbe::GetUserSidInfo(string userSid) {
 
 		// get the enabled flag
 		try {
-			bool enabled = WindowsCommon::GetEnabledFlagForUser(userName);
+			bool enabled;
+			if (!WindowsCommon::GetAccountInfo(userName, &enabled, NULL))
+				// Backward compatibility with the old 
+				// WindowsCommon::GetEnabledFlagForUser() method.
+				// FIXME: "user not found" shouldn't be an error!  It should
+				// result in status="does not exist".
+				throw Exception("Couldn't determine 'enabled': user not found.");
 			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
 		} catch (Exception ex) {
 			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));

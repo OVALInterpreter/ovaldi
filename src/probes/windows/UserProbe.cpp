@@ -28,6 +28,9 @@
 //
 //****************************************************************************************//
 
+#include <memory>
+
+#include <VectorPtrGuard.h>
 #include "WindowsCommon.h"
 
 #include "UserProbe.h"
@@ -63,31 +66,46 @@ ItemVector* UserProbe::CollectItems(Object *object) {
 
 	// get the trustee_name from the provided object
 	ObjectEntity* user = object->GetElementByName("user");
-	ItemVector *collectedItems = new ItemVector();
+	VectorPtrGuard<Item> collectedItems(new ItemVector());
 
 	if ( user->GetOperation() == OvalEnum::OPERATION_EQUALS ){
 		StringVector users;
 		//Since we are performing a lookup -- do not restrict the search scope (i.e. allow domain user lookups)
 		//We are ignoring the flag for now
 		/*OvalEnum::Flag flag =*/ user->GetEntityValues(users);
+		ItemEntity userItemEntity("user");
 		for(StringVector::iterator it = users.begin(); it != users.end(); it++){
-			collectedItems->push_back(this->GetUserInfo(*it));
+			userItemEntity.SetValue(*it);
+			if (user->GetVarRef() == NULL ||
+				user->Analyze(&userItemEntity) == OvalEnum::RESULT_TRUE) {
+				Item *item = this->GetUserInfo(*it);
+				if (item)
+					collectedItems->push_back(item);
+				else {
+					item = CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("user", "", 
+						OvalEnum::DATATYPE_STRING, 
+						OvalEnum::STATUS_DOES_NOT_EXIST));
+					collectedItems->push_back(item);
+				}
+			}
 		}
 	}else{
 		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
 		StringSet users;
 		WindowsCommon::GetAllLocalUsers(&users);
-		ItemEntity* userItemEntity = new ItemEntity("user","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
+		ItemEntity userItemEntity("user","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = users.begin(); it != users.end(); it++){
-			userItemEntity->SetValue(*it);
-			if ( user->Analyze(userItemEntity) == OvalEnum::RESULT_TRUE ){
-				collectedItems->push_back(this->GetUserInfo(*it));
+			userItemEntity.SetValue(*it);
+			if ( user->Analyze(&userItemEntity) == OvalEnum::RESULT_TRUE ){
+				Item *item = this->GetUserInfo(*it);
+				if (item) collectedItems->push_back(item);
 			}
 		}
-		delete userItemEntity;
 	}
 
-	return collectedItems;
+	return collectedItems.release();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -105,51 +123,69 @@ Item* UserProbe::CreateItem() {
 	return item;
 }
 
-Item* UserProbe::GetUserInfo(string userName) {
+Item* UserProbe::GetUserInfo(const string &userName) {
 
-	Item* item = NULL;
+	auto_ptr<Item> item;
+	auto_ptr<ItemEntity> enabledIe, lastLogonIe;
+	VectorPtrGuard<ItemEntity> groupEntities(new vector<ItemEntity*>());
+	bool enabled;
+	DWORD timeStamp;
 
-	// get the groups
-	StringSet* groups = new StringSet();
-	bool userExists = WindowsCommon::GetGroupsForUser(userName, groups);
-	if(userExists) {
-		item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("user", userName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	try {
+		if (!WindowsCommon::GetAccountInfo(userName, &enabled, &timeStamp))
+			return NULL;
 
-		// get the enabled flag
-		try {
-			bool enabled = WindowsCommon::GetEnabledFlagForUser(userName);
-			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
-		} catch (Exception ex) {
-			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
-			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
-		}
-
-		StringSet::iterator iterator;
-		if(groups->size() > 0) {
-			for(iterator = groups->begin(); iterator != groups->end(); iterator++) {
-				item->AppendElement(new ItemEntity("group", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-			}
-		} else {
-			item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-		}
-		delete groups;
-
-		DWORD timeStamp = WindowsCommon::GetLastLogonTimeStamp(userName);
-		if(timeStamp > 0){
-			item->AppendElement(new ItemEntity("last_logon", Common::ToString(timeStamp), OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_EXISTS));
-		}else{
-			item->AppendElement(new ItemEntity("last_logon", "", OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_DOES_NOT_EXIST));
-		}
-
-	} else {
-		item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		enabledIe.reset(new ItemEntity("enabled", (enabled ? "true":"false"),
+			OvalEnum::DATATYPE_BOOLEAN));
+		lastLogonIe.reset(new ItemEntity("last_logon", Common::ToString(timeStamp),
+			OvalEnum::DATATYPE_INTEGER));
+	} catch (Exception ex) {
+		enabledIe.reset(new ItemEntity("enabled", "",
+			OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
+		lastLogonIe.reset(new ItemEntity("last_logon", "",
+			OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
+		item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), 
+			OvalEnum::LEVEL_ERROR));
 	}
 
-	return item;
+	try {
+		StringSet groups;
+		// get the groups
+		if (!WindowsCommon::GetGroupsForUser(userName, &groups))
+			// user existed when GetAccountInfo() above was called,
+			// but it has since disappeared!
+			return NULL;
+
+		if (groups.empty())
+			groupEntities->push_back(new ItemEntity("group", "", 
+				OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		else
+			for (StringSet::iterator iter = groups.begin();
+				iter != groups.end();
+				++iter)
+				groupEntities->push_back(new ItemEntity("group", *iter));
+	} catch (Exception ex) {
+		item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING,
+			OvalEnum::STATUS_ERROR));
+		item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), 
+			OvalEnum::LEVEL_ERROR));
+	}
+
+	item.reset(CreateItem());
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	item->AppendElement(new ItemEntity("user", userName));
+	item->AppendElement(enabledIe.release());
+
+	vector<ItemEntity*>::iterator iterator;
+	for(iterator = groupEntities->begin(); 
+		iterator != groupEntities->end(); 
+		iterator++)
+		item->AppendElement(*iterator);
+	groupEntities->clear(); // item now has ownership of the entities!
+
+	item->AppendElement(lastLogonIe.release());
+
+	return item.release();
 }
 
 StringSet* UserProbe::GetAllUsers() {

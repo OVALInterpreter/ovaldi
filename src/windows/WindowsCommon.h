@@ -222,10 +222,6 @@ public:
 	/** Retrieves list of sids for all local users */
 	static StringSet* GetAllLocalUserSids();
 
-	/** Retrieves the last login time from a local username */
-	static DWORD GetLastLogonTimeStamp(std::string username);
-
-	
 	/** Return true if the SID corresponds to a group. */
 	static bool IsGroupSID(std::string sid);
 
@@ -253,11 +249,17 @@ public:
 	*/
 	static bool GetGroupsForUser(std::string userName, StringSet* groups);
 
-	/** Get 'enabled flag' for user with specified name 
-		If the user name is provided with a leading doamin name or host name
-		the user name is extracted and provided to the NetUserGetInfo api.
-	*/
-	static bool GetEnabledFlagForUser(std::string userNameIn);
+	/**
+	 * Gets some account info via NetUserGetInfo().  Pass NULL for any values
+	 * you don't need.
+	 *
+	 * \param[in] accountName The account name to look up.
+	 * \param[out] enabled If non-NULL, receives whether the account is
+	 *   enabled.
+	 * \param[out] lastLogon If non-NULL, receives the time of last logon.
+	 * \return true if the account exists, false if not.
+	 */
+	static bool GetAccountInfo(const std::string &accountName, bool *enabled, DWORD *lastLogon);
 
 	/** Convert the FILETIME structure to an integer. */
 	static std::string ToString(FILETIME fTime);
