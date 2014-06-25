@@ -1936,8 +1936,13 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 
 	// If the call succeeds
 	if (nStatus == NERR_Success) {
-		userExists = true;
 
+		// report an error if all groups are not listed
+		if (dwEntriesRead < dwTotalEntries) {
+			throw Exception("Unable to get all local groups for user: " + userName);
+		}
+
+		userExists = true;
 		if (pLocalBuf != NULL) {
 
 			//  Loop through the entries and 
@@ -1952,11 +1957,6 @@ bool WindowsCommon::GetGroupsForUser(string userNameIn, StringSet* groups) {
 			}
 		}
 		
-		// report an error if all groups are not listed
-		if (dwEntriesRead < dwTotalEntries) {
-			throw Exception("Unable to get all local groups for user: " + userName);
-		}
-
 	} else if (nStatus != NERR_UserNotFound &&
 				nStatus != ERROR_NO_SUCH_DOMAIN) {
 		throw Exception("Unable to get all local groups for user " + 
