@@ -194,13 +194,3 @@ Item* UserProbe::GetUserInfo(const string &userName) {
 
 	return item.release();
 }
-
-StringSet* UserProbe::GetAllUsers() {
-
-	StringSet* users = new StringSet();
-
-	// just call windows common method to get local users.
-	WindowsCommon::GetAllLocalUsers(users);
-
-	return users;
-}

@@ -62,10 +62,6 @@ private:
 	    If the user is not found return and item with the status set to does not exist
 	*/
 	Item* GetUserInfo(const std::string &userName);
-
-	/** Return the set of users on the local host. */
-	StringSet* GetAllUsers();
-
 };
 
 #endif
