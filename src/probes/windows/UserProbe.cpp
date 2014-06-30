@@ -131,6 +131,8 @@ Item* UserProbe::GetUserInfo(const string &userName) {
 	bool enabled;
 	DWORD timeStamp;
 
+	item.reset(CreateItem());
+
 	try {
 		if (!WindowsCommon::GetAccountInfo(userName, &enabled, &timeStamp))
 			return NULL;
@@ -150,7 +152,6 @@ Item* UserProbe::GetUserInfo(const string &userName) {
 
 	try {
 		StringSet groups;
-		// get the groups
 		if (!WindowsCommon::GetGroupsForUser(userName, &groups))
 			// user existed when GetAccountInfo() above was called,
 			// but it has since disappeared!
@@ -165,13 +166,19 @@ Item* UserProbe::GetUserInfo(const string &userName) {
 				++iter)
 				groupEntities->push_back(new ItemEntity("group", *iter));
 	} catch (Exception ex) {
+		// make sure the vector is clear; we only want one entity,
+		// with status=error.
+		for (vector<ItemEntity*>::iterator iter = groupEntities->begin();
+			iter != groupEntities->end();
+			++iter)
+			delete *iter;
+		groupEntities->clear();
 		item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING,
 			OvalEnum::STATUS_ERROR));
 		item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), 
 			OvalEnum::LEVEL_ERROR));
 	}
 
-	item.reset(CreateItem());
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
 	item->AppendElement(new ItemEntity("user", userName));
 	item->AppendElement(enabledIe.release());
