@@ -53,8 +53,6 @@ private:
 	virtual Item* CreateItem();
 
 	Item* GetUserSidInfo(std::string userSid);
-
-	bool GetEnabledFlagForUser(std::string userName);
 };
 
 #endif
