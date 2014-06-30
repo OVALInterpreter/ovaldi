@@ -29,6 +29,7 @@
 //****************************************************************************************//
 
 #include "WindowsCommon.h"
+#include <VectorPtrGuard.h>
 
 #include "UserSidProbe.h"
 
@@ -70,20 +71,35 @@ ItemVector* UserSidProbe::CollectItems(Object *object) {
 		//Since we are performing a lookup -- do not restrict the search scope (i.e. allow domain user lookups)
 		//We are ignoring the flag for now
 		/*OvalEnum::Flag flag =*/ userSid->GetEntityValues(userSids);
+		ItemEntity userIe("user");
 		for(StringVector::iterator it = userSids.begin(); it != userSids.end(); it++){
-			collectedItems->push_back(this->GetUserSidInfo(*it));
+			userIe.SetValue(*it);
+			if (userSid->GetVarRef() == NULL ||
+				userSid->Analyze(&userIe) == OvalEnum::RESULT_TRUE) {
+				Item *item = this->GetUserSidInfo(*it);
+				if (item) 
+					collectedItems->push_back(item);
+				else {
+					item = this->CreateItem();
+					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					item->AppendElement(new ItemEntity("user_sid", "",
+						OvalEnum::DATATYPE_STRING, 
+						OvalEnum::STATUS_DOES_NOT_EXIST));
+					collectedItems->push_back(item);
+				}
+			}
 		}
 	}else{
 		//Since we are performing a search -- restrict the search scope to only built-in and local accounts
 		StringSet* userSids = WindowsCommon::GetAllLocalUserSids();
-		ItemEntity* userSidItemEntity = new ItemEntity("user","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
+		ItemEntity userSidItemEntity("user","",OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);
 		for(StringSet::iterator it = userSids->begin(); it != userSids->end(); it++){
-			userSidItemEntity->SetValue(*it);
-			if ( userSid->Analyze(userSidItemEntity) == OvalEnum::RESULT_TRUE ){
-				collectedItems->push_back(this->GetUserSidInfo(*it));
+			userSidItemEntity.SetValue(*it);
+			if ( userSid->Analyze(&userSidItemEntity) == OvalEnum::RESULT_TRUE ){
+				Item *item = this->GetUserSidInfo(*it);
+				if (item) collectedItems->push_back(item);
 			}
 		}
-		delete userSidItemEntity;
 	}
 
 
@@ -107,64 +123,84 @@ Item* UserSidProbe::CreateItem() {
 
 Item* UserSidProbe::GetUserSidInfo(string userSid) {
 
-	Item* item = NULL;
-
+	auto_ptr<Item> item;
+	auto_ptr<ItemEntity> enabledIe, lastLogonIe;
+	VectorPtrGuard<ItemEntity> groupSidEntities(new vector<ItemEntity*>());
 	string userName;
 	string domain;
 	bool isGroup;
 
-	if (!WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain, &isGroup)) {
-		item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-		return item;
+	if (!WindowsCommon::LookUpTrusteeSid(userSid, &userName, &domain, &isGroup))
+		return NULL;
+
+	item.reset(CreateItem());
+
+	// get the enabled flag
+	try {
+		bool enabled;
+		DWORD lastLogon;
+		if (!WindowsCommon::GetAccountInfo(userName, &enabled, &lastLogon))
+			return NULL;
+
+		enabledIe.reset(new ItemEntity("enabled", 
+			Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN));
+		lastLogonIe.reset(new ItemEntity("last_logon",
+			Common::ToString(lastLogon), OvalEnum::DATATYPE_INTEGER));
+	} catch (Exception ex) {
+		enabledIe.reset(new ItemEntity("enabled", "", 
+			OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
+		lastLogonIe.reset(new ItemEntity("last_logon", "", 
+			OvalEnum::DATATYPE_INTEGER, OvalEnum::STATUS_ERROR));
+		item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), 
+			OvalEnum::LEVEL_ERROR));
 	}
 
-	StringSet* groups = new StringSet();
-	
-	bool userExists = WindowsCommon::GetGroupsForUser(userName, groups);		
+	try {
+		StringSet groups;
+		if (!WindowsCommon::GetGroupsForUser(userName, &groups))
+			return NULL;
 
-	if(userExists) {
-		StringSet* groupSids = new StringSet();
-	
-		WindowsCommon::ConvertTrusteeNamesToSidStrings(groups, groupSids);
+		StringSet groupSids;
+		WindowsCommon::ConvertTrusteeNamesToSidStrings(&groups, &groupSids);
 
-		item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-
-		// get the enabled flag
-		try {
-			bool enabled;
-			if (!WindowsCommon::GetAccountInfo(userName, &enabled, NULL))
-				// Backward compatibility with the old 
-				// WindowsCommon::GetEnabledFlagForUser() method.
-				// FIXME: "user not found" shouldn't be an error!  It should
-				// result in status="does not exist".
-				throw Exception("Couldn't determine 'enabled': user not found.");
-			item->AppendElement(new ItemEntity("enabled", Common::ToString(enabled), OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_EXISTS));
-		} catch (Exception ex) {
-			item->AppendElement(new ItemEntity("enabled", "", OvalEnum::DATATYPE_BOOLEAN, OvalEnum::STATUS_ERROR));
-			item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), OvalEnum::LEVEL_ERROR));
-		}
-
-		StringSet::iterator iterator;
-		if(groupSids->size() > 0) {
-			for(iterator = groupSids->begin(); iterator != groupSids->end(); iterator++) {
-				item->AppendElement(new ItemEntity("group_sid", (*iterator), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-			}
-		} else {
-			item->AppendElement(new ItemEntity("group_sid", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
-		}
-
-		delete groupSids;
-	} else {
-		item = this->CreateItem();
-		item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-		item->AppendElement(new ItemEntity("user_sid", userSid, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		if (groupSids.empty())
+			groupSidEntities->push_back(new ItemEntity("group_sid", "",
+				OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST));
+		else
+			for (StringSet::iterator iter = groupSids.begin();
+				iter != groupSids.end();
+				++iter)
+				groupSidEntities->push_back(
+					new ItemEntity("group_sid", *iter));
+	} catch (Exception ex) {
+		// make sure the vector is clear; we only want one entity,
+		// with status=error.
+		for (vector<ItemEntity*>::iterator iter = groupSidEntities->begin();
+			iter != groupSidEntities->end();
+			++iter)
+			if (*iter) delete *iter;
+		groupSidEntities->clear();
+		groupSidEntities->push_back(new ItemEntity("group_sid", "", 
+			OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
+		item->AppendMessage(new OvalMessage(ex.GetErrorMessage(),
+			OvalEnum::LEVEL_ERROR));
 	}
-	
-	delete groups;
 
-	return item;
+
+	item->SetStatus(OvalEnum::STATUS_EXISTS);
+	item->AppendElement(new ItemEntity("user_sid", userSid));
+	item->AppendElement(enabledIe.release());
+
+	for (vector<ItemEntity*>::iterator iter = groupSidEntities->begin();
+		iter != groupSidEntities->end();
+		++iter)
+		item->AppendElement(*iter);
+	groupSidEntities->clear(); // item now owns the entities
+
+	/* Uncomment this when the schemas bundled with
+	   OVALDI are updated to include this entity.
+	item->AppendElement(lastLogonIe.release());
+	*/
+
+	return item.release();
 }
