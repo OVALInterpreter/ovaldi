@@ -173,7 +173,7 @@ Item* UserProbe::GetUserInfo(const string &userName) {
 			++iter)
 			delete *iter;
 		groupEntities->clear();
-		item->AppendElement(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING,
+		groupEntities->push_back(new ItemEntity("group", "", OvalEnum::DATATYPE_STRING,
 			OvalEnum::STATUS_ERROR));
 		item->AppendMessage(new OvalMessage(ex.GetErrorMessage(), 
 			OvalEnum::LEVEL_ERROR));
