@@ -1120,9 +1120,16 @@ namespace {
 					if (paramCombo[i].find(',') == string::npos)
 						ps->AddParameter(marshal_as<String^>(*paramIter),
 							marshal_as<String^>(paramCombo[i]));
-					else
-						ps->AddParameter(marshal_as<String^>(*paramIter),
-							marshal_as<String^>(paramCombo[i])->Split(','));
+					else {
+						// Trim whitespace, so that "a, b" becomes {"a", "b"},
+						// rather than {"a", " b"}.
+						array<String^> ^splitValues = 
+							marshal_as<String^>(paramCombo[i])->Split(',');
+						for (int splitIdx = 0; splitIdx < splitValues->Length; ++splitIdx)
+							splitValues[splitIdx] = splitValues[splitIdx]->Trim();
+						ps->AddParameter(marshal_as<String^>(*paramIter), 
+							splitValues);
+					}
 				}
 				cmdline << " -" << *paramIter << ' ' << paramCombo[i];
 			}
@@ -1139,9 +1146,16 @@ namespace {
 						if (selectCombo[i].find(',') == string::npos)
 							ps->AddParameter(marshal_as<String^>(*selectIter),
 								marshal_as<String^>(selectCombo[i]));
-						else
+						else {
+							// Trim whitespace, so that "a, b" becomes {"a", "b"},
+							// rather than {"a", " b"}.
+							array<String^> ^splitValues = 
+								marshal_as<String^>(selectCombo[i])->Split(',');
+							for (int splitIdx = 0; splitIdx < splitValues->Length; ++splitIdx)
+								splitValues[splitIdx] = splitValues[splitIdx]->Trim();
 							ps->AddParameter(marshal_as<String^>(*selectIter),
-								marshal_as<String^>(selectCombo[i])->Split(','));
+								splitValues);
+						}
 					}
 					cmdline << " -" << *selectIter << ' ' << selectCombo[i];
 				}
