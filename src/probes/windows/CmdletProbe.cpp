@@ -378,6 +378,13 @@ namespace {
 	 * idiosyncrasies can go here.
 	 */
 	string Value2String(System::Object ^obj);
+
+	/**
+	 * Splits \p csv using a comma delimiter, and then trims surrounding
+	 * whitespace from the resulting values.  The individual values are
+	 * returned.  For example, "a, b" becomes {"a", "b"}.
+	 */
+	array<String^>^ SplitAndTrimCSV(String ^csv);
 }
 
 //****************************************************************************************//
@@ -1123,10 +1130,8 @@ namespace {
 					else {
 						// Trim whitespace, so that "a, b" becomes {"a", "b"},
 						// rather than {"a", " b"}.
-						array<String^> ^splitValues = 
-							marshal_as<String^>(paramCombo[i])->Split(',');
-						for (int splitIdx = 0; splitIdx < splitValues->Length; ++splitIdx)
-							splitValues[splitIdx] = splitValues[splitIdx]->Trim();
+						array<String^> ^splitValues = SplitAndTrimCSV(
+							marshal_as<String^>(paramCombo[i]));
 						ps->AddParameter(marshal_as<String^>(*paramIter), 
 							splitValues);
 					}
@@ -1149,10 +1154,8 @@ namespace {
 						else {
 							// Trim whitespace, so that "a, b" becomes {"a", "b"},
 							// rather than {"a", " b"}.
-							array<String^> ^splitValues = 
-								marshal_as<String^>(selectCombo[i])->Split(',');
-							for (int splitIdx = 0; splitIdx < splitValues->Length; ++splitIdx)
-								splitValues[splitIdx] = splitValues[splitIdx]->Trim();
+							array<String^> ^splitValues = SplitAndTrimCSV(
+								marshal_as<String^>(selectCombo[i]));
 							ps->AddParameter(marshal_as<String^>(*selectIter),
 								splitValues);
 						}
@@ -1269,5 +1272,12 @@ namespace {
 			return (*b) ? "true" : "false";
 
 		return marshal_as<string>(obj->ToString());
+	}
+
+	array<String^>^ SplitAndTrimCSV(String ^csv) {
+		array<String^> ^splitValues = csv->Split(',');
+		for (int splitIdx = 0; splitIdx < splitValues->Length; ++splitIdx)
+			splitValues[splitIdx] = splitValues[splitIdx]->Trim();
+		return splitValues;
 	}
 }
