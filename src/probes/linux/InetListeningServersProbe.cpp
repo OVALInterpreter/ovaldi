@@ -28,9 +28,32 @@
 //
 //****************************************************************************************//
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/termios.h>
+#include <sys/wait.h>
+#include <iostream>
+#include <sstream>
+#include <utility>
+
+#include <Log.h>
+
 #include "InetListeningServersProbe.h"
 
 using namespace std;
+
+namespace {
+	/**
+	 * Hosts and ports are combined in netstat output: <host>:<port>.
+	 * This function splits that into the two components.  If the port is found
+	 * to be "*", it is set to "0", per the OVAL spec, regarding listening
+	 * ports.
+	 *
+	 * \return host/port as a pair, in that order.
+	 */
+	pair<string, string> splitHostPort(const string &hostAndPort);
+}
+
 
 //****************************************************************************************//
 //						InetListeningServersProbe Class									  //	
@@ -44,6 +67,12 @@ InetListeningServersProbe::InetListeningServersProbe() {
 
 InetListeningServersProbe::~InetListeningServersProbe() {
 	delete this->netstatResult;
+
+	for (NetstatRecordVector::iterator nrIter = nrv.begin();
+		 nrIter != nrv.end();
+		 ++nrIter)
+		if (*nrIter) delete *nrIter;
+
   instance = NULL;
 }
 
@@ -93,13 +122,8 @@ ItemVector* InetListeningServersProbe::CollectItems(Object* object) {
 		throw ProbeException("Error: invalid data type specified on local_address. Found: " + OvalEnum::DatatypeToString(localAddress->GetDatatype()));
 	}
 
-	// check operation - only allow  equals, not equals and pattern match
-	if(localPort->GetOperation() != OvalEnum::OPERATION_EQUALS && localPort->GetOperation() != OvalEnum::OPERATION_PATTERN_MATCH && localPort->GetOperation() != OvalEnum::OPERATION_NOT_EQUAL) {
-		throw ProbeException("Error: invalid operation specified on local_port. Found: " + OvalEnum::OperationToString(localPort->GetOperation()));
-	}
-
 	// check datatypes - only allow string
-	if(localPort->GetDatatype() != OvalEnum::DATATYPE_STRING) {
+	if(localPort->GetDatatype() != OvalEnum::DATATYPE_INTEGER) {
 		throw ProbeException("Error: invalid data type specified on local_port. Found: " + OvalEnum::DatatypeToString(localPort->GetDatatype()));
 	}
 
@@ -496,117 +520,23 @@ StringVector* InetListeningServersProbe::GetLocalPorts(string protocolStr, strin
 	//  Get the set of all protocols on the system that match the object
 	//
 	// -----------------------------------------------------------------------
-	StringVector* localPorts = NULL;
 
-	// does this name use variables?
-	if(localPort->GetVarRef() == NULL) {
-		
-		// proceed based on operation
-		if(localPort->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			localPorts = new StringVector();
-			// if the localPort exists add it to the list 
-			if(this->LocalPortExists(protocolStr, localAddressStr, localPort->GetValue())) {
-				localPorts->push_back(localPort->GetValue());
-			}
-
-		} else if(localPort->GetOperation() == OvalEnum::OPERATION_NOT_EQUAL) {
-			
-			localPorts = this->GetMatchingLocalPorts(protocolStr, localAddressStr, localPort->GetValue(), false);
-
-		} else if(localPort->GetOperation() == OvalEnum::OPERATION_PATTERN_MATCH) {
-			localPorts = this->GetMatchingLocalPorts(protocolStr, localAddressStr, localPort->GetValue(), true);
-		}		
-
-	} else {
-
-		localPorts = new StringVector();
-
-		// Get all names
-		StringVector allLocalPorts;
-
-		if(localPort->GetOperation() == OvalEnum::OPERATION_EQUALS) {
-			// in the case of equals simply loop through all the 
-			// variable values and add them to the set of all names
-			// if they exist on the system
-			VariableValueVector vals = localPort->GetVarRef()->GetValues();
-			VariableValueVector::iterator iterator;
-			for(iterator = vals.begin(); iterator != vals.end(); iterator++) {
-				
-				if(this->LocalPortExists(protocolStr, localAddressStr, iterator->GetValue())) {
-					allLocalPorts.push_back(iterator->GetValue());
-				}
-			}
-
-		} else {
-            this->GetMatchingLocalPorts(protocolStr, localAddressStr, ".*", true);
-		}
+	auto_ptr<StringVector> localPorts(new StringVector());
+	ItemEntity portIe("local_port", "", OvalEnum::DATATYPE_INTEGER);
 	
-		// loop through all names on the system
-		// only keep names that match operation and value and var check
-		ItemEntity* tmp = this->CreateItemEntity(localPort);
-		StringVector::iterator it;
-		for(it = allLocalPorts.begin(); it != allLocalPorts.end(); it++) {
-			tmp->SetValue((*it));			
-			if(localPort->Analyze(tmp) == OvalEnum::RESULT_TRUE) {
-				localPorts->push_back((*it));
-			}
+	for (NetstatRecordVector::iterator nrvIter = nrv.begin();
+		 nrvIter != nrv.end();
+		 ++nrvIter) {
+
+		if (protocolStr == (*nrvIter)->protocol && 
+			localAddressStr == (*nrvIter)->local_address) {
+			portIe.SetValue((*nrvIter)->local_port);
+			if (localPort->Analyze(&portIe) == OvalEnum::RESULT_TRUE)
+				localPorts->push_back((*nrvIter)->local_port);
 		}
 	}
 
-	return localPorts;
-}
-
-StringVector* InetListeningServersProbe::GetMatchingLocalPorts(string protocolStr, string localAddressStr, string pattern, bool isRegex) {
-
-	StringVector* localPorts = new StringVector();
-
-	// loop through the NetstatRecord Vector
-	NetstatRecordVector::iterator iterator;
-	for(iterator = this->nrv.begin(); iterator != this->nrv.end(); iterator++) {
-		NetstatRecord* nr = (NetstatRecord*)(*iterator);
-
-		if(protocolStr.compare(nr->protocol) == 0) {
-			if(localAddressStr.compare(nr->local_address) == 0) {
-				if(this->IsMatch(pattern, nr->local_port, isRegex)) {
-					
-					// make sure local addresses are unique
-					StringVector::iterator iterator2;
-					bool isUnique = true;
-					for(iterator2 = localPorts->begin(); iterator2 != localPorts->end(); iterator2++) {	
-						if((*iterator2).compare(nr->local_port) == 0) {
-							isUnique = false;
-							break;
-						}
-					}
-					if(isUnique) {
-						localPorts->push_back(nr->local_port);
-					}
-				}
-			}
-		}
-	}
-	return localPorts;
-}
-
-bool InetListeningServersProbe::LocalPortExists(string protocolStr, string localAddressStr, string localPort) {
-
-	bool exists = false;
-	// loop through the NetstatRecord Vector
-	NetstatRecordVector::iterator iterator;
-	for(iterator = this->nrv.begin(); iterator != this->nrv.end(); iterator++) {
-		NetstatRecord* nr = (NetstatRecord*)(*iterator);
-
-		if(protocolStr.compare(nr->protocol) == 0) {
-			if(localAddressStr.compare(nr->local_address) == 0) {
-				if(localPort.compare(nr->local_port) == 0) {
-					exists = true;
-					break;
-				}
-			}
-		}
-	}
-	 
-	return exists;
+	return localPorts.release();
 }
 
 Item* InetListeningServersProbe::GetNetstat(string protocol, string localAddress, string localPort) {
@@ -811,13 +741,6 @@ void InetListeningServersProbe::ParseNetstatResult() {
 	string tmpSTR;
 	string PIDandProgramName;
 
-	int curDelim;
-	int preDelim;
-	int curColon;
-	int preColon;
-	size_t curPos;
-	size_t tmpPos;
-
 	string Protocol;
 	string LocalFullAddress;
 	string LocalAddress;
@@ -828,159 +751,132 @@ void InetListeningServersProbe::ParseNetstatResult() {
 	string UserID;
 	string PID;
 	string ProgramName;
-	bool skip;
+	string ignore;
 
-	// Toss out first two lines
-	curPos = this->netstatResult->text.find("\n") + 1;
-	curPos = this->netstatResult->text.find("\n", curPos) + 1;
-	
-	// Get the first line end 
-	tmpPos = this->netstatResult->text.find("\n", curPos);
+	istringstream iss(this->netstatResult->text);
 
-	// Parse the remaining lines.
-	while (tmpPos != string::npos) {
-		NetstatRecord *nr = new NetstatRecord();
-		
-		// Get the next string
-		tmpSTR = this->netstatResult->text.substr(curPos, (tmpPos - curPos));
-		curPos = tmpPos + 1;
-		
-		curDelim = 0;
-		preDelim = 0;
+	// Toss out first two lines:
+	// 
+	// "Active Internet connections (only servers)"
+	// "Proto Recv-Q Send-Q Local Address ... " (column headers)
+	//
+	// Let's also sanity check that these lines are what we think they are...
+	if (!getline(iss, tmpSTR))
+		throw ProbeException("Unrecognized netstat output format!");
+	if (tmpSTR.size() < 15 || tmpSTR.compare(0, 15, "Active Internet"))
+		throw ProbeException("Unrecognized netstat output format: header line=\""+tmpSTR+'"');
+	if (!getline(iss, tmpSTR))
+		throw ProbeException("Unrecognized netstat output format!");
+	if (tmpSTR.size() < 12 || tmpSTR.compare(0, 12, "Proto Recv-Q"))
+		throw ProbeException("Unrecognized netstat output format: header line=\""+tmpSTR+'"');
 
-		////////////////////////////////////////////
-		///// Protocol:  TCP or UDP ////////////////
-		////////////////////////////////////////////
+	// Attempting to read the stream when it's already at eof results in the
+	// failbit being set... let's avoid that...
+	while (!iss.eof() && (iss >> Protocol 
+						  >> ignore // Recv-Q
+						  >> ignore // Send-Q
+						  >> LocalFullAddress
+						  >> ForeignFullAddress)) {
 
-		// Find the first space and grab the characters between preDelim and that point
-		curDelim = tmpSTR.find(" ",preDelim);
-		nr->protocol = tmpSTR.substr(preDelim,(curDelim - preDelim));
+		if (Protocol == "tcp")
+			iss >> ignore; // State (udp sockets don't have this)
 
-		// Now find the end of that whitespace
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim);
+		iss >> UserID
+			>> ignore // Inode
+			>> PIDandProgramName;
 
-		////////////////////////////////////////////
-		///// Skip two fields //////////////////////
-		////////////////////////////////////////////
-		
-		// Find the next space and then skip past it
-		curDelim = tmpSTR.find(" ",preDelim);
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim); 
+		if (!iss)
+			throw ProbeException("Unrecognized netstat output format!");
 
-		// Do that again.
-		curDelim = tmpSTR.find(" ",preDelim);
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim); 
+		// Will *not* set failbit if eof is encountered while eating
+		// whitespace.  But it will set eofbit if eof is encountered.  Coupled
+		// with the eof check in the loop condition, I hope to break out of the
+		// loop on a normal eof condition, without that lousy failbit getting
+		// set.  The failbit seems to get set so easily...
+		iss >> std::ws;
 
-		////////////////////////////////////////////
-		///// LocalFullAddress //// ////////////////
-		////////////////////////////////////////////
+/*
+		Log::Debug("Protocol: " + Protocol +
+				   "\nLocalFullAddress: " + LocalFullAddress +
+				   "\nForeignFullAddress: " + ForeignFullAddress +
+				   "\nUserID: " + UserID +
+				   "\nPIDandProgramName: " + PIDandProgramName);
+*/
 
-		curDelim = tmpSTR.find(" ",preDelim);
-		LocalFullAddress = tmpSTR.substr(preDelim,(curDelim - preDelim));
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim);
-		nr->local_full_address = LocalFullAddress;
+		pair<string, string> localHostPort = splitHostPort(LocalFullAddress);
+		pair<string, string> foreignHostPort = splitHostPort(ForeignFullAddress);
 
-		////////////////////////////////////////////
-		///// LocalAddress /////////////////////////
-		////////////////////////////////////////////
-
-		preColon = 0;
-		curColon = LocalFullAddress.find(":",preColon);
-		nr->local_address = LocalFullAddress.substr(preColon,(curColon - preColon));
-
-		////////////////////////////////////////////
-		///// LocalPort ////////////////////////////
-		////////////////////////////////////////////
-
-		preColon = curColon + 1;
-		curColon = LocalFullAddress.length();
-		nr->local_port = LocalFullAddress.substr(preColon,(curColon - preColon));
-	
-		////////////////////////////////////////////
-		///// ForeignFullAddress ///////////////////
-		////////////////////////////////////////////
-
-		curDelim = tmpSTR.find(" ",preDelim);
-		ForeignFullAddress = tmpSTR.substr(preDelim,(curDelim - preDelim));
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim);
-		nr->foreign_full_address = ForeignFullAddress;
-
-		if((preDelim - curDelim) > 20)
-			skip = false;
-		else
-			skip = true;
-
-		////////////////////////////////////////////
-		///// ForeignAddress ///////////////////////
-		////////////////////////////////////////////
-
-		preColon = 0;
-		curColon = ForeignFullAddress.find(":",preColon);
-		nr->foreign_address = ForeignFullAddress.substr(preColon,(curColon - preColon));
-		
-
-		////////////////////////////////////////////
-		///// ForeignPort //////////////////////////
-		////////////////////////////////////////////
-
-		preColon = curColon + 1;
-		curColon = ForeignFullAddress.length();
-		nr->foreign_port = ForeignFullAddress.substr(preColon,(curColon - preColon));
-
-		///////////////////////////////////////////
-		///// Skip one field //////////////////////
-		///////////////////////////////////////////
-		if(skip) {
-			curDelim = tmpSTR.find(" ",preDelim);
-			preDelim = tmpSTR.find_first_not_of(" ",curDelim);
+		// example format for the last column: "8451/ntpd".  This code is
+		// incorrect: bad formatting here should result in potential errors.
+		// But for now, I'm staying (mostly) compatible with how this probe was
+		// originally written.
+		size_t slashIdx = PIDandProgramName.find('/');
+		if (slashIdx == string::npos) {
+			// this case was never checked for in the original code... I'll
+			// throw an exception for now...
+			if (PIDandProgramName == "-")
+				Log::Message("Found pid/program value of \"-\".  You "
+							 "probably need to run ovaldi as root to "
+							 "get the true values!");
+			throw ProbeException("Unrecognized pid/program format in netstat output: " +
+								 PIDandProgramName);
+		} else if (slashIdx == PIDandProgramName.size() - 1) {
+			PID = PIDandProgramName.substr(0, slashIdx);
+			ProgramName.clear();
+		} else {
+			PID = PIDandProgramName.substr(0, slashIdx);
+			ProgramName = PIDandProgramName.substr(slashIdx + 1);
 		}
-		///////////////////////////////////////////
-		///// UserID //////////////////////////////
-		///////////////////////////////////////////
 
-		curDelim = tmpSTR.find(" ",preDelim);
-		nr->user_id = tmpSTR.substr(preDelim,(curDelim - preDelim));
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim);
+		// another sanity check: make sure numbers are really numbers...
+		// Or, I spose I could have just used the stream operator>>'s for
+		// numbers... but I'd be converting the numbers back to strings again
+		// anyway.
+		size_t portNum;
+		if (!Common::FromString(localHostPort.second, &portNum))
+			throw ProbeException("Invalid local port in netstat output: " +
+								 localHostPort.second + " (from \"" +
+								 LocalFullAddress + "\")");
+		if (!Common::FromString(foreignHostPort.second, &portNum))
+			throw ProbeException("Invalid foreign port in netstat output: " +
+								 foreignHostPort.second + " (from \"" +
+								 ForeignFullAddress + "\")");
+		uid_t uidNum;
+		if (!Common::FromString(UserID, &uidNum))
+			throw ProbeException("Invalid userid in netstat output: " + 
+								 UserID);
 
-		///////////////////////////////////////////
-		///// Skip one field //////////////////////
-		///////////////////////////////////////////
+		nrv.push_back(new NetstatRecord(
+						  Protocol,
+						  localHostPort.first,
+						  localHostPort.second,
+						  LocalFullAddress,
+						  ProgramName,
+						  foreignHostPort.first,
+						  foreignHostPort.second,
+						  ForeignFullAddress,
+						  PID,
+						  UserID));
+	}
 
-		curDelim = tmpSTR.find(" ",preDelim);
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim);
-
-		///////////////////////////////////////////
-		///// PID/ProgramName /////////////////////
-		///////////////////////////////////////////
-
-		curDelim = tmpSTR.find(" ",preDelim);
-		PIDandProgramName = tmpSTR.substr(preDelim,(curDelim - preDelim));
-		preDelim = tmpSTR.find_first_not_of(" ",curDelim);
-		
-		////////////////////////////////////////////
-		///// PID  /////////////////////////////////
-		////////////////////////////////////////////
-
-		preColon = 0;
-		curColon = PIDandProgramName.find("/",preColon);
-		PID = PIDandProgramName.substr(preColon,(curColon - preColon));
-		nr->pid = atoi(PID.c_str());
-			
-		////////////////////////////////////////////
-		///// ProgramName //////////////////////////
-		////////////////////////////////////////////
-
-		preColon = curColon + 1;
-		curColon = PIDandProgramName.length();
-		nr->program_name = PIDandProgramName.substr(preColon,(curColon - preColon));
-
-
-		nrv.push_back(nr);
-
-		// Get the next line end 
-		tmpPos = this->netstatResult->text.find("\n", curPos);  
-	}  
+	if (!iss)
+		throw ProbeException("Unrecognized netstat output format!");
 }
 
+namespace {
+	pair<string, string> splitHostPort(const string &hostAndPort) {
+		size_t colonIdx = hostAndPort.find_last_of(':');
+		// ':' can't be first, last, or missing.
+		if (colonIdx == string::npos ||
+			colonIdx == 0 ||
+			colonIdx == hostAndPort.size() - 1)
+			throw ProbeException("Unrecognized host:port format: " + hostAndPort);
 
-  
+		pair<string, string> result =  make_pair(
+			hostAndPort.substr(0, colonIdx),
+			hostAndPort.substr(colonIdx + 1));
+
+		if (result.second == "*") result.second = "0";
+		return result;
+	}
+}

@@ -32,17 +32,8 @@
 #define _INETLISTENINGSERVERPROBE_H_
 
 #include "AbsProbe.h"
-
-// Include the data class
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/termios.h>
-#include <sys/wait.h>
-#include <iostream>
+#include <Common.h>
 #include <string>
-
-/// 110 characters + 20 characters for the program name, it appears. 
-#define NETSTAT_BUFLEN 200
 
 /**
 	Store the results of a call to netstat.
@@ -55,17 +46,30 @@ class NetstatResult {
 };
 
 /**
-	Stor a single record from a call to netstat it its nicely parsed form
+	Store a single record from a call to netstat in its nicely parsed form
 */
 class NetstatRecord {
 
 public: 
-	NetstatRecord(){};
-	NetstatRecord(std::string pr, std::string la, std::string lp, std::string lfa, std::string pn, std::string fa, std::string fp, std::string ffa, int p, std::string u) :
+	NetstatRecord(){}
+	NetstatRecord(std::string pr, std::string la, std::string lp, std::string lfa, std::string pn, std::string fa, std::string fp, std::string ffa, std::string p, std::string u) :
 	  protocol(pr), local_address(la), local_port(lp), local_full_address(lfa), program_name(pn), foreign_address(fa), foreign_port(fp),
-		  foreign_full_address(ffa), pid(p), user_id(u){};
-	~NetstatRecord(){};
+		  foreign_full_address(ffa), pid(p), user_id(u){}
+	~NetstatRecord(){}
 	
+	std::string toString() const {
+		return "protocol: " + protocol +
+			"\nlocal_address: " + local_address +
+			"\nlocal_port: " + local_port +
+			"\nlocal_full_address: " + local_full_address +
+			"\nprogram_name: " + program_name +
+			"\nforeign_address: " + foreign_address +
+			"\nforeign_port: " + foreign_port +
+			"\nforeign_full_address: " + foreign_full_address +
+			"\npid: " + Common::ToString(pid) +
+			"\nuser_id: " + user_id;
+	}
+
 	std::string protocol;
 	std::string local_address;
 	std::string local_port;
@@ -74,7 +78,7 @@ public:
 	std::string foreign_address;
 	std::string foreign_port;
 	std::string foreign_full_address;
-	int pid;
+	std::string pid;
 	std::string user_id;
 };
 
@@ -135,11 +139,6 @@ private:
 	bool LocalAddressExists(std::string protocolStr, std::string localAddress);
 
 	/**
-		Check that the specified local port exists on the system.
-	*/
-	bool LocalPortExists(std::string protocolStr, std::string localAddressStr, std::string localPort);
-
-	/**
 		Get all protocols on the system that match the specified pattern.
 		@param pattern a string used that protocols are compared against.
 		@param isRegex a bool that is indicates how system protocols should be compared against the specified pattern
@@ -152,12 +151,6 @@ private:
 		@return The set of matching local addresses.
 	*/
 	StringVector* GetMatchingLocalAddresses(std::string protocolStr, std::string pattern, bool isRegex);
-
-	/**
-		Get all local ports on the system that match the specified pattern.
-		@return The set of matching local ports.
-	*/
-	StringVector* GetMatchingLocalPorts(std::string protocolStr, std::string localAddressStr, std::string pattern, bool isRegex);
 
 	/**
 		Start a child processand make a call to netstat.
