@@ -32,7 +32,6 @@
 #define _INETLISTENINGSERVERPROBE_H_
 
 #include "AbsProbe.h"
-#include <Common.h>
 #include <string>
 
 /**
@@ -66,7 +65,7 @@ public:
 			"\nforeign_address: " + foreign_address +
 			"\nforeign_port: " + foreign_port +
 			"\nforeign_full_address: " + foreign_full_address +
-			"\npid: " + Common::ToString(pid) +
+			"\npid: " + pid +
 			"\nuser_id: " + user_id;
 	}
 
