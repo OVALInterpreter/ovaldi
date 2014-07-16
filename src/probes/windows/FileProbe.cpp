@@ -107,55 +107,15 @@ ItemVector* FileProbe::CollectItems(Object* object) {
 		for(iterator = filePaths->begin(); iterator != filePaths->end(); iterator++) {
 
 			StringPair* fp = (*iterator);
-			string filepath = Common::BuildFilePath(fp->first,fp->second);
-
-			if(fp->second.compare("") == 0) {
-
-				Item* item = NULL;
-
-				// check if the code should report that the filename does not exist.
-				if(fileFinder.ReportFileNameDoesNotExist(fp->first, fileName)) {
-
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);					
-					ItemEntity* filepath = new ItemEntity("filepath", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);	
-					item->AppendElement(filepath);
-					ItemEntity* path = new ItemEntity("path", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS);	
-					item->AppendElement(path);
-					ItemEntity* filename = new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING,OvalEnum::STATUS_EXISTS);	
-					item->AppendElement(filename);
-							
-					item->AppendElement(new ItemEntity("windows_view",
-						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-					collectedItems->push_back(item);
-					
-				} else {
-
-					item = this->CreateItem();
-					item->SetStatus(OvalEnum::STATUS_EXISTS);
-					item->AppendElement(new ItemEntity("path", fp->first, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-					if (fileName->GetNil()){
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_NOT_COLLECTED, true)); //GetNil is true
-					}
-					else
-					{
-						item->AppendElement(new ItemEntity("filename", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, false)); //GetNil is false
-					}
-					item->AppendElement(new ItemEntity("windows_view",
-						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-					collectedItems->push_back(item);
-
-				}
-
-			} else {
-				Item* item = this->GetFileAttributes(fp->first, fp->second, fileFinder);
-				if(item != NULL) {
-					item->AppendElement(new ItemEntity("windows_view",
-						(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
-					collectedItems->push_back(item);
-				}
-				item = NULL;
+			// This works with directories too: the filename part (fp->second)
+			// will be empty.
+			Item* item = this->GetFileAttributes(fp->first, fp->second, fileFinder);
+			if(item != NULL) {
+				item->AppendElement(new ItemEntity("windows_view",
+					(fileFinder.GetView() == BIT_32 ? "32_bit" : "64_bit")));
+				collectedItems->push_back(item);
 			}
+
 			delete fp;
 		}
 	} else {
@@ -242,7 +202,8 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 
 	HANDLE hFile;
 	DWORD res;
-	BOOL ok;
+	BOOL ok, attrOk;
+	bool isDir = fileName.empty();
 
 	Item *item = NULL;
 
@@ -259,7 +220,7 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		// SMC-AUDIT: ISSUE: should probably verify that this is a regular file before opening,
 		// instead of a virtual memory file!
 		
-		hFile = fileFinder.GetFileHandle(filePath, READ_CONTROL);
+		hFile = fileFinder.GetFileHandle(filePath, READ_CONTROL, isDir);
 		AutoCloser<HANDLE, BOOL(WINAPI&)(HANDLE)> handleGuard(hFile, 
 			CloseHandle, "file "+filePath);
 
@@ -278,9 +239,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		// add the path and file name
 		item = this->CreateItem();
 		item->SetStatus(OvalEnum::STATUS_EXISTS);
-		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		if (!isDir)
+			item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 		item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+		item->AppendElement(new ItemEntity("filename", fileName, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS, isDir));
 		ItemEntity* owner = new ItemEntity("owner", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR);
 		item->AppendElement(owner);
 
@@ -409,9 +371,9 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		// Get size of file.
 		WIN32_FILE_ATTRIBUTE_DATA wfad;
 		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-		ok = GetFileAttributesEx(filePath.c_str(), GetFileExInfoStandard, &wfad);
+		attrOk = GetFileAttributesEx(filePath.c_str(), GetFileExInfoStandard, &wfad);
 		FS_REDIRECT_GUARD_END
-		if (!ok) {
+		if (!attrOk) {
 			string errorMessage = string("Unable to get file attributes: ") +
 				WindowsCommon::GetErrorMessage(GetLastError());
 			item->AppendMessage(new OvalMessage(errorMessage));
@@ -446,29 +408,10 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 			item->AppendElement(mTime);
 		}
 
-		//////////////////////////////////////////////////////
-		////////////////////  MSChecksum  ////////////////////
-		//////////////////////////////////////////////////////
-
-		DWORD headersum;  
-		DWORD checksum;
-
-		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-		res = MapFileAndCheckSum(const_cast<char*>(filePath.c_str()), &headersum, &checksum);
-		FS_REDIRECT_GUARD_END
-		if (res != CHECKSUM_SUCCESS) {
-			string errorMessage = "";
-			errorMessage.append("(FileProbe) Unable to get ms_checksum information for the file: '");
-			errorMessage.append(filePath);
-			errorMessage.append("'");
-			item->AppendElement(new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_ERROR));
-			item->AppendMessage(new OvalMessage(errorMessage));
-
-		} else {
-			item->AppendElement(new ItemEntity("ms_checksum", Common::ToString(checksum), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
-		}
-
+		// only applicable to non-directories
 		// initialize remaining version information entities...
+		ItemEntity* ms_checksum = new ItemEntity("ms_checksum", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
+		item->AppendElement(ms_checksum);
 		ItemEntity* version = new ItemEntity("version", "", OvalEnum::DATATYPE_VERSION, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(version);
 		ItemEntity* type = new ItemEntity("type", "", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_DOES_NOT_EXIST);
@@ -488,132 +431,173 @@ Item* FileProbe::GetFileAttributes(string path, string fileName, FileFinder &fil
 		ItemEntity* productVersion = new ItemEntity("product_version", "", OvalEnum::DATATYPE_VERSION, OvalEnum::STATUS_DOES_NOT_EXIST);
 		item->AppendElement(productVersion);
 		
-		DWORD junk;
-		DWORD versionsize;
-		LPVOID versionbuf;
-
-		// Get the required size of the version info buffer.
-		FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-		versionsize = GetFileVersionInfoSize(filePath.c_str(), &junk);
-		FS_REDIRECT_GUARD_END
-		if (versionsize > 0) {
-
-			versionbuf = (LPVOID)malloc(versionsize);
-			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
-			ok = GetFileVersionInfo(filePath.c_str(), 0, versionsize, versionbuf);
-			FS_REDIRECT_GUARD_END
-			if (ok) {
-
-				//////////////////////////////////////////////////////
-				////////////////////    version    ///////////////////
-				//////////////////////////////////////////////////////
-
-				this->GetVersion(versionbuf, filePath, item, version);			
-
-				//////////////////////////////////////////////////////
-				///////////////  development_class  //////////////////
-				//////////////////////////////////////////////////////
-
-				GetFromVerInfo(versionbuf, filePath, item, devClass, "FileVersion");
-
-				//////////////////////////////////////////////////////
-				///////////////       company       //////////////////
-				//////////////////////////////////////////////////////
-
-				GetFromVerInfo(versionbuf, filePath, item, company, "CompanyName");
-
-				//////////////////////////////////////////////////////
-				///////////////    internal_name    //////////////////
-				//////////////////////////////////////////////////////
-
-				GetFromVerInfo(versionbuf, filePath, item, internalName, "InternalName");
-
-				//////////////////////////////////////////////////////
-				///////////////       language      //////////////////
-				//////////////////////////////////////////////////////
-				WORD* langInfo;        
-				UINT cbLang;
-				VerQueryValue(versionbuf, _T("\\VarFileInfo\\Translation"),(LPVOID*)&langInfo, &cbLang);  
-				DWORD lcid = langInfo[0];
-				LPTSTR szLang = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * 100 );
-				if(VerLanguageName(lcid, szLang, 100) != 0){
-					language->SetValue(Common::ToString(szLang));
-					language->SetStatus(OvalEnum::STATUS_EXISTS);
-					
-				}else{
-					language->SetStatus(OvalEnum::STATUS_ERROR);
-				}
-				if ( szLang != NULL ) {
-					free ( szLang );
-					szLang = NULL;
-				}
-
-				//////////////////////////////////////////////////////
-				///////////////  original_filename  //////////////////
-				//////////////////////////////////////////////////////
-
-				GetFromVerInfo(versionbuf, filePath, item, originalFilename, "OriginalFilename");
-
-				//////////////////////////////////////////////////////
-				///////////////     product_name    //////////////////
-				//////////////////////////////////////////////////////
-
-				GetFromVerInfo(versionbuf, filePath, item, productName, "ProductName");
-
-				//////////////////////////////////////////////////////
-				///////////////   product_version   //////////////////
-				//////////////////////////////////////////////////////
-
-				GetFromVerInfo(versionbuf, filePath, item, productVersion, "ProductVersion");
-
-
-				// Post-processing for development_class:
-				// for dev class, there is a parenthesized part at the end we need
-				// to pull out and use.
-				REGEX verMatcher;
-				if(devClass->GetStatus() == OvalEnum::STATUS_EXISTS &&
-					verMatcher.IsMatch(".+\\([^\\)].+\\)", devClass->GetValue().c_str())) {
-					string verStr = devClass->GetValue();
-					verStr = verStr.substr(verStr.find("(") + 1);
-					devClass->SetValue(verStr.substr(0, verStr.find(".")));
-				} else {
-					devClass->SetValue("");
-					devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
-				}
-
-			} else {
-				// we got a size from GetFileVersionInfoSize(), but then getting the
-				// actual info failed.  This seems worthy of error status on these
-				// entities, although MSDN docs are not clear about under which
-				// conditions this can occur.
-				version->SetStatus(OvalEnum::STATUS_ERROR);
-				devClass->SetStatus(OvalEnum::STATUS_ERROR);
-				company->SetStatus(OvalEnum::STATUS_ERROR);
-				internalName->SetStatus(OvalEnum::STATUS_ERROR);
-				language->SetStatus(OvalEnum::STATUS_ERROR);
-				originalFilename->SetStatus(OvalEnum::STATUS_ERROR);
-				productName->SetStatus(OvalEnum::STATUS_ERROR);
-				productVersion->SetStatus(OvalEnum::STATUS_ERROR);
-
-				string errorMessage = "(FileProbe) Unable to get version info for the file: '"
-					+ filePath + "': " + WindowsCommon::GetErrorMessage(GetLastError());
-				item->AppendMessage(new OvalMessage(errorMessage));
-			}
-
-			free(versionbuf);
-
-		} else {
-
-			string errorMessage = "(FileProbe) No version information available for the file: '"
-				+ filePath + "': " + WindowsCommon::GetErrorMessage(GetLastError());
-			item->AppendMessage(new OvalMessage(errorMessage));
-		}
-
 		//////////////////////////////////////////////////////
 		/////////////////////  FileType  /////////////////////
 		//////////////////////////////////////////////////////
 
-		this->GetType(hFile, filePath, item, type, wfad);
+		if (attrOk)
+			this->GetType(hFile, filePath, item, type, wfad);
+		else
+			type->SetStatus(OvalEnum::STATUS_ERROR);
+
+		if (!isDir) {
+			//////////////////////////////////////////////////////
+			////////////////////  MSChecksum  ////////////////////
+			//////////////////////////////////////////////////////
+
+			DWORD headersum;  
+			DWORD checksum;
+
+			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+			res = MapFileAndCheckSum(const_cast<char*>(filePath.c_str()), &headersum, &checksum);
+			FS_REDIRECT_GUARD_END
+			if (res == CHECKSUM_SUCCESS) {
+				ms_checksum->SetValue(Common::ToString(checksum));
+				ms_checksum->SetStatus(OvalEnum::STATUS_EXISTS);
+			} else {
+				// no GetLastError() support for this??
+				// Luckily, there aren't many possible errors.
+				const char *errMsgs[] = {
+					NULL, // CHECKSUM_SUCCESS: handled above; no need for a message
+					"CHECKSUM_OPEN_FAILURE: Could not open the file.",
+					"CHECKSUM_MAP_FAILURE: Could not map the file.",
+					"CHECKSUM_MAPVIEW_FAILURE: Could not map a view of the file.",
+					"CHECKSUM_UNICODE_FAILURE: Could not convert the file name to Unicode."
+				};
+				const size_t numMsgs = sizeof(errMsgs)/sizeof(errMsgs[0]);
+
+				ms_checksum->SetStatus(OvalEnum::STATUS_ERROR);
+
+				if (res < numMsgs)
+					item->AppendMessage(new OvalMessage(string("MapFileAndCheckSum(): ") +
+						errMsgs[res]));
+				else
+					item->AppendMessage(new OvalMessage("MapFileAndCheckSum(): Unknown error (" +
+						Common::ToString(res) + ')'));
+			}
+
+			// Version stuff
+			DWORD junk;
+			DWORD versionsize;
+			LPVOID versionbuf;
+
+			// Get the required size of the version info buffer.
+			FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+			versionsize = GetFileVersionInfoSize(filePath.c_str(), &junk);
+			FS_REDIRECT_GUARD_END
+			if (versionsize > 0) {
+
+				versionbuf = (LPVOID)malloc(versionsize);
+				FS_REDIRECT_GUARD_BEGIN(fileFinder.GetView())
+				ok = GetFileVersionInfo(filePath.c_str(), 0, versionsize, versionbuf);
+				FS_REDIRECT_GUARD_END
+				if (ok) {
+
+					//////////////////////////////////////////////////////
+					////////////////////    version    ///////////////////
+					//////////////////////////////////////////////////////
+
+					this->GetVersion(versionbuf, filePath, item, version);			
+
+					//////////////////////////////////////////////////////
+					///////////////  development_class  //////////////////
+					//////////////////////////////////////////////////////
+
+					GetFromVerInfo(versionbuf, filePath, item, devClass, "FileVersion");
+
+					//////////////////////////////////////////////////////
+					///////////////       company       //////////////////
+					//////////////////////////////////////////////////////
+
+					GetFromVerInfo(versionbuf, filePath, item, company, "CompanyName");
+
+					//////////////////////////////////////////////////////
+					///////////////    internal_name    //////////////////
+					//////////////////////////////////////////////////////
+
+					GetFromVerInfo(versionbuf, filePath, item, internalName, "InternalName");
+
+					//////////////////////////////////////////////////////
+					///////////////       language      //////////////////
+					//////////////////////////////////////////////////////
+					WORD* langInfo;        
+					UINT cbLang;
+					VerQueryValue(versionbuf, _T("\\VarFileInfo\\Translation"),(LPVOID*)&langInfo, &cbLang);  
+					DWORD lcid = langInfo[0];
+					LPTSTR szLang = ( LPTSTR ) malloc ( sizeof ( TCHAR ) * 100 );
+					if(VerLanguageName(lcid, szLang, 100) != 0){
+						language->SetValue(Common::ToString(szLang));
+						language->SetStatus(OvalEnum::STATUS_EXISTS);
+					
+					}else{
+						language->SetStatus(OvalEnum::STATUS_ERROR);
+					}
+					if ( szLang != NULL ) {
+						free ( szLang );
+						szLang = NULL;
+					}
+
+					//////////////////////////////////////////////////////
+					///////////////  original_filename  //////////////////
+					//////////////////////////////////////////////////////
+
+					GetFromVerInfo(versionbuf, filePath, item, originalFilename, "OriginalFilename");
+
+					//////////////////////////////////////////////////////
+					///////////////     product_name    //////////////////
+					//////////////////////////////////////////////////////
+
+					GetFromVerInfo(versionbuf, filePath, item, productName, "ProductName");
+
+					//////////////////////////////////////////////////////
+					///////////////   product_version   //////////////////
+					//////////////////////////////////////////////////////
+
+					GetFromVerInfo(versionbuf, filePath, item, productVersion, "ProductVersion");
+
+
+					// Post-processing for development_class:
+					// for dev class, there is a parenthesized part at the end we need
+					// to pull out and use.
+					REGEX verMatcher;
+					if(devClass->GetStatus() == OvalEnum::STATUS_EXISTS &&
+						verMatcher.IsMatch(".+\\([^\\)]+\\)", devClass->GetValue().c_str())) {
+						string verStr = devClass->GetValue();
+						verStr = verStr.substr(verStr.find("(") + 1);
+						devClass->SetValue(verStr.substr(0, verStr.find(".")));
+					} else {
+						devClass->SetValue("");
+						devClass->SetStatus(OvalEnum::STATUS_DOES_NOT_EXIST);
+					}
+
+				} else {
+					// we got a size from GetFileVersionInfoSize(), but then getting the
+					// actual info failed.  This seems worthy of error status on these
+					// entities, although MSDN docs are not clear about under which
+					// conditions this can occur.
+					version->SetStatus(OvalEnum::STATUS_ERROR);
+					devClass->SetStatus(OvalEnum::STATUS_ERROR);
+					company->SetStatus(OvalEnum::STATUS_ERROR);
+					internalName->SetStatus(OvalEnum::STATUS_ERROR);
+					language->SetStatus(OvalEnum::STATUS_ERROR);
+					originalFilename->SetStatus(OvalEnum::STATUS_ERROR);
+					productName->SetStatus(OvalEnum::STATUS_ERROR);
+					productVersion->SetStatus(OvalEnum::STATUS_ERROR);
+
+					string errorMessage = "(FileProbe) Unable to get version info for the file: '"
+						+ filePath + "': " + WindowsCommon::GetErrorMessage(GetLastError());
+					item->AppendMessage(new OvalMessage(errorMessage));
+				}
+
+				free(versionbuf);
+
+			} else {
+
+				string errorMessage = "(FileProbe) No version information available for the file: '"
+					+ filePath + "': " + WindowsCommon::GetErrorMessage(GetLastError());
+				item->AppendMessage(new OvalMessage(errorMessage));
+			}
+		} // if (!isDir) {
 
 		//////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////
