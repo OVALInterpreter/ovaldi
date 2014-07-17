@@ -362,9 +362,9 @@ void Analyzer::PrintResults() {
 	///////////////////////////////////////////////////////////////////////////
 	//	Print the vulnerable results
 	///////////////////////////////////////////////////////////////////////////
-	cout << "    OVAL Id                                 Result" << endl;
+	cout << "    OVAL Id                                  Result" << endl;
 	cout << "    -------------------------------------------------------" << endl;
-	Log::UnalteredMessage("    OVAL Id                                 Result\n");
+	Log::UnalteredMessage("    OVAL Id                                  Result\n");
 	Log::UnalteredMessage("    -------------------------------------------------------\n");
 
 	// print each result value 
