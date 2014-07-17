@@ -413,9 +413,9 @@ void Analyzer::PrintResults() {
 
 string Analyzer::ResultPairToStr(StringPair* pair) {
 
-	string resultStr = "    ";
-	resultStr.append(Common::PadString(pair->first, 40));
-	resultStr.append(Common::PadString(pair->second, 15));
+	string resultStr = "    " +
+		Common::PadString(pair->first, 40) + ' ' +
+		Common::PadString(pair->second, 15);
 
 	return resultStr;
 }
