@@ -434,8 +434,8 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 				continue;
 
 			string filePath = Common::BuildFilePath(path, dirp->d_name);
-			//	Call lstat 
-			if(lstat(filePath.c_str(), &statbuf) < 0) {
+			//	Call stat
+			if(stat(filePath.c_str(), &statbuf) < 0) {
 				if (errno == ENOENT) {
 					// shouldn't happen if readdir() just returned it, but
 					// just in case...
@@ -443,7 +443,7 @@ StringVector* FileFinder::GetChildDirectories(string path) {
 					continue;
 				}
 
-				throw FileFinderException("lstat(" + filePath +
+				throw FileFinderException("stat(" + filePath +
 										  "): " + strerror(errno));
 			}
 
