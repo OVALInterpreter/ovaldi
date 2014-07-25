@@ -201,7 +201,8 @@ Item* FileProbe::GetFileAttributes(string path, string fileName) {
 	// Set the status of the file to exists
 	item = this->CreateItem();
 	item->SetStatus(OvalEnum::STATUS_EXISTS);
-	item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
+	if (!fileName.empty())
+		item->AppendElement(new ItemEntity("filepath", filePath, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	item->AppendElement(new ItemEntity("path", path, OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 	ItemEntity *fileNameIe = new ItemEntity("filename", fileName);
 	if (fileName.empty()) {
