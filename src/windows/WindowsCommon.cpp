@@ -201,7 +201,10 @@ void WindowsCommon::init() {
 
 	// stop here if not joined to a domain.
 	if (njs != NetSetupDomainName)
+	{
+		errorRollback.success();
 		return;
+	}
 
 	// Get domain SID
 	globals::domainSID = GetSIDForTrusteeNameW(globals::domainName);
