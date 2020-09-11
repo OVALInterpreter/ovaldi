@@ -43,6 +43,10 @@
 
 #include "CmdletProbe.h"
 
+#using <System.dll>
+#using <System.Core.dll>
+#using <System.Management.dll>
+
 using namespace std;
 
 using namespace System;
@@ -220,7 +224,7 @@ namespace {
 	 */
 	ref struct ManagedGlobals {
 		static Collection<AvailableModule^> ^availableModules = nullptr;
-		initonly static array<String^> ^LEGAL_VERBS = {
+		initonly static cli::array<String^> ^LEGAL_VERBS = {
 			"approve",
 			"assert",
 			"compare",
@@ -384,7 +388,7 @@ namespace {
 	 * whitespace from the resulting values.  The individual values are
 	 * returned.  For example, "a, b" becomes {"a", "b"}.
 	 */
-	array<String^>^ SplitAndTrimCSV(String ^csv);
+	cli::array<String^>^ SplitAndTrimCSV(String ^csv);
 }
 
 //****************************************************************************************//
@@ -725,7 +729,7 @@ namespace {
 		ps->Runspace = runspace;
 		ps->AddCommand("Get-Module")->AddParameter("ListAvailable")
 			->AddCommand("Select-Object")->AddParameter("Property", 
-				gcnew array<String^> {"Name","Guid","Version"});
+				gcnew cli::array<String^> {"Name","Guid","Version"});
 
 		Collection<AvailableModule^> ^modules = gcnew Collection<AvailableModule^>();
 
@@ -757,7 +761,7 @@ namespace {
 		ps->Runspace = runspace;
 		ps->AddCommand("Get-PSSnapin")->AddParameter("Registered")
 			->AddCommand("Select-Object")->AddParameter("Property",
-				gcnew array<String^> {"Name", "Version"});
+				gcnew cli::array<String^> {"Name", "Version"});
 
 		// capture into a 2nd collection, which we can drop/delete on error.  So
 		// we'd lose the snapins, but not the modules, if getting the modules
@@ -1130,7 +1134,7 @@ namespace {
 					else {
 						// Trim whitespace, so that "a, b" becomes {"a", "b"},
 						// rather than {"a", " b"}.
-						array<String^> ^splitValues = SplitAndTrimCSV(
+						cli::array<String^> ^splitValues = SplitAndTrimCSV(
 							marshal_as<String^>(paramCombo[i]));
 						ps->AddParameter(marshal_as<String^>(*paramIter), 
 							splitValues);
@@ -1154,7 +1158,7 @@ namespace {
 						else {
 							// Trim whitespace, so that "a, b" becomes {"a", "b"},
 							// rather than {"a", " b"}.
-							array<String^> ^splitValues = SplitAndTrimCSV(
+							cli::array<String^> ^splitValues = SplitAndTrimCSV(
 								marshal_as<String^>(selectCombo[i]));
 							ps->AddParameter(marshal_as<String^>(*selectIter),
 								splitValues);
@@ -1274,8 +1278,8 @@ namespace {
 		return marshal_as<string>(obj->ToString());
 	}
 
-	array<String^>^ SplitAndTrimCSV(String ^csv) {
-		array<String^> ^splitValues = csv->Split(',');
+	cli::array<String^>^ SplitAndTrimCSV(String ^csv) {
+		cli::array<String^> ^splitValues = csv->Split(',');
 		for (int splitIdx = 0; splitIdx < splitValues->Length; ++splitIdx)
 			splitValues[splitIdx] = splitValues[splitIdx]->Trim();
 		return splitValues;
