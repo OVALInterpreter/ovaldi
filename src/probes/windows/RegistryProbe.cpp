@@ -406,6 +406,9 @@ void RegistryProbe::RetrieveInfo(string hiveIn, string keyIn, string nameIn,
 				item->AppendElement(new ItemEntity("type", "reg_expand_sz", OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
 				// don't trust there is a terminal null...
 				// Use the value length.
+				// Remove trailing 0
+				if (valuelenIn > 0 && valueIn[valuelenIn-1] == 0)
+					--valuelenIn;
 				item->AppendElement(new ItemEntity("value", string((const char*)valueIn, valuelenIn)));
 				break;
 			}
