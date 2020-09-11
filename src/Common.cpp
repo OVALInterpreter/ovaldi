@@ -31,6 +31,7 @@
 #include <time.h>
 #include <algorithm>
 #include <iostream>
+#include <functional>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
