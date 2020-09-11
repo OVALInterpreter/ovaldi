@@ -28,6 +28,7 @@
 //
 //****************************************************************************************//
 
+#define _WIN32_DCOM
 #include <memory>
 #include <windows.h>
 #include <comdef.h>
@@ -37,6 +38,10 @@
 #include <VectorPtrGuard.h>
 
 #include "WMIProbe.h"
+#include "WindowsCommon.h"
+#include <iostream>
+
+# pragma comment(lib, "wbemuuid.lib")
 
 using namespace std;
 
@@ -67,6 +72,10 @@ AbsProbe* WMIProbe::Instance() {
 }
 
 ItemVector* WMIProbe::CollectItems(Object* object) {
+
+	if (!WindowsCommon::EnablePrivilege("SeChangeNotifyPrivilege")) {
+		throw ProbeException("Error: Unable to enable security privileges.");
+	}
 
 	// get the namespace and wql query
 	ObjectEntity* wmi_namespace = object->GetElementByName("namespace");
@@ -111,6 +120,10 @@ ItemVector* WMIProbe::CollectItems(Object* object) {
 					collectedItems->push_back(item);
 				}
 			}
+	}
+
+	if (!WindowsCommon::DisableAllPrivileges()) {
+		throw ProbeException("Error: Unable to disable all privileges.");
 	}
 
 	return collectedItems.release();
@@ -204,14 +217,30 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 		HRESULT hres;
 
 		// find the WMI Locator
-		hres = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
+		hres = CoCreateInstance(
+			CLSID_WbemLocator,
+			0,
+			CLSCTX_INPROC_SERVER,
+			IID_IWbemLocator,
+			(LPVOID*)&pLoc
+		);
 		if (FAILED(hres)) {
 			string errorMessage = _com_error(hres).ErrorMessage();
 			throw ProbeException("(WMIProbe) Failed to create IWbemLocator object.  " + errorMessage, ERROR_FATAL);
 		}
 
+
 		// Connect to the specified namespace with the current user.
-		hres = pLoc->ConnectServer(_bstr_t(wmi_namespace->GetValue().c_str()), NULL, NULL, 0, NULL, 0, 0, &pSvc);
+		hres = pLoc->ConnectServer(
+			_bstr_t(wmi_namespace->GetValue().c_str()),
+			NULL,									
+			NULL,									
+			0,										
+			NULL,									
+			0,										
+			0,										
+			&pSvc									
+		);
 		if (FAILED(hres)) {
 			string errorMessage = _com_error(hres).ErrorMessage();
 			throw ProbeException("(WMIProbe) Unable to connect to the '" + wmi_namespace->GetValue() + "' namespace.  " + errorMessage, ERROR_FATAL);
@@ -219,21 +248,36 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 
 		// At this point we are connected to WMI.  Now set the security levels
 		// of the WMI connection.
-		hres = CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
+		hres = CoSetProxyBlanket(
+			pSvc,                       
+			RPC_C_AUTHN_WINNT,          
+			RPC_C_AUTHZ_NONE,           
+			NULL,                       
+			RPC_C_AUTHN_LEVEL_CALL,     
+			RPC_C_IMP_LEVEL_IMPERSONATE,
+			NULL,                       
+			EOAC_NONE                   
+		);
 		if (FAILED(hres)) {
 			string errorMessage = _com_error(hres).ErrorMessage();   
  			throw ProbeException("(WMIProbe) Unable to set the WMI proxy blanket.  " + errorMessage, ERROR_FATAL);
 		}
 
 		// run the query.  The results will be stored in pEnumerator.
-		hres = pSvc->ExecQuery(_bstr_t(L"WQL"), _bstr_t(wmi_wql->GetValue().c_str()), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+		hres = pSvc->ExecQuery(
+			bstr_t("WQL"),
+			bstr_t(wmi_wql->GetValue().c_str()),
+			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+			NULL,
+			&pEnumerator
+		);
 		if (FAILED(hres)) {
 			throw ProbeException("(WMIProbe) Wmi query failed. ('" + wmi_wql->GetValue() + "')", ERROR_FATAL);
 		}
 
-		IWbemClassObject *pclsObj[1];
+		IWbemClassObject *pclsObj = NULL;
 		ULONG uReturn = 0;
-		HRESULT enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn);
+		HRESULT enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
 		// iterate through each instance returned
 		do {
@@ -242,7 +286,6 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 			// while loop. Must create an item .  This will cause the wmi
 			// probe to return an empty item vector which will mean the collected
 			// object in the sc file will have a does not exist flag.
-
 			if(item == NULL){
 				item = this->CreateItem();
 				item->AppendElement(new ItemEntity("namespace", wmi_namespace->GetValue(), OvalEnum::DATATYPE_STRING, OvalEnum::STATUS_EXISTS));
@@ -285,7 +328,7 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 
 						// get the data associated with the name
 						//hres = pclsObj[0]->Get(bstr_t(fieldName.c_str()), 0, &vtProp, pvtType, 0);
-						hres = pclsObj[0]->Get(bstr_t(fieldName.c_str()), 0, &vtProp, 0, 0);
+						hres = pclsObj->Get(bstr_t(fieldName.c_str()), 0, &vtProp, 0, 0);
 						string errorMsg = "";
 						if(hres == WBEM_E_NOT_FOUND) {
 							errorMsg = "WBEM_E_NOT_FOUND for wql: " + wmi_wql->GetValue();
@@ -381,10 +424,10 @@ Item* WMIProbe::GetWMI(ItemEntity* wmi_namespace, ItemEntity* wmi_wql) {
 					 
 				} 
 
-				for (ULONG n=0; n<uReturn; n++) pclsObj[n]->Release();
+				pclsObj->Release();
 			}
 		}
-		while ( ( enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, pclsObj, &uReturn) ) == WBEM_S_NO_ERROR  );
+		while ( ( enumhRes = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn) ) == WBEM_S_NO_ERROR  );
 	} catch (ProbeException ex) {
 		// Make sure we clean up if there is an error, otherwise we will get an COM
 		// security error when we try to run the wmi probe again.
