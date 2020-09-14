@@ -157,17 +157,6 @@ int main(int argc, char* argv[]) {
 		Log::SetToScreen(false);
 	#endif
 
-#ifdef WIN32
-	// set security of COM connection to the default
-	// can only be done once!
-	HRESULT hres =  CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
-	if (FAILED(hres)) {
-		string errorMessage = _com_error(hres).ErrorMessage();
-		Log::Fatal("Failed to initialize COM security: " + errorMessage);
-		return EXIT_FAILURE;
-	}
-#endif
-
 	//////////////////////////////////////////////////////
 	/////////  Parse Command-line Options  ///////////////
 	//////////////////////////////////////////////////////
@@ -188,6 +177,36 @@ int main(int argc, char* argv[]) {
 
 	// Now that the log has been initialized send the header to the log file.
 	Log::UnalteredMessage(headerMessage);
+
+#ifdef WIN32
+	HRESULT hres = CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hres)) {
+		string errorMessage = _com_error(hres).ErrorMessage();
+		std::cout << errorMessage << std::endl;
+		Log::Fatal("Failed to initialize COM: " + errorMessage);
+		return EXIT_FAILURE;
+	}
+
+	// set security of COM connection to the default
+	// can only be done once!
+	hres = CoInitializeSecurity(
+		NULL,
+		-1,
+		NULL,
+		NULL,
+		RPC_C_AUTHN_LEVEL_DEFAULT,
+		RPC_C_IMP_LEVEL_IMPERSONATE,
+		NULL,
+		EOAC_NONE,
+		NULL
+	);
+	if (FAILED(hres)) {
+		string errorMessage = _com_error(hres).ErrorMessage();
+		Log::Fatal("Failed to initialize COM security: " + errorMessage);
+		return EXIT_FAILURE;
+	}
+
+#endif
 
 #ifdef WIN32
 	CheckWow64();
@@ -269,13 +288,13 @@ int main(int argc, char* argv[]) {
 	#ifdef WIN32
 		if (WindowsCommon::DisableAllPrivileges() == false) {
 			string errorMessage = "";
-
+	
 			errorMessage.append("\nERROR: Unable to disable all privileges.  The program ");
 			errorMessage.append("will terminate.\n");
-
+	
 			cerr << errorMessage;
 			Log::Fatal(errorMessage);
-
+	
 			exit( EXIT_FAILURE );
 		}
 	#endif
