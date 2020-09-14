@@ -154,7 +154,7 @@ void WindowsCommon::init() {
 	DWORD err;
 	FreeGuard<WCHAR> compName;
 	DWORD compNameSz = 0;
-	if (!GetComputerNameExW(ComputerNamePhysicalDnsHostname,
+	if (!GetComputerNameExW(ComputerNamePhysicalNetBIOS,
 		NULL, &compNameSz)) {
 		err = GetLastError();
 		if (err != ERROR_MORE_DATA)
@@ -164,7 +164,7 @@ void WindowsCommon::init() {
 		if (!compName.realloc(compNameSz * sizeof(WCHAR)))
 			throw Exception("Out of memory!");
 
-		if (!GetComputerNameExW(ComputerNamePhysicalDnsHostname,
+		if (!GetComputerNameExW(ComputerNamePhysicalNetBIOS,
 			compName.get(), &compNameSz))
 			throw Exception("Couldn't get computer name: GetComputerNameEx: " +
 				GetErrorMessage(GetLastError()));
